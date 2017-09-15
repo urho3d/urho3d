@@ -254,4 +254,13 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
         return INSIDE;
 }
 
+Vector3 Sphere::GetLocalPoint(float theta, float phi) const
+{
+    return Vector3(
+        radius_ * Sin(theta) * Sin(phi),
+        radius_ * Cos(phi),
+        radius_ * Cos(theta) * Sin(phi)
+    );
+}
+
 }

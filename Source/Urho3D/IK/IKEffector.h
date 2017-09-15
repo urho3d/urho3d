@@ -25,7 +25,7 @@
 #include "../Scene/Component.h"
 #include "../Scene/Scene.h"
 
-struct ik_effector_t;
+typedef struct ik_node_t ik_node_t;
 
 namespace Urho3D
 {
@@ -39,6 +39,28 @@ class URHO3D_API IKEffector : public Component
 
 public:
 
+    enum Feature
+    {
+
+        /*!
+         * If you set the effector weight (see SetWeight()) to a value in
+         * between 0 and 1, the default behaviour is to linearly interpolate
+         * the effector's target position. If the solved tree and the initial
+         * tree are far apart, this can look very strange, especially if you
+         * are controlling limbs on a character that are designed to rotation.
+         * Enabling this causes a rotational based interpolation (nlerp) around
+         * the chain's base node and makes transitions look much more natural.
+         */
+        WEIGHT_NLERP = 0x01,
+
+        /*!
+         * By default the end effector node will retain its global orientation,
+         * even after solving. By enabling this feature, the node will instead
+         * "rotate with" its parent node.
+         */
+        INHERIT_PARENT_ROTATION = 0x02
+    };
+
     /// Constructs a new IK effector.
     IKEffector(Context* context);
 
@@ -47,6 +69,11 @@ public:
 
     /// Registers this class as an object factory.
     static void RegisterObject(Context* context);
+
+    /// Test if a certain feature is enabled (see IKEffector::Feature)
+    bool GetFeature(Feature feature) const;
+    /// Enable or disable a certain feature (see IKEffector::Feature)
+    void SetFeature(Feature feature, bool enable);
 
     /// Retrieves the node that is being used as a target. Can be NULL.
     Node* GetTargetNode() const;
@@ -113,12 +140,13 @@ public:
 
     /// How strongly the target node's rotation influences the solution
     float GetRotationWeight() const;
+
     /*!
      * @brief Sets how much influence the target rotation should have on the
      * solution. A value of 1 means to match the target rotation exactly, if
      * possible. A value of 0 means to not match it at all.
      * @note The solver must have target rotation enabled for this to have
-     * any effect. See IKSolver::EnableTargetRotation().
+     * any effect. See IKSolver::Feature::TARGET_ROTATIONS.
      */
     void SetRotationWeight(float weight);
 
@@ -137,23 +165,6 @@ public:
      */
     void SetRotationDecay(float decay);
 
-    /// Whether or not to nlerp instead of lerp when transitioning with the weight parameter
-    bool WeightedNlerpEnabled() const;
-
-    /*!
-     * @brief If you set the effector weight (see SetWeight()) to a value in
-     * between 0 and 1, the default behaviour is to linearly interpolate the
-     * effector's target position. If the solved tree and the initial tree
-     * are far apart, this can look very strange, especially if you are
-     * controlling limbs on a character that are designed to rotation. Enabling
-     * this causes a rotational based interpolation (nlerp) around the chain's
-     * base node and makes transitions look much more natural.
-     */
-    void EnableWeightedNlerp(bool enable);
-
-    bool InheritParentRotationEnabled() const;
-    void EnableInheritParentRotation(bool enable);
-
     void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
@@ -163,13 +174,21 @@ private:
     /// Intended to be used only by IKSolver
     void SetIKSolver(IKSolver* solver);
     /// Intended to be used only by IKSolver
-    void SetIKEffector(ik_effector_t* effector);
+    void SetIKEffectorNode(ik_node_t* effector);
     /// Intended to be used by IKSolver. Copies the positions/rotations of the target node into the effector
     void UpdateTargetNodePosition();
 
+public:
+    /// Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
+    bool GetWEIGHT_NLERP() const;
+    bool GetINHERIT_PARENT_ROTATION() const;
+    void SetWEIGHT_NLERP(bool enable);
+    void SetINHERIT_PARENT_ROTATION(bool enable);
+
+private:
     WeakPtr<Node> targetNode_;
     WeakPtr<IKSolver> solver_;
-    ik_effector_t* ikEffector_;
+    ik_node_t* ikEffectorNode_;
 
     String targetName_;
     Vector3 targetPosition_;
@@ -178,8 +197,7 @@ private:
     float weight_;
     float rotationWeight_;
     float rotationDecay_;
-    bool weightedNlerp_;
-    bool inheritParentRotation_;
+    unsigned features_;
 };
 
 } // namespace Urho3D

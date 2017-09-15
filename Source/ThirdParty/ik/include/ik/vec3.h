@@ -45,6 +45,17 @@ vec3_dot(const ik_real* v1, const ik_real* v2);
 IK_PUBLIC_API void
 vec3_cross(ik_real* v1, const ik_real* v2);
 
+/*!
+ * @brief Calculates the angle between two vectors. If the angle is 0 or 180,
+ * the delta rotation is set to identity.
+ * @param[out] q A contiguous array of 4 ik_floats representing a quaternion.
+ * The result is written to this. Any previous data is overwritten.
+ * @param[in] v1 The first vector.
+ * @param[in] v2 The second vector.
+ */
+IK_PUBLIC_API void
+vec3_angle(ik_real* q, const ik_real* v1, const ik_real* v2);
+
 C_HEADER_END
 
 #endif /* VEC3_H */

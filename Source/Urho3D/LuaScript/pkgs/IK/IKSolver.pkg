@@ -4,40 +4,44 @@ class IKSolver : public Component
 {
     enum Algorithm
     {
+        ONE_BONE = 0,
+        TWO_BONE,
         FABRIK
     };
 
-    Algorithm GetAlgorithm() const;
-    void SetAlgorithm(Algorithm algorithm);
-    unsigned GetMaximumIterations() const;
-    void SetMaximumIterations(unsigned iterations);
-    float GetTolerance() const;
-    void SetTolerance(float tolerance);
+    enum Feature
+    {
+        JOINT_ROTATIONS = 0x01,
+        TARGET_ROTATIONS = 0x02,
+        UPDATE_ORIGINAL_POSE = 0x04,
+        UPDATE_ACTIVE_POSE = 0x08,
+        USE_ORIGINAL_POSE = 0x10,
+        CONSTRAINTS = 0x20,
+        AUTO_SOLVE = 0x40
+    };
 
-    bool BoneRotationsEnabled() const;
-    void EnableBoneRotations(bool enable);
-
-    bool TargetRotationEnabled() const;
-    void EnableTargetRotation(bool enable);
-
-    bool ContinuousSolvingEnabled() const;
-    void EnableContinuousSolving(bool enable);
-
-    bool UpdatePoseEnabled() const;
-    void EnableUpdatePose(bool enable);
-
-    bool AutoSolveEnabled() const;
-    void EnableAutoSolve(bool enable);
-
+    void RebuildChainTrees();
+    void RecalculateSegmentLengths();
+    void CalculateJointRotations();
     void Solve();
-    void ResetToInitialPose();
-    void UpdateInitialPose();
 
-    void MarkSolverTreeDirty();
+    void ApplyOriginalPoseToScene();
+    void ApplySceneToOriginalPose();
+    void ApplyActivePoseToScene();
+    void ApplySceneToActivePose();
+    void ApplyOriginalPoseToActivePose();
+
     void DrawDebugGeometry(bool depthTest);
 
     tolua_property__get_set Algorithm algorithm;
     tolua_property__get_set unsigned maximumIterations;
     tolua_property__get_set float tolerance;
-};
 
+    tolua_property__get_set bool JOINT_ROTATIONS;
+    tolua_property__get_set bool TARGET_ROTATIONS;
+    tolua_property__get_set bool UPDATE_ORIGINAL_POSE;
+    tolua_property__get_set bool UPDATE_ACTIVE_POSE;
+    tolua_property__get_set bool USE_ORIGINAL_POSE;
+    tolua_property__get_set bool CONSTRAINTS;
+    tolua_property__get_set bool AUTO_SOLVE;
+};

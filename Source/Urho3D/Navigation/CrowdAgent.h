@@ -89,7 +89,7 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
     /// Draw debug geometry.
-    void DrawDebugGeometry(bool);
+    void DrawDebugGeometry(bool depthTest);
     /// Draw debug feelers.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
@@ -188,6 +188,8 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Get internal Detour crowd agent.
     const dtCrowdAgent* GetDetourCrowdAgent() const;
+    /// Handle navigation mesh tile added.
+    void HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData);
 
 private:
     /// Update Detour crowd agent parameter.

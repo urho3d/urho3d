@@ -1,4 +1,5 @@
 $#include "Navigation/NavigationMesh.h"
+$#include "IO/VectorBuffer.h"
 
 enum NavmeshPartitionType
 {
@@ -31,8 +32,17 @@ class NavigationMesh : public Component
     void SetDetailSampleMaxError(float error);
     void SetPadding(const Vector3& padding);
     void SetAreaCost(unsigned areaID, float cost);
+    bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles);
     bool Build();
     bool Build(const BoundingBox& boundingBox);
+    bool Build(const IntVector2& from, const IntVector2& to);
+    tolua_outside VectorBuffer NavigationMeshGetTileData @ GetTileData(const IntVector2& tile) const;
+    tolua_outside bool NavigationMeshAddTile @ AddTile(const VectorBuffer& tileData);
+    void RemoveTile(const IntVector2& tile);
+    void RemoveAllTiles();
+    bool HasTile(const IntVector2& tile) const;
+    BoundingBox GetTileBoudningBox(const IntVector2& tile) const;
+    IntVector2 GetTileIndex(const Vector3& position) const;
     void SetPartitionType(NavmeshPartitionType aType);
     void SetDrawOffMeshConnections(bool enable);
     void SetDrawNavAreas(bool enable);
@@ -93,6 +103,18 @@ class NavigationMesh : public Component
 };
 
 ${
+VectorBuffer NavigationMeshGetTileData(const NavigationMesh* navMesh, const IntVector2& tile)
+{
+    VectorBuffer buffer;
+    buffer.SetData(navMesh->GetTileData(tile));
+    return buffer;
+}
+
+bool NavigationMeshAddTile(NavigationMesh* navMesh, const VectorBuffer& tileData)
+{
+    return navMesh->AddTile(tileData.GetBuffer());
+}
+
 const PODVector<Vector3>& NavigationMeshFindPath(NavigationMesh* navMesh, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
 {
     static PODVector<Vector3> dest;

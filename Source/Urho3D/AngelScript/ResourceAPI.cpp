@@ -46,7 +46,7 @@ static Resource* ResourceCacheGetResource(const String& type, const String& name
 
 static Resource* ResourceCacheGetExistingResource(const String& type, const String& name, ResourceCache* ptr)
 {
-    return ptr->GetResource(StringHash(type), name);
+    return ptr->GetExistingResource(StringHash(type), name);
 }
 
 static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
@@ -230,6 +230,7 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "bool SaveTGA(const String&in) const", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SaveJPG(const String&in, int) const", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SaveDDS(const String&in) const", asMETHOD(Image, SaveDDS), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveWEBP(const String&in, float compression = 0.0f) const", asMETHOD(Image, SaveWEBP), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", asMETHODPR(Image, GetPixel, (int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", asMETHODPR(Image, GetPixel, (int, int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int) const", asMETHODPR(Image, GetPixelInt, (int, int) const, unsigned), asCALL_THISCALL);

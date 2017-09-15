@@ -216,6 +216,15 @@ public:
     {
     }
 
+    /// Construct from minimum and maximum vectors.
+    IntRect(const IntVector2& min, const IntVector2& max) :
+        left_(min.x_),
+        top_(min.y_),
+        right_(max.x_),
+        bottom_(max.y_)
+    {
+    }
+
     /// Construct from coordinates.
     IntRect(int left, int top, int right, int bottom) :
         left_(left),
@@ -263,6 +272,14 @@ public:
         else
             return INSIDE;
     }
+
+    /// Clip with another rect.  Since IntRect does not have an undefined state
+    /// like Rect, return (0, 0, 0, 0) if the result is empty.
+    void Clip(const IntRect& rect);
+
+    /// Merge a rect.  If this rect was empty, become the other rect.  If the
+    /// other rect is empty, do nothing.
+    void Merge(const IntRect& rect);
 
     /// Return integer data.
     const int* Data() const { return &left_; }
