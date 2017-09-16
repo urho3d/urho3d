@@ -174,7 +174,7 @@ private:
 
 public:
     /// Construct empty.
-    CustomVariantValue() : typeInfo_(typeid(void)) { }
+    CustomVariantValue() : typeInfo_(typeid(void)) { }      // NOLINT
     /// Destruct.
     virtual ~CustomVariantValue() = default;
 
