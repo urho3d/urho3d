@@ -16,7 +16,7 @@ class Button : public BorderImage
     void SetRepeatRate(float rate);
     
     const IntVector2& GetPressedOffset() const;
-	const IntVector2& GetDisabledOffset() const;
+    const IntVector2& GetDisabledOffset() const;
     const IntVector2& GetPressedChildOffset() const;
     float GetRepeatDelay() const;
     float GetRepeatRate() const;
