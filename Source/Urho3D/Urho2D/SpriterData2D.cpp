@@ -573,7 +573,7 @@ SpatialInfo SpatialInfo::UnmapFromParent(const SpatialInfo& parentInfo) const
         unmappedY = parentInfo.y_;
     }
 
-    return SpatialInfo(unmappedX, unmappedY, unmappedAngle, unmappedScaleX, unmappedScaleY, unmappedAlpha, spin);
+    return {unmappedX, unmappedY, unmappedAngle, unmappedScaleX, unmappedScaleY, unmappedAlpha, spin};
 }
 
 void SpatialInfo::Interpolate(const SpatialInfo& other, float t)

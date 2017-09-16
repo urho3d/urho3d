@@ -2563,7 +2563,7 @@ aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* roo
 aiMatrix4x4 GetMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode)
 {
     if (meshNode == modelRootNode)
-        return aiMatrix4x4();
+        return {};
     else
         return GetDerivedTransform(meshNode, modelRootNode);
 }

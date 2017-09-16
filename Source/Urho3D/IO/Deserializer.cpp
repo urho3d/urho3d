@@ -141,7 +141,7 @@ IntRect Deserializer::ReadIntRect()
 {
     int data[4];
     Read(data, sizeof data);
-    return IntRect(data);
+    return {data};
 }
 
 IntVector2 Deserializer::ReadIntVector2()

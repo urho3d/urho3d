@@ -38,7 +38,7 @@ inline Color ToColor(const b2Color& color)
 
 inline b2Vec2 ToB2Vec2(const Vector2& vector)
 {
-    return b2Vec2(vector.x_, vector.y_);
+    return {vector.x_, vector.y_};
 }
 
 inline Vector2 ToVector2(const b2Vec2& vec2)
@@ -48,7 +48,7 @@ inline Vector2 ToVector2(const b2Vec2& vec2)
 
 inline b2Vec2 ToB2Vec2(const Vector3& vector)
 {
-    return b2Vec2(vector.x_, vector.y_);
+    return {vector.x_, vector.y_};
 }
 
 inline Vector3 ToVector3(const b2Vec2& vec2)

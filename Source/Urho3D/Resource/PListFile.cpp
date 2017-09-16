@@ -216,7 +216,7 @@ IntRect PListValue::GetIntRect() const
 
     int x, y, w, h;
     sscanf(string_->CString(), "{{%d,%d},{%d,%d}}", &x, &y, &w, &h);
-    return IntRect(x, y, x + w, y + h);
+    return {x, y, x + w, y + h};
 }
 
 IntVector2 PListValue::GetIntVector2() const

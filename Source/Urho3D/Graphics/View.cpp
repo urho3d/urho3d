@@ -2509,8 +2509,8 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
 
 IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap)
 {
-    auto width = (unsigned)shadowMap->GetWidth();
-    auto height = (unsigned)shadowMap->GetHeight();
+    int width = shadowMap->GetWidth();
+    int height = shadowMap->GetHeight();
 
     switch (light->GetLightType())
     {
@@ -2518,23 +2518,23 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
         {
             int numSplits = light->GetNumShadowSplits();
             if (numSplits == 1)
-                return IntRect(0, 0, width, height);
+                return {0, 0, width, height};
             else if (numSplits == 2)
-                return IntRect(splitIndex * width / 2, 0, (splitIndex + 1) * width / 2, height);
+                return {static_cast<int>(splitIndex * width / 2), 0, static_cast<int>((splitIndex + 1) * width / 2), height};
             else
-                return IntRect((splitIndex & 1) * width / 2, (splitIndex / 2) * height / 2, ((splitIndex & 1) + 1) * width / 2,
-                    (splitIndex / 2 + 1) * height / 2);
+                return {static_cast<int>((splitIndex & 1) * width / 2), static_cast<int>((splitIndex / 2) * height / 2),
+                    static_cast<int>(((splitIndex & 1) + 1) * width / 2), static_cast<int>((splitIndex / 2 + 1) * height / 2)};
         }
 
     case LIGHT_SPOT:
-        return IntRect(0, 0, width, height);
+        return {0, 0, width, height};
 
     case LIGHT_POINT:
-        return IntRect((splitIndex & 1) * width / 2, (splitIndex / 2) * height / 3, ((splitIndex & 1) + 1) * width / 2,
-            (splitIndex / 2 + 1) * height / 3);
+        return {static_cast<int>((splitIndex & 1) * width / 2), static_cast<int>((splitIndex / 2) * height / 3),
+            static_cast<int>(((splitIndex & 1) + 1) * width / 2), static_cast<int>((splitIndex / 2 + 1) * height / 3)};
     }
 
-    return IntRect();
+    return {};
 }
 
 void View::SetupShadowCameras(LightQueryResult& query)
