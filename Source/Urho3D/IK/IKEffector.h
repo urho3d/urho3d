@@ -25,7 +25,7 @@
 #include "../Scene/Component.h"
 #include "../Scene/Scene.h"
 
-typedef struct ik_node_t ik_node_t;
+using ik_node_t = struct ik_node_t;
 
 namespace Urho3D
 {
