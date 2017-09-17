@@ -252,7 +252,7 @@ private:
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView,
         const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Return the viewport for a shadow map split.
-    IntRect GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap);
+    IntRect GetShadowMapViewport(Light* light, int splitIndex, Texture2D* shadowMap);
     /// Find and set a new zone for a drawable when it has moved.
     void FindZone(Drawable* drawable);
     /// Return material technique, considering the drawable's LOD distance.

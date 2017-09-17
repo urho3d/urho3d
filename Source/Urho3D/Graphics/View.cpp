@@ -2507,7 +2507,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
     }
 }
 
-IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap)
+IntRect View::GetShadowMapViewport(Light* light, int splitIndex, Texture2D* shadowMap)
 {
     int width = shadowMap->GetWidth();
     int height = shadowMap->GetHeight();
@@ -2520,18 +2520,18 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
             if (numSplits == 1)
                 return {0, 0, width, height};
             else if (numSplits == 2)
-                return {static_cast<int>(splitIndex * width / 2), 0, static_cast<int>((splitIndex + 1) * width / 2), height};
+                return {splitIndex * width / 2, 0, (splitIndex + 1) * width / 2, height};
             else
-                return {static_cast<int>((splitIndex & 1) * width / 2), static_cast<int>((splitIndex / 2) * height / 2),
-                    static_cast<int>(((splitIndex & 1) + 1) * width / 2), static_cast<int>((splitIndex / 2 + 1) * height / 2)};
+                return {(splitIndex & 1) * width / 2, (splitIndex / 2) * height / 2,
+                    ((splitIndex & 1) + 1) * width / 2, (splitIndex / 2 + 1) * height / 2};
         }
 
     case LIGHT_SPOT:
         return {0, 0, width, height};
 
     case LIGHT_POINT:
-        return {static_cast<int>((splitIndex & 1) * width / 2), static_cast<int>((splitIndex / 2) * height / 3),
-            static_cast<int>(((splitIndex & 1) + 1) * width / 2), static_cast<int>((splitIndex / 2 + 1) * height / 3)};
+        return {(splitIndex & 1) * width / 2, (splitIndex / 2) * height / 3,
+            ((splitIndex & 1) + 1) * width / 2, (splitIndex / 2 + 1) * height / 3};
     }
 
     return {};
