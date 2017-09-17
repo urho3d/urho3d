@@ -65,9 +65,7 @@ Model::Model(Context* context) :
 {
 }
 
-Model::~Model()
-{
-}
+Model::~Model() = default;
 
 void Model::RegisterObject(Context* context)
 {

@@ -158,9 +158,7 @@ Engine::Engine(Context* context) :
     SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
 }
 
-Engine::~Engine()
-{
-}
+Engine::~Engine() = default;
 
 bool Engine::Initialize(const VariantMap& parameters)
 {

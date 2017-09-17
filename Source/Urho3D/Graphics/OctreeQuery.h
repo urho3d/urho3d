@@ -47,9 +47,7 @@ public:
     }
 
     /// Destruct.
-    virtual ~OctreeQuery()
-    {
-    }
+    virtual ~OctreeQuery() = default;
 
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) = 0;

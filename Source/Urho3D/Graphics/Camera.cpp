@@ -78,9 +78,7 @@ Camera::Camera(Context* context) :
     reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
 }
 
-Camera::~Camera()
-{
-}
+Camera::~Camera() = default;
 
 void Camera::RegisterObject(Context* context)
 {

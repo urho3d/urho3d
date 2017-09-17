@@ -46,13 +46,7 @@ public:
     }
 
     /// Copy-construct from another color.
-    Color(const Color& color) :
-        r_(color.r_),
-        g_(color.g_),
-        b_(color.b_),
-        a_(color.a_)
-    {
-    }
+    Color(const Color& color) = default;
 
     /// Construct from another color and modify the alpha.
     Color(const Color& color, float a) :
@@ -91,14 +85,7 @@ public:
     }
 
     /// Assign from another color.
-    Color& operator =(const Color& rhs)
-    {
-        r_ = rhs.r_;
-        g_ = rhs.g_;
-        b_ = rhs.b_;
-        a_ = rhs.a_;
-        return *this;
-    }
+    Color& operator =(const Color& rhs) = default;
 
     /// Test for equality with another color without epsilon.
     bool operator ==(const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }

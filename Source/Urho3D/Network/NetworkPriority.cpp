@@ -46,9 +46,7 @@ NetworkPriority::NetworkPriority(Context* context) :
 {
 }
 
-NetworkPriority::~NetworkPriority()
-{
-}
+NetworkPriority::~NetworkPriority() = default;
 
 void NetworkPriority::RegisterObject(Context* context)
 {

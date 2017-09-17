@@ -62,9 +62,7 @@ ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) :
 {
 }
 
-ValueAnimationInfo::~ValueAnimationInfo()
-{
-}
+ValueAnimationInfo::~ValueAnimationInfo() = default;
 
 bool ValueAnimationInfo::Update(float timeStep)
 {

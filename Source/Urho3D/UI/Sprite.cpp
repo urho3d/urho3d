@@ -48,9 +48,7 @@ Sprite::Sprite(Context* context) :
 {
 }
 
-Sprite::~Sprite()
-{
-}
+Sprite::~Sprite() = default;
 
 void Sprite::RegisterObject(Context* context)
 {

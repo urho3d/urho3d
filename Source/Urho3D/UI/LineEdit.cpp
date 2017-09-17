@@ -69,9 +69,7 @@ LineEdit::LineEdit(Context* context) :
     SubscribeToEvent(this, E_LAYOUTUPDATED, URHO3D_HANDLER(LineEdit, HandleLayoutUpdated));
 }
 
-LineEdit::~LineEdit()
-{
-}
+LineEdit::~LineEdit() = default;
 
 void LineEdit::RegisterObject(Context* context)
 {

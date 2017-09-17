@@ -255,7 +255,7 @@ public:
     }
 
     /// Destruct.
-    virtual ~EventHandler() { }
+    virtual ~EventHandler() = default;
 
     /// Set sender and event type.
     void SetSenderAndEventType(Object* sender, StringHash eventType)

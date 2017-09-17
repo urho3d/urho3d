@@ -1058,18 +1058,14 @@ bool XPathResultSet::Empty() const
     return resultSet_ ? resultSet_->empty() : true;
 }
 
-XPathQuery::XPathQuery()
-{
-}
+XPathQuery::XPathQuery() = default;
 
 XPathQuery::XPathQuery(const String& queryString, const String& variableString)
 {
     SetQuery(queryString, variableString);
 }
 
-XPathQuery::~XPathQuery()
-{
-}
+XPathQuery::~XPathQuery() = default;
 
 void XPathQuery::Bind()
 {

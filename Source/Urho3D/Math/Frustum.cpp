@@ -57,9 +57,7 @@ void ProjectAndMergeEdge(Vector3 v0, Vector3 v1, Rect& rect, const Matrix4& proj
     rect.Merge(Vector2(tV1.x_, tV1.y_));
 }
 
-Frustum::Frustum()
-{
-}
+Frustum::Frustum() = default;
 
 Frustum::Frustum(const Frustum& frustum)
 {

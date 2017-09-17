@@ -41,13 +41,7 @@ public:
     }
 
     /// Copy-construct from another vector.
-    Vector4(const Vector4& vector) :
-        x_(vector.x_),
-        y_(vector.y_),
-        z_(vector.z_),
-        w_(vector.w_)
-    {
-    }
+    Vector4(const Vector4& vector) = default;
 
     /// Construct from a 3-dimensional vector and the W coordinate.
     Vector4(const Vector3& vector, float w) :
@@ -77,14 +71,7 @@ public:
     }
 
     /// Assign from another vector.
-    Vector4& operator =(const Vector4& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        w_ = rhs.w_;
-        return *this;
-    }
+    Vector4& operator =(const Vector4& rhs) = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector4& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ && w_ == rhs.w_; }

@@ -46,15 +46,9 @@ AttributeAnimationInfo::AttributeAnimationInfo(Animatable* target, const Attribu
 {
 }
 
-AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& other) :
-    ValueAnimationInfo(other),
-    attributeInfo_(other.attributeInfo_)
-{
-}
+AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& other) = default;
 
-AttributeAnimationInfo::~AttributeAnimationInfo()
-{
-}
+AttributeAnimationInfo::~AttributeAnimationInfo() = default;
 
 void AttributeAnimationInfo::ApplyValue(const Variant& newValue)
 {
@@ -72,9 +66,7 @@ Animatable::Animatable(Context* context) :
 {
 }
 
-Animatable::~Animatable()
-{
-}
+Animatable::~Animatable() = default;
 
 void Animatable::RegisterObject(Context* context)
 {

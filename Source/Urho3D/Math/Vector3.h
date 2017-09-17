@@ -57,21 +57,10 @@ public:
     }
 
     /// Copy-construct from another vector.
-    IntVector3(const IntVector3& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_),
-        z_(rhs.z_)
-    {
-    }
+    IntVector3(const IntVector3& rhs) = default;
 
     /// Assign from another vector.
-    IntVector3& operator =(const IntVector3& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        return *this;
-    }
+    IntVector3& operator =(const IntVector3& rhs) = default;
 
     /// Test for equality with another vector.
     bool operator ==(const IntVector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
@@ -204,12 +193,7 @@ public:
     }
 
     /// Copy-construct from another vector.
-    Vector3(const Vector3& vector) :
-        x_(vector.x_),
-        y_(vector.y_),
-        z_(vector.z_)
-    {
-    }
+    Vector3(const Vector3& vector) = default;
 
     /// Construct from a two-dimensional vector and the Z coordinate.
     Vector3(const Vector2& vector, float z) :
@@ -260,13 +244,7 @@ public:
     }
 
     /// Assign from another vector.
-    Vector3& operator =(const Vector3& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        return *this;
-    }
+    Vector3& operator =(const Vector3& rhs) = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }

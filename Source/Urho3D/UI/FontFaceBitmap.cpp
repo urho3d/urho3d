@@ -44,9 +44,7 @@ FontFaceBitmap::FontFaceBitmap(Font* font) :
 {
 }
 
-FontFaceBitmap::~FontFaceBitmap()
-{
-}
+FontFaceBitmap::~FontFaceBitmap() = default;
 
 bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize)
 {

@@ -41,13 +41,7 @@ public:
     }
 
     /// Copy-construct from another matrix.
-    Matrix2(const Matrix2& matrix) :
-        m00_(matrix.m00_),
-        m01_(matrix.m01_),
-        m10_(matrix.m10_),
-        m11_(matrix.m11_)
-    {
-    }
+    Matrix2(const Matrix2& matrix) = default;
 
     /// Construct from values.
     Matrix2(float v00, float v01,
@@ -69,14 +63,7 @@ public:
     }
 
     /// Assign from another matrix.
-    Matrix2& operator =(const Matrix2& rhs)
-    {
-        m00_ = rhs.m00_;
-        m01_ = rhs.m01_;
-        m10_ = rhs.m10_;
-        m11_ = rhs.m11_;
-        return *this;
-    }
+    Matrix2& operator =(const Matrix2& rhs) = default;
 
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix2& rhs) const

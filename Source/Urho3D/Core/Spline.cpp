@@ -53,11 +53,7 @@ Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode) :
 {
 }
 
-Spline::Spline(const Spline& rhs) :
-    interpolationMode_(rhs.interpolationMode_),
-    knots_(rhs.knots_)
-{
-}
+Spline::Spline(const Spline& rhs) = default;
 
 Variant Spline::GetPoint(float f) const
 {

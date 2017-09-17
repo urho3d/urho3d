@@ -92,9 +92,7 @@ RibbonTrail::RibbonTrail(Context* context) :
     batches_[0].numWorldTransforms_ = 1;
 }
 
-RibbonTrail::~RibbonTrail()
-{
-}
+RibbonTrail::~RibbonTrail() = default;
 
 void RibbonTrail::RegisterObject(Context* context)
 {

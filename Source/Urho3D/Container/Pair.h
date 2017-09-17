@@ -32,9 +32,7 @@ template <class T, class U> class Pair
 {
 public:
     /// Construct undefined.
-    Pair()
-    {
-    }
+    Pair() = default;
 
     /// Construct with values.
     Pair(const T& first, const U& second) :

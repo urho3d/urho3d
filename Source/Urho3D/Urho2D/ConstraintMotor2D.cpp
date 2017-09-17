@@ -41,9 +41,7 @@ ConstraintMotor2D::ConstraintMotor2D(Context* context) :
 
 }
 
-ConstraintMotor2D::~ConstraintMotor2D()
-{
-}
+ConstraintMotor2D::~ConstraintMotor2D() = default;
 
 void ConstraintMotor2D::RegisterObject(Context* context)
 {

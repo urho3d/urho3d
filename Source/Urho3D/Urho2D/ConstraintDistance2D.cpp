@@ -42,9 +42,7 @@ ConstraintDistance2D::ConstraintDistance2D(Context* context) :
 
 }
 
-ConstraintDistance2D::~ConstraintDistance2D()
-{
-}
+ConstraintDistance2D::~ConstraintDistance2D() = default;
 
 void ConstraintDistance2D::RegisterObject(Context* context)
 {

@@ -46,9 +46,7 @@ CollisionEdge2D::CollisionEdge2D(Context* context) :
     fixtureDef_.shape = &edgeShape_;
 }
 
-CollisionEdge2D::~CollisionEdge2D()
-{
-}
+CollisionEdge2D::~CollisionEdge2D() = default;
 
 void CollisionEdge2D::RegisterObject(Context* context)
 {

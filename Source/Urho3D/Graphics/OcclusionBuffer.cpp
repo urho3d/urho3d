@@ -61,9 +61,7 @@ OcclusionBuffer::OcclusionBuffer(Context* context) :
 {
 }
 
-OcclusionBuffer::~OcclusionBuffer()
-{
-}
+OcclusionBuffer::~OcclusionBuffer() = default;
 
 bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
 {

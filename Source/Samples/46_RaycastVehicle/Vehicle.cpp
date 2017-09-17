@@ -52,9 +52,7 @@ Vehicle::Vehicle(Urho3D::Context* context)
     emittersCreated = false;
 }
 
-Vehicle::~Vehicle()
-{
-}
+Vehicle::~Vehicle() = default;
 
 void Vehicle::Init()
 {

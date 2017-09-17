@@ -36,9 +36,7 @@ public:
     struct Node : public ListNodeBase
     {
         /// Construct undefined.
-        Node()
-        {
-        }
+        Node() = default;
 
         /// Construct with value.
         Node(const T& value) :
@@ -60,9 +58,7 @@ public:
     struct Iterator : public ListIteratorBase
     {
         /// Construct.
-        Iterator()
-        {
-        }
+        Iterator() = default;
 
         /// Construct with a node pointer.
         explicit Iterator(Node* ptr) :
@@ -111,9 +107,7 @@ public:
     struct ConstIterator : public ListIteratorBase
     {
         /// Construct.
-        ConstIterator()
-        {
-        }
+        ConstIterator() = default;
 
         /// Construct with a node pointer.
         explicit ConstIterator(Node* ptr) :

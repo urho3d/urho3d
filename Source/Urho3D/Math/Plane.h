@@ -38,12 +38,7 @@ public:
     }
 
     /// Copy-construct from another plane.
-    Plane(const Plane& plane) :
-        normal_(plane.normal_),
-        absNormal_(plane.absNormal_),
-        d_(plane.d_)
-    {
-    }
+    Plane(const Plane& plane) = default;
 
     /// Construct from 3 vertices.
     Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
@@ -64,13 +59,7 @@ public:
     }
 
     /// Assign from another plane.
-    Plane& operator =(const Plane& rhs)
-    {
-        normal_ = rhs.normal_;
-        absNormal_ = rhs.absNormal_;
-        d_ = rhs.d_;
-        return *this;
-    }
+    Plane& operator =(const Plane& rhs) = default;
 
     /// Define from 3 vertices.
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)

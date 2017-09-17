@@ -41,9 +41,7 @@ ConstraintFriction2D::ConstraintFriction2D(Context* context) :
 
 }
 
-ConstraintFriction2D::~ConstraintFriction2D()
-{
-}
+ConstraintFriction2D::~ConstraintFriction2D() = default;
 
 void ConstraintFriction2D::RegisterObject(Context* context)
 {

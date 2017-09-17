@@ -40,9 +40,7 @@ ConstraintWeld2D::ConstraintWeld2D(Context* context) :
 {
 }
 
-ConstraintWeld2D::~ConstraintWeld2D()
-{
-}
+ConstraintWeld2D::~ConstraintWeld2D() = default;
 
 void ConstraintWeld2D::RegisterObject(Context* context)
 {

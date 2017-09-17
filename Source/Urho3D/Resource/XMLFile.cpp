@@ -69,9 +69,7 @@ XMLFile::XMLFile(Context* context) :
 {
 }
 
-XMLFile::~XMLFile()
-{
-}
+XMLFile::~XMLFile() = default;
 
 void XMLFile::RegisterObject(Context* context)
 {

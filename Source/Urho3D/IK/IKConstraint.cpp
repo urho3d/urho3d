@@ -44,9 +44,7 @@ IKConstraint::IKConstraint(Context* context) :
 }
 
 // ----------------------------------------------------------------------------
-IKConstraint::~IKConstraint()
-{
-}
+IKConstraint::~IKConstraint() = default;
 
 // ----------------------------------------------------------------------------
 void IKConstraint::RegisterObject(Context* context)

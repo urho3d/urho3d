@@ -42,9 +42,7 @@ ConstraintRope2D::ConstraintRope2D(Context* context) :
 
 }
 
-ConstraintRope2D::~ConstraintRope2D()
-{
-}
+ConstraintRope2D::~ConstraintRope2D() = default;
 
 void ConstraintRope2D::RegisterObject(Context* context)
 {

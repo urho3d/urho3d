@@ -35,9 +35,7 @@ SoundListener::SoundListener(Context* context) :
 {
 }
 
-SoundListener::~SoundListener()
-{
-}
+SoundListener::~SoundListener() = default;
 
 void SoundListener::RegisterObject(Context* context)
 {

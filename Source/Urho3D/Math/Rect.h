@@ -67,19 +67,10 @@ public:
     }
 
     /// Copy-construct from another rect.
-    Rect(const Rect& rect) :
-        min_(rect.min_),
-        max_(rect.max_)
-    {
-    }
+    Rect(const Rect& rect) = default;
 
     /// Assign from another rect.
-    Rect& operator =(const Rect& rhs)
-    {
-        min_ = rhs.min_;
-        max_ = rhs.max_;
-        return *this;
-    }
+    Rect& operator =(const Rect& rhs) = default;
 
     /// Test for equality with another rect.
     bool operator ==(const Rect& rhs) const { return min_ == rhs.min_ && max_ == rhs.max_; }

@@ -104,9 +104,7 @@ ParticleEffect2D::ParticleEffect2D(Context* context) :
 {
 }
 
-ParticleEffect2D::~ParticleEffect2D()
-{
-}
+ParticleEffect2D::~ParticleEffect2D() = default;
 
 void ParticleEffect2D::RegisterObject(Context* context)
 {

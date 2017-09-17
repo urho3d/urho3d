@@ -56,9 +56,7 @@ ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     sourceBatches_[0].owner_ = this;
 }
 
-ParticleEmitter2D::~ParticleEmitter2D()
-{
-}
+ParticleEmitter2D::~ParticleEmitter2D() = default;
 
 void ParticleEmitter2D::RegisterObject(Context* context)
 {

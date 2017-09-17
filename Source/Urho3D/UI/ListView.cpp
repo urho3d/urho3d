@@ -186,9 +186,7 @@ ListView::ListView(Context* context) :
     UpdateUIClickSubscription();
 }
 
-ListView::~ListView()
-{
-}
+ListView::~ListView() = default;
 
 void ListView::RegisterObject(Context* context)
 {

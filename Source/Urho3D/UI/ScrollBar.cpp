@@ -74,9 +74,7 @@ ScrollBar::ScrollBar(Context* context) :
     SetOrientation(O_HORIZONTAL);
 }
 
-ScrollBar::~ScrollBar()
-{
-}
+ScrollBar::~ScrollBar() = default;
 
 void ScrollBar::RegisterObject(Context* context)
 {

@@ -41,9 +41,7 @@ SmoothedTransform::SmoothedTransform(Context* context) :
 {
 }
 
-SmoothedTransform::~SmoothedTransform()
-{
-}
+SmoothedTransform::~SmoothedTransform() = default;
 
 void SmoothedTransform::RegisterObject(Context* context)
 {

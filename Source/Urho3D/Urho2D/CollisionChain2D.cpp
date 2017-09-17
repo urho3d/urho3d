@@ -42,9 +42,7 @@ CollisionChain2D::CollisionChain2D(Context* context) :
     fixtureDef_.shape = &chainShape_;
 }
 
-CollisionChain2D::~CollisionChain2D()
-{
-}
+CollisionChain2D::~CollisionChain2D() = default;
 
 void CollisionChain2D::RegisterObject(Context* context)
 {

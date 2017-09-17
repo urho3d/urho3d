@@ -56,9 +56,7 @@ CustomGeometry::CustomGeometry(Context* context) :
     SetNumGeometries(1);
 }
 
-CustomGeometry::~CustomGeometry()
-{
-}
+CustomGeometry::~CustomGeometry() = default;
 
 void CustomGeometry::RegisterObject(Context* context)
 {

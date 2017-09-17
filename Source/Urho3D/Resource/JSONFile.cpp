@@ -47,9 +47,7 @@ JSONFile::JSONFile(Context* context) :
 {
 }
 
-JSONFile::~JSONFile()
-{
-}
+JSONFile::~JSONFile() = default;
 
 void JSONFile::RegisterObject(Context* context)
 {

@@ -41,9 +41,7 @@ LogicComponent::LogicComponent(Context* context) :
 {
 }
 
-LogicComponent::~LogicComponent()
-{
-}
+LogicComponent::~LogicComponent() = default;
 
 void LogicComponent::OnSetEnabled()
 {

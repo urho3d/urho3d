@@ -64,9 +64,7 @@ Zone::Zone(Context* context) :
     boundingBox_ = BoundingBox(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX);
 }
 
-Zone::~Zone()
-{
-}
+Zone::~Zone() = default;
 
 void Zone::RegisterObject(Context* context)
 {

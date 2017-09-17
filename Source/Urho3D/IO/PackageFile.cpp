@@ -48,9 +48,7 @@ PackageFile::PackageFile(Context* context, const String& fileName, unsigned star
     Open(fileName, startOffset);
 }
 
-PackageFile::~PackageFile()
-{
-}
+PackageFile::~PackageFile() = default;
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {

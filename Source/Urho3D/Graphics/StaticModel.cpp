@@ -51,9 +51,7 @@ StaticModel::StaticModel(Context* context) :
 {
 }
 
-StaticModel::~StaticModel()
-{
-}
+StaticModel::~StaticModel() = default;
 
 void StaticModel::RegisterObject(Context* context)
 {

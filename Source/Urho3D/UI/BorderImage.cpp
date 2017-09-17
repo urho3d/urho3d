@@ -46,9 +46,7 @@ BorderImage::BorderImage(Context* context) :
 {
 }
 
-BorderImage::~BorderImage()
-{
-}
+BorderImage::~BorderImage() = default;
 
 void BorderImage::RegisterObject(Context* context)
 {

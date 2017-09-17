@@ -46,9 +46,7 @@ CollisionBox2D::CollisionBox2D(Context* context) :
     fixtureDef_.shape = &boxShape_;
 }
 
-CollisionBox2D::~CollisionBox2D()
-{
-}
+CollisionBox2D::~CollisionBox2D() = default;
 
 void CollisionBox2D::RegisterObject(Context* context)
 {

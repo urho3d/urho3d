@@ -64,9 +64,7 @@ Text3D::Text3D(Context* context) :
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
-Text3D::~Text3D()
-{
-}
+Text3D::~Text3D() = default;
 
 void Text3D::RegisterObject(Context* context)
 {

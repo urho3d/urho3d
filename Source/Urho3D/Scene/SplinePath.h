@@ -45,7 +45,7 @@ public:
     SplinePath(Context* context);
 
     /// Destructor.
-    ~SplinePath() override { };
+    ~SplinePath() override = default;;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

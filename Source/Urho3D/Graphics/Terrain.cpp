@@ -115,9 +115,7 @@ Terrain::Terrain(Context* context) :
     indexBuffer_->SetShadowed(true);
 }
 
-Terrain::~Terrain()
-{
-}
+Terrain::~Terrain() = default;
 
 void Terrain::RegisterObject(Context* context)
 {

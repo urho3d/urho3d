@@ -34,9 +34,7 @@
 namespace Urho3D
 {
 
-Polyhedron::~Polyhedron()
-{
-}
+Polyhedron::~Polyhedron() = default;
 
 void Polyhedron::Define(const BoundingBox& box)
 {

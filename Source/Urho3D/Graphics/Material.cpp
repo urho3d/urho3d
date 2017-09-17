@@ -179,9 +179,7 @@ TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lod
 {
 }
 
-TechniqueEntry::~TechniqueEntry()
-{
-}
+TechniqueEntry::~TechniqueEntry() = default;
 
 ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* target, const String& name, ValueAnimation* attributeAnimation,
     WrapMode wrapMode, float speed) :
@@ -190,15 +188,9 @@ ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* target, con
 {
 }
 
-ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other) :
-    ValueAnimationInfo(other),
-    name_(other.name_)
-{
-}
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other) = default;
 
-ShaderParameterAnimationInfo::~ShaderParameterAnimationInfo()
-{
-}
+ShaderParameterAnimationInfo::~ShaderParameterAnimationInfo() = default;
 
 void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 {
@@ -219,9 +211,7 @@ Material::Material(Context* context) :
     ResetToDefaults();
 }
 
-Material::~Material()
-{
-}
+Material::~Material() = default;
 
 void Material::RegisterObject(Context* context)
 {

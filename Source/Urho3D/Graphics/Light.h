@@ -54,9 +54,7 @@ static const unsigned MAX_CASCADE_SPLITS = 1;
 struct URHO3D_API BiasParameters
 {
     /// Construct undefined.
-    BiasParameters()
-    {
-    }
+    BiasParameters() = default;
 
     /// Construct with initial values.
     BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f) :
@@ -81,9 +79,7 @@ struct URHO3D_API BiasParameters
 struct URHO3D_API CascadeParameters
 {
     /// Construct undefined.
-    CascadeParameters()
-    {
-    }
+    CascadeParameters() = default;
 
     /// Construct with initial values.
     CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) :
@@ -121,9 +117,7 @@ struct URHO3D_API CascadeParameters
 struct URHO3D_API FocusParameters
 {
     /// Construct undefined.
-    FocusParameters()
-    {
-    }
+    FocusParameters() = default;
 
     /// Construct with initial values.
     FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) :

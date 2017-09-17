@@ -34,9 +34,7 @@ BufferedSoundStream::BufferedSoundStream() :
 {
 }
 
-BufferedSoundStream::~BufferedSoundStream()
-{
-}
+BufferedSoundStream::~BufferedSoundStream() = default;
 
 unsigned BufferedSoundStream::GetData(signed char* dest, unsigned numBytes)
 {

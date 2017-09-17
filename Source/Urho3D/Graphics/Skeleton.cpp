@@ -35,9 +35,7 @@ Skeleton::Skeleton() :
 {
 }
 
-Skeleton::~Skeleton()
-{
-}
+Skeleton::~Skeleton() = default;
 
 bool Skeleton::Load(Deserializer& source)
 {

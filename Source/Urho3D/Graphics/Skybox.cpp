@@ -41,9 +41,7 @@ Skybox::Skybox(Context* context) :
 {
 }
 
-Skybox::~Skybox()
-{
-}
+Skybox::~Skybox() = default;
 
 void Skybox::RegisterObject(Context* context)
 {

@@ -42,9 +42,7 @@ LuaScriptEventInvoker::LuaScriptEventInvoker(LuaScriptInstance* instance) :
 {
 }
 
-LuaScriptEventInvoker::~LuaScriptEventInvoker()
-{
-}
+LuaScriptEventInvoker::~LuaScriptEventInvoker() = default;
 
 void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& eventType, LuaFunction* function)
 {

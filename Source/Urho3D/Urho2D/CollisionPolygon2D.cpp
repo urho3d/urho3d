@@ -41,9 +41,7 @@ CollisionPolygon2D::CollisionPolygon2D(Context* context) :
     fixtureDef_.shape = &polygonShape_;
 }
 
-CollisionPolygon2D::~CollisionPolygon2D()
-{
-}
+CollisionPolygon2D::~CollisionPolygon2D() = default;
 
 void CollisionPolygon2D::RegisterObject(Context* context)
 {

@@ -57,9 +57,7 @@ Slider::Slider(Context* context) :
     UpdateSlider();
 }
 
-Slider::~Slider()
-{
-}
+Slider::~Slider() = default;
 
 void Slider::RegisterObject(Context* context)
 {

@@ -66,10 +66,6 @@ Sample2D::Sample2D(Context* context) :
 {
 }
 
-Sample2D::~Sample2D()
-{
-}
-
 void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info)
 {
     // Create rigid body to the root node

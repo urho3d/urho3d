@@ -116,9 +116,7 @@ struct Batch
 struct InstanceData
 {
     /// Construct undefined.
-    InstanceData()
-    {
-    }
+    InstanceData() = default;
 
     /// Construct with transform, instancing data and distance.
     InstanceData(const Matrix3x4* worldTransform, const void* instancingData, float distance) :
@@ -153,9 +151,7 @@ struct BatchGroup : public Batch
     }
 
     /// Destruct.
-    ~BatchGroup()
-    {
-    }
+    ~BatchGroup() = default;
 
     /// Add world transform(s) from a batch.
     void AddTransforms(const Batch& batch)
@@ -186,9 +182,7 @@ struct BatchGroup : public Batch
 struct BatchGroupKey
 {
     /// Construct undefined.
-    BatchGroupKey()
-    {
-    }
+    BatchGroupKey() = default;
 
     /// Construct from a batch.
     BatchGroupKey(const Batch& batch) :

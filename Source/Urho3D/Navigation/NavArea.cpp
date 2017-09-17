@@ -45,9 +45,7 @@ NavArea::NavArea(Context* context) :
 {
 }
 
-NavArea::~NavArea()
-{
-}
+NavArea::~NavArea() = default;
 
 void NavArea::RegisterObject(Context* context)
 {

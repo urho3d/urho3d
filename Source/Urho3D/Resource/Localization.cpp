@@ -39,9 +39,7 @@ Localization::Localization(Context* context) :
 {
 }
 
-Localization::~Localization()
-{
-}
+Localization::~Localization() = default;
 
 int Localization::GetLanguageIndex(const String& language)
 {

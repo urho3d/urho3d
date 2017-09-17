@@ -44,10 +44,7 @@ Sprite2D::Sprite2D(Context* context) :
 
 }
 
-Sprite2D::~Sprite2D()
-{
-
-}
+Sprite2D::~Sprite2D() = default;
 
 void Sprite2D::RegisterObject(Context* context)
 {

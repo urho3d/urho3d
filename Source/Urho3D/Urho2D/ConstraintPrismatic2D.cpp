@@ -41,9 +41,7 @@ ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) :
 {
 }
 
-ConstraintPrismatic2D::~ConstraintPrismatic2D()
-{
-}
+ConstraintPrismatic2D::~ConstraintPrismatic2D() = default;
 
 void ConstraintPrismatic2D::RegisterObject(Context* context)
 {

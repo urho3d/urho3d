@@ -37,9 +37,7 @@ class VertexBuffer;
 struct DecalVertex
 {
     /// Construct with defaults.
-    DecalVertex()
-    {
-    }
+    DecalVertex() = default;
 
     /// Construct with position and normal.
     DecalVertex(const Vector3& position, const Vector3& normal) :

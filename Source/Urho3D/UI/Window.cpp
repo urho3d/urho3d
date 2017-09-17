@@ -57,9 +57,7 @@ Window::Window(Context* context) :
     SetEnabled(true);
 }
 
-Window::~Window()
-{
-}
+Window::~Window() = default;
 
 void Window::RegisterObject(Context* context)
 {

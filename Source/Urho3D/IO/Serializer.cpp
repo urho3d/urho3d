@@ -31,9 +31,7 @@ namespace Urho3D
 
 static const float q = 32767.0f;
 
-Serializer::~Serializer()
-{
-}
+Serializer::~Serializer() = default;
 
 bool Serializer::WriteInt64(long long value)
 {

@@ -44,9 +44,7 @@ ConstraintPulley2D::ConstraintPulley2D(Context* context) :
 
 }
 
-ConstraintPulley2D::~ConstraintPulley2D()
-{
-}
+ConstraintPulley2D::~ConstraintPulley2D() = default;
 
 void ConstraintPulley2D::RegisterObject(Context* context)
 {

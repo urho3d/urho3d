@@ -44,9 +44,7 @@ class VertexBuffer;
 struct DebugLine
 {
     /// Construct undefined.
-    DebugLine()
-    {
-    }
+    DebugLine() = default;
 
     /// Construct with start and end positions and color.
     DebugLine(const Vector3& start, const Vector3& end, unsigned color) :
@@ -68,9 +66,7 @@ struct DebugLine
 struct DebugTriangle
 {
     /// Construct undefined.
-    DebugTriangle()
-    {
-    }
+    DebugTriangle() = default;
 
     /// Construct with start and end positions and color.
     DebugTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color) :

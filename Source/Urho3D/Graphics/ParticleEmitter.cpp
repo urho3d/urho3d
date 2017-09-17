@@ -58,9 +58,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
 
-ParticleEmitter::~ParticleEmitter()
-{
-}
+ParticleEmitter::~ParticleEmitter() = default;
 
 void ParticleEmitter::RegisterObject(Context* context)
 {

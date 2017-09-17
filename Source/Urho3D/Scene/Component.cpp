@@ -60,9 +60,7 @@ Component::Component(Context* context) :
 {
 }
 
-Component::~Component()
-{
-}
+Component::~Component() = default;
 
 bool Component::Save(Serializer& dest) const
 {

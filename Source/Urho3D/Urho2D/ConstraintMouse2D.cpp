@@ -40,9 +40,7 @@ ConstraintMouse2D::ConstraintMouse2D(Context* context) :
 {
 }
 
-ConstraintMouse2D::~ConstraintMouse2D()
-{
-}
+ConstraintMouse2D::~ConstraintMouse2D() = default;
 
 void ConstraintMouse2D::RegisterObject(Context* context)
 {

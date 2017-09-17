@@ -112,9 +112,7 @@ Animation::Animation(Context* context) :
 {
 }
 
-Animation::~Animation()
-{
-}
+Animation::~Animation() = default;
 
 void Animation::RegisterObject(Context* context)
 {

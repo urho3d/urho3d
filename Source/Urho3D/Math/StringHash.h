@@ -38,10 +38,7 @@ public:
     }
 
     /// Copy-construct from another hash.
-    StringHash(const StringHash& rhs) :
-        value_(rhs.value_)
-    {
-    }
+    StringHash(const StringHash& rhs) = default;
 
     /// Construct with an initial value.
     explicit StringHash(unsigned value) :
@@ -55,11 +52,7 @@ public:
     StringHash(const String& str);
 
     /// Assign from another hash.
-    StringHash& operator =(const StringHash& rhs)
-    {
-        value_ = rhs.value_;
-        return *this;
-    }
+    StringHash& operator =(const StringHash& rhs) = default;
 
     /// Add a hash.
     StringHash operator +(const StringHash& rhs) const

@@ -115,9 +115,7 @@ Light::Light(Context* context) :
 {
 }
 
-Light::~Light()
-{
-}
+Light::~Light() = default;
 
 void Light::RegisterObject(Context* context)
 {

@@ -38,9 +38,7 @@ Navigable::Navigable(Context* context) :
 {
 }
 
-Navigable::~Navigable()
-{
-}
+Navigable::~Navigable() = default;
 
 void Navigable::RegisterObject(Context* context)
 {

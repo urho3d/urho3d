@@ -79,7 +79,7 @@ public:
     {
     }
 
-    ~PackerInfo() override {}
+    ~PackerInfo() override = default;
 };
 
 void Help()

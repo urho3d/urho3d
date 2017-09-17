@@ -48,9 +48,7 @@ ObjectAnimation::ObjectAnimation(Context* context) :
 {
 }
 
-ObjectAnimation::~ObjectAnimation()
-{
-}
+ObjectAnimation::~ObjectAnimation() = default;
 
 void ObjectAnimation::RegisterObject(Context* context)
 {

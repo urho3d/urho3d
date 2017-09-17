@@ -63,9 +63,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     batches_[0].geometryType_ = GEOM_STATIC_NOINSTANCING;
 }
 
-TerrainPatch::~TerrainPatch()
-{
-}
+TerrainPatch::~TerrainPatch() = default;
 
 void TerrainPatch::RegisterObject(Context* context)
 {

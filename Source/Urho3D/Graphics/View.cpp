@@ -311,9 +311,7 @@ View::View(Context* context) :
     frame_.camera_ = nullptr;
 }
 
-View::~View()
-{
-}
+View::~View() = default;
 
 bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 {

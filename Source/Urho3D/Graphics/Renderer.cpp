@@ -308,9 +308,7 @@ Renderer::Renderer(Context* context) :
     Initialize();
 }
 
-Renderer::~Renderer()
-{
-}
+Renderer::~Renderer() = default;
 
 void Renderer::SetNumViewports(unsigned num)
 {

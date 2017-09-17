@@ -44,9 +44,7 @@ SpriteSheet2D::SpriteSheet2D(Context* context) :
 {
 }
 
-SpriteSheet2D::~SpriteSheet2D()
-{
-}
+SpriteSheet2D::~SpriteSheet2D() = default;
 
 void SpriteSheet2D::RegisterObject(Context* context)
 {

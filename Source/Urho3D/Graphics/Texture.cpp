@@ -84,9 +84,7 @@ Texture::Texture(Context* context) :
         mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
 }
 
-Texture::~Texture()
-{
-}
+Texture::~Texture() = default;
 
 void Texture::SetNumLevels(unsigned levels)
 {

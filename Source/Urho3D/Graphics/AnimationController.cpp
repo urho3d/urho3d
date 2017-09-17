@@ -58,9 +58,7 @@ AnimationController::AnimationController(Context* context) :
 {
 }
 
-AnimationController::~AnimationController()
-{
-}
+AnimationController::~AnimationController() = default;
 
 void AnimationController::RegisterObject(Context* context)
 {

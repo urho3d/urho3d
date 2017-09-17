@@ -59,9 +59,7 @@ Serializable::Serializable(Context* context) :
 {
 }
 
-Serializable::~Serializable()
-{
-}
+Serializable::~Serializable() = default;
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {

@@ -51,9 +51,7 @@ class File;
 struct StoredLogMessage
 {
     /// Construct undefined.
-    StoredLogMessage()
-    {
-    }
+    StoredLogMessage() = default;
 
     /// Construct with parameters.
     StoredLogMessage(const String& message, int level, bool error) :

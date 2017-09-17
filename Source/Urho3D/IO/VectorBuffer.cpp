@@ -27,9 +27,7 @@
 namespace Urho3D
 {
 
-VectorBuffer::VectorBuffer()
-{
-}
+VectorBuffer::VectorBuffer() = default;
 
 VectorBuffer::VectorBuffer(const PODVector<unsigned char>& data)
 {

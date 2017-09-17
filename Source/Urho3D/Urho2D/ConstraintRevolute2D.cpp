@@ -40,9 +40,7 @@ ConstraintRevolute2D::ConstraintRevolute2D(Context* context) :
 {
 }
 
-ConstraintRevolute2D::~ConstraintRevolute2D()
-{
-}
+ConstraintRevolute2D::~ConstraintRevolute2D() = default;
 
 void ConstraintRevolute2D::RegisterObject(Context* context)
 {

@@ -306,13 +306,9 @@ CubeMapFace RenderPathCommand::GetOutputFace(unsigned index) const
     return index < outputs_.Size() ? outputs_[index].second_ : FACE_POSITIVE_X;
 }
 
-RenderPath::RenderPath()
-{
-}
+RenderPath::RenderPath() = default;
 
-RenderPath::~RenderPath()
-{
-}
+RenderPath::~RenderPath() = default;
 
 SharedPtr<RenderPath> RenderPath::Clone()
 {

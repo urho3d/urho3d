@@ -49,9 +49,7 @@ OffMeshConnection::OffMeshConnection(Context* context) :
 {
 }
 
-OffMeshConnection::~OffMeshConnection()
-{
-}
+OffMeshConnection::~OffMeshConnection() = default;
 
 void OffMeshConnection::RegisterObject(Context* context)
 {

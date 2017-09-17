@@ -34,9 +34,7 @@ Controls::Controls() :
 {
 }
 
-Controls::~Controls()
-{
-}
+Controls::~Controls() = default;
 
 void Controls::Reset()
 {

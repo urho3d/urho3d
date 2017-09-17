@@ -53,7 +53,7 @@ class URHO3D_API ScriptEventListener
 {
 public:
     /// Destruct
-    virtual ~ScriptEventListener() { };
+    virtual ~ScriptEventListener() = default;
 
     /// Add a scripted event handler.
     virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;

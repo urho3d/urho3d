@@ -88,9 +88,7 @@ ParticleEffect::ParticleEffect(Context* context) :
 {
 }
 
-ParticleEffect::~ParticleEffect()
-{
-}
+ParticleEffect::~ParticleEffect() = default;
 
 void ParticleEffect::RegisterObject(Context* context)
 {

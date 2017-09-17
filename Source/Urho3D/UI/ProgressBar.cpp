@@ -53,9 +53,7 @@ ProgressBar::ProgressBar(Context * context) :
     UpdateProgressBar();
 }
 
-ProgressBar::~ProgressBar()
-{
-}
+ProgressBar::~ProgressBar() = default;
 
 void ProgressBar::RegisterObject(Context * context)
 {

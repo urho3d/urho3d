@@ -94,9 +94,7 @@ Pass::Pass(const String& name) :
         lightingMode_ = LIGHTING_PERPIXEL;
 }
 
-Pass::~Pass()
-{
-}
+Pass::~Pass() = default;
 
 void Pass::SetBlendMode(BlendMode mode)
 {
@@ -250,9 +248,7 @@ Technique::Technique(Context* context) :
 #endif
 }
 
-Technique::~Technique()
-{
-}
+Technique::~Technique() = default;
 
 void Technique::RegisterObject(Context* context)
 {

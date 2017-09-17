@@ -49,9 +49,7 @@ Button::Button(Context* context) :
     focusMode_ = FM_FOCUSABLE;
 }
 
-Button::~Button()
-{
-}
+Button::~Button() = default;
 
 void Button::RegisterObject(Context* context)
 {

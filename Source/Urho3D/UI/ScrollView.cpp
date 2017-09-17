@@ -87,9 +87,7 @@ ScrollView::ScrollView(Context* context) :
 
 }
 
-ScrollView::~ScrollView()
-{
-}
+ScrollView::~ScrollView() = default;
 
 void ScrollView::RegisterObject(Context* context)
 {

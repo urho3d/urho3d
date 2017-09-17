@@ -38,9 +38,7 @@ class URHO3D_API Polyhedron
 {
 public:
     /// Construct empty.
-    Polyhedron()
-    {
-    }
+    Polyhedron() = default;
 
     /// Copy-construct from another polyhedron.
     Polyhedron(const Polyhedron& polyhedron) :

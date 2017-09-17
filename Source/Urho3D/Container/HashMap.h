@@ -84,9 +84,7 @@ public:
     struct Node : public HashNodeBase
     {
         /// Construct undefined.
-        Node()
-        {
-        }
+        Node() = default;
 
         /// Construct with key and value.
         Node(const T& key, const U& value) :
@@ -111,9 +109,7 @@ public:
     struct Iterator : public HashIteratorBase
     {
         /// Construct.
-        Iterator()
-        {
-        }
+        Iterator() = default;
 
         /// Construct with a node pointer.
         Iterator(Node* ptr) :
@@ -162,9 +158,7 @@ public:
     struct ConstIterator : public HashIteratorBase
     {
         /// Construct.
-        ConstIterator()
-        {
-        }
+        ConstIterator() = default;
 
         /// Construct with a node pointer.
         ConstIterator(Node* ptr) :

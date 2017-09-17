@@ -39,9 +39,7 @@ ToolTip::ToolTip(Context* context) :
     SetVisible(false);
 }
 
-ToolTip::~ToolTip()
-{
-}
+ToolTip::~ToolTip() = default;
 
 void ToolTip::RegisterObject(Context* context)
 {

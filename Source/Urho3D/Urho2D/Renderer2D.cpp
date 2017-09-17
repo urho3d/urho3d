@@ -81,9 +81,7 @@ Renderer2D::Renderer2D(Context* context) :
     SubscribeToEvent(E_BEGINVIEWUPDATE, URHO3D_HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
 
-Renderer2D::~Renderer2D()
-{
-}
+Renderer2D::~Renderer2D() = default;
 
 void Renderer2D::RegisterObject(Context* context)
 {

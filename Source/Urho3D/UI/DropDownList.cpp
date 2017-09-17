@@ -66,9 +66,7 @@ DropDownList::DropDownList(Context* context) :
     SubscribeToEvent(listView_, E_SELECTIONCHANGED, URHO3D_HANDLER(DropDownList, HandleSelectionChanged));
 }
 
-DropDownList::~DropDownList()
-{
-}
+DropDownList::~DropDownList() = default;
 
 void DropDownList::RegisterObject(Context* context)
 {

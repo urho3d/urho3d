@@ -60,7 +60,7 @@ public:
     /// Construct.
     Sample2D(Context* context);
     /// Destruct.
-    ~Sample2D() override;
+    ~Sample2D() override = default;
 
     /// Generate physics collision shapes from the tmx file's objects located in tileMapLayer.
     void CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info);

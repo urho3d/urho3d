@@ -43,9 +43,7 @@ Deserializer::Deserializer(unsigned size) :
 {
 }
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 unsigned Deserializer::SeekRelative(int delta)
 {

@@ -75,9 +75,7 @@ Text::Text(Context* context) :
     useDerivedOpacity_ = false;
 }
 
-Text::~Text()
-{
-}
+Text::~Text() = default;
 
 void Text::RegisterObject(Context* context)
 {

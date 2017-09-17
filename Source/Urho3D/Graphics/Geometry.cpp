@@ -48,9 +48,7 @@ Geometry::Geometry(Context* context) :
     SetNumVertexBuffers(1);
 }
 
-Geometry::~Geometry()
-{
-}
+Geometry::~Geometry() = default;
 
 bool Geometry::SetNumVertexBuffers(unsigned num)
 {
@@ -310,12 +308,12 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
     const PODVector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
-    
+
     if (!vertexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
         return M_INFINITY;
 
     unsigned uvOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD);
-    
+
     if (outUV && uvOffset == M_MAX_UNSIGNED)
     {
         // requested UV output, but no texture data in vertex buffer

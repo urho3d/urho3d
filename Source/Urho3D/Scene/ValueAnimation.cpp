@@ -59,9 +59,7 @@ ValueAnimation::ValueAnimation(Context* context) :
 {
 }
 
-ValueAnimation::~ValueAnimation()
-{
-}
+ValueAnimation::~ValueAnimation() = default;
 
 void ValueAnimation::RegisterObject(Context* context)
 {

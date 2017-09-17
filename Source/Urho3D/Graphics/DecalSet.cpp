@@ -175,9 +175,7 @@ DecalSet::DecalSet(Context* context) :
     batches_[0].geometryType_ = GEOM_STATIC_NOINSTANCING;
 }
 
-DecalSet::~DecalSet()
-{
-}
+DecalSet::~DecalSet() = default;
 
 void DecalSet::RegisterObject(Context* context)
 {

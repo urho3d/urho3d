@@ -59,9 +59,7 @@ CharacterDemo::CharacterDemo(Context* context) :
     Character::RegisterObject(context);
 }
 
-CharacterDemo::~CharacterDemo()
-{
-}
+CharacterDemo::~CharacterDemo() = default;
 
 void CharacterDemo::Start()
 {

@@ -301,9 +301,7 @@ PListFile::PListFile(Context* context) :
 {
 }
 
-PListFile::~PListFile()
-{
-}
+PListFile::~PListFile() = default;
 
 void PListFile::RegisterObject(Context* context)
 {

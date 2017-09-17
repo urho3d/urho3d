@@ -43,11 +43,7 @@ public:
     }
 
     /// Copy-construct from another sphere.
-    Sphere(const Sphere& sphere) :
-        center_(sphere.center_),
-        radius_(sphere.radius_)
-    {
-    }
+    Sphere(const Sphere& sphere) = default;
 
     /// Construct from center and radius.
     Sphere(const Vector3& center, float radius) :
@@ -81,12 +77,7 @@ public:
     }
 
     /// Assign from another sphere.
-    Sphere& operator =(const Sphere& rhs)
-    {
-        center_ = rhs.center_;
-        radius_ = rhs.radius_;
-        return *this;
-    }
+    Sphere& operator =(const Sphere& rhs) = default;
 
     /// Test for equality with another sphere.
     bool operator ==(const Sphere& rhs) const { return center_ == rhs.center_ && radius_ == rhs.radius_; }

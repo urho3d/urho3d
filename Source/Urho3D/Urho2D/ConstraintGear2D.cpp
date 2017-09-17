@@ -39,9 +39,7 @@ ConstraintGear2D::ConstraintGear2D(Context* context) :
 {
 }
 
-ConstraintGear2D::~ConstraintGear2D()
-{
-}
+ConstraintGear2D::~ConstraintGear2D() = default;
 
 void ConstraintGear2D::RegisterObject(Context* context)
 {

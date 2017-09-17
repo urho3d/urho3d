@@ -60,19 +60,10 @@ public:
     {
     }
     /// Copy-construct from another vector.
-    IntVector2(const IntVector2& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_)
-    {
-    }
+    IntVector2(const IntVector2& rhs) = default;
 
     /// Assign from another vector.
-    IntVector2& operator =(const IntVector2& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        return *this;
-    }
+    IntVector2& operator =(const IntVector2& rhs) = default;
 
     /// Test for equality with another vector.
     bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
@@ -192,11 +183,7 @@ public:
     }
 
     /// Copy-construct from another vector.
-    Vector2(const Vector2& vector) :
-        x_(vector.x_),
-        y_(vector.y_)
-    {
-    }
+    Vector2(const Vector2& vector) = default;
 
     /// Construct from an IntVector2.
     explicit Vector2(const IntVector2& vector) :
@@ -220,12 +207,7 @@ public:
     }
 
     /// Assign from another vector.
-    Vector2& operator =(const Vector2& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        return *this;
-    }
+    Vector2& operator =(const Vector2& rhs) = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }

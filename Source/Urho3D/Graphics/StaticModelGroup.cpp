@@ -55,9 +55,7 @@ StaticModelGroup::StaticModelGroup(Context* context) :
     UpdateNodeIDs();
 }
 
-StaticModelGroup::~StaticModelGroup()
-{
-}
+StaticModelGroup::~StaticModelGroup() = default;
 
 void StaticModelGroup::RegisterObject(Context* context)
 {

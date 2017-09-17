@@ -39,9 +39,7 @@ Touch::Touch(Context* context, float touchSensitivity) :
 {
 }
 
-Touch::~Touch()
-{
-}
+Touch::~Touch() = default;
 
 void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
 {

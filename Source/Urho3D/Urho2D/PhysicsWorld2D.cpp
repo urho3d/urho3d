@@ -826,9 +826,7 @@ void PhysicsWorld2D::SendEndContactEvents()
     endContactInfos_.Clear();
 }
 
-PhysicsWorld2D::ContactInfo::ContactInfo()
-{
-}
+PhysicsWorld2D::ContactInfo::ContactInfo() = default;
 
 PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
 {

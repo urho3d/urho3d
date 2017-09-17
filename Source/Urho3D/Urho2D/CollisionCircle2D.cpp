@@ -43,9 +43,7 @@ CollisionCircle2D::CollisionCircle2D(Context* context) :
     fixtureDef_.shape = &circleShape_;
 }
 
-CollisionCircle2D::~CollisionCircle2D()
-{
-}
+CollisionCircle2D::~CollisionCircle2D() = default;
 
 void CollisionCircle2D::RegisterObject(Context* context)
 {

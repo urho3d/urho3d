@@ -56,9 +56,7 @@ DebugRenderer::DebugRenderer(Context* context) :
     SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(DebugRenderer, HandleEndFrame));
 }
 
-DebugRenderer::~DebugRenderer()
-{
-}
+DebugRenderer::~DebugRenderer() = default;
 
 void DebugRenderer::RegisterObject(Context* context)
 {

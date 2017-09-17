@@ -43,9 +43,7 @@ CheckBox::CheckBox(Context* context) :
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 }
 
-CheckBox::~CheckBox()
-{
-}
+CheckBox::~CheckBox() = default;
 
 void CheckBox::RegisterObject(Context* context)
 {

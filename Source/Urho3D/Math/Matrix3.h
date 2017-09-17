@@ -46,18 +46,7 @@ public:
     }
 
     /// Copy-construct from another matrix.
-    Matrix3(const Matrix3& matrix) :
-        m00_(matrix.m00_),
-        m01_(matrix.m01_),
-        m02_(matrix.m02_),
-        m10_(matrix.m10_),
-        m11_(matrix.m11_),
-        m12_(matrix.m12_),
-        m20_(matrix.m20_),
-        m21_(matrix.m21_),
-        m22_(matrix.m22_)
-    {
-    }
+    Matrix3(const Matrix3& matrix) = default;
 
     /// Construct from values.
     Matrix3(float v00, float v01, float v02,
@@ -90,19 +79,7 @@ public:
     }
 
     /// Assign from another matrix.
-    Matrix3& operator =(const Matrix3& rhs)
-    {
-        m00_ = rhs.m00_;
-        m01_ = rhs.m01_;
-        m02_ = rhs.m02_;
-        m10_ = rhs.m10_;
-        m11_ = rhs.m11_;
-        m12_ = rhs.m12_;
-        m20_ = rhs.m20_;
-        m21_ = rhs.m21_;
-        m22_ = rhs.m22_;
-        return *this;
-    }
+    Matrix3& operator =(const Matrix3& rhs) = default;
 
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix3& rhs) const

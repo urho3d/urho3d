@@ -49,9 +49,7 @@ LuaFile::LuaFile(Context* context) :
 {
 }
 
-LuaFile::~LuaFile()
-{
-}
+LuaFile::~LuaFile() = default;
 
 void LuaFile::RegisterObject(Context* context)
 {

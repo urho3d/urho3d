@@ -41,9 +41,7 @@ ConstraintWheel2D::ConstraintWheel2D(Context* context) :
 {
 }
 
-ConstraintWheel2D::~ConstraintWheel2D()
-{
-}
+ConstraintWheel2D::~ConstraintWheel2D() = default;
 
 void ConstraintWheel2D::RegisterObject(Context* context)
 {

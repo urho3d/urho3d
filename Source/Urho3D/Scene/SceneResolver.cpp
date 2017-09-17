@@ -32,13 +32,9 @@
 namespace Urho3D
 {
 
-SceneResolver::SceneResolver()
-{
-}
+SceneResolver::SceneResolver() = default;
 
-SceneResolver::~SceneResolver()
-{
-}
+SceneResolver::~SceneResolver() = default;
 
 void SceneResolver::Reset()
 {
