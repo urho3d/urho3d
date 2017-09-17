@@ -538,7 +538,7 @@ void Sample2D::PlaySoundEffect(String soundName)
     auto* cache = GetSubsystem<ResourceCache>();
     auto* source = scene_->CreateComponent<SoundSource>();
     auto* sound = cache->GetResource<Sound>("Sounds/" + soundName);
-    if (sound != NULL) {
+    if (sound != nullptr) {
         source->SetAutoRemoveMode(REMOVE_COMPONENT);
         source->Play(sound);
     }

@@ -370,7 +370,7 @@ bool NamedPipe::IsEof() const
         timeout.tv_sec = 0;
         timeout.tv_usec = 1000; // 1ms timeout for select
 
-        return select(readHandle_ + 1, &set, 0, 0, &timeout) <= 0;
+        return select(readHandle_ + 1, &set, nullptr, nullptr, &timeout) <= 0;
     }
     else
         return true;

@@ -235,7 +235,7 @@ ik_node_t* IKSolver::CreateIKNodeFromUrhoNode(const Node* node)
     if (effector != nullptr)
     {
 #ifdef DEBUG
-        if (effector->ikEffectorNode_ != NULL)
+        if (effector->ikEffectorNode_ != nullptr)
             URHO3D_LOGWARNINGF("[ik] IKEffector (attached to node \"%s\") has a reference to a possibly invalid internal effector. Should be NULL.", effector->GetNode()->GetName().CString());
 #endif
         ik_effector_t* ikEffector = ik_effector_create();
@@ -250,7 +250,7 @@ ik_node_t* IKSolver::CreateIKNodeFromUrhoNode(const Node* node)
     if (constraint != nullptr)
     {
 #ifdef DEBUG
-        if (constraint->ikConstraintNode_ != NULL)
+        if (constraint->ikConstraintNode_ != nullptr)
             URHO3D_LOGWARNINGF("[ik] IKConstraint (attached to node \"%s\") has a reference to a possibly invalid internal constraint. Should be NULL.", constraint->GetNode()->GetName().CString());
 #endif
 

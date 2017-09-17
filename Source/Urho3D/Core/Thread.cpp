@@ -51,8 +51,8 @@ static void* ThreadFunctionStatic(void* data)
 {
     auto* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
-    pthread_exit((void*)0);
-    return 0;
+    pthread_exit((void*)nullptr);
+    return nullptr;
 }
 
 #endif
@@ -108,7 +108,7 @@ void Thread::Stop()
 #else
     auto* thread = (pthread_t*)handle_;
     if (thread)
-        pthread_join(*thread, 0);
+        pthread_join(*thread, nullptr);
     delete thread;
 #endif
     handle_ = nullptr;

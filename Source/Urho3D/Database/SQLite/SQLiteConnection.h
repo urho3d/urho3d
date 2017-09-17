@@ -53,7 +53,7 @@ public:
     const sqlite3* GetConnectionImpl() const { return connectionImpl_; }
 
     /// Return true when the connection object is connected to the associated database.
-    bool IsConnected() const { return connectionImpl_ != 0; }
+    bool IsConnected() const { return connectionImpl_ != nullptr; }
 
 private:
     /// The connection string for SQLite3 is using the URI format described in https://www.sqlite.org/uri.html, while the connection string for ODBC is using DSN format as per ODBC standard.

@@ -83,7 +83,7 @@ Mutex::~Mutex()
     auto* mutex = (pthread_mutex_t*)handle_;
     pthread_mutex_destroy(mutex);
     delete mutex;
-    handle_ = 0;
+    handle_ = nullptr;
 }
 
 void Mutex::Acquire()

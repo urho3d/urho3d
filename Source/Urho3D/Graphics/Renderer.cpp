@@ -1088,7 +1088,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
                 // Note: this loses current rendertarget assignment
                 graphics_->ResetRenderTargets();
                 graphics_->SetRenderTarget(0, newTex2D);
-                graphics_->SetDepthStencil((RenderSurface*)0);
+                graphics_->SetDepthStencil((RenderSurface*)nullptr);
                 graphics_->SetViewport(IntRect(0, 0, width, height));
                 graphics_->Clear(CLEAR_COLOR);
             }

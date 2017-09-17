@@ -63,8 +63,8 @@ Condition::Condition() :
     mutex_(new pthread_mutex_t),
     event_(new pthread_cond_t)
 {
-    pthread_mutex_init((pthread_mutex_t*)mutex_, 0);
-    pthread_cond_init((pthread_cond_t*)event_, 0);
+    pthread_mutex_init((pthread_mutex_t*)mutex_, nullptr);
+    pthread_cond_init((pthread_cond_t*)event_, nullptr);
 }
 
 Condition::~Condition()
@@ -76,8 +76,8 @@ Condition::~Condition()
     pthread_mutex_destroy(mutex);
     delete cond;
     delete mutex;
-    event_ = 0;
-    mutex_ = 0;
+    event_ = nullptr;
+    mutex_ = nullptr;
 }
 
 void Condition::Set()
