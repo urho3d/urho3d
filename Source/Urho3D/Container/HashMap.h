@@ -77,7 +77,7 @@ public:
 
     private:
         /// Prevent assignment.
-        KeyValue& operator =(const KeyValue& rhs);
+        KeyValue& operator =(const KeyValue& rhs) = delete;
     };
 
     /// Hash map node.

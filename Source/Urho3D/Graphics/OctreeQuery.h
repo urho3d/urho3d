@@ -63,9 +63,9 @@ public:
 
 private:
     /// Prevent copy construction.
-    OctreeQuery(const OctreeQuery& rhs);
+    OctreeQuery(const OctreeQuery& rhs) = delete;
     /// Prevent assignment.
-    OctreeQuery& operator =(const OctreeQuery& rhs);
+    OctreeQuery& operator =(const OctreeQuery& rhs) = delete;
 };
 
 /// Point octree query.
@@ -249,9 +249,9 @@ public:
 
 private:
     /// Prevent copy construction.
-    RayOctreeQuery(const RayOctreeQuery& rhs);
+    RayOctreeQuery(const RayOctreeQuery& rhs) = delete;
     /// Prevent assignment.
-    RayOctreeQuery& operator =(const RayOctreeQuery& rhs);
+    RayOctreeQuery& operator =(const RayOctreeQuery& rhs) = delete;
 };
 
 class URHO3D_API AllContentOctreeQuery : public OctreeQuery
