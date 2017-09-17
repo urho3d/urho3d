@@ -330,7 +330,7 @@ SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
     else if (format_ == Graphics::GetRGBFormat())
         rawImage->SetSize(width_, height_, 3);
     else
-        assert(0);
+        assert(false);
 
     GetData(face, 0, rawImage->GetData());
     return SharedPtr<Image>(rawImage);

@@ -173,7 +173,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
 
         // s/(\w+)\[\]/Array<\1>/g
         unsigned posBegin = String::NPOS;
-        while (1)   // Loop to cater for array of array of T
+        while (true)   // Loop to cater for array of array of T
         {
             unsigned posEnd = out.Find("[]");
             if (posEnd == String::NPOS)

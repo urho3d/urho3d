@@ -93,7 +93,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         if (pageElem.IsNull())
         {
             URHO3D_LOGERROR("Could not find Page element for page: " + String(i));
-            return 0;
+            return false;
         }
 
         // Assume the font image is in the same directory as the font description file
@@ -105,11 +105,11 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         if (!fontFile || !fontImage->Load(*fontFile))
         {
             URHO3D_LOGERROR("Failed to load font image file");
-            return 0;
+            return false;
         }
         SharedPtr<Texture2D> texture = LoadFaceTexture(fontImage);
         if (!texture)
-            return 0;
+            return false;
 
         textures_.Push(texture);
 

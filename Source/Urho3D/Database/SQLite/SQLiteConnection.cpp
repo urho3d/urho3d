@@ -90,7 +90,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     bool filtered = false;
     bool aborted = false;
 
-    while (1)
+    while (true)
     {
         rc = sqlite3_step(pStmt);
         if (rc == SQLITE_ROW)
