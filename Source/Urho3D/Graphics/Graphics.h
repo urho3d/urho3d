@@ -90,6 +90,8 @@ public:
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);
+	void SetExternalGLContext(void* context);
+	void SetNotUseSDL(bool not_use);
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
     /// Set window icon.
@@ -306,6 +308,7 @@ public:
     /// Return the current monitor index. Effective on in fullscreen
     int GetMonitor() const { return monitor_; }
 
+	void GetRenderPixel(unsigned char* data, unsigned int data_length);
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
 
@@ -487,7 +490,7 @@ public:
     IntVector2 GetRenderTargetDimensions() const;
 
     /// Window was resized through user interaction. Called by Input subsystem.
-    void OnWindowResized();
+    void OnWindowResized(int new_width = 0, int new_height = 0);
     /// Window was moved through user interaction. Called by Input subsystem.
     void OnWindowMoved();
     /// Restore GPU objects and reinitialize state. Requires an open window. Used only on OpenGL.
@@ -630,6 +633,8 @@ private:
     WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
+
+	bool not_use_sdl_;
     /// Window width in pixels.
     int width_;
     /// Window height in pixels.

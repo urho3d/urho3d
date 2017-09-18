@@ -33,6 +33,8 @@ namespace Urho3D
 GraphicsImpl::GraphicsImpl() :
     context_(0),
     systemFBO_(0),
+	systemFBODSO_(0),
+	systemFBOCO_(0),
     activeTexture_(0),
     enabledVertexAttributes_(0),
     usedVertexAttributes_(0),

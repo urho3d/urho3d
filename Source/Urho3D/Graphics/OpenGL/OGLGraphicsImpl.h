@@ -116,6 +116,8 @@ private:
     SDL_GLContext context_;
     /// IOS system framebuffer handle.
     unsigned systemFBO_;
+	unsigned systemFBOCO_;
+	unsigned systemFBODSO_;
     /// Active texture unit.
     unsigned activeTexture_;
     /// Enabled vertex attributes bitmask.

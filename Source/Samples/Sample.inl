@@ -62,6 +62,12 @@ void Sample::Setup()
     engineParameters_[EP_FULL_SCREEN]  = false;
     engineParameters_[EP_HEADLESS]     = false;
     engineParameters_[EP_SOUND]        = false;
+    engineParameters_[EP_WINDOW_POSITION_X] = 320;
+    engineParameters_[EP_WINDOW_POSITION_Y] = 200;
+    engineParameters_[EP_BORDERLESS] = true;
+    engineParameters_[EP_WINDOW_RESIZABLE] = true;
+    engineParameters_["WindowWidth"] = 1280;
+    engineParameters_["WindowHeight"] = 800;
 
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
@@ -80,7 +86,7 @@ void Sample::Start()
         SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Sample, HandleTouchBegin));
 
     // Create logo
-    CreateLogo();
+    //CreateLogo();
 
     // Set custom window Title & Icon
     SetWindowTitleAndIcon();
@@ -196,7 +202,7 @@ void Sample::SetWindowTitleAndIcon()
     Graphics* graphics = GetSubsystem<Graphics>();
     Image* icon = cache->GetResource<Image>("Textures/UrhoIcon.png");
     graphics->SetWindowIcon(icon);
-    graphics->SetWindowTitle("Urho3D Sample");
+    graphics->SetWindowTitle("AR!!!!");
 }
 
 void Sample::CreateConsoleAndDebugHud()
@@ -237,7 +243,11 @@ void Sample::HandleKeyUp(StringHash /*eventType*/, VariantMap& eventData)
                     GetSubsystem<Input>()->SetMouseMode(MM_FREE);
             }
             else
-                engine_->Exit();
+            {
+              stop_ = true;
+              engine_->Exit();
+            }
+              
         }
     }
 }

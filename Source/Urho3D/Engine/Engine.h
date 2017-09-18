@@ -105,6 +105,7 @@ public:
     /// Return whether the engine has been created in headless mode.
     bool IsHeadless() const { return headless_; }
 
+	void GetRenderPixels(unsigned char* data, unsigned int length);
     /// Send frame update events.
     void Update();
     /// Render after frame update.

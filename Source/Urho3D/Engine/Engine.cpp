@@ -169,6 +169,10 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     URHO3D_PROFILE(InitEngine);
 
+	// Add resource paths
+	if (!InitializeResourceCache(parameters, false))
+		return false;
+
     // Set headless mode
     headless_ = GetParameter(parameters, EP_HEADLESS, false).GetBool();
 
@@ -218,10 +222,6 @@ bool Engine::Initialize(const VariantMap& parameters)
     }
 #endif
 
-    // Add resource paths
-    if (!InitializeResourceCache(parameters, false))
-        return false;
-
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -245,8 +245,19 @@ bool Engine::Initialize(const VariantMap& parameters)
 #ifdef URHO3D_OPENGL
         if (HasParameter(parameters, EP_FORCE_GL2))
             graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
+
+		if (HasParameter(parameters, EP_EXTERNAL_GL_CONTEXT))
+			graphics->SetExternalGLContext(GetParameter(parameters, EP_EXTERNAL_GL_CONTEXT).GetVoidPtr());
 #endif
 
+		if (HasParameter(parameters, EP_NOT_USE_SDL))
+		{
+			graphics->SetNotUseSDL(GetParameter(parameters, EP_NOT_USE_SDL).GetBool());
+		}
+		else
+		{
+			graphics->SetNotUseSDL(false);
+		}
         if (!graphics->SetMode(
             GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
             GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
@@ -681,6 +692,12 @@ void Engine::DumpMemory()
     URHO3D_LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
 #endif
 #endif
+}
+
+void Engine::GetRenderPixels(unsigned char * data, unsigned int length)
+{
+	auto graphics = GetSubsystem<Graphics>();
+	graphics->GetRenderPixel(data, length);
 }
 
 void Engine::Update()

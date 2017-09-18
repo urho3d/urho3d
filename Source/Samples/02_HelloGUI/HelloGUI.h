@@ -31,6 +31,8 @@ class Window;
 
 }
 
+class NumberEdit;
+
 /// A simple 'HelloWorld' GUI created purely from code.
 /// This sample demonstrates:
 ///     - Creation of controls and building a UI hierarchy
@@ -74,17 +76,85 @@ private:
     void HandleDragMove(StringHash eventType, VariantMap& eventData);
     /// Handle drag end for the fish button.
     void HandleDragEnd(StringHash eventType, VariantMap& eventData);
+
+    void HandleResized(StringHash eventType, VariantMap& eventData);
     /// Handle any UI control being clicked.
-    void HandleControlClicked(StringHash eventType, VariantMap& eventData);
+    void HandleLoginClicked(StringHash eventType, VariantMap& eventData);
     /// Handle close button pressed and released.
     void HandleClosePressed(StringHash eventType, VariantMap& eventData);
+    void HandleLoginReleased(StringHash eventType, VariantMap& eventData);
+
+    void HandleCancelClicked(StringHash eventType, VariantMap& eventData);
+    void HandleCancelReleased(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditReleased(StringHash eventType, VariantMap& eventData);
+
+    void HandleGenerateReleased(StringHash eventType, VariantMap& eventData);
+
+    void HandleSliderChanged0(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditorChanged0(StringHash eventType, VariantMap& eventData);
+
+    void HandleSliderChanged1(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditorChanged1(StringHash eventType, VariantMap& eventData);
+
+    void HandleSliderChanged2(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditorChanged2(StringHash eventType, VariantMap& eventData);
+
+    void HandleSliderChanged3(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditorChanged3(StringHash eventType, VariantMap& eventData);
+
+    void HandleSliderChanged4(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditorChanged4(StringHash eventType, VariantMap& eventData);
+
+    void HandleSliderChanged5(StringHash eventType, VariantMap& eventData);
+
+    void HandleEditorChanged5(StringHash eventType, VariantMap& eventData);
+
+	void HandleShowLoadingPage(StringHash eventType, VariantMap& eventData);
+
+	void HandleLoadingCircleUpdate(StringHash eventType, VariantMap& eventData);
+
+    //Init Main UI
+    void InitMainUI();
+    
+    void InitFineTuning();
+
+    // Init Start Page
+    void InitStartPage();
+
+    // Init Loading Page
+    void InitLoadingPage();
 
     /// The Window.
     SharedPtr<Window> window_;
+    SharedPtr<Window> windowfinetuning_;
+
+	SharedPtr<UIElement> startPage_;
+	SharedPtr<UIElement> loadingPage_;
+	SharedPtr<UIElement> animateCircle_;
+
+	bool isInLoadingPage_ = true;
     /// The UI's root UIElement.
     SharedPtr<UIElement> uiRoot_;
+
+    SharedPtr<UIElement> loginelement;
+    SharedPtr<UIElement> mainelement;
+
+
     /// Remembered drag begin position.
     IntVector2 dragBeginPosition_;
+
+    NumberEdit* editors_[6];
+    Slider*     sliders_[6];
+
+    int currentSignal_ = -1;
+
+	float loadingDurationTime_ = 0.0F;
 };
 
 

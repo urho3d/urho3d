@@ -89,7 +89,7 @@ protected:
     bool touchEnabled_;
     /// Mouse mode option to use in the sample.
     MouseMode useMouseMode_;
-
+    bool stop_;
 private:
     /// Create logo.
     void CreateLogo();
@@ -116,6 +116,7 @@ private:
     unsigned screenJoystickSettingsIndex_;
     /// Pause flag.
     bool paused_;
+    
 };
 
 #include "Sample.inl"
