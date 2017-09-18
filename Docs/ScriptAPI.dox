@@ -1104,6 +1104,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1521,6 +1522,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1775,6 +1777,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -3884,6 +3887,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -3930,6 +3934,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -6919,6 +6924,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -6968,6 +6974,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -8900,6 +8907,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -8949,6 +8957,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
