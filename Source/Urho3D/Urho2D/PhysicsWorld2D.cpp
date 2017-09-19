@@ -30,6 +30,7 @@
 #include "../IO/Log.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../Urho2D/CollisionShape2D.h"
 #include "../Urho2D/PhysicsEvents2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/PhysicsWorld2D.h"
@@ -50,7 +51,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     gravity_(DEFAULT_GRAVITY),
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
-    debugRenderer_(0),
+    debugRenderer_(nullptr),
     physicsStepping_(false),
     applyingTransforms_(false),
     updateEnabled_(true)
@@ -103,7 +104,7 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
         world_->DrawDebugData();
-        debugRenderer_ = 0;
+        debugRenderer_ = nullptr;
     }
 }
 
@@ -132,6 +133,61 @@ void PhysicsWorld2D::EndContact(b2Contact* contact)
         return;
 
     endContactInfos_.Push(ContactInfo(contact));
+}
+
+void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+{
+    b2Fixture* fixtureA = contact->GetFixtureA();
+    b2Fixture* fixtureB = contact->GetFixtureB();
+    if (!fixtureA || !fixtureB)
+        return;
+
+    ContactInfo contactInfo(contact);
+
+    // Send global event
+    VariantMap& eventData = GetEventDataMap();
+    eventData[PhysicsUpdateContact2D::P_WORLD] = this;
+    eventData[PhysicsUpdateContact2D::P_ENABLED] = contact->IsEnabled();
+
+    eventData[PhysicsUpdateContact2D::P_BODYA] = contactInfo.bodyA_.Get();
+    eventData[PhysicsUpdateContact2D::P_BODYB] = contactInfo.bodyB_.Get();
+    eventData[PhysicsUpdateContact2D::P_NODEA] = contactInfo.nodeA_.Get();
+    eventData[PhysicsUpdateContact2D::P_NODEB] = contactInfo.nodeB_.Get();
+    eventData[PhysicsUpdateContact2D::P_CONTACTS] = contactInfo.Serialize(contacts_);
+    eventData[PhysicsUpdateContact2D::P_SHAPEA] = contactInfo.shapeA_.Get();
+    eventData[PhysicsUpdateContact2D::P_SHAPEB] = contactInfo.shapeB_.Get();
+
+    SendEvent(E_PHYSICSUPDATECONTACT2D, eventData);
+    contact->SetEnabled(eventData[PhysicsUpdateContact2D::P_ENABLED].GetBool());
+    eventData.Clear();
+
+    // Send node event
+    eventData[NodeUpdateContact2D::P_ENABLED] = contact->IsEnabled();
+    eventData[NodeUpdateContact2D::P_CONTACTS] = contactInfo.Serialize(contacts_);
+
+    if (contactInfo.nodeA_)
+    {
+        eventData[NodeUpdateContact2D::P_BODY] = contactInfo.bodyA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+        eventData[NodeUpdateContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
+
+        contactInfo.nodeA_->SendEvent(E_NODEUPDATECONTACT2D, eventData);
+    }
+
+    if (contactInfo.nodeB_)
+    {
+        eventData[NodeUpdateContact2D::P_BODY] = contactInfo.bodyB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+        eventData[NodeUpdateContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
+
+        contactInfo.nodeB_->SendEvent(E_NODEUPDATECONTACT2D, eventData);
+    }
+
+    contact->SetEnabled(eventData[NodeUpdateContact2D::P_ENABLED].GetBool());
 }
 
 void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -174,6 +230,13 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
 
         debugRenderer_->AddLine(p + Vector3(x1, y1, 0.0f), p + Vector3(x2, y2, 0.0f), c, debugDepthTest_);
     }
+}
+
+extern URHO3D_API const float PIXEL_SIZE;
+
+void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
+{
+    DrawSolidCircle(p, size * 0.5f * PIXEL_SIZE, b2Vec2(), color);
 }
 
 void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
@@ -407,7 +470,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -458,7 +521,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -495,7 +558,7 @@ private:
 void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
     unsigned collisionMask)
 {
-    result.body_ = 0;
+    result.body_ = nullptr;
 
     SingleRayCastCallback callback(result, startPoint, collisionMask);
     world_->RayCast(&callback, ToB2Vec2(startPoint), ToB2Vec2(endPoint));
@@ -509,12 +572,12 @@ public:
     PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :
         point_(point),
         collisionMask_(collisionMask),
-        rigidBody_(0)
+        rigidBody_(nullptr)
     {
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture)
+    virtual bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -571,7 +634,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned col
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 // Aabb query callback class.
@@ -586,7 +649,7 @@ public:
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture)
+    virtual bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -678,17 +741,21 @@ void PhysicsWorld2D::SendBeginContactEvents()
         eventData[P_BODYB] = contactInfo.bodyB_.Get();
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
-        eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_CONTACTS] = contactInfo.Serialize(contacts_);
+        eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
+        eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
 
-        nodeEventData[NodeBeginContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+        nodeEventData[NodeBeginContact2D::P_CONTACTS] = contactInfo.Serialize(contacts_);
 
         if (contactInfo.nodeA_)
         {
             nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
         }
@@ -698,6 +765,8 @@ void PhysicsWorld2D::SendBeginContactEvents()
             nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
         }
@@ -723,17 +792,21 @@ void PhysicsWorld2D::SendEndContactEvents()
         eventData[P_BODYB] = contactInfo.bodyB_.Get();
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
-        eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_CONTACTS] = contactInfo.Serialize(contacts_);
+        eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
+        eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSENDCONTACT2D, eventData);
 
-        nodeEventData[NodeEndContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+        nodeEventData[NodeEndContact2D::P_CONTACTS] = contactInfo.Serialize(contacts_);
 
         if (contactInfo.nodeA_)
         {
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeEndContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -743,6 +816,8 @@ void PhysicsWorld2D::SendEndContactEvents()
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeEndContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -763,16 +838,30 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
     bodyB_ = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
     nodeA_ = bodyA_->GetNode();
     nodeB_ = bodyB_->GetNode();
-    contact_ = contact;
+    shapeA_ = (CollisionShape2D*)fixtureA->GetUserData();
+    shapeB_ = (CollisionShape2D*)fixtureB->GetUserData();
+
+    b2WorldManifold worldManifold;
+    contact->GetWorldManifold(&worldManifold);
+    numPoints_ = contact->GetManifold()->pointCount;
+    worldNormal_ = Vector2(worldManifold.normal.x, worldManifold.normal.y);
+    for (int i = 0; i < numPoints_; ++i)
+    {
+        worldPositions_[i] = Vector2(worldManifold.points[i].x, worldManifold.points[i].y);
+        separations_[i] = worldManifold.separations[i];
+    }
 }
 
-PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
-    bodyA_(other.bodyA_),
-    bodyB_(other.bodyB_),
-    nodeA_(other.nodeA_),
-    nodeB_(other.nodeB_),
-    contact_(other.contact_)
+const Urho3D::PODVector<unsigned char>& PhysicsWorld2D::ContactInfo::Serialize(VectorBuffer& buffer) const
 {
+    buffer.Clear();
+    for (int i = 0; i < numPoints_; ++i)
+    {
+        buffer.WriteVector2(worldPositions_[i]);
+        buffer.WriteVector2(worldNormal_);
+        buffer.WriteFloat(separations_[i]);
+    }
+    return buffer.GetBuffer();
 }
 
 }

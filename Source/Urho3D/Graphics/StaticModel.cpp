@@ -158,7 +158,7 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
 Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
 {
     if (batchIndex >= geometries_.Size())
-        return 0;
+        return nullptr;
 
     // If level is out of range, use visible geometry
     if (level < geometries_[batchIndex].Size())
@@ -234,15 +234,6 @@ void StaticModel::SetModel(Model* model)
     if (model == model_)
         return;
 
-    // If script erroneously calls StaticModel::SetModel on an AnimatedModel, warn and redirect
-    if (GetType() == AnimatedModel::GetTypeStatic())
-    {
-        URHO3D_LOGWARNING("StaticModel::SetModel() called on AnimatedModel. Redirecting to AnimatedModel::SetModel()");
-        AnimatedModel* animatedModel = static_cast<AnimatedModel*>(this);
-        animatedModel->SetModel(model);
-        return;
-    }
-
     if (!node_)
     {
         URHO3D_LOGERROR("Can not set model while model component is not attached to a scene node");
@@ -263,7 +254,7 @@ void StaticModel::SetModel(Model* model)
         SetNumGeometries(model->GetNumGeometries());
         const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
         const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
-        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : (const Matrix3x4*)0;
+        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : nullptr;
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
             batches_[i].worldTransform_ = worldTransform;
@@ -334,7 +325,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
 
 Material* StaticModel::GetMaterial(unsigned index) const
 {
-    return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
+    return index < batches_.Size() ? batches_[index].material_ : nullptr;
 }
 
 bool StaticModel::IsInside(const Vector3& point) const

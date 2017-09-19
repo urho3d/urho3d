@@ -1,6 +1,6 @@
 $#include "Graphics/Model.h"
 
-class Model : public Resource
+class Model : public ResourceWithMetadata
 {
     Model();
     ~Model();

@@ -5,9 +5,11 @@ class Deserializer
     // unsigned Read(void* dest, unsigned size);
     tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
     unsigned Seek(unsigned position);
+    unsigned SeekRelative(int delta);
     const String GetName() const;
     unsigned GetChecksum();
     unsigned GetPosition() const;
+    unsigned Tell() const;
     unsigned GetSize() const;
     bool IsEof() const;
     

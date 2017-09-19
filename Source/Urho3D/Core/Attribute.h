@@ -68,10 +68,9 @@ struct AttributeInfo
     AttributeInfo() :
         type_(VAR_NONE),
         offset_(0),
-        enumNames_(0),
-        variantStructureElementNames_(0),
+        enumNames_(nullptr),
         mode_(AM_DEFAULT),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -80,11 +79,10 @@ struct AttributeInfo
         type_(type),
         name_(name),
         offset_((unsigned)offset),
-        enumNames_(0),
-        variantStructureElementNames_(0),
+        enumNames_(nullptr),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -94,10 +92,9 @@ struct AttributeInfo
         name_(name),
         offset_((unsigned)offset),
         enumNames_(enumNames),
-        variantStructureElementNames_(0),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -106,12 +103,11 @@ struct AttributeInfo
         type_(type),
         name_(name),
         offset_(0),
-        enumNames_(0),
-        variantStructureElementNames_(0),
+        enumNames_(nullptr),
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -122,26 +118,24 @@ struct AttributeInfo
         name_(name),
         offset_(0),
         enumNames_(enumNames),
-        variantStructureElementNames_(0),
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
-    /// Construct variant structure (structure, which packed to VariantVector) attribute.
-    AttributeInfo(VariantType type, const char* name, AttributeAccessor* accessor, const Variant& defaultValue, const char** variantStructureElementNames, unsigned mode) :
-        type_(type),
-        name_(name),
-        offset_(0),
-        enumNames_(0),
-        variantStructureElementNames_(variantStructureElementNames),
-        accessor_(accessor),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(0)
+    /// Get attribute metadata.
+    const Variant& GetMetadata(const StringHash& key) const
     {
+        auto elem = metadata_.Find(key);
+        return elem != metadata_.End() ? elem->second_ : Variant::EMPTY;
+    }
+
+    /// Get attribute metadata of specified type.
+    template <class T> T GetMetadata(const StringHash& key) const
+    {
+        return GetMetadata(key).Get<T>();
     }
 
     /// Attribute type.
@@ -152,16 +146,41 @@ struct AttributeInfo
     unsigned offset_;
     /// Enum names.
     const char** enumNames_;
-    /// Variant structure elements names.
-    const char** variantStructureElementNames_;
     /// Helper object for accessor mode.
     SharedPtr<AttributeAccessor> accessor_;
     /// Default value for network replication.
     Variant defaultValue_;
     /// Attribute mode: whether to use for serialization, network replication, or both.
     unsigned mode_;
+    /// Attribute metadata.
+    VariantMap metadata_;
     /// Attribute data pointer if elsewhere than in the Serializable.
     void* ptr_;
+};
+
+/// Attribute handle returned by Context::RegisterAttribute and used to chain attribute setup calls.
+struct AttributeHandle
+{
+    friend class Context;
+private:
+    /// Construct default.
+    AttributeHandle() = default;
+    /// Construct from another handle.
+    AttributeHandle(const AttributeHandle& another) = default;
+    /// Attribute info.
+    AttributeInfo* attributeInfo_ = nullptr;
+    /// Network attribute info.
+    AttributeInfo* networkAttributeInfo_ = nullptr;
+public:
+    /// Set metadata.
+    AttributeHandle& SetMetadata(StringHash key, const Variant& value)
+    {
+        if (attributeInfo_)
+            attributeInfo_->metadata_[key] = value;
+        if (networkAttributeInfo_)
+            networkAttributeInfo_->metadata_[key] = value;
+        return *this;
+    }
 };
 
 }

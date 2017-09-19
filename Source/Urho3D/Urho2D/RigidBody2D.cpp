@@ -44,13 +44,13 @@ static const char* bodyTypeNames[] =
     "Static",
     "Kinematic",
     "Dynamic",
-    0
+    nullptr
 };
 
 RigidBody2D::RigidBody2D(Context* context) :
     Component(context),
     useFixtureMass_(true),
-    body_(0)
+    body_(nullptr)
 {
     // Make sure the massData members are zero-initialized.
     massData_.mass = 0.0f;
@@ -104,7 +104,7 @@ void RigidBody2D::OnSetEnabled()
 
 void RigidBody2D::SetBodyType(BodyType2D type)
 {
-    b2BodyType bodyType = (b2BodyType)type;    
+    b2BodyType bodyType = (b2BodyType)type;
     if (body_)
     {
         body_->SetType(bodyType);
@@ -175,7 +175,6 @@ void RigidBody2D::SetUseFixtureMass(bool useFixtureMass)
 
     if (body_)
     {
-        body_->m_useFixtureMass = useFixtureMass;
         if (useFixtureMass_)
             body_->ResetMassData();
         else
@@ -315,7 +314,7 @@ void RigidBody2D::SetLinearVelocity(const Vector2& linearVelocity)
 void RigidBody2D::SetAngularVelocity(float angularVelocity)
 {
     if (body_)
-        body_->SetAngularVelocity(angularVelocity); 
+        body_->SetAngularVelocity(angularVelocity);
     else
     {
         if (bodyDef_.angularVelocity == angularVelocity)
@@ -351,6 +350,12 @@ void RigidBody2D::ApplyLinearImpulse(const Vector2& impulse, const Vector2& poin
         body_->ApplyLinearImpulse(ToB2Vec2(impulse), ToB2Vec2(point), wake);
 }
 
+void RigidBody2D::ApplyLinearImpulseToCenter(const Vector2& impulse, bool wake)
+{
+    if (body_ && impulse != Vector2::ZERO)
+        body_->ApplyLinearImpulseToCenter(ToB2Vec2(impulse), wake);
+}
+
 void RigidBody2D::ApplyAngularImpulse(float impulse, bool wake)
 {
     if (body_)
@@ -365,7 +370,7 @@ void RigidBody2D::CreateBody()
     if (!physicsWorld_ || !physicsWorld_->GetWorld())
         return;
 
-    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());;
+    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());
     bodyDef_.angle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
 
     body_ = physicsWorld_->GetWorld()->CreateBody(&bodyDef_);
@@ -410,7 +415,7 @@ void RigidBody2D::ReleaseBody()
     }
 
     physicsWorld_->GetWorld()->DestroyBody(body_);
-    body_ = 0;
+    body_ = nullptr;
 }
 
 void RigidBody2D::ApplyWorldTransform()
@@ -420,7 +425,7 @@ void RigidBody2D::ApplyWorldTransform()
 
     // If the rigid body is parented to another rigid body, can not set the transform immediately.
     // In that case store it to PhysicsWorld2D for delayed assignment
-    RigidBody2D* parentRigidBody = 0;
+    RigidBody2D* parentRigidBody = nullptr;
     Node* parent = node_->GetParent();
     if (parent != GetScene() && parent)
         parentRigidBody = parent->GetComponent<RigidBody2D>();
@@ -561,7 +566,9 @@ void RigidBody2D::OnSceneSet(Scene* scene)
 {
     if (scene)
     {
-        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
+        physicsWorld_ = scene->GetDerivedComponent<PhysicsWorld2D>();
+        if (!physicsWorld_)
+            physicsWorld_ = scene->CreateComponent<PhysicsWorld2D>();
 
         CreateBody();
         physicsWorld_->AddRigidBody(this);
@@ -593,16 +600,14 @@ void RigidBody2D::OnMarkedDirty(Node* node)
     // Check if transform has changed from the last one set in ApplyWorldTransform()
     b2Vec2 newPosition = ToB2Vec2(node_->GetWorldPosition());
     float newAngle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
-    if (newPosition != bodyDef_.position || newAngle != bodyDef_.angle)
+
+    if (!body_)
     {
-        if (body_)
-            body_->SetTransform(newPosition, newAngle);
-        else
-        {
-            bodyDef_.position = newPosition;
-            bodyDef_.angle = newAngle;
-        }
+        bodyDef_.position = newPosition;
+        bodyDef_.angle = newAngle;
     }
+    else if (newPosition != body_->GetPosition() || newAngle != body_->GetAngle())
+        body_->SetTransform(newPosition, newAngle);
 }
 
 }

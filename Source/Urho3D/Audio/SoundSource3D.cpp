@@ -43,63 +43,6 @@ static const Color OUTER_COLOR(1.0f, 0.0f, 1.0f);
 
 extern const char* AUDIO_CATEGORY;
 
-static Vector3 PointOnSphere(float radius, float theta, float phi)
-{
-    // Zero angles point toward positive Z axis
-    phi += 90.0f;
-
-    return Vector3(
-        radius * Sin(theta) * Sin(phi),
-        radius * Cos(phi),
-        radius * Cos(theta) * Sin(phi)
-    );
-}
-
-static void DrawDebugArc(const Vector3& worldPosition, const Quaternion& worldRotation, float angle, float distance, bool drawLines,
-    const Color& color, DebugRenderer* debug, bool depthTest)
-{
-    if (angle <= 0.f)
-        return;
-    else if (angle >= 360.0f)
-    {
-        debug->AddSphere(Sphere(worldPosition, distance), color, depthTest);
-        return;
-    }
-
-    unsigned uintColor = color.ToUInt();
-    float halfAngle = 0.5f * angle;
-
-    if (drawLines)
-    {
-        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, halfAngle, halfAngle),
-            uintColor);
-        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, halfAngle),
-            uintColor);
-        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, halfAngle, -halfAngle),
-            uintColor);
-        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, -halfAngle),
-            uintColor);
-    }
-
-    const float step = 0.5f;
-
-    for (float x = -1.0f; x < 1.0f; x += step)
-    {
-        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, x * halfAngle, halfAngle),
-            worldPosition + worldRotation * PointOnSphere(distance, (x + step) * halfAngle, halfAngle),
-            uintColor);
-        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, x * halfAngle, -halfAngle),
-            worldPosition + worldRotation * PointOnSphere(distance, (x + step) * halfAngle, -halfAngle),
-            uintColor);
-        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, halfAngle, x * halfAngle),
-            worldPosition + worldRotation * PointOnSphere(distance, halfAngle, (x + step) * halfAngle),
-            uintColor);
-        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, x * halfAngle),
-            worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, (x + step) * halfAngle),
-            uintColor);
-    }
-}
-
 SoundSource3D::SoundSource3D(Context* context) :
     SoundSource(context),
     nearDistance_(DEFAULT_NEARDISTANCE),
@@ -139,10 +82,11 @@ void SoundSource3D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     // Draw cones for directional sounds, or spheres for non-directional
     if (innerAngle_ < DEFAULT_ANGLE && outerAngle_ > 0.0f)
     {
-        DrawDebugArc(worldPosition, worldRotation, innerAngle_, nearDistance_, false, INNER_COLOR, debug, depthTest);
-        DrawDebugArc(worldPosition, worldRotation, outerAngle_, nearDistance_, false, OUTER_COLOR, debug, depthTest);
-        DrawDebugArc(worldPosition, worldRotation, innerAngle_, farDistance_, true, INNER_COLOR, debug, depthTest);
-        DrawDebugArc(worldPosition, worldRotation, outerAngle_, farDistance_, true, OUTER_COLOR, debug, depthTest);
+        const Quaternion rotation = worldRotation * Quaternion(Vector3::UP, Vector3::FORWARD);
+        debug->AddSphereSector(Sphere(worldPosition, nearDistance_), rotation, innerAngle_, false, INNER_COLOR, depthTest);
+        debug->AddSphereSector(Sphere(worldPosition, nearDistance_), rotation, outerAngle_, false, OUTER_COLOR, depthTest);
+        debug->AddSphereSector(Sphere(worldPosition, farDistance_), rotation, innerAngle_, true, INNER_COLOR, depthTest);
+        debug->AddSphereSector(Sphere(worldPosition, farDistance_), rotation, outerAngle_, true, OUTER_COLOR, depthTest);
     }
     else
     {

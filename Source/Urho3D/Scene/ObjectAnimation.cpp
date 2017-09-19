@@ -40,7 +40,7 @@ const char* wrapModeNames[] =
     "Loop",
     "Once",
     "Clamp",
-    0
+    nullptr
 };
 
 ObjectAnimation::ObjectAnimation(Context* context) :
@@ -210,7 +210,7 @@ void ObjectAnimation::RemoveAttributeAnimation(const String& name)
     {
         SendAttributeAnimationRemovedEvent(name);
 
-        i->second_->GetAnimation()->SetOwner(0);
+        i->second_->GetAnimation()->SetOwner(nullptr);
         attributeAnimationInfos_.Erase(i);
     }
 }
@@ -227,7 +227,7 @@ void ObjectAnimation::RemoveAttributeAnimation(ValueAnimation* attributeAnimatio
         {
             SendAttributeAnimationRemovedEvent(i->first_);
 
-            attributeAnimation->SetOwner(0);
+            attributeAnimation->SetOwner(nullptr);
             attributeAnimationInfos_.Erase(i);
             return;
         }
@@ -237,7 +237,7 @@ void ObjectAnimation::RemoveAttributeAnimation(ValueAnimation* attributeAnimatio
 ValueAnimation* ObjectAnimation::GetAttributeAnimation(const String& name) const
 {
     ValueAnimationInfo* info = GetAttributeAnimationInfo(name);
-    return info ? info->GetAnimation() : 0;
+    return info ? info->GetAnimation() : nullptr;
 }
 
 WrapMode ObjectAnimation::GetAttributeAnimationWrapMode(const String& name) const
@@ -257,7 +257,7 @@ ValueAnimationInfo* ObjectAnimation::GetAttributeAnimationInfo(const String& nam
     HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
         return i->second_;
-    return 0;
+    return nullptr;
 }
 
 void ObjectAnimation::SendAttributeAnimationAddedEvent(const String& name)

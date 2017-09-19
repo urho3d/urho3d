@@ -17,9 +17,9 @@ class Text3D : public Drawable
     Text3D();
     ~Text3D();
 
-    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    bool SetFontSize(int size);
+    bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
+    bool SetFontSize(float size);
 
     void SetMaterial(Material* material);
 
@@ -46,7 +46,7 @@ class Text3D : public Drawable
 
     Font* GetFont() const;
     Material* GetMaterial() const;
-    int GetFontSize() const;
+    float GetFontSize() const;
     const String GetText() const;
     HorizontalAlignment GetTextAlignment() const;
     HorizontalAlignment GetHorizontalAlignment() const;
@@ -61,12 +61,12 @@ class Text3D : public Drawable
     float GetEffectDepthBias() const;
     int GetWidth() const;
     int GetHeight() const;
-    int GetRowHeight() const;
+    float GetRowHeight() const;
     unsigned GetNumRows() const;
     unsigned GetNumChars() const;
-    int GetRowWidth(unsigned index) const;
-    IntVector2 GetCharPosition(unsigned index);
-    IntVector2 GetCharSize(unsigned index);
+    float GetRowWidth(unsigned index) const;
+    Vector2 GetCharPosition(unsigned index);
+    Vector2 GetCharSize(unsigned index);
     const Color& GetColor(Corner corner) const;
     float GetOpacity() const;
     bool IsFixedScreenSize() const;
@@ -74,7 +74,7 @@ class Text3D : public Drawable
 
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
-    tolua_property__get_set int fontSize;
+    tolua_property__get_set float fontSize;
     tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
@@ -90,7 +90,7 @@ class Text3D : public Drawable
     tolua_property__get_set int width;
     tolua_property__get_set Color& color; // Write only property.
     tolua_readonly tolua_property__get_set int height;
-    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set float rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
     tolua_property__get_set float opacity;

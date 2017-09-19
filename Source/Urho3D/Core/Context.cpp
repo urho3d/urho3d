@@ -26,17 +26,33 @@
 #include "../Core/EventProfiler.h"
 #include "../IO/Log.h"
 
-#include "../DebugNew.h"
-
 #ifndef MINI_URHO
 #include <SDL/SDL.h>
+#ifdef URHO3D_IK
+#include <ik/log.h>
+#include <ik/memory.h>
 #endif
+#endif
+
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
 
+#ifndef MINI_URHO
 // Keeps track of how many times SDL was initialised so we know when to call SDL_Quit().
 static int sdlInitCounter = 0;
+
+// Keeps track of how many times IK was initialised
+static int ikInitCounter = 0;
+
+// Reroute all messages from the ik library to the Urho3D log
+static void HandleIKLog(const char* msg)
+{
+    URHO3D_LOGINFOF("[IK] %s", msg);
+}
+#endif
+
 
 void EventReceiverGroup::BeginSendEvent()
 {
@@ -74,7 +90,7 @@ void EventReceiverGroup::Remove(Object* object)
         PODVector<Object*>::Iterator i = receivers_.Find(object);
         if (i != receivers_.End())
         {
-            (*i) = 0;
+            (*i) = nullptr;
             dirty_ = true;
         }
     }
@@ -105,7 +121,7 @@ void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attribute
 }
 
 Context::Context() :
-    eventHandler_(0)
+    eventHandler_(nullptr)
 {
 #ifdef __ANDROID__
     // Always reset the random seed on Android, as the Urho3D library might not be unloaded between runs
@@ -177,20 +193,30 @@ void Context::RemoveSubsystem(StringHash objectType)
         subsystems_.Erase(i);
 }
 
-void Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr)
+AttributeHandle Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr)
 {
     // None or pointer types can not be supported
-    if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
+    if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR
+        || attr.type_ == VAR_CUSTOM_HEAP || attr.type_ == VAR_CUSTOM_STACK)
     {
         URHO3D_LOGWARNING("Attempt to register unsupported attribute type " + Variant::GetTypeName(attr.type_) + " to class " +
             GetTypeName(objectType));
-        return;
+        return AttributeHandle();
     }
 
-    attributes_[objectType].Push(attr);
+    AttributeHandle handle;
+
+    Vector<AttributeInfo>& objectAttributes = attributes_[objectType];
+    objectAttributes.Push(attr);
+    handle.attributeInfo_ = &objectAttributes.Back();
 
     if (attr.mode_ & AM_NET)
-        networkAttributes_[objectType].Push(attr);
+    {
+        Vector<AttributeInfo>& objectNetworkAttributes = networkAttributes_[objectType];
+        objectNetworkAttributes.Push(attr);
+        handle.networkAttributeInfo_ = &objectNetworkAttributes.Back();
+    }
+    return handle;
 }
 
 void Context::RemoveAttribute(StringHash objectType, const char* name)
@@ -217,15 +243,15 @@ VariantMap& Context::GetEventDataMap()
     return ret;
 }
 
+#ifndef MINI_URHO
 bool Context::RequireSDL(unsigned int sdlFlags)
 {
-#ifndef MINI_URHO
     // Always increment, the caller must match with ReleaseSDL(), regardless of
     // what happens.
     ++sdlInitCounter;
 
     // Need to call SDL_Init() at least once before SDL_InitSubsystem()
-    if (sdlInitCounter == 0)
+    if (sdlInitCounter == 1)
     {
         URHO3D_LOGDEBUG("Initialising SDL");
         if (SDL_Init(0) != 0)
@@ -244,14 +270,12 @@ bool Context::RequireSDL(unsigned int sdlFlags)
             return false;
         }
     }
-#endif
 
     return true;
 }
 
 void Context::ReleaseSDL()
 {
-#ifndef MINI_URHO
     --sdlInitCounter;
 
     if (sdlInitCounter == 0)
@@ -263,8 +287,41 @@ void Context::ReleaseSDL()
 
     if (sdlInitCounter < 0)
         URHO3D_LOGERROR("Too many calls to Context::ReleaseSDL()!");
-#endif
 }
+
+#ifdef URHO3D_IK
+void Context::RequireIK()
+{
+    // Always increment, the caller must match with ReleaseSDL(), regardless of
+    // what happens.
+    ++ikInitCounter;
+
+    if (ikInitCounter == 1)
+    {
+        URHO3D_LOGDEBUG("Initialising Inverse Kinematics library");
+        ik_memory_init();
+        ik_log_init(IK_LOG_NONE);
+        ik_log_register_listener(HandleIKLog);
+    }
+}
+
+void Context::ReleaseIK()
+{
+    --ikInitCounter;
+
+    if (ikInitCounter == 0)
+    {
+        URHO3D_LOGDEBUG("De-initialising Inverse Kinematics library");
+        ik_log_unregister_listener(HandleIKLog);
+        ik_log_deinit();
+        ik_memory_deinit();
+    }
+
+    if (ikInitCounter < 0)
+        URHO3D_LOGERROR("Too many calls to Context::ReleaseIK()");
+}
+#endif // ifdef URHO3D_IK
+#endif // ifndef MINI_URHO
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {
@@ -294,7 +351,7 @@ Object* Context::GetSubsystem(StringHash type) const
     if (i != subsystems_.End())
         return i->second_;
     else
-        return 0;
+        return nullptr;
 }
 
 const Variant& Context::GetGlobalVar(StringHash key) const
@@ -313,7 +370,7 @@ Object* Context::GetEventSender() const
     if (!eventSenders_.Empty())
         return eventSenders_.Back();
     else
-        return 0;
+        return nullptr;
 }
 
 const String& Context::GetTypeName(StringHash objectType) const
@@ -327,7 +384,7 @@ AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
 {
     HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
     if (i == attributes_.End())
-        return 0;
+        return nullptr;
 
     Vector<AttributeInfo>& infos = i->second_;
 
@@ -337,7 +394,7 @@ AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
             return &(*j);
     }
 
-    return 0;
+    return nullptr;
 }
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)

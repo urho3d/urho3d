@@ -67,10 +67,10 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
         return &glyph;
     }
     else
-        return 0;
+        return nullptr;
 }
 
-short FontFace::GetKerning(unsigned c, unsigned d) const
+float FontFace::GetKerning(unsigned c, unsigned d) const
 {
     if (kerningMapping_.Empty())
         return 0;
@@ -83,7 +83,7 @@ short FontFace::GetKerning(unsigned c, unsigned d) const
 
     unsigned value = (c << 16) + d;
 
-    HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Find(value);
+    HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Find(value);
     if (i != kerningMapping_.End())
         return i->second_;
 

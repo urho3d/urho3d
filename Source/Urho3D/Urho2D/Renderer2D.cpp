@@ -305,7 +305,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
     return newMaterial;
 }
 
-void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
+void CheckDrawableVisibilityWork(const WorkItem* item, unsigned threadIndex)
 {
     Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
@@ -348,7 +348,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
             item->priority_ = M_MAX_UNSIGNED;
-            item->workFunction_ = CheckDrawableVisibility;
+            item->workFunction_ = CheckDrawableVisibilityWork;
             item->aux_ = this;
 
             PODVector<Drawable2D*>::Iterator end = drawables_.End();
@@ -449,7 +449,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
-    Material* currMaterial = 0;
+    Material* currMaterial = nullptr;
     unsigned iStart = 0;
     unsigned iCount = 0;
     unsigned vStart = 0;

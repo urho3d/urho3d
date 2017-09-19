@@ -45,7 +45,7 @@ const char* trailTypeNames[] =
 {
     "Face Camera",
     "Bone",
-    0
+    nullptr
 };
 
 inline bool CompareTails(TrailPoint* lhs, TrailPoint* rhs)
@@ -270,7 +270,7 @@ void RibbonTrail::UpdateTail()
         nextPoint.lifetime_ = 0.0f;
         nextPoint.forward_ = forwardMotion;
 
-        if (node_->GetParent() != 0)
+        if (node_->GetParent() != nullptr)
         {
             startPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
             nextPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
@@ -296,7 +296,7 @@ void RibbonTrail::UpdateTail()
             newPoint.position_ = worldPosition;
             newPoint.lifetime_ = 0.0f;
             newPoint.forward_ = forwardMotion;
-            if (node_->GetParent() != 0)
+            if (node_->GetParent() != nullptr)
                 newPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
 
             points_.Push(newPoint);
@@ -839,7 +839,7 @@ void RibbonTrail::SetTrailType(TrailType type)
     if (trailType_ == type)
         return;
 
-    if (type == TT_BONE && (node_->GetParent() == 0 || node_->GetParent() == node_->GetScene()))
+    if (type == TT_BONE && (node_->GetParent() == nullptr || node_->GetParent() == node_->GetScene()))
     {
         URHO3D_LOGWARNING("No parent node found, revert back to Face Camera type");
         return;

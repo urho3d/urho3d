@@ -35,13 +35,13 @@ namespace Urho3D
 
 IndexBuffer::IndexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
+    GPUObject(forceHeadless ? nullptr : GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
     lockState_(LOCK_NONE),
     lockStart_(0),
     lockCount_(0),
-    lockScratchData_(0),
+    lockScratchData_(nullptr),
     shadowed_(false),
     dynamic_(false),
     discardLock_(false)

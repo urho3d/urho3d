@@ -1,0 +1,33 @@
+$#include "UI/UIComponent.h"
+$#include "UI/UIElement.h"
+$#include "Scene/Component.h"
+$#include "Graphics/Material.h"
+$#include "Graphics/Texture2D.h"
+$#include "Graphics/StaticModel.h"
+
+class UIComponent : public Component
+{
+    UIComponent();
+
+    UIElement* GetRoot() const;
+    Material* GetMaterial() const;
+    Texture2D* GetTexture() const;
+    
+    tolua_readonly tolua_property__get_set UIElement* root;
+    tolua_readonly tolua_property__get_set Material* material;
+    tolua_readonly tolua_property__get_set Texture2D* texture;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_UIComponent_new00
+static int tolua_UILuaAPI_UIComponent_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<UIComponent>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_UIComponent_new00_local
+static int tolua_UILuaAPI_UIComponent_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<UIComponent>(tolua_S);
+}
+$}

@@ -38,6 +38,9 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
+#ifdef URHO3D_IK
+#include "../IK/IK.h"
+#endif
 #ifdef URHO3D_NAVIGATION
 #include "../Navigation/NavigationMesh.h"
 #endif
@@ -49,6 +52,7 @@
 #endif
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
+#include "../Physics/RaycastVehicle.h"
 #endif
 #include "../Resource/ResourceCache.h"
 #include "../Resource/Localization.h"
@@ -93,7 +97,7 @@ Engine::Engine(Context* context) :
     timeStep_(0.0f),
     timeStepSmoothing_(2),
     minFps_(10),
-#if defined(IOS) || defined(__ANDROID__) || defined(__arm__) || defined(__aarch64__)
+#if defined(IOS) || defined(TVOS) || defined(__ANDROID__) || defined(__arm__) || defined(__aarch64__)
     maxFps_(60),
     maxInactiveFps_(10),
     pauseMinimized_(true),
@@ -139,6 +143,10 @@ Engine::Engine(Context* context) :
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
 
+#ifdef URHO3D_IK
+    RegisterIKLibrary(context_);
+#endif
+    
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
 #endif
@@ -211,9 +219,124 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 
     // Add resource paths
+    if (!InitializeResourceCache(parameters, false))
+        return false;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
+    // Initialize graphics & audio output
+    if (!headless_)
+    {
+        Graphics* graphics = GetSubsystem<Graphics>();
+        Renderer* renderer = GetSubsystem<Renderer>();
+
+        if (HasParameter(parameters, EP_EXTERNAL_WINDOW))
+            graphics->SetExternalWindow(GetParameter(parameters, EP_EXTERNAL_WINDOW).GetVoidPtr());
+        graphics->SetWindowTitle(GetParameter(parameters, EP_WINDOW_TITLE, "Urho3D").GetString());
+        graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, EP_WINDOW_ICON, String::EMPTY).GetString()));
+        graphics->SetFlushGPU(GetParameter(parameters, EP_FLUSH_GPU, false).GetBool());
+        graphics->SetOrientations(GetParameter(parameters, EP_ORIENTATIONS, "LandscapeLeft LandscapeRight").GetString());
+
+        if (HasParameter(parameters, EP_WINDOW_POSITION_X) && HasParameter(parameters, EP_WINDOW_POSITION_Y))
+            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
+                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
+
+#ifdef URHO3D_OPENGL
+        if (HasParameter(parameters, EP_FORCE_GL2))
+            graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
+#endif
+
+        if (!graphics->SetMode(
+            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
+            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
+            GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
+            GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
+            GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
+            GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
+            GetParameter(parameters, EP_VSYNC, false).GetBool(),
+            GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
+            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
+            GetParameter(parameters, EP_MONITOR, 0).GetInt(),
+            GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
+        ))
+            return false;
+
+        graphics->SetShaderCacheDir(GetParameter(parameters, EP_SHADER_CACHE_DIR, fileSystem->GetAppPreferencesDir("urho3d", "shadercache")).GetString());
+
+        if (HasParameter(parameters, EP_DUMP_SHADERS))
+            graphics->BeginDumpShaders(GetParameter(parameters, EP_DUMP_SHADERS, String::EMPTY).GetString());
+        if (HasParameter(parameters, EP_RENDER_PATH))
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, EP_RENDER_PATH).GetString()));
+
+        renderer->SetDrawShadows(GetParameter(parameters, EP_SHADOWS, true).GetBool());
+        if (renderer->GetDrawShadows() && GetParameter(parameters, EP_LOW_QUALITY_SHADOWS, false).GetBool())
+            renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
+        renderer->SetMaterialQuality(GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
+        renderer->SetTextureQuality(GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
+        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetInt());
+        renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetInt());
+
+        if (GetParameter(parameters, EP_SOUND, true).GetBool())
+        {
+            GetSubsystem<Audio>()->SetMode(
+                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetInt(),
+                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetInt(),
+                GetParameter(parameters, EP_SOUND_STEREO, true).GetBool(),
+                GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
+            );
+        }
+    }
+
+    // Init FPU state of main thread
+    InitFPU();
+
+    // Initialize input
+    if (HasParameter(parameters, EP_TOUCH_EMULATION))
+        GetSubsystem<Input>()->SetTouchEmulation(GetParameter(parameters, EP_TOUCH_EMULATION).GetBool());
+
+    // Initialize network
+#ifdef URHO3D_NETWORK
+    if (HasParameter(parameters, EP_PACKAGE_CACHE_DIR))
+        GetSubsystem<Network>()->SetPackageCacheDir(GetParameter(parameters, EP_PACKAGE_CACHE_DIR).GetString());
+#endif
+
+#ifdef URHO3D_TESTING
+    if (HasParameter(parameters, EP_TIME_OUT))
+        timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetInt() * 1000000LL;
+#endif
+
+#ifdef URHO3D_PROFILING
+    if (GetParameter(parameters, EP_EVENT_PROFILER, true).GetBool())
+    {
+        context_->RegisterSubsystem(new EventProfiler(context_));
+        EventProfiler::SetActive(true);
+    }
+#endif
+    frameTimer_.Reset();
+
+    URHO3D_LOGINFO("Initialized engine");
+    initialized_ = true;
+    return true;
+}
+
+bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOld /*= true*/)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    // Remove all resource paths and packages
+    if (removeOld)
+    {
+        Vector<String> resourceDirs = cache->GetResourceDirs();
+        Vector<SharedPtr<PackageFile> > packageFiles = cache->GetPackageFiles();
+        for (unsigned i = 0; i < resourceDirs.Size(); ++i)
+            cache->RemoveResourceDir(resourceDirs[i]);
+        for (unsigned i = 0; i < packageFiles.Size(); ++i)
+            cache->RemovePackageFile(packageFiles[i]);
+    }
+
+    // Add resource paths
     Vector<String> resourcePrefixPaths = GetParameter(parameters, EP_RESOURCE_PREFIX_PATHS, String::EMPTY).GetString().Split(';', true);
     for (unsigned i = 0; i < resourcePrefixPaths.Size(); ++i)
         resourcePrefixPaths[i] = AddTrailingSlash(
@@ -344,96 +467,6 @@ bool Engine::Initialize(const VariantMap& parameters)
                 autoLoadPaths[i].CString());
     }
 
-    // Initialize graphics & audio output
-    if (!headless_)
-    {
-        Graphics* graphics = GetSubsystem<Graphics>();
-        Renderer* renderer = GetSubsystem<Renderer>();
-
-        if (HasParameter(parameters, EP_EXTERNAL_WINDOW))
-            graphics->SetExternalWindow(GetParameter(parameters, EP_EXTERNAL_WINDOW).GetVoidPtr());
-        graphics->SetWindowTitle(GetParameter(parameters, EP_WINDOW_TITLE, "Urho3D").GetString());
-        graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, EP_WINDOW_ICON, String::EMPTY).GetString()));
-        graphics->SetFlushGPU(GetParameter(parameters, EP_FLUSH_GPU, false).GetBool());
-        graphics->SetOrientations(GetParameter(parameters, EP_ORIENTATIONS, "LandscapeLeft LandscapeRight").GetString());
-
-        if (HasParameter(parameters, EP_WINDOW_POSITION_X) && HasParameter(parameters, EP_WINDOW_POSITION_Y))
-            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
-                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
-
-#ifdef URHO3D_OPENGL
-        if (HasParameter(parameters, EP_FORCE_GL2))
-            graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
-#endif
-
-        if (!graphics->SetMode(
-            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
-            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
-            GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
-            GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
-            GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
-            GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
-            GetParameter(parameters, EP_VSYNC, false).GetBool(),
-            GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
-            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt()
-        ))
-            return false;
-
-        graphics->SetShaderCacheDir(GetParameter(parameters, EP_SHADER_CACHE_DIR, fileSystem->GetAppPreferencesDir("urho3d", "shadercache")).GetString());
-
-        if (HasParameter(parameters, EP_DUMP_SHADERS))
-            graphics->BeginDumpShaders(GetParameter(parameters, EP_DUMP_SHADERS, String::EMPTY).GetString());
-        if (HasParameter(parameters, EP_RENDER_PATH))
-            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, EP_RENDER_PATH).GetString()));
-
-        renderer->SetDrawShadows(GetParameter(parameters, EP_SHADOWS, true).GetBool());
-        if (renderer->GetDrawShadows() && GetParameter(parameters, EP_LOW_QUALITY_SHADOWS, false).GetBool())
-            renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
-        renderer->SetMaterialQuality(GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureQuality(GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetInt());
-        renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetInt());
-
-        if (GetParameter(parameters, EP_SOUND, true).GetBool())
-        {
-            GetSubsystem<Audio>()->SetMode(
-                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetInt(),
-                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetInt(),
-                GetParameter(parameters, EP_SOUND_STEREO, true).GetBool(),
-                GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
-            );
-        }
-    }
-
-    // Init FPU state of main thread
-    InitFPU();
-
-    // Initialize input
-    if (HasParameter(parameters, EP_TOUCH_EMULATION))
-        GetSubsystem<Input>()->SetTouchEmulation(GetParameter(parameters, EP_TOUCH_EMULATION).GetBool());
-
-    // Initialize network
-#ifdef URHO3D_NETWORK
-    if (HasParameter(parameters, EP_PACKAGE_CACHE_DIR))
-        GetSubsystem<Network>()->SetPackageCacheDir(GetParameter(parameters, EP_PACKAGE_CACHE_DIR).GetString());
-#endif
-
-#ifdef URHO3D_TESTING
-    if (HasParameter(parameters, EP_TIME_OUT))
-        timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetInt() * 1000000LL;
-#endif
-
-#ifdef URHO3D_PROFILING
-    if (GetParameter(parameters, EP_EVENT_PROFILER, true).GetBool())
-    {
-        context_->RegisterSubsystem(new EventProfiler(context_));
-        EventProfiler::SetActive(true);
-    }
-#endif
-    frameTimer_.Reset();
-
-    URHO3D_LOGINFO("Initialized engine");
-    initialized_ = true;
     return true;
 }
 
@@ -495,7 +528,7 @@ void Engine::RunFrame()
 Console* Engine::CreateConsole()
 {
     if (headless_ || !initialized_)
-        return 0;
+        return nullptr;
 
     // Return existing console if possible
     Console* console = GetSubsystem<Console>();
@@ -511,7 +544,7 @@ Console* Engine::CreateConsole()
 DebugHud* Engine::CreateDebugHud()
 {
     if (headless_ || !initialized_)
-        return 0;
+        return nullptr;
 
     // Return existing debug HUD if possible
     DebugHud* debugHud = GetSubsystem<DebugHud>();
@@ -552,7 +585,7 @@ void Engine::SetPauseMinimized(bool enable)
 void Engine::SetAutoExit(bool enable)
 {
     // On mobile platforms exit is mandatory if requested by the platform itself and should not be attempted to be disabled
-#if defined(__ANDROID__) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS) || defined(TVOS)
     enable = true;
 #endif
     autoExit_ = enable;
@@ -565,8 +598,8 @@ void Engine::SetNextTimeStep(float seconds)
 
 void Engine::Exit()
 {
-#if defined(IOS)
-    // On iOS it's not legal for the application to exit on its own, instead it will be minimized with the home key
+#if defined(IOS) || defined(TVOS)
+    // On iOS/tvOS it's not legal for the application to exit on its own, instead it will be minimized with the home key
 #else
     DoExit();
 #endif
@@ -702,10 +735,10 @@ void Engine::ApplyFrameLimit()
 
 #ifndef __EMSCRIPTEN__
     // Perform waiting loop if maximum FPS set
-#ifndef IOS
+#if !defined(IOS) && !defined(TVOS)
     if (maxFps)
 #else
-    // If on iOS and target framerate is 60 or above, just let the animation callback handle frame timing
+    // If on iOS/tvOS and target framerate is 60 or above, just let the animation callback handle frame timing
     // instead of waiting ourselves
     if (maxFps < 60)
 #endif
@@ -819,6 +852,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_FULL_SCREEN] = false;
             else if (argument == "borderless")
                 ret[EP_BORDERLESS] = true;
+            else if (argument == "lowdpi")
+                ret[EP_HIGH_DPI] = false;
             else if (argument == "s")
                 ret[EP_WINDOW_RESIZABLE] = true;
             else if (argument == "q")
@@ -840,6 +875,14 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument == "y" && !value.Empty())
             {
                 ret[EP_WINDOW_HEIGHT] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "monitor" && !value.Empty()) {
+                ret[EP_MONITOR] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "hz" && !value.Empty()) {
+                ret[EP_REFRESH_RATE] = ToInt(value);
                 ++i;
             }
             else if (argument == "m" && !value.Empty())

@@ -6,6 +6,7 @@ class Vector3
     Vector3(const Vector3& vector);
     Vector3(const Vector2& vector, float z);
     Vector3(const Vector2& vector);
+    Vector3(const IntVector3& vector);
     Vector3(float x, float y, float z);
     Vector3(float x, float y);
     ~Vector3();
@@ -18,12 +19,14 @@ class Vector3
     Vector3 operator * (const Vector3& rhs) const;
     Vector3 operator / (float rhs) const;
     Vector3 operator / (const Vector3& rhs) const;
+
     void Normalize();
     float Length() const;
     float LengthSquared() const;
     float DotProduct(const Vector3& rhs) const;
     float AbsDotProduct(const Vector3& rhs) const;
     float ProjectOntoAxis(const Vector3& axis) const;
+    Vector3 Orthogonalize(const Vector3& axis) const;
     Vector3 CrossProduct(const Vector3& rhs) const;
     Vector3 Abs() const;
     Vector3 Lerp(const Vector3& rhs, float t) const;
@@ -60,7 +63,9 @@ class IntVector3
     IntVector3 operator - () const;
     IntVector3 operator - (const IntVector3& rhs) const;
     IntVector3 operator * (int rhs) const;
+    IntVector3 operator * (const IntVector3& rhs) const;
     IntVector3 operator / (int rhs) const;
+    IntVector3 operator / (const IntVector3& rhs) const;
 
     String ToString() const;
     unsigned ToHash() const;

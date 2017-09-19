@@ -27,6 +27,7 @@
 
 class asIScriptFunction;
 class asIScriptObject;
+class asIScriptContext;
 
 namespace Urho3D
 {
@@ -62,41 +63,41 @@ public:
     /// Construct.
     ScriptInstance(Context* context);
     /// Destruct.
-    virtual ~ScriptInstance();
+    virtual ~ScriptInstance() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Handle attribute read access.
-    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const override;
 
     /// Return attribute descriptions, or null if none defined.
-    virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
+    virtual const Vector<AttributeInfo>* GetAttributes() const override { return &attributeInfos_; }
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
 
     /// Add a scripted event handler.
-    virtual void AddEventHandler(StringHash eventType, const String& handlerName);
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName) override;
     /// Add a scripted event handler for a specific sender.
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) override;
     /// Remove a scripted event handler.
-    virtual void RemoveEventHandler(StringHash eventType);
+    virtual void RemoveEventHandler(StringHash eventType) override;
     /// Remove a scripted event handler for a specific sender.
-    virtual void RemoveEventHandler(Object* sender, StringHash eventType);
+    virtual void RemoveEventHandler(Object* sender, StringHash eventType) override;
     /// Remove all scripted event handlers for a specific sender.
-    virtual void RemoveEventHandlers(Object* sender);
+    virtual void RemoveEventHandlers(Object* sender) override;
     /// Remove all scripted event handlers.
-    virtual void RemoveEventHandlers();
+    virtual void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
+    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
-    virtual bool HasEventHandler(StringHash eventType) const;
+    virtual bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.
-    virtual bool HasEventHandler(Object* sender, StringHash eventType) const;
+    virtual bool HasEventHandler(Object* sender, StringHash eventType) const override;
 
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
@@ -147,9 +148,9 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
 
 private:
     /// (Re)create the script object and check for supported methods if successfully created.
@@ -209,17 +210,19 @@ private:
     bool subscribedPostFixed_;
 };
 
-/// Return the Urho3D context of the active script context.
+/// Return the active AngelScript context. Provided as a wrapper to the AngelScript API function to avoid undefined symbol error in shared library Urho3D builds.
+URHO3D_API asIScriptContext* GetActiveASContext();
+/// Return the Urho3D context of the active AngelScript context.
 URHO3D_API Context* GetScriptContext();
-/// Return the ScriptInstance of the active script context.
+/// Return the ScriptInstance of the active AngelScript context.
 URHO3D_API ScriptInstance* GetScriptContextInstance();
-/// Return the scene node of the active script context.
+/// Return the scene node of the active AngelScript context.
 URHO3D_API Node* GetScriptContextNode();
-/// Return the scene of the active script context.
+/// Return the scene of the active AngelScript context.
 URHO3D_API Scene* GetScriptContextScene();
-/// Return the event listener of the active script context.
+/// Return the event listener of the active AngelScript context.
 URHO3D_API ScriptEventListener* GetScriptContextEventListener();
-/// Return the event listener of the active script context as an Object pointer.
+/// Return the event listener of the active AngelScript context as an Object pointer.
 URHO3D_API Object* GetScriptContextEventListenerObject();
 
 }

@@ -16,6 +16,7 @@ class DebugRenderer : public Component
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
     void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
     void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true);
+    void AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle, bool drawLines, const Color& color, bool depthTest = true);
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
     void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);

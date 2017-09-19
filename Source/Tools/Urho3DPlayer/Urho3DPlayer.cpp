@@ -82,7 +82,7 @@ void Urho3DPlayer::Setup()
         ErrorExit("Usage: Urho3DPlayer <scriptfile> [options]\n\n"
             "The script file should implement the function void Start() for initializing the "
             "application and subscribing to all necessary events, such as the frame update.\n"
-            #ifndef WIN32
+            #ifndef _WIN32
             "\nCommand line options:\n"
             "-x <res>     Horizontal resolution\n"
             "-y <res>     Vertical resolution\n"
@@ -109,9 +109,12 @@ void Urho3DPlayer::Setup()
             "-gl2         Force OpenGL 2 use even if OpenGL 3 is available\n"
             "-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D\n"
             "-borderless  Borderless window mode\n"
+            "-lowdpi      Force low DPI mode on Retina display\n"
             "-headless    Headless mode. No application window will be created\n"
             "-landscape   Use landscape orientations (iOS only, default)\n"
             "-portrait    Use portrait orientations (iOS only)\n"
+            "-monitor <num> Monitor number to use\n"
+            "-hz <freq>   Monitor refresh rate to use\n"
             "-prepass     Use light pre-pass rendering\n"
             "-deferred    Use deferred rendering\n"
             "-renderpath <name> Use the named renderpath (must enter full resource name)\n"

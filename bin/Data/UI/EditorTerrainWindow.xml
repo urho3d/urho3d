@@ -1,0 +1,213 @@
+<element type="Window">
+    <attribute name="Name" value="TerrainWindow" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="6 6 6 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
+
+    <!-- drag bar -->
+    <element>
+        <attribute name="Name" value="Title Bar" />
+        <attribute name="Min Size" value="184 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Terrain Editor" />
+            <attribute name="Auto Localizable" value="false" />
+        </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+
+    <!-- actions bar -->
+    <element type="Text">
+        <attribute name="Name" value="ActionsText" />
+        <attribute name="Text" value="Actions" />
+        <attribute name="Text Alignment" value="Left" />
+        <attribute name="Auto Localizable" value="false" />
+    </element>
+    <element>
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Min Size" value="0 34" />
+        <attribute name="Max Size" value="999999 34" />
+        <element type="LineEdit">
+            <attribute name="Name" value="CreateTerrainValue" />
+            <attribute name="Min Size" value="40 20" />
+            <attribute name="Max Size" value="40 20" />
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="CreateTerrainButton" />
+            <attribute name="Position" value="104 0" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <attribute name="Min Size" value="0 20" />
+            <attribute name="Max Size" value="130 20" />
+            <element type="Text">
+                <attribute name="Text" value="Create Terrain" />
+                <attribute name="Text Alignment" value="Center" />
+                <attribute name="Auto Localizable" value="false" />
+            </element>
+        </element>
+    </element>
+
+    <!-- toolbar -->
+    <element type="Text">
+        <attribute name="Name" value="ToolsText" />
+        <attribute name="Text" value="Tools" />
+        <attribute name="Text Alignment" value="Left" />
+        <attribute name="Auto Localizable" value="false" />
+    </element>
+    <element>
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Min Size" value="0 34" />
+        <attribute name="Max Size" value="999999 34" />
+        <element type="Checkbox" style="TerrainEditorCheckbox">
+            <attribute name="Name" value="RaiseLowerHeight" />
+            <element type="BorderImage">
+                <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                <attribute name="Image Rect" value="0 224 30 254" />
+                <attribute name="Position" value="2 2" />
+                <attribute name="Min Size" value="30 30" />
+                <attribute name="Max Size" value="30 30" />
+            </element>
+        </element>
+        <element type="Checkbox" style="TerrainEditorCheckbox">
+            <attribute name="Name" value="SetHeight"/>
+            <element type="BorderImage">
+                <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                <attribute name="Image Rect" value="32 224 62 254" />
+                <attribute name="Position" value="2 2" />
+                <attribute name="Min Size" value="30 30" />
+                <attribute name="Max Size" value="30 30" />
+            </element>
+        </element>
+        <element type="Checkbox" style="TerrainEditorCheckbox">
+            <attribute name="Name" value="SmoothHeight" />
+            <element type="BorderImage">
+                <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                <attribute name="Image Rect" value="64 224 94 254" />
+                <attribute name="Position" value="2 2" />
+                <attribute name="Min Size" value="30 30" />
+                <attribute name="Max Size" value="30 30" />
+            </element>
+        </element>
+        <!-- Disable these for now -->
+        <!--<element type="Checkbox" style="TerrainEditorCheckbox">
+            <attribute name="Name" value="PaintBrush" />
+            <element type="BorderImage">
+                <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                <attribute name="Image Rect" value="96 224 126 254" />
+                <attribute name="Position" value="2 2" />
+                <attribute name="Min Size" value="30 30" />
+                <attribute name="Max Size" value="30 30" />
+            </element>
+        </element>
+        <element type="Checkbox" style="TerrainEditorCheckbox">
+            <attribute name="Name" value="PaintTrees" />
+            <element type="BorderImage">
+                <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                <attribute name="Image Rect" value="96 224 126 254" />
+                <attribute name="Position" value="2 2" />
+                <attribute name="Min Size" value="30 30" />
+                <attribute name="Max Size" value="30 30" />
+            </element>
+        </element>
+        <element type="Checkbox" style="TerrainEditorCheckbox">
+            <attribute name="Name" value="PaintFoliage" />
+            <element type="BorderImage">
+                <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+                <attribute name="Image Rect" value="96 224 126 254" />
+                <attribute name="Position" value="2 2" />
+                <attribute name="Min Size" value="30 30" />
+                <attribute name="Max Size" value="30 30" />
+            </element>
+        </element>-->
+    </element>
+
+    <!-- current tool description -->
+    <element type="BorderImage" style="EditorToolBar">
+        <attribute name="Name" value="CurrentToolDesc" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="4" />
+        <attribute name="Horiz Alignment" value="Center" />
+        <attribute name="Min Size" value="0 30" />
+        <attribute name="Max Size" value="999999 30" />
+        <element type="Text">
+            <attribute name="Name" value="CurrentToolDescText" />
+            <attribute name="Text" value="Raise or lower terrain using the current brush" />
+            <attribute name="Auto Localizable" value="false" />
+            <attribute name="Position" value="16 16" />
+        </element>
+    </element>
+
+    <!-- brushes -->
+    <element type="Text">
+        <attribute name="Name" value="Brushes" />
+        <attribute name="Text" value="Brushes" />
+        <attribute name="Text Alignment" value="Left" />
+        <attribute name="Auto Localizable" value="false" />
+    </element>
+    <element type="ListView" style="ListView">
+        <attribute name="Name" value="BrushesContainer" />
+    </element>
+
+    <!-- settings -->
+    <element type="Text">
+        <attribute name="Text" value="Settings" />
+        <attribute name="Text Alignment" value="Left" />
+        <attribute name="Auto Localizable" value="false" />
+        <attribute name="Position" value="0 16" />
+    </element>
+    <element type="BorderImage" style="EditorToolBar">
+        <attribute name="Name" value="SettingsArea" />
+        <attribute name="Layout Mode" value="Vertical" />
+        <attribute name="Layout Spacing" value="4" />
+        <attribute name="Horiz Alignment" value="Center" />
+        <element type="Text">
+            <attribute name="Name" value="BrushSizeLabel" />
+            <attribute name="Text" value="Brush Size" />
+            <attribute name="Text Alignment" value="Left" />
+            <attribute name="Auto Localizable" value="false" />
+        </element>
+        <element type="Slider">
+            <attribute name="Name" value="BrushSize" />
+            <attribute name="Min Size" value="100 10" />
+            <attribute name="Max Size" value="999999 10" />
+            <attribute name="Range" value="25" />
+            <attribute name="Value" value="12.5" />
+        </element>
+        <element type="Text">
+            <attribute name="Name" value="BrushOpacityLabel" />
+            <attribute name="Text" value="Brush Opacity" />
+            <attribute name="Text Alignment" value="Left" />
+            <attribute name="Auto Localizable" value="false" />
+        </element>
+        <element type="Slider">
+            <attribute name="Name" value="BrushOpacity" />
+            <attribute name="Min Size" value="100 10" />
+            <attribute name="Max Size" value="999999 10" />
+            <attribute name="Range" value="25" />
+            <attribute name="Value" value="12.5" />
+            <attribute name="Is Visible" value="false" />
+        </element>
+        <element type="Text">
+            <attribute name="Name" value="BrushHeightLabel" />
+            <attribute name="Text" value="Brush Height" />
+            <attribute name="Text Alignment" value="Left" />
+            <attribute name="Auto Localizable" value="false" />
+        </element>
+        <element type="Slider">
+            <attribute name="Name" value="BrushHeight" />
+            <attribute name="Min Size" value="100 10" />
+            <attribute name="Max Size" value="999999 10" />
+            <attribute name="Range" value="25" />
+            <attribute name="Value" value="12.5" />
+            <attribute name="Is Visible" value="false" />
+        </element>
+    </element>
+</element>

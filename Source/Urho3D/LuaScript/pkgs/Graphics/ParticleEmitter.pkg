@@ -1,5 +1,8 @@
 $#include "Graphics/ParticleEmitter.h"
 
+// The actual enum is defined in Scene/Component.pkg
+enum AutoRemoveMode {};
+
 class ParticleEmitter : public BillboardSet
 {
     void SetEffect(ParticleEffect* effect);

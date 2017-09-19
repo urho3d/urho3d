@@ -29,10 +29,6 @@ define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h EXCLUDE_P
 # Define dependency libs
 if (READLINE_FOUND)
     add_definitions (-DLUA_USE_READLINE)
-    # FIXME: temporary quick fix
-    if (RPI AND CMAKE_CROSSCOMPILING)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
-    endif ()
     list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
     list (APPEND LIBS ${READLINE_LIBRARIES})
 endif ()
@@ -44,7 +40,7 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Lua FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone targets (these targets can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT WEB)
+if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-tolua\\+\\+ AND NOT IOS AND NOT TVOS AND NOT WEB)
     # Define target name for Lua interpreter
     set (TARGET_NAME lua_interpreter)   # Note: intended target name is 'lua' which clashes with 'Lua' library target above for case-insensitive platform
 

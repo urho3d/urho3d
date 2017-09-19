@@ -40,12 +40,12 @@ public:
     /// Construct.
     TileMap2D(Context* context);
     /// Destruct.
-    ~TileMap2D();
+    virtual ~TileMap2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tmx file.
     void SetTmxFile(TmxFile2D* tmxFile);
@@ -72,7 +72,8 @@ public:
     void SetTmxFileAttr(const ResourceRef& value);
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
-
+    ///
+    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(int gid) const;
 private:
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;

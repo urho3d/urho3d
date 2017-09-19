@@ -38,7 +38,7 @@ public:
     L10n(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    virtual void Start() override;
 
 private:
     // Load strings from JSON files and subscribe to the change language event

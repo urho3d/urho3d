@@ -43,7 +43,9 @@ static const int srcBlendFuncs[] =
     0x0302, // GL_SRC_ALPHA
     0x0302, // GL_SRC_ALPHA
     1,      // GL_ONE
-    0x0305  // GL_ONE_MINUS_DST_ALPHA
+    0x0305, // GL_ONE_MINUS_DST_ALPHA
+    1,      // GL_ONE
+    0x0302  // GL_SRC_ALPHA
 };
 
 static const int destBlendFuncs[] =
@@ -54,8 +56,14 @@ static const int destBlendFuncs[] =
     0x0303, // GL_ONE_MINUS_SRC_ALPHA
     1,      // GL_ONE
     0x0303, // GL_ONE_MINUS_SRC_ALPHA
-    0x0304  // GL_DST_ALPHA
+    0x0304, // GL_DST_ALPHA
+    1,      // GL_ONE
+    1       // GL_ONE
 };
+
+// Make sure that there are are as many blend functions as we have blend modes.
+static_assert(sizeof(srcBlendFuncs) / sizeof(srcBlendFuncs[0]) == MAX_BLENDMODES, "");
+static_assert(sizeof(destBlendFuncs) / sizeof(destBlendFuncs[0]) == MAX_BLENDMODES, "");
 
 ParticleEffect2D::ParticleEffect2D(Context* context) :
     Resource(context),

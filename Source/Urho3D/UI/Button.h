@@ -36,32 +36,36 @@ public:
     /// Construct.
     Button(Context* context);
     /// Destruct.
-    virtual ~Button();
+    virtual ~Button() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Perform UI element update.
-    virtual void Update(float timeStep);
+    virtual void Update(float timeStep) override;
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse click end.
     virtual void OnClickEnd
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
-            UIElement* beginElement);
+            UIElement* beginElement) override;
     /// React to mouse drag motion.
     virtual void OnDragMove
         (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
-            Cursor* cursor);
+            Cursor* cursor) override;
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) override;
 
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(int x, int y);
+    /// Set offset to image rectangle used when disabled.
+    void SetDisabledOffset(const IntVector2& offset);
+    /// Set offset to image rectangle used when disabled.
+    void SetDisabledOffset(int x, int y);
     /// Set offset of child elements when pressed.
     void SetPressedChildOffset(const IntVector2& offset);
     /// Set offset of child elements when pressed.
@@ -75,6 +79,9 @@ public:
 
     /// Return pressed image offset.
     const IntVector2& GetPressedOffset() const { return pressedOffset_; }
+    
+    /// Return disabled image offset.
+    const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
 
     /// Return offset of child elements when pressed.
     const IntVector2& GetPressedChildOffset() const { return pressedChildOffset_; }
@@ -94,6 +101,8 @@ protected:
 
     /// Pressed image offset.
     IntVector2 pressedOffset_;
+    /// Disabled image offset.
+    IntVector2 disabledOffset_;
     /// Pressed label offset.
     IntVector2 pressedChildOffset_;
     /// Repeat delay.

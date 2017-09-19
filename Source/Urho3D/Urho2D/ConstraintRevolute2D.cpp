@@ -163,12 +163,12 @@ void ConstraintRevolute2D::SetMaxMotorTorque(float maxMotorTorque)
 b2JointDef* ConstraintRevolute2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
-        return 0;
+        return nullptr;
 
     b2Body* bodyA = ownerBody_->GetBody();
     b2Body* bodyB = otherBody_->GetBody();
     if (!bodyA || !bodyB)
-        return 0;
+        return nullptr;
 
     jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_));
 

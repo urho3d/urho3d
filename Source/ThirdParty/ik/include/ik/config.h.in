@@ -1,0 +1,36 @@
+/* --------------------------------------------------------------
+ * Configures prerequisite for this library
+ * --------------------------------------------------------------*/
+
+#ifndef IK_CONFIG_HPP
+    #define IK_CONFIG_HPP
+
+    /* --------------------------------------------------------------
+     * build settings
+     * --------------------------------------------------------------*/
+
+    #define ik_real @IK_REAL@
+    #define IK_RESTRICT @IK_RESTRICT@
+
+    #cmakedefine IK_HAVE_STDINT_H
+    #cmakedefine IK_MEMORY_DEBUGGING
+    #cmakedefine IK_DOT_OUTPUT
+
+    #ifdef IK_MEMORY_DEBUGGING
+        #cmakedefine IK_MEMORY_BACKTRACE
+    #endif
+
+    /* --------------------------------------------------------------
+     * common include files
+     * --------------------------------------------------------------*/
+
+    #include "ik/export.h"
+    #include "ik/types.h"
+
+    #ifdef IK_HAVE_STDINT_H
+        #include <stdint.h>
+    #else
+        #include "ik/pstdint.h"
+    #endif
+
+#endif /* IK_CONFIG_HPP */

@@ -33,17 +33,17 @@ namespace Urho3D
 
 Profiler::Profiler(Context* context) :
     Object(context),
-    current_(0),
-    root_(0),
+    current_(nullptr),
+    root_(nullptr),
     intervalFrames_(0)
 {
-    current_ = root_ = new ProfilerBlock(0, "RunFrame");
+    current_ = root_ = new ProfilerBlock(nullptr, "RunFrame");
 }
 
 Profiler::~Profiler()
 {
     delete root_;
-    root_ = 0;
+    root_ = nullptr;
 }
 
 void Profiler::BeginFrame()

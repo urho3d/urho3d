@@ -55,6 +55,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
     Sample(context),
+    streamingDistance_(2),
     drawDebug_(false)
 {
 }
@@ -135,6 +136,8 @@ void CrowdNavigation::CreateScene()
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
+    // Set small tiles to show navigation mesh streaming
+    navMesh->SetTileSize(32);
     // Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh->SetDrawObstacles(true);
     navMesh->SetDrawOffMeshConnections(true);
@@ -213,6 +216,7 @@ void CrowdNavigation::CreateUI()
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "MMB or O key to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
+        "Tab to toggle navigation mesh streaming\n"
         "Space to toggle debug geometry\n"
         "F12 to toggle this instruction text"
     );
@@ -377,7 +381,7 @@ void CrowdNavigation::AddOrRemoveObject()
 
 bool CrowdNavigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 {
-    hitDrawable = 0;
+    hitDrawable = nullptr;
 
     UI* ui = GetSubsystem<UI>();
     IntVector2 pos = ui->GetCursorPosition();
@@ -473,6 +477,79 @@ void CrowdNavigation::MoveCamera(float timeStep)
     }
 }
 
+void CrowdNavigation::ToggleStreaming(bool enabled)
+{
+    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    if (enabled)
+    {
+        int maxTiles = (2 * streamingDistance_ + 1) * (2 * streamingDistance_ + 1);
+        BoundingBox boundingBox = navMesh->GetBoundingBox();
+        SaveNavigationData();
+        navMesh->Allocate(boundingBox, maxTiles);
+    }
+    else
+        navMesh->Build();
+}
+
+void CrowdNavigation::UpdateStreaming()
+{
+    // Center the navigation mesh at the crowd of jacks
+    Vector3 averageJackPosition;
+    if (Node* jackGroup = scene_->GetChild("Jacks"))
+    {
+        const unsigned numJacks = jackGroup->GetNumChildren();
+        for (unsigned i = 0; i < numJacks; ++i)
+            averageJackPosition += jackGroup->GetChild(i)->GetWorldPosition();
+        averageJackPosition /= (float)numJacks;
+    }
+
+    // Compute currently loaded area
+    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    const IntVector2 jackTile = navMesh->GetTileIndex(averageJackPosition);
+    const IntVector2 numTiles = navMesh->GetNumTiles();
+    const IntVector2 beginTile = VectorMax(IntVector2::ZERO, jackTile - IntVector2::ONE * streamingDistance_);
+    const IntVector2 endTile = VectorMin(jackTile + IntVector2::ONE * streamingDistance_, numTiles - IntVector2::ONE);
+
+    // Remove tiles
+    for (HashSet<IntVector2>::Iterator i = addedTiles_.Begin(); i != addedTiles_.End();)
+    {
+        const IntVector2 tileIdx = *i;
+        if (beginTile.x_ <= tileIdx.x_ && tileIdx.x_ <= endTile.x_ && beginTile.y_ <= tileIdx.y_ && tileIdx.y_ <= endTile.y_)
+            ++i;
+        else
+        {
+            navMesh->RemoveTile(tileIdx);
+            i = addedTiles_.Erase(i);
+        }
+    }
+
+    // Add tiles
+    for (int z = beginTile.y_; z <= endTile.y_; ++z)
+        for (int x = beginTile.x_; x <= endTile.x_; ++x)
+        {
+            const IntVector2 tileIdx(x, z);
+            if (!navMesh->HasTile(tileIdx) && tileData_.Contains(tileIdx))
+            {
+                addedTiles_.Insert(tileIdx);
+                navMesh->AddTile(tileData_[tileIdx]);
+            }
+        }
+}
+
+void CrowdNavigation::SaveNavigationData()
+{
+    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    tileData_.Clear();
+    addedTiles_.Clear();
+    const IntVector2 numTiles = navMesh->GetNumTiles();
+    for (int z = 0; z < numTiles.y_; ++z)
+        for (int x = 0; x <= numTiles.x_; ++x)
+        {
+            const IntVector2 tileIdx = IntVector2(x, z);
+            tileData_[tileIdx] = navMesh->GetTileData(tileIdx);
+        }
+}
+
 void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
@@ -482,6 +559,17 @@ void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Update streaming
+    Input* input = GetSubsystem<Input>();
+    if (input->GetKeyPress(KEY_TAB))
+    {
+        useStreaming_ = !useStreaming_;
+        ToggleStreaming(useStreaming_);
+    }
+    if (useStreaming_)
+        UpdateStreaming();
+
 }
 
 void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

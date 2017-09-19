@@ -63,7 +63,7 @@ void IndexBuffer::Release()
         if (!graphics_->IsDeviceLost())
         {
             if (graphics_->GetIndexBuffer() == this)
-                graphics_->SetIndexBuffer(0);
+                graphics_->SetIndexBuffer(nullptr);
 
             glDeleteBuffers(1, &object_.name_);
         }
@@ -161,23 +161,23 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Index buffer already locked");
-        return 0;
+        return nullptr;
     }
 
     if (!indexSize_)
     {
         URHO3D_LOGERROR("Index size not defined, can not lock index buffer");
-        return 0;
+        return nullptr;
     }
 
     if (start + count > indexCount_)
     {
         URHO3D_LOGERROR("Illegal range for locking index buffer");
-        return 0;
+        return nullptr;
     }
 
     if (!count)
-        return 0;
+        return nullptr;
 
     lockStart_ = start;
     lockCount_ = count;
@@ -195,7 +195,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return lockScratchData_;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 void IndexBuffer::Unlock()
@@ -211,7 +211,7 @@ void IndexBuffer::Unlock()
         SetDataRange(lockScratchData_, lockStart_, lockCount_, discardLock_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
-        lockScratchData_ = 0;
+        lockScratchData_ = nullptr;
         lockState_ = LOCK_NONE;
         break;
 
@@ -245,7 +245,7 @@ bool IndexBuffer::Create()
         }
 
         graphics_->SetIndexBuffer(this);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;
@@ -262,7 +262,7 @@ bool IndexBuffer::UpdateToGPU()
 void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     // Never called on OpenGL
-    return 0;
+    return nullptr;
 }
 
 void IndexBuffer::UnmapBuffer()

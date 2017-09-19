@@ -44,7 +44,7 @@ OggVorbisSoundStream::OggVorbisSoundStream(const Sound* sound)
     data_ = sound->GetData();
     dataSize_ = sound->GetDataSize();
     int error;
-    decoder_ = stb_vorbis_open_memory((unsigned char*)data_.Get(), dataSize_, &error, 0);
+    decoder_ = stb_vorbis_open_memory((unsigned char*)data_.Get(), dataSize_, &error, nullptr);
 }
 
 OggVorbisSoundStream::~OggVorbisSoundStream()
@@ -55,8 +55,18 @@ OggVorbisSoundStream::~OggVorbisSoundStream()
         stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
 
         stb_vorbis_close(vorbis);
-        decoder_ = 0;
+        decoder_ = nullptr;
     }
+}
+
+bool OggVorbisSoundStream::Seek(unsigned sample_number)
+{
+    if (!decoder_)
+        return false;
+    
+    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+    
+    return stb_vorbis_seek(vorbis, sample_number) == 1;
 }
 
 unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)

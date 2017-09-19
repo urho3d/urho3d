@@ -31,6 +31,9 @@
 #include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/File.h"
+#include "../IO/FileSystem.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
@@ -58,7 +61,7 @@ unsigned LookupIndexBuffer(IndexBuffer* buffer, const Vector<SharedPtr<IndexBuff
 }
 
 Model::Model(Context* context) :
-    Resource(context)
+    ResourceWithMetadata(context)
 {
 }
 
@@ -306,6 +309,13 @@ bool Model::BeginLoad(Deserializer& source)
         geometryCenters_.Push(Vector3::ZERO);
     memoryUse += sizeof(Vector3) * geometries_.Size();
 
+    // Read metadata
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String xmlName = ReplaceExtension(GetName(), ".xml");
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
+    if (file)
+        LoadMetadataFromXML(file->GetRoot());
+
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -452,6 +462,25 @@ bool Model::Save(Serializer& dest) const
     // Write geometry centers
     for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
         dest.WriteVector3(geometryCenters_[i]);
+
+    // Write metadata
+    if (HasMetadata())
+    {
+        File* destFile = dynamic_cast<File*>(&dest);
+        if (destFile)
+        {
+            String xmlName = ReplaceExtension(destFile->GetName(), ".xml");
+
+            SharedPtr<XMLFile> xml(new XMLFile(context_));
+            XMLElement rootElem = xml->CreateRoot("model");
+            SaveMetadataToXML(rootElem);
+
+            File xmlFile(context_, xmlName, FILE_WRITE);
+            xml->Save(xmlFile);
+        }
+        else
+            URHO3D_LOGWARNING("Can not save model metadata when not saving into a file");
+    }
 
     return true;
 }
@@ -714,7 +743,7 @@ unsigned Model::GetNumGeometryLodLevels(unsigned index) const
 Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 {
     if (index >= geometries_.Size() || geometries_[index].Empty())
-        return 0;
+        return nullptr;
 
     if (lodLevel >= geometries_[index].Size())
         lodLevel = geometries_[index].Size() - 1;
@@ -724,7 +753,7 @@ Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 
 const ModelMorph* Model::GetMorph(unsigned index) const
 {
-    return index < morphs_.Size() ? &morphs_[index] : 0;
+    return index < morphs_.Size() ? &morphs_[index] : nullptr;
 }
 
 const ModelMorph* Model::GetMorph(const String& name) const
@@ -740,7 +769,7 @@ const ModelMorph* Model::GetMorph(StringHash nameHash) const
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const

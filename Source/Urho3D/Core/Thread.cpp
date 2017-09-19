@@ -38,7 +38,7 @@ namespace Urho3D
 #ifdef URHO3D_THREADING
 #ifdef _WIN32
 
-DWORD WINAPI ThreadFunctionStatic(void* data)
+static DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
@@ -47,7 +47,7 @@ DWORD WINAPI ThreadFunctionStatic(void* data)
 
 #else
 
-void* ThreadFunctionStatic(void* data)
+static void* ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
@@ -56,12 +56,12 @@ void* ThreadFunctionStatic(void* data)
 }
 
 #endif
-#endif
+#endif // URHO3D_THREADING
 
 ThreadID Thread::mainThreadID;
 
 Thread::Thread() :
-    handle_(0),
+    handle_(nullptr),
     shouldRun_(false)
 {
 }
@@ -80,7 +80,7 @@ bool Thread::Run()
 
     shouldRun_ = true;
 #ifdef _WIN32
-    handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
+    handle_ = CreateThread(nullptr, 0, ThreadFunctionStatic, this, 0, nullptr);
 #else
     handle_ = new pthread_t;
     pthread_attr_t type;
@@ -88,10 +88,10 @@ bool Thread::Run()
     pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
     pthread_create((pthread_t*)handle_, &type, ThreadFunctionStatic, this);
 #endif
-    return handle_ != 0;
+    return handle_ != nullptr;
 #else
     return false;
-#endif
+#endif // URHO3D_THREADING
 }
 
 void Thread::Stop()
@@ -111,8 +111,8 @@ void Thread::Stop()
         pthread_join(*thread, 0);
     delete thread;
 #endif
-    handle_ = 0;
-#endif
+    handle_ = nullptr;
+#endif // URHO3D_THREADING
 }
 
 void Thread::SetPriority(int priority)
@@ -121,13 +121,12 @@ void Thread::SetPriority(int priority)
 #ifdef _WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
-#endif
-#if defined(__linux__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#elif defined(__linux__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);
 #endif
-#endif
+#endif // URHO3D_THREADING
 }
 
 void Thread::SetMainThread()
@@ -137,11 +136,15 @@ void Thread::SetMainThread()
 
 ThreadID Thread::GetCurrentThreadID()
 {
+#ifdef URHO3D_THREADING
 #ifdef _WIN32
     return GetCurrentThreadId();
 #else
     return pthread_self();
 #endif
+#else
+    return ThreadID();
+#endif // URHO3D_THREADING
 }
 
 bool Thread::IsMainThread()
@@ -150,7 +153,7 @@ bool Thread::IsMainThread()
     return GetCurrentThreadID() == mainThreadID;
 #else
     return true;
-#endif
+#endif // URHO3D_THREADING
 }
 
 }

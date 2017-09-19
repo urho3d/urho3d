@@ -40,7 +40,7 @@ static const char* valueTypeNames[] =
     "String",
     "Array",
     "Object",
-    0
+    nullptr
 };
 
 static const char* numberTypeNames[] =
@@ -49,7 +49,7 @@ static const char* numberTypeNames[] =
     "Int",
     "Unsigned",
     "Real",
-    0
+    nullptr
 };
 
 const JSONValue JSONValue::EMPTY;
@@ -322,7 +322,7 @@ JSONObjectIterator JSONValue::End()
     // Convert to object type.
     SetType(JSON_OBJECT);
 
-    return objectValue_->Begin();
+    return objectValue_->End();
 }
 
 ConstJSONObjectIterator JSONValue::End() const
@@ -581,7 +581,8 @@ VariantMap JSONValue::GetVariantMap() const
 
     for (ConstJSONObjectIterator i = Begin(); i != End(); ++i)
     {
-        StringHash key(ToUInt(i->first_));
+        /// \todo Ideally this should allow any strings, but for now the convention is that the keys need to be hexadecimal StringHashes
+        StringHash key(ToUInt(i->first_, 16));
         Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }

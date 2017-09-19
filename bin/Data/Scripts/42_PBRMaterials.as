@@ -160,6 +160,8 @@ void SetupViewport()
     RenderPath@ effectRenderPath = viewport.renderPath.Clone();
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/FXAA2.xml"));
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
+    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Tonemap.xml"));
+    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/AutoExposure.xml"));
 
     viewport.renderPath = effectRenderPath;
 }
@@ -208,13 +210,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown[KEY_W])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_S])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_A])
-        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_D])
-        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app

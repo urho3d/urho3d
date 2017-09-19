@@ -46,7 +46,7 @@ public:
     StaticScene(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    virtual void Start() override;
 
 private:
     /// Construct the scene content.

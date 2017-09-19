@@ -1,5 +1,4 @@
 
-// Modified by Lasse Oorni for Urho3D
 
 /** @file  IRRShared.h
   * @brief Shared utilities for the IRR and IRRMESH loaders

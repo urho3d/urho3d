@@ -48,10 +48,10 @@ URHO3D_DEFINE_APPLICATION_MAIN(PBRMaterials)
 
 PBRMaterials::PBRMaterials(Context* context) :
     Sample(context),
-    dynamicMaterial_(0),
-    roughnessLabel_(0),
-    metallicLabel_(0),
-    ambientLabel_(0)
+    dynamicMaterial_(nullptr),
+    roughnessLabel_(nullptr),
+    metallicLabel_(nullptr),
+    ambientLabel_(nullptr)
 {
 }
 
@@ -220,6 +220,8 @@ void PBRMaterials::SetupViewport()
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/Tonemap.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/AutoExposure.xml"));
 
     viewport->SetRenderPath(effectRenderPath);
 }

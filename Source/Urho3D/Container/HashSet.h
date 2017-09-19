@@ -26,9 +26,7 @@
 #include "../Container/Sort.h"
 
 #include <cassert>
-#if URHO3D_CXX11
 #include <initializer_list>
-#endif
 
 namespace Urho3D
 {
@@ -195,7 +193,6 @@ public:
         head_ = tail_ = ReserveNode();
         *this = set;
     }
-#if URHO3D_CXX11
     /// Aggregate initialization constructor.
     HashSet(const std::initializer_list<T>& list) : HashSet()
     {
@@ -204,7 +201,6 @@ public:
             Insert(*it);
         }
     }
-#endif
     /// Destruct.
     ~HashSet()
     {

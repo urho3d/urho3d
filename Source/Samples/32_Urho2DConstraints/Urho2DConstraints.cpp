@@ -524,7 +524,6 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
         constraintMouse->SetMaxForce(1000 * rigidBody->GetMass());
         constraintMouse->SetCollideConnected(true);
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
-        constraintMouse->SetDampingRatio(0.0f);
     }
     SubscribeToEvent(E_MOUSEMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleMouseMove));
     SubscribeToEvent(E_MOUSEBUTTONUP, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonUp));
@@ -538,7 +537,7 @@ void Urho2DConstraints::HandleMouseButtonUp(StringHash eventType, VariantMap& ev
         staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, 1.0f)); // Restore picked sprite color
 
         pickedNode->RemoveComponent<ConstraintMouse2D>(); // Remove temporary constraint
-        pickedNode = NULL;
+        pickedNode = nullptr;
     }
     UnsubscribeFromEvent(E_MOUSEMOVE);
     UnsubscribeFromEvent(E_MOUSEBUTTONUP);
@@ -608,7 +607,7 @@ void Urho2DConstraints::HandleTouchEnd3(StringHash eventType, VariantMap& eventD
         staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, 1.0f)); // Restore picked sprite color
 
         pickedNode->RemoveComponent<ConstraintMouse2D>(); // Remove temporary constraint
-        pickedNode = NULL;
+        pickedNode = nullptr;
     }
     UnsubscribeFromEvent(E_TOUCHMOVE);
     UnsubscribeFromEvent(E_TOUCHEND);

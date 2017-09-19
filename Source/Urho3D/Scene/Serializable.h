@@ -49,7 +49,7 @@ public:
     /// Construct.
     Serializable(Context* context);
     /// Destruct.
-    virtual ~Serializable();
+    virtual ~Serializable() override;
 
     /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
@@ -148,8 +148,8 @@ private:
 template <typename T, typename U> class EnumAttributeAccessorImpl : public AttributeAccessor
 {
 public:
-    typedef U (T::*GetFunctionPtr)() const;
-    typedef void (T::*SetFunctionPtr)(U);
+    using GetFunctionPtr = U (T::*)() const;
+    using SetFunctionPtr = void (T::*)(U);
 
     /// Construct with function pointers.
     EnumAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
@@ -161,7 +161,7 @@ public:
     }
 
     /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& dest) const
+    virtual void Get(const Serializable* ptr, Variant& dest) const override
     {
         assert(ptr);
         const T* classPtr = static_cast<const T*>(ptr);
@@ -169,7 +169,7 @@ public:
     }
 
     /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value)
+    virtual void Set(Serializable* ptr, const Variant& value) override
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
@@ -186,8 +186,8 @@ public:
 template <typename T, typename U> class EnumAttributeAccessorFreeImpl : public AttributeAccessor
 {
 public:
-    typedef U(*GetFunctionPtr)(const T*);
-    typedef void(*SetFunctionPtr)(T*, U);
+    using GetFunctionPtr = U(*)(const T*);
+    using SetFunctionPtr = void(*)(T*, U);
 
     /// Construct with function pointers.
     EnumAttributeAccessorFreeImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
@@ -199,7 +199,7 @@ public:
     }
 
     /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& dest) const
+    virtual void Get(const Serializable* ptr, Variant& dest) const override
     {
         assert(ptr);
         const T* classPtr = static_cast<const T*>(ptr);
@@ -207,7 +207,7 @@ public:
     }
 
     /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value)
+    virtual void Set(Serializable* ptr, const Variant& value) override
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
@@ -224,52 +224,52 @@ public:
 template <typename T> struct AttributeTrait
 {
     /// Get function return type.
-    typedef const T& ReturnType;
+    using ReturnType = const T&;
     /// Set function parameter type.
-    typedef const T& ParameterType;
+    using ParameterType = const T&;
 };
 
 /// Int attribute trait.
 template <> struct AttributeTrait<int>
 {
-    typedef int ReturnType;
-    typedef int ParameterType;
+    using ReturnType = int;
+    using ParameterType = int;
 };
 
 /// unsigned attribute trait.
 template <> struct AttributeTrait<unsigned>
 {
-    typedef unsigned ReturnType;
-    typedef unsigned ParameterType;
+    using ReturnType = unsigned;
+    using ParameterType = unsigned;
 };
 
 /// Bool attribute trait.
 template <> struct AttributeTrait<bool>
 {
-    typedef bool ReturnType;
-    typedef bool ParameterType;
+    using ReturnType = bool;
+    using ParameterType = bool;
 };
 
 /// Float attribute trait.
 template <> struct AttributeTrait<float>
 {
-    typedef float ReturnType;
-    typedef float ParameterType;
+    using ReturnType = float;
+    using ParameterType = float;
 };
 
 /// Mixed attribute trait (use const reference for set function only).
 template <typename T> struct MixedAttributeTrait
 {
-    typedef T ReturnType;
-    typedef const T& ParameterType;
+    using ReturnType = T;
+    using ParameterType = const T&;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.
 template <typename T, typename U, typename Trait> class AttributeAccessorImpl : public AttributeAccessor
 {
 public:
-    typedef typename Trait::ReturnType (T::*GetFunctionPtr)() const;
-    typedef void (T::*SetFunctionPtr)(typename Trait::ParameterType);
+    using GetFunctionPtr = typename Trait::ReturnType (T::*)() const;
+    using SetFunctionPtr = void (T::*)(typename Trait::ParameterType);
 
     /// Construct with function pointers.
     AttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
@@ -281,7 +281,7 @@ public:
     }
 
     /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& dest) const
+    virtual void Get(const Serializable* ptr, Variant& dest) const override
     {
         assert(ptr);
         const T* classPtr = static_cast<const T*>(ptr);
@@ -289,7 +289,7 @@ public:
     }
 
     /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value)
+    virtual void Set(Serializable* ptr, const Variant& value) override
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
@@ -306,8 +306,8 @@ public:
 template <typename T, typename U, typename Trait> class AttributeAccessorFreeImpl : public AttributeAccessor
 {
 public:
-    typedef typename Trait::ReturnType(*GetFunctionPtr)(const T*);
-    typedef void(*SetFunctionPtr)(T*, typename Trait::ParameterType);
+    using GetFunctionPtr = typename Trait::ReturnType(*)(const T*);
+    using SetFunctionPtr = void(*)(T*, typename Trait::ParameterType);
 
     /// Construct with function pointers.
     AttributeAccessorFreeImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
@@ -319,7 +319,7 @@ public:
     }
 
     /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& dest) const
+    virtual void Get(const Serializable* ptr, Variant& dest) const override
     {
         assert(ptr);
         const T* classPtr = static_cast<const T*>(ptr);
@@ -327,7 +327,7 @@ public:
     }
 
     /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value)
+    virtual void Set(Serializable* ptr, const Variant& value) override
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
@@ -339,6 +339,13 @@ public:
     /// Class-specific pointer to setter function.
     SetFunctionPtr setFunction_;
 };
+
+/// Attribute metadata.
+namespace AttributeMetadata
+{
+    /// Names of vector struct elements. StringVector.
+    static const StringHash P_VECTOR_STRUCT_ELEMENTS("VectorStructElements");
+}
 
 // The following macros need to be used within a class member function such as ClassName::RegisterObject().
 // A variable called "context" needs to exist in the current scope and point to a valid Context object.
@@ -365,9 +372,5 @@ public:
 #define URHO3D_MIXED_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorFreeImpl<ClassName, typeName, Urho3D::MixedAttributeTrait<typeName > >(getFunction, setFunction), defaultValue, mode))
 /// Update the default value of an already registered attribute.
 #define URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
-/// Define a variant structure attribute that uses get and set functions.
-#define URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, variantStructureElementNames, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, Urho3D::AttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, variantStructureElementNames, mode))
-/// Define a variant structure attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
-#define URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, variantStructureElementNames, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, Urho3D::MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, variantStructureElementNames, mode))
 
 }

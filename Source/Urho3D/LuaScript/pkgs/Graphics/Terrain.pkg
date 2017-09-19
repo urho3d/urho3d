@@ -46,6 +46,7 @@ class Terrain : public Component
     float GetHeight(const Vector3& worldPosition) const;
     Vector3 GetNormal(const Vector3& worldPosition) const;
     IntVector2 WorldToHeightMap(const Vector3& worldPosition) const;
+    Vector3 HeightMapToWorld(const IntVector2& pixelPosition) const;
     SharedArrayPtr<float> GetHeightData() const;
     float GetDrawDistance() const;
     float GetShadowDistance() const;

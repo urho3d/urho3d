@@ -36,13 +36,13 @@ class XMLElement;
 class XMLFile;
 
 /// Base class for texture resources.
-class URHO3D_API Texture : public Resource, public GPUObject
+class URHO3D_API Texture : public ResourceWithMetadata, public GPUObject
 {
 public:
     /// Construct.
     Texture(Context* context);
     /// Destruct.
-    virtual ~Texture();
+    virtual ~Texture() override;
 
     /// Set number of requested mip levels. Needs to be called before setting size.
     /** The default value (0) allocates as many mip levels as necessary to reach 1x1 size. Set value 1 to disable mipmapping.
@@ -82,7 +82,7 @@ public:
     /// Return height.
     int GetHeight() const { return height_; }
 
-    /// Return height.
+    /// Return depth.
     int GetDepth() const { return depth_; }
 
     /// Return filtering mode.
@@ -114,7 +114,7 @@ public:
 
     /// Return whether rendertarget mipmap levels need regenration.
     bool GetLevelsDirty() const { return levelsDirty_; }
-    
+
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
 

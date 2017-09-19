@@ -37,7 +37,7 @@ const char* orientations[] =
 {
     "Horizontal",
     "Vertical",
-    0
+    nullptr
 };
 
 extern const char* UI_CATEGORY;
@@ -236,7 +236,7 @@ void Slider::UpdateSlider()
         {
             int sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
 
-            if (knob_->IsFixedSize())
+            if (knob_->IsFixedWidth())
                 sliderLength = knob_->GetWidth();
 
             float sliderPos = (float)(GetWidth() - sliderLength) * value_ / range_;
@@ -253,7 +253,7 @@ void Slider::UpdateSlider()
         {
             int sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
 
-            if (knob_->IsFixedSize())
+            if (knob_->IsFixedHeight())
                 sliderLength = knob_->GetHeight();
 
             float sliderPos = (float)(GetHeight() - sliderLength) * value_ / range_;

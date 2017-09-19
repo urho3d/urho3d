@@ -109,7 +109,7 @@ SoundSource::SoundSource(Context* context) :
     panning_(0.0f),
     sendFinishedEvent_(false),
     autoRemove_(REMOVE_DISABLED),
-    position_(0),
+    position_(nullptr),
     fractPosition_(0),
     timePosition_(0.0f),
     unusedStreamSize_(0)
@@ -142,6 +142,30 @@ void SoundSource::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Autoremove Mode", autoRemove_, autoRemoveModeNames, REMOVE_DISABLED, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
+}
+
+void SoundSource::Seek(float seekTime)
+{
+    // Ignore buffered sound stream
+    if (!audio_ || !sound_ || (soundStream_ && !sound_->IsCompressed()))
+        return;
+
+    // Set to valid range
+    seekTime = Clamp(seekTime, 0.0f, sound_->GetLength());
+
+    if (!soundStream_)
+    {
+        // Raw or wav format
+        SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
+    }
+    else
+    {
+        // Ogg format
+        if (soundStream_->Seek((unsigned)(seekTime * soundStream_->GetFrequency())))
+        {
+            timePosition_ = seekTime;
+        }
+    }
 }
 
 void SoundSource::Play(Sound* sound)
@@ -289,7 +313,7 @@ void SoundSource::SetAutoRemoveMode(AutoRemoveMode mode)
 
 bool SoundSource::IsPlaying() const
 {
-    return (sound_ || soundStream_) && position_ != 0;
+    return (sound_ || soundStream_) && position_ != nullptr;
 }
 
 void SoundSource::SetPlayPosition(signed char* pos)
@@ -425,7 +449,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         // If stream did not produce any data, stop if applicable
         if (!outBytes && soundStream_->GetStopAtEnd())
         {
-            position_ = 0;
+            position_ = nullptr;
             return;
         }
     }
@@ -551,7 +575,7 @@ void SoundSource::PlayLockless(SharedPtr<SoundStream> stream)
 
 void SoundSource::StopLockless()
 {
-    position_ = 0;
+    position_ = nullptr;
     timePosition_ = 0.0f;
 
     // Free the sound stream and decode buffer if a stream was playing
@@ -1232,7 +1256,7 @@ void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
             }
         }
         else
-            position_ = 0;
+            position_ = nullptr;
     }
 }
 
@@ -1254,7 +1278,7 @@ void SoundSource::MixNull(float timeStep)
     {
         if (timePosition_ >= sound_->GetLength())
         {
-            position_ = 0;
+            position_ = nullptr;
             timePosition_ = 0.0f;
         }
     }

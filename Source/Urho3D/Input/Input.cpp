@@ -49,8 +49,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-// TODO: For now, in this particular case only, treat all the ARM on Linux as "desktop" (e.g. RPI, odroid, etc), revisit this again when we support "mobile" ARM on Linux
-#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(__ANDROID__))
+#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS) && !defined(TVOS)) || (defined(__linux__) && !defined(__ANDROID__))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
 
@@ -325,6 +324,7 @@ Input::Input(Context* context) :
     mouseButtonPress_(0),
     lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
     mouseMoveWheel_(0),
+    inputScale_(Vector2::ONE),
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
@@ -1406,7 +1406,7 @@ int Input::GetMouseMoveY() const
 TouchState* Input::GetTouch(unsigned index) const
 {
     if (index >= touches_.Size())
-        return 0;
+        return nullptr;
 
     HashMap<int, TouchState>::ConstIterator i = touches_.Begin();
     while (index--)
@@ -1424,7 +1424,7 @@ JoystickState* Input::GetJoystickByIndex(unsigned index)
             return &(i->second_);
     }
 
-    return 0;
+    return nullptr;
 }
 
 JoystickState* Input::GetJoystickByName(const String& name)
@@ -1435,13 +1435,13 @@ JoystickState* Input::GetJoystickByName(const String& name)
             return &(i->second_);
     }
 
-    return 0;
+    return nullptr;
 }
 
 JoystickState* Input::GetJoystick(SDL_JoystickID id)
 {
     HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Find(id);
-    return i != joysticks_.End() ? &(i->second_) : 0;
+    return i != joysticks_.End() ? &(i->second_) : nullptr;
 }
 
 bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
@@ -2304,8 +2304,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
-#if defined(IOS) || defined (__ANDROID__)
-                // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
+#if defined(IOS) || defined(TVOS) || defined (__ANDROID__)
+                // On iOS/tvOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
                 graphics_->Restore();
 #endif

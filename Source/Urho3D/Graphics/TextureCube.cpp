@@ -49,7 +49,7 @@ static const char* cubeMapLayoutNames[] = {
     "horizontalcross",
     "verticalcross",
     "blender",
-    0
+    nullptr
 };
 
 static SharedPtr<Image> GetTileImage(Image* src, int tileX, int tileY, int tileWidth, int tileHeight)
@@ -308,6 +308,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int mul
 
     width_ = size;
     height_ = size;
+    depth_ = 1;
     format_ = format;
     multiSample_ = multiSample;
     autoResolve_ = multiSample > 1;

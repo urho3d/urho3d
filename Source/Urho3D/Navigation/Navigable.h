@@ -36,7 +36,7 @@ public:
     /// Construct.
     Navigable(Context* context);
     /// Destruct.
-    virtual ~Navigable();
+    virtual ~Navigable() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

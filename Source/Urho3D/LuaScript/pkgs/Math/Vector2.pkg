@@ -4,6 +4,7 @@ class Vector2
 {
     Vector2();
     Vector2(const Vector2& vector);
+    Vector2(const IntVector2& vector);
     Vector2(float x, float y);
     ~Vector2();
 
@@ -14,7 +15,6 @@ class Vector2
     Vector2 operator * (float rhs) const;
     Vector2 operator * (const Vector2& rhs) const;
     Vector2 operator / (float rhs) const;
-    Vector2 operator / (const Vector2& rhs) const;
     Vector2 operator / (const Vector2& rhs) const;
 
     void Normalize();
@@ -28,7 +28,6 @@ class Vector2
     Vector2 Lerp(const Vector2& rhs, float t) const;
     bool Equals(const Vector2& rhs) const;
     bool IsNaN() const;
-
     Vector2 Normalized() const;
 
     String ToString() const;
@@ -56,7 +55,9 @@ class IntVector2
     IntVector2 operator - () const;
     IntVector2 operator - (const IntVector2& rhs) const;
     IntVector2 operator * (int rhs) const;
+    IntVector2 operator * (const IntVector2& rhs) const;
     IntVector2 operator / (int rhs) const;
+    IntVector2 operator / (const IntVector2& rhs) const;
 
     String ToString() const;
     unsigned ToHash() const;
@@ -66,6 +67,11 @@ class IntVector2
     int y_ @ y;
 
     static const IntVector2 ZERO;
+    static const IntVector2 LEFT;
+    static const IntVector2 RIGHT;
+    static const IntVector2 UP;
+    static const IntVector2 DOWN;
+    static const IntVector2 ONE;
 };
 
 Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t);

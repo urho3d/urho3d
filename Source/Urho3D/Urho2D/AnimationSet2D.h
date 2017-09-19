@@ -51,14 +51,14 @@ public:
     /// Construct.
     AnimationSet2D(Context* context);
     /// Destruct.
-    virtual ~AnimationSet2D();
+    virtual ~AnimationSet2D() override;
     /// Register object factory. 
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    virtual bool EndLoad() override;
 
     /// Get number of animations.
     unsigned GetNumAnimations() const;

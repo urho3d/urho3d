@@ -31,20 +31,20 @@ namespace Urho3D
 class SoundStream;
 
 /// %Sound resource.
-class URHO3D_API Sound : public Resource
+class URHO3D_API Sound : public ResourceWithMetadata
 {
-    URHO3D_OBJECT(Sound, Resource);
+    URHO3D_OBJECT(Sound, ResourceWithMetadata);
 
 public:
     /// Construct.
     Sound(Context* context);
     /// Destruct and free sound data.
-    virtual ~Sound();
+    virtual ~Sound() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
 
     /// Load raw sound data.
     bool LoadRaw(Deserializer& source);

@@ -59,7 +59,7 @@ long _maxdot_large( const float *vv, const float *vec, unsigned long count, floa
     float4 vvec = _mm_loadu_ps( vec );
     float4 vHi = btCastiTo128f(_mm_shuffle_epi32( btCastfTo128i( vvec), 0xaa ));          /// zzzz
     float4 vLo = _mm_movelh_ps( vvec, vvec );                               /// xyxy
-
+    
     long maxIndex = -1L;
     
     size_t segment = 0;

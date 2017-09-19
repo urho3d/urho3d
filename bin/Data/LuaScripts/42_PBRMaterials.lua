@@ -155,6 +155,8 @@ function SetupViewport()
     local effectRenderPath = viewport:GetRenderPath():Clone()
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/FXAA2.xml"))
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/GammaCorrection.xml"))
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/Tonemap.xml"))
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/AutoExposure.xml"))
 
     viewport.renderPath = effectRenderPath;
 end

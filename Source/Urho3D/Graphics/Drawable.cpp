@@ -49,10 +49,10 @@ const char* GEOMETRY_CATEGORY = "Geometry";
 
 SourceBatch::SourceBatch() :
     distance_(0.0f),
-    geometry_(0),
+    geometry_(nullptr),
     worldTransform_(&Matrix3x4::IDENTITY),
     numWorldTransforms_(1),
-    instancingData_((void*)0),
+    instancingData_(nullptr),
     geometryType_(GEOM_STATIC)
 {
 }
@@ -90,8 +90,8 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     occludee_(true),
     updateQueued_(false),
     zoneDirty_(false),
-    octant_(0),
-    zone_(0),
+    octant_(nullptr),
+    zone_(nullptr),
     viewMask_(DEFAULT_VIEWMASK),
     lightMask_(DEFAULT_LIGHTMASK),
     shadowMask_(DEFAULT_SHADOWMASK),
@@ -107,7 +107,7 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     lodBias_(1.0f),
     basePassFlags_(0),
     maxLights_(0),
-    firstLight_(0)
+    firstLight_(nullptr)
 {
 }
 
@@ -176,7 +176,7 @@ Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
     if (batchIndex < batches_.Size())
         return batches_[batchIndex].geometry_;
     else
-        return 0;
+        return nullptr;
 }
 
 bool Drawable::DrawOcclusion(OcclusionBuffer* buffer)
@@ -325,7 +325,7 @@ void Drawable::MarkInView(const FrameInfo& frame)
         viewCameras_.Push(frame.camera_);
 
     basePassFlags_ = 0;
-    firstLight_ = 0;
+    firstLight_ = nullptr;
     lights_.Clear();
     vertexLights_.Clear();
 }
@@ -468,7 +468,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
         for (unsigned geoIndex = 0; geoIndex < batches.Size(); ++geoIndex)
         {
             Geometry* geo = drawable->GetLodGeometry(geoIndex, 0);
-            if (geo == 0)
+            if (geo == nullptr)
                 continue;
             if (geo->GetPrimitiveType() != TRIANGLE_LIST)
             {

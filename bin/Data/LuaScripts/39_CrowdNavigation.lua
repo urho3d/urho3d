@@ -13,6 +13,11 @@ require "LuaScripts/Utilities/Sample"
 
 local INSTRUCTION = "instructionText"
 
+local useStreaming = false
+local streamingDistance = 2
+local navigationTiles = {}
+local addedTiles = {}
+
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -85,6 +90,8 @@ function CreateScene()
 
     -- Create a DynamicNavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("DynamicNavigationMesh")
+    -- Set small tiles to show navigation mesh streaming
+    navMesh.tileSize = 32
     -- Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh.drawObstacles = true
     navMesh.drawOffMeshConnections = true
@@ -157,6 +164,7 @@ function CreateUI()
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
         "MMB or O key to add obstacles or remove obstacles/agents\n"..
         "F5 to save scene, F7 to load\n"..
+        "Tab to toggle navigation mesh streaming\n"..
         "Space to toggle debug geometry\n"..
         "F12 to toggle this instruction text"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
@@ -385,6 +393,69 @@ function MoveCamera(timeStep)
         instruction.visible = not instruction.visible
     end
 end
+function ToggleStreaming(enabled)
+    local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+    if enabled then
+        local maxTiles = (2 * streamingDistance + 1) * (2 * streamingDistance + 1)
+        local boundingBox = BoundingBox(navMesh.boundingBox)
+        SaveNavigationData()
+        navMesh:Allocate(boundingBox, maxTiles);
+    else
+        navMesh:Build();
+    end
+end
+
+function UpdateStreaming()
+    local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+
+    -- Center the navigation mesh at the jacks crowd
+    local averageJackPosition = Vector3(0, 0, 0)
+    local jackGroup = scene_:GetChild("Jacks")
+    if jackGroup then
+        for i = 0,jackGroup:GetNumChildren()-1 do
+            averageJackPosition = averageJackPosition + jackGroup:GetChild(i).worldPosition
+        end
+        averageJackPosition = averageJackPosition / jackGroup:GetNumChildren()
+    end
+
+    local jackTile = navMesh:GetTileIndex(averageJackPosition)
+    local beginTile = VectorMax(IntVector2(0, 0), jackTile - IntVector2(1, 1) * streamingDistance)
+    local endTile = VectorMin(jackTile + IntVector2(1, 1) * streamingDistance, navMesh.numTiles - IntVector2(1, 1))
+
+    -- Remove tiles
+    local numTiles = navMesh.numTiles
+    for i,tileIdx in pairs(addedTiles) do
+        if not (beginTile.x <= tileIdx.x and tileIdx.x <= endTile.x and beginTile.y <= tileIdx.y and tileIdx.y <= endTile.y) then
+            addedTiles[i] = nil
+            navMesh:RemoveTile(tileIdx)
+        end
+    end
+
+    -- Add tiles
+    for z = beginTile.y, endTile.y do
+        for x = beginTile.x, endTile.x do
+            local i = z * numTiles.x + x
+            if not navMesh:HasTile(IntVector2(x, z)) and navigationTiles[i] then
+                addedTiles[i] = IntVector2(x, z)
+                navMesh:AddTile(navigationTiles[i])
+            end
+        end
+    end
+end
+
+function SaveNavigationData()
+    local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+    navigationTiles = {}
+    addedTiles = {}
+    local numTiles = navMesh.numTiles
+
+    for z = 0, numTiles.y - 1 do
+        for x = 0, numTiles.x - 1 do
+            local i = z * numTiles.x + x
+            navigationTiles[i] = navMesh:GetTileData(IntVector2(x, z))
+        end
+    end
+end
 
 function HandleUpdate(eventType, eventData)
     -- Take the frame time step, which is stored as a float
@@ -392,6 +463,15 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+
+    -- Update streaming
+    if input:GetKeyPress(KEY_TAB) then
+        useStreaming = not useStreaming
+        ToggleStreaming(useStreaming)
+    end
+    if useStreaming then
+        UpdateStreaming()
+    end
 end
 
 function HandlePostRenderUpdate(eventType, eventData)

@@ -64,21 +64,21 @@ public:
     /// Construct.
     RibbonTrail(Context* context);
     /// Destruct.
-    virtual ~RibbonTrail();
+    virtual ~RibbonTrail() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
     /// Update before octree reinsertion. Is called from a main thread.
-    virtual void Update(const FrameInfo &frame);
+    virtual void Update(const FrameInfo &frame) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
+    virtual void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    virtual UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Set material.
     void SetMaterial(Material* material);
@@ -160,9 +160,9 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    virtual void OnWorldBoundingBoxUpdate() override;
     /// Mark vertex buffer to need an update.
     void MarkPositionsDirty();
     /// Tails.

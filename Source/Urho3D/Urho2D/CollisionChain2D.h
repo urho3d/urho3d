@@ -35,7 +35,7 @@ public:
     /// Construct.
     CollisionChain2D(Context* context);
     /// Destruct.
-    virtual ~CollisionChain2D();
+    virtual ~CollisionChain2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -67,7 +67,7 @@ public:
 
 private:
     /// Apply node world scale.
-    virtual void ApplyNodeWorldScale();
+    virtual void ApplyNodeWorldScale() override;
     /// Recreate fixture.
     void RecreateFixture();
 

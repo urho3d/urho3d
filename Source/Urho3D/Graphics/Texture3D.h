@@ -39,20 +39,20 @@ public:
     /// Construct.
     Texture3D(Context* context);
     /// Destruct.
-    virtual ~Texture3D();
+    virtual ~Texture3D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    virtual bool EndLoad() override;
     /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost();
+    virtual void OnDeviceLost() override;
     /// Recreate the GPU resource and restore data if applicable.
-    virtual void OnDeviceReset();
+    virtual void OnDeviceReset() override;
     /// Release the texture.
-    virtual void Release();
+    virtual void Release() override;
 
     /// Set size, format and usage. Zero size will follow application window size. Return true if successful.
     bool SetSize(int width, int height, int depth, unsigned format, TextureUsage usage = TEXTURE_STATIC);
@@ -66,7 +66,7 @@ public:
 
 protected:
     /// Create the GPU texture.
-    virtual bool Create();
+    virtual bool Create() override;
 
 private:
     /// Image file acquired during BeginLoad.

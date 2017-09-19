@@ -47,14 +47,14 @@ static const char* commandTypeNames[] =
     "lightvolumes",
     "renderui",
     "sendevent",
-    0
+    nullptr
 };
 
 static const char* sortModeNames[] =
 {
     "fronttoback",
     "backtofront",
-    0
+    nullptr
 };
 
 extern const char* blendModeNames[];

@@ -84,6 +84,8 @@ namespace Urho3D
 - %Borderless : bool
 - %Resizable : bool
 - %HighDPI : bool
+- %Monitor : int
+- %RefreshRate : int
 
 ### WindowPos
 - %X : int
@@ -137,12 +139,20 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
+### EndAllViewsRender
+
 ### RenderPathEvent
 - %Name : String
 
 ### DeviceLost
 
 ### DeviceReset
+
+## %IK events
+
+### IKEffectorTargetChanged
+- %EffectorNode : (Node*) The effector node that has changed targets
+- %TargetNode : (Node*) The new target node. NOTE: Can be NULL (means no target)
 
 ## %IO events
 
@@ -296,6 +306,20 @@ namespace Urho3D
 - %BoundsMin : Vector3
 - %BoundsMax : Vector3
 
+### NavigationTileAdded
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %Tile : IntVector2
+
+### NavigationTileRemoved
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %Tile : IntVector2
+
+### NavigationAllTilesRemoved
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+
 ### CrowdAgentFormation
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
@@ -410,13 +434,24 @@ namespace Urho3D
 
 ## %Physics2D events
 
+### PhysicsUpdateContact2D
+- %World : PhysicsWorld2D pointer
+- %BodyA : RigidBody2D pointer
+- %BodyB : RigidBody2D pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
+- %Enabled : bool [in/out]
+
 ### PhysicsBeginContact2D
 - %World : PhysicsWorld2D pointer
 - %BodyA : RigidBody2D pointer
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
 
 ### PhysicsEndContact2D
 - %World : PhysicsWorld2D pointer
@@ -424,19 +459,30 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
+
+### NodeUpdateContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
+- %Enabled : bool [in/out]
 
 ### NodeBeginContact2D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
 
 ### NodeEndContact2D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
 
 ## %Physics events
 
@@ -884,6 +930,16 @@ namespace Urho3D
 - %ElementX : int (only if element is non-null)
 - %ElementY : int (only if element is non-null)
 
+## %Urho2D events
+
+### ParticlesEnd
+- %Node : Node pointer
+- %Effect : ParticleEffect2D pointer
+
+### ParticlesDuration
+- %Node : Node pointer
+- %Effect : ParticleEffect2D pointer
+
 
 \page AttributeList Attribute list
 
@@ -1048,6 +1104,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1215,6 +1272,7 @@ namespace Urho3D
 - %Damping %Ratio : float
 - %Length : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintFriction2D
 - %Is %Enabled : bool
@@ -1222,11 +1280,13 @@ namespace Urho3D
 - %Max %Force : float
 - %Max %Torque : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintGear2D
 - %Is %Enabled : bool
 - %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintMotor2D
 - %Is %Enabled : bool
@@ -1236,6 +1296,7 @@ namespace Urho3D
 - %Max %Torque : float
 - %Correction %Factor : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintMouse2D
 - %Is %Enabled : bool
@@ -1244,6 +1305,7 @@ namespace Urho3D
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintPrismatic2D
 - %Is %Enabled : bool
@@ -1256,6 +1318,7 @@ namespace Urho3D
 - %Max %Motor %Force : float
 - %Motor %Speed : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintPulley2D
 - %Is %Enabled : bool
@@ -1265,6 +1328,7 @@ namespace Urho3D
 - %Other %Body %Anchor : Vector2
 - %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintRevolute2D
 - %Is %Enabled : bool
@@ -1276,6 +1340,7 @@ namespace Urho3D
 - %Motor %Speed : float
 - %Max %Motor %Torque : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintRope2D
 - %Is %Enabled : bool
@@ -1283,6 +1348,7 @@ namespace Urho3D
 - %Other %Body %Anchor : Vector2
 - %Max %Length : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintWeld2D
 - %Is %Enabled : bool
@@ -1290,6 +1356,7 @@ namespace Urho3D
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintWheel2D
 - %Is %Enabled : bool
@@ -1301,6 +1368,7 @@ namespace Urho3D
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### CrowdAgent
 - %Target %Position : Vector3
@@ -1454,6 +1522,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1482,6 +1551,29 @@ namespace Urho3D
 - %Max %Obstacles : int
 - %Max %Layers : int
 - %Draw %Obstacles : bool
+
+### IKEffector
+- %Target %Node : String
+- %Chain %Length : int
+- %Target %Position : Vector3
+- %Target %Rotation : Vector3
+- %Weight : float
+- %Rotation %Weight : float
+- %Rotation %Decay : float
+- %Nlerp %Weight : bool
+- %Inherit %Parent %Rotation : bool
+
+### IKSolver
+- %Algorithm : int
+- %Max %Iterations : int
+- %Convergence %Tolerance : float
+- %Joint %Rotations : bool
+- %Target %Rotations : bool
+- %Update %Original %Pose : bool
+- %Update %Active %Pose : bool
+- %Use %Original %Pose : bool
+- %Enable %Constraints : bool
+- %Auto %Solve : bool
 
 ### Light
 - %Is %Enabled : bool
@@ -1685,6 +1777,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1775,6 +1868,7 @@ namespace Urho3D
 - %Particle %Effect : ResourceRef
 - %Sprite : ResourceRef
 - %Blend %Mode : int
+- %Is %Emitting : bool
 
 ### PhysicsWorld
 - %Gravity : Vector3
@@ -1852,6 +1946,11 @@ namespace Urho3D
 - %Range : float
 - %Value : float
 - %Show %Percent %Text : bool
+
+### RaycastVehicle
+- %Wheel %data : VariantVector
+- %Maximum %side %slip %threshold : float
+- %RPM %for %wheel %motors %in %air (0=calculate) : float
 
 ### RibbonTrail
 - %Is %Enabled : bool
@@ -2284,7 +2383,7 @@ namespace Urho3D
 - %Variables : VariantMap
 - %Tags : StringVector
 - %Font : ResourceRef
-- %Font %Size : int
+- %Font %Size : float
 - %Text : String
 - %Text %Alignment : int
 - %Row %Spacing : float
@@ -2302,7 +2401,7 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Font : ResourceRef
 - %Material : ResourceRef
-- %Font %Size : int
+- %Font %Size : float
 - %Text : String
 - %Text %Alignment : int
 - %Row %Spacing : float
@@ -2639,6 +2738,8 @@ namespace Urho3D
 <a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
+<a href="#Class_IKEffector"><b>IKEffector</b></a>
+<a href="#Class_IKSolver"><b>IKSolver</b></a>
 <a href="#Class_Image"><b>Image</b></a>
 <a href="#Class_IndexBuffer"><b>IndexBuffer</b></a>
 <a href="#Class_Input"><b>Input</b></a>
@@ -2690,6 +2791,7 @@ namespace Urho3D
 <a href="#Class_Quaternion"><b>Quaternion</b></a>
 <a href="#Class_Ray"><b>Ray</b></a>
 <a href="#Class_RayQueryResult"><b>RayQueryResult</b></a>
+<a href="#Class_RaycastVehicle"><b>RaycastVehicle</b></a>
 <a href="#Class_Rect"><b>Rect</b></a>
 <a href="#Class_RefCounted"><b>RefCounted</b></a>
 <a href="#Class_RenderPath"><b>RenderPath</b></a>
@@ -2755,6 +2857,7 @@ namespace Urho3D
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
 <a href="#Class_TouchState"><b>TouchState</b></a>
 <a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -3031,17 +3134,21 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
 - Animation@ Clone(const String& = String ( )) const
 - AnimationTrack@ CreateTrack(const String&)
+- AnimationTrack@ GetTrack(uint)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
 - bool RemoveAllTracks()
 - void RemoveAllTriggers()
+- void RemoveMetadata(const String&)
 - bool RemoveTrack(const String&)
 - void RemoveTrigger(uint)
 - bool Save(File@) const
@@ -3053,8 +3160,10 @@ Properties:
 
 - String animationName
 - String category // readonly
+- bool hasMetadata // readonly
 - float length
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - uint numTracks // readonly
 - uint numTriggers
@@ -3314,10 +3423,10 @@ Properties:
 
 - Variant defaultValue
 - String[]@ enumNames // readonly
+- VariantMap metadata
 - uint mode
 - String name
 - VariantType type
-- String[]@ variantStructureElementNames // readonly
 
 <a name="Class_Audio"></a>
 
@@ -3679,6 +3788,7 @@ Methods:
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
 - bool Defined() const
+- float DistanceToPoint(const Vector3&) const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
@@ -3777,6 +3887,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -3823,6 +3934,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -6363,6 +6475,7 @@ Methods:
 - void AddQuad(const Vector3&, float, float, const Color&, bool = true)
 - void AddSkeleton(Skeleton@, const Color&, bool = true)
 - void AddSphere(const Sphere&, const Color&, bool = true)
+- void AddSphereSector(const Sphere&, const Quaternion&, float, bool, const Color&, bool = true)
 - void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true)
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -6544,6 +6657,8 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
+- uint Tell() const
 
 Properties:
 
@@ -6809,6 +6924,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -6858,6 +6974,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -6947,9 +7064,12 @@ Properties:
 
 Methods:
 
+- bool AddTile(const VectorBuffer&) const
+- bool Allocate(const BoundingBox&, uint)
 - void ApplyAttributes()
 - bool Build()
 - bool Build(const BoundingBox&)
+- bool Build(const IntVector2&, const IntVector2&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -6965,8 +7085,12 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- VectorBuffer GetTileData(const IntVector2&) const
+- IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTile(const IntVector2&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -6975,9 +7099,11 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
+- void RemoveAllTiles()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- void RemoveTile(const IntVector2&)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -7115,7 +7241,9 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -7258,7 +7386,7 @@ Properties:
 
 Methods:
 
-- IntVector2 GetTotalGlyphOffset(int) const
+- IntVector2 GetTotalGlyphOffset(float) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
@@ -7362,7 +7490,7 @@ Methods:
 - void PrecacheShaders(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
-- bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int)
+- bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int)
 - void SetWindowPosition(int, int)
 - bool TakeScreenShot(Image@)
 - bool ToggleFullscreen()
@@ -7373,7 +7501,7 @@ Properties:
 - bool borderless // readonly
 - String category // readonly
 - bool deferredSupport // readonly
-- IntVector2 desktopResolution // readonly
+- IntVector2[] desktopResolution // readonly
 - bool deviceLost // readonly
 - bool dither
 - bool flushGPU
@@ -7383,6 +7511,7 @@ Properties:
 - bool initialized // readonly
 - bool instancingSupport // readonly
 - bool lightPrepassSupport // readonly
+- int monitorCount // readonly
 - int multiSample // readonly
 - int[]@ multiSampleLevels // readonly
 - uint numBatches // readonly
@@ -7391,11 +7520,12 @@ Properties:
 - bool readableDepthSupport // readonly
 - int refs // readonly
 - bool resizable // readonly
-- IntVector2[]@ resolutions // readonly
+- IntVector3[]@[] resolutions // readonly
 - bool sRGB
 - bool sRGBSupport // readonly
 - bool sRGBWriteSupport // readonly
 - String shaderCacheDir
+- IntVector2 size // readonly
 - bool tripleBuffer // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -7447,6 +7577,8 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
+- uint Tell() const
 
 Properties:
 
@@ -7462,6 +7594,153 @@ Properties:
 - HttpRequestState state // readonly
 - String url // readonly
 - String verb // readonly
+- int weakRefs // readonly
+
+<a name="Class_IKEffector"></a>
+
+### IKEffector
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- uint chainLength
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- float rotationDecay
+- float rotationWeight
+- String targetName
+- Node@ targetNode
+- Vector3 targetPosition
+- Quaternion targetRotation
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- float weight
+
+<a name="Class_IKSolver"></a>
+
+### IKSolver
+
+Methods:
+
+- void ApplyActivePoseToScene()
+- void ApplyAttributes()
+- void ApplyOriginalPoseToActivePose()
+- void ApplyOriginalPoseToScene()
+- void ApplySceneToActivePose()
+- void ApplySceneToInitialPose()
+- void CalculateJointRotations()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void RebuildChainTrees()
+- void RecalculateSegmentLengths()
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+- void Solve()
+
+Properties:
+
+- bool AUTO_SOLVE
+- bool CONSTRAINTS
+- bool JOINT_ROTATIONS
+- bool TARGET_ROTATIONS
+- bool UPDATE_ACTIVE_POSE
+- bool UPDATE_ORIGINAL_POSE
+- bool USE_ORIGINAL_POSE
+- IKAlgorithm algorithm
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- uint maximumIterations
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- float tolerance
+- StringHash type // readonly
+- String typeName // readonly
 - int weakRefs // readonly
 
 <a name="Class_Image"></a>
@@ -7497,6 +7776,7 @@ Methods:
 - bool SaveJPG(const String&, int) const
 - bool SavePNG(const String&) const
 - bool SaveTGA(const String&) const
+- bool SaveWEBP(const String&, float = 0.0f) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetPixel(int, int, const Color&)
 - void SetPixel(int, int, int, const Color&)
@@ -7590,6 +7870,7 @@ Properties:
 
 - String category // readonly
 - bool focus // readonly
+- Vector2 inputScale // readonly
 - JoystickState@[] joysticks // readonly
 - JoystickState@[] joysticksByIndex // readonly
 - JoystickState@[] joysticksByName // readonly
@@ -7631,7 +7912,9 @@ Properties:
 
 Methods:
 
+- int Clip(const IntRect&)
 - Intersection IsInside(const IntVector2&) const
+- int Merge(const IntRect&)
 
 Properties:
 
@@ -7660,6 +7943,15 @@ Properties:
 - int x
 - int y
 
+Constants:
+
+- IntVector2 DOWN
+- IntVector2 LEFT
+- IntVector2 ONE
+- IntVector2 RIGHT
+- IntVector2 UP
+- IntVector2 ZERO
+
 <a name="Class_IntVector3"></a>
 
 ### IntVector3
@@ -7676,6 +7968,17 @@ Properties:
 - int x
 - int y
 - int z
+
+Constants:
+
+- IntVector3 BACK
+- IntVector3 DOWN
+- IntVector3 FORWARD
+- IntVector3 LEFT
+- IntVector3 ONE
+- IntVector3 RIGHT
+- IntVector3 UP
+- IntVector3 ZERO
 
 <a name="Class_JSONFile"></a>
 
@@ -7723,12 +8026,16 @@ Methods:
 - float GetFloat() const
 - int GetInt() const
 - uint GetUInt() const
+- Variant GetVariant() const
+- VariantMap GetVariantMap() const
 - void Insert(uint, const JSONValue&)
 - const JSONValue& Get(const String&) const
 - void Pop()
 - void Push(const JSONValue&)
 - void Resize(uint)
 - void Set(const String&, const JSONValue&)
+- void SetVariant(const Variant&)
+- void SetVariantMap(const VariantMap&)
 - const String& GetString() const
 
 Properties:
@@ -7739,11 +8046,13 @@ Properties:
 - bool isNumber // readonly
 - bool isObject // readonly
 - bool isString // readonly
+- String[]@ keys // readonly
 - JSONNumberType numberType // readonly
 - String numberTypeName // readonly
 - uint size // readonly
 - JSONValueType valueType // readonly
 - String valueTypeName // readonly
+- JSONValue[]@ values // readonly
 
 <a name="Class_JoystickState"></a>
 
@@ -8598,6 +8907,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -8647,6 +8957,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -8751,6 +9062,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - Model@ Clone(const String& = String ( )) const
 - Geometry@ GetGeometry(uint, uint) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -8758,6 +9070,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -8771,7 +9085,9 @@ Properties:
 - BoundingBox boundingBox
 - String category // readonly
 - Vector3[] geometryCenters
+- bool hasMetadata // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - uint numGeometries
 - uint[] numGeometryLodLevels
@@ -8828,7 +9144,9 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -9007,9 +9325,12 @@ Properties:
 
 Methods:
 
+- bool AddTile(const VectorBuffer&) const
+- bool Allocate(const BoundingBox&, uint)
 - void ApplyAttributes()
 - bool Build()
 - bool Build(const BoundingBox&)
+- bool Build(const IntVector2&, const IntVector2&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -9025,8 +9346,12 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- VectorBuffer GetTileData(const IntVector2&) const
+- IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTile(const IntVector2&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9035,9 +9360,11 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
+- void RemoveAllTiles()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- void RemoveTile(const IntVector2&)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -9237,6 +9564,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&)
+- bool IsChildOf(Node@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9316,12 +9644,14 @@ Methods:
 
 Properties:
 
+- Node@[] allChildrenByName // readonly
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - String category // readonly
 - Node@[] children // readonly
+- Node@[] childrenByName // readonly
 - Component@[] components // readonly
 - Vector3 direction
 - bool enabled
@@ -9345,6 +9675,7 @@ Properties:
 - Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
+- Vector3 signedWorldScale // readonly
 - String[]@ tags // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
@@ -9894,6 +10225,7 @@ Properties:
 - String category // readonly
 - float drawDistance
 - ParticleEffect2D@ effect
+- bool emitting
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -10232,14 +10564,16 @@ Methods:
 - Quaternion Inverse() const
 - bool IsNaN() const
 - float LengthSquared() const
-- Quaternion Nlerp(Quaternion, float, bool) const
+- Quaternion Nlerp(const Quaternion&, float, bool) const
 - void Normalize()
 - Quaternion Normalized() const
-- Quaternion Slerp(Quaternion, float) const
+- Quaternion Slerp(const Quaternion&, float) const
 - String ToString() const
 
 Properties:
 
+- float angle // readonly
+- Vector3 axis // readonly
 - Vector3 eulerAngles // readonly
 - float pitch // readonly
 - float roll // readonly
@@ -10285,6 +10619,112 @@ Properties:
 - Vector3 position
 - uint subObject
 - Vector2 textureUV
+
+<a name="Class_RaycastVehicle"></a>
+
+### RaycastVehicle
+
+Methods:
+
+- void AddWheel(Node@, Vector3, Vector3, float, float, bool)
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- float GetBrake(int)
+- Vector3 GetContactNormal(int)
+- Vector3 GetContactPosition(int)
+- float GetEngineForce(int)
+- bool GetInterceptNetworkUpdate(const String&) const
+- float GetMaxSuspensionTravel(int)
+- float GetSteeringValue(int)
+- Vector3 GetWheelAxle(int)
+- Vector3 GetWheelConnectionPoint(int)
+- float GetWheelDampingCompression(int)
+- float GetWheelDampingRelaxation(int)
+- Vector3 GetWheelDirection(int)
+- float GetWheelFrictionSlip(int)
+- Node@ GetWheelNode(int)
+- Vector3 GetWheelPosition(int)
+- float GetWheelRadius(int)
+- float GetWheelRestLength(int)
+- float GetWheelRollInfluence(int)
+- Vector3 GetWheelRotation(int)
+- float GetWheelSideSlipSpeed(int)
+- float GetWheelSkidInfo(int)
+- float GetWheelSkidInfoCumulative(int)
+- float GetWheelSuspensionStiffness(int)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- void Init()
+- bool IsFrontWheel(int)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetSuspension()
+- void ResetToDefault()
+- void ResetWheels()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetBrake(int, float)
+- void SetEngineForce(int, float)
+- void SetInterceptNetworkUpdate(const String&, bool)
+- void SetMaxSuspensionTravel(int, float)
+- void SetSteeringValue(int, float)
+- void SetWheelAxle(int, Vector3)
+- void SetWheelDampingCompression(int, float)
+- void SetWheelDampingRelaxation(int, float)
+- void SetWheelDirection(int, Vector3)
+- void SetWheelFrictionSlip(int, float)
+- void SetWheelRadius(int, float)
+- void SetWheelRestLength(int, float)
+- void SetWheelRollInfluence(int, float)
+- void SetWheelSkidInfo(int, float)
+- void SetWheelSkidInfoCumulative(int, float)
+- void SetWheelSuspensionStiffness(int, float)
+- void UpdateWheelTransform(int, bool)
+- bool WheelIsGrounded(int)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- float inAirRPM
+- float maxSideSlipSpeed
+- Node@ node // readonly
+- uint numAttributes // readonly
+- int numWheels // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 <a name="Class_Rect"></a>
 
@@ -10440,6 +10880,7 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry(bool) const
+- Viewport@ GetViewportForScene(Scene@, uint)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - void ReloadShaders() const
@@ -10541,6 +10982,8 @@ Methods:
 - Resource@ GetResource(StringHash, const String&, bool = true)
 - Resource@ GetResource(const String&, const String&, bool = true)
 - String GetResourceFileName(const String&) const
+- Resource@[]@ GetResources(StringHash)
+- Resource@[]@ GetResources(const String&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - void ReleaseAllResources(bool = false)
@@ -10802,6 +11245,7 @@ Methods:
 - void ApplyForce(const Vector2&, const Vector2&, bool)
 - void ApplyForceToCenter(const Vector2&, bool)
 - void ApplyLinearImpulse(const Vector2&, const Vector2&, bool)
+- void ApplyLinearImpulseToCenter(const Vector2&, bool)
 - void ApplyTorque(float, bool)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - Variant GetAttribute(const String&) const
@@ -10925,6 +11369,7 @@ Methods:
 - Node@ InstantiateXML(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- bool IsChildOf(Node@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
@@ -11012,6 +11457,7 @@ Methods:
 
 Properties:
 
+- Node@[] allChildrenByName // readonly
 - bool animationEnabled
 - LoadMode asyncLoadMode // readonly
 - bool asyncLoading // readonly
@@ -11023,6 +11469,7 @@ Properties:
 - String category // readonly
 - uint checksum // readonly
 - Node@[] children // readonly
+- Node@[] childrenByName // readonly
 - Component@[] components // readonly
 - DebugRenderer@ debugRenderer // readonly
 - Vector3 direction
@@ -11049,6 +11496,7 @@ Properties:
 - Vector3 scale
 - Vector2 scale2D
 - ScriptObject@ scriptObject // readonly
+- Vector3 signedWorldScale // readonly
 - float smoothingConstant
 - float snapThreshold
 - String[]@ tags // readonly
@@ -12014,11 +12462,14 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -12029,9 +12480,11 @@ Properties:
 - String category // readonly
 - bool compressed // readonly
 - float frequency // readonly
+- bool hasMetadata // readonly
 - float length // readonly
 - bool looped
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - int refs // readonly
 - uint sampleSize // readonly
@@ -12136,6 +12589,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
+- void Seek(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
@@ -12209,6 +12663,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
+- void Seek(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
 - void SetAnimationTime(float)
@@ -12268,6 +12723,8 @@ Methods:
 - void Define(const Vector3&, float)
 - bool Defined() const
 - float Distance(const Vector3&) const
+- Vector3 GetLocalPoint(float, float) const
+- Vector3 GetPoint(float, float) const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
@@ -12918,6 +13375,7 @@ Methods:
 - double ToDouble() const
 - float ToFloat() const
 - int ToInt(int = 10) const
+- int64 ToInt64(int = 10) const
 - IntRect ToIntRect() const
 - IntVector2 ToIntVector2() const
 - IntVector3 ToIntVector3() const
@@ -12927,6 +13385,7 @@ Methods:
 - Matrix4 ToMatrix4() const
 - Quaternion ToQuaternion() const
 - uint ToUInt(int = 10) const
+- uint64 ToUInt64(int = 10) const
 - String ToUpper() const
 - Vector2 ToVector2() const
 - Vector3 ToVector3() const
@@ -13022,6 +13481,7 @@ Methods:
 - TerrainPatch@ GetPatch(int, int) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- Vector3 HeightMapToWorld(const IntVector2&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -13243,8 +13703,8 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
-- bool SetFont(Font@, int)
-- bool SetFont(const String&, int)
+- bool SetFont(Font@, float)
+- bool SetFont(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxAnchor(float, float)
@@ -13272,8 +13732,8 @@ Properties:
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
-- IntVector2[] charPositions // readonly
-- IntVector2[] charSizes // readonly
+- Vector2[] charPositions // readonly
+- Vector2[] charSizes // readonly
 - IntVector2 childOffset // readonly
 - UIElement@[] children // readonly
 - IntRect clipBorder
@@ -13302,7 +13762,7 @@ Properties:
 - bool focus
 - FocusMode focusMode
 - Font@ font // readonly
-- int fontSize
+- float fontSize
 - int height
 - HorizontalAlignment horizontalAlignment
 - Color hoverColor
@@ -13339,9 +13799,9 @@ Properties:
 - int priority
 - int refs // readonly
 - UIElement@ root // readonly
-- int rowHeight // readonly
+- float rowHeight // readonly
 - float rowSpacing
-- int[] rowWidths // readonly
+- float[] rowWidths // readonly
 - IntVector2 screenPosition // readonly
 - bool selected
 - Color selectionColor
@@ -13407,8 +13867,8 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- bool SetFont(Font@, int)
-- bool SetFont(const String&, int)
+- bool SetFont(Font@, float)
+- bool SetFont(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
 Properties:
@@ -13420,8 +13880,8 @@ Properties:
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
-- IntVector2[] charPositions // readonly
-- IntVector2[] charSizes // readonly
+- Vector2[] charPositions // readonly
+- Vector2[] charSizes // readonly
 - Color color // writeonly
 - Color[] colors
 - float drawDistance
@@ -13435,7 +13895,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 - bool fixedScreenSize
 - Font@ font // readonly
-- int fontSize
+- float fontSize
 - int height // readonly
 - HorizontalAlignment horizontalAlignment
 - uint id // readonly
@@ -13453,9 +13913,9 @@ Properties:
 - bool occluder
 - float opacity
 - int refs // readonly
-- int rowHeight // readonly
+- float rowHeight // readonly
 - float rowSpacing
-- int[] rowWidths // readonly
+- float[] rowWidths // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13478,12 +13938,15 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13503,12 +13966,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -13528,6 +13993,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - Image@ GetImage() const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -13535,6 +14001,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13556,12 +14024,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -13582,12 +14052,15 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13609,6 +14082,7 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - uint layers
 - int[] levelHeight // readonly
@@ -13616,6 +14090,7 @@ Properties:
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -13636,12 +14111,15 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13663,12 +14141,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -13688,6 +14168,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - Image@ GetImage(CubeMapFace) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -13695,6 +14176,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13716,12 +14199,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -13777,6 +14262,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
+- TileMapObject2D@[]@ GetTileCollisionShapes(int) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
@@ -14226,6 +14712,9 @@ Properties:
 - int dragBeginDistance
 - float dragBeginInterval
 - UIElement@ focusElement
+- FontHintLevel fontHintLevel
+- int fontOversampling
+- float fontSubpixelThreshold
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
 - int maxFontTextureSize
@@ -14239,6 +14728,67 @@ Properties:
 - bool useMutableGlyphs
 - bool useScreenKeyboard
 - bool useSystemClipboard
+- int weakRefs // readonly
+
+<a name="Class_UIComponent"></a>
+
+### UIComponent
+
+Methods:
+
+- void ApplyAttributes()
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Material@ material // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- UIElement@ root // readonly
+- bool temporary
+- Texture2D@ texture // readonly
+- StringHash type // readonly
+- String typeName // readonly
 - int weakRefs // readonly
 
 <a name="Class_UIElement"></a>
@@ -14464,11 +15014,13 @@ Methods:
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
+- int GetInt64() const
 - RefCounted@ GetPtr() const
 - ScriptObject@ GetScriptObject() const
 - StringHash GetStringHash() const
 - String[]@ GetStringVector() const
 - uint GetUInt() const
+- uint64 GetUInt64() const
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
@@ -14538,6 +15090,15 @@ Properties:
 - float x
 - float y
 
+Constants:
+
+- Vector2 DOWN
+- Vector2 LEFT
+- Vector2 ONE
+- Vector2 RIGHT
+- Vector2 UP
+- Vector2 ZERO
+
 <a name="Class_Vector3"></a>
 
 ### Vector3
@@ -14554,6 +15115,7 @@ Methods:
 - Vector3 Lerp(const Vector3&, float) const
 - void Normalize()
 - Vector3 Normalized() const
+- Vector3 Orthogonalize(const Vector3&) const
 - float ProjectOntoAxis(const Vector3&) const
 - String ToString() const
 
@@ -14565,6 +15127,17 @@ Properties:
 - float x
 - float y
 - float z
+
+Constants:
+
+- Vector3 BACK
+- Vector3 DOWN
+- Vector3 FORWARD
+- Vector3 LEFT
+- Vector3 ONE
+- Vector3 RIGHT
+- Vector3 UP
+- Vector3 ZERO
 
 <a name="Class_Vector4"></a>
 
@@ -14632,7 +15205,9 @@ Methods:
 - VectorBuffer ReadVectorBuffer(uint)
 - void Resize(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SetData(Deserializer@, uint)
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -15180,6 +15755,7 @@ Methods:
 - double GetDouble(const String&) const
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
+- int64 GetInt64(const String&) const
 - IntRect GetIntRect(const String&) const
 - IntVector2 GetIntVector2(const String&) const
 - IntVector3 GetIntVector3(const String&) const
@@ -15192,6 +15768,7 @@ Methods:
 - ResourceRef GetResourceRef() const
 - ResourceRefList GetResourceRefList() const
 - uint GetUInt(const String&) const
+- uint64 GetUInt64(const String&) const
 - String GetValue() const
 - Variant GetVariant() const
 - VariantMap GetVariantMap() const
@@ -15218,6 +15795,7 @@ Methods:
 - bool SetDouble(const String&, double)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
+- bool SetInt64(const String&, int64)
 - bool SetIntRect(const String&, const IntRect&)
 - bool SetIntVector2(const String&, const IntVector2&)
 - bool SetIntVector3(const String&, const IntVector3&)
@@ -15228,6 +15806,7 @@ Methods:
 - bool SetResourceRef(const String&, const ResourceRef&)
 - bool SetResourceRefList(const String&, const ResourceRefList&)
 - bool SetUInt(const String&, uint)
+- bool SetUInt64(const String&, uint64)
 - bool SetValue(const String&)
 - bool SetVariant(const Variant&)
 - bool SetVariantMap(const VariantMap&)
@@ -15608,6 +16187,13 @@ Properties:
 - FM_FOCUSABLE_DEFOCUSABLE
 
 
+### FontHintLevel
+
+- FONT_HINT_LEVEL_NONE
+- FONT_HINT_LEVEL_LIGHT
+- FONT_HINT_LEVEL_NORMAL
+
+
 ### FontType
 
 - FONT_NONE
@@ -15636,6 +16222,13 @@ Properties:
 - HTTP_ERROR
 - HTTP_OPEN
 - HTTP_CLOSED
+
+
+### IKAlgorithm
+
+- ONE_BONE
+- TWO_BONE
+- FABRIK
 
 
 ### InterpMethod
@@ -16015,6 +16608,7 @@ Properties:
 - VectorBuffer CompressVectorBuffer(VectorBuffer&)
 - float Cos(float)
 - uint CountSetBits(uint)
+- Object@ CreateObject(const String&)
 - VectorBuffer DecompressVectorBuffer(VectorBuffer&)
 - void DelayedExecute(float, bool, const String&, const Variant[]@ = null)
 - bool Equals(float, float)
@@ -16035,14 +16629,17 @@ Properties:
 - uint GetFloat32Format()
 - uint GetFormat(const String&)
 - Variant GetGlobalVar(const String&)
+- String GetHostName()
 - String GetInternalPath(const String&)
 - uint GetLinearDepthFormat()
+- String GetLoginName()
 - uint GetLuminanceAlphaFormat()
 - uint GetLuminanceFormat()
 - uint GetMaxBones()
 - String GetMiniDumpDir()
 - uint GetNumLogicalCPUs()
 - uint GetNumPhysicalCPUs()
+- String GetOSVersion()
 - AttributeInfo[]@ GetObjectAttributeInfos(const String&)
 - String[]@ GetObjectCategories()
 - String[]@ GetObjectsByCategory(const String&)
@@ -16060,6 +16657,7 @@ Properties:
 - uint GetRandomSeed()
 - uint GetReadableDepthFormat()
 - String GetTextureUnitName(TextureUnit)
+- uint64 GetTotalMemory()
 - VariantType GetVariantTypeFromName(const String&)
 - String GetVariantTypeName(VariantType)
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -16073,6 +16671,7 @@ Properties:
 - String Join(String[]&, const String&)
 - float Lerp(float, float, float)
 - float Ln(float)
+- uint LogBaseTwo(uint)
 - void MarkNetworkUpdate()
 - float Max(float, float)
 - int Max(int, int)
@@ -16087,7 +16686,9 @@ Properties:
 - void Print(const Variant&, bool = false)
 - void Print(float, bool = false)
 - void Print(int, bool = false)
+- void Print(int64, bool = false)
 - void Print(uint, bool = false)
+- void Print(uint64, bool = false)
 - void PrintCallStack(bool = false)
 - float Random()
 - float Random(float)

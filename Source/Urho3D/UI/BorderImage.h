@@ -40,12 +40,12 @@ public:
     /// Construct.
     BorderImage(Context* context);
     /// Destruct.
-    virtual ~BorderImage();
+    virtual ~BorderImage() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// Set texture.
     void SetTexture(Texture* texture);

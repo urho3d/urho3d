@@ -80,30 +80,30 @@ public:
     /// Construct.
     Node(Context* context);
     /// Destruct. Any child nodes are detached.
-    virtual ~Node();
+    virtual ~Node() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
+    virtual bool Load(Deserializer& source, bool setInstanceDefault = false) override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
     /// Load from JSON data. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    virtual bool Save(Serializer& dest) const override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const;
+    virtual bool SaveXML(XMLElement& dest) const override;
     /// Save as JSON data. Return true if successful.
-    virtual bool SaveJSON(JSONValue& dest) const;
+    virtual bool SaveJSON(JSONValue& dest) const override;
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
 
     /// Return whether should save default-valued attributes into XML. Always save node transforms for readability, even if identity.
-    virtual bool SaveDefaultAttributes() const { return true; }
+    virtual bool SaveDefaultAttributes() const override { return true; }
 
     /// Mark for attribute check on the next network update.
-    virtual void MarkNetworkUpdate();
+    virtual void MarkNetworkUpdate() override;
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
 
@@ -355,10 +355,13 @@ public:
     /// Return scene.
     Scene* GetScene() const { return scene_; }
 
+    /// Return whether is a direct or indirect child of specified node.
+    bool IsChildOf(Node* node) const;
+
     /// Return whether is enabled. Disables nodes effectively disable all their components.
     bool IsEnabled() const { return enabled_; }
 
-    /// Returns the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
+    /// Return the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
     bool IsEnabledSelf() const { return enabledPrev_; }
 
     /// Return owner connection in networking.
@@ -460,6 +463,9 @@ public:
 
         return worldTransform_.Scale();
     }
+
+    /// Return signed scale in world space. Utilized for Urho2D physics.
+    Vector3 GetSignedWorldScale() const;
 
     /// Return scale in world space (for Urho2D).
     Vector2 GetWorldScale2D() const
@@ -623,11 +629,11 @@ public:
 
 protected:
     /// Handle attribute animation added.
-    virtual void OnAttributeAnimationAdded();
+    virtual void OnAttributeAnimationAdded() override;
     /// Handle attribute animation removed.
-    virtual void OnAttributeAnimationRemoved();
+    virtual void OnAttributeAnimationRemoved() override;
     /// Find target of an attribute animation from object hierarchy by name.
-    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
+    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
 
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.

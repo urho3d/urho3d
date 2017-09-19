@@ -47,6 +47,11 @@ Deserializer::~Deserializer()
 {
 }
 
+unsigned Deserializer::SeekRelative(int delta)
+{
+    return Seek(GetPosition() + delta);
+}
+
 const String& Deserializer::GetName() const
 {
     return String::EMPTY;
@@ -309,6 +314,9 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_INT:
         return Variant(ReadInt());
 
+    case VAR_INT64:
+        return Variant(ReadInt64());
+
     case VAR_BOOL:
         return Variant(ReadBool());
 
@@ -340,7 +348,7 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_VOIDPTR:
     case VAR_PTR:
         ReadUInt();
-        return Variant((void*)0);
+        return Variant((void*)nullptr);
 
     case VAR_RESOURCEREF:
         return Variant(ReadResourceRef());
@@ -378,8 +386,14 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_DOUBLE:
         return Variant(ReadDouble());
 
+        // Deserializing custom values is not supported. Return empty
+    case VAR_CUSTOM_HEAP:
+    case VAR_CUSTOM_STACK:
+        ReadUInt();
+        return Variant::EMPTY;
+
     default:
-        return Variant();
+        return Variant::EMPTY;
     }
 }
 

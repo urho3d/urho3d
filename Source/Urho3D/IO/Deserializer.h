@@ -42,7 +42,7 @@ public:
 
     /// Read bytes from the stream. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size) = 0;
-    /// Set position from the beginning of the stream.
+    /// Set position from the beginning of the stream. Return actual new position.
     virtual unsigned Seek(unsigned position) = 0;
     /// Return name of the stream.
     virtual const String& GetName() const;
@@ -51,8 +51,12 @@ public:
     /// Return whether the end of stream has been reached.
     virtual bool IsEof() const { return position_ >= size_; }
 
+    /// Set position relative to current position. Return actual new position.
+    unsigned SeekRelative(int delta);
     /// Return current position.
     unsigned GetPosition() const { return position_; }
+    /// Return current position.
+    unsigned Tell() const { return position_; }
 
     /// Return size.
     unsigned GetSize() const { return size_; }

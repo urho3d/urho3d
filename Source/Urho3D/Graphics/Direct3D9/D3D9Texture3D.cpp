@@ -71,7 +71,7 @@ void Texture3D::Release()
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+                graphics_->SetTexture(i, nullptr);
         }
     }
 
@@ -137,7 +137,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
-    HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags);
+    HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? nullptr : &d3dBox, flags);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -482,7 +482,7 @@ bool Texture3D::Create()
         (D3DFORMAT)format_,
         (D3DPOOL)pool,
         (IDirect3DVolumeTexture9**)&object_,
-        0);
+        nullptr);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not create texture", hr);

@@ -44,10 +44,10 @@ enum PListValueType
 class PListValue;
 
 /// PList value map.
-typedef HashMap<String, PListValue> PListValueMap;
+using PListValueMap = HashMap<String, PListValue>;
 
 /// Vector of PList value.
-typedef Vector<PListValue> PListValueVector;
+using PListValueVector = Vector<PListValue>;
 
 /// PList value.
 class URHO3D_API PListValue
@@ -145,12 +145,12 @@ public:
     /// Construct.
     PListFile(Context* context);
     /// Destruct.
-    virtual ~PListFile();
+    virtual ~PListFile() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
 
     /// Return root.
     const PListValueMap& GetRoot() const { return root_; }

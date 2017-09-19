@@ -28,9 +28,7 @@
 #include "../Container/Vector.h"
 
 #include <cassert>
-#if URHO3D_CXX11
 #include <initializer_list>
-#endif
 
 namespace Urho3D
 {
@@ -39,8 +37,8 @@ namespace Urho3D
 template <class T, class U> class HashMap : public HashBase
 {
 public:
-    typedef T KeyType;
-    typedef U ValueType;
+    using KeyType = T;
+    using ValueType = U;
 
     /// Hash map key-value pair with const key.
     class KeyValue
@@ -240,7 +238,6 @@ public:
         head_ = tail_ = ReserveNode();
         *this = map;
     }
-#if URHO3D_CXX11
     /// Aggregate initialization constructor.
     HashMap(const std::initializer_list<Pair<T, U>>& list) : HashMap()
     {
@@ -249,7 +246,6 @@ public:
             Insert(*it);
         }
     }
-#endif
     /// Destruct.
     ~HashMap()
     {
@@ -345,7 +341,6 @@ public:
         return node ? &node->pair_.second_ : 0;
     }
 
-#if URHO3D_CXX11
     /// Populate the map using variadic template. This handles the base case.
     HashMap& Populate(const T& key, const U& value)
     {
@@ -358,7 +353,6 @@ public:
         this->operator [](key) = value;
         return Populate(args...);
     };
-#endif
 
     /// Insert a pair. Return an iterator to it.
     Iterator Insert(const Pair<T, U>& pair)
