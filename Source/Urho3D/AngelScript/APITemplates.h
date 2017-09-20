@@ -380,12 +380,15 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
 
 template <class T> T* ConstructObject()
 {
-    return new T(GetScriptContext());
+    T* object = new T(GetScriptContext());
+    object->AddRef();
+    return object;
 }
 
 template <class T> T* ConstructNamedObject(const String& name)
 {
     T* object = new T(GetScriptContext());
+    object->AddRef();
     object->SetName(name);
     return object;
 }
@@ -393,14 +396,14 @@ template <class T> T* ConstructNamedObject(const String& name)
 /// Template function for registering a default constructor for a class derived from Object.
 template <class T> void RegisterObjectConstructor(asIScriptEngine* engine, const char* className)
 {
-    String declFactory(String(className) + "@+ f()");
+    String declFactory(String(className) + "@ f()");
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactory.CString(), asFUNCTION(ConstructObject<T>), asCALL_CDECL);
 }
 
 /// Template function for registering a named constructor for a class derived from Object.
 template <class T> void RegisterNamedObjectConstructor(asIScriptEngine* engine, const char* className)
 {
-    String declFactoryWithName(String(className) + "@+ f(const String&in)");
+    String declFactoryWithName(String(className) + "@ f(const String&in)");
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.CString(), asFUNCTION(ConstructNamedObject<T>), asCALL_CDECL);
 }
 
