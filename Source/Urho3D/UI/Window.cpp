@@ -243,7 +243,7 @@ void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPo
 {
     UIElement::OnDragCancel(position, screenPosition, dragButtons, buttons, cursor);
 
-    if (dragButtons == MOUSEB_LEFT)
+    if (dragButtons == MOUSEB_LEFT && dragMode_ != DRAG_NONE)
     {
         dragMode_ = DRAG_NONE;
         SetPosition(dragBeginPosition_);
