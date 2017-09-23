@@ -22,6 +22,7 @@ Urho3D development, contributions and bugfixes by:
 - Aster Jian
 - Ricardo Abreu
 - Vivienne Anthony
+- Christopher Augustus
 - Colin Barrett
 - Erik Beran
 - Gauthier Billot
