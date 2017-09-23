@@ -198,7 +198,7 @@ case of iODBC with unicode build enabled, `char32_t`. Boost.Test dropped in this
 - Cleans up style; removes CPP11 macros and C++03 support cruft.
 - Silence warnings and untabify.
 - Works with Unicode (std::wstring as nanodbc::string_type)
-- Using Nanodbc with SQL Server Native Client works with nvarchar(max) and varchar(max) fields in Win32 and Win64.
+- Using nanodbc with SQL Server Native Client works with nvarchar(max) and varchar(max) fields in Win32 and Win64.
 
 # v1.0.0
 
