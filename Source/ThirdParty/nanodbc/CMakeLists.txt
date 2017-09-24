@@ -23,30 +23,13 @@
 # Define target name
 set (TARGET_NAME nanodbc)
 
-# nanodbc specific options
-option (NANODBC_DISABLE_ASYNC "Disable async features entirely" OFF)
-if (NANODBC_DISABLE_ASYNC)
-    add_definitions (-DNANODBC_DISABLE_ASYNC)
-endif ()
-option (NANODBC_ENABLE_UNICODE "Enable Unicode support" OFF)
-if (NANODBC_ENABLE_UNICODE)
-    add_definitions (-DNANODBC_ENABLE_UNICODE)
-    if (MSVC)
-        # Sets "Use Unicode Character Set" property in Visual Studio projects
-        add_definitions (-DUNICODE -D_UNICODE)
-    endif ()
-endif ()
-option (NANODBC_ENABLE_WORKAROUND_NODATA "Enable SQL_NO_DATA workaround (see Issue #33)" OFF)
-if (NANODBC_ENABLE_WORKAROUND_NODATA)
-  add_definitions (-DNANODBC_ENABLE_WORKAROUND_NODATA)
-endif ()
-
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS nanodbc/*.cpp GLOB_H_PATTERNS nanodbc/*.h)
 
 # Define dependency libs
+set (INCLUDE_DIRS .)
 if (ODBC_INCLUDE_DIRS)
-    set (INCLUDE_DIRS . ${ODBC_INCLUDE_DIRS})
+    LIST (APPEND INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
 endif ()
 if (ODBC_DEFINES)
     add_definitions (${ODBC_DEFINES})
