@@ -53,7 +53,7 @@ static const char* numberTypeNames[] =
 };
 
 const JSONValue JSONValue::EMPTY;
-const JSONArray JSONValue::emptyArray;
+const JSONArray JSONValue::emptyArray { };
 const JSONObject JSONValue::emptyObject;
 
 JSONValue& JSONValue::operator =(bool rhs)

@@ -30,13 +30,13 @@
 namespace Urho3D
 {
 
-const Variant Variant::EMPTY;
-const PODVector<unsigned char> Variant::emptyBuffer;
-const ResourceRef Variant::emptyResourceRef;
-const ResourceRefList Variant::emptyResourceRefList;
+const Variant Variant::EMPTY { };
+const PODVector<unsigned char> Variant::emptyBuffer { };
+const ResourceRef Variant::emptyResourceRef { };
+const ResourceRefList Variant::emptyResourceRefList { };
 const VariantMap Variant::emptyVariantMap;
-const VariantVector Variant::emptyVariantVector;
-const StringVector Variant::emptyStringVector;
+const VariantVector Variant::emptyVariantVector { };
+const StringVector Variant::emptyStringVector { };
 
 static const char* typeNames[] =
 {
