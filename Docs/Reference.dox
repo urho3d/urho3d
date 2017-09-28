@@ -2982,7 +2982,7 @@ Note that if a particular networked application does not need scene replication,
 
 \section Network_Connecting Connecting to a server
 
-Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 1234.
+Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 2345.
 
 Note the scene (to be used for replication) and identity VariantMap supplied as parameters when connecting. The identity data can contain for example the user name or credentials, it is completely application-specified. The identity data is sent right after connecting and causes the E_CLIENTIDENTITY event to be sent on the server when received. By subscribing to this event, server code can examine incoming connections and accept or deny them. The default is to accept all connections.
 
@@ -3072,7 +3072,7 @@ For high performance, consider using unordered messages, because for in-order me
 
 \section Network_RemoteEvents Remote events
 
-A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally set to be originate from a specific Node in the receiver's scene ("remote node event.")
+A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally be set to originate from a specific Node in the receiver's scene ("remote node event.")
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
