@@ -42,7 +42,7 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
     - URHO3D_DEPLOYMENT_TARGET=generic
-stage: build
+stage: release build configuration
 before_script:
   - rake ci_timer
   # Rely on git directly to detect the commit message and the release tag instead of using the corresponding Travis's environment variable because we may be querying for different commit SHA
@@ -134,7 +134,7 @@ matrix:
     - <<: *MinGW-32bit
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
     - &debug-build-stage
-      stage: debug build
+      stage: debug build configuration
       addons: *pulseaudio
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=Debug
       script: rake ci && rake ci_timer
@@ -329,7 +329,7 @@ env:
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
     - &arm64-v8a-static ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1 # Using default native API level android-21
     - &arm64-v8a-shared ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
-stage: build
+stage: release build configuration
 before_script:
   # Temporarily disable the test to build the APK as Travis-CI Trusty beta VM has not yet setup the environment for Android properly
   - export NO_SDK_SYSIMG=1; unset AVD INSTALL
@@ -351,7 +351,7 @@ matrix:
   fast_finish: true
   include:
     - &debug-build-stage
-      stage: debug build
+      stage: debug build configuration
       addons: {apt: {packages: g++-multilib}}
       env: [*armeabi-v7a-static, CMAKE_BUILD_TYPE=Debug]
       script: rake ci && rake ci_timer
@@ -401,7 +401,7 @@ env:
     # RPI 2/3
     - URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
     - URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
-stage: build
+stage: release build configuration
 before_script:
   - rake ci_timer
   - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for compiler in $RPI_PREFIX-{gcc,g++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
@@ -449,7 +449,7 @@ env:
     # ODROID-C2
     - SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
     - SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a53'
-stage: build
+stage: release build configuration
 before_script:
   - rake ci_timer
   - if [[ $SYSROOT =~ arm64 ]]; then export triplet=aarch64-linux-gnu; else export triplet=arm-linux-gnueabihf; fi
@@ -501,7 +501,7 @@ env:
     # URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=1 BRANCH=incoming numjobs=4
     - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=1 BRANCH=incoming
     - URHO3D_LIB_TYPE=SHARED EMSCRIPTEN_WASM=1 BRANCH=incoming
-stage: build
+stage: release build configuration
 before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
@@ -546,7 +546,7 @@ env:
     - &macOS-SHARED XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
     - MAKEFILE=1 URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
     - MAKEFILE=1 URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
-stage: build
+stage: release build configuration
 before_script: &before_script
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
