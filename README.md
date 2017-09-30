@@ -79,6 +79,7 @@ Urho3D development, contributions and bugfixes by:
 - Vladimir Pobedinsky
 - Franck Poulain
 - Pranjal Raihan
+- Alexey Rassikhin
 - Svyatoslav Razmyslov
 - Mariusz Richtscheid
 - Nick Royer
