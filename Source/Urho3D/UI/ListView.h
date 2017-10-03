@@ -56,6 +56,13 @@ public:
     /// React to resize.
     virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
+    /// Manually update layout on internal elements.
+    void UpdateInternalLayout();
+    /// Disable automatic layout update for internal elements.
+    void DisableInternalLayoutUpdate();
+    /// Enable automatic layout update for internal elements.
+    void EnableInternalLayoutUpdate();
+
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
     /// \brief Insert item at a specific index. In hierarchy mode, the optional parameter will be used to determine the child's indent level in respect to its parent.
