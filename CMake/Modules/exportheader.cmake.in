@@ -32,6 +32,8 @@
 #cmakedefine URHO3D_LUAJIT
 #cmakedefine URHO3D_TESTING
 
+#cmakedefine CLANG_PRE_STANDARD
+
 #ifdef @STATIC_DEFINE@
 #  define @EXPORT_MACRO_NAME@
 #  define @NO_EXPORT_MACRO_NAME@

@@ -24,6 +24,9 @@
 set (TARGET_NAME AngelScript)
 
 # Define preprocessor macros
+if (CLANG_PRE_STANDARD)
+    add_definitions (-DCLANG_PRE_STANDARD)
+endif ()
 if (NOT EXCEPTIONS)
     add_definitions (-DAS_NO_EXCEPTIONS)
 endif ()
