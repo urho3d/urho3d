@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1677,6 +1677,9 @@ bool asCScriptFunction::IsShared() const
 	// All class methods for shared classes are also shared
 	asASSERT( objectType == 0 || objectType->engine == engine || objectType->engine == 0 );
 	if( objectType && (objectType->flags & asOBJ_SHARED) ) return true;
+
+	// funcdefs that are registered by the application are shared
+	if (funcType == asFUNC_FUNCDEF && module == 0) return true;
 
 	// Functions that have been specifically marked as shared are shared
 	return isShared;

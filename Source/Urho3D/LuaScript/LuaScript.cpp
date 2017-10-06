@@ -476,7 +476,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     // Collect garbage
     {
         URHO3D_PROFILE(LuaCollectGarbage);
-        lua_gc(luaState_, LUA_GCCOLLECT, 0);
+        lua_gc(luaState_, LUA_GCSTEP, 0);
     }
 }
 

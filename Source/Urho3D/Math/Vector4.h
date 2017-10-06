@@ -207,6 +207,18 @@ public:
     /// Return as string.
     String ToString() const;
 
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const
+    {
+        unsigned hash = 37;
+        hash = 37 * hash + FloatToRawIntBits(x_);
+        hash = 37 * hash + FloatToRawIntBits(y_);
+        hash = 37 * hash + FloatToRawIntBits(z_);
+        hash = 37 * hash + FloatToRawIntBits(w_);
+
+        return hash;
+    }
+
     /// X coordinate.
     float x_;
     /// Y coordinate.

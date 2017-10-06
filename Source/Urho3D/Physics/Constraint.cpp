@@ -173,7 +173,7 @@ void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void Constraint::SetConstraintType(ConstraintType type)
 {
-    if (type != constraintType_)
+    if (type != constraintType_ || !constraint_)
     {
         constraintType_ = type;
         CreateConstraint();

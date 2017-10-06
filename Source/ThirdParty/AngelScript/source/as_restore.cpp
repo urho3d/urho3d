@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -142,7 +142,8 @@ int asCReader::ReadInner()
 	unsigned long i, count;
 	asCScriptFunction* func;
 
-	ReadData(&noDebugInfo, 1);
+	// Read the flag as 1 byte even on platforms with 4byte booleans
+	noDebugInfo = ReadEncodedUInt() ? VALUE_OF_BOOLEAN_TRUE : 0;
 
 	// Read enums
 	count = ReadEncodedUInt();
@@ -156,7 +157,8 @@ int asCReader::ReadInner()
 			return asOUT_OF_MEMORY;
 		}
 
-		ReadTypeDeclaration(et, 1);
+		bool isExternal = false;
+		ReadTypeDeclaration(et, 1, &isExternal);
 
 		// If the type is shared then we should use the original if it exists
 		bool sharedExists = false;
@@ -179,6 +181,16 @@ int asCReader::ReadInner()
 			}
 		}
 
+		if (isExternal && !sharedExists)
+		{
+			asCString msg;
+			msg.Format(TXT_EXTERNAL_SHARED_s_NOT_FOUND, et->name.AddressOf());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+			asDELETE(et, asCEnumType);
+			error = true;
+			return asERROR;
+		}
+
 		if( sharedExists )
 		{
 			existingShared.Insert(et, true);
@@ -196,6 +208,10 @@ int asCReader::ReadInner()
 			et->module = module;
 		}
 		module->enumTypes.PushLast(et);
+
+		if (isExternal)
+			module->externalTypes.PushLast(et);
+
 		ReadTypeDeclaration(et, 2);
 	}
 
@@ -214,7 +230,8 @@ int asCReader::ReadInner()
 			return asOUT_OF_MEMORY;
 		}
 
-		ReadTypeDeclaration(ot, 1);
+		bool isExternal = false;
+		ReadTypeDeclaration(ot, 1, &isExternal);
 
 		// If the type is shared, then we should use the original if it exists
 		bool sharedExists = false;
@@ -238,6 +255,16 @@ int asCReader::ReadInner()
 			}
 		}
 
+		if (isExternal && !sharedExists)
+		{
+			asCString msg;
+			msg.Format(TXT_EXTERNAL_SHARED_s_NOT_FOUND, ot->name.AddressOf());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+			asDELETE(ot, asCObjectType);
+			error = true;
+			return asERROR;
+		}
+
 		if( sharedExists )
 		{
 			existingShared.Insert(ot, true);
@@ -255,6 +282,9 @@ int asCReader::ReadInner()
 			ot->module = module;
 		}
 		module->classTypes.PushLast(ot);
+
+		if (isExternal)
+			module->externalTypes.PushLast(ot);
 	}
 
 	if( error ) return asERROR;
@@ -264,8 +294,8 @@ int asCReader::ReadInner()
 	module->funcDefs.Allocate(count, false);
 	for( i = 0; i < count && !error; i++ )
 	{
-		bool isNew;
-		asCScriptFunction *funcDef = ReadFunction(isNew, false, true);
+		bool isNew, isExternal;
+		asCScriptFunction *funcDef = ReadFunction(isNew, false, true, true, &isExternal);
 		if(funcDef)
 		{
 			funcDef->module = module;
@@ -298,6 +328,9 @@ int asCReader::ReadInner()
 						module->funcDefs[module->funcDefs.IndexOf(fdt)] = f2;
 						f2->AddRefInternal();
 
+						if (isExternal)
+							module->externalTypes.PushLast(f2);
+
 						engine->funcDefs.RemoveValue(fdt);
 
 						savedFunctions[savedFunctions.IndexOf(funcDef)] = f2->funcdef;
@@ -320,6 +353,16 @@ int asCReader::ReadInner()
 			// Add the funcdef to the parentClass if this is a child funcdef
 			if (funcDef && fdt->parentClass)
 				fdt->parentClass->childFuncDefs.PushLast(fdt);
+
+			// Check if an external shared funcdef was really found
+			if (isExternal && funcDef)
+			{
+				asCString msg;
+				msg.Format(TXT_EXTERNAL_SHARED_s_NOT_FOUND, funcDef->name.AddressOf());
+				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+				error = true;
+				return asERROR;
+			}
 		}
 		else
 			Error(TXT_INVALID_BYTECODE_d);
@@ -360,7 +403,8 @@ int asCReader::ReadInner()
 			return asOUT_OF_MEMORY;
 		}
 
-		ReadTypeDeclaration(td, 1);
+		bool isExternal = false;
+		ReadTypeDeclaration(td, 1, &isExternal);
 		td->module = module;
 		module->typeDefs.PushLast(td);
 		ReadTypeDeclaration(td, 2);
@@ -386,8 +430,8 @@ int asCReader::ReadInner()
 	for( i = 0; i < count && !error; ++i ) 
 	{
 		size_t len = module->scriptFunctions.GetLength();
-		bool isNew;
-		func = ReadFunction(isNew);
+		bool isNew, isExternal;
+		func = ReadFunction(isNew, true, true, true, &isExternal);
 		if( func == 0 )
 		{
 			Error(TXT_INVALID_BYTECODE_d);
@@ -416,13 +460,28 @@ int asCReader::ReadInner()
 					// Insert the function in the dontTranslate array
 					dontTranslate.Insert(realFunc, true);
 
+					if (isExternal)
+						module->externalFunctions.PushLast(realFunc);
+
 					// Release the function, but make sure nothing else is released
 					func->id = 0;
-					func->scriptData->byteCode.SetLength(0);
+					if( func->scriptData )
+						func->scriptData->byteCode.SetLength(0);
 					func->ReleaseInternal();
+					func = 0;
 					break;
 				}
 			}
+		}
+
+		// Check if an external shared func was really found
+		if (isExternal && func)
+		{
+			asCString msg;
+			msg.Format(TXT_EXTERNAL_SHARED_s_NOT_FOUND, func->name.AddressOf());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+			error = true;
+			return asERROR;
 		}
 	}
 
@@ -649,7 +708,7 @@ void asCReader::ReadUsedFunctions()
 					{
 						asCScriptFunction *f = module->bindInformations[i]->importedFunctionSignature;
 						if( func.objectType != f->objectType ||
-							func.funcType != f->funcType || 
+							func.funcType != f->funcType ||
 							func.nameSpace != f->nameSpace ||
 							!func.IsSignatureEqual(f) )
 							continue;
@@ -664,7 +723,10 @@ void asCReader::ReadUsedFunctions()
 					for( asUINT i = 0; i < funcs.GetLength(); i++ )
 					{
 						asCScriptFunction *f = funcs[i]->funcdef;
-						if( f == 0 || func.name != f->name || !func.IsSignatureExceptNameAndObjectTypeEqual(f) || funcs[i]->parentClass != parentClass )
+						if( f == 0 || 
+							func.name != f->name || 
+							!func.IsSignatureExceptNameAndObjectTypeEqual(f) || 
+							funcs[i]->parentClass != parentClass )
 							continue;
 
 						asASSERT( f->objectType == 0 );
@@ -682,7 +744,7 @@ void asCReader::ReadUsedFunctions()
 					{
 						asCScriptFunction *f = module->scriptFunctions[i];
 						if( func.objectType != f->objectType ||
-							func.funcType != f->funcType || 
+							func.funcType != f->funcType ||
 							func.nameSpace != f->nameSpace ||
 							!func.IsSignatureEqual(f) )
 							continue;
@@ -692,8 +754,49 @@ void asCReader::ReadUsedFunctions()
 					}
 				}
 			}
+			else if (c == 's')
+			{
+				// Look for shared entities in the engine, as they may not necessarily be part
+				// of the scope of the module if they have been inhereted from other modules.
+				if (func.funcType == asFUNC_FUNCDEF)
+				{
+					const asCArray<asCFuncdefType *> &funcs = engine->funcDefs;
+					for (asUINT i = 0; i < funcs.GetLength(); i++)
+					{
+						asCScriptFunction *f = funcs[i]->funcdef;
+						if (f == 0 || 
+							func.name != f->name || 
+							!func.IsSignatureExceptNameAndObjectTypeEqual(f) || 
+							funcs[i]->parentClass != parentClass)
+							continue;
+
+						asASSERT(f->objectType == 0);
+
+						usedFunctions[n] = f;
+						break;
+					}
+				}
+				else
+				{
+					for (asUINT i = 0; i < engine->scriptFunctions.GetLength(); i++)
+					{
+						asCScriptFunction *f = engine->scriptFunctions[i];
+						if (f == 0 || !f->IsShared() ||
+							func.objectType != f->objectType ||
+							func.funcType != f->funcType ||
+							func.nameSpace != f->nameSpace ||
+							!func.IsSignatureEqual(f))
+							continue;
+
+						usedFunctions[n] = f;
+						break;
+					}
+				}
+			}
 			else
 			{
+				asASSERT(c == 'a');
+
 				if( func.funcType == asFUNC_FUNCDEF )
 				{
 					// This is a funcdef (registered or shared)
@@ -824,10 +927,10 @@ void asCReader::ReadUsedFunctions()
 
 				if( usedFunctions[n] == 0 )
 				{
-					// TODO: clean up: This part of the code should never happen. All functions should 
-					//                 be found in the above logic. The only valid reason to come here 
+					// TODO: clean up: This part of the code should never happen. All functions should
+					//                 be found in the above logic. The only valid reason to come here
 					//                 is if the bytecode is wrong and the function doesn't exist anyway.
-					//                 This loop is kept temporarily until we can be certain all scenarios 
+					//                 This loop is kept temporarily until we can be certain all scenarios
 					//                 are covered.
 					for( asUINT i = 0; i < engine->scriptFunctions.GetLength(); i++ )
 					{
@@ -995,9 +1098,10 @@ void asCReader::ReadFunctionSignature(asCScriptFunction *func, asCObjectType **p
 	}
 }
 
-asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool addToEngine, bool addToGC) 
+asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool addToEngine, bool addToGC, bool *isExternal) 
 {
 	isNew = false;
+	if (isExternal) *isExternal = false;
 	if( error ) return 0;
 
 	char c;
@@ -1047,154 +1151,160 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 
 	if( func->funcType == asFUNC_SCRIPT )
 	{
-		func->AllocateScriptFunctionData();
-		if( func->scriptData == 0 )
+		char bits;
+		ReadData(&bits, 1);
+		func->isShared = bits & 1 ? true : false;
+		func->dontCleanUpOnException = bits & 2 ? true : false;
+		if ((bits & 4) && isExternal)
+			*isExternal = true;
+
+		// for external shared functions the rest is not needed
+		if (!(bits & 4))
 		{
-			// Out of memory
-			error = true;
-			func->DestroyHalfCreated();
-			return 0;
-		}
-
-		if( addToGC && !addToModule )
-			engine->gc.AddScriptObjectToGC(func, &engine->functionBehaviours);
-		
-		ReadByteCode(func);
-
-		func->scriptData->variableSpace = ReadEncodedUInt();
-
-		count = ReadEncodedUInt();
-		func->scriptData->objVariablePos.Allocate(count, false);
-		func->scriptData->objVariableTypes.Allocate(count, false);
-		for( i = 0; i < count; ++i )
-		{
-			func->scriptData->objVariableTypes.PushLast(ReadTypeInfo());
-			num = ReadEncodedUInt();
-			func->scriptData->objVariablePos.PushLast(num);
-
-			if( error )
-			{
-				// No need to continue (the error has already been reported before)
-				func->DestroyHalfCreated();
-				return 0;
-			}
-		}
-		if( count > 0 )
-			func->scriptData->objVariablesOnHeap = ReadEncodedUInt();
-		else
-			func->scriptData->objVariablesOnHeap = 0;
-
-		int length = ReadEncodedUInt();
-		func->scriptData->objVariableInfo.SetLength(length);
-		for( i = 0; i < length; ++i )
-		{
-			func->scriptData->objVariableInfo[i].programPos     = ReadEncodedUInt();
-			func->scriptData->objVariableInfo[i].variableOffset = ReadEncodedUInt();
-			asEObjVarInfoOption option = (asEObjVarInfoOption)ReadEncodedUInt();
-			func->scriptData->objVariableInfo[i].option         = option;
-			if (option != asOBJ_INIT && option != asOBJ_UNINIT && option != asBLOCK_BEGIN && option != asBLOCK_END)
-			{
-				error = true;
-				func->DestroyHalfCreated();
-				return 0;
-			}
-		}
-
-		if( !noDebugInfo )
-		{
-			length = ReadEncodedUInt();
-			func->scriptData->lineNumbers.SetLength(length);
-			if( int(func->scriptData->lineNumbers.GetLength()) != length )
+			func->AllocateScriptFunctionData();
+			if (func->scriptData == 0)
 			{
 				// Out of memory
 				error = true;
 				func->DestroyHalfCreated();
 				return 0;
 			}
-			for( i = 0; i < length; ++i )
-				func->scriptData->lineNumbers[i] = ReadEncodedUInt();
 
-			// Read the array of script sections 
-			length = ReadEncodedUInt();
-			func->scriptData->sectionIdxs.SetLength(length);
-			if( int(func->scriptData->sectionIdxs.GetLength()) != length )
+			if (addToGC && !addToModule)
+				engine->gc.AddScriptObjectToGC(func, &engine->functionBehaviours);
+
+			ReadByteCode(func);
+
+			func->scriptData->variableSpace = ReadEncodedUInt();
+
+			count = ReadEncodedUInt();
+			func->scriptData->objVariablePos.Allocate(count, false);
+			func->scriptData->objVariableTypes.Allocate(count, false);
+			for (i = 0; i < count; ++i)
 			{
-				// Out of memory
-				error = true;
-				func->DestroyHalfCreated();
-				return 0;
-			}
-			for( i = 0; i < length; ++i )
-			{
-				if( (i & 1) == 0 )
-					func->scriptData->sectionIdxs[i] = ReadEncodedUInt();
-				else
-				{
-					asCString str;
-					ReadString(&str);
-					func->scriptData->sectionIdxs[i] = engine->GetScriptSectionNameIndex(str.AddressOf());
-				}
-			}
-		}
+				func->scriptData->objVariableTypes.PushLast(ReadTypeInfo());
+				num = ReadEncodedUInt();
+				func->scriptData->objVariablePos.PushLast(num);
 
-		// Read the variable information
-		if( !noDebugInfo )
-		{
-			length = ReadEncodedUInt();
-			func->scriptData->variables.Allocate(length, false);
-			for( i = 0; i < length; i++ )
-			{
-				asSScriptVariable *var = asNEW(asSScriptVariable);
-				if( var == 0 )
-				{
-					// Out of memory
-					error = true;
-					func->DestroyHalfCreated();
-					return 0;
-				}
-				func->scriptData->variables.PushLast(var);
-
-				var->declaredAtProgramPos = ReadEncodedUInt();
-				var->stackOffset = ReadEncodedUInt();
-				ReadString(&var->name);
-				ReadDataType(&var->type);
-
-				if( error )
+				if (error)
 				{
 					// No need to continue (the error has already been reported before)
 					func->DestroyHalfCreated();
 					return 0;
 				}
 			}
-		}
+			if (count > 0)
+				func->scriptData->objVariablesOnHeap = ReadEncodedUInt();
+			else
+				func->scriptData->objVariablesOnHeap = 0;
 
-		char bits;
-		ReadData(&bits, 1);
-		func->isShared               = bits & 1 ? true : false;
-		func->dontCleanUpOnException = bits & 2 ? true : false;
-
-		// Read script section name
-		if( !noDebugInfo )
-		{
-			asCString name;
-			ReadString(&name);
-			func->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(name.AddressOf());
-			func->scriptData->declaredAt = ReadEncodedUInt();
-		}
-
-		// Read parameter names
-		if( !noDebugInfo )
-		{
-			asUINT countParam = asUINT(ReadEncodedUInt64());
-			if( countParam > func->parameterTypes.GetLength() )
+			int length = ReadEncodedUInt();
+			func->scriptData->objVariableInfo.SetLength(length);
+			for (i = 0; i < length; ++i)
 			{
-				error = true;
-				func->DestroyHalfCreated();
-				return 0;
+				func->scriptData->objVariableInfo[i].programPos = ReadEncodedUInt();
+				func->scriptData->objVariableInfo[i].variableOffset = ReadEncodedUInt();
+				asEObjVarInfoOption option = (asEObjVarInfoOption)ReadEncodedUInt();
+				func->scriptData->objVariableInfo[i].option = option;
+				if (option != asOBJ_INIT && option != asOBJ_UNINIT && option != asBLOCK_BEGIN && option != asBLOCK_END)
+				{
+					error = true;
+					func->DestroyHalfCreated();
+					return 0;
+				}
 			}
-			func->parameterNames.SetLength(countParam);
-			for( asUINT n = 0; n < countParam; n++ )
-				ReadString(&func->parameterNames[n]);
+
+			if (!noDebugInfo)
+			{
+				length = ReadEncodedUInt();
+				func->scriptData->lineNumbers.SetLength(length);
+				if (int(func->scriptData->lineNumbers.GetLength()) != length)
+				{
+					// Out of memory
+					error = true;
+					func->DestroyHalfCreated();
+					return 0;
+				}
+				for (i = 0; i < length; ++i)
+					func->scriptData->lineNumbers[i] = ReadEncodedUInt();
+
+				// Read the array of script sections 
+				length = ReadEncodedUInt();
+				func->scriptData->sectionIdxs.SetLength(length);
+				if (int(func->scriptData->sectionIdxs.GetLength()) != length)
+				{
+					// Out of memory
+					error = true;
+					func->DestroyHalfCreated();
+					return 0;
+				}
+				for (i = 0; i < length; ++i)
+				{
+					if ((i & 1) == 0)
+						func->scriptData->sectionIdxs[i] = ReadEncodedUInt();
+					else
+					{
+						asCString str;
+						ReadString(&str);
+						func->scriptData->sectionIdxs[i] = engine->GetScriptSectionNameIndex(str.AddressOf());
+					}
+				}
+			}
+
+			// Read the variable information
+			if (!noDebugInfo)
+			{
+				length = ReadEncodedUInt();
+				func->scriptData->variables.Allocate(length, false);
+				for (i = 0; i < length; i++)
+				{
+					asSScriptVariable *var = asNEW(asSScriptVariable);
+					if (var == 0)
+					{
+						// Out of memory
+						error = true;
+						func->DestroyHalfCreated();
+						return 0;
+					}
+					func->scriptData->variables.PushLast(var);
+
+					var->declaredAtProgramPos = ReadEncodedUInt();
+					var->stackOffset = ReadEncodedUInt();
+					ReadString(&var->name);
+					ReadDataType(&var->type);
+
+					if (error)
+					{
+						// No need to continue (the error has already been reported before)
+						func->DestroyHalfCreated();
+						return 0;
+					}
+				}
+			}
+
+			// Read script section name
+			if (!noDebugInfo)
+			{
+				asCString name;
+				ReadString(&name);
+				func->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(name.AddressOf());
+				func->scriptData->declaredAt = ReadEncodedUInt();
+			}
+
+			// Read parameter names
+			if (!noDebugInfo)
+			{
+				asUINT countParam = asUINT(ReadEncodedUInt64());
+				if (countParam > func->parameterTypes.GetLength())
+				{
+					error = true;
+					func->DestroyHalfCreated();
+					return 0;
+				}
+				func->parameterNames.SetLength(countParam);
+				for (asUINT n = 0; n < countParam; n++)
+					ReadString(&func->parameterNames[n]);
+			}
 		}
 	}
 	else if( func->funcType == asFUNC_VIRTUAL || func->funcType == asFUNC_INTERFACE )
@@ -1205,9 +1315,11 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 	{
 		asBYTE bits;
 		ReadData(&bits, 1);
-		if( bits )
+		if( bits & 1 )
 			func->isShared = true;
-
+		if ((bits & 2) && isExternal)
+			*isExternal = true;
+		
 		// The asCFuncdefType constructor adds itself to the func->funcdefType member
 		asCFuncdefType *fdt = asNEW(asCFuncdefType)(engine, func);
 		fdt->parentClass = parentClass;
@@ -1230,10 +1342,14 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 	return func;
 }
 
-void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase)
+void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExternal)
 {
 	if( phase == 1 )
 	{
+		asASSERT(isExternal);
+		if (isExternal)
+			*isExternal = false;
+
 		// Read the initial attributes
 		ReadString(&type->name);
 		ReadData(&type->flags, 4);
@@ -1275,9 +1391,27 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase)
 			// TODO: weak: Should not do this if the class has been declared with 'noweak'
 			engine->scriptFunctions[ot->beh.getWeakRefFlag]->AddRefInternal();
 		}
+
+		// external shared flag
+		if (type->flags & asOBJ_SHARED)
+		{
+			char c;
+			ReadData(&c, 1);
+			if (c == 'e')
+				*isExternal = true;
+			else if (c != ' ')
+			{
+				error = true;
+				return;
+			}
+		}
 	}
 	else if( phase == 2 )
 	{
+		// external shared types doesn't store this
+		if ((type->flags & asOBJ_SHARED) && module->externalTypes.IndexOf(type) >= 0)
+			return;
+
 		if( type->flags & asOBJ_ENUM )
 		{
 			asCEnumType *t = CastToEnumType(type);
@@ -1672,6 +1806,10 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase)
 	}
 	else if( phase == 3 )
 	{
+		// external shared types doesn't store this
+		if ((type->flags & asOBJ_SHARED) && module->externalTypes.IndexOf(type) >= 0)
+			return;
+
 		asCObjectType *ot = CastToObjectType(type);
 
 		// This is only done for object types
@@ -3508,7 +3646,9 @@ int asCWriter::Write()
 	// TODO: Should be possible to skip saving the enum values. They are usually not needed after the script is compiled anyway
 	// TODO: Should be possible to skip saving the typedefs. They are usually not needed after the script is compiled anyway
 	// TODO: Should be possible to skip saving constants. They are usually not needed after the script is compiled anyway
-	WriteData(&stripDebugInfo, sizeof(stripDebugInfo));
+	
+	// Write the flag as 1byte even on platforms with 4byte booleans
+	WriteEncodedInt64(stripDebugInfo ? 1 : 0);
 
 	// Store enums
 	{
@@ -3707,13 +3847,19 @@ void asCWriter::WriteUsedFunctions()
 		char c;
 
 		// Write enough data to be able to uniquely identify the function upon load
-
-		if( usedFunctions[n] )
+		asCScriptFunction *func = usedFunctions[n];
+		if(func)
 		{
 			// Is the function from the module or the application?
-			c = usedFunctions[n]->module ? 'm' : 'a';
+			c = func->module ? 'm' : 'a';
+
+			// Functions and methods that are shared and not owned by the module can be 
+			// stored as 's' to tell the reader that these are received from other modules.
+			if (c == 'm' && func->IsShared() && module->scriptFunctions.IndexOf(func) < 0 )
+				c = 's';
+
 			WriteData(&c, 1);
-			WriteFunctionSignature(usedFunctions[n]);
+			WriteFunctionSignature(func);
 		}
 		else
 		{
@@ -3836,6 +3982,17 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 
 	if( func->funcType == asFUNC_SCRIPT )
 	{
+		char bits = 0;
+		bits += func->isShared ? 1 : 0;
+		bits += func->dontCleanUpOnException ? 2 : 0;
+		if (module->externalFunctions.IndexOf(func) >= 0)
+			bits += 4;
+		WriteData(&bits, 1);
+
+		// For external shared functions the rest is not needed
+		if (bits & 4)
+			return;
+
 		// Calculate the adjustment by position lookup table
 		CalculateAdjustmentByPos(func);
 
@@ -3912,11 +4069,6 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 			}
 		}
 
-		char bits = 0;
-		bits += func->isShared ? 1 : 0;
-		bits += func->dontCleanUpOnException ? 2 : 0;
-		WriteData(&bits,1);
-
 		// Store script section name
 		if( !stripDebugInfo )
 		{
@@ -3948,6 +4100,8 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 	{
 		char bits = 0;
 		bits += func->isShared ? 1 : 0;
+		if (module->externalTypes.IndexOf(func->funcdefType) >= 0)
+			bits += 2;
 		WriteData(&bits,1);
 	}
 }
@@ -3979,9 +4133,22 @@ void asCWriter::WriteTypeDeclaration(asCTypeInfo *type, int phase)
 
 		// namespace
 		WriteString(&type->nameSpace->name);
+
+		// external shared flag
+		if ((type->flags & asOBJ_SHARED))
+		{
+			char c = ' ';
+			if (module->externalTypes.IndexOf(type) >= 0)
+				c = 'e';
+			WriteData(&c, 1);
+		}
 	}
 	else if( phase == 2 )
 	{
+		// external shared types doesn't need to save this
+		if ((type->flags & asOBJ_SHARED) && module->externalTypes.IndexOf(type) >= 0)
+			return;
+
 		if(type->flags & asOBJ_ENUM )
 		{
 			// enumValues[]
@@ -4055,6 +4222,10 @@ void asCWriter::WriteTypeDeclaration(asCTypeInfo *type, int phase)
 	}
 	else if( phase == 3 )
 	{
+		// external shared types doesn't need to save this
+		if ((type->flags & asOBJ_SHARED) && module->externalTypes.IndexOf(type) >= 0)
+			return;
+
 		// properties[]
 		asCObjectType *t = CastToObjectType(type);
 
