@@ -282,38 +282,38 @@ union VariantValue
     int int_;
     bool bool_;
     float float_;
+    double double_;
+    long long int64_;
+    void* voidPtr_;
+    WeakPtr<RefCounted> weakPtr_;
     Vector2 vector2_;
     Vector3 vector3_;
     Vector4 vector4_;
-    Quaternion quaternion_;
-    Color color_;
-    String string_;
-    PODVector<unsigned char> buffer_;
-    void* voidPtr_;
-    ResourceRef resourceRef_;
-    ResourceRefList resourceRefList_;
-    VariantVector variantVector_;
-    VariantMap variantMap_;
-    IntRect intRect_;
+    Rect rect_;
     IntVector2 intVector2_;
-    WeakPtr<RefCounted> weakPtr_;
+    IntVector3 intVector3_;
+    IntRect intRect_;
     Matrix3* matrix3_;
     Matrix3x4* matrix3x4_;
     Matrix4* matrix4_;
-    double double_;
+    Quaternion quaternion_;
+    Color color_;
+    String string_;
     StringVector stringVector_;
-    Rect rect_;
-    IntVector3 intVector3_;
-    long long int64_;
+    VariantVector variantVector_;
+    VariantMap variantMap_;
+    PODVector<unsigned char> buffer_;
+    ResourceRef resourceRef_;
+    ResourceRefList resourceRefList_;
     CustomVariantValue* customValueHeap_;
     CustomVariantValue customValueStack_;
 
     /// Construct uninitialized.
-    VariantValue() { }
+    VariantValue() { }      // NOLINT
     /// Non-copyable.
     VariantValue(const VariantValue& value) = delete;
     /// Destruct.
-    ~VariantValue() { }
+    ~VariantValue() { }     // NOLINT
 };
 
 static_assert(sizeof(VariantValue) == VARIANT_VALUE_SIZE, "Unexpected size of VariantValue");
