@@ -79,8 +79,10 @@ public:
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
 
+    /// Return material from the first geometry, assuming all the geometries use the same material.
+    virtual Material* GetMaterial() const { return GetMaterial(0); }
     /// Return material by geometry index.
-    virtual Material* GetMaterial(unsigned index = 0) const;
+    virtual Material* GetMaterial(unsigned index) const;
 
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
