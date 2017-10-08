@@ -125,28 +125,28 @@ void AnimatedModel::RegisterObject(Context* context)
         AM_DEFAULT | AM_NOEDIT);
 }
 
-bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
+bool AnimatedModel::Load(Deserializer& source)
 {
     loading_ = true;
-    bool success = Component::Load(source, setInstanceDefault);
+    bool success = Component::Load(source);
     loading_ = false;
 
     return success;
 }
 
-bool AnimatedModel::LoadXML(const XMLElement& source, bool setInstanceDefault)
+bool AnimatedModel::LoadXML(const XMLElement& source)
 {
     loading_ = true;
-    bool success = Component::LoadXML(source, setInstanceDefault);
+    bool success = Component::LoadXML(source);
     loading_ = false;
 
     return success;
 }
 
-bool AnimatedModel::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+bool AnimatedModel::LoadJSON(const JSONValue& source)
 {
     loading_ = true;
-    bool success = Component::LoadJSON(source, setInstanceDefault);
+    bool success = Component::LoadJSON(source);
     loading_ = false;
 
     return success;

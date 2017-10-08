@@ -43,7 +43,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Load from XML data with style. Return true if successful.
-    bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false) override;
+    bool LoadXML(const XMLElement& source, XMLFile* styleFile) override;
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const override;
 

@@ -124,7 +124,7 @@ void Menu::OnShowPopup()
 {
 }
 
-bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault)
+bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
 {
     // Get style override if defined
     String styleName = source.GetAttribute("style");
@@ -154,7 +154,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
     }
 
     // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source, setInstanceDefault))
+    if (!Serializable::LoadXML(source))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -220,7 +220,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
             if (popupElem)
                 child->SetDefaultStyle(styleFile);
 
-            if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
+            if (!child->LoadXML(childElem, styleFile))
                 return false;
         }
 

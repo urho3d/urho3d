@@ -213,12 +213,12 @@ void UIElement::ApplyAttributes()
     }
 }
 
-bool UIElement::LoadXML(const XMLElement& source, bool setInstanceDefault)
+bool UIElement::LoadXML(const XMLElement& source)
 {
-    return LoadXML(source, nullptr, setInstanceDefault);
+    return LoadXML(source, nullptr);
 }
 
-bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault)
+bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
 {
     // Get style override if defined
     String styleName = source.GetAttribute("style");
@@ -251,7 +251,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     DisableLayoutUpdate();
 
     // Then load rest of the attributes from the source
-    if (!Animatable::LoadXML(source, setInstanceDefault))
+    if (!Animatable::LoadXML(source))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -289,7 +289,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         {
             if (!styleFile)
                 styleFile = GetDefaultStyle();
-            if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
+            if (!child->LoadXML(childElem, styleFile))
                 return false;
         }
 
@@ -304,7 +304,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     return true;
 }
 
-UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault)
+UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile)
 {
     bool internalElem = childElem.GetBool("internal");
     if (internalElem)
@@ -323,7 +323,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     {
         if (!styleFile)
             styleFile = GetDefaultStyle();
-        if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
+        if (!child->LoadXML(childElem, styleFile))
         {
             RemoveChild(child, index);
             return nullptr;
@@ -1070,7 +1070,10 @@ bool UIElement::SetStyle(const XMLElement& element)
     appliedStyle_ = element.GetAttribute("type");
 
     // Consider style attribute values as instance-level attribute default values
-    return LoadXML(element, true);
+    SetInstanceDefault(true);
+    bool success = LoadXML(element);
+    SetInstanceDefault(false);
+    return success;
 }
 
 bool UIElement::SetStyleAuto(XMLFile* file)
