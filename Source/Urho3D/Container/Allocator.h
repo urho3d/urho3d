@@ -85,6 +85,11 @@ public:
         AllocatorUninitialize(allocator_);
     }
 
+    /// Prevent copy construction.
+    Allocator(const Allocator<T>& rhs) = delete;
+    /// Prevent assignment.
+    Allocator<T>& operator =(const Allocator<T>& rhs) = delete;
+
     /// Reserve and default-construct an object.
     T* Reserve()
     {
@@ -115,11 +120,6 @@ public:
     }
 
 private:
-    /// Prevent copy construction.
-    Allocator(const Allocator<T>& rhs) = delete;
-    /// Prevent assignment.
-    Allocator<T>& operator =(const Allocator<T>& rhs) = delete;
-
     /// Allocator block.
     AllocatorBlock* allocator_;
 };

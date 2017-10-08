@@ -64,9 +64,11 @@ public:
         {
         }
 
+        /// Prevent assignment.
+        KeyValue& operator =(const KeyValue& rhs) = delete;
+
         /// Test for equality with another pair.
         bool operator ==(const KeyValue& rhs) const { return first_ == rhs.first_ && second_ == rhs.second_; }
-
         /// Test for inequality with another pair.
         bool operator !=(const KeyValue& rhs) const { return first_ != rhs.first_ || second_ != rhs.second_; }
 
@@ -74,10 +76,6 @@ public:
         const T first_;
         /// Value.
         U second_;
-
-    private:
-        /// Prevent assignment.
-        KeyValue& operator =(const KeyValue& rhs) = delete;
     };
 
     /// Hash map node.

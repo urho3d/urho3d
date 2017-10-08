@@ -49,6 +49,11 @@ public:
     /// Destruct.
     virtual ~OctreeQuery() = default;
 
+    /// Prevent copy construction.
+    OctreeQuery(const OctreeQuery& rhs) = delete;
+    /// Prevent assignment.
+    OctreeQuery& operator =(const OctreeQuery& rhs) = delete;
+
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) = 0;
     /// Intersection test for drawables.
@@ -60,12 +65,6 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-
-private:
-    /// Prevent copy construction.
-    OctreeQuery(const OctreeQuery& rhs) = delete;
-    /// Prevent assignment.
-    OctreeQuery& operator =(const OctreeQuery& rhs) = delete;
 };
 
 /// Point octree query.
@@ -234,6 +233,11 @@ public:
     {
     }
 
+    /// Prevent copy construction.
+    RayOctreeQuery(const RayOctreeQuery& rhs) = delete;
+    /// Prevent assignment.
+    RayOctreeQuery& operator =(const RayOctreeQuery& rhs) = delete;
+
     /// Result vector reference.
     PODVector<RayQueryResult>& result_;
     /// Ray.
@@ -246,12 +250,6 @@ public:
     float maxDistance_;
     /// Raycast detail level.
     RayQueryLevel level_;
-
-private:
-    /// Prevent copy construction.
-    RayOctreeQuery(const RayOctreeQuery& rhs) = delete;
-    /// Prevent assignment.
-    RayOctreeQuery& operator =(const RayOctreeQuery& rhs) = delete;
 };
 
 class URHO3D_API AllContentOctreeQuery : public OctreeQuery
