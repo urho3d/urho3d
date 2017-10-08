@@ -363,7 +363,7 @@ bool NamedPipe::IsEof() const
     if (readHandle_ != -1)
     {
         fd_set set;
-        FD_ZERO(&set);
+        FD_ZERO(&set);      // NOLINT
         FD_SET(readHandle_, &set);
 
         struct timeval timeout;
