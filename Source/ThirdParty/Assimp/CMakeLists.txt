@@ -482,7 +482,7 @@ if (ASSIMP_BUILD_IFC_IMPORTER)
   if (MSVC)
     set_source_files_properties(code/IFCReaderGen1.cpp code/IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
   elseif(CMAKE_COMPILER_IS_MINGW)
-    set_source_files_properties(code/IFCReaderGen1.cpp code/IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "-Wa,-mbig-obj")   # Urho3D: Remove -O2 flag as it cannot be set here because we don't know the effective build config
+    set_source_files_properties(code/IFCReaderGen1.cpp code/IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "-O2")   # Urho3D: Remove -Wa,-mbig-obj flag as some older MinGW version may not support it yet
   endif()
 endif (ASSIMP_BUILD_IFC_IMPORTER)
 
