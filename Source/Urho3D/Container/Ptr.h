@@ -80,9 +80,10 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
 
-        ReleaseRef();
+        T* tmp = ptr_;
         ptr_ = rhs.ptr_;
         AddRef();
+        if (tmp) tmp->ReleaseRef();
 
         return *this;
     }
@@ -93,9 +94,10 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
 
-        ReleaseRef();
+        T* tmp = ptr_;
         ptr_ = rhs.ptr_;
         AddRef();
+        if (tmp) tmp->ReleaseRef();
 
         return *this;
     }
@@ -106,9 +108,10 @@ public:
         if (ptr_ == ptr)
             return *this;
 
-        ReleaseRef();
+        T* tmp = ptr_;
         ptr_ = ptr;
         AddRef();
+        if (tmp) tmp->ReleaseRef();
 
         return *this;
     }
@@ -166,17 +169,19 @@ public:
     /// Perform a static cast from a shared pointer of another type.
     template <class U> void StaticCast(const SharedPtr<U>& rhs)
     {
-        ReleaseRef();
+        T* tmp = ptr_;
         ptr_ = static_cast<T*>(rhs.Get());
         AddRef();
+        if (tmp) tmp->ReleaseRef();
     }
 
     /// Perform a dynamic cast from a shared pointer of another type.
     template <class U> void DynamicCast(const SharedPtr<U>& rhs)
     {
-        ReleaseRef();
-        ptr_ = dynamic_cast<T*>(rhs.Get());
+        T* tmp = ptr_;
+        ptr_ = static_cast<T*>(rhs.Get());
         AddRef();
+        if (tmp) tmp->ReleaseRef();
     }
 
     /// Check if the pointer is null.
