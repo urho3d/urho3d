@@ -323,6 +323,27 @@ void ListView::OnResize(const IntVector2& newSize, const IntVector2& delta)
         overlayContainer_->SetSize(scrollPanel_->GetSize());
 }
 
+void ListView::UpdateInternalLayout()
+{
+    if (overlayContainer_)
+        overlayContainer_->UpdateLayout();
+    contentElement_->UpdateLayout();
+}
+
+void ListView::DisableInternalLayoutUpdate()
+{
+    if (overlayContainer_)
+        overlayContainer_->DisableLayoutUpdate();
+    contentElement_->DisableLayoutUpdate();
+}
+
+void ListView::EnableInternalLayoutUpdate()
+{
+    if (overlayContainer_)
+        overlayContainer_->EnableLayoutUpdate();
+    contentElement_->EnableLayoutUpdate();
+}
+
 void ListView::AddItem(UIElement* item)
 {
     InsertItem(M_MAX_UNSIGNED, item);
