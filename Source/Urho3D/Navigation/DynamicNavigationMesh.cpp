@@ -96,7 +96,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
     PODVector<unsigned char> offMeshAreas_;
     PODVector<unsigned char> offMeshDir_;
 
-    inline MeshProcess(DynamicNavigationMesh* owner) :
+    inline explicit MeshProcess(DynamicNavigationMesh* owner) :
         owner_(owner)
     {
     }
@@ -166,7 +166,7 @@ struct LinearAllocator : public dtTileCacheAlloc
     int top;
     int high;
 
-    LinearAllocator(const int cap) :
+    explicit LinearAllocator(const int cap) :
         buffer(nullptr), capacity(0), top(0), high(0)
     {
         resize(cap);

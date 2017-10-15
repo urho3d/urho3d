@@ -76,7 +76,7 @@ class URHO3D_API Log : public Object
 
 public:
     /// Construct.
-    Log(Context* context);
+    explicit Log(Context* context);
     /// Destruct. Close the log file if open.
     ~Log() override;
 

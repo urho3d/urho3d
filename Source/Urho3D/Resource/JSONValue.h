@@ -73,64 +73,64 @@ class URHO3D_API JSONValue
 {
 public:
     /// Construct null value.
-    JSONValue() : 
+    JSONValue() :
         type_(0)
     {
     }
     /// Construct with a boolean.
-    JSONValue(bool value) :
+    explicit JSONValue(bool value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a integer.
-    JSONValue(int value) :
+    explicit JSONValue(int value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a unsigned integer.
-    JSONValue(unsigned value) :
+    explicit JSONValue(unsigned value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a float.
-    JSONValue(float value) :
+    explicit JSONValue(float value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a double.
-    JSONValue(double value) :
+    explicit JSONValue(double value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a string.
-    JSONValue(const String& value) :
+    explicit JSONValue(const String& value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a C string.
-    JSONValue(const char* value) :
+    explicit JSONValue(const char* value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON array.
-    JSONValue(const JSONArray& value) :
+    explicit JSONValue(const JSONArray& value) :
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON object.
-    JSONValue(const JSONObject& value) :
+    explicit JSONValue(const JSONObject& value) :
         type_(0)
     {
         *this = value;
-    }    
+    }
     /// Copy-construct from another JSON value.
     JSONValue(const JSONValue& value) :
         type_(0)

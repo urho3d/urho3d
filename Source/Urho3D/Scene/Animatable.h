@@ -66,7 +66,7 @@ class URHO3D_API Animatable : public Serializable
 
 public:
     /// Construct.
-    Animatable(Context* context);
+    explicit Animatable(Context* context);
     /// Destruct.
     ~Animatable() override;
     /// Register object factory.

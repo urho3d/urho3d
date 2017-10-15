@@ -34,7 +34,7 @@ class CreateRagdoll : public Component
 
 public:
     /// Construct.
-    CreateRagdoll(Context* context);
+    explicit CreateRagdoll(Context* context);
 
 protected:
     /// Handle node being assigned.

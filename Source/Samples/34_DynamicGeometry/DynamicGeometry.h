@@ -43,7 +43,7 @@ class DynamicGeometry : public Sample
 
 public:
     /// Construct.
-    DynamicGeometry(Context* context);
+    explicit DynamicGeometry(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

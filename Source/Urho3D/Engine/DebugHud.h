@@ -48,7 +48,7 @@ class URHO3D_API DebugHud : public Object
 
 public:
     /// Construct.
-    DebugHud(Context* context);
+    explicit DebugHud(Context* context);
     /// Destruct.
     ~DebugHud() override;
 

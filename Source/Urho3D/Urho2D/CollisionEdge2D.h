@@ -34,7 +34,7 @@ class URHO3D_API CollisionEdge2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionEdge2D(Context* context);
+    explicit CollisionEdge2D(Context* context);
     /// Destruct.
     ~CollisionEdge2D() override;
     /// Register object factory.

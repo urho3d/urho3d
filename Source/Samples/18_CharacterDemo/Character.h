@@ -47,7 +47,7 @@ class Character : public LogicComponent
 
 public:
     /// Construct.
-    Character(Context* context);
+    explicit Character(Context* context);
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);

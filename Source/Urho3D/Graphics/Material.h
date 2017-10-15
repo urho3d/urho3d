@@ -109,7 +109,7 @@ class URHO3D_API Material : public Resource
 
 public:
     /// Construct.
-    Material(Context* context);
+    explicit Material(Context* context);
     /// Destruct.
     ~Material() override;
     /// Register object factory.

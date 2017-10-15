@@ -65,7 +65,7 @@ class URHO3D_API EventProfiler : public Profiler
 
 public:
     /// Construct.
-    EventProfiler(Context* context);
+    explicit EventProfiler(Context* context);
 
     /// Activate the event profiler to collect information. This incurs slight performance hit on each SendEvent. By default inactive.
     static void SetActive(bool newActive) { active = newActive; }

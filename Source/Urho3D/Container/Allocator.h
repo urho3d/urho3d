@@ -72,7 +72,7 @@ template <class T> class Allocator
 {
 public:
     /// Construct.
-    Allocator(unsigned initialCapacity = 0) :
+    explicit Allocator(unsigned initialCapacity = 0) :
         allocator_(nullptr)
     {
         if (initialCapacity)

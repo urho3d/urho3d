@@ -57,7 +57,7 @@ class URHO3D_API ParticleEmitter : public BillboardSet
 
 public:
     /// Construct.
-    ParticleEmitter(Context* context);
+    explicit ParticleEmitter(Context* context);
     /// Destruct.
     ~ParticleEmitter() override;
     /// Register object factory.

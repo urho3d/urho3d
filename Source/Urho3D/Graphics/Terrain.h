@@ -41,7 +41,7 @@ class URHO3D_API Terrain : public Component
 
 public:
     /// Construct.
-    Terrain(Context* context);
+    explicit Terrain(Context* context);
     /// Destruct.
     ~Terrain() override;
     /// Register object factory.

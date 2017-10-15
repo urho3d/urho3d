@@ -92,7 +92,7 @@ class URHO3D_API OcclusionBuffer : public Object
 
 public:
     /// Construct.
-    OcclusionBuffer(Context* context);
+    explicit OcclusionBuffer(Context* context);
     /// Destruct.
     ~OcclusionBuffer() override;
 

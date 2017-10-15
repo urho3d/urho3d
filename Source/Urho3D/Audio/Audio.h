@@ -43,7 +43,7 @@ class URHO3D_API Audio : public Object
 
 public:
     /// Construct.
-    Audio(Context* context);
+    explicit Audio(Context* context);
     /// Destruct. Terminate the audio thread and free the audio buffer.
     ~Audio() override;
 

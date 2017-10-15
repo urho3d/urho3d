@@ -44,7 +44,7 @@ class URHO3D_API XMLFile : public Resource
 
 public:
     /// Construct.
-    XMLFile(Context* context);
+    explicit XMLFile(Context* context);
     /// Destruct.
     ~XMLFile() override;
     /// Register object factory.

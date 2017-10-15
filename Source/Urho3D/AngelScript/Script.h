@@ -59,7 +59,7 @@ class URHO3D_API Script : public Object
 
 public:
     /// Construct.
-    Script(Context* context);
+    explicit Script(Context* context);
     /// Destruct. Release the AngelScript engine.
     ~Script() override;
 

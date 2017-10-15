@@ -95,7 +95,7 @@ class URHO3D_API NavigationMesh : public Component
 
 public:
     /// Construct.
-    NavigationMesh(Context* context);
+    explicit NavigationMesh(Context* context);
     /// Destruct.
     ~NavigationMesh() override;
     /// Register object factory.

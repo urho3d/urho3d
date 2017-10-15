@@ -45,7 +45,7 @@ class URHO3D_API FileSystem : public Object
 
 public:
     /// Construct.
-    FileSystem(Context* context);
+    explicit FileSystem(Context* context);
     /// Destruct.
     ~FileSystem() override;
 

@@ -34,7 +34,7 @@ public:
     /// Construct an empty buffer.
     VectorBuffer();
     /// Construct from another buffer.
-    VectorBuffer(const PODVector<unsigned char>& data);
+    explicit VectorBuffer(const PODVector<unsigned char>& data);
     /// Construct from a memory area.
     VectorBuffer(const void* data, unsigned size);
     /// Construct from a stream.

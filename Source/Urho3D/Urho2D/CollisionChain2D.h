@@ -33,7 +33,7 @@ class URHO3D_API CollisionChain2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionChain2D(Context* context);
+    explicit CollisionChain2D(Context* context);
     /// Destruct.
     ~CollisionChain2D() override;
     /// Register object factory.

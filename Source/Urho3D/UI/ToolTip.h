@@ -35,7 +35,7 @@ class URHO3D_API ToolTip : public UIElement
 
 public:
     /// Construct.
-    ToolTip(Context* context);
+    explicit ToolTip(Context* context);
     /// Destruct.
     ~ToolTip() override;
     /// Register object factory.

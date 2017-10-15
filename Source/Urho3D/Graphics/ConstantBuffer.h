@@ -37,7 +37,7 @@ class URHO3D_API ConstantBuffer : public Object, public GPUObject
 
 public:
     /// Construct.
-    ConstantBuffer(Context* context);
+    explicit ConstantBuffer(Context* context);
     /// Destruct.
     ~ConstantBuffer() override;
 

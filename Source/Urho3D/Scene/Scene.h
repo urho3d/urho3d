@@ -92,7 +92,7 @@ class URHO3D_API Scene : public Node
 
 public:
     /// Construct.
-    Scene(Context* context);
+    explicit Scene(Context* context);
     /// Destruct.
     ~Scene() override;
     /// Register object factory. Node must be registered first.

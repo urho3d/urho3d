@@ -34,7 +34,7 @@ class URHO3D_API ConstraintRope2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintRope2D(Context* context);
+    explicit ConstraintRope2D(Context* context);
     /// Destruct.
     ~ConstraintRope2D() override;
     /// Register object factory.

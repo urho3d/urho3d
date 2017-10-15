@@ -47,7 +47,7 @@ class URHO3D_API Camera : public Component
 
 public:
     /// Construct.
-    Camera(Context* context);
+    explicit Camera(Context* context);
     /// Destruct.
     ~Camera() override;
     /// Register object factory.

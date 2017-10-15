@@ -151,7 +151,7 @@ class URHO3D_API Light : public Drawable
 
 public:
     /// Construct.
-    Light(Context* context);
+    explicit Light(Context* context);
     /// Destruct.
     ~Light() override;
     /// Register object factory. Drawable must be registered first.

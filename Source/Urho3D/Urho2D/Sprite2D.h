@@ -37,7 +37,7 @@ class URHO3D_API Sprite2D : public Resource
 
 public:
     /// Construct.
-    Sprite2D(Context* context);
+    explicit Sprite2D(Context* context);
     /// Destruct.
     ~Sprite2D() override;
     /// Register object factory.

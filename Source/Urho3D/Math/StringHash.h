@@ -47,9 +47,9 @@ public:
     }
 
     /// Construct from a C string case-insensitively.
-    StringHash(const char* str);
+    explicit StringHash(const char* str);
     /// Construct from a string case-insensitively.
-    StringHash(const String& str);
+    explicit StringHash(const String& str);
 
     /// Assign from another hash.
     StringHash& operator =(const StringHash& rhs) = default;
@@ -82,7 +82,7 @@ public:
     bool operator >(const StringHash& rhs) const { return value_ > rhs.value_; }
 
     /// Return true if nonzero hash value.
-    operator bool() const { return value_ != 0; }
+    explicit operator bool() const { return value_ != 0; }
 
     /// Return hash value.
     unsigned Value() const { return value_; }

@@ -72,7 +72,7 @@ class URHO3D_API Drawable2D : public Drawable
 
 public:
     /// Construct.
-    Drawable2D(Context* context);
+    explicit Drawable2D(Context* context);
     /// Destruct.
     ~Drawable2D() override;
     /// Register object factory. Drawable must be registered first.

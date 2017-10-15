@@ -39,7 +39,7 @@ public:
         Node() = default;
 
         /// Construct with value.
-        Node(const T& value) :
+        explicit Node(const T& value) :
             value_(value)
         {
         }
@@ -116,7 +116,7 @@ public:
         }
 
         /// Construct from a non-const iterator.
-        ConstIterator(const Iterator& rhs) :
+        explicit ConstIterator(const Iterator& rhs) :
             ListIteratorBase(rhs.ptr_)
         {
         }

@@ -41,7 +41,7 @@ class URHO3D_API AnimatedModel : public StaticModel
 
 public:
     /// Construct.
-    AnimatedModel(Context* context);
+    explicit AnimatedModel(Context* context);
     /// Destruct.
     ~AnimatedModel() override;
     /// Register object factory. Drawable must be registered first.

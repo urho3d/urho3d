@@ -43,7 +43,7 @@ class URHO3D_API Pass : public RefCounted
 {
 public:
     /// Construct.
-    Pass(const String& passName);
+    explicit Pass(const String& passName);
     /// Destruct.
     ~Pass() override;
 
@@ -193,7 +193,7 @@ class URHO3D_API Technique : public Resource
 
 public:
     /// Construct.
-    Technique(Context* context);
+    explicit Technique(Context* context);
     /// Destruct.
     ~Technique() override;
     /// Register object factory.

@@ -49,7 +49,7 @@ public:
     }
 
     /// Construct from an int array.
-    IntVector3(const int* data) :
+    explicit IntVector3(const int* data) :
         x_(data[0]),
         y_(data[1]),
         z_(data[2])
@@ -204,7 +204,7 @@ public:
     }
 
     /// Construct from a two-dimensional vector (for Urho2D).
-    Vector3(const Vector2& vector) :
+    explicit Vector3(const Vector2& vector) :
         x_(vector.x_),
         y_(vector.y_),
         z_(0.0f)

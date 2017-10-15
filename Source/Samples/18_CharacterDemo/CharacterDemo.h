@@ -49,7 +49,7 @@ class CharacterDemo : public Sample
 
 public:
     /// Construct.
-    CharacterDemo(Context* context);
+    explicit CharacterDemo(Context* context);
     /// Destruct.
     ~CharacterDemo() override;
 

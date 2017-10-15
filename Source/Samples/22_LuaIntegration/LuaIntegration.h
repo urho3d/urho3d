@@ -42,7 +42,7 @@ class LuaIntegration : public Sample
 
 public:
     /// Construct.
-    LuaIntegration(Context* context);
+    explicit LuaIntegration(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

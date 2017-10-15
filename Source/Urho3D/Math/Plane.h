@@ -53,7 +53,7 @@ public:
     }
 
     /// Construct from a 4-dimensional vector, where the w coordinate is the plane parameter.
-    Plane(const Vector4& plane)
+    explicit Plane(const Vector4& plane)
     {
         Define(plane);
     }

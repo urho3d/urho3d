@@ -37,7 +37,7 @@ class URHO3D_API Shader : public Resource
 
 public:
     /// Construct.
-    Shader(Context* context);
+    explicit Shader(Context* context);
     /// Destruct.
     ~Shader() override;
     /// Register object factory.

@@ -45,7 +45,7 @@ class URHO3D_API ParticleEffect2D : public Resource
 
 public:
     /// Construct.
-    ParticleEffect2D(Context* context);
+    explicit ParticleEffect2D(Context* context);
     /// Destruct.
     ~ParticleEffect2D() override;
     /// Register object factory. Drawable2D must be registered first.

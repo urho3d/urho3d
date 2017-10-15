@@ -165,7 +165,7 @@ class URHO3D_API Octree : public Component, public Octant
 
 public:
     /// Construct.
-    Octree(Context* context);
+    explicit Octree(Context* context);
     /// Destruct.
     ~Octree() override;
     /// Register object factory.

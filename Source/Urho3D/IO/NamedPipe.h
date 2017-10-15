@@ -40,7 +40,7 @@ class URHO3D_API NamedPipe : public Object, public AbstractFile
 
 public:
     /// Construct.
-    NamedPipe(Context* context);
+    explicit NamedPipe(Context* context);
     /// Construct and open in either server or client mode.
     NamedPipe(Context* context, const String& pipeName, bool isServer);
     /// Destruct and close.

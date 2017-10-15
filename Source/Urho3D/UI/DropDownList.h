@@ -36,7 +36,7 @@ class URHO3D_API DropDownList : public Menu
 
 public:
     /// Construct.
-    DropDownList(Context* context);
+    explicit DropDownList(Context* context);
     /// Destruct.
     ~DropDownList() override;
     /// Register object factory.

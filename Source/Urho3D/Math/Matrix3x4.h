@@ -85,7 +85,7 @@ public:
 #endif
 
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
-    Matrix3x4(const Matrix3& matrix) :
+    explicit Matrix3x4(const Matrix3& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -102,7 +102,7 @@ public:
     }
 
     /// Copy-construct from a 4x4 matrix which is assumed to contain no projection.
-    Matrix3x4(const Matrix4& matrix)
+    explicit Matrix3x4(const Matrix4& matrix)
 #ifndef URHO3D_SSE
        :m00_(matrix.m00_),
         m01_(matrix.m01_),

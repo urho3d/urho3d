@@ -36,7 +36,7 @@ class URHO3D_API Zone : public Drawable
 
 public:
     /// Construct.
-    Zone(Context* context);
+    explicit Zone(Context* context);
     /// Destruct.
     ~Zone() override;
     /// Register object factory. Drawable must be registered first.

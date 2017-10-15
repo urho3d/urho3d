@@ -116,7 +116,7 @@ class URHO3D_API View : public Object
 
 public:
     /// Construct.
-    View(Context* context);
+    explicit View(Context* context);
     /// Destruct.
     ~View() override;
 

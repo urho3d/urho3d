@@ -36,7 +36,7 @@ class URHO3D_API ProgressBar : public BorderImage
 
 public:
     /// Construct.
-    ProgressBar(Context *context);
+    explicit ProgressBar(Context *context);
 
     /// Destruct.
     ~ProgressBar() override;

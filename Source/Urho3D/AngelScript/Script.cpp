@@ -44,7 +44,7 @@ class ScriptResourceRouter : public ResourceRouter
     URHO3D_OBJECT(ScriptResourceRouter, ResourceRouter);
 
     /// Construct.
-    ScriptResourceRouter(Context* context) :
+    explicit ScriptResourceRouter(Context* context) :
         ResourceRouter(context)
     {
     }

@@ -34,7 +34,7 @@ class URHO3D_API ConstraintWheel2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintWheel2D(Context* context);
+    explicit ConstraintWheel2D(Context* context);
     /// Destruct.
     ~ConstraintWheel2D() override;
     /// Register object factory.

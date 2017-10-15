@@ -69,7 +69,7 @@ class URHO3D_API ValueAnimation : public Resource
 
 public:
     /// Construct.
-    ValueAnimation(Context* context);
+    explicit ValueAnimation(Context* context);
     /// Destruct.
     ~ValueAnimation() override;
     /// Register object factory.

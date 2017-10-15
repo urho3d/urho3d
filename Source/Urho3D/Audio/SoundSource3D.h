@@ -36,7 +36,7 @@ class URHO3D_API SoundSource3D : public SoundSource
 
 public:
     /// Construct.
-    SoundSource3D(Context* context);
+    explicit SoundSource3D(Context* context);
     /// Register object factory.
     static void RegisterObject(Context* context);
 

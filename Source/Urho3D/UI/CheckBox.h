@@ -34,7 +34,7 @@ class URHO3D_API CheckBox : public BorderImage
 
 public:
     /// Construct.
-    CheckBox(Context* context);
+    explicit CheckBox(Context* context);
     /// Destruct.
     ~CheckBox() override;
     /// Register object factory.

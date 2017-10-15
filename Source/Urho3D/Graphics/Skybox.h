@@ -34,7 +34,7 @@ class URHO3D_API Skybox : public StaticModel
 
 public:
     /// Construct.
-    Skybox(Context* context);
+    explicit Skybox(Context* context);
     /// Destruct.
     ~Skybox() override;
     /// Register object factory. StaticModel must be registered first.

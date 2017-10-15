@@ -64,7 +64,7 @@ class URHO3D_API BillboardSet : public Drawable
 
 public:
     /// Construct.
-    BillboardSet(Context* context);
+    explicit BillboardSet(Context* context);
     /// Destruct.
     ~BillboardSet() override;
     /// Register object factory.

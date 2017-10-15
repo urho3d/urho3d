@@ -39,7 +39,7 @@ class URHO3D_API TextureCube : public Texture
 
 public:
     /// Construct.
-    TextureCube(Context* context);
+    explicit TextureCube(Context* context);
     /// Destruct.
     ~TextureCube() override;
     /// Register object factory.

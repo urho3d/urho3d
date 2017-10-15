@@ -70,7 +70,7 @@ class URHO3D_API FontFace : public RefCounted
 
 public:
     /// Construct.
-    FontFace(Font* font);
+    explicit FontFace(Font* font);
     /// Destruct.
     ~FontFace() override;
 

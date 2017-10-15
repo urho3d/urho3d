@@ -45,7 +45,7 @@ class Decals : public Sample
 
 public:
     /// Construct.
-    Decals(Context* context);
+    explicit Decals(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

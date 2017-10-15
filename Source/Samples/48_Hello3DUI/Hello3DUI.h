@@ -39,7 +39,7 @@ class Hello3DUI : public Sample
 
 public:
     /// Construct.
-    Hello3DUI(Context* context);
+    explicit Hello3DUI(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

@@ -36,9 +36,9 @@ public:
     /// Construct as read-only with a pointer and size.
     MemoryBuffer(const void* data, unsigned size);
     /// Construct from a vector, which must not go out of scope before MemoryBuffer.
-    MemoryBuffer(PODVector<unsigned char>& data);
+    explicit MemoryBuffer(PODVector<unsigned char>& data);
     /// Construct from a read-only vector, which must not go out of scope before MemoryBuffer.
-    MemoryBuffer(const PODVector<unsigned char>& data);
+    explicit MemoryBuffer(const PODVector<unsigned char>& data);
 
     /// Read bytes from the memory area. Return number of bytes actually read.
     unsigned Read(void* dest, unsigned size) override;

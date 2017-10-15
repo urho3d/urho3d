@@ -38,7 +38,7 @@ class URHO3D_API BorderImage : public UIElement
 
 public:
     /// Construct.
-    BorderImage(Context* context);
+    explicit BorderImage(Context* context);
     /// Destruct.
     ~BorderImage() override;
     /// Register object factory.

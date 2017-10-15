@@ -40,7 +40,7 @@ class URHO3D_API Texture : public ResourceWithMetadata, public GPUObject
 {
 public:
     /// Construct.
-    Texture(Context* context);
+    explicit Texture(Context* context);
     /// Destruct.
     ~Texture() override;
 

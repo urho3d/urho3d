@@ -58,7 +58,7 @@ class URHO3D_API AnimatedSprite2D : public StaticSprite2D
 
 public:
     /// Construct.
-    AnimatedSprite2D(Context* context);
+    explicit AnimatedSprite2D(Context* context);
     /// Destruct.
     ~AnimatedSprite2D() override;
     /// Register object factory.

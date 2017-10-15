@@ -57,7 +57,7 @@ class URHO3D_API MutexLock
 {
 public:
     /// Construct and acquire the mutex.
-    MutexLock(Mutex& mutex);
+    explicit MutexLock(Mutex& mutex);
     /// Destruct. Release the mutex.
     ~MutexLock();
 

@@ -37,7 +37,7 @@ class URHO3D_API LuaFile : public Resource
 
 public:
     /// Construct.
-    LuaFile(Context* context);
+    explicit LuaFile(Context* context);
     /// Destruct.
     ~LuaFile() override;
     /// Register object factory.

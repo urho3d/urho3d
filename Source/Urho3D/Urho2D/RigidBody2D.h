@@ -48,7 +48,7 @@ class URHO3D_API RigidBody2D : public Component
 
 public:
     /// Construct.
-    RigidBody2D(Context* context);
+    explicit RigidBody2D(Context* context);
     /// Destruct.
     ~RigidBody2D() override;
     /// Register object factory.

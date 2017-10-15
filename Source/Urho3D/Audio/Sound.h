@@ -37,7 +37,7 @@ class URHO3D_API Sound : public ResourceWithMetadata
 
 public:
     /// Construct.
-    Sound(Context* context);
+    explicit Sound(Context* context);
     /// Destruct and free sound data.
     ~Sound() override;
     /// Register object factory.

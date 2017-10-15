@@ -39,7 +39,7 @@ class URHO3D_API IKConstraint : public Component
 public:
 
     /// Constructs a new IK constraint.
-    IKConstraint(Context* context);
+    explicit IKConstraint(Context* context);
 
     /// Destructs he IK constraint.
     ~IKConstraint() override;

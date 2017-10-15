@@ -34,7 +34,7 @@ class URHO3D_API ConstraintPulley2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintPulley2D(Context* context);
+    explicit ConstraintPulley2D(Context* context);
     /// Destruct.
     ~ConstraintPulley2D() override;
     /// Register object factory.

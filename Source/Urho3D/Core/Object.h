@@ -83,7 +83,7 @@ class URHO3D_API Object : public RefCounted
 
 public:
     /// Construct.
-    Object(Context* context);
+    explicit Object(Context* context);
     /// Destruct. Clean up self from event sender & receiver structures.
     ~Object() override;
 
@@ -199,7 +199,7 @@ class URHO3D_API ObjectFactory : public RefCounted
 {
 public:
     /// Construct.
-    ObjectFactory(Context* context) :
+    explicit ObjectFactory(Context* context) :
         context_(context)
     {
         assert(context_);
@@ -232,7 +232,7 @@ template <class T> class ObjectFactoryImpl : public ObjectFactory
 {
 public:
     /// Construct.
-    ObjectFactoryImpl(Context* context) :
+    explicit ObjectFactoryImpl(Context* context) :
         ObjectFactory(context)
     {
         typeInfo_ = T::GetTypeInfoStatic();
@@ -247,7 +247,7 @@ class URHO3D_API EventHandler : public LinkedListNode
 {
 public:
     /// Construct with specified receiver and userdata.
-    EventHandler(Object* receiver, void* userData = nullptr) :
+    explicit EventHandler(Object* receiver, void* userData = nullptr) :
         receiver_(receiver),
         sender_(nullptr),
         userData_(userData)
@@ -330,7 +330,7 @@ class EventHandler11Impl : public EventHandler
 {
 public:
     /// Construct with receiver and function pointers and userdata.
-    EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = nullptr) :
+    explicit EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = nullptr) :
         EventHandler(nullptr, userData),
         function_(std::move(function))
     {

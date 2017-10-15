@@ -39,7 +39,7 @@ class URHO3D_API Obstacle : public Component
 
 public:
     /// Construct.
-    Obstacle(Context*);
+    explicit Obstacle(Context*);
     /// Destruct.
     ~Obstacle() override;
 

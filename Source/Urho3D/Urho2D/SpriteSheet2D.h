@@ -40,7 +40,7 @@ class URHO3D_API SpriteSheet2D : public Resource
 
 public:
     /// Construct.
-    SpriteSheet2D(Context* context);
+    explicit SpriteSheet2D(Context* context);
     /// Destruct.
     ~SpriteSheet2D() override;
     /// Register object factory.

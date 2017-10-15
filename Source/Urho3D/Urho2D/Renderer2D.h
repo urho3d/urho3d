@@ -73,7 +73,7 @@ class URHO3D_API Renderer2D : public Drawable
 
 public:
     /// Construct.
-    Renderer2D(Context* context);
+    explicit Renderer2D(Context* context);
     /// Destruct.
     ~Renderer2D() override;
     /// Register object factory.

@@ -39,7 +39,7 @@ class URHO3D_API RenderSurface : public RefCounted
 
 public:
     /// Construct with parent texture.
-    RenderSurface(Texture* parentTexture);
+    explicit RenderSurface(Texture* parentTexture);
     /// Destruct.
     ~RenderSurface() override;
 

@@ -49,7 +49,7 @@ class URHO3D_API Window : public BorderImage
 
 public:
     /// Construct.
-    Window(Context* context);
+    explicit Window(Context* context);
     /// Destruct.
     ~Window() override;
     /// Register object factory.

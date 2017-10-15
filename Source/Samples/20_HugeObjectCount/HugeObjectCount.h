@@ -45,7 +45,7 @@ class HugeObjectCount : public Sample
 
 public:
     /// Construct.
-    HugeObjectCount(Context* context);
+    explicit HugeObjectCount(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

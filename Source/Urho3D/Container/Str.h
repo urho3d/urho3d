@@ -61,7 +61,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(const char* str) :
+    explicit String(const char* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -70,7 +70,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(char* str) :
+    explicit String(char* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -89,7 +89,7 @@ public:
     }
 
     /// Construct from a null-terminated wide character array.
-    String(const wchar_t* str) :
+    explicit String(const wchar_t* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -98,7 +98,7 @@ public:
     }
 
     /// Construct from a null-terminated wide character array.
-    String(wchar_t* str) :
+    explicit String(wchar_t* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -107,7 +107,7 @@ public:
     }
 
     /// Construct from a wide character string.
-    String(const WString& str);
+    explicit String(const WString& str);
 
     /// Construct from an integer.
     explicit String(int value);
@@ -548,7 +548,7 @@ public:
     /// Construct empty.
     WString();
     /// Construct from a string.
-    WString(const String& str);
+    explicit WString(const String& str);
     /// Destruct.
     ~WString();
 

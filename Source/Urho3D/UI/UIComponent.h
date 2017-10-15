@@ -42,7 +42,7 @@ class URHO3D_API UIComponent : public Component
 
 public:
     /// Construct.
-    UIComponent(Context* context);
+    explicit UIComponent(Context* context);
     /// Destruct.
     ~UIComponent() override;
     /// Register object factory.

@@ -34,7 +34,7 @@ class URHO3D_API ConstraintPrismatic2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintPrismatic2D(Context* context);
+    explicit ConstraintPrismatic2D(Context* context);
     /// Destruct.
     ~ConstraintPrismatic2D() override;
     /// Register object factory.

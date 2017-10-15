@@ -53,7 +53,7 @@ class URHO3D_API RigidBody : public Component, public btMotionState
 
 public:
     /// Construct.
-    RigidBody(Context* context);
+    explicit RigidBody(Context* context);
     /// Destruct. Free the rigid body and geometries.
     ~RigidBody() override;
     /// Register object factory.

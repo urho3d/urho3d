@@ -41,7 +41,7 @@ class MaterialAnimation : public Sample
 
 public:
     /// Construct.
-    MaterialAnimation(Context* context);
+    explicit MaterialAnimation(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

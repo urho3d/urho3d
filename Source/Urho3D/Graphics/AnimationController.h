@@ -87,7 +87,7 @@ class URHO3D_API AnimationController : public Component
 
 public:
     /// Construct.
-    AnimationController(Context* context);
+    explicit AnimationController(Context* context);
     /// Destruct.
     ~AnimationController() override;
     /// Register object factory.

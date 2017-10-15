@@ -57,7 +57,7 @@ struct Batch
     }
 
     /// Construct from a drawable's source batch.
-    Batch(const SourceBatch& rhs) :
+    explicit Batch(const SourceBatch& rhs) :
         distance_(rhs.distance_),
         renderOrder_(rhs.material_ ? rhs.material_->GetRenderOrder() : DEFAULT_RENDER_ORDER),
         isBase_(false),
@@ -144,7 +144,7 @@ struct BatchGroup : public Batch
     }
 
     /// Construct from a batch.
-    BatchGroup(const Batch& batch) :
+    explicit BatchGroup(const Batch& batch) :
         Batch(batch),
         startIndex_(M_MAX_UNSIGNED)
     {
@@ -185,7 +185,7 @@ struct BatchGroupKey
     BatchGroupKey() = default;
 
     /// Construct from a batch.
-    BatchGroupKey(const Batch& batch) :
+    explicit BatchGroupKey(const Batch& batch) :
         zone_(batch.zone_),
         lightQueue_(batch.lightQueue_),
         pass_(batch.pass_),

@@ -31,7 +31,7 @@ class DatabaseDemo : public Sample
 
 public:
     /// Construct.
-    DatabaseDemo(Context* context);
+    explicit DatabaseDemo(Context* context);
     /// Destruct.
     ~DatabaseDemo() override;
 

@@ -63,7 +63,7 @@ class URHO3D_API File : public Object, public AbstractFile
 
 public:
     /// Construct.
-    File(Context* context);
+    explicit File(Context* context);
     /// Construct and open a filesystem file.
     File(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file.

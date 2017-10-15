@@ -80,7 +80,7 @@ class URHO3D_API WorkQueue : public Object
 
 public:
     /// Construct.
-    WorkQueue(Context* context);
+    explicit WorkQueue(Context* context);
     /// Destruct.
     ~WorkQueue() override;
 

@@ -32,7 +32,7 @@ class URHO3D_API UnknownComponent : public Component
 {
 public:
     /// Construct.
-    UnknownComponent(Context* context);
+    explicit UnknownComponent(Context* context);
 
     /// Register object factory.
     static void RegisterObject(Context* context);

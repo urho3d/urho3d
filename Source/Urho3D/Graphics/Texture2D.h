@@ -39,7 +39,7 @@ class URHO3D_API Texture2D : public Texture
 
 public:
     /// Construct.
-    Texture2D(Context* context);
+    explicit Texture2D(Context* context);
     /// Destruct.
     ~Texture2D() override;
     /// Register object factory.

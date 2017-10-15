@@ -41,7 +41,7 @@ class Urho2DSprite : public Sample
 
 public:
     /// Construct.
-    Urho2DSprite(Context* context);
+    explicit Urho2DSprite(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

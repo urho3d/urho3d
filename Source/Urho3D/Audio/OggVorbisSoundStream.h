@@ -35,7 +35,7 @@ class URHO3D_API OggVorbisSoundStream : public SoundStream
 {
 public:
     /// Construct from an Ogg Vorbis compressed sound.
-    OggVorbisSoundStream(const Sound* sound);
+    explicit OggVorbisSoundStream(const Sound* sound);
     /// Destruct.
     ~OggVorbisSoundStream() override;
 

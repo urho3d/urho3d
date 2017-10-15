@@ -45,7 +45,7 @@ class URHO3D_API StaticModel : public Drawable
 
 public:
     /// Construct.
-    StaticModel(Context* context);
+    explicit StaticModel(Context* context);
     /// Destruct.
     ~StaticModel() override;
     /// Register object factory. Drawable must be registered first.

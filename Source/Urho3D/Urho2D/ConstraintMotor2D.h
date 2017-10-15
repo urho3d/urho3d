@@ -34,7 +34,7 @@ class URHO3D_API ConstraintMotor2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintMotor2D(Context* context);
+    explicit ConstraintMotor2D(Context* context);
     /// Destruct.
     ~ConstraintMotor2D() override;
     /// Register object factory.

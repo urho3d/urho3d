@@ -34,7 +34,7 @@ class URHO3D_API ConstraintFriction2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintFriction2D(Context* context);
+    explicit ConstraintFriction2D(Context* context);
     /// Destruct.
     ~ConstraintFriction2D() override;
     /// Register object factory.

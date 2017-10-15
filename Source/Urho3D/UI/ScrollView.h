@@ -37,7 +37,7 @@ class URHO3D_API ScrollView : public UIElement
 
 public:
     /// Construct.
-    ScrollView(Context* context);
+    explicit ScrollView(Context* context);
     /// Destruct.
     ~ScrollView() override;
     /// Register object factory.

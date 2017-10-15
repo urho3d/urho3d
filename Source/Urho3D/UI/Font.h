@@ -49,7 +49,7 @@ class URHO3D_API Font : public Resource
 
 public:
     /// Construct.
-    Font(Context* context);
+    explicit Font(Context* context);
     /// Destruct.
     ~Font() override;
     /// Register object factory.

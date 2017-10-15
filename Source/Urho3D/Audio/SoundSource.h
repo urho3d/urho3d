@@ -42,7 +42,7 @@ class URHO3D_API SoundSource : public Component
 
 public:
     /// Construct.
-    SoundSource(Context* context);
+    explicit SoundSource(Context* context);
     /// Destruct. Remove self from the audio subsystem
     ~SoundSource() override;
     /// Register object factory.

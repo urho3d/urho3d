@@ -35,7 +35,7 @@ public:
     /// Construct.
     AbstractFile() : Deserializer() { }
     /// Construct.
-    AbstractFile(unsigned int size) : Deserializer(size) { }
+    explicit AbstractFile(unsigned int size) : Deserializer(size) { }
     /// Destruct.
     ~AbstractFile() override = default;
 };

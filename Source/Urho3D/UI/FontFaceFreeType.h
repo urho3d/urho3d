@@ -35,7 +35,7 @@ class URHO3D_API FontFaceFreeType : public FontFace
 {
 public:
     /// Construct.
-    FontFaceFreeType(Font* font);
+    explicit FontFaceFreeType(Font* font);
     /// Destruct.
     ~FontFaceFreeType() override;
 

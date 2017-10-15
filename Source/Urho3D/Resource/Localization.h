@@ -35,7 +35,7 @@ class URHO3D_API Localization : public Object
 
 public:
     /// Construct.
-    Localization(Context* context);
+    explicit Localization(Context* context);
     /// Destruct. Free all resources.
     ~Localization() override;
 

@@ -143,7 +143,7 @@ class URHO3D_API Input : public Object
 
 public:
     /// Construct.
-    Input(Context* context);
+    explicit Input(Context* context);
     /// Destruct.
     ~Input() override;
 

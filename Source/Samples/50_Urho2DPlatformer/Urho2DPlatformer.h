@@ -44,7 +44,7 @@ class Urho2DPlatformer : public Sample
 
 public:
     /// Construct.
-    Urho2DPlatformer(Context* context);
+    explicit Urho2DPlatformer(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

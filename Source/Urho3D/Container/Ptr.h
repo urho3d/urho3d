@@ -43,7 +43,7 @@ public:
     }
 
     /// Construct a null shared pointer.
-    SharedPtr(std::nullptr_t) :
+    explicit SharedPtr(std::nullptr_t) :
         ptr_(0)
     {
     }
@@ -56,7 +56,7 @@ public:
     }
 
     /// Copy-construct from another shared pointer allowing implicit upcasting.
-    template <class U> SharedPtr(const SharedPtr<U>& rhs) :
+    template <class U> explicit SharedPtr(const SharedPtr<U>& rhs) :
         ptr_(rhs.ptr_)
     {
         AddRef();
@@ -142,7 +142,7 @@ public:
     template <class U> bool operator !=(const SharedPtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
 
     /// Convert to a raw pointer.
-    operator T*() const { return ptr_; }
+    explicit operator T*() const { return ptr_; }
 
     /// Swap with another SharedPtr.
     void Swap(SharedPtr& rhs) { Urho3D::Swap(ptr_, rhs.ptr_); }
@@ -251,7 +251,7 @@ public:
     }
 
     /// Construct a null weak pointer.
-    WeakPtr(std::nullptr_t) :
+    explicit WeakPtr(std::nullptr_t) :
         ptr_(0),
         refCount_(nullptr)
     {
@@ -266,7 +266,7 @@ public:
     }
 
     /// Copy-construct from another weak pointer allowing implicit upcasting.
-    template <class U> WeakPtr(const WeakPtr<U>& rhs) :
+    template <class U> explicit WeakPtr(const WeakPtr<U>& rhs) :
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
     {
@@ -274,7 +274,7 @@ public:
     }
 
     /// Construct from a shared pointer.
-    WeakPtr(const SharedPtr<T>& rhs) :
+    explicit WeakPtr(const SharedPtr<T>& rhs) :
         ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
     {
@@ -405,7 +405,7 @@ public:
     template <class U> bool operator <(const WeakPtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer, null if the object is expired.
-    operator T*() const { return Get(); }
+    explicit operator T*() const { return Get(); }
 
     /// Reset to null and release the weak reference.
     void Reset() { ReleaseRef(); }
@@ -544,7 +544,7 @@ public:
     }
 
     /// Construct empty.
-    UniquePtr(std::nullptr_t) { }
+    explicit UniquePtr(std::nullptr_t) { }
 
     /// Move-construct from UniquePtr.
     UniquePtr(UniquePtr && up) : ptr_(up.Detach()) { }
@@ -583,7 +583,7 @@ public:
     bool operator !=(const UniquePtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
 
     /// Cast pointer to bool.
-    operator bool() const { return !!ptr_; }
+    explicit operator bool() const { return !!ptr_; }
 
     /// Swap with another UniquePtr.
     void Swap(UniquePtr& up) { Urho3D::Swap(ptr_, up.ptr_); }

@@ -40,7 +40,7 @@ class Urho2DPhysics : public Sample
 
 public:
     /// Construct.
-    Urho2DPhysics(Context* context);
+    explicit Urho2DPhysics(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

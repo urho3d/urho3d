@@ -78,7 +78,7 @@ class URHO3D_API Node : public Animatable
 
 public:
     /// Construct.
-    Node(Context* context);
+    explicit Node(Context* context);
     /// Destruct. Any child nodes are detached.
     ~Node() override;
     /// Register object factory.

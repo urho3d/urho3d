@@ -41,7 +41,7 @@ class URHO3D_API Geometry : public Object
 
 public:
     /// Construct with one empty vertex buffer.
-    Geometry(Context* context);
+    explicit Geometry(Context* context);
     /// Destruct.
     ~Geometry() override;
 

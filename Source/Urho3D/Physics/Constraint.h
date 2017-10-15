@@ -51,7 +51,7 @@ class URHO3D_API Constraint : public Component
 
 public:
     /// Construct.
-    Constraint(Context* context);
+    explicit Constraint(Context* context);
     /// Destruct.
     ~Constraint() override;
     /// Register object factory.

@@ -54,7 +54,7 @@ class BackgroundLoader : public RefCounted, public Thread
 {
 public:
     /// Construct.
-    BackgroundLoader(ResourceCache* owner);
+    explicit BackgroundLoader(ResourceCache* owner);
 
     /// Destruct. Forcibly clear the load queue.
     ~BackgroundLoader() override;

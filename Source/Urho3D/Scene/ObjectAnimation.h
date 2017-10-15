@@ -40,7 +40,7 @@ class URHO3D_API ObjectAnimation : public Resource
 
 public:
     /// Construct.
-    ObjectAnimation(Context* context);
+    explicit ObjectAnimation(Context* context);
     /// Destruct.
     ~ObjectAnimation() override;
     /// Register object factory.

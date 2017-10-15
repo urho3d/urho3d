@@ -47,7 +47,7 @@ class URHO3D_API TileMapLayer2D : public Component
 
 public:
     /// Construct.
-    TileMapLayer2D(Context* context);
+    explicit TileMapLayer2D(Context* context);
     /// Destruct.
     ~TileMapLayer2D() override;
     /// Register object factory.

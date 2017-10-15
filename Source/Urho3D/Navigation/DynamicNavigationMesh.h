@@ -47,7 +47,7 @@ class URHO3D_API DynamicNavigationMesh : public NavigationMesh
 
 public:
     /// Constructor.
-    DynamicNavigationMesh(Context*);
+    explicit DynamicNavigationMesh(Context*);
     /// Destructor.
     ~DynamicNavigationMesh() override;
 

@@ -37,7 +37,7 @@ class URHO3D_API ScrollBar : public BorderImage
 
 public:
     /// Construct.
-    ScrollBar(Context* context);
+    explicit ScrollBar(Context* context);
     /// Destruct.
     ~ScrollBar() override;
     /// Register object factory.

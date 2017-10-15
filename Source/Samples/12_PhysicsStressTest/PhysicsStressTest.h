@@ -43,7 +43,7 @@ class PhysicsStressTest : public Sample
 
 public:
     /// Construct.
-    PhysicsStressTest(Context* context);
+    explicit PhysicsStressTest(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

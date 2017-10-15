@@ -33,7 +33,7 @@ class Urho3DPlayer : public Application
 
 public:
     /// Construct.
-    Urho3DPlayer(Context* context);
+    explicit Urho3DPlayer(Context* context);
 
     /// Setup before engine initialization. Verify that a script file has been specified.
     void Setup() override;

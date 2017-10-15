@@ -767,7 +767,7 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
 struct Gradients
 {
     /// Construct from vertices.
-    Gradients(const Vector3* vertices)
+    explicit Gradients(const Vector3* vertices)
     {
         float invdX = 1.0f / (((vertices[1].x_ - vertices[2].x_) *
                                (vertices[0].y_ - vertices[2].y_)) -

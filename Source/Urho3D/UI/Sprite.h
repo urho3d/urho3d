@@ -35,7 +35,7 @@ class URHO3D_API Sprite : public UIElement
 
 public:
     /// Construct.
-    Sprite(Context* context);
+    explicit Sprite(Context* context);
     /// Destruct.
     ~Sprite() override;
     /// Register object factory.

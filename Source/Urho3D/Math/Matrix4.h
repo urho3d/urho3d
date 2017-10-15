@@ -97,7 +97,7 @@ public:
     }
 
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
-    Matrix4(const Matrix3& matrix) :
+    explicit Matrix4(const Matrix3& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),

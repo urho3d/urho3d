@@ -36,7 +36,7 @@ class Urho2DTileMap : public Sample
 
 public:
     /// Construct.
-    Urho2DTileMap(Context* context);
+    explicit Urho2DTileMap(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

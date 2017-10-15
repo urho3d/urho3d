@@ -45,7 +45,7 @@ class URHO3D_API Console : public Object
 
 public:
     /// Construct.
-    Console(Context* context);
+    explicit Console(Context* context);
     /// Destruct.
     ~Console() override;
 

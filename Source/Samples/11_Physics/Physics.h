@@ -44,7 +44,7 @@ class Physics : public Sample
 
 public:
     /// Construct.
-    Physics(Context* context);
+    explicit Physics(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

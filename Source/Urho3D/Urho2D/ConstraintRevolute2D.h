@@ -34,7 +34,7 @@ class URHO3D_API ConstraintRevolute2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintRevolute2D(Context* context);
+    explicit ConstraintRevolute2D(Context* context);
     /// Destruct.
     ~ConstraintRevolute2D() override;
     /// Register object factory.

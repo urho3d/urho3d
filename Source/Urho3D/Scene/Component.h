@@ -51,7 +51,7 @@ class URHO3D_API Component : public Animatable
 
 public:
     /// Construct.
-    Component(Context* context);
+    explicit Component(Context* context);
     /// Destruct.
     ~Component() override;
 

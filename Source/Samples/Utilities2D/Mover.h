@@ -37,7 +37,7 @@ class Mover : public LogicComponent
 
 public:
     /// Construct.
-    Mover(Context* context);
+    explicit Mover(Context* context);
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);

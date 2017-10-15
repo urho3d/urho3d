@@ -58,7 +58,7 @@ class Sample2D : public Object
 
 public:
     /// Construct.
-    Sample2D(Context* context);
+    explicit Sample2D(Context* context);
     /// Destruct.
     ~Sample2D() override = default;
 

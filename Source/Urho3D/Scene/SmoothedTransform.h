@@ -41,7 +41,7 @@ class URHO3D_API SmoothedTransform : public Component
 
 public:
     /// Construct.
-    SmoothedTransform(Context* context);
+    explicit SmoothedTransform(Context* context);
     /// Destruct.
     ~SmoothedTransform() override;
     /// Register object factory.

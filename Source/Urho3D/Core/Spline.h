@@ -50,9 +50,9 @@ public:
     /// Default constructor.
     Spline();
     /// Constructor setting interpolation mode.
-    Spline(InterpolationMode mode);
+    explicit Spline(InterpolationMode mode);
     /// Constructor setting knots and interpolation mode.
-    Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE);
+    explicit Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE);
     /// Copy constructor.
     Spline(const Spline& rhs);
 

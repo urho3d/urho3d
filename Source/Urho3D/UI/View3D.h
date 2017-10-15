@@ -40,7 +40,7 @@ class URHO3D_API View3D : public Window
 
 public:
     /// Construct.
-    View3D(Context* context);
+    explicit View3D(Context* context);
     /// Destruct.
     ~View3D() override;
     /// Register object factory.

@@ -47,7 +47,7 @@ class SceneReplication : public Sample
 
 public:
     /// Construct.
-    SceneReplication(Context* context);
+    explicit SceneReplication(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

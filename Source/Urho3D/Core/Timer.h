@@ -81,7 +81,7 @@ class URHO3D_API Time : public Object
 
 public:
     /// Construct.
-    Time(Context* context);
+    explicit Time(Context* context);
     /// Destruct. Reset the low-resolution timer period if set.
     ~Time() override;
 

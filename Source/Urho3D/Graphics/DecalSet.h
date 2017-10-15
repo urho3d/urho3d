@@ -106,7 +106,7 @@ class URHO3D_API DecalSet : public Drawable
 
 public:
     /// Construct.
-    DecalSet(Context* context);
+    explicit DecalSet(Context* context);
     /// Destruct.
     ~DecalSet() override;
     /// Register object factory.

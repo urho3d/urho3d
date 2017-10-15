@@ -43,7 +43,7 @@ class AnimatingScene : public Sample
 
 public:
     /// Construct.
-    AnimatingScene(Context* context);
+    explicit AnimatingScene(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

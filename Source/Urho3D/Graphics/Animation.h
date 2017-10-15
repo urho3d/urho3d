@@ -113,7 +113,7 @@ class URHO3D_API Animation : public ResourceWithMetadata
 
 public:
     /// Construct.
-    Animation(Context* context);
+    explicit Animation(Context* context);
     /// Destruct.
     ~Animation() override;
     /// Register object factory.

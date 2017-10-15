@@ -36,7 +36,7 @@ class Sprites : public Sample
 
 public:
     /// Construct.
-    Sprites(Context* context);
+    explicit Sprites(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

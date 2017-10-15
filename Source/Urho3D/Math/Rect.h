@@ -53,7 +53,7 @@ public:
     }
 
     /// Construct from a Vector4.
-    Rect(const Vector4& vector) :
+    explicit Rect(const Vector4& vector) :
         min_(vector.x_, vector.y_),
         max_(vector.z_, vector.w_)
     {
@@ -300,7 +300,7 @@ public:
     }
 
     /// Construct from an int array.
-    IntRect(const int* data) :
+    explicit IntRect(const int* data) :
         left_(data[0]),
         top_(data[1]),
         right_(data[2]),

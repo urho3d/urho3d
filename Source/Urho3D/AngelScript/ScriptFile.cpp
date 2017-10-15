@@ -45,7 +45,7 @@ class ByteCodeSerializer : public asIBinaryStream
 {
 public:
     /// Construct.
-    ByteCodeSerializer(Serializer& dest) :
+    explicit ByteCodeSerializer(Serializer& dest) :
         dest_(dest)
     {
     }
@@ -72,7 +72,7 @@ class ByteCodeDeserializer : public asIBinaryStream
 {
 public:
     /// Construct.
-    ByteCodeDeserializer(MemoryBuffer& source) :
+    explicit ByteCodeDeserializer(MemoryBuffer& source) :
         source_(source)
     {
     }

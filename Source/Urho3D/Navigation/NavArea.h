@@ -34,7 +34,7 @@ class URHO3D_API NavArea : public Component
 
 public:
     /// Construct.
-    NavArea(Context*);
+    explicit NavArea(Context*);
     /// Destruct.
     ~NavArea() override;
     /// Register object factory and attributes.

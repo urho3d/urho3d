@@ -61,7 +61,7 @@ class URHO3D_API ScriptInstance : public Component, public ScriptEventListener
 
 public:
     /// Construct.
-    ScriptInstance(Context* context);
+    explicit ScriptInstance(Context* context);
     /// Destruct.
     ~ScriptInstance() override;
     /// Register object factory.

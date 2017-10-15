@@ -56,7 +56,7 @@ class Sample : public Application
 
 public:
     /// Construct.
-    Sample(Context* context);
+    explicit Sample(Context* context);
 
     /// Setup before engine initialization. Modifies the engine parameters.
     void Setup() override;

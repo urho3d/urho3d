@@ -56,7 +56,7 @@ class Urho2DConstraints : public Sample
 
 public:
     /// Construct.
-    Urho2DConstraints(Context* context);
+    explicit Urho2DConstraints(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

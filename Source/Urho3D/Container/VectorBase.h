@@ -145,7 +145,7 @@ template <class T> struct RandomAccessConstIterator
     }
 
     /// Construct from a non-const iterator.
-    RandomAccessConstIterator(const RandomAccessIterator<T>& rhs) :
+    explicit RandomAccessConstIterator(const RandomAccessIterator<T>& rhs) :
         ptr_(rhs.ptr_)
     {
     }

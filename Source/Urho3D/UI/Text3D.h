@@ -39,7 +39,7 @@ class URHO3D_API Text3D : public Drawable
 
 public:
     /// Construct.
-    Text3D(Context* context);
+    explicit Text3D(Context* context);
     /// Destruct.
     ~Text3D() override;
     /// Register object factory. Drawable must be registered first.

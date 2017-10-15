@@ -34,7 +34,7 @@ class URHO3D_API Slider : public BorderImage
 
 public:
     /// Construct.
-    Slider(Context* context);
+    explicit Slider(Context* context);
     /// Destruct.
     ~Slider() override;
     /// Register object factory.

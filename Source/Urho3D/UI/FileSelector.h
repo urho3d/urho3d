@@ -54,7 +54,7 @@ class URHO3D_API FileSelector : public Object
 
 public:
     /// Construct.
-    FileSelector(Context* context);
+    explicit FileSelector(Context* context);
     /// Destruct.
     ~FileSelector() override;
     /// Register object factory.

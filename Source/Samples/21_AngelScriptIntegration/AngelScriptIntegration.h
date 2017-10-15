@@ -42,7 +42,7 @@ class AngelScriptIntegration : public Sample
 
 public:
     /// Construct.
-    AngelScriptIntegration(Context* context);
+    explicit AngelScriptIntegration(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

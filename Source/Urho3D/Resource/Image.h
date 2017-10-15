@@ -94,7 +94,7 @@ class URHO3D_API Image : public Resource
 
 public:
     /// Construct empty.
-    Image(Context* context);
+    explicit Image(Context* context);
     /// Destruct.
     ~Image() override;
     /// Register object factory.

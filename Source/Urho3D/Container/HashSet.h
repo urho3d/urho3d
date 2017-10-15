@@ -42,7 +42,7 @@ public:
         Node() = default;
 
         /// Construct with key.
-        Node(const T& key) :
+        explicit Node(const T& key) :
             key_(key)
         {
         }
@@ -67,7 +67,7 @@ public:
         Iterator() = default;
 
         /// Construct with a node pointer.
-        Iterator(Node* ptr) :
+        explicit Iterator(Node* ptr) :
             HashIteratorBase(ptr)
         {
         }
@@ -116,13 +116,13 @@ public:
         ConstIterator() = default;
 
         /// Construct with a node pointer.
-        ConstIterator(Node* ptr) :
+        explicit ConstIterator(Node* ptr) :
             HashIteratorBase(ptr)
         {
         }
 
         /// Construct from a non-const iterator.
-        ConstIterator(const Iterator& rhs) :
+        explicit ConstIterator(const Iterator& rhs) :
             HashIteratorBase(rhs.ptr_)
         {
         }

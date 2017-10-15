@@ -37,9 +37,9 @@ class LuaScriptEventInvoker : public Object
 
 public:
     /// Construct.
-    LuaScriptEventInvoker(Context* context);
+    explicit LuaScriptEventInvoker(Context* context);
     /// Construct from LuaScriptInstance.
-    LuaScriptEventInvoker(LuaScriptInstance* instance);
+    explicit LuaScriptEventInvoker(LuaScriptInstance* instance);
     /// Destruct.
     ~LuaScriptEventInvoker() override;
 

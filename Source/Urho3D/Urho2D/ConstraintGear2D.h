@@ -34,7 +34,7 @@ class URHO3D_API ConstraintGear2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintGear2D(Context* context);
+    explicit ConstraintGear2D(Context* context);
     /// Destruct.
     ~ConstraintGear2D() override;
     /// Register object factory.

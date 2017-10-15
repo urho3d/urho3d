@@ -62,7 +62,7 @@ public:
     };
 
     /// Constructs a new IK effector.
-    IKEffector(Context* context);
+    explicit IKEffector(Context* context);
 
     /// Destructs he IK effector.
     ~IKEffector() override;

@@ -59,19 +59,19 @@ public:
     }
 
     /// Construct from a bounding box.
-    Sphere(const BoundingBox& box)
+    explicit Sphere(const BoundingBox& box)
     {
         Define(box);
     }
 
     /// Construct from a frustum.
-    Sphere(const Frustum& frustum)
+    explicit Sphere(const Frustum& frustum)
     {
         Define(frustum);
     }
 
     /// Construct from a polyhedron.
-    Sphere(const Polyhedron& poly)
+    explicit Sphere(const Polyhedron& poly)
     {
         Define(poly);
     }

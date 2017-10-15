@@ -38,7 +38,7 @@ class URHO3D_API TerrainPatch : public Drawable
 
 public:
     /// Construct.
-    TerrainPatch(Context* context);
+    explicit TerrainPatch(Context* context);
     /// Destruct.
     ~TerrainPatch() override;
     /// Register object factory.

@@ -34,7 +34,7 @@ class URHO3D_API Navigable : public Component
 
 public:
     /// Construct.
-    Navigable(Context* context);
+    explicit Navigable(Context* context);
     /// Destruct.
     ~Navigable() override;
     /// Register object factory.

@@ -34,7 +34,7 @@ class URHO3D_API ConstraintDistance2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintDistance2D(Context* context);
+    explicit ConstraintDistance2D(Context* context);
     /// Destruct.
     ~ConstraintDistance2D() override;
     /// Register object factory.

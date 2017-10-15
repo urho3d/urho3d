@@ -55,7 +55,7 @@ class FreeTypeLibrary : public Object
 
 public:
     /// Construct.
-    FreeTypeLibrary(Context* context) :
+    explicit FreeTypeLibrary(Context* context) :
         Object(context)
     {
         FT_Error error = FT_Init_FreeType(&library_);

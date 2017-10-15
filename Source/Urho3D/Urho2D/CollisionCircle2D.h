@@ -34,7 +34,7 @@ class URHO3D_API CollisionCircle2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionCircle2D(Context* context);
+    explicit CollisionCircle2D(Context* context);
     /// Destruct.
     ~CollisionCircle2D() override;
     /// Register object factory.

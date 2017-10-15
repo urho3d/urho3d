@@ -34,7 +34,7 @@ class URHO3D_API OffMeshConnection : public Component
 
 public:
     /// Construct.
-    OffMeshConnection(Context* context);
+    explicit OffMeshConnection(Context* context);
     /// Destruct.
     ~OffMeshConnection() override;
     /// Register object factory.

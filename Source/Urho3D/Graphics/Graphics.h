@@ -84,7 +84,7 @@ class URHO3D_API Graphics : public Object
 
 public:
     /// Construct.
-    Graphics(Context* context);
+    explicit Graphics(Context* context);
     /// Destruct. Release the Direct3D11 device and close the window.
     ~Graphics() override;
 

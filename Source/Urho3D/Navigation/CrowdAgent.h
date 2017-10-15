@@ -78,7 +78,7 @@ class URHO3D_API CrowdAgent : public Component
 
 public:
     /// Construct.
-    CrowdAgent(Context* context);
+    explicit CrowdAgent(Context* context);
     /// Destruct.
     ~CrowdAgent() override;
     /// Register object factory.

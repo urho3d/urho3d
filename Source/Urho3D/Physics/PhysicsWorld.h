@@ -139,7 +139,7 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 
 public:
     /// Construct.
-    PhysicsWorld(Context* scontext);
+    explicit PhysicsWorld(Context* scontext);
     /// Destruct.
     ~PhysicsWorld() override;
     /// Register object factory.

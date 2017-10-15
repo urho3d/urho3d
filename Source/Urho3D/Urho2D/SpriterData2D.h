@@ -83,7 +83,7 @@ struct Folder
 /// File.
 struct File
 {
-    File(Folder* folder);
+    explicit File(Folder* folder);
     ~File();
 
     bool Load(const pugi::xml_node& node);
@@ -221,7 +221,7 @@ enum CurveType
 /// Timeline key.
 struct TimelineKey
 {
-    TimelineKey(Timeline* timeline);
+    explicit TimelineKey(Timeline* timeline);
     virtual ~TimelineKey();
 
     virtual ObjectType GetObjectType() const = 0;
@@ -250,7 +250,7 @@ struct SpatialInfo
     float alpha_;
     int spin;
 
-    SpatialInfo(float x = 0.0f, float y = 0.0f, float angle = 0.0f, float scale_x = 1, float scale_y = 1, float a = 1, int spin = 1);
+    explicit SpatialInfo(float x = 0.0f, float y = 0.0f, float angle = 0.0f, float scale_x = 1, float scale_y = 1, float a = 1, int spin = 1);
     SpatialInfo UnmapFromParent(const SpatialInfo& parentInfo) const;
     void Interpolate(const SpatialInfo& other, float t);
 };
@@ -260,7 +260,7 @@ struct SpatialTimelineKey : TimelineKey
 {
     SpatialInfo info_;
 
-    SpatialTimelineKey(Timeline* timeline);
+    explicit SpatialTimelineKey(Timeline* timeline);
     ~SpatialTimelineKey() override;
 
     bool Load(const pugi::xml_node& node) override;
@@ -274,7 +274,7 @@ struct BoneTimelineKey : SpatialTimelineKey
     float length_;
     float width_;
 
-    BoneTimelineKey(Timeline* timeline);
+    explicit BoneTimelineKey(Timeline* timeline);
     ~BoneTimelineKey() override;
 
     ObjectType GetObjectType() const override { return BONE; }
@@ -297,7 +297,7 @@ struct SpriteTimelineKey : SpatialTimelineKey
     /// Run time data.
     int zIndex_;
 
-    SpriteTimelineKey(Timeline* timeline);
+    explicit SpriteTimelineKey(Timeline* timeline);
     ~SpriteTimelineKey() override;
 
     ObjectType GetObjectType() const override { return SPRITE; }

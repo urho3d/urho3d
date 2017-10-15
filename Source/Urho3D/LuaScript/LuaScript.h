@@ -44,7 +44,7 @@ class URHO3D_API LuaScript : public Object, public LuaScriptEventListener
 
 public:
     /// Construct.
-    LuaScript(Context* context);
+    explicit LuaScript(Context* context);
     /// Destruct.
     ~LuaScript() override;
 

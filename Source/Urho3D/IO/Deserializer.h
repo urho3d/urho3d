@@ -36,7 +36,7 @@ public:
     /// Construct with zero size.
     Deserializer();
     /// Construct with defined size.
-    Deserializer(unsigned size);
+    explicit Deserializer(unsigned size);
     /// Destruct.
     virtual ~Deserializer();
 

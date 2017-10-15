@@ -43,7 +43,7 @@ class URHO3D_API GPUObject
 {
 public:
     /// Construct with graphics subsystem pointer.
-    GPUObject(Graphics* graphics);
+    explicit GPUObject(Graphics* graphics);
     /// Destruct. Remove from the Graphics.
     virtual ~GPUObject();
 

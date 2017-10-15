@@ -34,7 +34,7 @@ class URHO3D_API SoundListener : public Component
 
 public:
     /// Construct.
-    SoundListener(Context* context);
+    explicit SoundListener(Context* context);
     /// Destruct.
     ~SoundListener() override;
     /// Register object factory.

@@ -37,7 +37,7 @@ class URHO3D_API Texture3D : public Texture
 
 public:
     /// Construct.
-    Texture3D(Context* context);
+    explicit Texture3D(Context* context);
     /// Destruct.
     ~Texture3D() override;
     /// Register object factory.

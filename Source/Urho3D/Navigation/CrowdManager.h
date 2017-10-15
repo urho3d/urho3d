@@ -64,7 +64,7 @@ class URHO3D_API CrowdManager : public Component
 
 public:
     /// Construct.
-    CrowdManager(Context* context);
+    explicit CrowdManager(Context* context);
     /// Destruct.
     ~CrowdManager() override;
     /// Register object factory.

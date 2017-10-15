@@ -63,7 +63,7 @@ struct URHO3D_API CursorShapeInfo
     }
 
     /// Construct with system cursor.
-    CursorShapeInfo(int systemCursor) :
+    explicit CursorShapeInfo(int systemCursor) :
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
         osCursor_(nullptr),
@@ -95,7 +95,7 @@ class URHO3D_API Cursor : public BorderImage
 
 public:
     /// Construct.
-    Cursor(Context* context);
+    explicit Cursor(Context* context);
     /// Destruct.
     ~Cursor() override;
     /// Register object factory.

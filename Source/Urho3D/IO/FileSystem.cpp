@@ -204,7 +204,7 @@ class AsyncExecRequest : public Thread
 {
 public:
     /// Construct.
-    AsyncExecRequest(unsigned& requestID) :
+    explicit AsyncExecRequest(unsigned& requestID) :
         requestID_(requestID),
         completed_(false)
     {

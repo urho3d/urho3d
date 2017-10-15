@@ -37,7 +37,7 @@ class URHO3D_API RaycastVehicle : public LogicComponent
 
 public:
     /// Construct.
-    RaycastVehicle(Urho3D::Context* context);
+    explicit RaycastVehicle(Urho3D::Context* context);
     /// Destruct.
     ~RaycastVehicle() override;
 

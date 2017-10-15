@@ -44,7 +44,7 @@ class XMLWriter : public pugi::xml_writer
 {
 public:
     /// Construct.
-    XMLWriter(Serializer& dest) :
+    explicit XMLWriter(Serializer& dest) :
         dest_(dest),
         success_(true)
     {

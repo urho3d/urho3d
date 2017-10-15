@@ -47,7 +47,7 @@ class URHO3D_API Serializable : public Object
 
 public:
     /// Construct.
-    Serializable(Context* context);
+    explicit Serializable(Context* context);
     /// Destruct.
     ~Serializable() override;
 

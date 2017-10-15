@@ -41,7 +41,7 @@ class InverseKinematics : public Sample
 
 public:
     /// Construct.
-    InverseKinematics(Context* context);
+    explicit InverseKinematics(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

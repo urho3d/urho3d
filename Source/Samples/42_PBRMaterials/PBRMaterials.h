@@ -46,7 +46,7 @@ class PBRMaterials : public Sample
 
 public:
     /// Construct.
-    PBRMaterials(Context* context);
+    explicit PBRMaterials(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

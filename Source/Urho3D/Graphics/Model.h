@@ -111,7 +111,7 @@ class URHO3D_API Model : public ResourceWithMetadata
 
 public:
     /// Construct.
-    Model(Context* context);
+    explicit Model(Context* context);
     /// Destruct.
     ~Model() override;
     /// Register object factory.

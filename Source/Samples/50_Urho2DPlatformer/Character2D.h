@@ -37,7 +37,7 @@ class Character2D : public LogicComponent
 
 public:
     /// Construct.
-    Character2D(Context* context);
+    explicit Character2D(Context* context);
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);

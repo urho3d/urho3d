@@ -36,7 +36,7 @@ class URHO3D_API Menu : public Button
 
 public:
     /// Construct.
-    Menu(Context* context);
+    explicit Menu(Context* context);
     /// Destruct.
     ~Menu() override;
     /// Register object factory.

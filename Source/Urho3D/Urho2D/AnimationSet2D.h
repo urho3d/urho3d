@@ -49,7 +49,7 @@ class URHO3D_API AnimationSet2D : public Resource
 
 public:
     /// Construct.
-    AnimationSet2D(Context* context);
+    explicit AnimationSet2D(Context* context);
     /// Destruct.
     ~AnimationSet2D() override;
     /// Register object factory.

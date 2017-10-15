@@ -90,7 +90,7 @@ struct URHO3D_API ResourceRef
     ResourceRef() = default;
 
     /// Construct with type only and empty id.
-    ResourceRef(StringHash type) :
+    explicit ResourceRef(StringHash type) :
         type_(type)
     {
     }
@@ -138,7 +138,7 @@ struct URHO3D_API ResourceRefList
     ResourceRefList() = default;
 
     /// Construct with type only.
-    ResourceRefList(StringHash type) :
+    explicit ResourceRefList(StringHash type) :
         type_(type)
     {
     }
@@ -170,7 +170,7 @@ class CustomVariantValue
 
 private:
     /// Construct from type info.
-    CustomVariantValue(const std::type_info& typeInfo) : typeInfo_(typeInfo) {}
+    explicit CustomVariantValue(const std::type_info& typeInfo) : typeInfo_(typeInfo) {}
 
 public:
     /// Construct empty.
@@ -228,7 +228,7 @@ public:
     /// Type traits.
     using Traits = CustomVariantValueTraits<T>;
     /// Construct from value.
-    CustomVariantValueImpl(const T& value) : CustomVariantValue(typeid(T)), value_(value) {}
+    explicit CustomVariantValueImpl(const T& value) : CustomVariantValue(typeid(T)), value_(value) {}
     /// Set value.
     void SetValue(const T& value) { value_ = value; }
     /// Get value.
@@ -326,194 +326,194 @@ public:
     Variant() = default;
 
     /// Construct from integer.
-    Variant(int value)
+    explicit Variant(int value)
     {
         *this = value;
     }
 
     /// Construct from 64 bit integer.
-    Variant(long long value)
+    explicit Variant(long long value)
     {
         *this = value;
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned value)
+    explicit Variant(unsigned value)
     {
         *this = (int)value;
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned long long value)
+    explicit Variant(unsigned long long value)
     {
         *this = (long long)value;
     }
 
     /// Construct from a string hash (convert to integer).
-    Variant(const StringHash& value)
+    explicit Variant(const StringHash& value)
     {
         *this = (int)value.Value();
     }
 
     /// Construct from a bool.
-    Variant(bool value)
+    explicit Variant(bool value)
     {
         *this = value;
     }
 
     /// Construct from a float.
-    Variant(float value)
+    explicit Variant(float value)
     {
         *this = value;
     }
 
     /// Construct from a double.
-    Variant(double value)
+    explicit Variant(double value)
     {
         *this = value;
     }
 
     /// Construct from a Vector2.
-    Variant(const Vector2& value)
+    explicit Variant(const Vector2& value)
     {
         *this = value;
     }
 
     /// Construct from a Vector3.
-    Variant(const Vector3& value)
+    explicit Variant(const Vector3& value)
     {
         *this = value;
     }
 
     /// Construct from a Vector4.
-    Variant(const Vector4& value)
+    explicit Variant(const Vector4& value)
     {
         *this = value;
     }
 
     /// Construct from a quaternion.
-    Variant(const Quaternion& value)
+    explicit Variant(const Quaternion& value)
     {
         *this = value;
     }
 
     /// Construct from a color.
-    Variant(const Color& value)
+    explicit Variant(const Color& value)
     {
         *this = value;
     }
 
     /// Construct from a string.
-    Variant(const String& value)
+    explicit Variant(const String& value)
     {
         *this = value;
     }
 
     /// Construct from a C string.
-    Variant(const char* value)
+    explicit Variant(const char* value)
     {
         *this = value;
     }
 
     /// Construct from a buffer.
-    Variant(const PODVector<unsigned char>& value)
+    explicit Variant(const PODVector<unsigned char>& value)
     {
         *this = value;
     }
 
     /// Construct from a %VectorBuffer and store as a buffer.
-    Variant(const VectorBuffer& value)
+    explicit Variant(const VectorBuffer& value)
     {
         *this = value;
     }
 
     /// Construct from a pointer.
-    Variant(void* value)
+    explicit Variant(void* value)
     {
         *this = value;
     }
 
     /// Construct from a resource reference.
-    Variant(const ResourceRef& value)
+    explicit Variant(const ResourceRef& value)
     {
         *this = value;
     }
 
     /// Construct from a resource reference list.
-    Variant(const ResourceRefList& value)
+    explicit Variant(const ResourceRefList& value)
     {
         *this = value;
     }
 
     /// Construct from a variant vector.
-    Variant(const VariantVector& value)
+    explicit Variant(const VariantVector& value)
     {
         *this = value;
     }
 
     /// Construct from a variant map.
-    Variant(const VariantMap& value)
+    explicit Variant(const VariantMap& value)
     {
         *this = value;
     }
 
     /// Construct from a string vector.
-    Variant(const StringVector& value)
+    explicit Variant(const StringVector& value)
     {
         *this = value;
     }
 
     /// Construct from a rect.
-    Variant(const Rect& value)
+    explicit Variant(const Rect& value)
     {
         *this = value;
     }
 
     /// Construct from an integer rect.
-    Variant(const IntRect& value)
+    explicit Variant(const IntRect& value)
     {
         *this = value;
     }
 
     /// Construct from an IntVector2.
-    Variant(const IntVector2& value)
+    explicit Variant(const IntVector2& value)
     {
         *this = value;
     }
 
     /// Construct from an IntVector3.
-    Variant(const IntVector3& value)
+    explicit Variant(const IntVector3& value)
     {
         *this = value;
     }
 
     /// Construct from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
-    Variant(RefCounted* value)
+    explicit Variant(RefCounted* value)
     {
         *this = value;
     }
 
     /// Construct from a Matrix3.
-    Variant(const Matrix3& value)
+    explicit Variant(const Matrix3& value)
     {
         *this = value;
     }
 
     /// Construct from a Matrix3x4.
-    Variant(const Matrix3x4& value)
+    explicit Variant(const Matrix3x4& value)
     {
         *this = value;
     }
 
     /// Construct from a Matrix4.
-    Variant(const Matrix4& value)
+    explicit Variant(const Matrix4& value)
     {
         *this = value;
     }
 
     /// Construct from custom value.
     template <class T>
-    Variant(const CustomVariantValueImpl<T>& value)
+    explicit Variant(const CustomVariantValueImpl<T>& value)
     {
         *this = value;
     }

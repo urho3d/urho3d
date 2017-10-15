@@ -45,7 +45,7 @@ class URHO3D_API PackageFile : public Object
 
 public:
     /// Construct.
-    PackageFile(Context* context);
+    explicit PackageFile(Context* context);
     /// Construct and open.
     PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.

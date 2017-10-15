@@ -42,7 +42,7 @@ class RenderToTexture : public Sample
 
 public:
     /// Construct.
-    RenderToTexture(Context* context);
+    explicit RenderToTexture(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

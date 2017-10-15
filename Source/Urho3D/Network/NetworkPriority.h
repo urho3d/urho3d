@@ -34,7 +34,7 @@ class URHO3D_API NetworkPriority : public Component
 
 public:
     /// Construct.
-    NetworkPriority(Context* context);
+    explicit NetworkPriority(Context* context);
     /// Destruct.
     ~NetworkPriority() override;
     /// Register object factory.

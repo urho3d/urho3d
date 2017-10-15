@@ -53,7 +53,7 @@ class Vehicle : public LogicComponent
 
 public:
     /// Construct.
-    Vehicle(Context* context);
+    explicit Vehicle(Context* context);
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);

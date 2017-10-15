@@ -94,7 +94,7 @@ class URHO3D_API DebugRenderer : public Component
 
 public:
     /// Construct.
-    DebugRenderer(Context* context);
+    explicit DebugRenderer(Context* context);
     /// Destruct.
     ~DebugRenderer() override;
     /// Register object factory.

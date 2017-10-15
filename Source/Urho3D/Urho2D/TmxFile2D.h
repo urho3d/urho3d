@@ -91,7 +91,7 @@ protected:
 class TmxTileLayer2D : public TmxLayer2D
 {
 public:
-    TmxTileLayer2D(TmxFile2D* tmxFile);
+    explicit TmxTileLayer2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
@@ -107,7 +107,7 @@ protected:
 class TmxObjectGroup2D : public TmxLayer2D
 {
 public:
-    TmxObjectGroup2D(TmxFile2D* tmxFile);
+    explicit TmxObjectGroup2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
@@ -130,7 +130,7 @@ private:
 class TmxImageLayer2D : public TmxLayer2D
 {
 public:
-    TmxImageLayer2D(TmxFile2D* tmxFile);
+    explicit TmxImageLayer2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
@@ -160,7 +160,7 @@ class URHO3D_API TmxFile2D : public Resource
 
 public:
     /// Construct.
-    TmxFile2D(Context* context);
+    explicit TmxFile2D(Context* context);
     /// Destruct.
     ~TmxFile2D() override;
     /// Register object factory.

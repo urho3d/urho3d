@@ -76,7 +76,7 @@ struct TriangleMeshData : public CollisionGeometryData
     /// Construct from a model.
     TriangleMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
-    TriangleMeshData(CustomGeometry* custom);
+    explicit TriangleMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
     UniquePtr<TriangleMeshInterface> meshInterface_;
@@ -92,7 +92,7 @@ struct GImpactMeshData : public CollisionGeometryData
     /// Construct from a model.
     GImpactMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
-    GImpactMeshData(CustomGeometry* custom);
+    explicit GImpactMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
     UniquePtr<TriangleMeshInterface> meshInterface_;
@@ -104,7 +104,7 @@ struct ConvexData : public CollisionGeometryData
     /// Construct from a model.
     ConvexData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
-    ConvexData(CustomGeometry* custom);
+    explicit ConvexData(CustomGeometry* custom);
 
     /// Build the convex hull from vertices.
     void BuildHull(const PODVector<Vector3>& vertices);
@@ -144,7 +144,7 @@ class URHO3D_API CollisionShape : public Component
 
 public:
     /// Construct.
-    CollisionShape(Context* context);
+    explicit CollisionShape(Context* context);
     /// Destruct. Free the geometry data and clean up unused data from the geometry data cache.
     ~CollisionShape() override;
     /// Register object factory.

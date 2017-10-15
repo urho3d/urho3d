@@ -36,7 +36,7 @@ class URHO3D_API StaticSprite2D : public Drawable2D
 
 public:
     /// Construct.
-    StaticSprite2D(Context* context);
+    explicit StaticSprite2D(Context* context);
     /// Destruct.
     ~StaticSprite2D() override;
     /// Register object factory. Drawable2D must be registered first.

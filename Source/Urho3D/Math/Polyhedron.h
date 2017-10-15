@@ -47,19 +47,19 @@ public:
     }
 
     /// Construct from a list of faces.
-    Polyhedron(const Vector<PODVector<Vector3> >& faces) :
+    explicit Polyhedron(const Vector<PODVector<Vector3> >& faces) :
         faces_(faces)
     {
     }
 
     /// Construct from a bounding box.
-    Polyhedron(const BoundingBox& box)
+    explicit Polyhedron(const BoundingBox& box)
     {
         Define(box);
     }
 
     /// Construct from a frustum.
-    Polyhedron(const Frustum& frustum)
+    explicit Polyhedron(const Frustum& frustum)
     {
         Define(frustum);
     }

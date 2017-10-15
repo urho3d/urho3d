@@ -35,7 +35,7 @@ class HelloWorld : public Sample
 
 public:
     /// Construct.
-    HelloWorld(Context* context);
+    explicit HelloWorld(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;

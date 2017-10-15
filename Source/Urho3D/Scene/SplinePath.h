@@ -42,7 +42,7 @@ class URHO3D_API SplinePath : public Component
 
 public:
     /// Construct an Empty SplinePath.
-    SplinePath(Context* context);
+    explicit SplinePath(Context* context);
 
     /// Destructor.
     ~SplinePath() override = default;;

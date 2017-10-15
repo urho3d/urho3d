@@ -52,7 +52,7 @@ class Vehicle : public LogicComponent
 
 public :
     /// Construct.
-    Vehicle(Context* context);
+    explicit Vehicle(Context* context);
     /// Destruct.
     ~Vehicle() override;
 

@@ -68,7 +68,7 @@ class URHO3D_API ResourceRouter : public Object
 {
 public:
     /// Construct.
-    ResourceRouter(Context* context) :
+    explicit ResourceRouter(Context* context) :
         Object(context)
     {
     }
@@ -84,7 +84,7 @@ class URHO3D_API ResourceCache : public Object
 
 public:
     /// Construct.
-    ResourceCache(Context* context);
+    explicit ResourceCache(Context* context);
     /// Destruct. Free all resources.
     ~ResourceCache() override;
 

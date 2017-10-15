@@ -34,7 +34,7 @@ class URHO3D_API ConstraintMouse2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintMouse2D(Context* context);
+    explicit ConstraintMouse2D(Context* context);
     /// Destruct.
     ~ConstraintMouse2D() override;
     /// Register object factory.

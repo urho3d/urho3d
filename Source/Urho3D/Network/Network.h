@@ -50,7 +50,7 @@ class URHO3D_API Network : public Object, public kNet::IMessageHandler, public k
 
 public:
     /// Construct.
-    Network(Context* context);
+    explicit Network(Context* context);
     /// Destruct.
     ~Network() override;
 

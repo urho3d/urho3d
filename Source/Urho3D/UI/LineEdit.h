@@ -37,7 +37,7 @@ class URHO3D_API LineEdit : public BorderImage
 
 public:
     /// Construct.
-    LineEdit(Context* context);
+    explicit LineEdit(Context* context);
     /// Destruct.
     ~LineEdit() override;
     /// Register object factory.

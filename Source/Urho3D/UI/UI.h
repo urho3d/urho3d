@@ -61,7 +61,7 @@ class URHO3D_API UI : public Object
 
 public:
     /// Construct.
-    UI(Context* context);
+    explicit UI(Context* context);
     /// Destruct.
     ~UI() override;
 

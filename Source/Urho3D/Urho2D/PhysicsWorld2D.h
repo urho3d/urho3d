@@ -79,7 +79,7 @@ class URHO3D_API PhysicsWorld2D : public Component, public b2ContactListener, pu
 
 public:
     /// Construct.
-    PhysicsWorld2D(Context* context);
+    explicit PhysicsWorld2D(Context* context);
     /// Destruct.
     ~PhysicsWorld2D() override;
     /// Register object factory.
@@ -255,7 +255,7 @@ protected:
         /// Construct.
         ContactInfo();
         /// Construct.
-        ContactInfo(b2Contact* contract);
+        explicit ContactInfo(b2Contact* contract);
         /// Write contact info to buffer.
         const PODVector<unsigned char>& Serialize(VectorBuffer& buffer) const;
 

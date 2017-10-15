@@ -42,7 +42,7 @@ class URHO3D_API LogicComponent : public Component
     URHO3D_OBJECT(LogicComponent, Component);
 
     /// Construct.
-    LogicComponent(Context* context);
+    explicit LogicComponent(Context* context);
     /// Destruct.
     ~LogicComponent() override;
 

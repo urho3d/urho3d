@@ -140,7 +140,7 @@ public:
         useQuantize_ = totalTriangles <= QUANTIZE_MAX_TRIANGLES;
     }
 
-    TriangleMeshInterface(CustomGeometry* custom) :
+    explicit TriangleMeshInterface(CustomGeometry* custom) :
         btTriangleIndexVertexArray()
     {
         const Vector<PODVector<CustomGeometryVertex> >& srcVertices = custom->GetVertices();

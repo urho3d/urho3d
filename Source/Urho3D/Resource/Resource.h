@@ -55,7 +55,7 @@ class URHO3D_API Resource : public Object
 
 public:
     /// Construct.
-    Resource(Context* context);
+    explicit Resource(Context* context);
 
     /// Load resource synchronously. Call both BeginLoad() & EndLoad() and return true if both succeeded.
     bool Load(Deserializer& source);
@@ -115,7 +115,7 @@ class URHO3D_API ResourceWithMetadata : public Resource
 
 public:
     /// Construct.
-    ResourceWithMetadata(Context* context) : Resource(context) {}
+    explicit ResourceWithMetadata(Context* context) : Resource(context) {}
 
     /// Add new metadata variable or overwrite old value.
     void AddMetadata(const String& name, const Variant& value);

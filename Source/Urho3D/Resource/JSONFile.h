@@ -35,7 +35,7 @@ class URHO3D_API JSONFile : public Resource
 
 public:
     /// Construct.
-    JSONFile(Context* context);
+    explicit JSONFile(Context* context);
     /// Destruct.
     ~JSONFile() override;
     /// Register object factory.

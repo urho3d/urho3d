@@ -35,7 +35,7 @@ class URHO3D_API FontFaceBitmap : public FontFace
 {
 public:
     /// Construct.
-    FontFaceBitmap(Font* font);
+    explicit FontFaceBitmap(Font* font);
     /// Destruct.
     ~FontFaceBitmap() override;
 

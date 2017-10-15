@@ -79,7 +79,7 @@ class URHO3D_API ParticleEmitter2D : public Drawable2D
 
 public:
     /// Construct.
-    ParticleEmitter2D(Context* context);
+    explicit ParticleEmitter2D(Context* context);
     /// Destruct.
     ~ParticleEmitter2D() override;
     /// Register object factory. drawable2d must be registered first.

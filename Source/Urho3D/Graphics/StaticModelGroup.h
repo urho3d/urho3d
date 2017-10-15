@@ -34,7 +34,7 @@ class URHO3D_API StaticModelGroup : public StaticModel
 
 public:
     /// Construct.
-    StaticModelGroup(Context* context);
+    explicit StaticModelGroup(Context* context);
     /// Destruct.
     ~StaticModelGroup() override;
     /// Register object factory. StaticModel must be registered first.

@@ -49,7 +49,7 @@ class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 
 public:
     /// Construct.
-    ScriptFile(Context* context);
+    explicit ScriptFile(Context* context);
     /// Destruct.
     ~ScriptFile() override;
     /// Register object factory.
@@ -158,7 +158,7 @@ class URHO3D_API ScriptEventInvoker : public Object
 
 public:
     /// Constructor, will create the asILockableSharedBool if a ScriptObject is passed in.
-    ScriptEventInvoker(ScriptFile* file, asIScriptObject* object = nullptr);
+    explicit ScriptEventInvoker(ScriptFile* file, asIScriptObject* object = nullptr);
     /// Destructor, release the ref it we still hold it.
     ~ScriptEventInvoker() override;
 

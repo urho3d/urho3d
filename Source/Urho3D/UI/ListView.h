@@ -45,7 +45,7 @@ class URHO3D_API ListView : public ScrollView
 
 public:
     /// Construct.
-    ListView(Context* context);
+    explicit ListView(Context* context);
     /// Destruct.
     ~ListView() override;
     /// Register object factory.

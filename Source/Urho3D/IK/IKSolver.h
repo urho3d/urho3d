@@ -166,7 +166,7 @@ public:
     };
 
     /// Construct an IK root component.
-    IKSolver(Context* context);
+    explicit IKSolver(Context* context);
     /// Default destructor.
     ~IKSolver() override;
     /// Registers this class to the context.

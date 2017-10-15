@@ -45,7 +45,7 @@ struct ColorFrame
     }
 
     /// Construct with a color and zero time.
-    ColorFrame(const Color& color) :
+    explicit ColorFrame(const Color& color) :
         color_(color),
         time_(0.0f)
     {
@@ -106,7 +106,7 @@ class URHO3D_API ParticleEffect : public Resource
 
 public:
     /// Construct.
-    ParticleEffect(Context* context);
+    explicit ParticleEffect(Context* context);
     /// Destruct.
     ~ParticleEffect() override;
     /// Register object factory.

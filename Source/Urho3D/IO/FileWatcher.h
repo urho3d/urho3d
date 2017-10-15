@@ -40,7 +40,7 @@ class URHO3D_API FileWatcher : public Object, public Thread
 
 public:
     /// Construct.
-    FileWatcher(Context* context);
+    explicit FileWatcher(Context* context);
     /// Destruct.
     ~FileWatcher() override;
 

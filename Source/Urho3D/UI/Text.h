@@ -78,7 +78,7 @@ class URHO3D_API Text : public UIElement
 
 public:
     /// Construct.
-    Text(Context* context);
+    explicit Text(Context* context);
     /// Destruct.
     ~Text() override;
     /// Register object factory.

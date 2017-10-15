@@ -61,7 +61,7 @@ class URHO3D_API LuaScriptInstance : public Component, public LuaScriptEventList
 
 public:
     /// Construct.
-    LuaScriptInstance(Context* context);
+    explicit LuaScriptInstance(Context* context);
     /// Destruct.
     ~LuaScriptInstance() override;
     /// Register object factory.

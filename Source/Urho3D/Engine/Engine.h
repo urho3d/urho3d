@@ -38,7 +38,7 @@ class URHO3D_API Engine : public Object
 
 public:
     /// Construct.
-    Engine(Context* context);
+    explicit Engine(Context* context);
     /// Destruct. Free all subsystems.
     ~Engine() override;
 

@@ -34,7 +34,7 @@ class URHO3D_API Button : public BorderImage
 
 public:
     /// Construct.
-    Button(Context* context);
+    explicit Button(Context* context);
     /// Destruct.
     ~Button() override;
     /// Register object factory.
@@ -79,7 +79,7 @@ public:
 
     /// Return pressed image offset.
     const IntVector2& GetPressedOffset() const { return pressedOffset_; }
-    
+
     /// Return disabled image offset.
     const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
 

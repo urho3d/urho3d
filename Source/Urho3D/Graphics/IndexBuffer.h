@@ -37,7 +37,7 @@ class URHO3D_API IndexBuffer : public Object, public GPUObject
 
 public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.
-    IndexBuffer(Context* context, bool forceHeadless = false);
+    explicit IndexBuffer(Context* context, bool forceHeadless = false);
     /// Destruct.
     ~IndexBuffer() override;
 

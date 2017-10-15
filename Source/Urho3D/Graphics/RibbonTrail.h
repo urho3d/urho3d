@@ -62,7 +62,7 @@ class URHO3D_API RibbonTrail : public Drawable
 
 public:
     /// Construct.
-    RibbonTrail(Context* context);
+    explicit RibbonTrail(Context* context);
     /// Destruct.
     ~RibbonTrail() override;
     /// Register object factory.

@@ -34,7 +34,7 @@ template <class T> class RWOpsWrapper
 {
 public:
     /// Construct with object reference.
-    RWOpsWrapper(T& object)
+    explicit RWOpsWrapper(T& object)
     {
         ops_.type = dynamic_cast<File*>(&object) ? SDL_RWOPS_STDFILE : SDL_RWOPS_MEMORY;
         ops_.hidden.unknown.data1 = &object;

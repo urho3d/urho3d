@@ -118,7 +118,7 @@ class URHO3D_API UIElement : public Animatable
 
 public:
     /// Construct.
-    UIElement(Context* context);
+    explicit UIElement(Context* context);
     /// Destruct.
     ~UIElement() override;
     /// Register object factory.
