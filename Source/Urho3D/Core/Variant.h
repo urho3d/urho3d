@@ -326,194 +326,194 @@ public:
     Variant() = default;
 
     /// Construct from integer.
-    explicit Variant(int value)
+    Variant(int value)                  // NOLINT
     {
         *this = value;
     }
 
     /// Construct from 64 bit integer.
-    explicit Variant(long long value)
+    Variant(long long value)            // NOLINT
     {
         *this = value;
     }
 
     /// Construct from unsigned integer.
-    explicit Variant(unsigned value)
+    Variant(unsigned value)             // NOLINT
     {
         *this = (int)value;
     }
 
     /// Construct from unsigned integer.
-    explicit Variant(unsigned long long value)
+    Variant(unsigned long long value)   // NOLINT
     {
         *this = (long long)value;
     }
 
     /// Construct from a string hash (convert to integer).
-    explicit Variant(const StringHash& value)
+    Variant(const StringHash& value)    // NOLINT
     {
         *this = (int)value.Value();
     }
 
     /// Construct from a bool.
-    explicit Variant(bool value)
+    Variant(bool value)                 // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a float.
-    explicit Variant(float value)
+    Variant(float value)                // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a double.
-    explicit Variant(double value)
+    Variant(double value)               // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a Vector2.
-    explicit Variant(const Vector2& value)
+    Variant(const Vector2& value)       // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a Vector3.
-    explicit Variant(const Vector3& value)
+    Variant(const Vector3& value)       // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a Vector4.
-    explicit Variant(const Vector4& value)
+    Variant(const Vector4& value)       // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a quaternion.
-    explicit Variant(const Quaternion& value)
+    Variant(const Quaternion& value)    // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a color.
-    explicit Variant(const Color& value)
+    Variant(const Color& value)         // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a string.
-    explicit Variant(const String& value)
+    Variant(const String& value)        // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a C string.
-    explicit Variant(const char* value)
+    Variant(const char* value)          // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a buffer.
-    explicit Variant(const PODVector<unsigned char>& value)
+    Variant(const PODVector<unsigned char>& value)      // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a %VectorBuffer and store as a buffer.
-    explicit Variant(const VectorBuffer& value)
+    Variant(const VectorBuffer& value)  // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a pointer.
-    explicit Variant(void* value)
+    Variant(void* value)                // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a resource reference.
-    explicit Variant(const ResourceRef& value)
+    Variant(const ResourceRef& value)   // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a resource reference list.
-    explicit Variant(const ResourceRefList& value)
+    Variant(const ResourceRefList& value)   // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a variant vector.
-    explicit Variant(const VariantVector& value)
+    Variant(const VariantVector& value) // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a variant map.
-    explicit Variant(const VariantMap& value)
+    Variant(const VariantMap& value)    // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a string vector.
-    explicit Variant(const StringVector& value)
+    Variant(const StringVector& value)  // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a rect.
-    explicit Variant(const Rect& value)
+    Variant(const Rect& value)          // NOLINT
     {
         *this = value;
     }
 
     /// Construct from an integer rect.
-    explicit Variant(const IntRect& value)
+    Variant(const IntRect& value)       // NOLINT
     {
         *this = value;
     }
 
     /// Construct from an IntVector2.
-    explicit Variant(const IntVector2& value)
+    Variant(const IntVector2& value)    // NOLINT
     {
         *this = value;
     }
 
     /// Construct from an IntVector3.
-    explicit Variant(const IntVector3& value)
+    Variant(const IntVector3& value)    // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
-    explicit Variant(RefCounted* value)
+    Variant(RefCounted* value)          // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a Matrix3.
-    explicit Variant(const Matrix3& value)
+    Variant(const Matrix3& value)       // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a Matrix3x4.
-    explicit Variant(const Matrix3x4& value)
+    Variant(const Matrix3x4& value)     // NOLINT
     {
         *this = value;
     }
 
     /// Construct from a Matrix4.
-    explicit Variant(const Matrix4& value)
+    Variant(const Matrix4& value)       // NOLINT
     {
         *this = value;
     }
 
     /// Construct from custom value.
     template <class T>
-    explicit Variant(const CustomVariantValueImpl<T>& value)
+    Variant(const CustomVariantValueImpl<T>& value)     // NOLINT
     {
         *this = value;
     }

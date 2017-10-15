@@ -61,7 +61,7 @@ public:
     }
 
     /// Construct from a C string.
-    explicit String(const char* str) :
+    String(const char* str) :   // NOLINT
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -70,7 +70,7 @@ public:
     }
 
     /// Construct from a C string.
-    explicit String(char* str) :
+    String(char* str) :         // NOLINT
         length_(0),
         capacity_(0),
         buffer_(&endZero)

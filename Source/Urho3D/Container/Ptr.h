@@ -43,7 +43,7 @@ public:
     }
 
     /// Construct a null shared pointer.
-    explicit SharedPtr(std::nullptr_t) :
+    SharedPtr(std::nullptr_t) :     // NOLINT
         ptr_(0)
     {
     }
@@ -142,7 +142,7 @@ public:
     template <class U> bool operator !=(const SharedPtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
 
     /// Convert to a raw pointer.
-    explicit operator T*() const { return ptr_; }
+    operator T*() const { return ptr_; }    // NOLINT
 
     /// Swap with another SharedPtr.
     void Swap(SharedPtr& rhs) { Urho3D::Swap(ptr_, rhs.ptr_); }
@@ -251,7 +251,7 @@ public:
     }
 
     /// Construct a null weak pointer.
-    explicit WeakPtr(std::nullptr_t) :
+    WeakPtr(std::nullptr_t) :   // NOLINT
         ptr_(0),
         refCount_(nullptr)
     {
@@ -405,7 +405,7 @@ public:
     template <class U> bool operator <(const WeakPtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer, null if the object is expired.
-    explicit operator T*() const { return Get(); }
+    operator T*() const { return Get(); }   // NOLINT
 
     /// Reset to null and release the weak reference.
     void Reset() { ReleaseRef(); }

@@ -39,7 +39,8 @@ SpriterInstance::SpriterInstance(Component* owner, SpriterData* spriteData) :
     owner_(owner),
     spriterData_(spriteData),
     entity_(nullptr),
-    animation_(nullptr)
+    animation_(nullptr),
+    spatialInfo_(0.f, 0.f, 0.f, 1.f, 1.f)
 {
 }
 

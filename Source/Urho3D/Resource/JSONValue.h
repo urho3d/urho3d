@@ -78,55 +78,55 @@ public:
     {
     }
     /// Construct with a boolean.
-    explicit JSONValue(bool value) :
+    JSONValue(bool value) :         // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a integer.
-    explicit JSONValue(int value) :
+    JSONValue(int value) :          // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a unsigned integer.
-    explicit JSONValue(unsigned value) :
+    JSONValue(unsigned value) :     // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a float.
-    explicit JSONValue(float value) :
+    JSONValue(float value) :        // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a double.
-    explicit JSONValue(double value) :
+    JSONValue(double value) :       // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a string.
-    explicit JSONValue(const String& value) :
+    JSONValue(const String& value) :    // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a C string.
-    explicit JSONValue(const char* value) :
+    JSONValue(const char* value) :      // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON array.
-    explicit JSONValue(const JSONArray& value) :
+    JSONValue(const JSONArray& value) :     // NOLINT
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON object.
-    explicit JSONValue(const JSONObject& value) :
+    JSONValue(const JSONObject& value) :    // NOLINT
         type_(0)
     {
         *this = value;

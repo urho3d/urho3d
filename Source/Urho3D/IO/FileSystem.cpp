@@ -1073,7 +1073,7 @@ String FileSystem::GetTemporaryDir() const
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     GetTempPathW(SDL_arraysize(pathName), pathName);
-    return AddTrailingSlash(pathName);
+    return AddTrailingSlash(String(pathName));
 #else
     if (char* pathName = getenv("TMPDIR"))
         return AddTrailingSlash(pathName);

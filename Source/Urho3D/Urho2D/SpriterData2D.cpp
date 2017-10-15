@@ -562,9 +562,9 @@ void SpatialInfo::Interpolate(const SpatialInfo& other, float t)
 }
 
 SpatialTimelineKey::SpatialTimelineKey(Timeline* timeline) :
-    TimelineKey(timeline)
+    TimelineKey(timeline),
+    info_(0.f, 0.f, 0.f, 1.f, 1.f)
 {
-
 }
 
 SpatialTimelineKey::~SpatialTimelineKey() = default;

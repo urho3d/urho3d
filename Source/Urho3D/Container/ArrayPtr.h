@@ -126,7 +126,7 @@ public:
     bool operator <(const SharedArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer.
-    explicit operator T*() const { return ptr_; }
+    operator T*() const { return ptr_; }    // NOLINT
 
     /// Reset to null and release the array reference.
     void Reset() { ReleaseRef(); }
@@ -340,7 +340,7 @@ public:
     bool operator <(const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer, null if array is expired.
-    explicit operator T*() const { return Get(); }
+    operator T*() const { return Get(); }       // NOLINT
 
     /// Reset to null and release the weak reference.
     void Reset() { ReleaseRef(); }

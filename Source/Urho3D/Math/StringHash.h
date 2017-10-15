@@ -47,9 +47,9 @@ public:
     }
 
     /// Construct from a C string case-insensitively.
-    explicit StringHash(const char* str);
+    StringHash(const char* str);        // NOLINT
     /// Construct from a string case-insensitively.
-    explicit StringHash(const String& str);
+    StringHash(const String& str);      // NOLINT
 
     /// Assign from another hash.
     StringHash& operator =(const StringHash& rhs) = default;

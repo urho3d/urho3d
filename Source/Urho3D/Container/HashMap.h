@@ -165,7 +165,7 @@ public:
         }
 
         /// Construct from a non-const iterator.
-        explicit ConstIterator(const Iterator& rhs) :
+        ConstIterator(const Iterator& rhs) :        // NOLINT
             HashIteratorBase(rhs.ptr_)
         {
         }
