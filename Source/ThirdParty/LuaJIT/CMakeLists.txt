@@ -385,6 +385,9 @@ if (CMAKE_CROSSCOMPILING)
     endforeach ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
+    if (ANDROID AND DEFINED ENV{TRAVIS})
+        set (TRAVIS_ANDROID_FIX -DURHO3D_DEPLOYMENT_TARGET=generic)
+    endif ()
     if (IOS OR TVOS)
         # When cross-compiling for iOS/tvOS the host environment has been altered by xcodebuild for the said platform, the following fix is required to reset the host environment before spawning another process to configure/generate project file for external project
         # Also workaround a known CMake/Xcode generator bug which prevents it from installing native tool binaries correctly
@@ -396,6 +399,7 @@ if (CMAKE_CROSSCOMPILING)
     ExternalProject_Add (buildvm
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/host
         CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${TOOL_PATH} -DBAKED_CMAKE_SOURCE_DIR=${BAKED_CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH}
+        ${TRAVIS_ANDROID_FIX}
         ${ALTERNATE_COMMAND})
 else ()
     # Otherwise, build it internally as per normal

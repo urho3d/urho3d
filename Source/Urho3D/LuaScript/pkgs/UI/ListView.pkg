@@ -15,12 +15,16 @@ class ListView : public ScrollView
 {
     ListView();
     virtual ~ListView();
-    
+
+    void UpdateInternalLayout();
+    void DisableInternalLayoutUpdate();
+    void EnableInternalLayoutUpdate();
+
     void AddItem(UIElement* item);
-    
+
     void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
     void RemoveItem(UIElement* item, unsigned index = 0);
-    
+
     void RemoveItem(unsigned index);
     void RemoveAllItems();
     void SetSelection(unsigned index);
@@ -28,7 +32,7 @@ class ListView : public ScrollView
     void AddSelection(unsigned index);
     void RemoveSelection(unsigned index);
     void ToggleSelection(unsigned index);
-    
+
     void ChangeSelection(int delta, bool additive = false);
     void ClearSelection();
     void SetHighlightMode(HighlightMode mode);

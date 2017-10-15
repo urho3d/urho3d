@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -43,15 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MEMORYIOSTREAM_H_INC
 #define AI_MEMORYIOSTREAM_H_INC
 
-#include "../include/assimp/IOStream.hpp"
-#include "../include/assimp/IOSystem.hpp"
-#include "../include/assimp/ai_assert.h"
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
+#include <assimp/IOStream.hpp>
+#include <assimp/IOSystem.hpp>
+#include <assimp/ai_assert.h>
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
 
 namespace Assimp    {
 #define AI_MEMORYIO_MAGIC_FILENAME "$$$___magic___$$$"
@@ -183,7 +179,8 @@ public:
 
     // -------------------------------------------------------------------
     /** Closes the given file and releases all resources associated with it. */
-    void Close( IOStream* /*pFile*/) {
+    void Close( IOStream* pFile) {
+    	delete pFile;
     }
 
     // -------------------------------------------------------------------
