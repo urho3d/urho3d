@@ -198,6 +198,7 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_HINGE", CONSTRAINT_HINGE);
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_SLIDER", CONSTRAINT_SLIDER);
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_CONETWIST", CONSTRAINT_CONETWIST);
+    engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_FIXED", CONSTRAINT_FIXED);
 
     RegisterComponent<Constraint>(engine, "Constraint");
     engine->RegisterObjectMethod("Constraint", "void set_constraintType(ConstraintType)", asMETHOD(Constraint, SetConstraintType), asCALL_THISCALL);
