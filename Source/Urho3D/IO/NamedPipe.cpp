@@ -79,7 +79,7 @@ unsigned NamedPipe::Seek(unsigned position)
 
 #ifdef _WIN32
 
-static const String pipePath("\\\\.\\pipe\\");
+static const char* pipePath = "\\\\.\\pipe\\";
 
 bool NamedPipe::Open(const String& pipeName, bool isServer)
 {
@@ -203,7 +203,7 @@ bool NamedPipe::IsEof() const
 
 #else
 
-static const String pipePath("/tmp/");
+static const char* pipePath = "/tmp/";
 
 #define SAFE_CLOSE(handle) if (handle != -1) { close(handle); handle = -1; }
 

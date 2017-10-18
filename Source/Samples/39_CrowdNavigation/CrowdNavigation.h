@@ -179,4 +179,6 @@ private:
     HashSet<IntVector2> addedTiles_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
+    /// Instruction text UI-element.
+    Text* instructionText_;
 };

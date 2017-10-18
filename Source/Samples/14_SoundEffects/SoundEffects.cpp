@@ -44,13 +44,13 @@
 static const StringHash VAR_SOUNDRESOURCE("SoundResource");
 static const unsigned NUM_SOUNDS = 3;
 
-static String soundNames[] = {
+static const char* soundNames[] = {
     "Fist",
     "Explosion",
     "Power-up"
 };
 
-static String soundResourceNames[] = {
+static const char* soundResourceNames[] = {
     "Sounds/PlayerFistHit.wav",
     "Sounds/BigExplosion.wav",
     "Sounds/Powerup.wav"

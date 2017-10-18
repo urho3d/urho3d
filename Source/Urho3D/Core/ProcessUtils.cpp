@@ -245,8 +245,13 @@ void PrintUnicodeLine(const String& str, bool error)
 
 void PrintLine(const String& str, bool error)
 {
+    PrintLine(str.CString(), error);
+}
+
+void PrintLine(const char* str, bool error)
+{
 #if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
-    fprintf(error ? stderr : stdout, "%s\n", str.CString());
+    fprintf(error ? stderr : stdout, "%s\n", str);
 #endif
 }
 

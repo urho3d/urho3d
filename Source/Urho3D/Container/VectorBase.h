@@ -292,7 +292,7 @@ class URHO3D_API VectorBase
 {
 public:
     /// Construct.
-    VectorBase() :
+    VectorBase() noexcept :
         size_(0),
         capacity_(0),
         buffer_(nullptr)

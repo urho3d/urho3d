@@ -32,45 +32,45 @@ class URHO3D_API Rect
 {
 public:
     /// Construct an undefined rect.
-    Rect() :
+    Rect() noexcept :
         min_(M_INFINITY, M_INFINITY),
         max_(-M_INFINITY, -M_INFINITY)
     {
     }
 
     /// Construct from minimum and maximum vectors.
-    Rect(const Vector2& min, const Vector2& max) :
+    Rect(const Vector2& min, const Vector2& max) noexcept :
         min_(min),
         max_(max)
     {
     }
 
     /// Construct from coordinates.
-    Rect(float left, float top, float right, float bottom) :
+    Rect(float left, float top, float right, float bottom) noexcept :
         min_(left, top),
         max_(right, bottom)
     {
     }
 
     /// Construct from a Vector4.
-    explicit Rect(const Vector4& vector) :
+    explicit Rect(const Vector4& vector) noexcept :
         min_(vector.x_, vector.y_),
         max_(vector.z_, vector.w_)
     {
     }
 
     /// Construct from a float array.
-    explicit Rect(const float* data) :
+    explicit Rect(const float* data) noexcept :
         min_(data[0], data[1]),
         max_(data[2], data[3])
     {
     }
 
     /// Copy-construct from another rect.
-    Rect(const Rect& rect) = default;
+    Rect(const Rect& rect) noexcept = default;
 
     /// Assign from another rect.
-    Rect& operator =(const Rect& rhs) = default;
+    Rect& operator =(const Rect& rhs) noexcept = default;
 
     /// Test for equality with another rect.
     bool operator ==(const Rect& rhs) const { return min_ == rhs.min_ && max_ == rhs.max_; }
@@ -273,7 +273,7 @@ class URHO3D_API IntRect
 {
 public:
     /// Construct a zero rect.
-    IntRect() :
+    IntRect() noexcept :
         left_(0),
         top_(0),
         right_(0),
@@ -282,7 +282,7 @@ public:
     }
 
     /// Construct from minimum and maximum vectors.
-    IntRect(const IntVector2& min, const IntVector2& max) :
+    IntRect(const IntVector2& min, const IntVector2& max) noexcept :
         left_(min.x_),
         top_(min.y_),
         right_(max.x_),
@@ -291,7 +291,7 @@ public:
     }
 
     /// Construct from coordinates.
-    IntRect(int left, int top, int right, int bottom) :
+    IntRect(int left, int top, int right, int bottom) noexcept :
         left_(left),
         top_(top),
         right_(right),
@@ -300,7 +300,7 @@ public:
     }
 
     /// Construct from an int array.
-    explicit IntRect(const int* data) :
+    explicit IntRect(const int* data) noexcept :
         left_(data[0]),
         top_(data[1]),
         right_(data[2]),

@@ -155,8 +155,6 @@ StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
     return type;
 }
 
-static TechniqueEntry noEntry;
-
 bool CompareTechniqueEntries(const TechniqueEntry& lhs, const TechniqueEntry& rhs)
 {
     if (lhs.lodDistance_ != rhs.lodDistance_)
@@ -165,21 +163,19 @@ bool CompareTechniqueEntries(const TechniqueEntry& lhs, const TechniqueEntry& rh
         return lhs.qualityLevel_ > rhs.qualityLevel_;
 }
 
-TechniqueEntry::TechniqueEntry() :
+TechniqueEntry::TechniqueEntry() noexcept :
     qualityLevel_(0),
     lodDistance_(0.0f)
 {
 }
 
-TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) :
+TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) noexcept :
     technique_(tech),
     original_(tech),
     qualityLevel_(qualityLevel),
     lodDistance_(lodDistance)
 {
 }
-
-TechniqueEntry::~TechniqueEntry() = default;
 
 ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* target, const String& name, ValueAnimation* attributeAnimation,
     WrapMode wrapMode, float speed) :
@@ -1190,6 +1186,8 @@ void Material::MarkForAuxView(unsigned frameNumber)
 
 const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 {
+    static TechniqueEntry noEntry;
+
     return index < techniques_.Size() ? techniques_[index] : noEntry;
 }
 

@@ -56,11 +56,11 @@ struct MaterialShaderParameter
 struct TechniqueEntry
 {
     /// Construct with defaults.
-    TechniqueEntry();
+    TechniqueEntry() noexcept;
     /// Construct with parameters.
-    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance);
+    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) noexcept;
     /// Destruct.
-    ~TechniqueEntry();
+    ~TechniqueEntry() noexcept = default;
 
     /// Technique.
     SharedPtr<Technique> technique_;

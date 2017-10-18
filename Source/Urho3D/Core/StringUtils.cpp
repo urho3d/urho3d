@@ -31,11 +31,6 @@
 namespace Urho3D
 {
 
-static const String base64_chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz"
-        "0123456789+/";
-
 unsigned CountElements(const char* buffer, char separator)
 {
     if (!buffer)
@@ -794,6 +789,11 @@ static inline bool IsBase64(char c) {
 
 PODVector<unsigned char> DecodeBase64(String encodedString)
 {
+    static const String base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
+
     int inLen = encodedString.Length();
     int i = 0;
     int j = 0;

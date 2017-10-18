@@ -32,27 +32,27 @@ class URHO3D_API StringHash
 {
 public:
     /// Construct with zero value.
-    StringHash() :
+    StringHash() noexcept :
         value_(0)
     {
     }
 
     /// Copy-construct from another hash.
-    StringHash(const StringHash& rhs) = default;
+    StringHash(const StringHash& rhs) noexcept = default;
 
     /// Construct with an initial value.
-    explicit StringHash(unsigned value) :
+    explicit StringHash(unsigned value) noexcept :
         value_(value)
     {
     }
 
     /// Construct from a C string case-insensitively.
-    StringHash(const char* str);        // NOLINT
+    StringHash(const char* str) noexcept;        // NOLINT
     /// Construct from a string case-insensitively.
-    StringHash(const String& str);      // NOLINT
+    StringHash(const String& str) noexcept;      // NOLINT
 
     /// Assign from another hash.
-    StringHash& operator =(const StringHash& rhs) = default;
+    StringHash& operator =(const StringHash& rhs) noexcept = default;
 
     /// Add a hash.
     StringHash operator +(const StringHash& rhs) const

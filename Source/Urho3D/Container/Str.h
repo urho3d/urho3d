@@ -44,7 +44,7 @@ public:
     using ConstIterator = RandomAccessConstIterator<char>;
 
     /// Construct empty.
-    String() :
+    String() noexcept :
         length_(0),
         capacity_(0),
         buffer_(&endZero)

@@ -4,6 +4,7 @@ void ErrorDialog(const String title, const String message);
 void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE);
 void OpenConsoleWindow();
 void PrintLine(const String str, bool error = false);
+void PrintLine(const char* str, bool error = false);
 
 const Vector<String>& GetArguments();
 
@@ -16,7 +17,7 @@ unsigned GetNumLogicalCPUs();
 void SetMiniDumpDir(const String pathName);
 String GetMiniDumpDir();
 
-unsigned long long GetTotalMemory(); 
-String GetLoginName(); 
+unsigned long long GetTotalMemory();
+String GetLoginName();
 String GetHostName();
-String GetOSVersion(); 
+String GetOSVersion();

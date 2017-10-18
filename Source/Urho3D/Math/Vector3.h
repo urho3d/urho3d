@@ -33,7 +33,7 @@ class URHO3D_API IntVector3
 {
 public:
     /// Construct a zero vector.
-    IntVector3() :
+    IntVector3() noexcept :
         x_(0),
         y_(0),
         z_(0)
@@ -41,7 +41,7 @@ public:
     }
 
     /// Construct from coordinates.
-    IntVector3(int x, int y, int z) :
+    IntVector3(int x, int y, int z) noexcept :
         x_(x),
         y_(y),
         z_(z)
@@ -49,7 +49,7 @@ public:
     }
 
     /// Construct from an int array.
-    explicit IntVector3(const int* data) :
+    explicit IntVector3(const int* data) noexcept :
         x_(data[0]),
         y_(data[1]),
         z_(data[2])
@@ -57,10 +57,10 @@ public:
     }
 
     /// Copy-construct from another vector.
-    IntVector3(const IntVector3& rhs) = default;
+    IntVector3(const IntVector3& rhs) noexcept = default;
 
     /// Assign from another vector.
-    IntVector3& operator =(const IntVector3& rhs) = default;
+    IntVector3& operator =(const IntVector3& rhs) noexcept = default;
 
     /// Test for equality with another vector.
     bool operator ==(const IntVector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
@@ -185,7 +185,7 @@ class URHO3D_API Vector3
 {
 public:
     /// Construct a zero vector.
-    Vector3() :
+    Vector3() noexcept :
         x_(0.0f),
         y_(0.0f),
         z_(0.0f)
@@ -193,10 +193,10 @@ public:
     }
 
     /// Copy-construct from another vector.
-    Vector3(const Vector3& vector) = default;
+    Vector3(const Vector3& vector) noexcept = default;
 
     /// Construct from a two-dimensional vector and the Z coordinate.
-    Vector3(const Vector2& vector, float z) :
+    Vector3(const Vector2& vector, float z) noexcept :
         x_(vector.x_),
         y_(vector.y_),
         z_(z)
@@ -204,7 +204,7 @@ public:
     }
 
     /// Construct from a two-dimensional vector (for Urho2D).
-    explicit Vector3(const Vector2& vector) :
+    explicit Vector3(const Vector2& vector) noexcept :
         x_(vector.x_),
         y_(vector.y_),
         z_(0.0f)
@@ -212,7 +212,7 @@ public:
     }
 
     /// Construct from an IntVector3.
-    explicit Vector3(const IntVector3& vector) :
+    explicit Vector3(const IntVector3& vector) noexcept :
         x_((float)vector.x_),
         y_((float)vector.y_),
         z_((float)vector.z_)
@@ -220,7 +220,7 @@ public:
     }
 
     /// Construct from coordinates.
-    Vector3(float x, float y, float z) :
+    Vector3(float x, float y, float z) noexcept :
         x_(x),
         y_(y),
         z_(z)
@@ -228,7 +228,7 @@ public:
     }
 
     /// Construct from two-dimensional coordinates (for Urho2D).
-    Vector3(float x, float y) :
+    Vector3(float x, float y) noexcept :
         x_(x),
         y_(y),
         z_(0.0f)
@@ -236,7 +236,7 @@ public:
     }
 
     /// Construct from a float array.
-    explicit Vector3(const float* data) :
+    explicit Vector3(const float* data) noexcept :
         x_(data[0]),
         y_(data[1]),
         z_(data[2])
@@ -244,7 +244,7 @@ public:
     }
 
     /// Assign from another vector.
-    Vector3& operator =(const Vector3& rhs) = default;
+    Vector3& operator =(const Vector3& rhs) noexcept = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }

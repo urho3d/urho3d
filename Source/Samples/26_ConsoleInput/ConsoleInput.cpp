@@ -38,7 +38,7 @@
 URHO3D_DEFINE_APPLICATION_MAIN(ConsoleInput)
 
 // Hunger level descriptions
-String hungerLevels[] = {
+const char* hungerLevels[] = {
     "bursting",
     "well-fed",
     "fed",
@@ -48,7 +48,7 @@ String hungerLevels[] = {
 };
 
 // Urho threat level descriptions
-String urhoThreatLevels[] = {
+const char* urhoThreatLevels[] = {
     "Suddenly Urho appears from a dark corner of the fish tank",
     "Urho seems to have his eyes set on you",
     "Urho is homing in on you mercilessly"
@@ -169,7 +169,7 @@ void ConsoleInput::Advance()
         ++urhoThreat_;
 
     if (urhoThreat_ > 0)
-        Print(urhoThreatLevels[urhoThreat_ - 1] + ".");
+        Print(String(urhoThreatLevels[urhoThreat_ - 1]) + ".");
 
     if ((numTurns_ & 3) == 0 && !eatenLastTurn_)
     {
@@ -180,7 +180,7 @@ void ConsoleInput::Advance()
             return;
         }
         else
-            Print("You are " + hungerLevels[hunger_] + ".");
+            Print("You are " + String(hungerLevels[hunger_]) + ".");
     }
 
     eatenLastTurn_ = false;
@@ -231,7 +231,7 @@ void ConsoleInput::HandleInput(const String& input)
                     return;
                 }
                 else
-                    Print("You are now " + hungerLevels[hunger_] + ".");
+                    Print("You are now " + String(hungerLevels[hunger_]) + ".");
             }
             else
                 Print("There is no food available.");

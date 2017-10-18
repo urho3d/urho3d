@@ -49,14 +49,13 @@
 
 #include <Urho3D/DebugNew.h>
 
-static const String INSTRUCTION("instructionText");
-
 URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
     Sample(context),
     streamingDistance_(2),
-    drawDebug_(false)
+    drawDebug_(false),
+    instructionText_(nullptr)
 {
 }
 
@@ -210,8 +209,8 @@ void CrowdNavigation::CreateUI()
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
     // Construct new Text object, set string to display and font to use
-    auto* instructionText = ui->GetRoot()->CreateChild<Text>(INSTRUCTION);
-    instructionText->SetText(
+    instructionText_ = ui->GetRoot()->CreateChild<Text>();
+    instructionText_->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "MMB or O key to add obstacles or remove obstacles/agents\n"
@@ -220,14 +219,14 @@ void CrowdNavigation::CreateUI()
         "Space to toggle debug geometry\n"
         "F12 to toggle this instruction text"
     );
-    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    instructionText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
-    instructionText->SetTextAlignment(HA_CENTER);
+    instructionText_->SetTextAlignment(HA_CENTER);
 
     // Position the text relative to the screen center
-    instructionText->SetHorizontalAlignment(HA_CENTER);
-    instructionText->SetVerticalAlignment(VA_CENTER);
-    instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+    instructionText_->SetHorizontalAlignment(HA_CENTER);
+    instructionText_->SetVerticalAlignment(VA_CENTER);
+    instructionText_->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
 void CrowdNavigation::SetupViewport()
@@ -472,8 +471,8 @@ void CrowdNavigation::MoveCamera(float timeStep)
     // Toggle instruction text with F12
     else if (input->GetKeyPress(KEY_F12))
     {
-        UIElement* instruction = ui->GetRoot()->GetChild(INSTRUCTION);
-        instruction->SetVisible(!instruction->IsVisible());
+        if (instructionText_)
+            instructionText_->SetVisible(!instructionText_->IsVisible());
     }
 }
 

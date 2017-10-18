@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/ProcessUtils.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
 
@@ -530,10 +531,18 @@ void Object::RemoveEventSender(Object* sender)
 }
 
 
-Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
+Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName) noexcept
 {
     StringHash id(eventName);
-    GetEventNameMap()[id] = eventName;
+    try
+    {
+        GetEventNameMap()[id] = eventName;
+    }
+    catch (std::bad_alloc&)
+    {
+        PrintLine("An out-of-memory error occurred. The application will now terminate.", true);
+        std::terminate();
+    }
     return id;
 }
 

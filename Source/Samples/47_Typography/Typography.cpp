@@ -42,7 +42,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(Typography)
 namespace
 {
     // Tag used to find all Text elements
-    const String TEXT_TAG("Typography_text_tag");
+    const char* TEXT_TAG = "Typography_text_tag";
 }
 
 Typography::Typography(Context* context) :

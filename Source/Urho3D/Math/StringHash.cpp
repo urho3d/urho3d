@@ -34,12 +34,12 @@ namespace Urho3D
 
 const StringHash StringHash::ZERO;
 
-StringHash::StringHash(const char* str) :
+StringHash::StringHash(const char* str) noexcept :
     value_(Calculate(str))
 {
 }
 
-StringHash::StringHash(const String& str) :
+StringHash::StringHash(const String& str) noexcept :
     value_(Calculate(str.CString()))
 {
 }

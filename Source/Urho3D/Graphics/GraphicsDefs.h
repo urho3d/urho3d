@@ -180,7 +180,7 @@ enum VertexElementSemantic
 struct URHO3D_API VertexElement
 {
     /// Default-construct.
-    VertexElement() :
+    VertexElement() noexcept :
         type_(TYPE_VECTOR3),
         semantic_(SEM_POSITION),
         index_(0),
@@ -190,7 +190,7 @@ struct URHO3D_API VertexElement
     }
 
     /// Construct with type, semantic, index and whether is per-instance data.
-    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) :
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) noexcept :
         type_(type),
         semantic_(semantic),
         index_(index),

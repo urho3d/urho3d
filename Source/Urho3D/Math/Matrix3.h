@@ -32,7 +32,7 @@ class URHO3D_API Matrix3
 {
 public:
     /// Construct an identity matrix.
-    Matrix3() :
+    Matrix3() noexcept :
         m00_(1.0f),
         m01_(0.0f),
         m02_(0.0f),
@@ -46,12 +46,12 @@ public:
     }
 
     /// Copy-construct from another matrix.
-    Matrix3(const Matrix3& matrix) = default;
+    Matrix3(const Matrix3& matrix) noexcept = default;
 
     /// Construct from values.
     Matrix3(float v00, float v01, float v02,
             float v10, float v11, float v12,
-            float v20, float v21, float v22) :
+            float v20, float v21, float v22) noexcept :
         m00_(v00),
         m01_(v01),
         m02_(v02),
@@ -65,7 +65,7 @@ public:
     }
 
     /// Construct from a float array.
-    explicit Matrix3(const float* data) :
+    explicit Matrix3(const float* data) noexcept :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),
@@ -79,7 +79,7 @@ public:
     }
 
     /// Assign from another matrix.
-    Matrix3& operator =(const Matrix3& rhs) = default;
+    Matrix3& operator =(const Matrix3& rhs) noexcept = default;
 
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix3& rhs) const

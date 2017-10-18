@@ -32,34 +32,34 @@ class URHO3D_API Plane
 {
 public:
     /// Construct a degenerate plane with zero normal and parameter.
-    Plane() :
+    Plane() noexcept :
         d_(0.0f)
     {
     }
 
     /// Copy-construct from another plane.
-    Plane(const Plane& plane) = default;
+    Plane(const Plane& plane) noexcept = default;
 
     /// Construct from 3 vertices.
-    Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+    Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2) noexcept
     {
         Define(v0, v1, v2);
     }
 
     /// Construct from a normal vector and a point on the plane.
-    Plane(const Vector3& normal, const Vector3& point)
+    Plane(const Vector3& normal, const Vector3& point) noexcept
     {
         Define(normal, point);
     }
 
     /// Construct from a 4-dimensional vector, where the w coordinate is the plane parameter.
-    explicit Plane(const Vector4& plane)
+    explicit Plane(const Vector4& plane) noexcept
     {
         Define(plane);
     }
 
     /// Assign from another plane.
-    Plane& operator =(const Plane& rhs) = default;
+    Plane& operator =(const Plane& rhs) noexcept = default;
 
     /// Define from 3 vertices.
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)

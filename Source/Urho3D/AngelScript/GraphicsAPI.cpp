@@ -614,10 +614,10 @@ static CScriptArray* MaterialGetShaderParameterNames(Material* material)
     return VectorToArray<String>(result, "Array<String>");
 }
 
-static TechniqueEntry noTechniqueEntry;
-
 static const TechniqueEntry& MaterialGetTechniqueEntry(unsigned index, Material* ptr)
 {
+    static TechniqueEntry noTechniqueEntry;
+
     if (index >= ptr->GetNumTechniques())
     {
         asGetActiveContext()->SetException("Index out of bounds");

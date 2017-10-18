@@ -37,40 +37,40 @@ template <class T> class SharedPtr
 {
 public:
     /// Construct a null shared pointer.
-    SharedPtr() :
+    SharedPtr() noexcept :
         ptr_(0)
     {
     }
 
     /// Construct a null shared pointer.
-    SharedPtr(std::nullptr_t) :     // NOLINT
+    SharedPtr(std::nullptr_t) noexcept :     // NOLINT
         ptr_(0)
     {
     }
 
     /// Copy-construct from another shared pointer.
-    SharedPtr(const SharedPtr<T>& rhs) :
+    SharedPtr(const SharedPtr<T>& rhs) noexcept :
         ptr_(rhs.ptr_)
     {
         AddRef();
     }
 
     /// Copy-construct from another shared pointer allowing implicit upcasting.
-    template <class U> explicit SharedPtr(const SharedPtr<U>& rhs) :
+    template <class U> explicit SharedPtr(const SharedPtr<U>& rhs) noexcept :
         ptr_(rhs.ptr_)
     {
         AddRef();
     }
 
     /// Construct from a raw pointer.
-    explicit SharedPtr(T* ptr) :
+    explicit SharedPtr(T* ptr) noexcept :
         ptr_(ptr)
     {
         AddRef();
     }
 
     /// Destruct. Release the object reference.
-    ~SharedPtr()
+    ~SharedPtr() noexcept
     {
         ReleaseRef();
     }
@@ -244,21 +244,21 @@ template <class T> class WeakPtr
 {
 public:
     /// Construct a null weak pointer.
-    WeakPtr() :
+    WeakPtr() noexcept :
         ptr_(0),
         refCount_(nullptr)
     {
     }
 
     /// Construct a null weak pointer.
-    WeakPtr(std::nullptr_t) :   // NOLINT
+    WeakPtr(std::nullptr_t) noexcept :   // NOLINT
         ptr_(0),
         refCount_(nullptr)
     {
     }
 
     /// Copy-construct from another weak pointer.
-    WeakPtr(const WeakPtr<T>& rhs) :
+    WeakPtr(const WeakPtr<T>& rhs) noexcept :
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
     {
@@ -266,7 +266,7 @@ public:
     }
 
     /// Copy-construct from another weak pointer allowing implicit upcasting.
-    template <class U> explicit WeakPtr(const WeakPtr<U>& rhs) :
+    template <class U> explicit WeakPtr(const WeakPtr<U>& rhs) noexcept :
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
     {
@@ -274,7 +274,7 @@ public:
     }
 
     /// Construct from a shared pointer.
-    explicit WeakPtr(const SharedPtr<T>& rhs) :
+    explicit WeakPtr(const SharedPtr<T>& rhs) noexcept :
         ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
     {
@@ -282,7 +282,7 @@ public:
     }
 
     /// Construct from a raw pointer.
-    explicit WeakPtr(T* ptr) :
+    explicit WeakPtr(T* ptr) noexcept :
         ptr_(ptr),
         refCount_(ptr ? ptr->RefCountPtr() : 0)
     {
@@ -290,7 +290,7 @@ public:
     }
 
     /// Destruct. Release the weak reference to the object.
-    ~WeakPtr()
+    ~WeakPtr() noexcept
     {
         ReleaseRef();
     }

@@ -57,18 +57,6 @@ const char* faceCameraModeNames[] =
     nullptr
 };
 
-static const StringVector billboardsStructureElementNames =
-{
-    "Billboard Count",
-    "   Position",
-    "   Size",
-    "   UV Coordinates",
-    "   Color",
-    "   Rotation",
-    "   Direction",
-    "   Is Enabled"
-};
-
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 {
     return lhs->sortDistance_ > rhs->sortDistance_;
@@ -109,6 +97,18 @@ BillboardSet::~BillboardSet() = default;
 
 void BillboardSet::RegisterObject(Context* context)
 {
+    static const StringVector billboardsStructureElementNames =
+        {
+            "Billboard Count",
+            "   Position",
+            "   Size",
+            "   UV Coordinates",
+            "   Color",
+            "   Rotation",
+            "   Direction",
+            "   Is Enabled"
+        };
+
     context->RegisterFactory<BillboardSet>(GEOMETRY_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
