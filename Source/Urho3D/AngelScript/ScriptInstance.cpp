@@ -388,7 +388,7 @@ bool ScriptInstance::IsA(const String& className) const
     if (scriptObject_)
     {
         asITypeInfo* myType = scriptObject_->GetObjectType();
-        asITypeInfo* searchType = myType->GetModule()->GetTypeInfoByName(className.CString);
+        asITypeInfo* searchType = myType->GetModule()->GetTypeInfoByName(className.CString());
         return searchType && (searchType->GetTypeId() & asTYPEID_MASK_OBJECT) != 0 &&
             (myType->DerivesFrom(searchType) || myType->Implements(searchType));
     }
