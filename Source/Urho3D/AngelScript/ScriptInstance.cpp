@@ -387,10 +387,10 @@ bool ScriptInstance::IsA(const String& className) const
         return true;
     if (scriptObject_)
     {
-		asITypeInfo* myType = scriptObject_->GetObjectType();
-		asITypeInfo* searchType = myType->GetModule()->GetTypeInfoByName(&className.At(0));
-		return searchType && (searchType->GetTypeId() & asTYPEID_MASK_OBJECT) != 0 &&
-			(myType->DerivesFrom(searchType) || myType->Implements(searchType));
+        asITypeInfo* myType = scriptObject_->GetObjectType();
+        asITypeInfo* searchType = myType->GetModule()->GetTypeInfoByName(className.CString);
+        return searchType && (searchType->GetTypeId() & asTYPEID_MASK_OBJECT) != 0 &&
+            (myType->DerivesFrom(searchType) || myType->Implements(searchType));
     }
     return false;
 }
