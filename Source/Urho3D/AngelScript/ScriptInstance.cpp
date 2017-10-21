@@ -387,14 +387,10 @@ bool ScriptInstance::IsA(const String& className) const
         return true;
     if (scriptObject_)
     {
-        // Start immediately at the first base class because we already checked the early out
-        asITypeInfo* currentType = scriptObject_->GetObjectType()->GetBaseType();
-        while (currentType)
-        {
-            if (className == currentType->GetName())
-                return true;
-            currentType = currentType->GetBaseType();
-        }
+        asITypeInfo* myType = scriptObject_->GetObjectType();
+        asITypeInfo* searchType = myType->GetModule()->GetTypeInfoByName(className.CString());
+        return searchType && (searchType->GetTypeId() & asTYPEID_MASK_OBJECT) != 0 &&
+            (myType->DerivesFrom(searchType) || myType->Implements(searchType));
     }
     return false;
 }
