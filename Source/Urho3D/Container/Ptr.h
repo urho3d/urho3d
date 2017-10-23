@@ -80,9 +80,8 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
 
-        ReleaseRef();
-        ptr_ = rhs.ptr_;
-        AddRef();
+        SharedPtr<T> copy(rhs);
+        Swap(copy);
 
         return *this;
     }
@@ -93,9 +92,8 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
 
-        ReleaseRef();
-        ptr_ = rhs.ptr_;
-        AddRef();
+        SharedPtr<T> copy(rhs);
+        Swap(copy);
 
         return *this;
     }
@@ -106,9 +104,8 @@ public:
         if (ptr_ == ptr)
             return *this;
 
-        ReleaseRef();
-        ptr_ = ptr;
-        AddRef();
+        SharedPtr<T> copy(ptr);
+        Swap(copy);
 
         return *this;
     }
@@ -146,6 +143,9 @@ public:
     /// Convert to a raw pointer.
     operator T*() const { return ptr_; }
 
+    /// Swap with another SharedPtr.
+    void Swap(SharedPtr& rhs) { Urho3D::Swap(ptr_, rhs.ptr_); }
+
     /// Reset to null and release the object reference.
     void Reset() { ReleaseRef(); }
 
@@ -166,17 +166,15 @@ public:
     /// Perform a static cast from a shared pointer of another type.
     template <class U> void StaticCast(const SharedPtr<U>& rhs)
     {
-        ReleaseRef();
-        ptr_ = static_cast<T*>(rhs.Get());
-        AddRef();
+        SharedPtr<T> copy(static_cast<T*>(rhs.Get()));
+        Swap(copy);
     }
 
     /// Perform a dynamic cast from a shared pointer of another type.
     template <class U> void DynamicCast(const SharedPtr<U>& rhs)
     {
-        ReleaseRef();
-        ptr_ = dynamic_cast<T*>(rhs.Get());
-        AddRef();
+        SharedPtr<T> copy(dynamic_cast<T*>(rhs.Get()));
+        Swap(copy);
     }
 
     /// Check if the pointer is null.
@@ -586,7 +584,7 @@ public:
     operator bool() const { return !!ptr_; }
 
     /// Swap with another UniquePtr.
-    void Swap(UniquePtr& up) { Swap(ptr_, up.ptr_); }
+    void Swap(UniquePtr& up) { Urho3D::Swap(ptr_, up.ptr_); }
 
     /// Detach pointer from UniquePtr without destroying.
     T* Detach()

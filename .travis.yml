@@ -547,14 +547,15 @@ env:
     - MAKEFILE=1 URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
     - MAKEFILE=1 URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
 stage: release build configuration
-before_script: &before_script
+before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
   - brew update
   - which cmake >/dev/null 2>&1 || cmake=cmake
-  - travis_retry brew install ccache $cmake
+  - travis_retry brew install ccache doxygen graphviz $cmake
   - if [[ ! $cmake ]]; then brew outdated cmake || brew upgrade cmake; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) >/dev/null && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd >/dev/null && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(cache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
@@ -568,15 +569,6 @@ matrix:
       stage: package
       condition: PACKAGE_UPLOAD
       env: *tvOS
-      before_script:
-        - *before_script
-        - export PACKAGE_UPLOAD=1
-        # Uncomment/readjust below when the packaging build is running out of disk space again
-        # whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline'
-        # for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done
-        # for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
-        - travis_retry brew cleanup
-        - travis_retry brew install doxygen graphviz
     - <<: *package-stage
       env: *iOS
     - <<: *package-stage
