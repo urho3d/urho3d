@@ -125,13 +125,21 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     {
         CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
-            arr = VectorToArray(src.GetVariantVector(), "Array<Variant>");
+        {
+            CScriptArray* copy = VectorToArray(src.GetVariantVector(), "Array<Variant>");
+            arr->Swap(*copy);
+            copy->Release();
+        }
     }
     else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
     {
         CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
-            arr = VectorToArray(src.GetStringVector(), "Array<String>");
+        {
+            CScriptArray* copy = VectorToArray(src.GetStringVector(), "Array<String>");
+            arr->Swap(*copy);
+            copy->Release();
+        }
     }
     else
         Serializable::OnSetAttribute(attr, src);
