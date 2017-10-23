@@ -675,9 +675,9 @@ void ScriptInstance::GetScriptAttributes()
                 break;
 
             default:
-                if (0 == typeName.Compare("Variant[]"))
+                if (typeName == "Variant[]")
                     typeName = "VariantVector";
-                else if (0 == typeName.Compare("String[]"))
+                else if (typeName == "String[]")
                     typeName = "StringVector";
                 info.type_ = Variant::GetTypeFromName(typeName);
                 break;
