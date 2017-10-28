@@ -1112,6 +1112,16 @@ int CScriptArray::FindByRef(asUINT startAt, void *ref) const
     return -1;
 }
 
+bool CScriptArray::Swap(CScriptArray& other)
+{
+    if (other.GetArrayObjectType() == GetArrayObjectType())
+    {
+        Urho3D::Swap(buffer, other.buffer);
+        return true;
+    }
+    return false;
+}
+
 int CScriptArray::Find(void *value) const
 {
     return Find(0, value);
@@ -1647,6 +1657,7 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "int Find(uint, const T&in) const", asMETHODPR(CScriptArray, Find, (asUINT, void*) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "int FindByRef(const T&in) const", asMETHODPR(CScriptArray, FindByRef, (void*) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "int FindByRef(uint, const T&in) const", asMETHODPR(CScriptArray, FindByRef, (asUINT, void*) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "bool Swap(Array<T>&in)", asMETHOD(CScriptArray, Swap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "bool opEquals(const Array<T>&in) const", asMETHOD(CScriptArray, operator==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "uint get_length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void set_length(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);

@@ -25,6 +25,8 @@
 #include "../AngelScript/Script.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../AngelScript/ScriptInstance.h"
+#include "../AngelScript/Addons.h"
+#include "../AngelScript/APITemplates.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
@@ -119,6 +121,30 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         if (resourcePtr)
             resourcePtr->AddRef();
     }
+    else if (attr.type_ == VAR_VARIANTVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+        {
+            Vector<Variant> vector = src.GetVariantVector();
+            unsigned size = vector.Size();
+            arr->Resize(size);
+            for (unsigned i = 0; i < size; i++)
+                *(static_cast<Variant*>(arr->At(i))) = vector[i];
+        }
+    }
+    else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+        {
+            Vector<String> vector = src.GetStringVector();
+            unsigned size = vector.Size();
+            arr->Resize(size);
+            for (unsigned i = 0; i < size; i++)
+                *(static_cast<String*>(arr->At(i))) = vector[i];
+        }
+    }
     else
         Serializable::OnSetAttribute(attr, src);
 }
@@ -154,7 +180,18 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
         // If resource is non-null get its type and name hash. Otherwise get type from the default value
         dest = GetResourceRef(resource, attr.defaultValue_.GetResourceRef().type_);
     }
-    else
+    else if (attr.type_ == VAR_VARIANTVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+            dest = ArrayToVector<Variant>(arr);
+    }
+    else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+            dest = ArrayToVector<String>(arr);
+    } else
         Serializable::OnGetAttribute(attr, dest);
 }
 
@@ -642,6 +679,10 @@ void ScriptInstance::GetScriptAttributes()
                 break;
 
             default:
+                if (typeName == "Variant[]")
+                    typeName = "VariantVector";
+                else if (typeName == "String[]")
+                    typeName = "StringVector";
                 info.type_ = Variant::GetTypeFromName(typeName);
                 break;
             }
