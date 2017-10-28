@@ -3409,6 +3409,7 @@ Methods:
 - void Sort(uint, uint)
 - void SortReverse()
 - void SortReverse(uint, uint)
+- bool Swap(T[]&)
 
 Properties:
 
