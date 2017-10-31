@@ -34,8 +34,6 @@
 namespace Urho3D
 {
 
-Polyhedron::~Polyhedron() = default;
-
 void Polyhedron::Define(const BoundingBox& box)
 {
     Vector3 vertices[8];

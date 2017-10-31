@@ -38,19 +38,19 @@ class URHO3D_API Ray
 {
 public:
     /// Construct a degenerate ray with zero origin and direction.
-    Ray() = default;
+    Ray() noexcept = default;
 
     /// Construct from origin and direction. The direction will be normalized.
-    Ray(const Vector3& origin, const Vector3& direction)
+    Ray(const Vector3& origin, const Vector3& direction) noexcept
     {
         Define(origin, direction);
     }
 
     /// Copy-construct from another ray.
-    Ray(const Ray& ray) = default;
+    Ray(const Ray& ray) noexcept = default;
 
     /// Assign from another ray.
-    Ray& operator =(const Ray& rhs) = default;
+    Ray& operator =(const Ray& rhs) noexcept = default;
 
     /// Check for equality with another ray.
     bool operator ==(const Ray& rhs) const { return origin_ == rhs.origin_ && direction_ == rhs.direction_; }

@@ -38,7 +38,9 @@ class URHO3D_API Polyhedron
 {
 public:
     /// Construct empty.
-    Polyhedron() = default;
+    Polyhedron() noexcept = default;
+    /// Destruct.
+    ~Polyhedron() noexcept = default;
 
     /// Copy-construct from another polyhedron.
     Polyhedron(const Polyhedron& polyhedron) :
@@ -63,9 +65,6 @@ public:
     {
         Define(frustum);
     }
-
-    /// Destruct.
-    ~Polyhedron();
 
     /// Assign from another polyhedron.
     Polyhedron& operator =(const Polyhedron& rhs)

@@ -36,48 +36,48 @@ class URHO3D_API Sphere
 {
 public:
     /// Construct undefined.
-    Sphere() :
+    Sphere() noexcept :
         center_(Vector3::ZERO),
         radius_(-M_INFINITY)
     {
     }
 
     /// Copy-construct from another sphere.
-    Sphere(const Sphere& sphere) = default;
+    Sphere(const Sphere& sphere) noexcept = default;
 
     /// Construct from center and radius.
-    Sphere(const Vector3& center, float radius) :
+    Sphere(const Vector3& center, float radius) noexcept :
         center_(center),
         radius_(radius)
     {
     }
 
     /// Construct from an array of vertices.
-    Sphere(const Vector3* vertices, unsigned count)
+    Sphere(const Vector3* vertices, unsigned count) noexcept
     {
         Define(vertices, count);
     }
 
     /// Construct from a bounding box.
-    explicit Sphere(const BoundingBox& box)
+    explicit Sphere(const BoundingBox& box) noexcept
     {
         Define(box);
     }
 
     /// Construct from a frustum.
-    explicit Sphere(const Frustum& frustum)
+    explicit Sphere(const Frustum& frustum) noexcept
     {
         Define(frustum);
     }
 
     /// Construct from a polyhedron.
-    explicit Sphere(const Polyhedron& poly)
+    explicit Sphere(const Polyhedron& poly) noexcept
     {
         Define(poly);
     }
 
     /// Assign from another sphere.
-    Sphere& operator =(const Sphere& rhs) = default;
+    Sphere& operator =(const Sphere& rhs) noexcept = default;
 
     /// Test for equality with another sphere.
     bool operator ==(const Sphere& rhs) const { return center_ == rhs.center_ && radius_ == rhs.radius_; }

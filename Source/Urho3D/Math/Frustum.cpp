@@ -57,14 +57,12 @@ void ProjectAndMergeEdge(Vector3 v0, Vector3 v1, Rect& rect, const Matrix4& proj
     rect.Merge(Vector2(tV1.x_, tV1.y_));
 }
 
-Frustum::Frustum() = default;
-
-Frustum::Frustum(const Frustum& frustum)
+Frustum::Frustum(const Frustum& frustum) noexcept
 {
     *this = frustum;
 }
 
-Frustum& Frustum::operator =(const Frustum& rhs)
+Frustum& Frustum::operator =(const Frustum& rhs) noexcept
 {
     for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         planes_[i] = rhs.planes_[i];

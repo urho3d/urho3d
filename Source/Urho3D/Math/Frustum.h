@@ -50,12 +50,13 @@ class URHO3D_API Frustum
 {
 public:
     /// Construct a degenerate frustum with all points at origin.
-    Frustum();
+    Frustum() noexcept = default;
+
     /// Copy-construct from another frustum.
-    Frustum(const Frustum& frustum);
+    Frustum(const Frustum& frustum) noexcept;
 
     /// Assign from another frustum.
-    Frustum& operator =(const Frustum& rhs);
+    Frustum& operator =(const Frustum& rhs) noexcept;
 
     /// Define with projection parameters and a transform matrix.
     void
