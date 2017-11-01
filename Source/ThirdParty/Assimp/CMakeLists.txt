@@ -47,7 +47,9 @@
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
-INCLUDE_DIRECTORIES( . code include contrib/unzip contrib/rapidjson/include contrib/irrXML )
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules)
+
+INCLUDE_DIRECTORIES( . code include contrib contrib/unzip contrib/rapidjson/include contrib/irrXML )
 
 SET( HEADER_PATH include/assimp )
 

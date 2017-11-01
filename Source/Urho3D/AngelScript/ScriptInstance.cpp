@@ -126,7 +126,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
         {
-            Vector<Variant> vector = src.GetVariantVector();
+            const Vector<Variant>& vector = src.GetVariantVector();
             unsigned size = vector.Size();
             arr->Resize(size);
             for (unsigned i = 0; i < size; i++)
@@ -138,7 +138,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
         {
-            Vector<String> vector = src.GetStringVector();
+            const Vector<String>& vector = src.GetStringVector();
             unsigned size = vector.Size();
             arr->Resize(size);
             for (unsigned i = 0; i < size; i++)
@@ -680,10 +680,11 @@ void ScriptInstance::GetScriptAttributes()
 
             default:
                 if (typeName == "Variant[]")
-                    typeName = "VariantVector";
+                    info.type_ = VAR_VARIANTVECTOR;
                 else if (typeName == "String[]")
-                    typeName = "StringVector";
-                info.type_ = Variant::GetTypeFromName(typeName);
+                    info.type_ = VAR_STRINGVECTOR;
+                else
+                    info.type_ = Variant::GetTypeFromName(typeName);
                 break;
             }
         }

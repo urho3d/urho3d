@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Container/RefCounted.h"
+#include "../Container/Swap.h"
 
 #include <cassert>
 #include <cstddef>

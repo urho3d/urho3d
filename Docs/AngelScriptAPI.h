@@ -629,6 +629,7 @@ void Sort();
 void Sort(uint, uint);
 void SortReverse();
 void SortReverse(uint, uint);
+bool Swap(Array<T>&);
 
 // Properties:
 /* readonly */

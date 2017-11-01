@@ -2990,7 +2990,7 @@ After connecting successfully, client code can get the Connection object represe
 
 \section Network_Replication Scene replication
 
-%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have been not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
+%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
 
 The CreateMode translates into two different node and component ID ranges - replicated ID's range from 0x1 to 0xffffff, while local ID's range from 0x1000000 to 0xffffffff. This means there is a maximum of 16777215 replicated nodes or components in a scene.
 
