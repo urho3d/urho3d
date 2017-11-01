@@ -374,11 +374,11 @@ void SDL_SYS_JoystickDetect()
      * so we poll every three seconds
      * Ref: http://developer.android.com/reference/android/hardware/input/InputManager.InputDeviceListener.html
      */
-    static Uint32 timeout = 0;
-    if (SDL_TICKS_PASSED(SDL_GetTicks(), timeout)) {
-        timeout = SDL_GetTicks() + 3000;
+    //static Uint32 timeout = 0;
+    //if (SDL_TICKS_PASSED(SDL_GetTicks(), timeout)) {
+    //    timeout = SDL_GetTicks() + 3000;
         Android_JNI_PollInputDevices();
-    }
+    //}
 }
 
 static SDL_joylist_item *
@@ -413,6 +413,7 @@ JoystickByDeviceId(int device_id)
     
     /* Joystick not found, try adding it */
     SDL_SYS_JoystickDetect();
+	item = SDL_joylist;
     
     while (item != NULL) {
         if (item->device_id == device_id) {
