@@ -75,6 +75,4 @@ URHO3D_API unsigned long long GetTotalMemory();
 URHO3D_API String GetLoginName(); 
 /// Return the name of the running machine. 
 URHO3D_API String GetHostName();
-/// Return the version of the currently running OS, or (?) if not identified.
-URHO3D_API String GetOSVersion(); 
 }

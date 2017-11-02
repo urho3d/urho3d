@@ -400,6 +400,22 @@ String GetConsoleInput()
 #endif
 }
 
+// Disable Windows OS version functionality when compiling mini version for Web, see https://github.com/urho3d/Urho3D/issues/1998
+#if defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
+using RtlGetVersionPtr = NTSTATUS(WINAPI *)(PRTL_OSVERSIONINFOW);
+
+static void GetOS(RTL_OSVERSIONINFOW *r)
+{
+    HMODULE m = GetModuleHandle("ntdll.dll");
+    if (m)
+    {
+        RtlGetVersionPtr fPtr = (RtlGetVersionPtr)GetProcAddress(m, "RtlGetVersion");
+        if (r && fPtr && fPtr(r) == 0)
+            r->dwOSVersionInfoSize = sizeof *r;
+    }
+}
+#endif
+
 String GetPlatform()
 {
 #if defined(__ANDROID__)
@@ -409,15 +425,113 @@ String GetPlatform()
 #elif defined(TVOS)
     return "tvOS";
 #elif defined(__APPLE__)
-    return "macOS";
-#elif defined(_WIN32)
-    return "Windows";
+    char kernel_r[256];
+    size_t size = sizeof(kernel_r);
+
+    if (sysctlbyname("kern.osrelease", &kernel_r, &size, NULL, 0) != -1)
+    {
+        Vector<String> kernel_version = String(kernel_r).Split('.');
+        String version = "macOS/Mac OS X ";
+        int major = ToInt(kernel_version[0]);
+        int minor = ToInt(kernel_version[1]);
+
+        // https://en.wikipedia.org/wiki/Darwin_(operating_system)
+        if (major == 16) // macOS Sierra 
+        {
+            version += "Sierra ";
+            switch (minor)
+            {
+            case 0: version += "10.12.0 "; break;
+            case 1: version += "10.12.1 "; break;
+            case 3: version += "10.12.2 "; break;
+            }
+        }
+        else if (major == 15) // OS X El Capitan
+        {
+            version += "El Capitan ";
+            switch (minor)
+            {
+            case 0: version += "10.11.0 "; break;
+            case 6: version += "10.11.6 "; break;
+            }
+        }
+        else if (major == 14) // OS X Yosemite 
+        {
+            version += "Yosemite ";
+            switch (minor)
+            {
+            case 0: version += "10.10.0 "; break;
+            case 5: version += "10.10.5 "; break;
+            }
+        }
+        else if (major == 13) // OS X Mavericks
+        {
+            version += "Mavericks ";
+            switch (minor)
+            {
+            case 0: version += "10.9.0 "; break;
+            case 4: version += "10.9.5 "; break;
+            }
+        }
+        else if (major == 12) // OS X Mountain Lion
+        {
+            version += "Mountain Lion ";
+            switch (minor)
+            {
+            case 0: version += "10.8.0 "; break;
+            case 6: version += "10.8.5 "; break;
+            }
+        }
+        else if (major == 11) // Mac OS X Lion
+        {
+            version += "Lion ";
+            switch (minor)
+            {
+            case 0: version += "10.7.0 "; break;
+            case 4: version += "10.7.5 "; break;
+            }
+        }
+        else
+        {
+            version += "Unknown ";
+        }
+
+        return version + " (Darwin kernel " + kernel_version[0] + "." + kernel_version[1] + "." + kernel_version[2] + ")";
+    }
+#elif defined(_WIN32) // For _WIN32, only returns the platform name. If we're not compiling the mini version for Web, then also appending extra version information.
+    String platform = "Windows";
+#if defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
+    RTL_OSVERSIONINFOW r;
+    GetOS(&r);
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
+    if (r.dwMajorVersion == 5 && r.dwMinorVersion == 0)
+        platform += " 2000";
+    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 1)
+        platform += " XP";
+    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 2)
+        platform += " XP 64-Bit Edition/Windows Server 2003/Windows Server 2003 R2";
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 0)
+        platform += " Vista/Windows Server 2008";
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 1)
+        platform += " 7/Windows Server 2008 R2";
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 2)
+        platform += " 8/Windows Server 2012";
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 3)
+        platform += " 8.1/Windows Server 2012 R2";
+    else if (r.dwMajorVersion == 10 && r.dwMinorVersion == 0)
+        platform += " 10/Windows Server 2016";
+    else
+        platform += " (unknown version)";
+#endif
+    return platform;
 #elif defined(RPI)
     return "Raspberry Pi";
 #elif defined(__EMSCRIPTEN__)
     return "Web";
-#elif defined(__linux__)
-    return "Linux";
+#elif defined(__linux__) && !defined(__ANDROID__)
+    struct utsname u;
+    if (uname(&u) == 0)
+        return String(u.sysname) + " " + u.release;
 #else
     return "(?)";
 #endif
@@ -579,128 +693,6 @@ String GetHostName()
     DWORD len = MAX_COMPUTERNAME_LENGTH + 1; 
     if (GetComputerName(buffer, &len))
         return buffer;
-#endif
-    return "(?)";
-}
-
-// Disable Windows OS version functionality when compiling mini version for Web, see https://github.com/urho3d/Urho3D/issues/1998
-#if defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
-using RtlGetVersionPtr = NTSTATUS (WINAPI *)(PRTL_OSVERSIONINFOW);
-
-static void GetOS(RTL_OSVERSIONINFOW *r)
-{
-    HMODULE m = GetModuleHandle("ntdll.dll");
-    if (m)
-    {
-        RtlGetVersionPtr fPtr = (RtlGetVersionPtr) GetProcAddress(m, "RtlGetVersion");
-        if (r && fPtr && fPtr(r) == 0)
-            r->dwOSVersionInfoSize = sizeof *r; 
-    }
-}
-#endif 
-
-String GetOSVersion() 
-{
-#if defined(__linux__) && !defined(__ANDROID__)
-    struct utsname u;
-    if (uname(&u) == 0)
-        return String(u.sysname) + " " + u.release; 
-#elif defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
-    RTL_OSVERSIONINFOW r;
-    GetOS(&r); 
-    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
-    if (r.dwMajorVersion == 5 && r.dwMinorVersion == 0) 
-        return "Windows 2000"; 
-    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 1) 
-        return "Windows XP"; 
-    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 2) 
-        return "Windows XP 64-Bit Edition/Windows Server 2003/Windows Server 2003 R2"; 
-    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 0) 
-        return "Windows Vista/Windows Server 2008"; 
-    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 1) 
-        return "Windows 7/Windows Server 2008 R2"; 
-    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 2) 
-        return "Windows 8/Windows Server 2012";
-    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 3) 
-        return "Windows 8.1/Windows Server 2012 R2"; 
-    else if (r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
-        return "Windows 10/Windows Server 2016"; 
-    else 
-        return "Windows Unknown";
-#elif defined(__APPLE__)
-    char kernel_r[256]; 
-    size_t size = sizeof(kernel_r); 
-
-    if (sysctlbyname("kern.osrelease", &kernel_r, &size, NULL, 0) != -1)
-    {
-        Vector<String> kernel_version = String(kernel_r).Split('.'); 
-        String version = "macOS/Mac OS X "; 
-        int major = ToInt(kernel_version[0]);
-        int minor = ToInt(kernel_version[1]);
-
-        // https://en.wikipedia.org/wiki/Darwin_(operating_system)
-        if (major == 16) // macOS Sierra 
-        {
-            version += "Sierra "; 
-            switch(minor)
-            {
-                case 0: version += "10.12.0 "; break; 
-                case 1: version += "10.12.1 "; break; 
-                case 3: version += "10.12.2 "; break; 
-            }
-        }
-        else if (major == 15) // OS X El Capitan
-        {
-            version += "El Capitan ";
-            switch(minor)
-            {
-                case 0: version += "10.11.0 "; break; 
-                case 6: version += "10.11.6 "; break; 
-            }
-        }
-        else if (major == 14) // OS X Yosemite 
-        {
-            version += "Yosemite "; 
-            switch(minor) 
-            {
-                case 0: version += "10.10.0 "; break; 
-                case 5: version += "10.10.5 "; break; 
-            }
-        }
-        else if (major == 13) // OS X Mavericks
-        {
-            version += "Mavericks ";
-            switch(minor)
-            {
-                case 0: version += "10.9.0 "; break; 
-                case 4: version += "10.9.5 "; break; 
-            }
-        }
-        else if (major == 12) // OS X Mountain Lion
-        {
-            version += "Mountain Lion "; 
-            switch(minor) 
-            {
-                case 0: version += "10.8.0 "; break; 
-                case 6: version += "10.8.5 "; break; 
-            }
-        }
-        else if (major == 11) // Mac OS X Lion
-        {
-            version += "Lion ";
-            switch(minor)
-            {
-                case 0: version += "10.7.0 "; break; 
-                case 4: version += "10.7.5 "; break; 
-            }
-        }
-        else 
-        {
-            version += "Unknown ";
-        }
-
-        return version + " (Darwin kernel " + kernel_version[0] + "." + kernel_version[1] + "." + kernel_version[2] + ")"; 
-    }
 #endif
     return "(?)";
 }
