@@ -22,6 +22,7 @@ Urho3D development, contributions and bugfixes by:
 - Aster Jian
 - Ricardo Abreu
 - Vivienne Anthony
+- Christopher Augustus
 - Colin Barrett
 - Erik Beran
 - Gauthier Billot
@@ -78,6 +79,7 @@ Urho3D development, contributions and bugfixes by:
 - Vladimir Pobedinsky
 - Franck Poulain
 - Pranjal Raihan
+- Alexey Rassikhin
 - Svyatoslav Razmyslov
 - Mariusz Richtscheid
 - Nick Royer
@@ -172,7 +174,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.31.2 (http://www.angelcode.com/angelscript)
+- AngelScript 2.32.0 WIP (http://www.angelcode.com/angelscript)
 - Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 2.86.1 (http://www.bulletphysics.org)
@@ -187,8 +189,8 @@ Urho3D uses the following third-party libraries:
 - LZ4 1.7.5 (https://github.com/lz4/lz4)
 - MojoShader (https://icculus.org/mojoshader)
 - Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
-- nanodbc 2.12.4 (https://lexicalunit.github.io/nanodbc)
-- Open Asset Import Library 3.2 (http://assimp.sourceforge.net)
+- nanodbc 2.12.4+ (https://lexicalunit.github.io/nanodbc)
+- Open Asset Import Library 4.0.1 (http://assimp.sourceforge.net)
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)

@@ -1104,6 +1104,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1521,6 +1522,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1775,6 +1777,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -3406,6 +3409,7 @@ Methods:
 - void Sort(uint, uint)
 - void SortReverse()
 - void SortReverse(uint, uint)
+- bool Swap(T[]&)
 
 Properties:
 
@@ -3884,6 +3888,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -3930,6 +3935,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -6919,6 +6925,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -6968,6 +6975,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -8379,8 +8387,10 @@ Methods:
 - void ClearSelection()
 - void CopySelectedItemsToClipboard()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
+- void DisableInternalLayoutUpdate()
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
+- void EnableInternalLayoutUpdate()
 - void EnableLayoutUpdate()
 - void Expand(uint, bool, bool = false)
 - uint FindChild(UIElement@) const
@@ -8472,6 +8482,7 @@ Methods:
 - void SetViewPosition(int, int)
 - void ToggleExpand(uint, bool = false)
 - void ToggleSelection(uint)
+- void UpdateInternalLayout()
 - void UpdateLayout()
 - const Variant& GetVar(const StringHash&)
 
@@ -8900,6 +8911,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -8949,6 +8961,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode

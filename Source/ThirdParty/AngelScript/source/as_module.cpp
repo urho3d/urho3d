@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -455,6 +455,48 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 }
 
 // internal
+void asCModule::UninitializeGlobalProp(asCGlobalProperty *prop)
+{
+	if (prop == 0) 
+		return;
+
+	if (prop->type.IsObject())
+	{
+		void **obj = (void**)prop->GetAddressOfValue();
+		if (*obj)
+		{
+			asCObjectType *ot = CastToObjectType(prop->type.GetTypeInfo());
+
+			if (ot->flags & asOBJ_REF)
+			{
+				asASSERT((ot->flags & asOBJ_NOCOUNT) || ot->beh.release);
+				if (ot->beh.release)
+					engine->CallObjectMethod(*obj, ot->beh.release);
+			}
+			else
+			{
+				if (ot->beh.destruct)
+					engine->CallObjectMethod(*obj, ot->beh.destruct);
+
+				engine->CallFree(*obj);
+			}
+
+			// Set the address to 0 as someone might try to access the variable afterwards
+			*obj = 0;
+		}
+	}
+	else if (prop->type.IsFuncdef())
+	{
+		asCScriptFunction **func = (asCScriptFunction**)prop->GetAddressOfValue();
+		if (*func)
+		{
+			(*func)->Release();
+			*func = 0;
+		}
+	}
+}
+
+// internal
 void asCModule::CallExit()
 {
 	if( !isGlobalVarInitialized ) return;
@@ -462,40 +504,7 @@ void asCModule::CallExit()
 	asCSymbolTableIterator<asCGlobalProperty> it = scriptGlobals.List();
 	while( it )
 	{
-		if( (*it)->type.IsObject() )
-		{
-			void **obj = (void**)(*it)->GetAddressOfValue();
-			if( *obj )
-			{
-				asCObjectType *ot = CastToObjectType((*it)->type.GetTypeInfo());
-
-				if( ot->flags & asOBJ_REF )
-				{
-					asASSERT( (ot->flags & asOBJ_NOCOUNT) || ot->beh.release );
-					if( ot->beh.release )
-						engine->CallObjectMethod(*obj, ot->beh.release);
-				}
-				else
-				{
-					if( ot->beh.destruct )
-						engine->CallObjectMethod(*obj, ot->beh.destruct);
-
-					engine->CallFree(*obj);
-				}
-
-				// Set the address to 0 as someone might try to access the variable afterwards
-				*obj = 0;
-			}
-		}
-		else if ((*it)->type.IsFuncdef())
-		{
-			asCScriptFunction **func = (asCScriptFunction**)(*it)->GetAddressOfValue();
-			if (*func)
-			{
-				(*func)->Release();
-				*func = 0;
-			}
-		}
+		UninitializeGlobalProp(*it);
 		it++;
 	}
 
@@ -952,10 +961,15 @@ int asCModule::RemoveGlobalVar(asUINT index)
 	if( !prop )
 		return asINVALID_ARG;
 
+	// If the global variables have already been initialized 
+	// then uninitialize the variable before it is removed
+	if (isGlobalVarInitialized)
+		UninitializeGlobalProp(prop);
+	
 	// Destroy the internal of the global variable (removes the initialization function)
 	prop->DestroyInternal();
 
-	// Check if the module is the only one referring to the module, if so remove it from the engine too
+	// Check if the module is the only one referring to the property, if so remove it from the engine too
 	// If the property is not removed now, it will be removed later when the module is discarded
 	if( prop->refCount.get() == 2 )
 		engine->RemoveGlobalProperty(prop);

@@ -703,7 +703,7 @@ To build:
 rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
 \endverbatim
 
-The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'.
+The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'ninja', 'vs2013', 'vs2015', 'vs2017', 'xcode'.
 
 The default <platform> when not specified is 'native'. The possible values are: 'android', 'web', 'ios', 'tvos', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
 

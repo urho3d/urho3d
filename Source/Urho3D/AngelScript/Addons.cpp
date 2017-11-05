@@ -258,7 +258,7 @@ static bool ScriptArrayTemplateCallback(asITypeInfo *ti, bool &dontGarbageCollec
 
         // It is not necessary to set the array as garbage collected for all handle types.
         // If it is possible to determine that the handle cannot refer to an object type
-        // that can potentially form a circular reference with the array then it is not 
+        // that can potentially form a circular reference with the array then it is not
         // necessary to make the array garbage collected.
         asITypeInfo *subtype = ti->GetEngine()->GetTypeInfoById(typeId);
         asDWORD flags = subtype->GetFlags();
@@ -267,7 +267,7 @@ static bool ScriptArrayTemplateCallback(asITypeInfo *ti, bool &dontGarbageCollec
             if ((flags & asOBJ_SCRIPT_OBJECT))
             {
                 // Even if a script class is by itself not garbage collected, it is possible
-                // that classes that derive from it may be, so it is not possible to know 
+                // that classes that derive from it may be, so it is not possible to know
                 // that no circular reference can occur.
                 if ((flags & asOBJ_NOINHERIT))
                 {
@@ -1112,6 +1112,16 @@ int CScriptArray::FindByRef(asUINT startAt, void *ref) const
     return -1;
 }
 
+bool CScriptArray::Swap(CScriptArray& other)
+{
+    if (other.GetArrayObjectType() == GetArrayObjectType())
+    {
+        Urho3D::Swap(buffer, other.buffer);
+        return true;
+    }
+    return false;
+}
+
 int CScriptArray::Find(void *value) const
 {
     return Find(0, value);
@@ -1647,6 +1657,7 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "int Find(uint, const T&in) const", asMETHODPR(CScriptArray, Find, (asUINT, void*) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "int FindByRef(const T&in) const", asMETHODPR(CScriptArray, FindByRef, (void*) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "int FindByRef(uint, const T&in) const", asMETHODPR(CScriptArray, FindByRef, (asUINT, void*) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "bool Swap(Array<T>&inout)", asMETHOD(CScriptArray, Swap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "bool opEquals(const Array<T>&in) const", asMETHOD(CScriptArray, operator==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "uint get_length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void set_length(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
@@ -2116,7 +2127,7 @@ bool CScriptDictValue::Get(asIScriptEngine *engine, void *value, int typeId) con
     {
         // A handle can be retrieved if the stored type is a handle of same or compatible type
         // or if the stored type is an object that implements the interface that the handle refer to.
-        
+
         void* cast = nullptr;
         if ((m_typeId & asTYPEID_MASK_OBJECT) &&
             engine->RefCastObject(m_valueObj, engine->GetTypeInfoById(m_typeId), engine->GetTypeInfoById(typeId), &cast) >= 0)

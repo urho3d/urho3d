@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -176,6 +176,7 @@ protected:
 	friend class asCScriptEngine;
 	friend class asCConfigGroup;
 	friend class asCModule;
+	friend class asCObjectType;
 	asCTypeInfo();
 
 	mutable asCAtomic externalRefCount;

@@ -629,6 +629,7 @@ void Sort();
 void Sort(uint, uint);
 void SortReverse();
 void SortReverse(uint, uint);
+bool Swap(Array<T>&);
 
 // Properties:
 /* readonly */
@@ -1176,6 +1177,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -1230,6 +1232,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -4699,6 +4702,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -4758,6 +4762,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -6476,8 +6481,10 @@ void ChangeSelection(int, bool);
 void ClearSelection();
 void CopySelectedItemsToClipboard();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
+void DisableInternalLayoutUpdate();
 void DisableLayoutUpdate();
 IntVector2 ElementToScreen(const IntVector2&);
+void EnableInternalLayoutUpdate();
 void EnableLayoutUpdate();
 void Expand(uint, bool, bool = false);
 uint FindChild(UIElement) const;
@@ -6569,6 +6576,7 @@ bool SetStyleAuto(XMLFile = null);
 void SetViewPosition(int, int);
 void ToggleExpand(uint, bool = false);
 void ToggleSelection(uint);
+void UpdateInternalLayout();
 void UpdateLayout();
 const Variant& GetVar(const StringHash&);
 
@@ -7064,6 +7072,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -7123,6 +7132,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */

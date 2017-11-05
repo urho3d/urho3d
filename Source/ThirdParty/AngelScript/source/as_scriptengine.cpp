@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -413,6 +413,13 @@ int asCScriptEngine::SetEngineProperty(asEEngineProp property, asPWORD value)
 			return asINVALID_ARG;
 		break;
 
+	case asEP_MAX_NESTED_CALLS:
+		if (value > 0xFFFFFFFF)
+			ep.maxNestedCalls = (asUINT)value;
+		else
+			ep.maxNestedCalls = (asUINT)value;
+		break;
+
 	default:
 		return asINVALID_ARG;
 	}
@@ -503,6 +510,9 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 	case asEP_HEREDOC_TRIM_MODE:
 		return ep.heredocTrimMode;
 
+	case asEP_MAX_NESTED_CALLS:
+		return ep.maxNestedCalls;
+
 	default:
 		return 0;
 	}
@@ -567,6 +577,7 @@ asCScriptEngine::asCScriptEngine()
 		ep.privatePropAsProtected        = false;
 		ep.allowUnicodeIdentifiers       = false;
 		ep.heredocTrimMode               = 1;         // 0 = never trim, 1 = don't trim on single line, 2 = trim initial and final empty line
+		ep.maxNestedCalls                = 100;
 	}
 
 	gc.engine = this;
@@ -1059,6 +1070,10 @@ int asCScriptEngine::SetDefaultNamespace(const char *nameSpace)
 			if( (expectIdentifier && t != ttIdentifier) || (!expectIdentifier && t != ttScope) )
 				return ConfigError(asINVALID_DECLARATION, "SetDefaultNamespace", nameSpace, 0);
 
+			// Make sure parent namespaces are registred in case of nested namespaces
+			if (expectIdentifier)
+				AddNameSpace(ns.SubString(0, pos + len).AddressOf());
+
 			expectIdentifier = !expectIdentifier;
 		}
 
@@ -1519,7 +1534,7 @@ int asCScriptEngine::RegisterInterface(const char *name)
 
 	currentGroup->types.PushLast(st);
 
-	return asSUCCESS;
+	return GetTypeIdByDecl(name);
 }
 
 // interface
@@ -2447,7 +2462,7 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 
 int asCScriptEngine::SetTemplateRestrictions(asCObjectType *templateType, asCScriptFunction *func, const char *caller, const char *decl)
 {
-	asASSERT(templateType->flags && asOBJ_TEMPLATE);
+	asASSERT(templateType->flags & asOBJ_TEMPLATE);
 
 	for (asUINT subTypeIdx = 0; subTypeIdx < templateType->templateSubTypes.GetLength(); subTypeIdx++)
 	{
@@ -3507,6 +3522,15 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 	// The object types in templateInstanceTypes that are not also in generatedTemplateTypes are registered template specializations
 	generatedTemplateTypes.PushLast(ot);
 
+	// Any child funcdefs must be copied to the template instance (with adjustments in case of template subtypes)
+	// This must be done before resolving other methods, to make sure the other methods that may refer to the 
+	// templated funcdef will resolve to the new funcdef
+	for (n = 0; n < templateType->childFuncDefs.GetLength(); n++)
+	{
+		asCFuncdefType *funcdef = GenerateNewTemplateFuncdef(templateType, ot, templateType->childFuncDefs[n]);
+		funcdef->parentClass = ot;
+		ot->childFuncDefs.PushLast(funcdef);
+	}
 
 	// As the new template type is instantiated the engine should
 	// generate new functions to substitute the ones with the template subtype.
@@ -3618,14 +3642,6 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 		ot->properties.PushLast(asNEW(asCObjectProperty)(*prop));
 		if( prop->type.GetTypeInfo() )
 			prop->type.GetTypeInfo()->AddRefInternal();
-	}
-
-	// Any child funcdefs must also be copied to the template instance (with adjustments in case of template subtypes)
-	for (n = 0; n < templateType->childFuncDefs.GetLength(); n++)
-	{
-		asCFuncdefType *funcdef = GenerateNewTemplateFuncdef(templateType, ot, templateType->childFuncDefs[n]);
-		funcdef->parentClass = ot;
-		ot->childFuncDefs.PushLast(funcdef);
 	}
 
 	return ot;
@@ -3756,6 +3772,18 @@ asCDataType asCScriptEngine::DetermineTypeForTemplate(const asCDataType &orig, a
 
 		dt.MakeReference(orig.IsReference());
 		dt.MakeReadOnly(orig.IsReadOnly());
+	}
+	else if (orig.GetTypeInfo() && (orig.GetTypeInfo()->flags & asOBJ_FUNCDEF) && CastToFuncdefType(orig.GetTypeInfo())->parentClass == tmpl)
+	{
+		// The type is a child funcdef. Find the corresponding child funcdef in the template instance
+		for (asUINT n = 0; n < ot->childFuncDefs.GetLength(); n++)
+		{
+			if (ot->childFuncDefs[n]->name == orig.GetTypeInfo()->name)
+			{
+				dt = orig;
+				dt.SetTypeInfo(ot->childFuncDefs[n]);
+			}
+		}
 	}
 	else
 		dt = orig;
@@ -3895,6 +3923,8 @@ bool asCScriptEngine::RequireTypeReplacement(asCDataType &type, asCObjectType *t
 				ot->templateSubTypes[n].GetTypeInfo()->flags & asOBJ_TEMPLATE_SUBTYPE )
 				return true;
 	}
+	if (type.GetTypeInfo() && (type.GetTypeInfo()->flags & asOBJ_FUNCDEF) && CastToFuncdefType(type.GetTypeInfo())->parentClass == templateType)
+		return true;
 
 	return false;
 }
@@ -3969,6 +3999,12 @@ bool asCScriptEngine::GenerateNewTemplateFunction(asCObjectType *templateType, a
 
 asCFuncdefType *asCScriptEngine::GenerateNewTemplateFuncdef(asCObjectType *templateType, asCObjectType *ot, asCFuncdefType *func)
 {
+	// TODO: Only generate the new funcdef if it used the template subtypes.
+	//       Remember to also update the clean up in asCObjectType::DestroyInternal so it doesn't delete
+	//       child funcdefs that have not been created specificially for the template instance.
+	//       Perhaps a new funcdef is always needed, since the funcdef will have a reference to the 
+	//       parent class (in this case the template instance).
+
 	asCScriptFunction *func2 = asNEW(asCScriptFunction)(this, 0, func->funcdef->funcType);
 	if (func2 == 0)
 	{
@@ -5624,8 +5660,8 @@ int asCScriptEngine::RegisterFuncdef(const char *decl)
 	// If parameter type from other groups are used, add references
 	currentGroup->AddReferencesForFunc(this, func);
 
-	// Return the function id as success
-	return func->id;
+	// Return the type id as success
+	return GetTypeIdFromDataType(asCDataType::CreateType(fdt, false));
 }
 
 // interface
@@ -5785,7 +5821,7 @@ int asCScriptEngine::RegisterTypedef(const char *type, const char *decl)
 
 	currentGroup->types.PushLast(td);
 
-	return asSUCCESS;
+	return GetTypeIdByDecl(type);
 }
 
 // interface
@@ -5855,7 +5891,7 @@ int asCScriptEngine::RegisterEnum(const char *name)
 
 	currentGroup->types.PushLast(st);
 
-	return asSUCCESS;
+	return GetTypeIdByDecl(name);
 }
 
 // interface
