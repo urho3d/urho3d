@@ -2112,8 +2112,6 @@ void Graphics::OnWindowResized()
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
 
-    URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
-
     using namespace ScreenMode;
 
     VariantMap& eventData = GetEventDataMap();
@@ -2139,8 +2137,6 @@ void Graphics::OnWindowMoved()
 
     position_.x_ = newX;
     position_.y_ = newY;
-
-    URHO3D_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
 
     using namespace WindowPos;
 
