@@ -566,7 +566,7 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
     Graphics* graphics = GetSubsystem<Graphics>();
     PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
     using namespace TouchBegin;
-    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(Vector2((float)eventData[P_X].GetInt(), (float)eventData[P_Y].GetInt())); // Raycast for RigidBody2Ds to pick
+    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(eventData[P_X].GetInt(), eventData[P_Y].GetInt(), M_MAX_UNSIGNED); // Raycast for RigidBody2Ds to pick
     if (rigidBody)
     {
         pickedNode = rigidBody->GetNode();
