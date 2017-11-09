@@ -379,6 +379,42 @@ void RenderPath::SetEnabled(const String& tag, bool active)
     }
 }
 
+bool RenderPath::IsEnabled(const String& tag) const
+{
+    bool enabled = false;
+    for (unsigned i = 0; i < renderTargets_.Size() && !enabled; ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false))
+            enabled |= renderTargets_[i].enabled_;
+    }
+
+    for (unsigned i = 0; i < commands_.Size() && !enabled; ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false))
+            enabled |= commands_[i].enabled_;
+    }
+
+    return enabled;
+}
+
+bool RenderPath::IsAdded(const String& tag) const
+{
+    bool enabled = false;
+    for (unsigned i = 0; i < renderTargets_.Size() && !enabled; ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false))
+            enabled |= true;
+    }
+
+    for (unsigned i = 0; i < commands_.Size() && !enabled; ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false))
+            enabled |= true;
+    }
+
+    return enabled;
+}
+
 void RenderPath::ToggleEnabled(const String& tag)
 {
     for (unsigned i = 0; i < renderTargets_.Size(); ++i)

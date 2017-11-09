@@ -227,6 +227,10 @@ public:
     bool Append(XMLFile* file);
     /// Enable/disable commands and rendertargets by tag.
     void SetEnabled(const String& tag, bool active);
+    /// Return true of any of render targets or commands with specified tag are enabled.
+    bool IsEnabled(const String& tag) const;
+    /// Return true if renderpath or command with given tag exists.
+    bool IsAdded(const String& tag) const;
     /// Toggle enabled state of commands and rendertargets by tag.
     void ToggleEnabled(const String& tag);
     /// Assign rendertarget at index.
