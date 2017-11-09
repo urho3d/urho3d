@@ -70,6 +70,10 @@ public:
     XMLElement GetOrCreateChild(const String& name);
     /// Return the first child element with name or create if does not exist.
     XMLElement GetOrCreateChild(const char* name);
+    /// Append element. If asCopy is set to true then original element is copied and appended, otherwise specified element is appended.
+    bool AppendChild(XMLElement element, bool asCopy=false);
+    /// Remove element from it's parent.
+    bool Remove();
     /// Remove a child element. Return true if successful.
     bool RemoveChild(const XMLElement& element);
     /// Remove a child element by name. Return true if successful.
