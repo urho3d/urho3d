@@ -225,6 +225,12 @@ void Context::RemoveAttribute(StringHash objectType, const char* name)
     RemoveNamedAttribute(networkAttributes_, objectType, name);
 }
 
+void Context::RemoveAllAttributes(StringHash objectType)
+{
+    attributes_.Erase(objectType);
+    networkAttributes_.Erase(objectType);
+}
+
 void Context::UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue)
 {
     AttributeInfo* info = GetAttribute(objectType, name);
