@@ -168,8 +168,12 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 IntVector2 Graphics::GetWindowPosition() const
 {
     if (window_)
-        return position_;
-    return IntVector2::ZERO;
+    {
+        IntVector2 position;
+        SDL_GetWindowPosition(window_, &position.x_, &position.y_);
+        return position;
+    }
+    return position_;
 }
 
 PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
