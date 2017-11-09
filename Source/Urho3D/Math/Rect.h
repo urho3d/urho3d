@@ -87,6 +87,62 @@ public:
     /// Test for inequality with another rect.
     bool operator !=(const Rect& rhs) const { return min_ != rhs.min_ || max_ != rhs.max_; }
 
+    /// Add another rect to this one inplace.
+    Rect& operator +=(const Rect& rhs)
+    {
+        min_ += rhs.min_;
+        max_ += rhs.max_;
+        return *this;
+    }
+
+    /// Subtract another rect from this one inplace.
+    Rect& operator -=(const Rect& rhs)
+    {
+        min_ -= rhs.min_;
+        max_ -= rhs.max_;
+        return *this;
+    }
+
+    /// Divide by scalar inplace.
+    Rect& operator /=(float value)
+    {
+        min_ /= value;
+        max_ /= value;
+        return *this;
+    }
+
+    /// Multiply by scalar inplace.
+    Rect& operator *=(float value)
+    {
+        min_ *= value;
+        max_ *= value;
+        return *this;
+    }
+
+    /// Divide by scalar.
+    Rect operator /(float value) const
+    {
+        return Rect(min_ / value, max_ / value);
+    }
+
+    /// Multiply by scalar.
+    Rect operator *(float value) const
+    {
+        return Rect(min_ * value, max_ * value);
+    }
+
+    /// Add another rect.
+    Rect operator +(const Rect& rhs) const
+    {
+        return Rect(min_ + rhs.min_, max_ + rhs.max_);
+    }
+
+    /// Subtract another rect.
+    Rect operator -(const Rect& rhs) const
+    {
+        return Rect(min_ - rhs.min_, max_ - rhs.max_);
+    }
+
     /// Define from another rect.
     void Define(const Rect& rect)
     {
@@ -190,6 +246,24 @@ public:
     /// Return as string.
     String ToString() const;
 
+    /// Return left-top corner position.
+    Vector2 Min() const { return min_; }
+
+    /// Return right-bottom corner position.
+    Vector2 Max() const { return max_; }
+
+    /// Return left coordinate.
+    float Left() const { return min_.x_; }
+
+    /// Return top coordinate.
+    float Top() const { return min_.y_; }
+
+    /// Return right coordinate.
+    float Right() const { return max_.x_; }
+
+    /// Return bottom coordinate.
+    float Bottom() const { return max_.y_; }
+
     /// Minimum vector.
     Vector2 min_;
     /// Maximum vector.
@@ -255,6 +329,82 @@ public:
         return left_ != rhs.left_ || top_ != rhs.top_ || right_ != rhs.right_ || bottom_ != rhs.bottom_;
     }
 
+    /// Add another rect to this one inplace.
+    IntRect& operator +=(const IntRect& rhs)
+    {
+        left_ += rhs.left_;
+        top_ += rhs.top_;
+        right_ += rhs.right_;
+        bottom_ += rhs.bottom_;
+        return *this;
+    }
+
+    /// Subtract another rect from this one inplace.
+    IntRect& operator -=(const IntRect& rhs)
+    {
+        left_ -= rhs.left_;
+        top_ -= rhs.top_;
+        right_ -= rhs.right_;
+        bottom_ -= rhs.bottom_;
+        return *this;
+    }
+
+    /// Divide by scalar inplace.
+    IntRect& operator /=(float value)
+    {
+        left_ = static_cast<int>(left_ / value);
+        top_ = static_cast<int>(top_ / value);
+        right_ = static_cast<int>(right_ / value);
+        bottom_ = static_cast<int>(bottom_ / value);
+        return *this;
+    }
+
+    /// Multiply by scalar inplace.
+    IntRect& operator *=(float value)
+    {
+        left_ = static_cast<int>(left_ * value);
+        top_ = static_cast<int>(top_ * value);
+        right_ = static_cast<int>(right_ * value);
+        bottom_ = static_cast<int>(bottom_ * value);
+        return *this;
+    }
+
+    /// Divide by scalar.
+    IntRect operator /(float value) const
+    {
+        return IntRect(
+            static_cast<int>(left_ / value), static_cast<int>(top_ / value),
+            static_cast<int>(right_ / value), static_cast<int>(bottom_ / value)
+        );
+    }
+
+    /// Multiply by scalar.
+    IntRect operator *(float value) const
+    {
+        return IntRect(
+            static_cast<int>(left_ * value), static_cast<int>(top_ * value),
+            static_cast<int>(right_ * value), static_cast<int>(bottom_ * value)
+        );
+    }
+
+    /// Add another rect.
+    IntRect operator +(const IntRect& rhs) const
+    {
+        return IntRect(
+            left_ + rhs.left_, top_ + rhs.top_,
+            right_ + rhs.right_, bottom_ + rhs.bottom_
+        );
+    }
+
+    /// Subtract another rect.
+    IntRect operator -(const IntRect& rhs) const
+    {
+        return IntRect(
+            left_ - rhs.left_, top_ - rhs.top_,
+            right_ - rhs.right_, bottom_ - rhs.bottom_
+        );
+    }
+
     /// Return size.
     IntVector2 Size() const { return IntVector2(Width(), Height()); }
 
@@ -286,6 +436,24 @@ public:
 
     /// Return as string.
     String ToString() const;
+
+    /// Return left-top corner position.
+    IntVector2 Min() const { return {left_, top_}; }
+
+    /// Return right-bottom corner position.
+    IntVector2 Max() const { return {right_, bottom_}; }
+
+    /// Return left coordinate.
+    int Left() const { return left_; }
+
+    /// Return top coordinate.
+    int Top() const { return top_; }
+
+    /// Return right coordinate.
+    int Right() const { return right_; }
+
+    /// Return bottom coordinate.
+    int Bottom() const { return bottom_; }
 
     /// Left coordinate.
     int left_;
