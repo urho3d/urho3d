@@ -799,7 +799,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
 
-    String filterExtension = filter.Substring(filter.Find('.'));
+    String filterExtension = filter.Substring(filter.FindLast('.'));
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
