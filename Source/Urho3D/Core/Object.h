@@ -161,6 +161,11 @@ public:
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
 
+    /// Block object from sending and receiving events.
+    void SetBlockEvents(bool block) { blockEvents_ = block; }
+    /// Return sending and receiving events blocking status.
+    bool GetBlockEvents() const { return blockEvents_; }
+
 protected:
     /// Execution context.
     Context* context_;
@@ -177,6 +182,9 @@ private:
 
     /// Event handlers. Sender is null for non-specific handlers.
     LinkedList<EventHandler> eventHandlers_;
+
+    /// Block object from sending and receiving any events.
+    bool blockEvents_;
 };
 
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
