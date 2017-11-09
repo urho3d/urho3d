@@ -30,7 +30,9 @@
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#ifndef STB_VORBIS_HEADER_ONLY
 #define STB_VORBIS_HEADER_ONLY
+#endif
 #include <STB/stb_vorbis.h>
 
 #include "../DebugNew.h"
