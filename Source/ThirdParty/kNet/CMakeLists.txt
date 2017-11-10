@@ -60,6 +60,7 @@ set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 
 # Define dependency libs
 set (INCLUDE_DIRS include)
+list (APPEND LIBS ws2_32)
 
 # Setup target
 setup_library ()

@@ -490,6 +490,9 @@ if (XCODE)
         endif ()
     endif ()
 endif ()
+if (NOT WIN32 AND NOT WEB)
+    list (APPEND LIBS dl m)
+endif ()
 setup_library (${EXCLUDE_FROM_ALL})
 if (XCODE AND NOT ARCH)    # These variables are used to control the recursion as this script is recursive in nature on Xcode
     # Add external and custom targets to build Mach-O universal binary LuaJIT sub-library
