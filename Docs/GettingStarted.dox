@@ -586,7 +586,7 @@ endif ()
 project (MyProjectName)
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${URHO3D_SOURCE_DIR}/CMake/Modules)
 
 # Include UrhoCommon.cmake module after setting project name
 include (UrhoCommon)
@@ -637,7 +637,7 @@ If that is the case then you have to tell both the build system and the Urho3D l
 
 # Define source files
 define_source_files ()
-define_resource_dirs (GLOB_PATTERNS ${CMAKE_SOURCE_DIR}/bin/Scene* ${CMAKE_SOURCE_DIR}/bin/Core)
+define_resource_dirs (GLOB_PATTERNS ${URHO3D_SOURCE_DIR}/bin/Scene* ${URHO3D_SOURCE_DIR}/bin/Core)
 
 ...
 \endcode

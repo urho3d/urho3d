@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+if (NOT URHO3D_IN_ENGINE_BUILD)
     # Set CMake minimum version and CMake policy required by UrhoCommon module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)

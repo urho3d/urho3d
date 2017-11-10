@@ -23,7 +23,7 @@
 # Based on src/Makefile from http://luajit.org
 # The cross-compiling logic is ported to CMake as faithful as possible although currently Urho3D does not support all target archs supported by LuaJIT
 
-if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+if (NOT URHO3D_IN_ENGINE_BUILD)
     # Set CMake minimum version and CMake policy required by UrhoCommon module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
@@ -57,7 +57,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
     endif ()
 elseif (NOT BAKED_CMAKE_SOURCE_DIR)
-    set (BAKED_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+    set (BAKED_CMAKE_SOURCE_DIR ${URHO3D_SOURCE_DIR})
 endif ()
 
 # Makefile: Compiler options

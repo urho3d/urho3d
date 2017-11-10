@@ -155,7 +155,7 @@ if (RPI)
     include_directories (SYSTEM ${VIDEOCORE_INCLUDE_DIRS})
     link_directories (${VIDEOCORE_LIBRARY_DIRS})
 endif ()
-if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+if (URHO3D_IN_ENGINE_BUILD)
     set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default), SHARED, and MODULE; the last value is available for Emscripten only")
     # Non-Windows platforms always use OpenGL, the URHO3D_OPENGL variable will always be forced to TRUE, i.e. it is not an option at all
     # Windows platform has URHO3D_OPENGL as an option, MSVC compiler default to FALSE (i.e. prefers Direct3D) while MinGW compiler default to TRUE
@@ -777,7 +777,7 @@ macro (create_symlink SOURCE DESTINATION)
     if (IS_ABSOLUTE ${SOURCE})
         set (ABS_SOURCE ${SOURCE})
     else ()
-        set (ABS_SOURCE ${CMAKE_SOURCE_DIR}/${SOURCE})
+        set (ABS_SOURCE ${URHO3D_SOURCE_DIR}/${SOURCE})
     endif ()
     if (IS_ABSOLUTE ${DESTINATION})
         set (ABS_DESTINATION ${DESTINATION})
@@ -1065,10 +1065,10 @@ macro (define_resource_dirs)
     if (XCODE)
         if (NOT RESOURCE_FILES)
             # Default app bundle icon
-            set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
+            set (RESOURCE_FILES ${URHO3D_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
             if (ARM)
                 # Default app icon on the iOS/tvOS home screen
-                list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
+                list (APPEND RESOURCE_FILES ${URHO3D_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
             endif ()
         endif ()
         # Group them together under 'Resources' in Xcode IDE
@@ -1288,7 +1288,7 @@ macro (find_Urho3D_tool VAR NAME)
     mark_as_advanced (${VAR})  # Hide it from cmake-gui in non-advanced mode
     if (NOT ${VAR})
         set (${VAR} ${CMAKE_BINARY_DIR}/bin/tool/${NAME})
-        if (ARG_MSG_MODE AND NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+        if (ARG_MSG_MODE AND NOT URHO3D_IN_ENGINE_BUILD)
             message (${ARG_MSG_MODE}
                 "Could not find ${VAR} tool in the Urho3D build tree or Urho3D SDK. Your project may not build successfully without this tool. "
                 "You may have to first rebuild the Urho3D in its build tree or reinstall Urho3D SDK to get this tool built or installed properly. "
@@ -1576,7 +1576,7 @@ macro (setup_main_executable)
     if (ANDROID)
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
-            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
+            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${URHO3D_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
             DOC "Path to SDL_android_main.c" MSG_MODE FATAL_ERROR)
         list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
         # Setup shared library output path
@@ -1612,7 +1612,7 @@ macro (setup_main_executable)
             add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
         endif ()
         # When performing packaging, include the final apk file
-        if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
+        if (URHO3D_IN_ENGINE_BUILD AND NOT APK_INCLUDED)
             install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D-debug.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
             set (APK_INCLUDED 1)
         endif ()
@@ -1673,7 +1673,7 @@ macro (setup_main_executable)
             find_Urho3d_tool (PACKAGE_TOOL PackageTool
                 HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
                 DOC "Path to PackageTool" MSG_MODE WARNING)
-            if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+            if (URHO3D_IN_ENGINE_BUILD)
                 set (PACKAGING_DEP DEPENDS PackageTool)
             endif ()
             set (PACKAGING_COMMENT " and packaging")
@@ -1804,7 +1804,7 @@ macro (_setup_target)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}> $<TARGET_FILE_DIR:${TARGET_NAME}>
                     COMMAND ${CMAKE_COMMAND} -E $<$<NOT:$<CONFIG:Debug>>:echo> copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>.map>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}.map> $<TARGET_FILE_DIR:${TARGET_NAME}> $<$<NOT:$<CONFIG:Debug>>:$<ANGLE-R>${NULL_DEVICE}>
-                    COMMAND ${CMAKE_COMMAND} -DTARGET_NAME=${TARGET_NAME} -DTARGET_FILE=$<TARGET_FILE:${TARGET_NAME}> -DTARGET_DIR=$<TARGET_FILE_DIR:${TARGET_NAME}> -DHAS_SHELL_FILE=${HAS_SHELL_FILE} -DSIDE_MODULES="${SIDE_MODULES}" -P ${CMAKE_SOURCE_DIR}/CMake/Modules/PostProcessForWebModule.cmake)
+                    COMMAND ${CMAKE_COMMAND} -DTARGET_NAME=${TARGET_NAME} -DTARGET_FILE=$<TARGET_FILE:${TARGET_NAME}> -DTARGET_DIR=$<TARGET_FILE_DIR:${TARGET_NAME}> -DHAS_SHELL_FILE=${HAS_SHELL_FILE} -DSIDE_MODULES="${SIDE_MODULES}" -P ${URHO3D_SOURCE_DIR}/CMake/Modules/PostProcessForWebModule.cmake)
                 add_make_clean_files ($<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js $<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js.map)
             endif ()
         endif ()
@@ -1857,8 +1857,8 @@ macro (_setup_target)
     # Create symbolic links in the build tree
     if (ANDROID)
         foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
-            if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
-                create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
+            if (EXISTS ${URHO3D_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
+                create_symlink (${URHO3D_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
             endif ()
         endforeach ()
         set (ASSET_ROOT assets)
