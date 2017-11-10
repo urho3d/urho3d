@@ -31,6 +31,7 @@
 #  URHO3D_FOUND
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
+#  URHO3D_DEFINES
 #  URHO3D_VERSION
 #  URHO3D_64BIT (may be used as input variable for multilib-capable compilers; must be anyway specified as input variable for MSVC due to CMake/VS generator limitation)
 #  URHO3D_LIB_TYPE (may be used as input variable as well to limit the search of library type)
@@ -52,6 +53,82 @@
 # MSVC only:
 #  URHO3D_STATIC_RUNTIME
 #
+
+if (MSVC)
+    set (FLAG_PREFIX /)
+else ()
+    set (FLAG_PREFIX -)
+endif ()
+
+# Macro for reading and parsing Urho3D.pc file
+macro (pkg_check_modules_internal PREFIX PACKAGE)
+    set (PATH_SUFFIX Urho3D)
+    if (WIN32)
+        set (SCRIPT_EXT .bat)
+        if (CMAKE_HOST_WIN32)
+            set (PATH_SUFFIX .)
+        endif ()
+    else ()
+        set (SCRIPT_EXT .sh)
+    endif ()
+    if (ANDROID)
+        # For Android platform, install to a path based on the chosen Android ABI, e.g. libs/armeabi-v7a
+        set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
+    elseif (URHO3D_64BIT)
+        # Install to 'lib64' when one of these conditions is true
+        if ((MINGW AND CMAKE_CROSSCOMPILING) OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
+            set (LIB_SUFFIX 64)
+        endif ()
+    endif ()
+    set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
+
+    set (PKGCONFIG_FILE ${URHO3D_HOME}/${DEST_PKGCONFIG_DIR}/${PACKAGE}.pc)
+    if (NOT EXISTS "${PKGCONFIG_FILE}")
+        set (PKGCONFIG_FILE ${CMAKE_BINARY_DIR}/${DEST_PKGCONFIG_DIR}/${PACKAGE}.pc)
+    endif ()
+
+    file(READ ${PKGCONFIG_FILE} FILE_CONTENT)
+    string (REPLACE "\n" ";" FILE_CONTENT "${FILE_CONTENT}")
+    foreach (LINE ${FILE_CONTENT})
+        if (LINE MATCHES "^#.*$")
+            # A comment
+        else ()
+            # Inject extracted variables into current line
+            string (REGEX MATCHALL "\\$\\{[^\\}]*\\}" __pkg_config_vars "${LINE}")
+            foreach (__pkg_config_var ${__pkg_config_vars})
+                if (__pkg_config_var)
+                    string (LENGTH "${__pkg_config_var}" __pkg_config_var_len)
+                    math (EXPR __pkg_config_var_len "${__pkg_config_var_len} - 3")
+                    string (SUBSTRING "${__pkg_config_var}" 2 ${__pkg_config_var_len} __pkg_config_var)
+                    if (DEFINED __pkg_config__${__pkg_config_var})
+                        string (REPLACE "\${${__pkg_config_var}}" "${__pkg_config__${__pkg_config_var}}" LINE "${LINE}")
+                    endif ()
+                endif ()
+            endforeach ()
+
+            if (LINE MATCHES "^[a-zA-Z0-9_]+=.+$")
+                # Extract variables
+                string (REGEX MATCH "^[a-zA-Z0-9_]+" __pkg_config_name "${LINE}")
+                string (REGEX MATCH "=.+$" __pkg_config_value "${LINE}")
+                string (SUBSTRING "${__pkg_config_value}" 1 100000 __pkg_config_value)
+                string (STRIP "${__pkg_config_value}" __pkg_config_value)
+                set (__pkg_config__${__pkg_config_name} "${__pkg_config_value}")
+            elseif (LINE MATCHES "^Libs:.*$")
+                # Extract libs
+                string (SUBSTRING "${LINE}" 5 100000 LINE)
+                string (STRIP "${LINE}" LINE)
+                separate_arguments(${PREFIX}_LIBRARIES WINDOWS_COMMAND "${LINE}")
+                # For MSVC: replace /flag with -flag, because cmake converts /flag to \flag
+                string (REGEX REPLACE "(^|;)/" "\\1-" ${PREFIX}_LIBRARIES "${${PREFIX}_LIBRARIES}")
+            elseif (LINE MATCHES "^Cflags:.*$")
+                # Extract cflags
+                string (SUBSTRING "${LINE}" 7 100000 LINE)
+                string (STRIP "${LINE}" LINE)
+                separate_arguments(${PREFIX}_CFLAGS WINDOWS_COMMAND "${LINE}")
+            endif ()
+        endif ()
+    endforeach ()
+endmacro ()
 
 set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING URHO3D_STATIC_RUNTIME)
 set (PATH_SUFFIX Urho3D)
@@ -82,10 +159,10 @@ else ()
     else ()
         set (URHO3D_64BIT 0)
     endif ()
+    unset (URHO3D_LIBRARIES)
     # If either of the URHO3D_64BIT or URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
     if (NOT URHO3D_64BIT EQUAL URHO3D_FOUND_64BIT OR NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE OR NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/Urho3D$")
         unset (URHO3D_BASE_INCLUDE_DIR CACHE)
-        unset (URHO3D_LIBRARIES CACHE)
         unset (URHO3D_FOUND_64BIT CACHE)
         unset (URHO3D_FOUND_LIB_TYPE CACHE)
         unset (URHO3D_COMPILE_RESULT CACHE)
@@ -321,6 +398,27 @@ else ()
     if (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED)
         set (CMAKE_TRY_COMPILE_CONFIGURATION ${CMAKE_TRY_COMPILE_CONFIGURATION_SAVED})
     endif ()
+
+    # Obtain link libraries and defines from pkg-config script
+    pkg_check_modules_internal(URHO3D_PKGCONF Urho3D)
+    # Urho3D library is already included in URHO3D_LIBRARIES as a full path
+    foreach(lib ${URHO3D_PKGCONF_LIBRARIES})
+        if ("${lib}" MATCHES "^(-l)?Urho3D(_d)?(.lib|.dll)?$")
+            list (REMOVE_ITEM URHO3D_PKGCONF_LIBRARIES ${lib})
+        endif ()
+    endforeach()
+    # Include any system libraries to URHO3D_LIBRARIES
+    list (APPEND URHO3D_LIBRARIES "${URHO3D_PKGCONF_LIBRARIES}")
+    foreach (CFLAG ${URHO3D_PKGCONF_CFLAGS})
+        # Detect defines
+        if ("${CFLAG}" MATCHES "^\\${FLAG_PREFIX}DURHO3D_")
+            # Append them to URHO3D_DEFINES as -DVALUE
+            list (APPEND URHO3D_DEFINES "${CFLAG}")
+            string(SUBSTRING "${CFLAG}" 2 100000 CFLAG)
+            # Set appropriate CMake variable
+            set ("${CFLAG}" ON)
+        endif ()
+    endforeach ()
 endif ()
 
 if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES AND URHO3D_LIB_TYPE AND URHO3D_COMPILE_RESULT)

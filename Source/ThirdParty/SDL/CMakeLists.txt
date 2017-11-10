@@ -1431,6 +1431,22 @@ set (TARGET_NAME SDL)
 file (GLOB H_FILES include/*.h)     # Adding the headers into source files list is just for easier file browsing in the IDE
 list (APPEND SOURCE_FILES ${H_FILES})
 
+if (WIN32)
+    list (APPEND LIBS user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
+elseif (APPLE)
+    list (APPEND LIBS iconv)
+elseif (ANDROID)
+    list (APPEND LIBS dl log android)
+else ()
+    # Linux
+    if (NOT WEB)
+        list (APPEND LIBS dl m rt)
+    endif ()
+    if (RPI)
+        list (APPEND ABSOLUTE_PATH_LIBS ${VIDEOCORE_LIBRARIES})
+    endif ()
+endif ()
+
 # Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
 setup_library ()
 
