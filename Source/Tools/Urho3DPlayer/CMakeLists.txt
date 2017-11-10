@@ -26,7 +26,7 @@ set (TARGET_NAME Urho3DPlayer)
 # Define source files
 define_source_files ()
 if (NOT WEB)
-    define_resource_dirs (EXTRA_DIRS ${CMAKE_SOURCE_DIR}/bin/Autoload)
+    define_resource_dirs (EXTRA_DIRS ${URHO3D_SOURCE_DIR}/bin/Autoload)
 endif ()
 
 # Setup target with resource copying
@@ -46,8 +46,8 @@ endif ()
 if (NOT IOS AND NOT TVOS AND NOT ANDROID AND NOT WEB AND NOT CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Ensure the output directory exist before creating the symlinks
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    file (GLOB FILES RELATIVE ${CMAKE_SOURCE_DIR}/bin ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
+    file (GLOB FILES RELATIVE ${URHO3D_SOURCE_DIR}/bin ${URHO3D_SOURCE_DIR}/bin/*${SCRIPT_EXT})
     foreach (FILE ${FILES})
-        create_symlink (${CMAKE_SOURCE_DIR}/bin/${FILE} ${CMAKE_BINARY_DIR}/bin/${FILE} FALLBACK_TO_COPY)
+        create_symlink (${URHO3D_SOURCE_DIR}/bin/${FILE} ${CMAKE_BINARY_DIR}/bin/${FILE} FALLBACK_TO_COPY)
     endforeach ()
 endif ()
