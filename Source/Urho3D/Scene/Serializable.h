@@ -145,9 +145,6 @@ private:
 };
 
 /// Template implementation of the variant attribute accessor.
-/// \tparam TClassType Serializable class type.
-/// \tparam TGetFunction `getFunction(const TClassType& self, Variant& value)`
-/// \tparam TSetFunction `setFunction(TClassType& self, const Variant& value)`
 template <class TClassType, class TGetFunction, class TSetFunction>
 class VariantAttributeAccessorImpl : public AttributeAccessor
 {
@@ -179,64 +176,18 @@ private:
 };
 
 /// Make variant attribute accessor implementation.
+/// \tparam TClassType Serializable class type.
+/// \tparam TGetFunction Functional object with call signature `void getFunction(const TClassType& self, Variant& value)`
+/// \tparam TSetFunction Functional object with call signature `void setFunction(TClassType& self, const Variant& value)`
 template <class TClassType, class TGetFunction, class TSetFunction>
-SharedPtr<AttributeAccessor> MakeVariantAttributeAccessorImpl(TGetFunction getFunction, TSetFunction setFunction)
+SharedPtr<AttributeAccessor> MakeVariantAttributeAccessor(TGetFunction getFunction, TSetFunction setFunction)
 {
     return SharedPtr<AttributeAccessor>(new VariantAttributeAccessorImpl<TClassType, TGetFunction, TSetFunction>(getFunction, setFunction));
 }
 
-#if 0
-/// Template implementation of the attribute accessor.
-/// \tparam TClassType Serializable class type.
-/// \tparam TVariantType Internal variant type.
-/// \tparam TAttributeType Real attribute type.
-/// \tparam TGetFunction Get function with signature `getFunction(const TClassType& self, TAttributeType& value)`
-/// \tparam TSetFunction Set function with signature `setFunction(TClassType& self, const TAttributeType& value)`
-template <class TClassType, class TVariantType, class TAttributeType, class TGetFunction, class TSetFunction>
-class AttributeAccessorImpl : public AttributeAccessor
-{
-public:
-    /// Construct.
-    AttributeAccessorImpl(TGetFunction getFunction, TSetFunction setFunction) : getFunction_(getFunction), setFunction_(setFunction) { }
-
-    /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& value) const override
-    {
-        assert(ptr);
-        const auto classPtr = static_cast<const TClassType*>(ptr);
-        TAttributeType attributeValue;
-        getFunction_(*classPtr, attributeValue);
-        value = static_cast<TVariantType>(attributeValue);
-    }
-
-    /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value) override
-    {
-        assert(ptr);
-        auto classPtr = static_cast<TClassType*>(ptr);
-        const TAttributeType attributeValue = static_cast<TAttributeType>(value.Get<TVariantType>());
-        setFunction_(*classPtr, value);
-    }
-
-private:
-    /// Get functor.
-    TGetFunction getFunction_;
-    /// Set functor.
-    TSetFunction setFunction_;
-};
-
-/// Make attribute accessor implementation.
-template <class TClassType, class TVariantType, class TAttributeType, class TGetFunction, class TSetFunction>
-SharedPtr<AttributeAccessor> MakeAttributeAccessorImpl(TGetFunction getFunction, TSetFunction setFunction)
-{
-    return MakeShared<VariantAttributeAccessorImpl<TClassType, TVariantType, TAttributeType, TGetFunction, TSetFunction>>(getFunction, setFunction);
-}
-
-#endif
-
 /// Make variant attribute accessor with inline get and set code snippets.
 #define URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR(getSnippet, setSnippet) \
-    Urho3D::MakeVariantAttributeAccessorImpl<ClassName>( \
+    Urho3D::MakeVariantAttributeAccessor<ClassName>( \
         [](const ClassName& self, Variant& value) { getSnippet; }, \
         [](ClassName& self, const Variant& value) { setSnippet; })
 
@@ -280,20 +231,13 @@ namespace AttributeMetadata
 // The following macros need to be used within a class member function such as ClassName::RegisterObject().
 // A variable called "context" needs to exist in the current scope and point to a valid Context object.
 
-/// Define an attribute with custom setter and getter functional objects.
-#define URHO3D_CUSTOM_ATTRIBUTE_IMPL(typeName, name, enumNames, defaultValue, mode, getFunction, setFunction) \
-    context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-        Urho3D::GetVariantType<typeName >(), name, MakeVariantAttributeAccessorImpl<ClassName>(getFunction, setFunction), enumNames, defaultValue, mode))
-/// Define an attribute with getter and setter inline code snippets.
-#define URHO3D_INLINE_ATTRIBUTE_IMPL(typeName, name, enumNames, defaultValue, mode, getSnippet, setSnippet) \
-    URHO3D_CUSTOM_ATTRIBUTE_IMPL(typeName, name, enumNames, defaultValue, mode, \
-        [](const ClassName& self, Variant& value) { getSnippet; }, \
-        [](ClassName& self, const Variant& value) { setSnippet; })
-
 /// Copy attributes from a base class.
 #define URHO3D_COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
+/// Update the default value of an already registered attribute.
+#define URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
 /// Remove attribute by name.
 #define URHO3D_REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
+
 /// Define an object member attribute.
 #define URHO3D_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName >(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable), nullptr, defaultValue, mode))
@@ -303,6 +247,7 @@ namespace AttributeMetadata
 /// Define an attribute that uses get and set functions.
 #define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName >(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), nullptr, defaultValue, mode))
+
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     VAR_INT, name, URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR(variable), enumNames, static_cast<int>(defaultValue), mode))
@@ -312,15 +257,15 @@ namespace AttributeMetadata
 /// Define an attribute that uses get and set functions. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     VAR_INT, name, URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), enumNames, static_cast<int>(defaultValue), mode))
+
 /// Define an attribute with custom setter and getter.
-#define URHO3D_CUSTOM_ATTRIBUTE(name, typeName, getFunction, setFunction, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    URHO3D_CUSTOM_ATTRIBUTE_IMPL(typeName, name, nullptr, defaultValue, mode, getFunction, setFunction)
+#define URHO3D_CUSTOM_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<typeName >(), name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), nullptr, defaultValue, mode))
 /// Define an enum attribute with custom setter and getter. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_CUSTOM_ENUM_ATTRIBUTE(name, getFunction, setFunction, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    URHO3D_CUSTOM_ATTRIBUTE_IMPL(int, name, enumNames, defaultValue, mode, getFunction, setFunction)
+    VAR_INT, name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), enumNames, static_cast<int>(defaultValue), mode))
+
 /// Deprecated. Use URHO3D_ACCESSOR_ATTRIBUTE instead.
 #define URHO3D_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode)
-/// Update the default value of an already registered attribute.
-#define URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
 
 }
