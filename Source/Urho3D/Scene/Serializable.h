@@ -185,41 +185,35 @@ SharedPtr<AttributeAccessor> MakeVariantAttributeAccessor(TGetFunction getFuncti
     return SharedPtr<AttributeAccessor>(new VariantAttributeAccessorImpl<TClassType, TGetFunction, TSetFunction>(getFunction, setFunction));
 }
 
-/// Make variant attribute accessor with inline get and set code snippets.
-#define URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR(getSnippet, setSnippet) \
-    Urho3D::MakeVariantAttributeAccessor<ClassName>( \
-        [](const ClassName& self, Variant& value) { getSnippet; }, \
-        [](ClassName& self, const Variant& value) { setSnippet; })
-
 /// Make member attribute accessor.
-#define URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable) URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR( \
-    value = self.variable, \
-    self.variable = value.Get<typeName>())
+#define URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
+    [](const ClassName& self, Urho3D::Variant& value) { value = self.variable; }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.variable = value.Get<typeName>(); })
 
 /// Make member attribute accessor with custom epilogue.
-#define URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, epilogue) URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR( \
-    value = self.variable, \
-    self.variable = value.Get<typeName>(); self.epilogue())
+#define URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, epilogue) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
+    [](const ClassName& self, Urho3D::Variant& value) { value = self.variable; }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.variable = value.Get<typeName>(); self.epilogue(); })
 
 /// Make get/set attribute accessor.
-#define URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName) URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR( \
-    value = self.getFunction(), \
-    self.setFunction(value.Get<typeName>()))
+#define URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
+    [](const ClassName& self, Urho3D::Variant& value) { value = self.getFunction(); }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.setFunction(value.Get<typeName>()); })
 
 /// Make member enum attribute accessor
-#define URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR(variable) URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR( \
-    value = static_cast<int>(self.variable), \
-    self.variable = static_cast<decltype(self.variable)>(value.Get<int>()))
+#define URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR(variable) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
+    [](const ClassName& self, Urho3D::Variant& value) { value = static_cast<int>(self.variable); }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.variable = static_cast<decltype(self.variable)>(value.Get<int>()); })
 
 /// Make member enum attribute accessor with custom epilogue.
-#define URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR_EX(variable, epilogue) URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR( \
-    value = static_cast<int>(self.variable), \
-    self.variable = static_cast<decltype(self.variable)>(value.Get<int>()); self.epilogue())
+#define URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR_EX(variable, epilogue) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
+    [](const ClassName& self, Urho3D::Variant& value) { value = static_cast<int>(self.variable); }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.variable = static_cast<decltype(self.variable)>(value.Get<int>()); self.epilogue(); })
 
 /// Make get/set enum attribute accessor.
-#define URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName) URHO3D_MAKE_INLINE_ATTRIBUTE_ACCESSOR( \
-    value = static_cast<int>(self.getFunction()), \
-    self.setFunction(static_cast<typeName>(value.Get<int>())))
+#define URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
+    [](const ClassName& self, Urho3D::Variant& value) { value = static_cast<int>(self.getFunction()); }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.setFunction(static_cast<typeName>(value.Get<int>())); })
 
 /// Attribute metadata.
 namespace AttributeMetadata
@@ -250,20 +244,20 @@ namespace AttributeMetadata
 
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    VAR_INT, name, URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR(variable), enumNames, static_cast<int>(defaultValue), mode))
+    Urho3D::VAR_INT, name, URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR(variable), enumNames, static_cast<int>(defaultValue), mode))
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers. Custom epilogue member function is called when attribute set.
 #define URHO3D_ENUM_ATTRIBUTE_EX(name, variable, epilogue, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    VAR_INT, name, URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR_EX(variable, epilogue), enumNames, static_cast<int>(defaultValue), mode))
+    Urho3D::VAR_INT, name, URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR_EX(variable, epilogue), enumNames, static_cast<int>(defaultValue), mode))
 /// Define an attribute that uses get and set functions. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    VAR_INT, name, URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), enumNames, static_cast<int>(defaultValue), mode))
+    Urho3D::VAR_INT, name, URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), enumNames, static_cast<int>(defaultValue), mode))
 
 /// Define an attribute with custom setter and getter.
 #define URHO3D_CUSTOM_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName >(), name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), nullptr, defaultValue, mode))
 /// Define an enum attribute with custom setter and getter. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_CUSTOM_ENUM_ATTRIBUTE(name, getFunction, setFunction, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    VAR_INT, name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), enumNames, static_cast<int>(defaultValue), mode))
+    Urho3D::VAR_INT, name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), enumNames, static_cast<int>(defaultValue), mode))
 
 /// Deprecated. Use URHO3D_ACCESSOR_ATTRIBUTE instead.
 #define URHO3D_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode)
