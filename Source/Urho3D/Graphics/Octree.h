@@ -171,8 +171,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute change.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
@@ -205,6 +203,8 @@ public:
 private:
     /// Handle render update in case of headless execution.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Update octree size.
+    void UpdateOctreeSize() { SetSize(worldBoundingBox_, numLevels_); }
 
     /// Drawable objects that require update.
     PODVector<Drawable*> drawableUpdates_;

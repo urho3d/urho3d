@@ -337,16 +337,9 @@ void Octree::RegisterObject(Context* context)
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
 
-    URHO3D_ATTRIBUTE("Bounding Box Min", Vector3, worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bounding Box Max", Vector3, worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Number of Levels", int, numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
-}
-
-void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    // If any of the (size) attributes change, resize the octree
-    Serializable::OnSetAttribute(attr, src);
-    SetSize(worldBoundingBox_, numLevels_);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Min", Vector3, worldBoundingBox_.min_, UpdateOctreeSize, defaultBoundsMin, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Max", Vector3, worldBoundingBox_.max_, UpdateOctreeSize, defaultBoundsMax, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Number of Levels", int, numLevels_, UpdateOctreeSize, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
 void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

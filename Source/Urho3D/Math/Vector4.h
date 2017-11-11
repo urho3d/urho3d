@@ -174,6 +174,12 @@ public:
         return *this;
     }
 
+    /// Return const value by index.
+    float operator[](unsigned index) const { return (&x_)[index]; }
+
+    /// Return mutable value by index.
+    float& operator[](unsigned index) { return (&x_)[index]; }
+
     /// Calculate dot product.
     float DotProduct(const Vector4& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ + w_ * rhs.w_; }
 

@@ -65,63 +65,16 @@ public:
 struct AttributeInfo
 {
     /// Construct empty.
-    AttributeInfo() :
-        type_(VAR_NONE),
-        offset_(0),
-        enumNames_(nullptr),
-        mode_(AM_DEFAULT),
-        ptr_(nullptr)
-    {
-    }
+    AttributeInfo() { }
 
-    /// Construct offset attribute.
-    AttributeInfo(VariantType type, const char* name, size_t offset, const Variant& defaultValue, unsigned mode) :
+    /// Construct attribute.
+    AttributeInfo(VariantType type, const char* name, SharedPtr<AttributeAccessor> accessor, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
-        offset_((unsigned)offset),
-        enumNames_(nullptr),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(nullptr)
-    {
-    }
-
-    /// Construct offset enum attribute.
-    AttributeInfo(const char* name, size_t offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
-        type_(VAR_INT),
-        name_(name),
-        offset_((unsigned)offset),
-        enumNames_(enumNames),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(nullptr)
-    {
-    }
-
-    /// Construct accessor attribute.
-    AttributeInfo(VariantType type, const char* name, AttributeAccessor* accessor, const Variant& defaultValue, unsigned mode) :
-        type_(type),
-        name_(name),
-        offset_(0),
-        enumNames_(nullptr),
-        accessor_(accessor),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(nullptr)
-    {
-    }
-
-    /// Construct accessor enum attribute.
-    AttributeInfo(const char* name, AttributeAccessor* accessor, const char** enumNames, const Variant& defaultValue,
-        unsigned mode) :
-        type_(VAR_INT),
-        name_(name),
-        offset_(0),
         enumNames_(enumNames),
         accessor_(accessor),
         defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(nullptr)
+        mode_(mode)
     {
     }
 
@@ -139,23 +92,21 @@ struct AttributeInfo
     }
 
     /// Attribute type.
-    VariantType type_;
+    VariantType type_ = VAR_NONE;
     /// Name.
     String name_;
-    /// Byte offset from start of object.
-    unsigned offset_;
     /// Enum names.
-    const char** enumNames_;
+    const char** enumNames_ = nullptr;
     /// Helper object for accessor mode.
     SharedPtr<AttributeAccessor> accessor_;
     /// Default value for network replication.
     Variant defaultValue_;
     /// Attribute mode: whether to use for serialization, network replication, or both.
-    unsigned mode_;
+    unsigned mode_ = AM_DEFAULT;
     /// Attribute metadata.
     VariantMap metadata_;
     /// Attribute data pointer if elsewhere than in the Serializable.
-    void* ptr_;
+    void* ptr_ = nullptr;
 };
 
 /// Attribute handle returned by Context::RegisterAttribute and used to chain attribute setup calls.

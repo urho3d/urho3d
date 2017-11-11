@@ -150,8 +150,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
@@ -283,6 +281,8 @@ private:
     void HandleTerrainCreated(StringHash eventType, VariantMap& eventData);
     /// Update trimesh or convex shape after a model has reloaded itself.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
+    /// Mark shape dirty.
+    void MarkShapeDirty() { recreateShape_ = true; }
 
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;

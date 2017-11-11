@@ -42,8 +42,6 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
@@ -131,6 +129,8 @@ protected:
     void UpdateAmbientGradient();
     /// Clear zone reference from drawables inside the bounding box.
     void ClearDrawablesZone();
+    /// Mark node transform dirty.
+    void MarkNodeDirty() { OnMarkedDirty(node_); }
 
     /// Cached inverse world transform matrix.
     mutable Matrix3x4 inverseWorld_;
