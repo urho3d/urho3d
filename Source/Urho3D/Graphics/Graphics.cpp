@@ -243,6 +243,14 @@ void Graphics::Minimize()
     SDL_MinimizeWindow(window_);
 }
 
+void Graphics::Raise() const
+{
+    if (!window_)
+        return;
+
+    SDL_RaiseWindow(window_);
+}
+
 void Graphics::BeginDumpShaders(const String& fileName)
 {
     shaderPrecache_ = new ShaderPrecache(context_, fileName);
@@ -382,12 +390,6 @@ bool Graphics::GetMaximized() const
         return false;
 
     return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
-}
-
-void Graphics::RaiseWindow() const
-{
-    if (window_)
-        SDL_RaiseWindow(window_);
 }
 
 Vector3 Graphics::GetDisplayDPI() const

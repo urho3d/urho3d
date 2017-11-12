@@ -311,7 +311,7 @@ public:
 
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
-    
+
     /// Return whether rendering output is dithered.
     bool GetDither() const;
 
@@ -496,6 +496,8 @@ public:
     void Maximize();
     /// Minimize the window.
     void Minimize();
+    /// Raises window if it was minimized.
+    void Raise() const;
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -566,8 +568,6 @@ public:
     int GetCurrentMonitor() const;
     /// Returns true if window is maximized or runs in full screen mode.
     bool GetMaximized() const;
-    /// Raises window if it was minimized.
-    void RaiseWindow() const;
     /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
     Vector3 GetDisplayDPI() const;
 
