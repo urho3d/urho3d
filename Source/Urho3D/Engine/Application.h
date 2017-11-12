@@ -25,7 +25,6 @@
 #include "../Core/Context.h"
 #include "../Core/Main.h"
 #include "../Engine/Engine.h"
-#include "../DotNet/Callbacks.h"
 
 namespace Urho3D
 {
@@ -45,7 +44,7 @@ public:
     virtual void Setup() { }
 
     /// Setup after engine initialization and before running the main loop. Call ErrorExit() to terminate without running the main loop. Called by Application.
-    virtual void Start();
+    virtual void Start() { }
 
     /// Cleanup after the main loop. Called by Application.
     virtual void Stop() { }
@@ -54,9 +53,6 @@ public:
     int Run();
     /// Show an error message (last log message if empty), terminate the main loop, and set failure exit code.
     void ErrorExit(const String& message = String::EMPTY);
-
-    /// Start() callback.
-    void_function_void callbackStart_;
 
 protected:
     /// Handle log message.

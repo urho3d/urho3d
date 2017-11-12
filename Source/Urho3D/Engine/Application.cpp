@@ -49,8 +49,7 @@ void RunFrame(void* data)
 
 Application::Application(Context* context) :
     Object(context),
-    exitCode_(EXIT_SUCCESS),
-    callbackStart_(nullptr)
+    exitCode_(EXIT_SUCCESS)
 {
     engineParameters_ = Engine::ParseParameters(GetArguments());
 
@@ -138,10 +137,5 @@ void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Application::Start()
-{
-    if (callbackStart_)
-        callbackStart_();
-}
 
 }
