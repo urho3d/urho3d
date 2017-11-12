@@ -2541,7 +2541,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
 {
     Light* light = query.light_;
 
-    int splits = 0;
+    unsigned splits = 0;
 
     switch (light->GetLightType())
     {
@@ -2615,7 +2615,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
         break;
     }
 
-    query.numSplits_ = (unsigned)splits;
+    query.numSplits_ = splits;
 }
 
 void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit)
