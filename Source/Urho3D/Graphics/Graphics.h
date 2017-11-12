@@ -374,6 +374,13 @@ public:
     IntVector2 GetDesktopResolution(int monitor) const;
     /// Return the number of currently connected monitors.
     int GetMonitorCount() const;
+    /// Returns the index of the display containing the center of the window on success or a negative error code on failure.
+    int GetCurrentMonitor() const;
+    /// Returns true if window is maximized or runs in full screen mode.
+    bool GetMaximized() const;
+    /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
+    Vector3 GetDisplayDPI() const;
+
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
     /// Return a shader variation by name and defines.
@@ -563,13 +570,6 @@ public:
     static unsigned GetMaxBones();
     /// Return whether is using an OpenGL 3 context. Return always false on Direct3D9 & Direct3D11.
     static bool GetGL3Support();
-
-    /// Returns the index of the display containing the center of the window on success or a negative error code on failure.
-    int GetCurrentMonitor() const;
-    /// Returns true if window is maximized or runs in full screen mode.
-    bool GetMaximized() const;
-    /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
-    Vector3 GetDisplayDPI() const;
 
 private:
     /// Create the application window.

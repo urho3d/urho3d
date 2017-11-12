@@ -227,6 +227,29 @@ int Graphics::GetMonitorCount() const
     return SDL_GetNumVideoDisplays();
 }
 
+int Graphics::GetCurrentMonitor() const
+{
+    if (!window_)
+        return 0;
+
+    return SDL_GetWindowDisplayIndex(window_);
+}
+
+bool Graphics::GetMaximized() const
+{
+    if (!window_)
+        return false;
+
+    return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
+}
+
+Vector3 Graphics::GetDisplayDPI() const
+{
+    Vector3 result;
+    SDL_GetDisplayDPI(0, &result.z_, &result.x_, &result.y_);
+    return result;
+}
+
 void Graphics::Maximize()
 {
     if (!window_)
@@ -377,26 +400,6 @@ void Graphics::CreateWindowIcon()
             SDL_FreeSurface(surface);
         }
     }
-}
-
-int Graphics::GetCurrentMonitor() const
-{
-    return SDL_GetWindowDisplayIndex((SDL_Window*) this->GetSDLWindow());
-}
-
-bool Graphics::GetMaximized() const
-{
-    if (!window_)
-        return false;
-
-    return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
-}
-
-Vector3 Graphics::GetDisplayDPI() const
-{
-    Vector3 result;
-    SDL_GetDisplayDPI(0, &result.z_, &result.x_, &result.y_);
-    return result;
 }
 
 void RegisterGraphicsLibrary(Context* context)
