@@ -2953,20 +2953,35 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers and custom values.
 
-To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
+Attributes can either refer to a member of the object or define setter & getter functions. Member attributes can also have post-set action: member function without arguments that is called every time when value is assigned to the attribute.
+
+Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
+
+The folowing macros can be used to define an attribute:
+
+- `URHO3D_ATTRIBUTE`: Member of the object. Shall be convertible from and to specified type.
+- `URHO3D_ATTRIBUTE_EX`: Member of the object. Post-set member function callback is called when attribute is set.
+- `URHO3D_ACCESSOR_ATTRIBUTE`: Getter and setter member functions. Attribute value of specified type is passed into setter and expected to be returned from getter.
+- `URHO3D_CUSTOM_ATTRIBUTE`: Getter and setter functional objects that are directly working with Variant value. See \ref MakeVariantAttributeAccessor "MakeVariantAttributeAccessor()"
+- `URHO3D_ENUM_ATTRIBUTE`: 32-bit integer zero-based enumeration with human-readable names.
+- `URHO3D_ENUM_ATTRIBUTE_EX`: The same as `URHO3D_ATTRIBUTE_EX`, used for enumerations.
+- `URHO3D_ENUM_ACCESSOR_ATTRIBUTE`: The same as `URHO3D_ACCESSOR_ATTRIBUTE`, used for enumerations.
+- `URHO3D_CUSTOM_ENUM_ATTRIBUTE`: The same as `URHO3D_CUSTOM_ATTRIBUTE`, used for enumerations.
+
+To implement side effects to attributes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
 Each attribute can have a combination of the following flags:
 
-- AM_FILE: Is used for file serialization (load/save.)
-- AM_NET: Is used for network replication.
-- AM_LATESTDATA: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
-- AM_NOEDIT: Is an internal attribute and is not to be shown for editing.
-- AM_NODEID: Is a node ID and may need rewriting when instantiating scene content.
-- AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
+- `AM_FILE`: Is used for file serialization (load/save.)
+- `AM_NET`: Is used for network replication.
+- `AM_LATESTDATA`: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
+- `AM_NOEDIT`: Is an internal attribute and is not to be shown for editing.
+- `AM_NODEID`: Is a node ID and may need rewriting when instantiating scene content.
+- `AM_COMPONENTID`: Is a component ID and may need rewriting when instantiating scene content.
 
-The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+The default flags are `AM_FILE` and `AM_NET`. Note that it is legal to define neither `AM_FILE` or `AM_NET`, meaning the attribute has only run-time significance (perhaps for editing.)
 
 See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
