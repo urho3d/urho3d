@@ -98,6 +98,11 @@ static void LogWrite(const String& str, bool error, Log* ptr)
     Log::WriteRaw(str + "\n", error);
 }
 
+static void LogTrace(const String& str, Log* ptr)
+{
+    Log::Write(LOG_TRACE, str);
+}
+
 static void LogDebug(const String& str, Log* ptr)
 {
     Log::Write(LOG_DEBUG, str);
@@ -130,6 +135,7 @@ static void Print(bool value, bool error) { }
 static void Print(const Variant& value, bool error) { }
 static void PrintCallStack(bool error) { }
 static void LogWrite(const String& str, bool error, Log* ptr) { }
+static void LogTrace(const String& str, Log* ptr) { }
 static void LogDebug(const String& str, Log* ptr) { }
 static void LogInfo(const String& str, Log* ptr) { }
 static void LogWarning(const String& str, Log* ptr) { }
@@ -139,6 +145,7 @@ static void LogError(const String& str, Log* ptr) { }
 
 static void RegisterLog(asIScriptEngine* engine)
 {
+    engine->RegisterGlobalProperty("const int LOG_TRACE", (void*)&LOG_TRACE);
     engine->RegisterGlobalProperty("const int LOG_DEBUG", (void*)&LOG_DEBUG);
     engine->RegisterGlobalProperty("const int LOG_INFO", (void*)&LOG_INFO);
     engine->RegisterGlobalProperty("const int LOG_WARNING", (void*)&LOG_WARNING);
@@ -149,6 +156,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "void Open(const String&in)", asMETHOD(Log, Open), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void Close()", asMETHOD(Log, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Trace(const String&in)", asFUNCTION(LogTrace), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Warning(const String&in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);

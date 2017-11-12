@@ -47,6 +47,7 @@ namespace Urho3D
 
 const char* logLevelPrefixes[] =
 {
+    "TRACE",
     "DEBUG",
     "INFO",
     "WARNING",
@@ -115,7 +116,7 @@ void Log::Close()
 
 void Log::SetLevel(int level)
 {
-    if (level < LOG_DEBUG || level > LOG_NONE)
+    if (level < LOG_TRACE || level > LOG_NONE)
     {
         URHO3D_LOGERRORF("Attempted to set erroneous log level %d", level);
         return;
@@ -144,7 +145,7 @@ void Log::Write(int level, const String& message)
     }
 
     // No-op if illegal level
-    if (level < LOG_DEBUG || level >= LOG_NONE)
+    if (level < LOG_TRACE || level >= LOG_NONE)
         return;
 
     // If not in the main thread, store message for later processing
@@ -171,7 +172,7 @@ void Log::Write(int level, const String& message)
         formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
 
 #if defined(__ANDROID__)
-    int androidLevel = ANDROID_LOG_DEBUG + level;
+    int androidLevel = ANDROID_LOG_VERBOSE + level;
     __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
 #elif defined(IOS) || defined(TVOS)
     SDL_IOS_LogMessage(message.CString());
