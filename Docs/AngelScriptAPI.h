@@ -6772,6 +6772,7 @@ bool HasSubscribedToEvent(const String&);
 void Info(const String&);
 void Open(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void Trace(const String&);
 void Warning(const String&);
 void Write(const String&, bool = false);
 
@@ -16404,6 +16405,7 @@ int LOG_DEBUG;
 int LOG_ERROR;
 int LOG_INFO;
 int LOG_NONE;
+int LOG_TRACE;
 int LOG_WARNING;
 Color MAGENTA;
 uint MASK_BLENDINDICES;

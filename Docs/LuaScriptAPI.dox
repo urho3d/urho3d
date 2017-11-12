@@ -9065,6 +9065,7 @@ Properties:
 - int LOG_ERROR
 - int LOG_INFO
 - int LOG_NONE
+- int LOG_TRACE
 - int LOG_WARNING
 - unsigned MASK_BLENDINDICES
 - unsigned MASK_BLENDWEIGHTS
