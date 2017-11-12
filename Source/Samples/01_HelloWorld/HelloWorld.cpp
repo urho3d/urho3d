@@ -26,99 +26,6 @@
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
-#include <Urho3D/IO/VectorBuffer.h> // TO BE REMOVED
-
-// TO BE REMOVED
-// @{
-#include <Urho3D/Core/Context.h>
-
-static const char* enumNames[] =
-{
-    "Enum1",
-    "Enum2",
-    "Enum3"
-};
-
-enum class TestEnum
-{
-    Enum1,
-    Enum2,
-    Enum3,
-};
-
-class TestSerializable : public Urho3D::Serializable
-{
-    URHO3D_OBJECT(TestSerializable, Urho3D::Serializable);
-
-public:
-    TestSerializable(Urho3D::Context* context) : Urho3D::Serializable(context) { }
-
-    static void RegisterObject(Urho3D::Context* context)
-    {
-        context->RegisterFactory<TestSerializable>();
-        URHO3D_ATTRIBUTE("attribute", Urho3D::String, attribute_, "attribute", Urho3D::AM_DEFAULT);
-        URHO3D_ATTRIBUTE_EX("attributeEx", Urho3D::String, attributeEx_, OnAttributeExSet, "attributeEx", Urho3D::AM_DEFAULT);
-        URHO3D_ENUM_ATTRIBUTE("enumAttribute", enumAttribute_, enumNames, TestEnum::Enum2, Urho3D::AM_DEFAULT);
-        URHO3D_ENUM_ATTRIBUTE_EX("enumAttributeEx", enumAttributeEx_, OnEnumAttributeExSet, enumNames, TestEnum::Enum2, Urho3D::AM_DEFAULT);
-        URHO3D_ACCESSOR_ATTRIBUTE("accessorAttribute", GetAccessorAttribute, SetAccessorAttribute, Urho3D::String, "accessorAttribute", Urho3D::AM_DEFAULT);
-        URHO3D_ENUM_ACCESSOR_ATTRIBUTE("enumAccessorAttribute", GetEnumAccessorAttribute, SetEnumAccessorAttribute, TestEnum, enumNames, TestEnum::Enum3, Urho3D::AM_DEFAULT);
-        URHO3D_MIXED_ACCESSOR_ATTRIBUTE("mixedAccessorAttribute", GetMixedAccessorAttribute, SetMixedAccessorAttribute, Urho3D::String, "mixedAccessorAttribute", Urho3D::AM_DEFAULT);
-
-        {
-            Urho3D::String suffix = "_temp";
-            auto getter = [=](const TestSerializable& self, Urho3D::Variant& value)
-            {
-                value = self.customAttribute_ + suffix;
-            };
-            auto setter = [=](TestSerializable& self, const Urho3D::Variant& value)
-            {
-                self.customAttribute_ = value.GetString() + suffix;
-            };
-            URHO3D_CUSTOM_ATTRIBUTE("customAttribute", getter, setter, Urho3D::String, "customAttribute", Urho3D::AM_DEFAULT);
-        }
-
-        {
-            auto getter = [=](const TestSerializable& self, Urho3D::Variant& value)
-            {
-                value = static_cast<int>(self.customEnumAttribute_);
-            };
-            auto setter = [=](TestSerializable& self, const Urho3D::Variant& value)
-            {
-                self.customEnumAttribute_ = static_cast<TestEnum>(value.GetInt());
-            };
-            URHO3D_CUSTOM_ENUM_ATTRIBUTE("customAttribute", getter, setter, enumNames, TestEnum::Enum1, Urho3D::AM_DEFAULT);
-        }
-    }
-
-    Urho3D::String attribute_;
-    Urho3D::String attributeEx_;
-    void OnAttributeExSet()
-    {
-        attributeEx_ = attributeEx_.ToUpper();
-    }
-    TestEnum enumAttribute_ = TestEnum::Enum1;
-    TestEnum enumAttributeEx_ = TestEnum::Enum1;
-    void OnEnumAttributeExSet()
-    {
-        enumAttributeEx_ = static_cast<TestEnum>(static_cast<int>(enumAttributeEx_) + 1);
-    }
-
-    Urho3D::String accessorAttribute_;
-    const Urho3D::String& GetAccessorAttribute() const { return accessorAttribute_; }
-    void SetAccessorAttribute(const Urho3D::String& value) { accessorAttribute_ = value; }
-
-    TestEnum enumAccessorAttribute_ = TestEnum::Enum1;
-    TestEnum GetEnumAccessorAttribute() const { return enumAccessorAttribute_; }
-    void SetEnumAccessorAttribute(TestEnum value) { enumAccessorAttribute_ = value; }
-
-    Urho3D::String mixedAccessorAttribute_;
-    Urho3D::String GetMixedAccessorAttribute() const { return mixedAccessorAttribute_; }
-    void SetMixedAccessorAttribute(const Urho3D::String& value) { mixedAccessorAttribute_ = value; }
-
-    Urho3D::String customAttribute_;
-    TestEnum customEnumAttribute_ = TestEnum::Enum1;
-};
-// @}
 
 #include "HelloWorld.h"
 
@@ -130,21 +37,6 @@ URHO3D_DEFINE_APPLICATION_MAIN(HelloWorld)
 HelloWorld::HelloWorld(Context* context) :
     Sample(context)
 {
-    // TO BE REMOVED
-    // @{
-    TestSerializable::RegisterObject(context);
-    auto obj = MakeShared<TestSerializable>(context_);
-    obj->ResetToDefault();
-
-    VectorBuffer buf;
-    XMLFile xml(context_);
-    XMLElement root = xml.CreateRoot("test");
-    obj->SaveXML(root);
-    xml.Save(buf);
-    String text;
-    text.Append(reinterpret_cast<const char*>(buf.GetData()), buf.GetSize());
-    obj.Reset();
-    // @}
 }
 
 void HelloWorld::Start()
