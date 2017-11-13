@@ -2326,7 +2326,13 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
 
     if (depth_ > 1 || IsCompressed())
     {
-        URHO3D_LOGERROR("SetSubimage not supported for Compressed or 3D images");
+        URHO3D_LOGERROR("Image::SetSubimage is not supported for compressed or 3D images");
+        return false;
+    }
+
+    if (components_ != image->components_)
+    {
+        URHO3D_LOGERROR("Can not set subimage in image " + GetName() + " with different number of components");
         return false;
     }
 
@@ -2340,14 +2346,11 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
     const int destHeight = rect.Height();
     if (destWidth == image->GetWidth() && destHeight == image->GetHeight())
     {
-        // \todo Revise this place
-        const int components = Min((int)components_, (int)image->components_);
-
         unsigned char* src = image->GetData();
         unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
         for (int i = 0; i < destHeight; ++i)
         {
-            memcpy(dest, src, destWidth * components);
+            memcpy(dest, src, destWidth * components_);
 
             src += destWidth * image->components_;
             dest += width_ * components_;

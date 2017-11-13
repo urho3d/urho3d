@@ -88,6 +88,7 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
 {
     if (blockEvents_)
         return;
+
     // Make a copy of the context pointer in case the object is destroyed during event handler invocation
     Context* context = context_;
     EventHandler* specific = nullptr;
@@ -304,6 +305,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
     if (blockEvents_)
         return;
+
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
