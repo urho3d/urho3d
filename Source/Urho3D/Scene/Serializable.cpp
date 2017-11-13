@@ -87,6 +87,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         break;
 
     case VAR_INT64:
+        // \todo Revise this place
         *(reinterpret_cast<unsigned long long*>(dest)) = src.GetUInt64();
         break;
 
@@ -196,6 +197,7 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         break;
 
     case VAR_INT64:
+        // \todo Revise this place
         dest = *(reinterpret_cast<const unsigned long long*>(src));
         break;
 

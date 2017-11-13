@@ -381,38 +381,36 @@ void RenderPath::SetEnabled(const String& tag, bool active)
 
 bool RenderPath::IsEnabled(const String& tag) const
 {
-    bool enabled = false;
-    for (unsigned i = 0; i < renderTargets_.Size() && !enabled; ++i)
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
     {
-        if (!renderTargets_[i].tag_.Compare(tag, false))
-            enabled |= renderTargets_[i].enabled_;
+        if (!renderTargets_[i].tag_.Compare(tag, false) && renderTargets_[i].enabled_)
+            return true;
     }
 
-    for (unsigned i = 0; i < commands_.Size() && !enabled; ++i)
+    for (unsigned i = 0; i < commands_.Size(); ++i)
     {
-        if (!commands_[i].tag_.Compare(tag, false))
-            enabled |= commands_[i].enabled_;
+        if (!commands_[i].tag_.Compare(tag, false) && commands_[i].enabled_)
+            return true;
     }
 
-    return enabled;
+    return false;
 }
 
 bool RenderPath::IsAdded(const String& tag) const
 {
-    bool enabled = false;
-    for (unsigned i = 0; i < renderTargets_.Size() && !enabled; ++i)
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
     {
         if (!renderTargets_[i].tag_.Compare(tag, false))
-            enabled |= true;
+            return true;
     }
 
-    for (unsigned i = 0; i < commands_.Size() && !enabled; ++i)
+    for (unsigned i = 0; i < commands_.Size(); ++i)
     {
         if (!commands_[i].tag_.Compare(tag, false))
-            enabled |= true;
+            return true;
     }
 
-    return enabled;
+    return false;
 }
 
 void RenderPath::ToggleEnabled(const String& tag)

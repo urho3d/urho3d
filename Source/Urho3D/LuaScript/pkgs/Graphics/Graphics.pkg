@@ -18,6 +18,7 @@ class Graphics : public Object
     bool ToggleFullscreen();
     void Maximize();
     void Minimize();
+    void Raise();
     void Close();
     bool TakeScreenShot(Image& destImage);
     void BeginDumpShaders(const String fileName);
