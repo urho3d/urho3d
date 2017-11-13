@@ -38,7 +38,7 @@ class Sample2D;
 /// Note that this sample uses some functions from Sample2D utility class.
 class Urho2DIsometricDemo : public Sample
 {
-    OBJECT(Urho2DIsometricDemo);
+    URHO3D_OBJECT(Urho2DIsometricDemo, Sample);
 
 public:
     /// Construct.
@@ -46,7 +46,9 @@ public:
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
-
+    /// Setup before engine initialization. Modifies the engine parameters.
+    virtual void Setup();
+    
 private:
     /// Construct the scene content.
     void CreateScene();
@@ -64,6 +66,8 @@ private:
     void HandleSceneRendered(StringHash eventType, VariantMap& eventData);
     /// Handle reloading the scene.
     void ReloadScene(bool reInit);
+    /// Handle the contact begin event (Box2D contact listener).
+    void HandleCollisionBegin(StringHash eventType, VariantMap& eventData);
     /// Handle 'PLAY' button released event.
     void HandlePlayButton(StringHash eventType, VariantMap& eventData);
 

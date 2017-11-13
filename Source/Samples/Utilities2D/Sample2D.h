@@ -24,7 +24,6 @@
 
 #include <Urho3D/Core/Object.h>
 
-
 namespace Urho3D
 {
 
@@ -55,7 +54,7 @@ const float MOVE_SPEED_SCALE = 1.0f; // Scaling factor based on tiles' aspect ra
 ///    - Create XML patch instructions for screen joystick layout
 class Sample2D : public Object
 {
-    OBJECT(Sample2D);
+    URHO3D_OBJECT(Sample2D, Object);
 
 public:
     /// Construct.
@@ -106,7 +105,7 @@ public:
     /// Create a particle emitter attached to the given node.
     void SpawnEffect(Node* node);
     /// Play a non-looping sound effect.
-    void PlaySound(String soundName);
+    void PlaySoundEffect(String soundName);
 
     /// Filename used in load/save functions.
     String demoFilename_;

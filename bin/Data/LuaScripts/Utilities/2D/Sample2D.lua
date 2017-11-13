@@ -15,7 +15,7 @@ CAMERA_MIN_DIST = 0.1
 CAMERA_MAX_DIST = 6
 
 MOVE_SPEED = 23 -- Movement speed as world units per second
-MOVE_SPEED_X = 1.5 -- Movement speed for isometric maps
+MOVE_SPEED_X = 2.5 -- Movement speed for isometric maps
 MOVE_SPEED_SCALE = 1 -- Scaling factor based on tiles' aspect ratio
 
 LIFES = 3
@@ -87,11 +87,15 @@ function CreateCharacter(info, createObject, friction, position, scale)
     character2DNode.position = position
     character2DNode:SetScale(scale)
     local animatedSprite = character2DNode:CreateComponent("AnimatedSprite2D")
-    animatedSprite:SetAnimation(cache:GetResource("AnimationSet2D", "Urho2D/imp/imp.scml"), "idle") -- Get scml file and Play "idle" anim
-    animatedSprite:SetLayer(2) -- Put character over tile map (which is on layer 0) and over Orcs (which are on layer 1)
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/imp/imp.scml")
+    animatedSprite.animationSet = animationSet
+    animatedSprite.animation = "idle"
+    animatedSprite:SetLayer(3) -- Put character over tile map (which is on layer 0) and over Orcs (which are on layer 1)
+-- 
     local body = character2DNode:CreateComponent("RigidBody2D")
     body.bodyType = BT_DYNAMIC
     body.allowSleep = false
+
     local shape = character2DNode:CreateComponent("CollisionCircle2D")
     shape.radius = 1.1 -- Set shape size
     shape.friction = friction -- Set friction
@@ -128,8 +132,11 @@ function CreateOrc()
     local node = scene_:CreateChild("Orc")
     node.scale = character2DNode.scale -- Use same scale as player character
     local animatedSprite = node:CreateComponent("AnimatedSprite2D")
-    animatedSprite:SetAnimation(cache:GetResource("AnimationSet2D", "Urho2D/Orc/Orc.scml"), "run") -- Get scml file and Play "run" anim
-    animatedSprite:SetLayer(1) -- Make orc always visible
+    -- Get scml file and Play "run" anim
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/Orc/Orc.scml")
+    animatedSprite.animationSet = animationSet
+    animatedSprite.animation = "run"
+    animatedSprite:SetLayer(2) -- Make orc always visible
     local body = node:CreateComponent("RigidBody2D")
     local shape = node:CreateComponent("CollisionCircle2D") -- Create circle shape
     shape.radius = 1.3 -- Set shape size
@@ -141,7 +148,11 @@ function CreateCoin()
     local node = scene_:CreateChild("Coin")
     node:SetScale(0.5)
     local animatedSprite = node:CreateComponent("AnimatedSprite2D")
-    animatedSprite:SetAnimation(cache:GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml"), "idle") -- Get scml file and Play "idle" anim
+    -- Get scml file and Play "idle" anim
+    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml")
+    animatedSprite.animationSet = animationSet
+    animatedSprite.animation = "idle"
+    animatedSprite:SetLayer(2)
     local body = node:CreateComponent("RigidBody2D")
     body.bodyType = BT_STATIC
     local shape = node:CreateComponent("CollisionCircle2D") -- Create circle shape
@@ -292,8 +303,7 @@ function CreateUIContent(demoTitle)
     -- Create the UI for displaying the remaining lifes
     local lifeUI = ui.root:CreateChild("BorderImage", "Life")
     lifeUI.texture = cache:GetResource("Texture2D", "Urho2D/imp/imp_all.png")
-    lifeUI.imageRect = IntRect(2, 153, 238, 298)
-    lifeUI:SetSize(80, 50)
+    lifeUI:SetSize(70, 80)
     lifeUI:SetAlignment(HA_RIGHT, VA_TOP)
     lifeUI:SetPosition(-5, 5);
     local lifeText = lifeUI:CreateChild("Text", "LifeText")
@@ -322,8 +332,7 @@ function CreateUIContent(demoTitle)
     -- Create the image
     local spriteUI = fullUI:CreateChild("BorderImage", "Sprite")
     spriteUI.texture = cache:GetResource("Texture2D", "Urho2D/imp/imp_all.png")
-    spriteUI:SetSize(240, 150)
-    spriteUI.imageRect = IntRect(2, 153, 238, 149)
+    spriteUI:SetSize(238, 271)
     spriteUI:SetAlignment(HA_CENTER, VA_CENTER)
     spriteUI:SetPosition(0, - ui.root.height / 4)
 

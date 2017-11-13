@@ -21,7 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME 39_Urho2DIsometricDemo)
+set (TARGET_NAME 50_Urho2DPlatformer)
 
 # Define source files
 define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES} ../Utilities2D/Sample2D.h ../Utilities2D/Sample2D.cpp ../Utilities2D/Mover.h ../Utilities2D/Mover.cpp)

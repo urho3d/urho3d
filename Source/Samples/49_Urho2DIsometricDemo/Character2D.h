@@ -27,13 +27,13 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-const float MOVE_SPEED = 23.0f;
+const float MOVE_SPEED_X = 4.0f;
 const int LIFES = 3;
 
 /// Character2D component controling Imp behavior.
 class Character2D : public LogicComponent
 {
-    OBJECT(Character2D)
+    URHO3D_OBJECT(Character2D, LogicComponent);
 
 public:
     /// Construct.
@@ -43,12 +43,14 @@ public:
     static void RegisterObject(Context* context);
 
     /// Handle update. Called by LogicComponent base class.
-    virtual void Update(float timeStep);
+    virtual void Update(float timeStep) override;
+
     /// Handle player state/behavior when wounded.
     void HandleWoundedState(float timeStep);
+    
     /// Handle death of the player.
     void HandleDeath();
-
+    
     /// Flag when player is wounded.
     bool wounded_;
     /// Flag when player is dead.
@@ -61,12 +63,8 @@ public:
     int remainingCoins_;
     /// Counter for remaining lifes.
     int remainingLifes_;
-    /// Indicate when the player is climbing a ladder or a rope.
-    bool isClimbing_;
-    /// Used only for ropes, as they are split into 2 shapes.
-    bool climb2_;
-    /// Indicate when the player is above a climbable object, so we can still jump anyway.
-    bool aboveClimbable_;
-    /// Indicate when the player is climbing a slope, so we can apply force to its body.
-    bool onSlope_;
+    /// Scaling factor based on tiles' aspect ratio (definitively set at tile map creation).
+    float moveSpeedScale_;
+    /// Camera's zoom (used to scale movement speed based on camera zoom).
+    float zoom_;
 };

@@ -179,8 +179,11 @@ Node* Sample2D::CreateCharacter(TileMapInfo2D info, float friction, Vector3 posi
     spriteNode->SetPosition(position);
     spriteNode->SetScale(scale);
     AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
-    animatedSprite->SetAnimation(cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml"), "idle"); // Get scml file and Play "idle" anim
-    animatedSprite->SetLayer(2); // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 1)
+    // Get scml file and Play "idle" anim
+    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
+    animatedSprite->SetAnimationSet(animationSet);
+    animatedSprite->SetAnimation("idle");
+    animatedSprite->SetLayer(3); // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 2)
     RigidBody2D* impBody = spriteNode->CreateComponent<RigidBody2D>();
     impBody->SetBodyType(BT_DYNAMIC);
     impBody->SetAllowSleep(false);
@@ -221,8 +224,10 @@ Node* Sample2D::CreateOrc()
     Node* node = scene_->CreateChild("Orc");
     node->SetScale(scene_->GetChild("Imp", true)->GetScale());
     AnimatedSprite2D* animatedSprite = node->CreateComponent<AnimatedSprite2D>();
-    animatedSprite->SetAnimation(cache->GetResource<AnimationSet2D>("Urho2D/Orc/Orc.scml"), "run"); // Get scml file and Play "run" anim
-    animatedSprite->SetLayer(1); // Make orc always visible
+    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/Orc/Orc.scml");
+    animatedSprite->SetAnimationSet(animationSet);
+    animatedSprite->SetAnimation("run"); // Get scml file and Play "run" anim
+    animatedSprite->SetLayer(2); // Make orc always visible
     RigidBody2D* body = node->CreateComponent<RigidBody2D>();
     CollisionCircle2D* shape = node->CreateComponent<CollisionCircle2D>();
     shape->SetRadius(1.3f); // Set shape size
@@ -236,7 +241,10 @@ Node* Sample2D::CreateCoin()
     Node* node = scene_->CreateChild("Coin");
     node->SetScale(0.5);
     AnimatedSprite2D* animatedSprite = node->CreateComponent<AnimatedSprite2D>();
-    animatedSprite->SetAnimation(cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml"), "idle"); // Get scml file and Play "idle" anim
+    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml");
+    animatedSprite->SetAnimationSet(animationSet); // Get scml file and Play "idle" anim
+    animatedSprite->SetAnimation("idle");
+    animatedSprite->SetLayer(4);
     RigidBody2D* body = node->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
     CollisionCircle2D* shape = node->CreateComponent<CollisionCircle2D>(); // Create circle shape
@@ -320,6 +328,7 @@ void Sample2D::PopulateCoins(TileMapLayer2D* coinsLayer)
         TileMapObject2D* coinObject = coinsLayer->GetObject(i); // Get placeholder object
         Node* coinClone = coinNode->Clone();
         coinClone->SetPosition2D(coinObject->GetPosition() + coinObject->GetSize() / 2 + Vector2(0.0f, 0.16f));
+        
     }
 
     // Remove node used for cloning purpose
@@ -405,8 +414,7 @@ void Sample2D::CreateUIContent(String demoTitle, int remainingLifes, int remaini
     // Create the UI for displaying the remaining lifes
     BorderImage* lifeUI = ui->GetRoot()->CreateChild<BorderImage>("Life");
     lifeUI->SetTexture(cache->GetResource<Texture2D>("Urho2D/imp/imp_all.png"));
-    lifeUI->SetImageRect(IntRect(2, 153, 238, 298));
-    lifeUI->SetSize(80, 50);
+    lifeUI->SetSize(70, 80);
     lifeUI->SetAlignment(HA_RIGHT, VA_TOP);
     lifeUI->SetPosition(-5, 5);
     Text* lifeText = lifeUI->CreateChild<Text>("LifeText");
@@ -435,8 +443,7 @@ void Sample2D::CreateUIContent(String demoTitle, int remainingLifes, int remaini
     // Create the image
     BorderImage* spriteUI = fullUI->CreateChild<BorderImage>("Sprite");
     spriteUI->SetTexture(cache->GetResource<Texture2D>("Urho2D/imp/imp_all.png"));
-    spriteUI->SetSize(240, 150);
-    spriteUI->SetImageRect(IntRect(2, 153, 238, 149));
+    spriteUI->SetSize(238, 271);
     spriteUI->SetAlignment(HA_CENTER, VA_CENTER);
     spriteUI->SetPosition(0, - ui->GetRoot()->GetHeight() / 4);
 
@@ -451,7 +458,7 @@ void Sample2D::CreateUIContent(String demoTitle, int remainingLifes, int remaini
     exitText->SetAlignment(HA_CENTER, VA_CENTER);
     exitText->SetFont(font, 24);
     exitText->SetText("EXIT");
-    SubscribeToEvent(exitButton, E_RELEASED, HANDLER(Sample2D, HandleExitButton));
+    SubscribeToEvent(exitButton, E_RELEASED, URHO3D_HANDLER(Sample2D, HandleExitButton));
 
     // Create the 'PLAY' button
     Button* playButton = ui->GetRoot()->CreateChild<Button>("PlayButton");
@@ -522,13 +529,17 @@ void Sample2D::SpawnEffect(Node* node)
     Node* particleNode = node->CreateChild("Emitter");
     particleNode->SetScale(0.5 / node->GetScale().x_);
     ParticleEmitter2D* particleEmitter = particleNode->CreateComponent<ParticleEmitter2D>();
+    particleEmitter->SetLayer(2);
     particleEmitter->SetEffect(cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex"));
 }
 
-void Sample2D::PlaySound(String soundName)
+void Sample2D::PlaySoundEffect(String soundName)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Node* soundNode = scene_->CreateChild("Sound");
-    SoundSource* source = soundNode->CreateComponent<SoundSource>();
-    source->Play(cache->GetResource<Sound>("Sounds/" + soundName));
+    SoundSource* source = scene_->CreateComponent<SoundSource>();
+    Sound* sound = cache->GetResource<Sound>("Sounds/" + soundName);
+    if (sound != NULL) {
+        source->SetAutoRemoveMode(REMOVE_COMPONENT);
+        source->Play(sound);
+    }
 }

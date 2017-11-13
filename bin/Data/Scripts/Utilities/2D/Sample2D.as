@@ -124,8 +124,14 @@ void CreateCharacter(TileMapInfo2D@ info, bool createObject, float friction, Vec
     character2DNode.position = position;
     character2DNode.SetScale(scale);
     AnimatedSprite2D@ animatedSprite = character2DNode.CreateComponent("AnimatedSprite2D");
-    animatedSprite.SetAnimation(cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml"), "idle"); // Get scml file and Play "idle" anim
-    animatedSprite.layer = 2; // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 1)
+    
+    AnimationSet2D@ spriterAnimationSet = cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml");
+    if (spriterAnimationSet is null)
+        return;
+
+    animatedSprite.animationSet = spriterAnimationSet;
+    animatedSprite.SetAnimation("idle"); // Get scml file and Play "idle" anim
+    animatedSprite.layer = 3; // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 1)
     RigidBody2D@ characterBody = character2DNode.CreateComponent("RigidBody2D");
     characterBody.bodyType = BT_DYNAMIC;
     characterBody.allowSleep = false;
@@ -167,8 +173,14 @@ Node@ CreateOrc()
     Node@ node = scene_.CreateChild("Orc");
     node.scale = character2DNode.scale; // Use same scale as player character
     AnimatedSprite2D@ animatedSprite = node.CreateComponent("AnimatedSprite2D");
-    animatedSprite.SetAnimation(cache.GetResource("AnimationSet2D", "Urho2D/Orc/Orc.scml"), "run"); // Get scml file and Play "run" anim
-    animatedSprite.layer = 1; // Make orc always visible
+
+    AnimationSet2D@ spriterAnimationSet = cache.GetResource("AnimationSet2D", "Urho2D/Orc/Orc.scml");
+    if (spriterAnimationSet is null)
+        return null;
+
+    animatedSprite.animationSet = spriterAnimationSet;
+    animatedSprite.SetAnimation("run"); // Get scml file and Play "run" anim
+    animatedSprite.layer = 2; // Make orc always visible
     RigidBody2D@ body = node.CreateComponent("RigidBody2D");
     CollisionCircle2D@ shape = node.CreateComponent("CollisionCircle2D"); // Create circle shape
     shape.radius = 1.3f; // Set shape size
@@ -181,7 +193,13 @@ Node@ CreateCoin()
     Node@ node = scene_.CreateChild("Coin");
     node.SetScale(0.5);
     AnimatedSprite2D@ animatedSprite = node.CreateComponent("AnimatedSprite2D");
-    animatedSprite.SetAnimation(cache.GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml"), "idle"); // Get scml file and Play "idle" anim
+    animatedSprite.layer = 4;
+    AnimationSet2D@ spriterAnimationSet = cache.GetResource("AnimationSet2D", "Urho2D/GoldIcon.scml");
+    if (spriterAnimationSet is null)
+        return null;
+
+    animatedSprite.animationSet = spriterAnimationSet;
+    animatedSprite.SetAnimation("idle"); // Get scml file and Play "idle" anim
     RigidBody2D@ body = node.CreateComponent("RigidBody2D");
     body.bodyType = BT_STATIC;
     CollisionCircle2D@ shape = node.CreateComponent("CollisionCircle2D"); // Create circle shape
@@ -344,8 +362,7 @@ void CreateUIContent(String demoTitle)
     // Create the UI for displaying the remaining lifes
     BorderImage@ lifeUI = ui.root.CreateChild("BorderImage", "Life");
     lifeUI.texture = cache.GetResource("Texture2D", "Urho2D/imp/imp_all.png");
-    lifeUI.imageRect = IntRect(2, 153, 238, 298);
-    lifeUI.SetSize(80, 50);
+    lifeUI.SetSize(70, 80);
     lifeUI.SetAlignment(HA_RIGHT, VA_TOP);
     lifeUI.SetPosition(-5, 5);
     Text@ lifeText = lifeUI.CreateChild("Text", "LifeText");
@@ -374,8 +391,7 @@ void CreateUIContent(String demoTitle)
     // Create the image
     BorderImage@ spriteUI = fullUI.CreateChild("BorderImage", "Sprite");
     spriteUI.texture = cache.GetResource("Texture2D", "Urho2D/imp/imp_all.png");
-    spriteUI.SetSize(240, 150);
-    spriteUI.imageRect = IntRect(2, 153, 238, 149);
+    spriteUI.SetSize(238, 271);
     spriteUI.SetAlignment(HA_CENTER, VA_CENTER);
     spriteUI.SetPosition(0, - ui.root.height / 4);
 
@@ -499,6 +515,7 @@ void SpawnEffect(Node@ node)
     particleNode.SetScale(0.5 / node.scale.x);
     ParticleEmitter2D@ particleEmitter = particleNode.CreateComponent("ParticleEmitter2D");
     particleEmitter.effect = cache.GetResource("ParticleEffect2D", "Urho2D/sun.pex");
+    particleEmitter.layer = 2;
 }
 
 void PlaySound(String soundName)

@@ -50,6 +50,8 @@
 #include <Urho3D/Urho2D/TmxFile2D.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Urho2D/PhysicsEvents2D.h>
+#include <Urho3D/Urho2D/PhysicsWorld2D.h>
 
 #include <Urho3D/DebugNew.h>
 
@@ -57,9 +59,6 @@
 #include "Utilities2D/Sample2D.h"
 #include "Utilities2D/Mover.h"
 #include "Urho2DIsometricDemo.h"
-
-
-DEFINE_APPLICATION_MAIN(Urho2DIsometricDemo)
 
 Urho2DIsometricDemo::Urho2DIsometricDemo(Context* context) :
     Sample(context),
@@ -70,6 +69,12 @@ Urho2DIsometricDemo::Urho2DIsometricDemo(Context* context) :
     Character2D::RegisterObject(context);
     // Register factory and attributes for the Mover component so it can be created via CreateComponent, and loaded / saved
     Mover::RegisterObject(context);
+}
+
+void Urho2DIsometricDemo::Setup()
+{
+    Sample::Setup();
+    engineParameters_[EP_SOUND] = true;
 }
 
 void Urho2DIsometricDemo::Start()
@@ -89,7 +94,7 @@ void Urho2DIsometricDemo::Start()
     sample2D_->CreateUIContent("ISOMETRIC 2.5D DEMO", character2D_->remainingLifes_, character2D_->remainingCoins_);
     UI* ui = GetSubsystem<UI>();
     Button* playButton = static_cast<Button*>(ui->GetRoot()->GetChild("PlayButton", true));
-    SubscribeToEvent(playButton, E_RELEASED, HANDLER(Urho2DIsometricDemo, HandlePlayButton));
+    SubscribeToEvent(playButton, E_RELEASED, URHO3D_HANDLER(Urho2DIsometricDemo, HandlePlayButton));
 
     // Hook up to the frame update events
     SubscribeToEvents();
@@ -143,8 +148,76 @@ void Urho2DIsometricDemo::CreateScene()
     // Instantiate enemies at each placeholder of "MovingEntities" layer (placeholders are Poly Line objects defining a path from points)
     sample2D_->PopulateMovingEntities(tileMap->GetLayer(tileMap->GetNumLayers() - 2));
 
+    // Instantiate coins to pick at each placeholder of "Coins" layer (placeholders for coins are Rectangle objects)
+    TileMapLayer2D* coinsLayer = tileMap->GetLayer(tileMap->GetNumLayers() - 3);
+    sample2D_->PopulateCoins(coinsLayer);
+    
+    // Init coins counters
+    character2D_->remainingCoins_ = coinsLayer->GetNumObjects();
+    character2D_->maxCoins_ = coinsLayer->GetNumObjects();
+    
     // Check when scene is rendered
-    SubscribeToEvent(E_ENDRENDERING, HANDLER(Urho2DIsometricDemo, HandleSceneRendered));
+    SubscribeToEvent(E_ENDRENDERING, URHO3D_HANDLER(Urho2DIsometricDemo, HandleSceneRendered));
+}
+
+void Urho2DIsometricDemo::HandleCollisionBegin(StringHash eventType, VariantMap& eventData)
+{
+    // Get colliding node
+    Node* hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEA].GetPtr());
+    if (hitNode->GetName() == "Imp")
+        hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEB].GetPtr());
+    String nodeName = hitNode->GetName();
+    Node* character2DNode = scene_->GetChild("Imp", true);
+    
+    // Handle coins picking
+    if (nodeName == "Coin")
+    {
+        hitNode->Remove();
+        character2D_->remainingCoins_ -= 1;
+        UI* ui = GetSubsystem<UI>();
+        if (character2D_->remainingCoins_ == 0)
+        {
+            Text* instructions = static_cast<Text*>(ui->GetRoot()->GetChild("Instructions", true));
+            instructions->SetText("!!! You have all the coins !!!");
+        }
+        Text* coinsText = static_cast<Text*>(ui->GetRoot()->GetChild("CoinsText", true));
+        coinsText->SetText(String(character2D_->remainingCoins_)); // Update coins UI counter
+        sample2D_->PlaySoundEffect("Powerup.wav");
+    }
+    
+    // Handle interactions with enemies
+    if (nodeName == "Orc")
+    {
+        AnimatedSprite2D* animatedSprite = character2DNode->GetComponent<AnimatedSprite2D>();
+        float deltaX = character2DNode->GetPosition().x_ - hitNode->GetPosition().x_;
+        
+        // Orc killed if character is fighting in its direction when the contact occurs
+        if (animatedSprite->GetAnimation() == "attack" && (deltaX < 0 == animatedSprite->GetFlipX()))
+        {
+            static_cast<Mover*>(hitNode->GetComponent<Mover>())->emitTime_ = 1;
+            if (!hitNode->GetChild("Emitter", true))
+            {
+                hitNode->GetComponent("RigidBody2D")->Remove(); // Remove Orc's body
+                sample2D_->SpawnEffect(hitNode);
+                sample2D_->PlaySoundEffect("BigExplosion.wav");
+            }
+        }
+        // Player killed if not fighting in the direction of the Orc when the contact occurs
+        else
+        {
+            if (!character2DNode->GetChild("Emitter", true))
+            {
+                character2D_->wounded_ = true;
+                if (nodeName == "Orc")
+                {
+                    Mover* orc = static_cast<Mover*>(hitNode->GetComponent<Mover>());
+                    orc->fightTimer_ = 1;
+                }
+                sample2D_->SpawnEffect(character2DNode);
+                sample2D_->PlaySoundEffect("BigExplosion.wav");
+            }
+        }
+    }
 }
 
 void Urho2DIsometricDemo::HandleSceneRendered(StringHash eventType, VariantMap& eventData)
@@ -159,16 +232,19 @@ void Urho2DIsometricDemo::HandleSceneRendered(StringHash eventType, VariantMap& 
 void Urho2DIsometricDemo::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DIsometricDemo, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DIsometricDemo, HandleUpdate));
 
     // Subscribe HandlePostUpdate() function for processing post update events
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(Urho2DIsometricDemo, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(Urho2DIsometricDemo, HandlePostUpdate));
 
     // Subscribe to PostRenderUpdate to draw debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Urho2DIsometricDemo, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Urho2DIsometricDemo, HandlePostRenderUpdate));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
+    
+    // Subscribe to Box2D contact listeners
+    SubscribeToEvent(E_PHYSICSBEGINCONTACT2D, URHO3D_HANDLER(Urho2DIsometricDemo, HandleCollisionBegin));
 }
 
 void Urho2DIsometricDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -273,3 +349,5 @@ void Urho2DIsometricDemo::HandlePlayButton(StringHash eventType, VariantMap& eve
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(false);
 }
+
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DIsometricDemo)

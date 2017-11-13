@@ -40,7 +40,7 @@ class Sample2D;
 /// Note that this sample uses some functions from Sample2D utility class.
 class Urho2DPlatformer : public Sample
 {
-    OBJECT(Urho2DPlatformer);
+    URHO3D_OBJECT(Urho2DPlatformer, Sample);
 
 public:
     /// Construct.
@@ -48,7 +48,9 @@ public:
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
-
+    /// Setup before engine initialization. Modifies the engine parameters.
+    virtual void Setup();
+    
 private:
     /// Construct the scene content.
     void CreateScene();

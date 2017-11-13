@@ -64,6 +64,9 @@ void CreateScene()
     // Instantiate enemies and moving platforms at each placeholder of "MovingEntities" layer (placeholders are Poly Line objects defining a path from points)
     PopulateMovingEntities(tileMap.GetLayer(tileMap.numLayers - 2));
 
+    // Instantiate coins to pick at each placeholder of "Coins" layer (in this sample, placeholders for coins are Rectangle objects)
+    PopulateCoins(tileMap.GetLayer(tileMap.numLayers - 3));
+
     // Check when scene is rendered
     SubscribeToEvent("EndRendering", "HandleSceneRendered");
 }
@@ -87,6 +90,9 @@ void SubscribeToEvents()
 
     // Subscribe to PostRenderUpdate to draw physics shapes
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
+
+    // Subscribe to Box2D contact listeners
+    SubscribeToEvent("PhysicsBeginContact2D", "HandleCollisionBegin");
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent("SceneUpdate");
@@ -131,6 +137,62 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
     }
 }
 
+void HandleCollisionBegin(StringHash eventType, VariantMap& eventData)
+{
+    // Get colliding node
+    Node@ hitNode = eventData["NodeA"].GetPtr();
+    if (hitNode.name == "Imp")
+        hitNode = eventData["NodeB"].GetPtr();
+    String nodeName = hitNode.name;
+    Character2D@ character = cast<Character2D>(character2DNode.scriptObject);
+
+    // Handle coins picking
+    if (nodeName == "Coin")
+    {
+        hitNode.Remove();
+        character.remainingCoins = character.remainingCoins - 1;
+        if (character.remainingCoins == 0)
+        {
+            Text@ instructions = ui.root.GetChild("Instructions", true);
+            instructions.text = "!!! You got all the coins !!!";
+        }
+        Text@ coinsText = ui.root.GetChild("CoinsText", true);
+        coinsText.text = character.remainingCoins; // Update coins UI counter
+        PlaySound("Powerup.wav");
+    }
+
+    // Handle interactions with enemies
+    if (nodeName == "Orc")
+    {
+        AnimatedSprite2D@ animatedSprite = character2DNode.GetComponent("AnimatedSprite2D");
+        float deltaX = character2DNode.position.x - hitNode.position.x;
+
+        // Orc killed if character is fighting in its direction when the contact occurs
+        if (animatedSprite.animation == "attack" && (deltaX < 0 == animatedSprite.flipX))
+        {
+            cast<Mover>(hitNode.scriptObject).emitTime = 1;
+            if (hitNode.GetChild("Emitter", true) is null)
+            {
+                hitNode.GetComponent("RigidBody2D").Remove(); // Remove Orc's body
+                SpawnEffect(hitNode);
+                PlaySound("BigExplosion.wav");
+            }
+        }
+        // Player killed if not fighting in the direction of the Orc when the contact occurs
+        else
+        {
+            if (character2DNode.GetChild("Emitter", true) is null)
+            {
+                character.wounded = true;
+                if (nodeName == "Orc")
+                    cast<Mover>(hitNode.scriptObject).fightTimer = 1;
+                SpawnEffect(character2DNode);
+                PlaySound("BigExplosion.wav");
+            }
+        }
+    }
+}
+
 // Character2D script object class
 class Character2D : ScriptObject
 {
@@ -146,8 +208,18 @@ class Character2D : ScriptObject
         if (character2DNode is null)
             return;
 
-        AnimatedSprite2D@ animatedSprite = character2DNode.GetComponent("AnimatedSprite2D");
+        // Handle wounded/killed states
+        if (killed)
+            return;
 
+        if (wounded)
+        {
+            HandleWoundedState(timeStep);
+            return;
+        }
+
+        AnimatedSprite2D@ animatedSprite = character2DNode.GetComponent("AnimatedSprite2D");
+        
         // Set direction
         Vector3 moveDir = Vector3(0.0f, 0.0f, 0.0f); // Reset
         float speedX = Clamp(MOVE_SPEED_X / zoom, 0.4f, 1.0f);
@@ -191,5 +263,79 @@ class Character2D : ScriptObject
         {
             animatedSprite.SetAnimation("idle");
         }
+    }
+
+    void HandleWoundedState(float timeStep)
+    {
+        RigidBody2D@ body = node.GetComponent("RigidBody2D");
+        AnimatedSprite2D@ animatedSprite = node.GetComponent("AnimatedSprite2D");
+
+        // Play "hit" animation in loop
+        if (animatedSprite.animation != "hit")
+            animatedSprite.SetAnimation("hit", LM_FORCE_LOOPED);
+
+        // Update timer
+        timer = timer + timeStep;
+
+        if (timer > 2.0f)
+        {
+            // Reset timer
+            timer = 0.0f;
+
+            // Clear forces (should be performed by setting linear velocity to zero, but currently doesn't work)
+            body.linearVelocity = Vector2(0.0f, 0.0f);
+            body.awake = false;
+            body.awake = true;
+
+            // Remove particle emitter
+            node.GetChild("Emitter", true).Remove();
+
+            // Update lifes UI and counter
+            remainingLifes = remainingLifes - 1;
+            Text@ lifeText = ui.root.GetChild("LifeText", true);
+            lifeText.text = remainingLifes; // Update lifes UI counter
+
+            // Reset wounded state
+            wounded = false;
+
+            // Handle death
+            if (remainingLifes == 0)
+            {
+                HandleDeath();
+                return;
+            }
+
+            // Re-position the character to the nearest point
+            if (node.position.x < 15.0f)
+                node.position = Vector3(1.0f, 8.0f, 0.0f);
+            else
+                node.position = Vector3(18.8f, 9.2f, 0.0f);
+        }
+    }
+
+    void HandleDeath()
+    {
+        RigidBody2D@ body = node.GetComponent("RigidBody2D");
+        AnimatedSprite2D@ animatedSprite = node.GetComponent("AnimatedSprite2D");
+
+        // Set state to 'killed'
+        killed = true;
+
+        // Update UI elements
+        Text@ instructions = ui.root.GetChild("Instructions", true);
+        instructions.text = "!!! GAME OVER !!!";
+        ui.root.GetChild("ExitButton", true).visible = true;
+        ui.root.GetChild("PlayButton", true).visible = true;
+
+        // Show mouse cursor so that we can click
+        input.mouseVisible = true;
+
+        // Put character outside of the scene and magnify him
+        node.position = Vector3(-20.0f, 0.0f, 0.0f);
+        node.SetScale(1.2f);
+
+        // Play death animation once
+        if (animatedSprite.animation != "dead2")
+            animatedSprite.SetAnimation("dead2");
     }
 }

@@ -66,6 +66,9 @@ function CreateScene()
     -- Instantiate enemies and moving platforms at each placeholder of "MovingEntities" layer (placeholders are Poly Line objects defining a path from points)
     PopulateMovingEntities(tileMap:GetLayer(tileMap.numLayers - 2))
 
+    -- Instantiate coins to pick at each placeholder of "Coins" layer (placeholders for coins are Rectangle objects)
+    PopulateCoins(tileMap:GetLayer(tileMap.numLayers - 3))
+
     -- Check when scene is rendered
     SubscribeToEvent("EndRendering", HandleSceneRendered)
 end

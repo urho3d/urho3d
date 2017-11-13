@@ -139,9 +139,9 @@ end
 
 function HandleCollisionBegin(eventType, eventData)
     -- Get colliding node
-    local hitNode = eventData:GetPtr("Node", "NodeA")
+    local hitNode = eventData["NodeA"]:GetPtr("Node")
     if hitNode.name == "Imp" then
-        hitNode = eventData:GetPtr("Node", "NodeB")
+        hitNode = eventData["NodeB"]:GetPtr("Node")
     end
     local nodeName = hitNode.name
     local character = character2DNode:GetScriptObject()
@@ -237,9 +237,9 @@ end
 
 function HandleCollisionEnd(eventType, eventData)
     -- Get colliding node
-    local hitNode = eventData:GetPtr("Node", "NodeA")
+    local hitNode = eventData["NodeA"]:GetPtr("Node")
     if hitNode.name == "Imp" then
-        hitNode = eventData:GetPtr("Node", "NodeB")
+        hitNode = eventData["NodeB"]:GetPtr("Node")
     end
     local nodeName = hitNode.name
     local character = character2DNode:GetScriptObject()

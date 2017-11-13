@@ -33,7 +33,7 @@ using namespace Urho3D;
 ///    - Default speed is 0.8 if 'Speed' property is not set in the tmx file objects
 class Mover : public LogicComponent
 {
-    OBJECT(Mover);
+    URHO3D_OBJECT(Mover, LogicComponent);
 
 public:
     /// Construct.

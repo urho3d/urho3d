@@ -22,6 +22,7 @@
 
 #include <Urho3D/Urho3D.h>
 
+#include <Urho3D/Audio/Audio.h>
 #include <Urho3D/Urho2D/AnimatedSprite2D.h>
 #include <Urho3D/Urho2D/AnimationSet2D.h>
 #include <Urho3D/UI/Button.h>
@@ -63,7 +64,7 @@
 #include "Urho2DPlatformer.h"
 
 
-DEFINE_APPLICATION_MAIN(Urho2DPlatformer)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DPlatformer)
 
 Urho2DPlatformer::Urho2DPlatformer(Context* context) :
     Sample(context),
@@ -73,6 +74,12 @@ Urho2DPlatformer::Urho2DPlatformer(Context* context) :
     Character2D::RegisterObject(context);
     // Register factory and attributes for the Mover component so it can be created via CreateComponent, and loaded / saved
     Mover::RegisterObject(context);
+}
+
+void Urho2DPlatformer::Setup()
+{
+    Sample::Setup();
+    engineParameters_[EP_SOUND] = true;
 }
 
 void Urho2DPlatformer::Start()
@@ -92,7 +99,7 @@ void Urho2DPlatformer::Start()
     sample2D_->CreateUIContent("PLATFORMER 2D DEMO", character2D_->remainingLifes_, character2D_->remainingCoins_);
     UI* ui = GetSubsystem<UI>();
     Button* playButton = static_cast<Button*>(ui->GetRoot()->GetChild("PlayButton", true));
-    SubscribeToEvent(playButton, E_RELEASED, HANDLER(Urho2DPlatformer, HandlePlayButton));
+    SubscribeToEvent(playButton, E_RELEASED, URHO3D_HANDLER(Urho2DPlatformer, HandlePlayButton));
 
     // Hook up to the frame update events
     SubscribeToEvents();
@@ -106,7 +113,7 @@ void Urho2DPlatformer::CreateScene()
     // Create the Octree, DebugRenderer and PhysicsWorld2D components to the scene
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-    PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
+    /*PhysicsWorld2D* physicsWorld =*/ scene_->CreateComponent<PhysicsWorld2D>(); 
 
     // Create camera
     cameraNode_ = scene_->CreateChild("Camera");
@@ -159,7 +166,7 @@ void Urho2DPlatformer::CreateScene()
     sample2D_->CreateBackgroundSprite(info, 3.5, "Textures/HeightMap.png", true);
 
     // Check when scene is rendered
-    SubscribeToEvent(E_ENDRENDERING, HANDLER(Urho2DPlatformer, HandleSceneRendered));
+    SubscribeToEvent(E_ENDRENDERING, URHO3D_HANDLER(Urho2DPlatformer, HandleSceneRendered));
 }
 
 void Urho2DPlatformer::HandleSceneRendered(StringHash eventType, VariantMap& eventData)
@@ -174,17 +181,17 @@ void Urho2DPlatformer::HandleSceneRendered(StringHash eventType, VariantMap& eve
 void Urho2DPlatformer::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DPlatformer, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DPlatformer, HandleUpdate));
 
     // Subscribe HandlePostUpdate() function for processing post update events
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(Urho2DPlatformer, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(Urho2DPlatformer, HandlePostUpdate));
 
     // Subscribe to PostRenderUpdate to draw debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Urho2DPlatformer, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Urho2DPlatformer, HandlePostRenderUpdate));
 
     // Subscribe to Box2D contact listeners
-    SubscribeToEvent(E_PHYSICSBEGINCONTACT2D, HANDLER(Urho2DPlatformer, HandleCollisionBegin));
-    SubscribeToEvent(E_PHYSICSENDCONTACT2D, HANDLER(Urho2DPlatformer, HandleCollisionEnd));
+    SubscribeToEvent(E_PHYSICSBEGINCONTACT2D, URHO3D_HANDLER(Urho2DPlatformer, HandleCollisionBegin));
+    SubscribeToEvent(E_PHYSICSENDCONTACT2D, URHO3D_HANDLER(Urho2DPlatformer, HandleCollisionEnd));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
@@ -232,7 +239,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
         }
         Text* coinsText = static_cast<Text*>(ui->GetRoot()->GetChild("CoinsText", true));
         coinsText->SetText(String(character2D_->remainingCoins_)); // Update coins UI counter
-        sample2D_->PlaySound("Powerup.wav");
+        sample2D_->PlaySoundEffect("Powerup.wav");
     }
 
     // Handle interactions with enemies
@@ -249,7 +256,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
             {
                 hitNode->GetComponent("RigidBody2D")->Remove(); // Remove Orc's body
                 sample2D_->SpawnEffect(hitNode);
-                sample2D_->PlaySound("BigExplosion.wav");
+                sample2D_->PlaySoundEffect("BigExplosion.wav");
             }
         }
         // Player killed if not fighting in the direction of the Orc when the contact occurs, or when colliding with a flower
@@ -264,7 +271,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
                     orc->fightTimer_ = 1;
                 }
                 sample2D_->SpawnEffect(character2DNode);
-                sample2D_->PlaySound("BigExplosion.wav");
+                sample2D_->PlaySoundEffect("BigExplosion.wav");
             }
         }
     }
@@ -291,7 +298,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
         {
             character2D_->wounded_ = true;
             sample2D_->SpawnEffect(character2DNode);
-            sample2D_->PlaySound("BigExplosion.wav");
+            sample2D_->PlaySoundEffect("BigExplosion.wav");
         }
     }
 
