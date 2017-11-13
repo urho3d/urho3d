@@ -562,6 +562,15 @@ public:
     /// Return whether is using an OpenGL 3 context. Return always false on Direct3D9 & Direct3D11.
     static bool GetGL3Support();
 
+    /// Returns the index of the display containing the center of the window on success or a negative error code on failure.
+    int GetCurrentMonitor() const;
+    /// Returns true if window is maximized or runs in full screen mode.
+    bool GetMaximized() const;
+    /// Raises window if it was minimized.
+    void RaiseWindow() const;
+    /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
+    Vector3 GetDisplayDPI() const;
+
 private:
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable, bool borderless);
