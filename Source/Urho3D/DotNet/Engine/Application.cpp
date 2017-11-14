@@ -30,6 +30,11 @@ public:
         if (callbackStop_)
             callbackStop_();
     }
+
+    VariantMap* GetEngineParametersPtr()
+    {
+        return &engineParameters_;
+    }
 };
 
 extern "C"
@@ -58,6 +63,11 @@ URHO3D_API void ApplicationEXT_SetCallback_Start(ApplicationEXT* nativeInstance,
 URHO3D_API void ApplicationEXT_SetCallback_Stop(ApplicationEXT* nativeInstance, void_function_void callback)
 {
     nativeInstance->callbackStop_ = callback;
+}
+
+URHO3D_API VariantMap* ApplicationEXT_GetEngineParametersPtr(ApplicationEXT* nativeInstance)
+{
+    return nativeInstance->GetEngineParametersPtr();
 }
 
 }
