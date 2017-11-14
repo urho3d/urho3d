@@ -57,8 +57,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
@@ -160,6 +158,12 @@ private:
     void CreateConstraint();
     /// Apply high and low constraint limits.
     void ApplyLimits();
+    /// Adjust other body position.
+    void AdjustOtherBodyPosition();
+    /// Mark constraint dirty.
+    void MarkConstraintDirty() { recreateConstraint_ = true; }
+    /// Mark frames dirty.
+    void MarkFramesDirty() { framesDirty_ = true; }
 
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;

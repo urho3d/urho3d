@@ -59,8 +59,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
@@ -262,6 +260,8 @@ private:
     void HandleTargetPosition(StringHash eventType, VariantMap& eventData);
     /// Handle SmoothedTransform target rotation update.
     void HandleTargetRotation(StringHash eventType, VariantMap& eventData);
+    /// Mark body dirty.
+    void MarkBodyDirty() { readdBody_ = true; }
 
     /// Bullet rigid body.
     UniquePtr<btRigidBody> body_;

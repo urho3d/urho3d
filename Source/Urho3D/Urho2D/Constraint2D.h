@@ -45,8 +45,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
@@ -89,6 +87,8 @@ protected:
     void RecreateJoint();
     /// Initialize joint def.
     void InitializeJointDef(b2JointDef* jointDef);
+    /// Mark other body node ID dirty.
+    void MarkOtherBodyNodeIDDirty() { otherBodyNodeIDDirty_ = true; }
 
     /// Physics world.
     WeakPtr<PhysicsWorld2D> physicsWorld_;
