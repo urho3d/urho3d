@@ -2313,4 +2313,68 @@ void Image::FreeImageData(unsigned char* pixelData)
     stbi_image_free(pixelData);
 }
 
+bool Image::HasAlphaChannel() const
+{
+    return components_ > 3;
+}
+
+// Author: Josh Engebretson (AtomicGameEngine)
+bool Image::SetSubimage(const Image* image, const IntRect& rect)
+{
+    if (!data_)
+        return false;
+
+    if (depth_ > 1 || IsCompressed())
+    {
+        URHO3D_LOGERROR("SetSubimage not supported for Compressed or 3D images");
+        return false;
+    }
+
+    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
+    {
+        URHO3D_LOGERROR("Can not set subimage in image " + GetName() + " with invalid region");
+        return false;
+    }
+
+    int width = rect.Width();
+    int height = rect.Height();
+    if (width == image->GetWidth() && height == image->GetHeight())
+    {
+        int components = Min((int)components_, (int)image->components_);
+
+        unsigned char* src = image->GetData();
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        for (int i = 0; i < height; ++i)
+        {
+            memcpy(dest, src, width * components);
+
+            src += width * image->components_;
+            dest += width_ * components_;
+        }
+    }
+    else
+    {
+        unsigned uintColor;
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        unsigned char* src = (unsigned char*)&uintColor;
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                // Calculate float coordinates between 0 - 1 for resampling
+                float xF = (image->width_ > 1) ? (float)x / (float)(width - 1) : 0.0f;
+                float yF = (image->height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
+                uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
+
+                memcpy(dest, src, components_);
+
+                dest += components_;
+            }
+            dest += (width_ - width) * components_;
+        }
+    }
+
+    return true;
+}
+
 }
