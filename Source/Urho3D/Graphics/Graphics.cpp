@@ -243,10 +243,10 @@ bool Graphics::GetMaximized() const
     return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
 }
 
-Vector3 Graphics::GetDisplayDPI() const
+Vector3 Graphics::GetDisplayDPI(int monitor) const
 {
     Vector3 result;
-    SDL_GetDisplayDPI(0, &result.z_, &result.x_, &result.y_);
+    SDL_GetDisplayDPI(monitor, &result.z_, &result.x_, &result.y_);
     return result;
 }
 

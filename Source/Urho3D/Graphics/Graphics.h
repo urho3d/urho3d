@@ -379,7 +379,7 @@ public:
     /// Returns true if window is maximized or runs in full screen mode.
     bool GetMaximized() const;
     /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
-    Vector3 GetDisplayDPI() const;
+    Vector3 GetDisplayDPI(int monitor=0) const;
 
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
