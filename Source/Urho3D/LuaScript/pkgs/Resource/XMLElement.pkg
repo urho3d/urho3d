@@ -2,12 +2,14 @@ $#include "Resource/XMLElement.h"
 
 class XMLElement
 {
+    bool AppendChild(XMLElement element, bool asCopy);
     XMLElement CreateChild(const String name);
     XMLElement GetOrCreateChild(const String name);
     bool RemoveChild(const XMLElement& element);
     bool RemoveChild(const String name);
     bool RemoveChildren(const String name = String::EMPTY);
     bool RemoveAttribute(const String name = String::EMPTY);
+    bool Remove();
 
     bool SetValue(const String value);
     bool SetAttribute(const String name, const String value);

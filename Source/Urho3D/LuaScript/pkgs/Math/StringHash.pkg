@@ -16,7 +16,7 @@ class StringHash
     String ToString() const;
     unsigned ToHash() const;
 
-    static unsigned Calculate(const char* str);
+    static unsigned Calculate(const char* str, unsigned hash = 0);
     static const StringHash ZERO;
 
     tolua_readonly tolua_property__no_prefix unsigned value;
