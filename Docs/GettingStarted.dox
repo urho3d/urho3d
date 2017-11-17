@@ -64,7 +64,7 @@ To run Urho3D, the minimum system requirements are:
 
 - Web: modern HTML5 browsers with fast JavaScript engine and WebGL support. Nightly built browsers are required for running WebAssembly target.
 
-SSE2 requirement can be eliminated by disabling the use of SSE2 instruction set, see URHO3D_SSE build option below. For Linux platform using GCC/Clang compiler toolchain, the MMX and 3DNow! extensions can be enabled for older CPUs by using URHO3D_MMX and URHO3D_3DNOW build options when the option is available. The MMX and SSE/SSE2 extensions on x86_64 ABI are always enabled, so the URHO3D_MMX and URHO3D_SSE build option do not exist on x86_64 ABI. Also note that MMX extension is effectively enabled when 3DNow! or SSE/SSE2 extension is enabled, so disabling URHO3D_MMX build option in this case has no effect. The URHO3D_MMX and URHO3D_3DNOW build options are disabled by default. They should only be enabled when targeting older CPU with MMX and 3DNow! support, respectively.
+SIMD requirement can be eliminated by disabling the use of SIMD instruction set, see URHO3D_SSE build option below. For Linux platform using GCC/Clang compiler toolchain, the MMX and 3DNow! extensions can be enabled for older CPUs by using URHO3D_MMX and URHO3D_3DNOW build options when the option is available (they are disabled by default). The MMX and SSE extensions on x86_64 ABI are always enabled, so the URHO3D_MMX and URHO3D_SSE build option do not exist on x86_64 ABI (they are always on). Also note that MMX extension is effectively enabled when 3DNow! or SSE extension is enabled, so disabling URHO3D_MMX build option in this case has no effect.
 
 The NEON instruction set will be used by default whenever it is available. See the ANDROID_ABI and RPI_ABI build options for more detail for Android and Raspberry-Pi platforms, respectively. The NEON instruction set is always used on iOS and tVOS platforms.
 
@@ -126,7 +126,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_WEBP          |1|Enable WebP image support|
 |URHO3D_MMX           |0|Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support|
 |URHO3D_3DNOW         |0|Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support|
-|URHO3D_SSE           |*|Enable SSE/SSE2 instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
+|URHO3D_SSE           |*|Enable SIMD instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
 |URHO3D_PACKAGING     |0|Enable resources packaging support|
