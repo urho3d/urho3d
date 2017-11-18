@@ -7,12 +7,12 @@ extern "C"
 
 URHO3D_API void Log_Write(int level, const char* message)
 {
-    Log::Write(level, String(message));
+    Log::Write(level, message);
 }
 
-URHO3D_API void Log_WriteRaw(const char* message, bool error)
+URHO3D_API void Log_WriteRaw(const char* message, bool error = false)
 {
-    Log::WriteRaw(String(message), error);
+    Log::WriteRaw(message, error);
 }
 
 }

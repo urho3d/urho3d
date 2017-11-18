@@ -24,10 +24,6 @@ public:
         return new EventHandlerImplDotNet(function_);
     }
 
-    ~EventHandlerImplDotNet()
-    {
-    }
-
 private:
     void_function_VariantMap* function_;
 };
