@@ -1,13 +1,14 @@
 #include "../../Core/Object.h"
+#include "../Defines.h"
 
 using namespace Urho3D;
 
-typedef void (__cdecl*HandleEventFunction)(VariantMap& eventData);
+using void_function_VariantMap = void __CDECL(VariantMap& eventData);
 
 class EventHandlerImplDotNet : public EventHandler
 {
 public:
-    EventHandlerImplDotNet(HandleEventFunction function) : EventHandler(nullptr, nullptr)
+    EventHandlerImplDotNet(void_function_VariantMap* function) : EventHandler(nullptr, nullptr)
     {
         function_ = function;
     }
@@ -23,22 +24,18 @@ public:
         return new EventHandlerImplDotNet(function_);
     }
 
+    ~EventHandlerImplDotNet()
+    {
+    }
+
 private:
-    HandleEventFunction function_;
+    void_function_VariantMap* function_;
 };
-
-
-
 
 extern "C"
 {
 
-/*URHO3D_API EventHandlerImplDotNet* EventHandlerImplDotNet_EventHandlerImplDotNet(HandleEventFunction function)
-{
-    return new EventHandlerImplDotNet(function);
-}*/
-
-URHO3D_API void Object_SubscribeToEvent(Object* nativeInstance, StringHash eventType, HandleEventFunction function)
+URHO3D_API void Object_SubscribeToEvent(Object* nativeInstance, StringHash eventType, void_function_VariantMap function)
 {
     EventHandlerImplDotNet* eventHandler = new EventHandlerImplDotNet(function);
     nativeInstance->SubscribeToEvent(eventType, eventHandler);
