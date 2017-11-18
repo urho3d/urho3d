@@ -425,10 +425,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
 
-        // Reposition the window on the specified monitor
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(monitor, &display_rect);
-        SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
         bool reposition = fullscreen || (borderless && width >= display_rect.w && height >= display_rect.h);
 
         int x = reposition ? display_rect.x : position_.x_;
@@ -477,6 +475,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 }
             }
         }
+
+        // Reposition the window on the specified monitor
+        if (reposition)
+            SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
 
         CreateWindowIcon();
 
