@@ -80,7 +80,14 @@ void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep)
 static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0Wrap, int partId0,
     int index0, const btCollisionObjectWrapper* colObj1Wrap, int partId1, int index1)
 {
-    btAdjustInternalEdgeContacts(cp, colObj1Wrap, colObj0Wrap, partId1, index1);
+    // Ensure that shape type of colObj1Wrap is either btScaledBvhTriangleMeshShape or btBvhTriangleMeshShape
+    // because btAdjustInternalEdgeContacts doesn't check types properly. Bug in the Bullet?
+    const int shapeType = colObj1Wrap->getCollisionObject()->getCollisionShape()->getShapeType();
+    if (shapeType == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE || shapeType == TRIANGLE_SHAPE_PROXYTYPE
+        || shapeType == MULTIMATERIAL_TRIANGLE_MESH_PROXYTYPE)
+    {
+        btAdjustInternalEdgeContacts(cp, colObj1Wrap, colObj0Wrap, partId1, index1);
+    }
 
     cp.m_combinedFriction = colObj0Wrap->getCollisionObject()->getFriction() * colObj1Wrap->getCollisionObject()->getFriction();
     cp.m_combinedRestitution =
