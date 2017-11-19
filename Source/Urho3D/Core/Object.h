@@ -102,7 +102,9 @@ public:
     /// Check current instance is type of specified type.
     bool IsInstanceOf(const TypeInfo* typeInfo) const;
     /// Check current instance is type of specified class.
-    template<typename T> bool IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()); }
+    template<typename T> T* IsInstanceOf() { return IsInstanceOf(T::GetTypeInfoStatic()) ? static_cast<T*>(this) : nullptr; }
+    /// Check current instance is type of specified class.
+    template<typename T> const T* IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()) ? static_cast<const T*>(this) : nullptr; }
 
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
