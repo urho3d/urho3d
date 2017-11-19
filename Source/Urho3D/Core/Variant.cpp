@@ -67,8 +67,8 @@ static const char* typeNames[] =
     "Rect",
     "IntVector3",
     "Int64",
-    "CustomPtr",
-    "Custom",
+    "CustomHeap",
+    "CustomStack",
     nullptr
 };
 
