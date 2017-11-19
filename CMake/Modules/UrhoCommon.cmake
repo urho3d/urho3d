@@ -1583,11 +1583,6 @@ macro (setup_main_executable)
         define_resource_dirs ()
     endif ()
     if (ANDROID)
-        # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
-        find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
-            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
-            DOC "Path to SDL_android_main.c" MSG_MODE FATAL_ERROR)
-        list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
         # Setup shared library output path
         set_output_directories (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME} LIBRARY)
         # Setup target as main shared library
