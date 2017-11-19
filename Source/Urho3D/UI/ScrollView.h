@@ -54,6 +54,9 @@ public:
     /// React to resize.
     virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
+    /// Return whether the element could handle wheel input.
+    virtual bool IsWheelHandler() const { return true; }
+
     /// Set content element.
     void SetContentElement(UIElement* element);
     /// Set view offset from the top-left corner.
@@ -62,6 +65,10 @@ public:
     void SetViewPosition(int x, int y);
     /// Set scrollbars' visibility manually. Disables scrollbar autoshow/hide.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
+    /// Set horizontal scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    void SetHorizontalScrollBarVisible(bool visible);
+    /// Set vertical scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    void SetVerticalScrollBarVisible(bool visible);
     /// Set whether to automatically show/hide scrollbars. Default true.
     void SetScrollBarsAutoVisible(bool enable);
     /// Set arrow key scroll step. Also sets it on the scrollbars.
@@ -98,6 +105,12 @@ public:
 
     /// Return whether scrollbars are automatically shown/hidden.
     bool GetScrollBarsAutoVisible() const { return scrollBarsAutoVisible_; }
+
+    /// Return whether the horizontal scrollbar is visible.
+    bool GetHorizontalScrollBarVisible() const;
+
+    /// Return whether the vertical scrollbar is visible.
+    bool GetVerticalScrollBarVisible() const;
 
     /// Return arrow key scroll step.
     float GetScrollStep() const;

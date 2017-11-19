@@ -238,7 +238,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                         if (x > -thickness && x < thickness &&
                             y > -thickness && y < thickness)
                             continue;
-    
+
                         ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
                     }
                 }
