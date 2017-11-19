@@ -382,6 +382,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "bool get_executeConsoleCommands() const", asMETHOD(FileSystem, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String get_temporaryDir() const", asMETHOD(FileSystem, GetTemporaryDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
 
     engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);

@@ -104,6 +104,9 @@ public:
     /// Return elapsed time from program start as seconds.
     float GetElapsedTime();
 
+    /// Return current frames per second.
+    float GetFramesPerSecond() const;
+
     /// Get system time as milliseconds.
     static unsigned GetSystemTime();
     /// Get system time as seconds since 1.1.1970.

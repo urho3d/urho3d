@@ -29,6 +29,7 @@
 namespace Urho3D
 {
 
+static const unsigned DRAWABLE_UNDEFINED = 0x0;
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
 static const unsigned DRAWABLE_ZONE = 0x4;

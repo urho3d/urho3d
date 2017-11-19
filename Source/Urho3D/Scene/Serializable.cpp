@@ -86,6 +86,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
             *(reinterpret_cast<int*>(dest)) = src.GetInt();
         break;
 
+    case VAR_INT64:
+        *(reinterpret_cast<long long*>(dest)) = src.GetInt64();
+        break;
+
     case VAR_BOOL:
         *(reinterpret_cast<bool*>(dest)) = src.GetBool();
         break;
@@ -189,6 +193,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
             dest = *(reinterpret_cast<const unsigned char*>(src));
         else
             dest = *(reinterpret_cast<const int*>(src));
+        break;
+
+    case VAR_INT64:
+        dest = *(reinterpret_cast<const long long*>(src));
         break;
 
     case VAR_BOOL:

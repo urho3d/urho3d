@@ -124,6 +124,26 @@ XMLElement XMLElement::GetOrCreateChild(const char* name)
         return CreateChild(name);
 }
 
+bool XMLElement::AppendChild(XMLElement element, bool asCopy)
+{
+    if (!element.file_ || (!element.node_ && !element.xpathNode_) || !file_ || (!node_ && !xpathNode_))
+        return false;
+
+    pugi::xml_node node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    const pugi::xml_node& child = element.xpathNode_ ? element.xpathNode_->node() : pugi::xml_node(element.node_);
+
+    if (asCopy)
+        node.append_copy(child);
+    else
+        node.append_move(child);
+    return true;
+}
+
+bool XMLElement::Remove()
+{
+    return GetParent().RemoveChild(*this);
+}
+
 bool XMLElement::RemoveChild(const XMLElement& element)
 {
     if (!element.file_ || (!element.node_ && !element.xpathNode_) || !file_ || (!node_ && !xpathNode_))

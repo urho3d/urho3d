@@ -92,6 +92,8 @@ public:
     AttributeHandle RegisterAttribute(StringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute.
     void RemoveAttribute(StringHash objectType, const char* name);
+    /// Remove all object attributes.
+    void RemoveAllAttributes(StringHash objectType);
     /// Update object attribute's default value.
     void UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
@@ -119,6 +121,8 @@ public:
     template <class T> AttributeHandle RegisterAttribute(const AttributeInfo& attr);
     /// Template version of removing an object attribute.
     template <class T> void RemoveAttribute(const char* name);
+    /// Template version of removing all object attributes.
+    template <class T> void RemoveAllAttributes();
     /// Template version of copying base class attributes to derived class.
     template <class T, class U> void CopyBaseAttributes();
     /// Template version of updating an object attribute's default value.
@@ -252,6 +256,8 @@ template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeS
 template <class T> AttributeHandle Context::RegisterAttribute(const AttributeInfo& attr) { return RegisterAttribute(T::GetTypeStatic(), attr); }
 
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
+
+template <class T> void Context::RemoveAllAttributes() { RemoveAllAttributes(T::GetTypeStatic()); }
 
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
 

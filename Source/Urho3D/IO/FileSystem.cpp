@@ -799,7 +799,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
 
-    String filterExtension = filter.Substring(filter.Find('.'));
+    String filterExtension = filter.Substring(filter.FindLast('.'));
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
@@ -1065,6 +1065,24 @@ bool IsAbsolutePath(const String& pathName)
 #endif
 
     return false;
+}
+
+String FileSystem::GetTemporaryDir() const
+{
+#if defined(_WIN32)
+    wchar_t pathName[MAX_PATH];
+    pathName[0] = 0;
+    GetTempPathW(SDL_arraysize(pathName), pathName);
+    return AddTrailingSlash(pathName);
+#else
+    if (char* pathName = getenv("TMPDIR"))
+        return AddTrailingSlash(pathName);
+#ifdef P_tmpdir
+    return AddTrailingSlash(P_tmpdir);
+#else
+    return "/tmp/";
+#endif
+#endif
 }
 
 }

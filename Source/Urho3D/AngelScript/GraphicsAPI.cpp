@@ -408,6 +408,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPath", "const RenderPathCommand& get_commands(uint) const", asFUNCTION(RenderPathGetCommand), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("RenderPath", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(RenderPath, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(RenderPath, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool get_enabled(const String&in) const", asMETHOD(RenderPath, IsEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool get_added(const String&in) const", asMETHOD(RenderPath, IsAdded), asCALL_THISCALL);
 }
 
 static void RegisterTextures(asIScriptEngine* engine)
@@ -1880,6 +1882,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool ToggleFullscreen()", asMETHOD(Graphics, ToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void Maximize()", asMETHOD(Graphics, Maximize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void Minimize()", asMETHOD(Graphics, Minimize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void Raise()", asMETHOD(Graphics, Raise), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void Close()", asMETHOD(Graphics, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool TakeScreenShot(Image@+)", asMETHOD(Graphics, TakeScreenShot), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void BeginDumpShaders(const String&in)", asMETHOD(Graphics, BeginDumpShaders), asCALL_THISCALL);
@@ -1926,6 +1929,9 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "Array<int>@ get_multiSampleLevels() const", asFUNCTION(GraphicsGetMultiSampleLevels), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "IntVector2 get_desktopResolution(int) const", asMETHOD(Graphics, GetDesktopResolution), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "int get_monitorCount() const", asFUNCTION(GraphicsGetMonitorCount), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Graphics", "int get_currentMonitor() const", asMETHOD(Graphics, GetCurrentMonitor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_maximized() const", asMETHOD(Graphics, GetMaximized), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "Vector3 get_displayDPI(int) const", asMETHOD(Graphics, GetDisplayDPI), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Graphics@+ get_graphics()", asFUNCTION(GetGraphics), asCALL_CDECL);
 }
 
