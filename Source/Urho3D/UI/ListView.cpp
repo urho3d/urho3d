@@ -358,7 +358,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     item->SetEnabled(true);
     item->SetSelected(false);
 
-    unsigned numItems = contentElement_->GetNumChildren();
+    const unsigned numItems = contentElement_->GetNumChildren();
     if (hierarchyMode_)
     {
         int baseIndent = baseIndent_;
@@ -367,8 +367,13 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
             baseIndent = parentItem->GetIndent();
             SetItemHierarchyParent(parentItem, true);
 
+            // Hide item if parent is collapsed
+            const unsigned parentIndex = FindItem(parentItem);
+            if (!IsExpanded(parentIndex))
+                item->SetVisible(false);
+
             // Adjust the index to ensure it is within the children index limit of the parent item
-            unsigned indexLimit = FindItem(parentItem);
+            unsigned indexLimit = parentIndex;
             if (index <= indexLimit)
                 index = indexLimit + 1;
             else
