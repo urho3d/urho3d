@@ -496,6 +496,9 @@ public:
     /// Return whether has focus.
     bool HasFocus() const;
 
+    /// Return whether is a direct or indirect child of specified element.
+    bool IsChildOf(UIElement* element) const;
+
     /// Return whether reacts to input.
     bool IsEnabled() const { return enabled_; }
 

@@ -1586,6 +1586,18 @@ bool UIElement::HasFocus() const
     return ui ? ui->GetFocusElement() == this : false;
 }
 
+bool UIElement::IsChildOf(UIElement* element) const
+{
+    UIElement* parent = parent_;
+    while (parent)
+    {
+        if (parent == element)
+            return true;
+        parent = parent->parent_;
+    }
+    return false;
+}
+
 bool UIElement::IsVisibleEffective() const
 {
     bool visible = visible_;
