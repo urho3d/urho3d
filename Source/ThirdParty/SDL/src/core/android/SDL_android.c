@@ -289,26 +289,11 @@ const char* SDL_Android_GetFilesDir()
 }
 
 /* Activity initialization -- called before SDL_main() to initialize JNI bindings */
-// Urho3D: added passing user files directory from SDLActivity on startup
-JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(nativeSetupJNI)(JNIEnv* mEnv, jclass cls, jstring filesDir)
+JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(nativeSetupJNI)(JNIEnv* mEnv, jclass cls)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeSetupJNI()");
 
     Android_JNI_SetupThread();
-
-    // Copy the files dir
-    const char *str;
-    str = (*mEnv)->GetStringUTFChars(mEnv, filesDir, 0);
-    if (str)
-    {
-        if (mFilesDir)
-            free(mFilesDir);
-
-        size_t length = strlen(str) + 1;
-        mFilesDir = (char*)malloc(length);
-        memcpy(mFilesDir, str, length);
-        (*mEnv)->ReleaseStringUTFChars(mEnv, filesDir, str);
-    }
 
     mActivityClass = (jclass)((*mEnv)->NewGlobalRef(mEnv, cls));
 
@@ -438,13 +423,10 @@ JNIEXPORT int JNICALL SDL_JAVA_INTERFACE(nativeRunMain)(JNIEnv* env, jclass cls,
             char **argv;
 
             /* Prepare the arguments. */
+            // Urho3D: Remove any assumption on the arguments, except that the first argument will be the program name set by SDLActivity or its subclass
             len = (*env)->GetArrayLength(env, array);
-            argv = SDL_stack_alloc(char*, 1 + len + 1);
+            argv = SDL_stack_alloc(char*, len + 1);
             argc = 0;
-            /* Use the name "app_process" so PHYSFS_platformCalcBaseDir() works.
-               https://bitbucket.org/MartinFelis/love-android-sdl2/issue/23/release-build-crash-on-start
-             */
-            argv[argc++] = SDL_strdup("app_process");
             for (i = 0; i < len; ++i) {
                 const char* utf;
                 char* arg = NULL;
@@ -464,6 +446,27 @@ JNIEXPORT int JNICALL SDL_JAVA_INTERFACE(nativeRunMain)(JNIEnv* env, jclass cls,
             }
             argv[argc] = NULL;
 
+            // Urho3D: Set the files dir
+            jobject context = (*env)->CallStaticObjectMethod(env, mActivityClass, midGetContext);
+            jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
+                    "getFilesDir", "()Ljava/io/File;");
+            jobject dir = (*env)->CallObjectMethod(env, context, mid);
+            mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, dir),
+                    "getAbsolutePath", "()Ljava/lang/String;");
+            jstring filesDir = (jstring)(*env)->CallObjectMethod(env, dir, mid);
+
+            const char *str;
+            str = (*env)->GetStringUTFChars(env, filesDir, 0);
+            if (str)
+            {
+                if (mFilesDir)
+                    free(mFilesDir);
+
+                size_t length = strlen(str) + 1;
+                mFilesDir = (char*)malloc(length);
+                memcpy(mFilesDir, str, length);
+                (*env)->ReleaseStringUTFChars(env, filesDir, str);
+            }
 
             /* Run the application. */
             status = SDL_main(argc, argv);
@@ -714,6 +717,9 @@ JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(nativeQuit)(
 {
     // Urho3D: added log print
     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeQuit()");
+    // Urho3D: Free the memory that we allocate during init
+    if (mFilesDir)
+        free(mFilesDir);
 
     /* Discard previous events. The user should have handled state storage
      * in SDL_APP_WILLENTERBACKGROUND. After nativeQuit() is called, no
@@ -1926,12 +1932,10 @@ char** SDL_Android_GetFileList(const char* path, int* count)
     jstring pathJString = (*mEnv)->NewStringUTF(mEnv, path);
 
     /* context = SDLActivity.getContext(); */
-    jmethodID mid = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass,
-            "getContext","()Landroid/content/Context;");
-    jobject context = (*mEnv)->CallStaticObjectMethod(mEnv, mActivityClass, mid);
+    jobject context = (*mEnv)->CallStaticObjectMethod(mEnv, mActivityClass, midGetContext);
 
     /* assetManager = context.getAssets(); */
-    mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, context),
+    jmethodID mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, context),
             "getAssets", "()Landroid/content/res/AssetManager;");
     jobject assetManager = (*mEnv)->CallObjectMethod(mEnv, context, mid);
 
