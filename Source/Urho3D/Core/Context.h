@@ -113,6 +113,8 @@ public:
     template <class T> void RegisterFactory();
     /// Template version of registering an object factory with category.
     template <class T> void RegisterFactory(const char* category);
+    /// Template version of registering subsystem.
+    template <class T> T* RegisterSubsystem();
     /// Template version of removing a subsystem.
     template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
@@ -128,7 +130,7 @@ public:
     Object* GetSubsystem(StringHash type) const;
 
     /// Return global variable based on key
-    const Variant& GetGlobalVar(StringHash key) const ;
+    const Variant& GetGlobalVar(StringHash key) const;
 
     /// Return all global variables.
     const VariantMap& GetGlobalVars() const { return globalVars_; }
@@ -245,6 +247,13 @@ template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectF
 template <class T> void Context::RegisterFactory(const char* category)
 {
     RegisterFactory(new ObjectFactoryImpl<T>(this), category);
+}
+
+template <class T> T* Context::RegisterSubsystem()
+{
+    T* subsystem = new T(this);
+    RegisterSubsystem(subsystem);
+    return subsystem;
 }
 
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
