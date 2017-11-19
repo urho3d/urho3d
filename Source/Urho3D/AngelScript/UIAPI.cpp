@@ -262,6 +262,10 @@ static void RegisterScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "BorderImage@+ get_scrollPanel() const", asMETHOD(ScrollView, GetScrollPanel), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void set_scrollBarsAutoVisible(bool)", asMETHOD(ScrollView, SetScrollBarsAutoVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "bool get_scrollBarsAutoVisible() const", asMETHOD(ScrollView, GetScrollBarsAutoVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_horizontalScrollBarVisible(bool)", asMETHOD(ScrollView, SetHorizontalScrollBarVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool get_horizontalScrollBarVisible() const", asMETHOD(ScrollView, GetHorizontalScrollBarVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_verticalScrollBarVisible(bool)", asMETHOD(ScrollView, SetVerticalScrollBarVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool get_verticalScrollBarVisible() const", asMETHOD(ScrollView, GetVerticalScrollBarVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void set_scrollDeceleration(float)", asMETHOD(ScrollView, SetScrollDeceleration), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float get_scrollDeceleration() const", asMETHOD(ScrollView, GetScrollDeceleration), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void set_scrollSnapEpsilon(float)", asMETHOD(ScrollView, SetScrollSnapEpsilon), asCALL_THISCALL);

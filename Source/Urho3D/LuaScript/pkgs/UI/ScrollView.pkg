@@ -36,6 +36,8 @@ class ScrollView : public UIElement
     tolua_readonly tolua_property__get_set ScrollBar* verticalScrollBar;
     tolua_readonly tolua_property__get_set BorderImage* scrollPanel;
     tolua_property__get_set bool scrollBarsAutoVisible;
+    tolua_property__get_set bool horizontalScrollBarVisible;
+    tolua_property__get_set bool verticalScrollBarVisible;
     tolua_property__get_set float scrollStep;
     tolua_property__get_set float pageStep;
     tolua_property__get_set float scrollDeceleration;
