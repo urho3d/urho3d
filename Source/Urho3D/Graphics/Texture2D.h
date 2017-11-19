@@ -69,6 +69,8 @@ public:
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned level, void* dest) const;
     /// Get image data from zero mip level. Only RGB and RGBA textures are supported.
+    bool GetImage(Image& image) const;
+    /// Get image data from zero mip level. Only RGB and RGBA textures are supported.
     SharedPtr<Image> GetImage() const;
 
     /// Return render surface.
