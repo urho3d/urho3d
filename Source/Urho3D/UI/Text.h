@@ -218,7 +218,7 @@ protected:
     void ValidateSelection();
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
-    /// Contruct batch.
+    /// Construct batch.
     void ConstructBatch
         (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
             float depthBias = 0.0f);

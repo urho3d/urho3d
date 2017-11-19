@@ -54,6 +54,9 @@ public:
     /// React to resize.
     virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
+    /// Return whether the element could handle wheel input.
+    virtual bool IsWheelHandler() const { return true; }
+
     /// Set content element.
     void SetContentElement(UIElement* element);
     /// Set view offset from the top-left corner.

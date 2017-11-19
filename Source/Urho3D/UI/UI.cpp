@@ -497,7 +497,7 @@ void UI::Render(bool renderUICommand)
         // Render modal batches
         Render(vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
     }
-    
+
     // Render to UIComponent textures. This is skipped when called from the RENDERUI command
     if (!renderUICommand)
     {
@@ -508,7 +508,7 @@ void UI::Render(bool renderUICommand)
             {
                 SetVertexData(component->vertexBuffer_, component->vertexData_);
                 SetVertexData(component->debugVertexBuffer_, component->debugVertexData_);
-                
+
                 RenderSurface* surface = component->GetTexture()->GetRenderSurface();
                 graphics_->SetRenderTarget(0, surface);
                 graphics_->SetViewport(IntRect(0, 0, surface->GetWidth(), surface->GetHeight()));
@@ -1746,23 +1746,19 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    UIElement* element;
-    if (!nonFocusedMouseWheel_ && (element = focusElement_))
-        element->OnWheel(delta, mouseButtons_, qualifiers_);
+    if (!nonFocusedMouseWheel_ && focusElement_)
+        focusElement_->OnWheel(delta, mouseButtons_, qualifiers_);
     else
     {
         // If no element has actual focus or in non-focused mode, get the element at cursor
         if (cursorVisible)
         {
-            element = GetElementAt(cursorPos);
+            UIElement* element = GetElementAt(cursorPos);
             if (nonFocusedMouseWheel_)
             {
                 // Going up the hierarchy chain to find element that could handle mouse wheel
-                while (element)
+                while (element && !element->IsWheelHandler())
                 {
-                    if (element->GetType() == ListView::GetTypeStatic() ||
-                        element->GetType() == ScrollView::GetTypeStatic())
-                        break;
                     element = element->GetParent();
                 }
             }

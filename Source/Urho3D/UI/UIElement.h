@@ -197,6 +197,9 @@ public:
     /// Convert element coordinates to screen coordinates.
     virtual IntVector2 ElementToScreen(const IntVector2& position);
 
+    /// Return whether the element could handle wheel input.
+    virtual bool IsWheelHandler() const { return false; }
+
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
