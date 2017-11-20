@@ -653,9 +653,8 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
         const Vector<SharedPtr<Component> >& components = node->GetComponents();
         for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
         {
-            if ((*j)->IsInstanceOf<ScriptInstance>())
+            if (ScriptInstance* instance = (*j)->Cast<ScriptInstance>())
             {
-                ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
                 if (instance->IsA(className))
                     result.Push(node);
             }
