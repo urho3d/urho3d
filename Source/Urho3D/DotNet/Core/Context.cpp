@@ -1,8 +1,6 @@
 #include "../../Core/Context.h"
 #include "../Defines.h"
 
-using namespace Urho3D;
-
 extern "C"
 {
 

@@ -1,8 +1,6 @@
 #include "../../Core/Object.h"
 #include "../Defines.h"
 
-using namespace Urho3D;
-
 using void_function_VariantMap = void __CDECL(VariantMap& eventData);
 
 class EventHandlerImplDotNet : public EventHandler

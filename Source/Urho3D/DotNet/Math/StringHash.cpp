@@ -1,8 +1,6 @@
 #include "../../Math/StringHash.h"
 #include "../Defines.h"
 
-using namespace Urho3D;
-
 extern "C"
 {
 

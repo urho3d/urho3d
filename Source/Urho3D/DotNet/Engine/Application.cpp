@@ -1,8 +1,6 @@
 #include "../../Engine/Application.h"
 #include "../Defines.h"
 
-using namespace Urho3D;
-
 using void_function_void = void __CDECL();
 
 class ApplicationEXT : public Application

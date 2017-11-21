@@ -7,3 +7,5 @@
 #endif
 
 #define bool int
+
+using namespace Urho3D;
