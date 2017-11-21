@@ -1,4 +1,5 @@
 #include "../../UI/UI.h"
+#include "../Defines.h"
 
 using namespace Urho3D;
 

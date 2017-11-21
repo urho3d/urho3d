@@ -1,4 +1,5 @@
 #include "../../Engine/Engine.h"
+#include "../Defines.h"
 
 using namespace Urho3D;
 

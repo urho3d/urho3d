@@ -1,4 +1,5 @@
 #include "../../Input/Input.h"
+#include "../Defines.h"
 
 using namespace Urho3D;
 

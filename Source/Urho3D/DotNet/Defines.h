@@ -5,3 +5,5 @@
 #else
     #define __CDECL
 #endif
+
+#define bool int
