@@ -133,6 +133,10 @@ public:
 
     /// Return color packed to a 32-bit integer, with R component in the lowest 8 bits. Components are clamped to [0, 1] range.
     unsigned ToUInt() const;
+    
+    /// Set RGBA values from packed 32-bit integer, with R component in the lowest 8 bits
+    void FromUInt(unsigned data);
+
     /// Return HSL color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSL() const;
     /// Return HSV color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
