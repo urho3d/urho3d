@@ -10,24 +10,24 @@ URHO3D_API UIElement* UIElement_CreateChild(UIElement* nativeInstance, StringHas
     return nativeInstance->CreateChild(type, name, index);
 }
 
-URHO3D_API UIElement* UIElement_SetPriority(UIElement* nativeInstance, int priority)
+URHO3D_API void UIElement_SetPriority(UIElement* nativeInstance, int priority)
 {
-    return nativeInstance->SetPriority(priority);
+    nativeInstance->SetPriority(priority);
 }
 
-URHO3D_API UIElement* UIElement_SetOpacity(UIElement* nativeInstance, float opacity)
+URHO3D_API void UIElement_SetOpacity(UIElement* nativeInstance, float opacity)
 {
-    return nativeInstance->SetOpacity(opacity);
+    nativeInstance->SetOpacity(opacity);
 }
 
-URHO3D_API UIElement* UIElement_SetAlignment(UIElement* nativeInstance, HorizontalAlignment hAlign, VerticalAlignment vAlign)
+URHO3D_API void UIElement_SetAlignment(UIElement* nativeInstance, HorizontalAlignment hAlign, VerticalAlignment vAlign)
 {
-    return nativeInstance->SetAlignment(hAlign, vAlign);
+    nativeInstance->SetAlignment(hAlign, vAlign);
 }
 
-URHO3D_API UIElement* UIElement_SetSize(UIElement* nativeInstance, int width, int height)
+URHO3D_API void UIElement_SetSize(UIElement* nativeInstance, int width, int height)
 {
-    return nativeInstance->SetSize(width, height);
+    nativeInstance->SetSize(width, height);
 }
 
 }
