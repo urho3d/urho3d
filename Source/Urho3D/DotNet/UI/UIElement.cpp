@@ -24,9 +24,29 @@ URHO3D_API void UIElement_SetAlignment(UIElement* nativeInstance, HorizontalAlig
     nativeInstance->SetAlignment(hAlign, vAlign);
 }
 
+URHO3D_API void UIElement_SetHorizontalAlignment(UIElement* nativeInstance, HorizontalAlignment align)
+{
+    nativeInstance->SetHorizontalAlignment(align);
+}
+
+URHO3D_API void UIElement_SetVerticalAlignment(UIElement* nativeInstance, VerticalAlignment align)
+{
+    nativeInstance->SetVerticalAlignment(align);
+}
+
 URHO3D_API void UIElement_SetSize(UIElement* nativeInstance, int width, int height)
 {
     nativeInstance->SetSize(width, height);
+}
+
+URHO3D_API void UIElement_SetColor(UIElement* nativeInstance, Color& color)
+{
+    nativeInstance->SetColor(color);
+}
+
+URHO3D_API void UIElement_AddChild(UIElement* nativeInstance, UIElement* element)
+{
+    nativeInstance->AddChild(element);
 }
 
 }
