@@ -131,7 +131,7 @@ void CreateCharacter(TileMapInfo2D@ info, bool createObject, float friction, Vec
 
     animatedSprite.animationSet = spriterAnimationSet;
     animatedSprite.SetAnimation("idle"); // Get scml file and Play "idle" anim
-    animatedSprite.layer = 3; // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 1)
+    animatedSprite.layer = 3; // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 2)
     RigidBody2D@ characterBody = character2DNode.CreateComponent("RigidBody2D");
     characterBody.bodyType = BT_DYNAMIC;
     characterBody.allowSleep = false;
