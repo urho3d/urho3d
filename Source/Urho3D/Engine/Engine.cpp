@@ -286,6 +286,13 @@ bool Engine::Initialize(const VariantMap& parameters)
                 GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
             );
         }
+        
+        // Scale UI by default if in high dpi mode
+        if (GetParameter(parameters, EP_HIGH_DPI, true).GetBool())
+        {
+            context_->GetSubsystem<UI>()->SetScale(2.0f);
+        }
+
     }
 
     // Init FPU state of main thread
