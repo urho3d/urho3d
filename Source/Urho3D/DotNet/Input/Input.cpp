@@ -29,4 +29,9 @@ URHO3D_API bool Input_GetKeyPress(Input* nativeInstance, int key)
     return nativeInstance->GetKeyPress(key);
 }
 
+URHO3D_API void Input_GetMouseMove(Input* nativeInstance, IntVector2& result)
+{
+    result = nativeInstance->GetMouseMove();
+}
+
 }

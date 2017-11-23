@@ -1,12 +1,12 @@
 #include "../../Core/Object.h"
 #include "../Defines.h"
 
-using void_function_VariantMap = void __CDECL(VariantMap& eventData);
+using void_function_StringHash_VariantMap = void __CDECL(StringHash, VariantMap&);
 
 class EventHandlerImplDotNet : public EventHandler
 {
 public:
-    EventHandlerImplDotNet(void_function_VariantMap* function) : EventHandler(nullptr, nullptr)
+    EventHandlerImplDotNet(void_function_StringHash_VariantMap* function) : EventHandler(nullptr, nullptr)
     {
         function_ = function;
     }
@@ -14,7 +14,7 @@ public:
     virtual void Invoke(VariantMap& eventData) override
     {
         if (function_)
-            function_(eventData);
+            function_(eventType_, eventData);
     }
 
     virtual EventHandler* Clone() const override
@@ -23,13 +23,13 @@ public:
     }
 
 private:
-    void_function_VariantMap* function_;
+    void_function_StringHash_VariantMap* function_;
 };
 
 extern "C"
 {
 
-URHO3D_API void Object_SubscribeToEvent(Object* nativeInstance, StringHash eventType, void_function_VariantMap function)
+URHO3D_API void Object_SubscribeToEvent(Object* nativeInstance, StringHash eventType, void_function_StringHash_VariantMap* function)
 {
     EventHandlerImplDotNet* eventHandler = new EventHandlerImplDotNet(function);
     nativeInstance->SubscribeToEvent(eventType, eventHandler);
