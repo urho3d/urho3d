@@ -49,4 +49,19 @@ URHO3D_API void UIElement_AddChild(UIElement* nativeInstance, UIElement* element
     nativeInstance->AddChild(element);
 }
 
+URHO3D_API void UIElement_SetPosition(UIElement* nativeInstance, int x, int y)
+{
+    nativeInstance->SetPosition(x, y);
+}
+
+URHO3D_API int UIElement_GetWidth(UIElement* nativeInstance)
+{
+    return nativeInstance->GetWidth();
+}
+
+URHO3D_API int UIElement_GetHeight(UIElement* nativeInstance)
+{
+    return nativeInstance->GetHeight();
+}
+
 }
