@@ -1,5 +1,7 @@
 #include "../DotNet/Defines.h"
 
+#include <stdlib.h>
+
 char* DuplicateCString(const char *str)
 {
     char* result = (char*)malloc(strlen(str) + 1);
