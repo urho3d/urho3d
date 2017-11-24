@@ -1,5 +1,5 @@
 #include "../../Math/Quaternion.h"
-#include "../Defines.h"
+#include "../../DotNet/Defines.h"
 
 extern "C"
 {

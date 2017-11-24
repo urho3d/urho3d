@@ -1,5 +1,5 @@
 #include "../../Engine/Application.h"
-#include "../Defines.h"
+#include "../../DotNet/Defines.h"
 
 using void_function_void = void __CDECL();
 

@@ -1,6 +1,6 @@
 #include "../../IO/FileSystem.h"
-#include "../Defines.h"
-#include "../Utils.h"
+#include "../../DotNet/Defines.h"
+#include "../../DotNet/Utils.h"
 
 extern "C"
 {

@@ -1,5 +1,5 @@
 #include "../../Graphics/StaticModel.h"
-#include "../Defines.h"
+#include "../../DotNet/Defines.h"
 
 extern "C"
 {

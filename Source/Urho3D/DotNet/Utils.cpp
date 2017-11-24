@@ -1,4 +1,4 @@
-#include "Defines.h"
+#include "../DotNet/Defines.h"
 
 char* DuplicateCString(const char *str)
 {

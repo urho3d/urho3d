@@ -1,5 +1,5 @@
 #include "../../Core/Object.h"
-#include "../Defines.h"
+#include "../../DotNet/Defines.h"
 
 using void_function_StringHash_VariantMap = void __CDECL(StringHash, VariantMap&);
 

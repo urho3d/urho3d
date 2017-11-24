@@ -1,5 +1,5 @@
 #include "../../Graphics/Viewport.h"
-#include "../Defines.h"
+#include "../../DotNet/Defines.h"
 
 extern "C"
 {
