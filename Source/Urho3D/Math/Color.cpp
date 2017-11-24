@@ -40,6 +40,16 @@ unsigned Color::ToUInt() const
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
+
+void Color::FromUInt(unsigned data)
+{
+    a_ = float(unsigned((data & 0xFF000000) >> 24)) / 255.0f;
+    b_ = float(unsigned((data & 0x00FF0000) >> 16)) / 255.0f;
+    g_ = float(unsigned((data & 0x0000FF00) >> 8)) / 255.0f;
+    r_ = float(unsigned((data & 0x000000FF))) / 255.0f;
+}
+
+
 Vector3 Color::ToHSL() const
 {
     float min, max;

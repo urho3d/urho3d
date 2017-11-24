@@ -14,8 +14,11 @@ class Color
     Color operator + (const Color& rhs);
 
     unsigned ToUInt() const;
+    void FromUInt(unsigned data);
+
     Vector3 ToHSL() const;
     Vector3 ToHSV() const;
+
     void FromHSL(float h, float s, float l, float a);
     void FromHSV(float h, float s, float v, float a);
 
