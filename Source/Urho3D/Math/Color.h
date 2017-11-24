@@ -137,6 +137,8 @@ public:
     Vector3 ToHSL() const;
     /// Return HSV color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSV() const;
+    /// Set RGBA values from packed 32-bit integer, with R component in the lowest 8 bits (format 0xAABBGGRR).
+    void FromUInt(unsigned color);
     /// Set RGBA values from specified HSL values and alpha.
     void FromHSL(float h, float s, float l, float a = 1.0f);
     /// Set RGBA values from specified HSV values and alpha.

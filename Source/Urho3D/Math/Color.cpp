@@ -64,6 +64,14 @@ Vector3 Color::ToHSV() const
     return Vector3(h, s, v);
 }
 
+void Color::FromUInt(unsigned color)
+{
+    a_ = (float)(((color >> 24) & 0xff) / 255.0f);
+    b_ = (float)(((color >> 16) & 0xff) / 255.0f);
+    g_ = (float)(((color >> 8)  & 0xff) / 255.0f);
+    r_ = (float)(((color >> 0)  & 0xff) / 255.0f);
+}
+
 void Color::FromHSL(float h, float s, float l, float a)
 {
     float c;

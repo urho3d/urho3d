@@ -1388,6 +1388,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Color", "uint ToUInt() const", asMETHOD(Color, ToUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 ToHSL() const", asMETHOD(Color, ToHSL), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 ToHSV() const", asMETHOD(Color, ToHSV), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "void FromUInt(uint)", asMETHOD(Color, FromUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "void FromHSL(float, float, float, float)", asMETHOD(Color, FromHSL), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "void FromHSV(float, float, float, float)", asMETHOD(Color, FromHSV), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, ToVector3), asCALL_THISCALL);
