@@ -2283,6 +2283,7 @@ void Clip(bool);
 bool Equals() const;
 void FromHSL(float, float, float, float);
 void FromHSV(float, float, float, float);
+void FromUInt(uint);
 float Hue() const;
 void Invert(bool);
 Color Lerp(const Color&, float) const;
