@@ -45,16 +45,21 @@ static int const UICOMPONENT_DEFAULT_TEXTURE_SIZE = 512;
 static int const UICOMPONENT_MIN_TEXTURE_SIZE = 64;
 static int const UICOMPONENT_MAX_TEXTURE_SIZE = 4096;
 
+
 UIComponent::UIComponent(Context* context) : 
     Component(context),
     isStaticModelOwned_(false)
 {
-    vertexBuffer_ = new VertexBuffer(context_);
-    debugVertexBuffer_ = new VertexBuffer(context_);
     texture_ = context_->CreateObject<Texture2D>();
+    texture_->SetFilterMode(FILTER_BILINEAR);
+    texture_->SetAddressMode(COORD_U, ADDRESS_CLAMP);
+    texture_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
+    texture_->SetNumLevels(1);                                        // No mipmaps
 
-    rootElement_ = context_->CreateObject<UIElement>();
+    rootElement_ = context_->CreateObject<UIElement3D>();
+    rootElement_->SetUIComponent(this);
     rootElement_->SetTraversalMode(TM_BREADTH_FIRST);
+    rootElement_->SetEnabled(true);
 
     material_ = context_->CreateObject<Material>();
     material_->SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/Diff.xml"));
@@ -63,6 +68,7 @@ UIComponent::UIComponent(Context* context) :
     SubscribeToEvent(rootElement_, E_RESIZED, URHO3D_HANDLER(UIComponent, OnElementResized));
 
     // Triggers resizing of texture.
+    rootElement_->SetRenderTexture(texture_);
     rootElement_->SetSize(UICOMPONENT_DEFAULT_TEXTURE_SIZE, UICOMPONENT_DEFAULT_TEXTURE_SIZE);
 }
 
@@ -90,6 +96,10 @@ Texture2D* UIComponent::GetTexture() const
     return texture_;
 }
 
+StaticModel* UIComponent::GetModel() const
+{
+    return model_;
+}
 
 void UIComponent::OnNodeSet(Node* node)
 {
@@ -102,9 +112,11 @@ void UIComponent::OnNodeSet(Node* node)
             model_ = node->CreateComponent<StaticModel>();
         }
         model_->SetMaterial(material_);
+        rootElement_->SetRenderTexture(texture_);
     }
     else
     {
+        rootElement_->SetRenderTexture(nullptr);
         model_->SetMaterial(nullptr);
         if (isStaticModelOwned_)
         {
@@ -113,11 +125,6 @@ void UIComponent::OnNodeSet(Node* node)
         }
         model_ = nullptr;
     }
-
-    UI* ui = GetSubsystem<UI>();
-    // May be null on shutdown
-    if (ui)
-        ui->SetRenderToTexture(this, node != nullptr);
 }
 
 void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
@@ -134,38 +141,42 @@ void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
     }
 
     if (texture_->SetSize(width, height, GetSubsystem<Graphics>()->GetRGBAFormat(), TEXTURE_RENDERTARGET))
-    {
-        texture_->SetFilterMode(FILTER_BILINEAR);
-        texture_->SetAddressMode(COORD_U, ADDRESS_CLAMP);
-        texture_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
-        texture_->SetNumLevels(1);                                                // No mipmaps
         texture_->GetRenderSurface()->SetUpdateMode(SURFACE_MANUALUPDATE);
-    }
     else
         URHO3D_LOGERROR("UIComponent: resizing texture failed.");
 }
 
-bool UIComponent::ScreenToUIPosition(IntVector2 screenPos, IntVector2& result)
+IntVector2 UIElement3D::ScreenToElement(const IntVector2& screenPos)
 {
-    Scene* scene = GetScene();
+    IntVector2 result(-1, -1);
+
+    Scene* scene = component_->GetScene();
     if (!scene)
-        return false;
+        return result;
 
     Renderer* renderer = GetSubsystem<Renderer>();
     if (!renderer)
-        return false;
+        return result;
 
     // \todo Always uses the first viewport, in case there are multiple
-    Viewport* viewport = renderer->GetViewportForScene(scene, 0);
     Octree* octree = scene->GetComponent<Octree>();
+    Viewport* viewport = viewport_;
+    if (viewport == nullptr)
+        viewport = renderer->GetViewportForScene(scene, 0);
 
     if (!viewport || !octree)
-        return false;
+        return result;
+
+    if (viewport->GetScene() != scene)
+    {
+        URHO3D_LOGERROR("UIComponent and Viewport set to component's root element belong to different scenes.");
+        return result;
+    }
 
     Camera* camera = viewport->GetCamera();
 
     if (!camera)
-        return false;
+        return result;
 
     IntRect rect = viewport->GetRect();
     if (rect == IntRect::ZERO)
@@ -182,25 +193,51 @@ bool UIComponent::ScreenToUIPosition(IntVector2 screenPos, IntVector2& result)
     octree->Raycast(query);
 
     if (queryResultVector.Empty())
-        return false;
+        return result;
 
     for (unsigned i = 0; i < queryResultVector.Size(); i++)
     {
         RayQueryResult& queryResult = queryResultVector[i];
-        if (queryResult.drawable_ != model_)
+        if (queryResult.drawable_ != component_->GetModel())
         {
             // ignore billboard sets by default
             if (queryResult.drawable_->GetTypeInfo()->IsTypeOf(BillboardSet::GetTypeStatic()))
                 continue;
-            return false;
+            return result;
         }
 
         Vector2& uv = queryResult.textureUV_;
-        result = IntVector2(static_cast<int>(uv.x_ * rootElement_->GetWidth()),
-                            static_cast<int>(uv.y_ * rootElement_->GetHeight()));
-        return true;
+        result = IntVector2(static_cast<int>(uv.x_ * component_->GetRoot()->GetWidth()),
+            static_cast<int>(uv.y_ * component_->GetRoot()->GetHeight()));
+        return result;
     }
-    return false;
+    return result;
+}
+
+IntVector2 UIElement3D::ElementToScreen(const IntVector2& position)
+{
+    URHO3D_LOGERROR("UIElement3D::ElementToScreen is not implemented.");
+    return {-1, -1};
+}
+
+void UIElement3D::RegisterObject(Context* context)
+{
+    context->RegisterFactory<UIElement3D>();
+}
+
+UIElement3D::UIElement3D(Context* context)
+    : UIElement(context)
+{
+}
+
+void UIElement3D::SetUIComponent(UIComponent* component)
+{
+    component_ = component;
+}
+
+void UIElement3D::SetViewport(Viewport* viewport)
+{
+    viewport_ = viewport;
 }
 
 }

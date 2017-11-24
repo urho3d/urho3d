@@ -453,7 +453,7 @@ stage: release build configuration
 before_script:
   - rake ci_timer
   - if [[ $SYSROOT =~ arm64 ]]; then export triplet=aarch64-linux-gnu; else export triplet=arm-linux-gnueabihf; fi
-  - wget https://releases.linaro.org/components/toolchain/binaries/latest-5/$triplet/gcc-linaro-5.4.1-2017.05-x86_64_$triplet.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/$triplet
+  - wget https://releases.linaro.org/components/toolchain/binaries/latest-5/$triplet/gcc-linaro-5.5.0-2017.10-x86_64_$triplet.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/$triplet
   - for compiler in $ARM_PREFIX-{gcc,g++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
   - git clone --depth 1 https://github.com/urho3d/$SYSROOT.git && export ARM_SYSROOT=$(pwd)/$SYSROOT
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
