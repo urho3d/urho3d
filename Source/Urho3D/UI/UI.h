@@ -213,7 +213,7 @@ public:
     const IntVector2& GetCustomSize() const { return customSize_; }
 
     /// Set texture to which element will be rendered.
-    void SetRenderTexture(UIElement* element, Texture2D* texture);
+    void SetElementRenderTexture(UIElement* element, Texture2D* texture);
 
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData

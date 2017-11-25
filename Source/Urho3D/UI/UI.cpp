@@ -2078,11 +2078,11 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
     return size;
 }
 
-void UI::SetRenderTexture(UIElement* element, Texture2D* texture)
+void UI::SetElementRenderTexture(UIElement* element, Texture2D* texture)
 {
     if (element == nullptr)
     {
-        URHO3D_LOGERROR("UI::SetRenderTexture called with null element.");
+        URHO3D_LOGERROR("UI::SetElementRenderTexture called with null element.");
         return;
     }
 
