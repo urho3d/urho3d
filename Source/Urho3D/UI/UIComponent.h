@@ -34,7 +34,6 @@ class Viewport;
 class UIElement;
 class UIBatch;
 class VertexBuffer;
-class UIElement3D;
 
 class URHO3D_API UIComponent : public Component
 {
@@ -54,52 +53,25 @@ public:
     Material* GetMaterial() const;
     /// Return texture which will be used for rendering UI to.
     Texture2D* GetTexture() const;
-    /// Return static model on to which UI will be rendered.
-    StaticModel* GetModel() const;
+    /// Set index of viewport to be used for screen coordinate translation.
+    void SetViewportIndex(unsigned int index);
 
 protected:
-    /// Material that is set to the model.
-    SharedPtr<Material> material_;
-    /// Texture that UIElement will be rendered into.
-    SharedPtr<Texture2D> texture_;
-    /// Model that texture will be applied to.
-    SharedPtr<StaticModel> model_;
-    /// UIElement to be rendered into texture.
-    SharedPtr<UIElement3D> rootElement_;
-    /// Is StaticModel component created by this component.
-    bool isStaticModelOwned_;
-
     /// Handle component being added to Node or removed from it.
     virtual void OnNodeSet(Node* node) override;
     /// Handle resizing of element. Setting size of element will automatically resize texture. UIElement size matches size of texture.
     void OnElementResized(StringHash eventType, VariantMap& args);
-};
 
-class URHO3D_API UIElement3D : public UIElement
-{
-    URHO3D_OBJECT(UIElement3D, UIElement);
-public:
-    /// Construct.
-    UIElement3D(Context* context);
-    /// Destruct.
-    virtual ~UIElement3D() override = default;
-    /// Register object factory.
-    static void RegisterObject(Context* context);
-
-    /// Set UIComponent which is using this element as root element.
-    void SetUIComponent(UIComponent* component);
-    /// Set active viewport through which this element is rendered. If viewport is not set, it defaults to first viewport.
-    void SetViewport(Viewport* viewport);
-    /// Convert screen coordinates to element coordinates.
-    IntVector2 ScreenToElement(const IntVector2& screenPos) override;
-    /// Convert element coordinates to screen coordinates.
-    IntVector2 ElementToScreen(const IntVector2& position) override;
-
-protected:
-    /// A UIComponent which owns this element.
-    WeakPtr<UIComponent> component_;
-    /// Viewport which renders this element.
-    WeakPtr<Viewport> viewport_;
+    /// Material that is set to the model.
+    SharedPtr<Material> material_;
+    /// Texture that UIElement will be rendered into.
+    SharedPtr<Texture2D> texture_;
+    /// Model created by this component. If node already has StaticModel then this will be null.
+    SharedPtr<StaticModel> model_;
+    /// UIElement to be rendered into texture. It also handles screen to UI coordinate translation.
+    SharedPtr<UIElement> rootElement_;
+    /// Viewport index to be set when component is added to a node.
+    unsigned viewportIndex_;
 };
 
 }

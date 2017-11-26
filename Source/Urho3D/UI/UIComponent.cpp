@@ -19,7 +19,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "UIComponent.h"
 #include "../Core/Context.h"
 #include "../Graphics/BillboardSet.h"
 #include "../Graphics/Graphics.h"
@@ -32,9 +31,11 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
 #include "../Resource/ResourceCache.h"
 #include "../IO/Log.h"
 #include "../UI/UI.h"
+#include "../UI/UIComponent.h"
 #include "../UI/UIEvents.h"
 
 
@@ -46,9 +47,106 @@ static int const UICOMPONENT_MIN_TEXTURE_SIZE = 64;
 static int const UICOMPONENT_MAX_TEXTURE_SIZE = 4096;
 
 
-UIComponent::UIComponent(Context* context) : 
-    Component(context),
-    isStaticModelOwned_(false)
+class UIElement3D : public UIElement
+{
+    URHO3D_OBJECT(UIElement3D, UIElement);
+public:
+    /// Construct.
+    UIElement3D(Context* context) : UIElement(context) { }
+    /// Destruct.
+    virtual ~UIElement3D() override = default;
+    /// Set UIComponent which is using this element as root element.
+    void SetNode(Node* node) { node_ = node; }
+    /// Set active viewport through which this element is rendered. If viewport is not set, it defaults to first viewport.
+    void SetViewport(Viewport* viewport) { viewport_ = viewport; }
+    /// Convert element coordinates to screen coordinates.
+    IntVector2 ElementToScreen(const IntVector2& position) override
+    {
+        URHO3D_LOGERROR("UIElement3D::ElementToScreen is not implemented.");
+        return {-1, -1};
+    }
+    /// Convert screen coordinates to element coordinates.
+    IntVector2 ScreenToElement(const IntVector2& screenPos) override
+    {
+        IntVector2 result(-1, -1);
+
+        if (node_.Expired())
+            return result;
+
+        Scene* scene = node_->GetScene();
+        StaticModel* model = node_->GetComponent<StaticModel>();
+        if (scene == nullptr || model == nullptr)
+            return result;
+
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (renderer == nullptr)
+            return result;
+
+        // \todo Always uses the first viewport, in case there are multiple
+        Octree* octree = scene->GetComponent<Octree>();
+        if (viewport_ == nullptr)
+            viewport_ = renderer->GetViewportForScene(scene, 0);
+
+        if (viewport_.Expired() || octree == nullptr)
+            return result;
+
+        if (viewport_->GetScene() != scene)
+        {
+            URHO3D_LOGERROR("UIComponent and Viewport set to component's root element belong to different scenes.");
+            return result;
+        }
+
+        Camera* camera = viewport_->GetCamera();
+
+        if (camera == nullptr)
+            return result;
+
+        IntRect rect = viewport_->GetRect();
+        if (rect == IntRect::ZERO)
+        {
+            Graphics* graphics = GetSubsystem<Graphics>();
+            rect.right_ = graphics->GetWidth();
+            rect.bottom_ = graphics->GetHeight();
+        }
+
+        Ray ray(camera->GetScreenRay((float)screenPos.x_ / rect.Width(), (float)screenPos.y_ / rect.Height()));
+        PODVector<RayQueryResult> queryResultVector;
+        RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
+
+        octree->Raycast(query);
+
+        if (queryResultVector.Empty())
+            return result;
+
+        for (unsigned i = 0; i < queryResultVector.Size(); i++)
+        {
+            RayQueryResult& queryResult = queryResultVector[i];
+            if (queryResult.drawable_ != model)
+            {
+                // ignore billboard sets by default
+                if (queryResult.drawable_->GetTypeInfo()->IsTypeOf(BillboardSet::GetTypeStatic()))
+                    continue;
+                return result;
+            }
+
+            Vector2& uv = queryResult.textureUV_;
+            result = IntVector2(static_cast<int>(uv.x_ * GetWidth()),
+                static_cast<int>(uv.y_ * GetHeight()));
+            return result;
+        }
+        return result;
+    }
+
+protected:
+    /// A UIComponent which owns this element.
+    WeakPtr<Node> node_;
+    /// Viewport which renders this element.
+    WeakPtr<Viewport> viewport_;
+};
+
+UIComponent::UIComponent(Context* context)
+    : Component(context)
+    , viewportIndex_(0)
 {
     texture_ = context_->CreateObject<Texture2D>();
     texture_->SetFilterMode(FILTER_BILINEAR);
@@ -57,7 +155,6 @@ UIComponent::UIComponent(Context* context) :
     texture_->SetNumLevels(1);                                        // No mipmaps
 
     rootElement_ = context_->CreateObject<UIElement3D>();
-    rootElement_->SetUIComponent(this);
     rootElement_->SetTraversalMode(TM_BREADTH_FIRST);
     rootElement_->SetEnabled(true);
 
@@ -79,6 +176,7 @@ UIComponent::~UIComponent()
 void UIComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIComponent>();
+    context->RegisterFactory<UIElement3D>();
 }
 
 UIElement* UIComponent::GetRoot() const
@@ -96,34 +194,28 @@ Texture2D* UIComponent::GetTexture() const
     return texture_;
 }
 
-StaticModel* UIComponent::GetModel() const
-{
-    return model_;
-}
-
 void UIComponent::OnNodeSet(Node* node)
 {
+    UIElement3D* rootElement = static_cast<UIElement3D*>(rootElement_.Get());
+    rootElement->SetNode(node);
     if (node)
     {
-        model_ = node->GetComponent<StaticModel>();
-        if (model_.Null())
-        {
-            isStaticModelOwned_ = true;
-            model_ = node->CreateComponent<StaticModel>();
-        }
-        model_->SetMaterial(material_);
-        rootElement_->SetRenderTexture(texture_);
+        Renderer* renderer = GetSubsystem<Renderer>();
+        StaticModel* model = node->GetComponent<StaticModel>();
+        rootElement->SetViewport(renderer->GetViewportForScene(GetScene(), viewportIndex_));
+        if (model == nullptr)
+            model_ = model = node->CreateComponent<StaticModel>();
+        model->SetMaterial(material_);
+        rootElement->SetRenderTexture(texture_);
     }
     else
     {
-        rootElement_->SetRenderTexture(nullptr);
-        model_->SetMaterial(nullptr);
-        if (isStaticModelOwned_)
+        rootElement->SetRenderTexture(nullptr);
+        if (model_.NotNull())
         {
-            model_->GetNode()->RemoveComponent<StaticModel>();
-            isStaticModelOwned_ = false;
+            model_->Remove();
+            model_ = nullptr;
         }
-        model_ = nullptr;
     }
 }
 
@@ -146,98 +238,15 @@ void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
         URHO3D_LOGERROR("UIComponent: resizing texture failed.");
 }
 
-IntVector2 UIElement3D::ScreenToElement(const IntVector2& screenPos)
+void UIComponent::SetViewportIndex(unsigned int index)
 {
-    IntVector2 result(-1, -1);
-
-    Scene* scene = component_->GetScene();
-    if (!scene)
-        return result;
-
-    Renderer* renderer = GetSubsystem<Renderer>();
-    if (!renderer)
-        return result;
-
-    // \todo Always uses the first viewport, in case there are multiple
-    Octree* octree = scene->GetComponent<Octree>();
-    Viewport* viewport = viewport_;
-    if (viewport == nullptr)
-        viewport = renderer->GetViewportForScene(scene, 0);
-
-    if (!viewport || !octree)
-        return result;
-
-    if (viewport->GetScene() != scene)
+    viewportIndex_ = index;
+    if (Scene* scene = GetScene())
     {
-        URHO3D_LOGERROR("UIComponent and Viewport set to component's root element belong to different scenes.");
-        return result;
+        Renderer* renderer = GetSubsystem<Renderer>();
+        Viewport* viewport = renderer->GetViewportForScene(scene, index);
+        static_cast<UIElement3D*>(rootElement_.Get())->SetViewport(viewport);
     }
-
-    Camera* camera = viewport->GetCamera();
-
-    if (!camera)
-        return result;
-
-    IntRect rect = viewport->GetRect();
-    if (rect == IntRect::ZERO)
-    {
-        Graphics* graphics = GetSubsystem<Graphics>();
-        rect.right_ = graphics->GetWidth();
-        rect.bottom_ = graphics->GetHeight();
-    }
-
-    Ray ray(camera->GetScreenRay((float)screenPos.x_ / rect.Width(), (float)screenPos.y_ / rect.Height()));
-    PODVector<RayQueryResult> queryResultVector;
-    RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
-
-    octree->Raycast(query);
-
-    if (queryResultVector.Empty())
-        return result;
-
-    for (unsigned i = 0; i < queryResultVector.Size(); i++)
-    {
-        RayQueryResult& queryResult = queryResultVector[i];
-        if (queryResult.drawable_ != component_->GetModel())
-        {
-            // ignore billboard sets by default
-            if (queryResult.drawable_->GetTypeInfo()->IsTypeOf(BillboardSet::GetTypeStatic()))
-                continue;
-            return result;
-        }
-
-        Vector2& uv = queryResult.textureUV_;
-        result = IntVector2(static_cast<int>(uv.x_ * component_->GetRoot()->GetWidth()),
-            static_cast<int>(uv.y_ * component_->GetRoot()->GetHeight()));
-        return result;
-    }
-    return result;
-}
-
-IntVector2 UIElement3D::ElementToScreen(const IntVector2& position)
-{
-    URHO3D_LOGERROR("UIElement3D::ElementToScreen is not implemented.");
-    return {-1, -1};
-}
-
-void UIElement3D::RegisterObject(Context* context)
-{
-    context->RegisterFactory<UIElement3D>();
-}
-
-UIElement3D::UIElement3D(Context* context)
-    : UIElement(context)
-{
-}
-
-void UIElement3D::SetUIComponent(UIComponent* component)
-{
-    component_ = component;
-}
-
-void UIElement3D::SetViewport(Viewport* viewport)
-{
-    viewport_ = viewport;
 }
 
 }

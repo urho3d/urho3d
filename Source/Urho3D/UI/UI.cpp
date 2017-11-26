@@ -2131,7 +2131,6 @@ void RegisterUILibrary(Context* context)
     ProgressBar::RegisterObject(context);
     ToolTip::RegisterObject(context);
     UIComponent::RegisterObject(context);
-    UIElement3D::RegisterObject(context);
 }
 
 }
