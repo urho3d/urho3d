@@ -309,6 +309,7 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
 
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
+    SetID(text, component, ITEM_COMPONENT);
 }
 
 int GetType(Serializable@ serializable)
@@ -335,6 +336,8 @@ void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
     // Set node ID as drag and drop content for node ID editing
     if (itemType == ITEM_NODE)
         text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[NODE_ID_VAR].GetUInt());
+    else if (itemType == ITEM_COMPONENT)
+        text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[COMPONENT_ID_VAR].GetUInt());
 
     switch (itemType)
     {

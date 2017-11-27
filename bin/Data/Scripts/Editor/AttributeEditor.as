@@ -318,7 +318,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         // If the attribute is a node ID, make it a drag/drop target
-        if (info.name.Contains("NodeID", false) || info.name.Contains("Node ID", false) || (info.mode & AM_NODEID) != 0)
+        if (info.name.Contains("NodeID", false) || info.name.Contains("Node ID", false) || (info.mode & AM_NODEID) != 0 || (info.mode & AM_COMPONENTID) != 0)
             attrEdit.dragDropMode = DD_TARGET;
     }
     else
