@@ -98,6 +98,7 @@ void CreateUI()
     CreateCamera();
     CreateLayerEditor();
     CreateColorWheel();
+    CreateMultiplyEditor();
 
 	terrainEditor.Create();
 
@@ -531,6 +532,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Particle editor", @ToggleParticleEffectEditor));
         popup.AddChild(CreateMenuItem("Terrain editor", TerrainEditorShowCallback(terrainEditor.Show)));
         popup.AddChild(CreateMenuItem("Spawn editor", @ToggleSpawnEditor));
+        popup.AddChild(CreateMenuItem("Multiply editor", @ToggleMultiplyEditor));
         popup.AddChild(CreateMenuItem("Sound Type editor", @ToggleSoundTypeEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ToggleEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ToggleEditorPreferencesDialog));
