@@ -327,63 +327,37 @@ void OnButtonApply(StringHash eventType, VariantMap& eventData)
 void setMultiply()
 {
     if(selectedNodes.length > 0)
-    //for (uint i = 0; i < selectedNodes.length; ++i)
     {
+        // get only first selected node
         Node@ currentNode = selectedNodes[0];         
 
+        // clear cloned nodes with tags
         Array<Node@> nodes = currentNode.GetChildrenWithTag("EditMul");
         for(uint i=0; i<nodes.length; i++)
         {
             nodes[i].Remove();
-        }      
-         
+        }
         
         Node@ baseClone = currentNode.Clone();
 
-
         Matrix3x4 mulMat(Position, Quaternion(Rotation), Scale);
-        Matrix3x4 preMat(PrePosition, Quaternion(PreRotation), PreScale);      
-
-        //Matrix3x4 mati = currentNode.transform;
-        Matrix3x4 accu = mulMat;// = currentNode.worldTransform;   
-
-
-        Vector3 p;
-        Quaternion r;
-        Vector3 s;
+        Matrix3x4 preMat(PrePosition, Quaternion(PreRotation), PreScale);
+        
+        Matrix3x4 accu = mulMat;
         Matrix3x4 mat0;
 
-
-        /*p = currentNode.worldPosition;
-        r = currentNode.worldRotation;
-        s = currentNode.worldScale;
-        //baseClone.SetTransform(p,r,s);
-        Matrix3x4 accu = Matrix3x4(p,r,s);
-
-        Print("mul world rot " + currentNode.worldRotation.y);
-        Print("mul rot " + currentNode.rotation.y);*/
-
-        //Node@ rootNode = scene.CreateChild();
-        
-
         for(uint i=1; i<MultiplyCount; i++)
-        {            
+        {
             mat0 = preMat * accu;
-            mat0.Decompose(p,r,s);
-            accu = accu * mulMat;
+            accu = accu * mulMat ;
 
             Node@ cloneNode = baseClone.Clone();
-            cloneNode.AddTag("EditMul");            
-            cloneNode.SetWorldTransform(p,r,s);
-            //cloneNode.SetWorldTransform(mat0);
+            cloneNode.AddTag("EditMul");
+            cloneNode.SetTransform(mat0);
 
-            currentNode.AddChild(cloneNode);           
+            currentNode.AddChild(cloneNode);
         }
 
-        //rootNode.parent = currentNode;
-
-        baseClone.Remove();  
-
-
+        baseClone.Remove();
     }   
 }
