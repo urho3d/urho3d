@@ -6,10 +6,10 @@ bool inMultiplyRefresh = false;
 Vector3 Position;
 Vector3 Rotation;
 Vector3 Scale;
-Vector3 PrePosition;
-Vector3 PreRotation;
-Vector3 PreScale;
 uint MultiplyCount;
+String tagName = "TagEditMultiplicator";
+bool isSwitchOrder = false;
+bool isClonesInChild = false;
 
 void CreateMultiplyEditor()
 {
@@ -30,33 +30,18 @@ void CreateMultiplyEditor()
     HideMultiplyEditor();
 
     SubscribeToEvent(multiplyWindow.GetChild("CloseButton", true), "Released", "HideMultiplyEditor");
-
     SubscribeToEvent(multiplyWindow.GetChild("Count", true), "TextChanged", "EditMultiplyCount");
-
     SubscribeToEvent(multiplyWindow.GetChild("PosX", true), "TextChanged", "EditMultiplyPos");
     SubscribeToEvent(multiplyWindow.GetChild("PosY", true), "TextChanged", "EditMultiplyPos");
     SubscribeToEvent(multiplyWindow.GetChild("PosZ", true), "TextChanged", "EditMultiplyPos");
-
     SubscribeToEvent(multiplyWindow.GetChild("RotX", true), "TextChanged", "EditMultiplyRot");
     SubscribeToEvent(multiplyWindow.GetChild("RotY", true), "TextChanged", "EditMultiplyRot");
     SubscribeToEvent(multiplyWindow.GetChild("RotZ", true), "TextChanged", "EditMultiplyRot");
-
     SubscribeToEvent(multiplyWindow.GetChild("ScaleX", true), "TextChanged", "EditMultiplyScale");
     SubscribeToEvent(multiplyWindow.GetChild("ScaleY", true), "TextChanged", "EditMultiplyScale");
     SubscribeToEvent(multiplyWindow.GetChild("ScaleZ", true), "TextChanged", "EditMultiplyScale");
-
-    SubscribeToEvent(multiplyWindow.GetChild("PrePosX", true), "TextChanged", "EditMultiplyPrePos");
-    SubscribeToEvent(multiplyWindow.GetChild("PrePosY", true), "TextChanged", "EditMultiplyPrePos");
-    SubscribeToEvent(multiplyWindow.GetChild("PrePosZ", true), "TextChanged", "EditMultiplyPrePos");
-
-    SubscribeToEvent(multiplyWindow.GetChild("PreRotX", true), "TextChanged", "EditMultiplyPreRot");
-    SubscribeToEvent(multiplyWindow.GetChild("PreRotY", true), "TextChanged", "EditMultiplyPreRot");
-    SubscribeToEvent(multiplyWindow.GetChild("PreRotZ", true), "TextChanged", "EditMultiplyPreRot");
-
-    SubscribeToEvent(multiplyWindow.GetChild("PreScaleX", true), "TextChanged", "EditMultiplyPreScale");
-    SubscribeToEvent(multiplyWindow.GetChild("PreScaleY", true), "TextChanged", "EditMultiplyPreScale");
-    SubscribeToEvent(multiplyWindow.GetChild("PreScaleZ", true), "TextChanged", "EditMultiplyPreScale");
-
+    SubscribeToEvent(multiplyWindow.GetChild("CheckBox2", true), "Toggled", "OnCheckBox2");
+    SubscribeToEvent(multiplyWindow.GetChild("CheckBox3", true), "Toggled", "OnCheckBox3");
     SubscribeToEvent(multiplyWindow.GetChild("ButtonPreview", true), "Released", "OnButtonPreview");
     SubscribeToEvent(multiplyWindow.GetChild("ButtonClear", true), "Released", "OnButtonClear");
     SubscribeToEvent(multiplyWindow.GetChild("ButtonApply", true), "Released", "OnButtonApply");
@@ -64,41 +49,22 @@ void CreateMultiplyEditor()
 
 void InitMultiplyWindow()
 {
+    MultiplyCount = 1;
+
     Position = Vector3(0,0,0);
     Rotation = Vector3(0,0,0);
     Scale = Vector3(1,1,1);
 
-    PrePosition = Vector3(0,0,0);
-    PreRotation = Vector3(0,0,0);
-    PreScale = Vector3(1,1,1);
-
-    MultiplyCount = 1;
-
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("Count", true)));
-
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PosX", true)));
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PosY", true)));
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PosZ", true)));
-
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("RotX", true)));
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("RotY", true)));
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("RotZ", true)));
-
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("ScaleX", true)));
     CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("ScaleY", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("ScaleZ", true)));
-
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PrePosX", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PrePosY", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PrePosZ", true)));
-
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PreRotX", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PreRotY", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PreRotZ", true)));
-
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PreScaleX", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PreScaleY", true)));
-    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("PreScaleZ", true)));
+    CreateDragSlider(cast<LineEdit>(multiplyWindow.GetChild("ScaleZ", true)));    
 }
 
 void RefreshMultiplyWindow()
@@ -114,30 +80,17 @@ void RefreshMultiplyWindow()
 void RefreshMultiplyWindowAttributes()
 {
     cast<LineEdit>(multiplyWindow.GetChild("Count", true)).text = MultiplyCount;
-
     cast<LineEdit>(multiplyWindow.GetChild("PosX", true)).text = Position.x;
     cast<LineEdit>(multiplyWindow.GetChild("PosY", true)).text = Position.y;
     cast<LineEdit>(multiplyWindow.GetChild("PosZ", true)).text = Position.z;
-
     cast<LineEdit>(multiplyWindow.GetChild("RotX", true)).text = Rotation.x;
     cast<LineEdit>(multiplyWindow.GetChild("RotY", true)).text = Rotation.y;
     cast<LineEdit>(multiplyWindow.GetChild("RotZ", true)).text = Rotation.z;
-
     cast<LineEdit>(multiplyWindow.GetChild("ScaleX", true)).text = Scale.x;
     cast<LineEdit>(multiplyWindow.GetChild("ScaleY", true)).text = Scale.y;
     cast<LineEdit>(multiplyWindow.GetChild("ScaleZ", true)).text = Scale.z;
-
-    cast<LineEdit>(multiplyWindow.GetChild("PrePosX", true)).text = PrePosition.x;
-    cast<LineEdit>(multiplyWindow.GetChild("PrePosY", true)).text = PrePosition.y;
-    cast<LineEdit>(multiplyWindow.GetChild("PrePosZ", true)).text = PrePosition.z;
-
-    cast<LineEdit>(multiplyWindow.GetChild("PreRotX", true)).text = PreRotation.x;
-    cast<LineEdit>(multiplyWindow.GetChild("PreRotY", true)).text = PreRotation.y;
-    cast<LineEdit>(multiplyWindow.GetChild("PreRotZ", true)).text = PreRotation.z;
-
-    cast<LineEdit>(multiplyWindow.GetChild("PreScaleX", true)).text = PreScale.x;
-    cast<LineEdit>(multiplyWindow.GetChild("PreScaleY", true)).text = PreScale.y;
-    cast<LineEdit>(multiplyWindow.GetChild("PreScaleZ", true)).text = PreScale.z;
+    cast<CheckBox>(multiplyWindow.GetChild("CheckBox2", true)).checked = isSwitchOrder;
+    cast<CheckBox>(multiplyWindow.GetChild("CheckBox3", true)).checked = isClonesInChild;
 }
 
 
@@ -232,132 +185,120 @@ void EditMultiplyScale(StringHash eventType, VariantMap& eventData)
         Scale = Vector3(v.x, v.y, element.text.ToFloat());
 }
 
-void EditMultiplyPrePos(StringHash eventType, VariantMap& eventData)
-{
-    if (inMultiplyRefresh)
-        return;
-
-    LineEdit@ element = eventData["Element"].GetPtr();
-
-    Vector3 v = PrePosition;
-
-    if (element.name == "PrePosX")
-        PrePosition = Vector3(element.text.ToFloat(), v.y, v.z);
-
-    if (element.name == "PrePosY")
-        PrePosition = Vector3(v.x, element.text.ToFloat(), v.z);
-
-    if (element.name == "PrePosZ")
-        PrePosition = Vector3(v.x, v.y, element.text.ToFloat());
-}
-
-void EditMultiplyPreRot(StringHash eventType, VariantMap& eventData)
-{
-    if (inMultiplyRefresh)
-        return;
-
-    LineEdit@ element = eventData["Element"].GetPtr();
-
-    Vector3 v = PreRotation;
-
-    if (element.name == "PreRotX")
-        PreRotation = Vector3(element.text.ToFloat(), v.y, v.z);
-
-    if (element.name == "PreRotY")
-        PreRotation = Vector3(v.x, element.text.ToFloat(), v.z);
-
-    if (element.name == "PreRotZ")
-        PreRotation = Vector3(v.x, v.y, element.text.ToFloat());
-}
-
-void EditMultiplyPreScale(StringHash eventType, VariantMap& eventData)
-{
-    if (inMultiplyRefresh)
-        return;
-
-    LineEdit@ element = eventData["Element"].GetPtr();
-
-    Vector3 v = PreScale;
-
-    if (element.name == "PreScaleX")
-        PreScale = Vector3(element.text.ToFloat(), v.y, v.z);
-
-    if (element.name == "PreScaleY")
-        PreScale = Vector3(v.x, element.text.ToFloat(), v.z);
-
-    if (element.name == "PreScaleZ")
-        PreScale = Vector3(v.x, v.y, element.text.ToFloat());
-}
-
 
 void OnButtonPreview(StringHash eventType, VariantMap& eventData)
-{
-    setMultiply();
+{    
+    ProcessMultiply();
 }
 
 void OnButtonClear(StringHash eventType, VariantMap& eventData)
 {
-    if(selectedNodes.length > 0)
-    {
-        Node@ currentNode = selectedNodes[0];
-
-        Array<Node@> nodes = currentNode.GetChildrenWithTag("EditMul");
-        for(uint i=0; i<nodes.length; i++)
-        {
-            nodes[i].Remove();
-        }
-    }
+    MultiplyClearAll();
 }
 
 void OnButtonApply(StringHash eventType, VariantMap& eventData)
 {
-    if(selectedNodes.length > 0)
+    MultiplyApplyAll();
+}
+
+void OnCheckBox2(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    if (edit !is null)
+        isSwitchOrder = edit.checked;
+
+    ProcessMultiply();
+}
+
+void OnCheckBox3(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    if (edit !is null)
+        isClonesInChild = edit.checked;
+
+    ProcessMultiply();
+}
+
+void MultiplyClearAll()
+{
+    Array<Node@> nodes = editorScene.GetChildrenWithTag(tagName,true);
+    for(uint i=0; i<nodes.length; i++)
     {
-        Node@ currentNode = selectedNodes[0];
-        
-        Array<Node@> nodes = currentNode.GetChildrenWithTag("EditMul");
-        for(uint i=0; i<nodes.length; i++)
-        {
-            nodes[i].RemoveTag("EditMul");
-        }
+        nodes[i].Remove();
     }
 }
 
+void MultiplyApplyAll()
+{
+    Array<Node@> nodes = editorScene.GetChildrenWithTag(tagName,true);
+    for(uint i=0; i<nodes.length; i++)
+    {
+        nodes[i].RemoveTag(tagName);
+    }
+}
 
-void setMultiply()
+void ProcessMultiply()
+{
+    MultiplyClearAll();
+
+    if(isClonesInChild)
+        MultiplyInNode();        
+    else
+        MultiplyInScene();
+}
+
+void MultiplyInScene()
 {
     if(selectedNodes.length > 0)
     {
-        // get only first selected node
-        Node@ currentNode = selectedNodes[0];         
-
-        // clear cloned nodes with tags
-        Array<Node@> nodes = currentNode.GetChildrenWithTag("EditMul");
-        for(uint i=0; i<nodes.length; i++)
-        {
-            nodes[i].Remove();
-        }
+        // Apply multiplication only on first selected node
+        Node@ currentNode = selectedNodes[0];
         
         Node@ baseClone = currentNode.Clone();
+        baseClone.AddTag(tagName);
 
-        Matrix3x4 mulMat(Position, Quaternion(Rotation), Scale);
-        Matrix3x4 preMat(PrePosition, Quaternion(PreRotation), PreScale);
-        
-        Matrix3x4 accu = mulMat;
-        Matrix3x4 mat0;
+        Matrix3x4 mulMat(Position, Quaternion(Rotation), Scale);        
+        Matrix3x4 accu = baseClone.transform;
 
         for(uint i=1; i<MultiplyCount; i++)
         {
-            mat0 = preMat * accu;
-            accu = accu * mulMat ;
+            if(isSwitchOrder)
+                accu = mulMat * accu;
+            else
+                accu = accu * mulMat;
 
-            Node@ cloneNode = baseClone.Clone();
-            cloneNode.AddTag("EditMul");
-            cloneNode.SetTransform(mat0);
+            Node@ cloneNode = baseClone.Clone();            
+            cloneNode.SetTransform(accu);           
+            
+            editorScene.AddChild(cloneNode);         
+        }
 
-            currentNode.AddChild(cloneNode);
+        baseClone.Remove();        
+    }   
+}
+
+void MultiplyInNode()
+{
+    if(selectedNodes.length > 0)
+    {
+        // Apply multiplication only on first selected node
+        Node@ currentNode = selectedNodes[0];
+        
+        Node@ baseClone = currentNode.Clone();
+        baseClone.AddTag(tagName);
+
+        Matrix3x4 mulMat(Position, Quaternion(Rotation), Scale);        
+        Matrix3x4 accu =  mulMat;
+
+        for(uint i=1; i<MultiplyCount; i++)
+        {
+            Node@ cloneNode = baseClone.Clone();            
+            cloneNode.SetTransform(accu);
+            currentNode.AddChild(cloneNode);  
+
+            accu = mulMat * accu;
         }
 
         baseClone.Remove();
-    }   
+    }  
 }
