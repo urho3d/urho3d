@@ -1288,6 +1288,10 @@ PUGI__NS_BEGIN
 	{
 		xml_node_struct* parent = node->parent;
 
+		// Urho3D fix: fixes crash when node does not belong to a parent.
+		if (parent == 0)
+			return;
+
 		if (node->next_sibling)
 			node->next_sibling->prev_sibling_c = node->prev_sibling_c;
 		else
