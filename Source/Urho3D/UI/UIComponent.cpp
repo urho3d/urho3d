@@ -38,6 +38,7 @@
 #include "../UI/UIComponent.h"
 #include "../UI/UIEvents.h"
 
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
@@ -45,7 +46,6 @@ namespace Urho3D
 static int const UICOMPONENT_DEFAULT_TEXTURE_SIZE = 512;
 static int const UICOMPONENT_MIN_TEXTURE_SIZE = 64;
 static int const UICOMPONENT_MAX_TEXTURE_SIZE = 4096;
-
 
 class UIElement3D : public UIElement
 {
@@ -196,21 +196,20 @@ Texture2D* UIComponent::GetTexture() const
 
 void UIComponent::OnNodeSet(Node* node)
 {
-    UIElement3D* rootElement = static_cast<UIElement3D*>(rootElement_.Get());
-    rootElement->SetNode(node);
+    rootElement_->SetNode(node);
     if (node)
     {
         Renderer* renderer = GetSubsystem<Renderer>();
         StaticModel* model = node->GetComponent<StaticModel>();
-        rootElement->SetViewport(renderer->GetViewportForScene(GetScene(), viewportIndex_));
+        rootElement_->SetViewport(renderer->GetViewportForScene(GetScene(), viewportIndex_));
         if (model == nullptr)
             model_ = model = node->CreateComponent<StaticModel>();
         model->SetMaterial(material_);
-        rootElement->SetRenderTexture(texture_);
+        rootElement_->SetRenderTexture(texture_);
     }
     else
     {
-        rootElement->SetRenderTexture(nullptr);
+        rootElement_->SetRenderTexture(nullptr);
         if (model_.NotNull())
         {
             model_->Remove();
@@ -245,7 +244,7 @@ void UIComponent::SetViewportIndex(unsigned int index)
     {
         Renderer* renderer = GetSubsystem<Renderer>();
         Viewport* viewport = renderer->GetViewportForScene(scene, index);
-        static_cast<UIElement3D*>(rootElement_.Get())->SetViewport(viewport);
+        rootElement_->SetViewport(viewport);
     }
 }
 

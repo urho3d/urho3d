@@ -445,8 +445,12 @@ void UI::RenderUpdate()
     {
         RenderToTextureData& data = it->second_;
         if (data.rootElement_.Expired())
+        {
             it = renderToTexture_.Erase(it);
-        else if (data.rootElement_->IsEnabled())
+            continue;
+        }
+
+        if (data.rootElement_->IsEnabled())
         {
             data.batches_.Clear();
             data.vertexData_.Clear();
@@ -465,10 +469,8 @@ void UI::RenderUpdate()
                 batch.AddQuad(scissor.left_, scissor.top_, scissor.right_, scissor.bottom_, 0, 0);
                 data.batches_.Push(batch);
             }
-            ++it;
         }
-        else
-            ++it;
+        ++it;
     }
 }
 
@@ -503,9 +505,9 @@ void UI::Render(bool renderUICommand)
     // Render to UIComponent textures. This is skipped when called from the RENDERUI command
     if (!renderUICommand)
     {
-        for (auto it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+        for (auto& item : renderToTexture_)
         {
-            RenderToTextureData& data = it->second_;
+            RenderToTextureData& data = item.second_;
             if (data.rootElement_->IsEnabled())
             {
                 SetVertexData(data.vertexBuffer_, data.vertexData_);
@@ -548,9 +550,9 @@ void UI::DebugDraw(UIElement* element)
             element->GetDebugDrawBatches(debugDrawBatches_, debugVertexData_, scissor);
         else
         {
-            for (auto it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+            for (auto& item : renderToTexture_)
             {
-                RenderToTextureData& data = it->second_;
+                RenderToTextureData& data = item.second_;
                 if (!data.rootElement_.Expired() && data.rootElement_ == root && data.rootElement_->IsEnabled())
                 {
                     element->GetDebugDrawBatches(data.debugDrawBatches_, data.debugVertexData_, scissor);
@@ -770,9 +772,9 @@ UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVec
     // Mouse was not hovering UI element. Check elements rendered on 3D objects.
     if (!result && renderToTexture_.Size())
     {
-        for (auto it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+        for (auto& item : renderToTexture_)
         {
-            RenderToTextureData& data = it->second_;
+            RenderToTextureData& data = item.second_;
             if (data.rootElement_.Expired() || !data.rootElement_->IsEnabled())
                 continue;
 
