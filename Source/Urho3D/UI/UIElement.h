@@ -109,6 +109,7 @@ static const unsigned DD_SOURCE_AND_TARGET = 0x3;
 
 class Cursor;
 class ResourceCache;
+class Texture2D;
 
 /// Base class for %UI elements.
 class URHO3D_API UIElement : public Animatable
@@ -639,6 +640,9 @@ public:
 
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
+
+    /// Set texture to which element will be rendered.
+    void SetRenderTexture(Texture2D* texture);
 
 protected:
     /// Handle attribute animation added.

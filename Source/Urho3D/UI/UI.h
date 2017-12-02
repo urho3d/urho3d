@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Core/Object.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../UI/Cursor.h"
 #include "../UI/UIBatch.h"
 
@@ -48,7 +49,6 @@ class ResourceCache;
 class Timer;
 class UIBatch;
 class UIElement;
-class VertexBuffer;
 class XMLElement;
 class XMLFile;
 class RenderSurface;
@@ -212,8 +212,8 @@ public:
     /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
     const IntVector2& GetCustomSize() const { return customSize_; }
 
-    /// Register UIElement for being rendered into a texture.
-    void SetRenderToTexture(UIComponent* component, bool enable);
+    /// Set texture to which element will be rendered.
+    void SetElementRenderTexture(UIElement* element, Texture2D* texture);
 
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData
@@ -233,6 +233,27 @@ public:
     };
 
 private:
+    /// Data structured used to hold data of UI elements that are rendered to texture.
+    struct RenderToTextureData
+    {
+        /// UIElement to be rendered into texture.
+        WeakPtr<UIElement> rootElement_;
+        /// Texture that UIElement will be rendered into.
+        SharedPtr<Texture2D> texture_;
+        /// UI rendering batches.
+        PODVector<UIBatch> batches_;
+        /// UI rendering vertex data.
+        PODVector<float> vertexData_;
+        /// UI vertex buffer.
+        SharedPtr<VertexBuffer> vertexBuffer_;
+        /// UI rendering batches for debug draw.
+        PODVector<UIBatch> debugDrawBatches_;
+        /// UI rendering vertex data for debug draw.
+        PODVector<float> debugVertexData_;
+        /// UI debug geometry vertex buffer.
+        SharedPtr<VertexBuffer> debugVertexBuffer_;
+    };
+
     /// Initialize when screen mode initially set.
     void Initialize();
     /// Update UI element logic recursively.
@@ -398,9 +419,7 @@ private:
     /// Root element custom size. 0,0 for automatic resizing (default.)
     IntVector2 customSize_;
     /// Elements that should be rendered to textures.
-    Vector<WeakPtr<UIComponent> > renderToTexture_;
-
-    friend class UIComponent;
+    HashMap<UIElement*, RenderToTextureData> renderToTexture_;
 };
 
 /// Register UI library objects.
