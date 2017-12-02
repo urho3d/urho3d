@@ -102,6 +102,9 @@ public:
     /// Return the script module create/delete mutex.
     Mutex& GetModuleMutex() { return moduleMutex_; }
 
+    /// Returns an array of strings of enum value names for Enum Attributes
+    const char** GetEnumValues(int asTypeID);
+
 
 private:
     /// Increase script nesting level.
@@ -132,6 +135,8 @@ private:
     Vector<asIScriptContext*> scriptFileContexts_;
     /// Search cache for inbuilt object types.
     HashMap<const char*, asITypeInfo*> objectTypes_;
+    /// Cache of typeIds to array of enum value strings for attributes. Once found, the
+    HashMap<int, PODVector<const char*>> enumValues_;
     /// AngelScript resource router.
     SharedPtr<ResourceRouter> router_;
     /// Script module create/delete mutex.

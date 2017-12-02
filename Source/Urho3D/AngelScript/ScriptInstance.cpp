@@ -643,7 +643,7 @@ void ScriptInstance::GetScriptAttributes()
     {
         const char* name;
         int typeId;
-        bool isPrivate, isProtected, isHandle;
+        bool isPrivate, isProtected, isHandle, isEnum;
 
         scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate, &isProtected);
 
@@ -656,12 +656,20 @@ void ScriptInstance::GetScriptAttributes()
         if (isHandle)
             typeName = typeName.Substring(0, typeName.Length() - 1);
 
+        if (engine->GetTypeInfoById(typeId))
+            isEnum = engine->GetTypeInfoById(typeId)->GetFlags() & asOBJ_ENUM;
+
         AttributeInfo info;
         info.mode_ = AM_FILE;
         info.name_ = name;
         info.ptr_ = scriptObject_->GetAddressOfProperty(i);
 
-        if (!isHandle)
+        if (isEnum)
+        {
+            info.type_ = VAR_INT;
+            info.enumNames_ = GetSubsystem<Script>()->GetEnumValues(typeId);
+        }
+        else if (!isHandle)
         {
             switch (typeId)
             {
