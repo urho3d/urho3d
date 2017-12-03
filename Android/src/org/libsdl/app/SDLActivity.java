@@ -3,9 +3,9 @@
 package org.libsdl.app;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -134,24 +134,16 @@ public class SDLActivity extends Activity {
         // Urho3D: auto load all the shared libraries available in the library path
         if (!mIsSharedLibraryLoaded) {
             String libraryPath = getApplicationInfo().nativeLibraryDir;
-            File[] files = new File(libraryPath).listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String filename) {
-                    // Only list libraries, i.e. exclude gdbserver when it presents
-                    return filename.matches("^lib.*\\.so$");
-                }
+            File[] files = new File(libraryPath).listFiles((dir, filename) -> {
+                // Only list libraries, i.e. exclude gdbserver when it presents
+                return filename.matches("^lib.*\\.so$");
             });
             String errorMsgBrokenLib = "";
             if (files == null) {
                 errorMsgBrokenLib = "no libraries found in path \"" + libraryPath + "\"";
             } else {
-                Arrays.sort(files, new Comparator<File>() {
-                    @Override
-                    public int compare(File lhs, File rhs) {
-                        return Long.valueOf(lhs.lastModified()).compareTo(rhs.lastModified());
-                    }
-                });
-                ArrayList<String> libraryNames = new ArrayList<String>(files.length);
+                Arrays.sort(files, (lhs, rhs) -> Long.valueOf(lhs.lastModified()).compareTo(rhs.lastModified()));
+                ArrayList<String> libraryNames = new ArrayList<>(files.length);
                 for (final File libraryFilename : files) {
                     String name = libraryFilename.getName().replaceAll("^lib(.*)\\.so$", "$1");
                     libraryNames.add(name);
@@ -163,8 +155,6 @@ public class SDLActivity extends Activity {
                         mIsSharedLibraryLoaded = true;
                         mMainSharedLib = "lib" + libraryNames.get(libraryNames.size() - 1) + ".so";
                     }
-                } catch(UnsatisfiedLinkError e) {
-                    errorMsgBrokenLib = e.getMessage();
                 } catch(Exception e) {
                     errorMsgBrokenLib = e.getMessage();
                 }
@@ -193,21 +183,24 @@ public class SDLActivity extends Activity {
             }
         }
 
-        // Set up JNI
-        SDL.setupJNI();
+        // Urho3D: onLoadLibrary() may return false
+        if (SDLActivity.mIsSharedLibraryLoaded) {
+            // Set up JNI
+            SDL.setupJNI();
 
-        // Initialize state
-        SDL.initialize();
+            // Initialize state
+            SDL.initialize();
 
-        // So we can call stuff from static callbacks
-        mSingleton = this;
-        SDL.setContext(this);
+            // So we can call stuff from static callbacks
+            mSingleton = this;
+            SDL.setContext(this);
 
-        if (Build.VERSION.SDK_INT >= 11) {
-            mClipboardHandler = new SDLClipboardHandler_API11();
-        } else {
-            /* Before API 11, no clipboard notification (eg no SDL_CLIPBOARDUPDATE) */
-            mClipboardHandler = new SDLClipboardHandler_Old();
+            if (Build.VERSION.SDK_INT >= 11) {
+                mClipboardHandler = new SDLClipboardHandler_API11();
+            } else {
+                /* Before API 11, no clipboard notification (eg no SDL_CLIPBOARDUPDATE) */
+                mClipboardHandler = new SDLClipboardHandler_Old();
+            }
         }
 
         // Set up the surface
@@ -297,7 +290,7 @@ public class SDLActivity extends Activity {
         if (!SDLActivity.mIsSharedLibraryLoaded) {
            super.onDestroy();
            // Reset everything in case the user re opens the app
-           if (mSingleton)
+           if (mSingleton != null)
                SDLActivity.initialize();
            return;
         }
@@ -324,7 +317,7 @@ public class SDLActivity extends Activity {
         super.onDestroy();
 
         // Reset everything in case the user re opens the app
-        if (mSingleton)
+        if (mSingleton != null)
             SDLActivity.initialize();
     }
 
