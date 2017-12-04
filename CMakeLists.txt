@@ -38,8 +38,19 @@ endif ()
 # Set project name
 project (Urho3D)
 
+# Set engine project path
+set (URHO3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${URHO3D_SOURCE_DIR}/CMake/Modules)
+
+# Detect if engine is being used as a subproject
+if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+    set (URHO3D_IS_ROOT_ROJECT ON)
+endif()
+
+# Set variable that helps external projects to figure out if they are being built externally or internally
+set (URHO3D_IN_ENGINE_BUILD ON)
 
 # Include UrhoCommon.cmake module after setting project name
 include (UrhoCommon)
@@ -70,12 +81,12 @@ set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
-file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
+file (GLOB APP_SCRIPTS ${URHO3D_SOURCE_DIR}/bin/*${SCRIPT_EXT})
 install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the UrhoCommon module
 # Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
+install (DIRECTORY ${URHO3D_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
 # Install CMake build scripts
-file (GLOB CMAKE_SCRIPTS ${CMAKE_SOURCE_DIR}/*${SCRIPT_EXT})
+file (GLOB CMAKE_SCRIPTS ${URHO3D_SOURCE_DIR}/*${SCRIPT_EXT})
 install (PROGRAMS ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts)
 
 # Setup package variables
@@ -84,7 +95,7 @@ set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
 set (URHO3D_URL "https://github.com/urho3d/Urho3D")
 set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
 set (CPACK_PACKAGE_CONTACT ${URHO3D_URL})
-execute_process (COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND ${CMAKE_COMMAND} -P ${URHO3D_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake WORKING_DIRECTORY ${URHO3D_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set (CPACK_PACKAGE_VERSION ${URHO3D_VERSION})
 string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO3D_VERSION})
 if (MATCHED)
@@ -92,7 +103,7 @@ if (MATCHED)
     set (CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
     set (CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
 endif ()
-set (CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
+set (CPACK_RESOURCE_FILE_LICENSE ${URHO3D_SOURCE_DIR}/LICENSE)
 set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set (CPACK_GENERATOR TGZ)
 if (ANDROID)

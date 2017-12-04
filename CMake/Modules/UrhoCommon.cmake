@@ -155,7 +155,7 @@ if (RPI)
     include_directories (SYSTEM ${VIDEOCORE_INCLUDE_DIRS})
     link_directories (${VIDEOCORE_LIBRARY_DIRS})
 endif ()
-if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+if (URHO3D_IN_ENGINE_BUILD)
     set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default), SHARED, and MODULE; the last value is available for Emscripten only")
     # Non-Windows platforms always use OpenGL, the URHO3D_OPENGL variable will always be forced to TRUE, i.e. it is not an option at all
     # Windows platform has URHO3D_OPENGL as an option, MSVC compiler default to FALSE (i.e. prefers Direct3D) while MinGW compiler default to TRUE
@@ -777,7 +777,7 @@ macro (create_symlink SOURCE DESTINATION)
     if (IS_ABSOLUTE ${SOURCE})
         set (ABS_SOURCE ${SOURCE})
     else ()
-        set (ABS_SOURCE ${CMAKE_SOURCE_DIR}/${SOURCE})
+        set (ABS_SOURCE ${URHO3D_SOURCE_DIR}/${SOURCE})
     endif ()
     if (IS_ABSOLUTE ${DESTINATION})
         set (ABS_DESTINATION ${DESTINATION})
@@ -821,103 +821,6 @@ endmacro ()
 macro (add_make_clean_files)
     get_directory_property (ADDITIONAL_MAKE_CLEAN_FILES ADDITIONAL_MAKE_CLEAN_FILES)
     set_directory_properties (PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ADDITIONAL_MAKE_CLEAN_FILES};${ARGN}")
-endmacro ()
-
-# *** THIS IS A DEPRECATED MACRO ***
-# Macro for defining external library dependencies
-# The purpose of this macro is emulate CMake to set the external library dependencies transitively
-# It works for both targets setup within Urho3D project and downstream projects that uses Urho3D as external static/shared library
-# *** THIS IS A DEPRECATED MACRO ***
-macro (define_dependency_libs TARGET)
-    # ThirdParty/SDL external dependency
-    if (${TARGET} MATCHES SDL|Urho3D)
-        if (WIN32)
-            list (APPEND LIBS user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
-        elseif (APPLE)
-            list (APPEND LIBS iconv)
-        elseif (ANDROID)
-            list (APPEND LIBS dl log android)
-        else ()
-            # Linux
-            if (NOT WEB)
-                list (APPEND LIBS dl m rt)
-            endif ()
-            if (RPI)
-                list (APPEND ABSOLUTE_PATH_LIBS ${VIDEOCORE_LIBRARIES})
-            endif ()
-        endif ()
-    endif ()
-
-    # ThirdParty/kNet & ThirdParty/Civetweb external dependency
-    if (${TARGET} MATCHES Civetweb|kNet|Urho3D)
-        if (WIN32)
-            list (APPEND LIBS ws2_32)
-        endif ()
-    endif ()
-
-    # Urho3D/LuaJIT external dependency
-    if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
-        if (NOT WIN32 AND NOT WEB)
-            list (APPEND LIBS dl m)
-        endif ()
-    endif ()
-
-    # Urho3D external dependency
-    if (${TARGET} STREQUAL Urho3D)
-        # Core
-        if (WIN32)
-            list (APPEND LIBS winmm)
-            if (URHO3D_MINIDUMPS)
-                list (APPEND LIBS dbghelp)
-            endif ()
-        elseif (APPLE)
-            if (ARM)
-                list (APPEND LIBS "-framework AudioToolbox" "-framework AVFoundation" "-framework CoreAudio" "-framework CoreGraphics" "-framework CoreMotion" "-framework Foundation" "-framework GameController" "-framework OpenGLES" "-framework QuartzCore" "-framework UIKit")
-            else ()
-                list (APPEND LIBS "-framework AudioToolbox" "-framework Carbon" "-framework Cocoa" "-framework CoreFoundation" "-framework SystemConfiguration" "-framework CoreAudio" "-framework CoreServices" "-framework CoreVideo" "-framework ForceFeedback" "-framework IOKit" "-framework OpenGL")
-            endif ()
-        endif ()
-
-        # Graphics
-        if (URHO3D_OPENGL)
-            if (APPLE)
-                # Do nothing
-            elseif (WIN32)
-                list (APPEND LIBS opengl32)
-            elseif (ANDROID OR ARM)
-                list (APPEND LIBS GLESv1_CM GLESv2)
-            else ()
-                list (APPEND LIBS GL)
-            endif ()
-        elseif (DIRECT3D_LIBRARIES)
-            list (APPEND LIBS ${DIRECT3D_LIBRARIES})
-        endif ()
-
-        # Database
-        if (URHO3D_DATABASE_ODBC)
-            list (APPEND LIBS ${ODBC_LIBRARIES})
-        endif ()
-
-        # This variable value can either be 'Urho3D' target or an absolute path to an actual static/shared Urho3D library or empty (if we are building the library itself)
-        # The former would cause CMake not only to link against the Urho3D library but also to add a dependency to Urho3D target
-        if (URHO3D_LIBRARIES)
-            if (WIN32 AND URHO3D_LIBRARIES_DBG AND URHO3D_LIBRARIES_REL AND TARGET ${TARGET_NAME})
-                # Special handling when both debug and release libraries are found
-                target_link_libraries (${TARGET_NAME} debug ${URHO3D_LIBRARIES_DBG} optimized ${URHO3D_LIBRARIES_REL})
-            else ()
-                if (TARGET ${TARGET}_universal)
-                    add_dependencies (${TARGET_NAME} ${TARGET}_universal)
-                endif ()
-                if (URHO3D_LIB_TYPE STREQUAL MODULE)
-                    if (TARGET ${TARGET})
-                        add_dependencies (${TARGET_NAME} ${TARGET})
-                    endif ()
-                else ()
-                    list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
-                endif ()
-            endif ()
-        endif ()
-    endif ()
 endmacro ()
 
 # Macro for defining source files with optional arguments as follows:
@@ -1065,10 +968,10 @@ macro (define_resource_dirs)
     if (XCODE)
         if (NOT RESOURCE_FILES)
             # Default app bundle icon
-            set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
+            set (RESOURCE_FILES ${URHO3D_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
             if (ARM)
                 # Default app icon on the iOS/tvOS home screen
-                list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
+                list (APPEND RESOURCE_FILES ${URHO3D_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
             endif ()
         endif ()
         # Group them together under 'Resources' in Xcode IDE
@@ -1288,7 +1191,7 @@ macro (find_Urho3D_tool VAR NAME)
     mark_as_advanced (${VAR})  # Hide it from cmake-gui in non-advanced mode
     if (NOT ${VAR})
         set (${VAR} ${CMAKE_BINARY_DIR}/bin/tool/${NAME})
-        if (ARG_MSG_MODE AND NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+        if (ARG_MSG_MODE AND NOT URHO3D_IN_ENGINE_BUILD)
             message (${ARG_MSG_MODE}
                 "Could not find ${VAR} tool in the Urho3D build tree or Urho3D SDK. Your project may not build successfully without this tool. "
                 "You may have to first rebuild the Urho3D in its build tree or reinstall Urho3D SDK to get this tool built or installed properly. "
@@ -1447,8 +1350,8 @@ macro (setup_executable)
             set (RUNTIME_DIR ${CMAKE_BINARY_DIR}/bin/tool)
         endif ()
     endif ()
-    if (NOT ARG_NODEPS)
-        define_dependency_libs (Urho3D)
+    if (NOT ARG_NODEPS AND TARGET Urho3D)
+        list (APPEND LIBS Urho3D)
     endif ()
     if (XCODE AND LUAJIT_EXE_LINKER_FLAGS_APPLE)
         # Xcode universal build linker flags when targeting 64-bit OSX with LuaJIT enabled
@@ -1529,9 +1432,6 @@ macro (setup_library)
     check_source_files ()
     add_library (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
     get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
-    if (NOT ARG_NODEPS AND NOT PROJECT_NAME STREQUAL Urho3D)
-        define_dependency_libs (Urho3D)
-    endif ()
     if (XCODE AND LUAJIT_SHARED_LINKER_FLAGS_APPLE AND LIB_TYPE STREQUAL SHARED_LIBRARY)
         list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_LDFLAGS[arch=x86_64] "${LUAJIT_SHARED_LINKER_FLAGS_APPLE} $(OTHER_LDFLAGS)")    # Xcode universal build linker flags when targeting 64-bit OSX with LuaJIT enabled
     endif ()
@@ -1576,7 +1476,7 @@ macro (setup_main_executable)
     if (ANDROID)
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
-            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
+            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${URHO3D_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
             DOC "Path to SDL_android_main.c" MSG_MODE FATAL_ERROR)
         list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
         # Setup shared library output path
@@ -1612,7 +1512,7 @@ macro (setup_main_executable)
             add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
         endif ()
         # When performing packaging, include the final apk file
-        if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
+        if (URHO3D_IN_ENGINE_BUILD AND NOT APK_INCLUDED)
             install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D-debug.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
             set (APK_INCLUDED 1)
         endif ()
@@ -1673,7 +1573,7 @@ macro (setup_main_executable)
             find_Urho3d_tool (PACKAGE_TOOL PackageTool
                 HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
                 DOC "Path to PackageTool" MSG_MODE WARNING)
-            if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+            if (URHO3D_IN_ENGINE_BUILD)
                 set (PACKAGING_DEP DEPENDS PackageTool)
             endif ()
             set (PACKAGING_COMMENT " and packaging")
@@ -1715,6 +1615,13 @@ macro (setup_main_executable)
         endif ()
         add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
     endif ()
+
+    if (URHO3D_LIBRARIES AND URHO3D_INCLUDE_DIRS AND URHO3D_DEFINES)
+        target_include_directories(${TARGET_NAME} PRIVATE ${URHO3D_INCLUDE_DIRS})
+        target_link_libraries(${TARGET_NAME} ${URHO3D_LIBRARIES})
+        target_compile_definitions(${TARGET_NAME} PRIVATE ${URHO3D_DEFINES})
+    endif ()
+
     # Only need to install the resource directories once in case they are referenced by multiple targets
     if (RESOURCE_DIRS AND DEST_SHARE_DIR)
         foreach (DIR ${RESOURCE_DIRS})
@@ -1743,7 +1650,6 @@ macro (_setup_target)
     # Include directories
     include_directories (${INCLUDE_DIRS})
     # Link libraries
-    define_dependency_libs (${TARGET_NAME})
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
     # Enable PCH if requested
     if (${TARGET_NAME}_HEADER_PATHNAME)
@@ -1804,7 +1710,7 @@ macro (_setup_target)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}> $<TARGET_FILE_DIR:${TARGET_NAME}>
                     COMMAND ${CMAKE_COMMAND} -E $<$<NOT:$<CONFIG:Debug>>:echo> copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>.map>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}.map> $<TARGET_FILE_DIR:${TARGET_NAME}> $<$<NOT:$<CONFIG:Debug>>:$<ANGLE-R>${NULL_DEVICE}>
-                    COMMAND ${CMAKE_COMMAND} -DTARGET_NAME=${TARGET_NAME} -DTARGET_FILE=$<TARGET_FILE:${TARGET_NAME}> -DTARGET_DIR=$<TARGET_FILE_DIR:${TARGET_NAME}> -DHAS_SHELL_FILE=${HAS_SHELL_FILE} -DSIDE_MODULES="${SIDE_MODULES}" -P ${CMAKE_SOURCE_DIR}/CMake/Modules/PostProcessForWebModule.cmake)
+                    COMMAND ${CMAKE_COMMAND} -DTARGET_NAME=${TARGET_NAME} -DTARGET_FILE=$<TARGET_FILE:${TARGET_NAME}> -DTARGET_DIR=$<TARGET_FILE_DIR:${TARGET_NAME}> -DHAS_SHELL_FILE=${HAS_SHELL_FILE} -DSIDE_MODULES="${SIDE_MODULES}" -P ${URHO3D_SOURCE_DIR}/CMake/Modules/PostProcessForWebModule.cmake)
                 add_make_clean_files ($<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js $<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js.map)
             endif ()
         endif ()
@@ -1857,8 +1763,8 @@ macro (_setup_target)
     # Create symbolic links in the build tree
     if (ANDROID)
         foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
-            if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
-                create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
+            if (EXISTS ${URHO3D_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
+                create_symlink (${URHO3D_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
             endif ()
         endforeach ()
         set (ASSET_ROOT assets)

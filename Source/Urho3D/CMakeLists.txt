@@ -140,7 +140,7 @@ define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cp
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
     execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrhoRevision.cmake
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
+        WORKING_DIRECTORY ${URHO3D_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
 endif ()
 set (URHO3D_DEPS ${STATIC_LIBRARY_TARGETS})
 if (TARGET LuaJIT_universal)
@@ -156,8 +156,8 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new -P CMake/Modules/GetUrhoRevision.cmake
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new
-    DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DEPENDS ${URHO3D_DEPS} ${URHO3D_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake
+    WORKING_DIRECTORY ${URHO3D_SOURCE_DIR}
     COMMENT "")     # Suppress the comment as the header file may or may not be re-generated
 
 # Use the AutoBinder tool to generate source files for binding script subsystems
@@ -172,8 +172,8 @@ if (URHO3D_BINDINGS)
         set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
     endif ()
     ExternalProject_Add (AutoBinder
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
-        CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+        SOURCE_DIR ${URHO3D_SOURCE_DIR}/Source/Clang-Tools
+        CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${URHO3D_SOURCE_DIR}
         ${ALTERNATE_COMMAND})
     add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder)
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
@@ -207,8 +207,8 @@ if (URHO3D_LUA)
             set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
         endif ()
         ExternalProject_Add (tolua++
-            SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE}
+            SOURCE_DIR ${URHO3D_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
+            CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${URHO3D_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE}
             ${TRAVIS_ANDROID_FIX}
             ${ALTERNATE_COMMAND})
         add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/tolua++)
@@ -305,6 +305,12 @@ if (URHO3D_LUA)
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
 endif ()
+
+if (NOT URHO3D_IS_ROOT_ROJECT)
+    # If engine is being built as subproject provide engine with it's own include directory assembled in CMAKE_BINARY_DIR.
+    list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/include)
+endif ()
+
 # Workaround for GCC 5.4 and above when building a SHARED lib type for Linux platform to fix the undefined symbol "__cpu_model" issue (see #1519)
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.3.1 AND CMAKE_SYSTEM_NAME STREQUAL Linux AND URHO3D_LIB_TYPE STREQUAL SHARED)  # 5.3.1 was the last known good version
     list (APPEND LIBS gcc)
@@ -322,6 +328,51 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
 if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
+
+if (WIN32)
+    list (APPEND LIBS winmm user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
+    if (URHO3D_MINIDUMPS)
+        list (APPEND LIBS dbghelp)
+    endif ()
+    if (URHO3D_NETWORK)
+        list (APPEND LIBS ws2_32)
+    endif ()
+elseif (APPLE)
+    list (APPEND LIBS iconv)
+    if (ARM)
+        list (APPEND LIBS "-framework AudioToolbox" "-framework AVFoundation" "-framework CoreAudio" "-framework CoreGraphics" "-framework CoreMotion" "-framework Foundation" "-framework GameController" "-framework OpenGLES" "-framework QuartzCore" "-framework UIKit")
+    else ()
+        list (APPEND LIBS "-framework AudioToolbox" "-framework Carbon" "-framework Cocoa" "-framework CoreFoundation" "-framework SystemConfiguration" "-framework CoreAudio" "-framework CoreServices" "-framework CoreVideo" "-framework ForceFeedback" "-framework IOKit" "-framework OpenGL")
+    endif ()
+elseif (ANDROID)
+    list (APPEND LIBS dl log android)
+else ()
+    # Linux
+    if (NOT WEB)
+        list (APPEND LIBS dl m rt)
+    endif ()
+endif ()
+
+# Graphics
+if (URHO3D_OPENGL)
+    if (APPLE)
+        # Do nothing
+    elseif (WIN32)
+        list (APPEND LIBS opengl32)
+    elseif (ANDROID OR ARM)
+        list (APPEND LIBS GLESv1_CM GLESv2)
+    else ()
+        list (APPEND LIBS GL)
+    endif ()
+elseif (DIRECT3D_LIBRARIES)
+    list (APPEND LIBS ${DIRECT3D_LIBRARIES})
+endif ()
+
+# Database
+if (URHO3D_DATABASE_ODBC)
+    list (APPEND LIBS ${ODBC_LIBRARIES})
+endif ()
+
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
 if (NOT ANDROID AND NOT WEB)
     file (READ .soversion SOVERSION)
@@ -510,7 +561,7 @@ else ()
     string (REPLACE ";" " -l" URHO3D_LIBS "-l${LIB_NAME};${LIBS}")
 endif ()
 string (REPLACE ";" " ${DASH}D" URHO3D_COMPILE_DEFINITIONS "${DASH}D${URHO3D_COMPILE_DEFINITIONS}")
-get_directory_property (GLOBAL_INCLUDE_DIRS DIRECTORY ${CMAKE_SOURCE_DIR} INCLUDE_DIRECTORIES)
+get_directory_property (GLOBAL_INCLUDE_DIRS DIRECTORY ${URHO3D_SOURCE_DIR} INCLUDE_DIRECTORIES)
 if (GLOBAL_INCLUDE_DIRS)
     string (REPLACE ";" "\" ${DASH}I\"" GLOBAL_INCLUDE_DIRS "${DASH}I\"${GLOBAL_INCLUDE_DIRS}\"")
     string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
@@ -530,11 +581,14 @@ string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_CXX_FLAGS "${CLEA
 string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc${PC_SUFFIX} @ONLY)
 if (MSVC)
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/CMake/Modules/AdjustPkgConfigForMSVC.cmake)
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${URHO3D_SOURCE_DIR}/CMake/Modules/AdjustPkgConfigForMSVC.cmake)
 endif ()
 if (ANDROID)
     set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)
 endif ()
+# Make pkg-config script available in a build tree so that using it as SDK works
+file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_PKGCONFIG_DIR})
+create_symlink (${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc ${CMAKE_BINARY_DIR}/${DEST_PKGCONFIG_DIR}/Urho3D.pc)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
 
 # Define post build steps
