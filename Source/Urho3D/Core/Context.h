@@ -117,6 +117,8 @@ public:
     template <class T> void RegisterFactory(const char* category);
     /// Template version of registering subsystem.
     template <class T> T* RegisterSubsystem();
+    /// Template version of registering subsystem that allows the subsystem object to be a subclass of the template type.
+    template<class T> void RegisterDerivedSubsystem(T* subsystem);
     /// Template version of removing a subsystem.
     template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
@@ -258,6 +260,13 @@ template <class T> T* Context::RegisterSubsystem()
     T* subsystem = new T(this);
     RegisterSubsystem(subsystem);
     return subsystem;
+}
+
+template <class T> void Context::RegisterDerivedSubsystem(T* subsystem)
+{
+    if(!subsystem)
+        return;
+    subsystems_[T::GetTypeStatic()] = subsystem;
 }
 
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
