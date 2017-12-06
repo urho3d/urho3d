@@ -377,7 +377,7 @@ bool ResourceCache::ReloadResource(Resource* resource)
     resource->SendEvent(E_RELOADSTARTED);
 
     bool success = false;
-    SharedPtr<File> file = GetFile(resource->GetName());
+    SharedPtr<AbstractFile> file = GetAbstractFile(resource->GetName());
     if (file)
         success = resource->Load(*(file.Get()));
 
@@ -485,6 +485,33 @@ void ResourceCache::RemoveResourceRouter(ResourceRouter* router)
     }
 }
 
+void ResourceCache::AddResourceAbstractSource(ResourceAbstractSource* abstractSource, bool addAsFirst)
+{
+    // Check for duplicate
+    for (unsigned i = 0; i < resourceAbstractSources_.Size(); ++i)
+    {
+        if (resourceAbstractSources_[i] == abstractSource)
+            return;
+    }
+
+    if (addAsFirst)
+        resourceAbstractSources_.Insert(0, SharedPtr<ResourceAbstractSource>(abstractSource));
+    else
+        resourceAbstractSources_.Push(SharedPtr<ResourceAbstractSource>(abstractSource));
+}
+
+void ResourceCache::RemoveResourceAbstractSource(ResourceAbstractSource* abstractSource)
+{
+    for (unsigned i = 0; i < resourceAbstractSources_.Size(); ++i)
+    {
+        if (resourceAbstractSources_[i] == abstractSource)
+        {
+            resourceAbstractSources_.Erase(i);
+            return;
+        }
+    }
+}
+
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
 {
     MutexLock lock(resourceMutex_);
@@ -537,6 +564,18 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     }
 
     return SharedPtr<File>();
+}
+
+SharedPtr<AbstractFile> ResourceCache::GetAbstractFile(const String& name, bool sendEventOnFailure)
+{
+    for (unsigned i = 0; i < resourceAbstractSources_.Size(); ++i)
+    {
+        SharedPtr<AbstractFile> file(resourceAbstractSources_[i]->GetAbstractFile(name));
+        if (file.NotNull())
+            return file;
+    }
+
+    return GetFile(name, sendEventOnFailure);
 }
 
 Resource* ResourceCache::GetExistingResource(StringHash type, const String& nameIn)
@@ -604,7 +643,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     }
 
     // Attempt to load the resource
-    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
+    SharedPtr<AbstractFile> file = GetAbstractFile(name, sendEventOnFailure);
     if (!file)
         return nullptr;   // Error is already logged
 
@@ -683,7 +722,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     }
 
     // Attempt to load the resource
-    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
+    SharedPtr<AbstractFile> file = GetAbstractFile(name, sendEventOnFailure);
     if (!file)
         return SharedPtr<Resource>();  // Error is already logged
 

@@ -306,7 +306,7 @@ bool Scene::SaveJSON(Serializer& dest, const String& indentation) const
         return false;
 }
 
-bool Scene::LoadAsync(File* file, LoadMode mode)
+bool Scene::LoadAsync(AbstractFile* file, LoadMode mode)
 {
     if (!file)
     {
@@ -379,7 +379,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
     return true;
 }
 
-bool Scene::LoadAsyncXML(File* file, LoadMode mode)
+bool Scene::LoadAsyncXML(AbstractFile* file, LoadMode mode)
 {
     if (!file)
     {
@@ -448,7 +448,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
     return true;
 }
 
-bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
+bool Scene::LoadAsyncJSON(AbstractFile* file, LoadMode mode)
 {
     if (!file)
     {
@@ -1289,7 +1289,7 @@ void Scene::FinishSaving(Serializer* dest) const
     }
 }
 
-void Scene::PreloadResources(File* file, bool isSceneFile)
+void Scene::PreloadResources(AbstractFile* file, bool isSceneFile)
 {
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING

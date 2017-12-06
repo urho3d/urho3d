@@ -120,7 +120,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         if (colorlutTexPath.Empty())
             name = texPath + name;
 
-        SharedPtr<File> file = GetSubsystem<ResourceCache>()->GetFile(name);
+        SharedPtr<AbstractFile> file = GetSubsystem<ResourceCache>()->GetAbstractFile(name);
         loadImage_ = new Image(context_);
         if (!loadImage_->LoadColorLUT(*(file.Get())))
         {

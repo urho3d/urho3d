@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "../IO/AbstractFile.h"
+#include "../IO/IOStream.h"
 
 namespace Urho3D
 {
 
 /// Dynamically sized buffer that can be read and written to as a stream.
-class URHO3D_API VectorBuffer : public AbstractFile
+class URHO3D_API VectorBuffer : public IOStream
 {
 public:
     /// Construct an empty buffer.

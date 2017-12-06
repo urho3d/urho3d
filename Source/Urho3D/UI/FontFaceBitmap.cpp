@@ -100,7 +100,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         String textureFile = fontPath + pageElem.GetAttribute("file");
 
         // Load texture manually to allow controlling the alpha channel mode
-        SharedPtr<File> fontFile = resourceCache->GetFile(textureFile);
+        SharedPtr<AbstractFile> fontFile = resourceCache->GetAbstractFile(textureFile);
         SharedPtr<Image> fontImage(new Image(context));
         if (!fontFile || !fontImage->Load(*fontFile))
         {

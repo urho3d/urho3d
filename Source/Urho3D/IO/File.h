@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../Container/ArrayPtr.h"
-#include "../Core/Object.h"
 #include "../IO/AbstractFile.h"
 
 #ifdef __ANDROID__
@@ -57,9 +56,9 @@ enum FileMode
 class PackageFile;
 
 /// %File opened either through the filesystem or from within a package file.
-class URHO3D_API File : public Object, public AbstractFile
+class URHO3D_API File : public AbstractFile
 {
-    URHO3D_OBJECT(File, Object);
+    URHO3D_OBJECT(File, AbstractFile);
 
 public:
     /// Construct.

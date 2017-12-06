@@ -66,7 +66,7 @@ static const unsigned READ_BUFFER_SIZE = 32768;
 static const unsigned SKIP_BUFFER_SIZE = 1024;
 
 File::File(Context* context) :
-    Object(context),
+    AbstractFile(context),
     mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__
@@ -83,7 +83,7 @@ File::File(Context* context) :
 }
 
 File::File(Context* context, const String& fileName, FileMode mode) :
-    Object(context),
+    AbstractFile(context),
     mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__
@@ -101,7 +101,7 @@ File::File(Context* context, const String& fileName, FileMode mode) :
 }
 
 File::File(Context* context, PackageFile* package, const String& fileName) :
-    Object(context),
+    AbstractFile(context),
     mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__

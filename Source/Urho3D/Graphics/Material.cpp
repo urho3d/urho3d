@@ -145,7 +145,7 @@ StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
     if (!cache)
         return type;
 
-    SharedPtr<File> texXmlFile = cache->GetFile(filename, false);
+    SharedPtr<AbstractFile> texXmlFile = cache->GetAbstractFile(filename, false);
     if (texXmlFile.NotNull())
     {
         SharedPtr<XMLFile> texXml(new XMLFile(cache->GetContext()));

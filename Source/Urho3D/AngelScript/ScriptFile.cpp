@@ -691,7 +691,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     for (unsigned i = 0; i < includeFiles.Size(); ++i)
     {
         cache->StoreResourceDependency(this, includeFiles[i]);
-        SharedPtr<File> file = cache->GetFile(includeFiles[i]);
+        SharedPtr<AbstractFile> file = cache->GetAbstractFile(includeFiles[i]);
         if (file)
         {
             if (!AddScriptSection(engine, *file))

@@ -264,7 +264,7 @@ template <class T> T* Context::RegisterSubsystem()
 
 template <class T> void Context::RegisterDerivedSubsystem(T* subsystem)
 {
-    if(!subsystem)
+    if (!subsystem)
         return;
     subsystems_[T::GetTypeStatic()] = subsystem;
 }

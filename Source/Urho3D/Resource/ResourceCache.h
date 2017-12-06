@@ -66,15 +66,37 @@ enum ResourceRequest
 /// Optional resource request processor. Can deny requests, re-route resource file names, or perform other processing per request.
 class URHO3D_API ResourceRouter : public Object
 {
+    URHO3D_OBJECT(ResourceRouter, Object);
+
 public:
     /// Construct.
     ResourceRouter(Context* context) :
         Object(context)
     {
     }
+    /// Destruct.
+    virtual ~ResourceRouter() {}
 
     /// Process the resource request and optionally modify the resource name string. Empty name string means the resource is not found or not allowed.
     virtual void Route(String& name, ResourceRequest requestType) = 0;
+};
+
+/// Optional resource abstract data source. Can produce AbstractFile objects for resource requests before the default filesystem access is used.
+class URHO3D_API ResourceAbstractSource : public Object
+{
+    URHO3D_OBJECT(ResourceAbstractSource, Object);
+
+public:
+    /// Construct.
+    ResourceAbstractSource(Context* context) :
+        Object(context)
+    {
+    }
+    /// Destruct.
+    virtual ~ResourceAbstractSource() {}
+
+    /// Produce an AbstractFile object for deserializing data for a resource request. Return null to forward request to next abstract source or filesystem.
+    virtual SharedPtr<AbstractFile> GetAbstractFile(const String& name) = 0;
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
@@ -134,8 +156,15 @@ public:
     /// Remove a resource router object.
     void RemoveResourceRouter(ResourceRouter* router);
 
+    /// Add a resource abstract source object. By default there is none, so the routing process is skipped.
+    void AddResourceAbstractSource(ResourceAbstractSource* abstractSource, bool addAsFirst = false);
+    /// Remove a resource router object.
+    void RemoveResourceAbstractSource(ResourceAbstractSource* abstractSource);
+
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
-    virtual SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
+    SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
+    /// Open and return an abstract file provided by a resource abstract source. If no resource abstract sources are found, or if none provided an abstract file, falls back to the behavior of GetFile. Return null if fails. Can be called from outside the main thread.
+    SharedPtr<AbstractFile> GetAbstractFile(const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
     Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)
@@ -242,6 +271,8 @@ private:
     SharedPtr<BackgroundLoader> backgroundLoader_;
     /// Resource routers.
     Vector<SharedPtr<ResourceRouter> > resourceRouters_;
+    /// Resource abstract sources.
+    Vector<SharedPtr<ResourceAbstractSource> > resourceAbstractSources_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.

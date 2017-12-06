@@ -22,24 +22,22 @@
 
 #pragma once
 
-#include "../Core/Object.h"
-#include "../IO/IOStream.h"
+#include "../IO/Serializer.h"
+#include "../IO/Deserializer.h"
 
 namespace Urho3D
 {
 
-/// A common root class for file-like objects that are associated with a context.
-class URHO3D_API AbstractFile : public Object, public IOStream
+/// A common root class for objects that implement both Serializer and Deserializer.
+class URHO3D_API IOStream : public Deserializer, public Serializer
 {
-    URHO3D_OBJECT(AbstractFile, Object);
-
 public:
     /// Construct.
-    AbstractFile(Context* ctx) : Object(ctx), IOStream() { }
+    IOStream() : Deserializer() { }
     /// Construct.
-    AbstractFile(Context* ctx, unsigned int size) : Object(ctx), IOStream(size) { }
+    IOStream(unsigned int size) : Deserializer(size) { }
     /// Destruct.
-    virtual ~AbstractFile() override { }
+    virtual ~IOStream() override { }
 };
 
 };
