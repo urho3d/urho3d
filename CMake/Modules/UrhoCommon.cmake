@@ -880,6 +880,8 @@ macro (define_dependency_libs TARGET)
                 # Do nothing
             elseif (WIN32)
                 list (APPEND LIBS opengl32)
+            elseif (RPI)
+                list (APPEND LIBS brcmGLESv2)
             elseif (ANDROID OR ARM)
                 list (APPEND LIBS GLESv1_CM GLESv2)
             else ()
