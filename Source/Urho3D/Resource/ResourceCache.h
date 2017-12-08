@@ -81,7 +81,7 @@ public:
     virtual void Route(String& name, ResourceRequest requestType) = 0;
 };
 
-/// Optional resource abstract data source. Can produce AbstractFile objects for resource requests before the default filesystem access is used.
+/// Optional resource abstract data source. Can produce AbstractFile objects for resource loading before the default filesystem is used.
 class URHO3D_API ResourceAbstractSource : public Object
 {
     URHO3D_OBJECT(ResourceAbstractSource, Object);
@@ -96,7 +96,7 @@ public:
     virtual ~ResourceAbstractSource() {}
 
     /// Produce an AbstractFile object for deserializing data for a resource request. Return null to forward request to next abstract source or filesystem.
-    virtual SharedPtr<AbstractFile> GetAbstractFile(const String& name) = 0;
+    virtual SharedPtr<AbstractFile> ProduceAbstractFile(const String& name) = 0;
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
@@ -156,9 +156,9 @@ public:
     /// Remove a resource router object.
     void RemoveResourceRouter(ResourceRouter* router);
 
-    /// Add a resource abstract source object. By default there is none, so the routing process is skipped.
+    /// Add a resource abstract source object. By default there is none, so the the default filesystem is exclusively used for loading resources.
     void AddResourceAbstractSource(ResourceAbstractSource* abstractSource, bool addAsFirst = false);
-    /// Remove a resource router object.
+    /// Remove a resource abstract source object.
     void RemoveResourceAbstractSource(ResourceAbstractSource* abstractSource);
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
@@ -224,6 +224,8 @@ public:
 
     /// Return a resource router by index.
     ResourceRouter* GetResourceRouter(unsigned index) const;
+    /// Return a resource abstract source by index.
+    ResourceAbstractSource* GetResourceAbstractSource(unsigned index) const;
 
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;

@@ -570,7 +570,7 @@ SharedPtr<AbstractFile> ResourceCache::GetAbstractFile(const String& name, bool 
 {
     for (unsigned i = 0; i < resourceAbstractSources_.Size(); ++i)
     {
-        SharedPtr<AbstractFile> file(resourceAbstractSources_[i]->GetAbstractFile(name));
+        SharedPtr<AbstractFile> file(resourceAbstractSources_[i]->ProduceAbstractFile(name));
         if (file.NotNull())
             return file;
     }
@@ -839,6 +839,11 @@ String ResourceCache::GetResourceFileName(const String& name) const
 ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
 {
     return index < resourceRouters_.Size() ? resourceRouters_[index] : nullptr;
+}
+
+ResourceAbstractSource* ResourceCache::GetResourceAbstractSource(unsigned index) const
+{
+    return index < resourceAbstractSources_.Size() ? resourceAbstractSources_[index] : nullptr;
 }
 
 String ResourceCache::GetPreferredResourceDir(const String& path) const
