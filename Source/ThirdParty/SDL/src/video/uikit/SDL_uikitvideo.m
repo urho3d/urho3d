@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -37,7 +40,9 @@
 #include "SDL_uikitwindow.h"
 #include "SDL_uikitopengles.h"
 #include "SDL_uikitclipboard.h"
+#ifndef TARGET_IPHONE_SIMULATOR
 #include "SDL_uikitvulkan.h"
+#endif
 
 #define UIKITVID_DRIVER_NAME "uikit"
 
@@ -124,7 +129,8 @@ UIKit_CreateDevice(int devindex)
         device->GL_LoadLibrary      = UIKit_GL_LoadLibrary;
         device->free = UIKit_DeleteDevice;
 
-#if SDL_VIDEO_VULKAN
+// Urho3D - iOS/tvOS simulator does not have Metal support
+#if SDL_VIDEO_VULKAN && !defined(TARGET_IPHONE_SIMULATOR)
         device->Vulkan_LoadLibrary = UIKit_Vulkan_LoadLibrary;
         device->Vulkan_UnloadLibrary = UIKit_Vulkan_UnloadLibrary;
         device->Vulkan_GetInstanceExtensions
