@@ -95,6 +95,7 @@ UI::UI(Context* context) :
     dragBeginDistance_(DEFAULT_DRAGBEGIN_DISTANCE),
     mouseButtons_(0),
     lastMouseButtons_(0),
+	maxDoubleClickDist_(FLT_MAX),	
     qualifiers_(0),
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
     initialized_(false),
@@ -632,6 +633,11 @@ void UI::SetClipboardText(const String& text)
 void UI::SetDoubleClickInterval(float interval)
 {
     doubleClickInterval_ = Max(interval, 0.0f);
+}
+
+void UI::SetMaxDoubleClickDistance(float distPixels)
+{
+	maxDoubleClickDist_ = distPixels;
 }
 
 void UI::SetDragBeginInterval(float interval)
@@ -1380,9 +1386,9 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             element->OnClickBegin(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            // Fire double click event if element matches and is in time
+            // Fire double click event if element matches and is in time and is within max distance from the original click
             if (doubleClickElement_ && element == doubleClickElement_ &&
-                clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
+                (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000)) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
@@ -1391,6 +1397,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             else
             {
                 doubleClickElement_ = element;
+				doubleClickFirstPos_ = windowCursorPos;
                 clickTimer_.Reset();
             }
 

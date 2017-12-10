@@ -92,6 +92,8 @@ public:
     void SetClipboardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
+    /// Set max screen distance in pixels for double clicks to register.  default is FLT_MAX.
+    void SetMaxDoubleClickDistance(float pixels);
     /// Set UI drag event start interval in seconds.
     void SetDragBeginInterval(float interval);
     /// Set UI drag event start distance threshold in pixels.
@@ -163,8 +165,11 @@ public:
 
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
-
-    /// Return UI drag start event interval in seconds.
+	
+	/// Get max screen distance for double clicks to register.  default is FLT_MAX.
+    float GetMaxDoubleClickDistance() const { return maxDoubleClickDist_;}
+    
+	/// Return UI drag start event interval in seconds.
     float GetDragBeginInterval() const { return dragBeginInterval_; }
 
     /// Return UI drag start event distance threshold in pixels.
@@ -402,6 +407,10 @@ private:
     Timer clickTimer_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
+	/// Screen position of first mouse click for double click distance checking.
+	IntVector2 doubleClickFirstPos_;
+	/// Max screen distance the first click in a double click can be from the second click in a double click.
+	float maxDoubleClickDist_;
     /// Currently hovered elements.
     HashMap<WeakPtr<UIElement>, bool> hoveredElements_;
     /// Currently dragged elements.
