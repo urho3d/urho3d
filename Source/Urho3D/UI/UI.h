@@ -294,11 +294,15 @@ private:
     /// Send a UI element drag or hover begin event.
     void SendDragOrHoverEvent
         (StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, UI::DragData* dragData);
-    /// Send a UI click or double click event.
+    /// Send a UI click event.
     void SendClickEvent
         (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button, int buttons,
             int qualifiers);
-    /// Handle screen mode event.
+
+	/// Send a UI double click event
+	void SendDoubleClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button, int buttons, int qualifiers);
+	
+	/// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
     void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);

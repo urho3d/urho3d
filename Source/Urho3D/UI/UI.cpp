@@ -1392,7 +1392,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
+				SendDoubleClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
             }
             else
             {
@@ -1433,8 +1433,8 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
                 SetFocusElement(nullptr);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
+            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
+                SendDoubleClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;
@@ -1642,13 +1642,36 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
             endElement->SendEvent(E_CLICK, eventData);
         else if (eventType == E_UIMOUSECLICKEND)
             endElement->SendEvent(E_CLICKEND, eventData);
-        else if (eventType == E_UIMOUSEDOUBLECLICK)
-            endElement->SendEvent(E_DOUBLECLICK, eventData);
     }
 
     // Send the global event from the UI subsystem last
     SendEvent(eventType, eventData);
 }
+
+void UI::SendDoubleClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button,
+	int buttons, int qualifiers)
+{
+	VariantMap& eventData = GetEventDataMap();
+	eventData[UIMouseDoubleClick::P_ELEMENT] = endElement;
+	eventData[UIMouseDoubleClick::P_X] = secondPos.x_;
+	eventData[UIMouseDoubleClick::P_Y] = secondPos.y_;
+	eventData[UIMouseDoubleClick::P_XBegin] = firstPos.x_;
+	eventData[UIMouseDoubleClick::P_YBegin] = firstPos.y_;
+	eventData[UIMouseDoubleClick::P_BUTTON] = button;
+	eventData[UIMouseDoubleClick::P_BUTTONS] = buttons;
+	eventData[UIMouseDoubleClick::P_QUALIFIERS] = qualifiers;
+
+
+	if (endElement)
+	{
+		// Send also element version of the event
+		endElement->SendEvent(E_DOUBLECLICK, eventData);
+	}
+
+	// Send the global event from the UI subsystem last
+	SendEvent(eventType, eventData);
+}
+
 
 void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
