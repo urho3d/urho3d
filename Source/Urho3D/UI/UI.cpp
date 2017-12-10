@@ -95,7 +95,7 @@ UI::UI(Context* context) :
     dragBeginDistance_(DEFAULT_DRAGBEGIN_DISTANCE),
     mouseButtons_(0),
     lastMouseButtons_(0),
-	maxDoubleClickDist_(FLT_MAX),	
+    maxDoubleClickDist_(99999.0f),	
     qualifiers_(0),
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
     initialized_(false),
@@ -637,7 +637,7 @@ void UI::SetDoubleClickInterval(float interval)
 
 void UI::SetMaxDoubleClickDistance(float distPixels)
 {
-	maxDoubleClickDist_ = distPixels;
+    maxDoubleClickDist_ = distPixels;
 }
 
 void UI::SetDragBeginInterval(float interval)
@@ -1392,12 +1392,12 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-				SendDoubleClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
+                SendDoubleClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
             }
             else
             {
                 doubleClickElement_ = element;
-				doubleClickFirstPos_ = windowCursorPos;
+                doubleClickFirstPos_ = windowCursorPos;
                 clickTimer_.Reset();
             }
 
@@ -1649,27 +1649,27 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
 }
 
 void UI::SendDoubleClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button,
-	int buttons, int qualifiers)
+    int buttons, int qualifiers)
 {
-	VariantMap& eventData = GetEventDataMap();
-	eventData[UIMouseDoubleClick::P_ELEMENT] = endElement;
-	eventData[UIMouseDoubleClick::P_X] = secondPos.x_;
-	eventData[UIMouseDoubleClick::P_Y] = secondPos.y_;
-	eventData[UIMouseDoubleClick::P_XBegin] = firstPos.x_;
-	eventData[UIMouseDoubleClick::P_YBegin] = firstPos.y_;
-	eventData[UIMouseDoubleClick::P_BUTTON] = button;
-	eventData[UIMouseDoubleClick::P_BUTTONS] = buttons;
-	eventData[UIMouseDoubleClick::P_QUALIFIERS] = qualifiers;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[UIMouseDoubleClick::P_ELEMENT] = endElement;
+    eventData[UIMouseDoubleClick::P_X] = secondPos.x_;
+    eventData[UIMouseDoubleClick::P_Y] = secondPos.y_;
+    eventData[UIMouseDoubleClick::P_XBEGIN] = firstPos.x_;
+    eventData[UIMouseDoubleClick::P_YBEGIN] = firstPos.y_;
+    eventData[UIMouseDoubleClick::P_BUTTON] = button;
+    eventData[UIMouseDoubleClick::P_BUTTONS] = buttons;
+    eventData[UIMouseDoubleClick::P_QUALIFIERS] = qualifiers;
 
 
-	if (endElement)
-	{
-		// Send also element version of the event
-		endElement->SendEvent(E_DOUBLECLICK, eventData);
-	}
+    if (endElement)
+    {
+        // Send also element version of the event
+        endElement->SendEvent(E_DOUBLECLICK, eventData);
+    }
 
-	// Send the global event from the UI subsystem last
-	SendEvent(eventType, eventData);
+    // Send the global event from the UI subsystem last
+    SendEvent(eventType, eventData);
 }
 
 
