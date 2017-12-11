@@ -199,18 +199,19 @@ Timer::Timer()
     Reset();
 }
 
-Timer::Timer(unsigned duration)
+Timer::Timer(unsigned timeoutDurationMs)
 {
-    Reset(duration);
+    Reset();
+	SetTimeoutDuration(timeoutDurationMs);
 }
 
-unsigned Timer::GetMSec(bool reset, unsigned timeoutDuration)
+unsigned Timer::GetMSec(bool reset)
 {
     unsigned currentTime = Tick();
     unsigned elapsedTime = currentTime - startTime_;
 
     if (reset) {
-        Reset(timeoutDuration);
+        Reset();
     }
 
     return elapsedTime;
@@ -219,6 +220,13 @@ unsigned Timer::GetMSec(bool reset, unsigned timeoutDuration)
 unsigned Timer::GetStartTime()
 {
     return startTime_;
+}
+
+void Timer::SetTimeoutDuration(unsigned timeoutDurationMs, bool reset)
+{
+	timeoutDuration_ = timeoutDurationMs;
+	if (reset)
+		Reset();
 }
 
 unsigned Timer::GetTimeoutDuration()
@@ -234,10 +242,9 @@ bool Timer::IsTimedOut()
     return false;
 }
 
-void Timer::Reset(unsigned timeoutDurationMs)
+void Timer::Reset()
 {
     startTime_ = Tick();
-	timeoutDuration_ = timeoutDurationMs;
 }
 
 
@@ -247,12 +254,13 @@ HiresTimer::HiresTimer()
 
 }
 
-HiresTimer::HiresTimer(long long duration)
+HiresTimer::HiresTimer(long long timeoutDurationUs)
 {
-    Reset(duration);
+    Reset();
+	SetTimeoutDuration(timeoutDurationUs);
 }
 
-long long HiresTimer::GetUSec(bool reset, long long timeoutDurationUs)
+long long HiresTimer::GetUSec(bool reset)
 {
     long long currentTime = HiresTick();
 
@@ -262,8 +270,8 @@ long long HiresTimer::GetUSec(bool reset, long long timeoutDurationUs)
     if (elapsedTicks < 0)
         elapsedTicks = 0;
 
-    if (reset)
-        Reset(timeoutDurationUs);
+	if (reset)
+		Reset();
 
     return TicksToUSec(elapsedTicks);
 }
@@ -271,6 +279,13 @@ long long HiresTimer::GetUSec(bool reset, long long timeoutDurationUs)
 long long HiresTimer::GetStartTime()
 {
     return startTick_;
+}
+
+void HiresTimer::SetTimeoutDuration(long long timeoutDurationUs, bool reset)
+{
+	timeoutDurationTicks_ = USecToTicks(timeoutDurationUs);
+	if (reset)
+		Reset();
 }
 
 long long HiresTimer::GetTimeoutDuration()
@@ -286,10 +301,9 @@ bool HiresTimer::IsTimedOut()
     return false;
 }
 
-void HiresTimer::Reset(long long timeoutDurationUs)
+void HiresTimer::Reset()
 {
     startTick_ = HiresTick();
-	timeoutDurationTicks_ = USecToTicks(timeoutDurationUs);
 }
 
 long long HiresTimer::TicksToUSec( long long ticks)
