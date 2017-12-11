@@ -31,17 +31,33 @@ namespace Urho3D
 class URHO3D_API Timer
 {
 public:
-    /// Construct. Get the starting clock value.
+    /// Construct. Get the starting clock value. No timeout.
     Timer();
 
-    /// Return elapsed milliseconds and optionally reset.
-    unsigned GetMSec(bool reset);
-    /// Reset the timer.
-    void Reset();
+    /// Construct. Specify duration in milliseconds until the timer times-out.
+    Timer(unsigned timeoutDurationMs);
+
+    /// Return elapsed milliseconds and optionally reset. 
+    unsigned GetMSec(bool reset, unsigned timeoutDuration = 0);
+
+    /// Return the clock value in milliseconds when the timer was started.
+    unsigned GetStartTime();
+
+    /// Return the duration in milliseconds for the timeout.
+    unsigned GetTimeoutDuration();
+
+    ///Return whether the timer has timed-out (is in over-time)
+    bool GetHasTimedOut();
+
+    /// Reset the timer with optional timeout duration.
+    void Reset(unsigned timeoutDurationMs = 0);
 
 private:
     /// Starting clock value in milliseconds.
     unsigned startTime_;
+
+    /// clock value in milliseconds when the timer will time-out.
+    unsigned timeoutTime_;
 };
 
 /// High-resolution operating system timer used in profiling.
@@ -53,10 +69,23 @@ public:
     /// Construct. Get the starting high-resolution clock value.
     HiresTimer();
 
-    /// Return elapsed microseconds and optionally reset.
-    long long GetUSec(bool reset);
-    /// Reset the timer.
-    void Reset();
+    /// Construct. Specify duration in microseconds until the timer times-out.
+    HiresTimer(long long timeoutDuration);
+
+    /// Return elapsed microseconds and optionally reset. 
+    long long GetUSec(bool reset, long long timeoutDuration = 0);
+
+    ///Return the microsecond clock value when the timer was started.
+    long long GetStartTime();
+
+    ///Returns the duration for the timeout. 0 if no timeout duration was specified.
+    long long GetTimeoutDuration();
+
+    ///Return whether the timer has timed-out.
+    bool GetHasTimedOut();
+
+    /// Reset the timer with optional timeout duration.
+    void Reset(long long timeoutDuration = 0);
 
     /// Return if high-resolution timer is supported.
     static bool IsSupported() { return supported; }
@@ -64,12 +93,22 @@ public:
     /// Return high-resolution timer frequency if supported.
     static long long GetFrequency() { return frequency; }
 
+    /// converts CPU ticks to microseconds.
+    static long long TicksToUSec(long long ticks);
+
+    /// converts microseconds to CPU ticks.
+    static long long USecToTicks(long long microseconds);
+
 private:
     /// Starting clock value in CPU ticks.
-    long long startTime_;
+    long long startTick_;
+
+    /// clock value when the timer will time-out.
+    long long timeoutTick_;
 
     /// High-resolution timer support flag.
     static bool supported;
+
     /// High-resolution timer frequency.
     static long long frequency;
 };

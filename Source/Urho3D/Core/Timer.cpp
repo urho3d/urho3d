@@ -197,46 +197,111 @@ float Time::GetFramesPerSecond() const
 Timer::Timer()
 {
     Reset();
+
+    timeoutTime_ = startTime_;
 }
 
-unsigned Timer::GetMSec(bool reset)
+Timer::Timer(unsigned duration)
+{
+    Reset(duration);
+}
+
+unsigned Timer::GetMSec(bool reset, unsigned timeoutDuration)
 {
     unsigned currentTime = Tick();
     unsigned elapsedTime = currentTime - startTime_;
-    if (reset)
-        startTime_ = currentTime;
+
+    if (reset) {
+        Reset(timeoutDuration);
+    }
 
     return elapsedTime;
 }
 
-void Timer::Reset()
+unsigned Timer::GetStartTime()
+{
+    return startTime_;
+}
+
+unsigned Timer::GetTimeoutDuration()
+{
+    return timeoutTime_ - startTime_;
+}
+
+bool Timer::GetHasTimedOut()
+{
+    unsigned currentTime = Tick();
+    if (currentTime >= timeoutTime_ && (timeoutTime_ != startTime_))
+        return true;
+    return false;
+}
+
+void Timer::Reset(unsigned timeoutDurationMs)
 {
     startTime_ = Tick();
+    timeoutTime_ = startTime_ + timeoutDurationMs;
 }
+
 
 HiresTimer::HiresTimer()
 {
     Reset();
+
 }
 
-long long HiresTimer::GetUSec(bool reset)
+HiresTimer::HiresTimer(long long duration)
+{
+    Reset(duration);
+}
+
+long long HiresTimer::GetUSec(bool reset, long long timeoutDurationUs)
 {
     long long currentTime = HiresTick();
-    long long elapsedTime = currentTime - startTime_;
+
+    long long elapsedTicks = currentTime - startTick_;
 
     // Correct for possible weirdness with changing internal frequency
-    if (elapsedTime < 0)
-        elapsedTime = 0;
+    if (elapsedTicks < 0)
+        elapsedTicks = 0;
 
     if (reset)
-        startTime_ = currentTime;
+        Reset(timeoutDurationUs);
 
-    return (elapsedTime * 1000000LL) / frequency;
+    return TicksToUSec(elapsedTicks);
 }
 
-void HiresTimer::Reset()
+long long HiresTimer::GetStartTime()
 {
-    startTime_ = HiresTick();
+    return startTick_;
+}
+
+long long HiresTimer::GetTimeoutDuration()
+{
+    return TicksToUSec(timeoutTick_ - startTick_);
+}
+
+bool HiresTimer::GetHasTimedOut()
+{
+    long long currentTick = HiresTick();
+    if (currentTick >= timeoutTick_ && (timeoutTick_ != startTick_))
+        return true;
+    return false;
+}
+
+void HiresTimer::Reset(long long timeoutDuration)
+{
+    startTick_ = HiresTick();
+    timeoutTick_ = startTick_ + USecToTicks(timeoutDuration);
+}
+
+long long HiresTimer::TicksToUSec( long long ticks)
+{
+    return (ticks * 1000000LL) / frequency;
+}
+
+long long HiresTimer::USecToTicks(long long microseconds)
+{
+    return (microseconds * frequency) / 1000000LL + 1;
 }
 
 }
