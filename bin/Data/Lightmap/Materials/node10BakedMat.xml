@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<material>
+	<technique name="Techniques/DiffUnlit.xml" />
+	<texture unit="diffuse" name="Lightmap/BakedTextures/node10_bakeIndirect.png" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+	<parameter name="MatSpecColor" value="0 0 0 20" />
+	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+</material>

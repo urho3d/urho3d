@@ -1,0 +1,7 @@
+<technique vs="LitSolidBake" ps="LitSolidBake">
+    <pass name="base" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="litbase" vsdefines="BAKE" psdefines="AMBIENT" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>
