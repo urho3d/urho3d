@@ -228,7 +228,7 @@ unsigned Timer::GetTimeoutDuration()
     return timeoutTime_ - startTime_;
 }
 
-bool Timer::GetHasTimedOut()
+bool Timer::IsTimedOut()
 {
     unsigned currentTime = Tick();
     if (currentTime >= timeoutTime_ && (timeoutTime_ != startTime_))
@@ -280,7 +280,7 @@ long long HiresTimer::GetTimeoutDuration()
     return TicksToUSec(timeoutTick_ - startTick_);
 }
 
-bool HiresTimer::GetHasTimedOut()
+bool HiresTimer::IsTimedOut()
 {
     long long currentTick = HiresTick();
     if (currentTick >= timeoutTick_ && (timeoutTick_ != startTick_))

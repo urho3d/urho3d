@@ -775,7 +775,7 @@ static void ConstructTimer(Timer* ptr)
 {
     new(ptr) Timer();
 }
-static void ConstructTimerDuration(uint timeoutDuration, Timer* ptr)
+static void ConstructTimerDuration(unsigned timeoutDuration, Timer* ptr)
 {
     new(ptr) Timer(timeoutDuration);
 }
@@ -809,7 +809,7 @@ static void RegisterTimer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Timer", "uint GetMSec(bool, uint = 0)", asMETHOD(Timer, GetMSec), asCALL_THISCALL);
     engine->RegisterObjectMethod("Timer", "uint GetStartTime()", asMETHOD(Timer, GetStartTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Timer", "uint GetTimeoutDuration()", asMETHOD(Timer, GetTimeoutDuration), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Timer", "bool GetHasTimedOut()", asMETHOD(Timer, GetHasTimedOut), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Timer", "bool IsTimedOut()", asMETHOD(Timer, IsTimedOut), asCALL_THISCALL);
     engine->RegisterObjectMethod("Timer", "void Reset(uint)", asMETHOD(Timer, Reset), asCALL_THISCALL);
 
     RegisterObject<Time>(engine, "Time");

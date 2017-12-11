@@ -47,7 +47,7 @@ public:
     unsigned GetTimeoutDuration();
 
     ///Return whether the timer has timed-out (is in over-time)
-    bool GetHasTimedOut();
+    bool IsTimedOut();
 
     /// Reset the timer with optional timeout duration.
     void Reset(unsigned timeoutDurationMs = 0);
@@ -82,7 +82,7 @@ public:
     long long GetTimeoutDuration();
 
     ///Return whether the timer has timed-out.
-    bool GetHasTimedOut();
+    bool IsTimedOut();
 
     /// Reset the timer with optional timeout duration.
     void Reset(long long timeoutDuration = 0);
