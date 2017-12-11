@@ -57,7 +57,7 @@ private:
     unsigned startTime_;
 
     /// clock value in milliseconds when the timer will time-out.
-    unsigned timeoutTime_;
+    unsigned timeoutDuration_;
 };
 
 /// High-resolution operating system timer used in profiling.
@@ -73,7 +73,7 @@ public:
     HiresTimer(long long timeoutDuration);
 
     /// Return elapsed microseconds and optionally reset. 
-    long long GetUSec(bool reset, long long timeoutDuration = 0);
+    long long GetUSec(bool reset, long long timeoutDurationUs = 0);
 
     ///Return the microsecond clock value when the timer was started.
     long long GetStartTime();
@@ -103,8 +103,8 @@ private:
     /// Starting clock value in CPU ticks.
     long long startTick_;
 
-    /// clock value when the timer will time-out.
-    long long timeoutTick_;
+    /// Clock ticks until the timer times-out.
+    long long timeoutDurationTicks_;
 
     /// High-resolution timer support flag.
     static bool supported;

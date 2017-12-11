@@ -197,8 +197,6 @@ float Time::GetFramesPerSecond() const
 Timer::Timer()
 {
     Reset();
-
-    timeoutTime_ = startTime_;
 }
 
 Timer::Timer(unsigned duration)
@@ -225,13 +223,13 @@ unsigned Timer::GetStartTime()
 
 unsigned Timer::GetTimeoutDuration()
 {
-    return timeoutTime_ - startTime_;
+    return timeoutDuration_;
 }
 
 bool Timer::IsTimedOut()
 {
     unsigned currentTime = Tick();
-    if (currentTime >= timeoutTime_ && (timeoutTime_ != startTime_))
+    if (currentTime - startTime_ >= timeoutDuration_ && (timeoutDuration_ != 0))
         return true;
     return false;
 }
@@ -239,7 +237,7 @@ bool Timer::IsTimedOut()
 void Timer::Reset(unsigned timeoutDurationMs)
 {
     startTime_ = Tick();
-    timeoutTime_ = startTime_ + timeoutDurationMs;
+	timeoutDuration_ = timeoutDurationMs;
 }
 
 
@@ -277,21 +275,21 @@ long long HiresTimer::GetStartTime()
 
 long long HiresTimer::GetTimeoutDuration()
 {
-    return TicksToUSec(timeoutTick_ - startTick_);
+    return TicksToUSec(timeoutDurationTicks_);
 }
 
 bool HiresTimer::IsTimedOut()
 {
     long long currentTick = HiresTick();
-    if (currentTick >= timeoutTick_ && (timeoutTick_ != startTick_))
+    if (currentTick - startTick_ >= timeoutDurationTicks_ && (timeoutDurationTicks_ != 0))
         return true;
     return false;
 }
 
-void HiresTimer::Reset(long long timeoutDuration)
+void HiresTimer::Reset(long long timeoutDurationUs)
 {
     startTick_ = HiresTick();
-    timeoutTick_ = startTick_ + USecToTicks(timeoutDuration);
+	timeoutDurationTicks_ = USecToTicks(timeoutDurationUs);
 }
 
 long long HiresTimer::TicksToUSec( long long ticks)
