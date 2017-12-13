@@ -641,9 +641,9 @@ void ScriptInstance::GetScriptAttributes()
     unsigned numProperties = scriptObject_->GetPropertyCount();
     for (unsigned i = 0; i < numProperties; ++i)
     {
-        const char* name;
-        int typeId;
-        bool isPrivate, isProtected, isHandle, isEnum;
+        const char* name = nullptr;
+        int typeId = 0; // AngelScript void typeid
+        bool isPrivate=false, isProtected=false, isHandle=false, isEnum=false;
 
         scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate, &isProtected);
 

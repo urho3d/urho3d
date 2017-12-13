@@ -321,34 +321,32 @@ const char **Script::GetEnumValues(int asTypeID)
     if (!type)
         return nullptr;
 
-    if (type->GetFlags() & asOBJ_ENUM)
-    {
-        unsigned count = type->GetEnumValueCount();
-        enumValues_[asTypeID].Resize(count + 1);
-        int val;
-        for (unsigned i = 0; i < count; ++i)
-        {
-            const char* name = type->GetEnumValueByIndex(i,&val);
-            if ((unsigned)val >= count)// use unsigned for val so negative values will be flagged as invalid
-            {
-                URHO3D_LOGDEBUGF("Could not register enum attribute names for type %d."
-                          "%s has value of %d, which is outside of the range [0,%d) for a 0-based enum.",
-                          asTypeID,name,val,count);
-
-                //fill with empty buffer
-                enumValues_[asTypeID] = PODVector<const char*>();
-                return nullptr;
-            }
-            else
-            {
-                enumValues_[asTypeID][i] = name;
-            }
-        }
-        enumValues_[asTypeID][count] = 0;
-        return enumValues_[asTypeID].Buffer();
-    }
-    else
+    if (!(type->GetFlags() & asOBJ_ENUM))
         return nullptr;
+
+    unsigned count = type->GetEnumValueCount();
+    enumValues_[asTypeID].Resize(count + 1);
+    for (unsigned i = 0; i < count; ++i)
+    {
+        int val = -1;
+        const char* name = type->GetEnumValueByIndex(i,&val);
+        if ((unsigned)val >= count)// use unsigned for val so negative values will be flagged as invalid
+        {
+            URHO3D_LOGDEBUGF("Could not register enum attribute names for type %d."
+                      "%s has value of %d, which is outside of the range [0,%d) for a 0-based enum.",
+                      asTypeID,name,val,count);
+
+            //fill with empty buffer
+            enumValues_[asTypeID] = PODVector<const char*>();
+            return nullptr;
+        }
+        else
+        {
+            enumValues_[asTypeID][i] = name;
+        }
+    }
+    enumValues_[asTypeID][count] = 0;
+    return enumValues_[asTypeID].Buffer();
 }
 
 asIScriptContext* Script::GetScriptFileContext()
