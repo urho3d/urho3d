@@ -300,7 +300,7 @@ private:
             int qualifiers);
 
     /// Send a UI double click event
-    void SendDoubleClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button, int buttons, int qualifiers);
+    void SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button, int buttons, int qualifiers);
     
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);

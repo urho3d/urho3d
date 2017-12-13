@@ -1392,7 +1392,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-                SendDoubleClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
+                SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
             }
             else
             {
@@ -1434,7 +1434,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
             if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
-                SendDoubleClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
+                SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;
@@ -1648,7 +1648,7 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
     SendEvent(eventType, eventData);
 }
 
-void UI::SendDoubleClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button,
+void UI::SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button,
     int buttons, int qualifiers)
 {
     VariantMap& eventData = GetEventDataMap();
@@ -1669,7 +1669,7 @@ void UI::SendDoubleClickEvent(StringHash eventType, UIElement* beginElement, UIE
     }
 
     // Send the global event from the UI subsystem last
-    SendEvent(eventType, eventData);
+    SendEvent(E_UIMOUSEDOUBLECLICK, eventData);
 }
 
 
