@@ -131,6 +131,10 @@ if (NOT ANDROID AND NOT ARM AND NOT WEB)
     endif ()
 endif ()
 
+if (URHO3D_SPARK)
+	add_subdirectory (ThirdParty/Spark)
+endif ()
+
 # Urho3D game engine library
 add_subdirectory (Urho3D)
 

@@ -62,6 +62,9 @@
 #ifdef URHO3D_URHO2D
 #include "../Urho2D/Urho2D.h"
 #endif
+#ifdef URHO3D_SPARK
+#include <Spark/SPARK_URHO3D.h>
+#endif
 
 #if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
 #include <emscripten/emscripten.h>
@@ -187,6 +190,11 @@ bool Engine::Initialize(const VariantMap& parameters)
 #ifdef URHO3D_URHO2D
     // 2D graphics library is dependent on 3D graphics library
     RegisterUrho2DLibrary(context_);
+#endif
+
+#ifdef URHO3D_SPARK
+    // Spark library is dependent on 3D graphics library
+    RegisterSparkLibrary(context_);
 #endif
 
     // Start logging
