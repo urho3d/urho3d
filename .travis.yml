@@ -558,7 +558,7 @@ before_script:
   - travis_retry brew install ccache doxygen graphviz $cmake
   - if [[ ! $cmake ]]; then brew outdated cmake || brew upgrade cmake; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) >/dev/null && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd >/dev/null && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(cache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
+  - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) >/dev/null && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd >/dev/null && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
 script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
