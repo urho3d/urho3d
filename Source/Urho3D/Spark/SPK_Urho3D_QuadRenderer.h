@@ -34,7 +34,7 @@
 namespace SPK {
 namespace URHO {
 
-class SPK_URHO_PREFIX Urho3DQuadRenderer :
+class URHO3D_API Urho3DQuadRenderer :
         public IUrho3DRenderer,
         public QuadRenderBehavior,
         public Oriented3DRenderBehavior

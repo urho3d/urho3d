@@ -36,7 +36,7 @@
 namespace SPK {
 namespace URHO {
 
-class SPK_URHO_PREFIX IUrho3DBuffer : public RenderBuffer
+class URHO3D_API IUrho3DBuffer : public RenderBuffer
 {
 
 public :

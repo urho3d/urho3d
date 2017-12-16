@@ -59,7 +59,7 @@ namespace URHO {
     /**
     * @brief Helper class to register Urho3D context
     * */
-    class SPK_URHO_PREFIX Urho3DContext
+    class URHO3D_API Urho3DContext
     {
     public :
 
