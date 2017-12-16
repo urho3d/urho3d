@@ -107,10 +107,6 @@ private:
 SparkParticles::SparkParticles(Context* context) :
     Sample(context)
 {
-    // Register Urho3D Spark Objects.
-    SparkParticleEffect::RegisterObject(context_);
-    SparkParticle::RegisterObject(context_);
-
     // Register the logic component used to move a node around a circle.
     context_->RegisterFactory<FxMover>();
 }
