@@ -24,7 +24,7 @@
 #define LUA_LDIR	"!\\lua\\"
 #define LUA_CDIR	"!\\"
 #define LUA_PATH_DEFAULT \
-  ".\\?.lua;" "!\\"LUA_RDIR"?.lua;" LUA_IDIR"?.lua;" LUA_LDIR"?.lua;" LUA_LDIR"?\\init.lua;"
+  ".\\?.lua;" "!\\" LUA_RDIR "?.lua;" LUA_IDIR"?.lua;" LUA_LDIR"?.lua;" LUA_LDIR"?\\init.lua;"
 #define LUA_CPATH_DEFAULT \
   ".\\?.dll;" LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll"
 #else

@@ -494,13 +494,9 @@ if (APPLE)
         # iOS-specific setup
         add_definitions (-DIOS)
         if (URHO3D_64BIT)
-            if (DEFINED ENV{XCODE_64BIT_ONLY})                  # This environment variable is set automatically when ccache is just being cleared in Travis CI VM
-                set (CMAKE_OSX_ARCHITECTURES "arm64 x86_64")    # This is a hack to temporarily only build 64-bit archs to reduce overall build time for one build
-            else ()
-                set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD))
-            endif ()
+            set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD))
         else ()
-            # This is a legacy option and should not be used as we are phasing out 32-bit only mode
+            message (WARNING "URHO3D_64BIT=0 for iOS is a deprecated option and should not be used as we are phasing out 32-bit only mode")
             set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
         endif ()
     elseif (TVOS)
@@ -512,13 +508,13 @@ if (APPLE)
             # macOS-specific setup
             if (URHO3D_64BIT)
                 if (URHO3D_UNIVERSAL)
-                    # This is a legacy option and should not be used as we are phasing out macOS universal binary mode
+                    message (WARNING "URHO3D_UNIVERSAL=1 for macOS is a deprecated option and should not be used as we are phasing out macOS universal binary mode")
                     set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
                 else ()
                     set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD))
                 endif ()
             else ()
-                # This is a legacy option and should not be used as we are phasing out 32-bit only mode
+                message (WARNING "URHO3D_64BIT=0 for macOS is a deprecated option and should not be used as we are phasing out 32-bit only mode")
                 set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
             endif ()
         endif ()
@@ -884,6 +880,8 @@ macro (define_dependency_libs TARGET)
                 # Do nothing
             elseif (WIN32)
                 list (APPEND LIBS opengl32)
+            elseif (RPI)
+                list (APPEND LIBS brcmGLESv2)
             elseif (ANDROID OR ARM)
                 list (APPEND LIBS GLESv1_CM GLESv2)
             else ()

@@ -39,6 +39,10 @@ generated/
 /Docs/html/
 /Docs/qch/
 
+# Saved sample scenes
+/bin/Data/Scenes/Isometric2D.xml
+/bin/Data/Scenes/Platformer2D.xml
+
 # Eclipse project settings
 /.*project
 /.settings

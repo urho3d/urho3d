@@ -528,7 +528,7 @@ cache:
   directories:
     - $HOME/.ccache
     - $HOME/initial-build-tree
-osx_image: xcode8.3
+osx_image: xcode9.2
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -540,10 +540,10 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
-    - &tvOS XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=10.2 sdk=appletvsimulator
-    - &iOS XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=10.3 sdk=iphonesimulator
-    - &macOS-STATIC XCODE=1 URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - &macOS-SHARED XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
+    - &tvOS XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=11.2 sdk=appletvsimulator
+    - &iOS XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=11.2 sdk=iphonesimulator
+    - &macOS-STATIC XCODE=1 URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.13 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - &macOS-SHARED XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.13
     - MAKEFILE=1 URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
     - MAKEFILE=1 URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
 stage: release build configuration
@@ -558,7 +558,7 @@ before_script:
   - travis_retry brew install ccache doxygen graphviz $cmake
   - if [[ ! $cmake ]]; then brew outdated cmake || brew upgrade cmake; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) >/dev/null && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd >/dev/null && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(cache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
+  - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) >/dev/null && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd >/dev/null && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
 script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
