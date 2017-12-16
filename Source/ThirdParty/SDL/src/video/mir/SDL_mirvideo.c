@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,8 @@
 
 #if SDL_VIDEO_DRIVER_MIR
 
+#include "SDL_log.h"
+
 #include "SDL_mirwindow.h"
 #include "SDL_video.h"
 
@@ -34,6 +36,7 @@
 #include "SDL_mirmouse.h"
 #include "SDL_miropengl.h"
 #include "SDL_mirvideo.h"
+#include "SDL_mirvulkan.h"
 
 #include "SDL_mirdyn.h"
 
@@ -98,7 +101,19 @@ MIR_Available()
     int available = 0;
 
     if (SDL_MIR_LoadSymbols()) {
-        /* !!! FIXME: try to make a MirConnection here. */
+
+        /* Lets ensure we can connect to the mir server */
+        MirConnection* connection = MIR_mir_connect_sync(NULL, __PRETTY_FUNCTION__);
+
+        if (!MIR_mir_connection_is_valid(connection)) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO, "Unable to connect to the mir server %s",
+                MIR_mir_connection_get_error_message(connection));
+
+            return available;
+        }
+
+        MIR_mir_connection_release(connection);
+
         available = 1;
         SDL_MIR_UnloadSymbols();
     }
@@ -165,7 +180,7 @@ MIR_CreateDevice(int device_index)
     device->GL_GetProcAddress  = MIR_GL_GetProcAddress;
 
     /* mirwindow */
-    device->CreateWindow         = MIR_CreateWindow;
+    device->CreateSDLWindow         = MIR_CreateWindow;
     device->DestroyWindow        = MIR_DestroyWindow;
     device->GetWindowWMInfo      = MIR_GetWindowWMInfo;
     device->SetWindowFullscreen  = MIR_SetWindowFullscreen;
@@ -182,7 +197,7 @@ MIR_CreateDevice(int device_index)
     device->SetWindowGammaRamp   = MIR_SetWindowGammaRamp;
     device->GetWindowGammaRamp   = MIR_GetWindowGammaRamp;
 
-    device->CreateWindowFrom     = NULL;
+    device->CreateSDLWindowFrom     = NULL;
     device->SetWindowIcon        = NULL;
     device->RaiseWindow          = NULL;
     device->SetWindowBordered    = NULL;
@@ -217,6 +232,13 @@ MIR_CreateDevice(int device_index)
     device->HasClipboardText = NULL;
 
     device->ShowMessageBox = NULL;
+
+#if SDL_VIDEO_VULKAN
+    device->Vulkan_LoadLibrary = MIR_Vulkan_LoadLibrary;
+    device->Vulkan_UnloadLibrary = MIR_Vulkan_UnloadLibrary;
+    device->Vulkan_GetInstanceExtensions = MIR_Vulkan_GetInstanceExtensions;
+    device->Vulkan_CreateSurface = MIR_Vulkan_CreateSurface;
+#endif
 
     return device;
 }
@@ -255,7 +277,7 @@ MIR_InitDisplayFromOutput(_THIS, MirOutput* output)
 
     MirPixelFormat format = MIR_mir_output_get_current_pixel_format(output);
     int num_modes         = MIR_mir_output_get_num_modes(output);
-    SDL_DisplayMode current_mode = MIR_ConvertModeToSDLMode(mir_output_get_current_mode(output), format);
+    SDL_DisplayMode current_mode = MIR_ConvertModeToSDLMode(MIR_mir_output_get_current_mode(output), format);
 
     SDL_zero(display);
 

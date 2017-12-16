@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,6 @@
 #include "SDL_events.h"
 
 #include "SDL_joystick.h"
-#include "SDL_hints.h"
 #include "SDL_assert.h"
 #include "SDL_timer.h"
 #include "SDL_log.h"
@@ -42,7 +41,7 @@ static SDL_joylist_item *SDL_joylist_tail = NULL;
 static int numjoysticks = 0;
 static int instance_counter = 0;
 
-EM_BOOL
+static EM_BOOL
 Emscripten_JoyStickConnected(int eventType, const EmscriptenGamepadEvent *gamepadEvent, void *userData)
 {
     int i;
@@ -111,7 +110,7 @@ Emscripten_JoyStickConnected(int eventType, const EmscriptenGamepadEvent *gamepa
     return 1;
 }
 
-EM_BOOL
+static EM_BOOL
 Emscripten_JoyStickDisconnected(int eventType, const EmscriptenGamepadEvent *gamepadEvent, void *userData)
 {
     SDL_joylist_item *item = SDL_joylist;
@@ -146,7 +145,7 @@ Emscripten_JoyStickDisconnected(int eventType, const EmscriptenGamepadEvent *gam
     /* Need to decrement the joystick count before we post the event */
     --numjoysticks;
 
-	SDL_PrivateJoystickRemoved(item->device_instance);
+    SDL_PrivateJoystickRemoved(item->device_instance);
 
 #ifdef DEBUG_JOYSTICK
     SDL_Log("Removed joystick with id %d", item->device_instance);
@@ -240,12 +239,14 @@ JoystickByIndex(int index)
     return item;
 }
 
-int SDL_SYS_NumJoysticks()
+int
+SDL_SYS_NumJoysticks(void)
 {
     return numjoysticks;
 }
 
-void SDL_SYS_JoystickDetect()
+void
+SDL_SYS_JoystickDetect(void)
 {
 }
 
@@ -329,7 +330,7 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
 
                 for(i = 0; i < item->naxes; i++) {
                     if(item->axis[i] != gamepadState.axis[i]) {
-                        // do we need to do conversion?
+                        /* do we need to do conversion? */
                         SDL_PrivateJoystickAxis(item->joystick, i,
                                                   (Sint16) (32767.*gamepadState.axis[i]));
                     }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -115,7 +115,7 @@ IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServiceP
 }
 #endif
 
-BOOL WIN_IsWindowsVistaOrGreater()
+BOOL WIN_IsWindowsVistaOrGreater(void)
 {
 #ifdef __WINRT__
     return TRUE;
@@ -142,6 +142,8 @@ Registry, and a unhelpful "Microphone(Yeti Stereo Microph" in winmm. Sigh.
 
 (Also, DirectSound shouldn't be limited to 32 chars, but its device enum
 has the same problem.)
+
+WASAPI doesn't need this. This is just for DirectSound/WinMM.
 */
 char *
 WIN_LookupAudioDeviceName(const WCHAR *name, const GUID *guid)
@@ -158,7 +160,7 @@ WIN_LookupAudioDeviceName(const WCHAR *name, const GUID *guid)
     DWORD len = 0;
     char *retval = NULL;
 
-    if (SDL_memcmp(guid, &nullguid, sizeof (*guid)) == 0) {
+    if (WIN_IsEqualGUID(guid, &nullguid)) {
         return WIN_StringToUTF8(name);  /* No GUID, go with what we've got. */
     }
 
@@ -200,6 +202,18 @@ WIN_LookupAudioDeviceName(const WCHAR *name, const GUID *guid)
     SDL_free(strw);
     return retval ? retval : WIN_StringToUTF8(name);
 #endif /* if __WINRT__ / else */
+}
+
+BOOL
+WIN_IsEqualGUID(const GUID * a, const GUID * b)
+{
+    return (SDL_memcmp(a, b, sizeof (*a)) == 0);
+}
+
+BOOL
+WIN_IsEqualIID(REFIID a, REFIID b)
+{
+    return (SDL_memcmp(a, b, sizeof (*a)) == 0);
 }
 
 #endif /* __WIN32__ || __WINRT__ */

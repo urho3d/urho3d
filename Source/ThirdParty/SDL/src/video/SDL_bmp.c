@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -123,6 +123,9 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
     /* Sint32 biYPelsPerMeter = 0; */
     Uint32 biClrUsed = 0;
     /* Uint32 biClrImportant = 0; */
+
+    (void) haveRGBMasks;
+    (void) haveAlphaMask;
 
     /* Make sure we are passed a valid data source */
     surface = NULL;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,8 +24,8 @@
 
 /* This is the Haiku implementation of the SDL joystick API */
 
-#include <os/support/String.h>
-#include <os/device/Joystick.h>
+#include <support/String.h>
+#include <device/Joystick.h>
 
 extern "C"
 {
@@ -84,12 +84,12 @@ extern "C"
         return (SDL_SYS_numjoysticks);
     }
 
-    int SDL_SYS_NumJoysticks()
+    int SDL_SYS_NumJoysticks(void)
     {
         return SDL_SYS_numjoysticks;
     }
 
-    void SDL_SYS_JoystickDetect()
+    void SDL_SYS_JoystickDetect(void)
     {
     }
 
@@ -176,10 +176,9 @@ extern "C"
             SDL_HAT_LEFT,
             SDL_HAT_LEFTUP
         };
-        const int JITTER = (32768 / 10);        /* 10% jitter threshold (ok?) */
 
         BJoystick *stick;
-        int i, change;
+        int i;
         int16 *axes;
         uint8 *hats;
         uint32 buttons;
@@ -197,24 +196,17 @@ extern "C"
 
         /* Generate axis motion events */
         for (i = 0; i < joystick->naxes; ++i) {
-            change = ((int32) axes[i] - joystick->axes[i]);
-            if ((change > JITTER) || (change < -JITTER)) {
-                SDL_PrivateJoystickAxis(joystick, i, axes[i]);
-            }
+            SDL_PrivateJoystickAxis(joystick, i, axes[i]);
         }
 
         /* Generate hat change events */
         for (i = 0; i < joystick->nhats; ++i) {
-            if (hats[i] != joystick->hats[i]) {
-                SDL_PrivateJoystickHat(joystick, i, hat_map[hats[i]]);
-            }
+            SDL_PrivateJoystickHat(joystick, i, hat_map[hats[i]]);
         }
 
         /* Generate button events */
         for (i = 0; i < joystick->nbuttons; ++i) {
-            if ((buttons & 0x01) != joystick->buttons[i]) {
-                SDL_PrivateJoystickButton(joystick, i, (buttons & 0x01));
-            }
+            SDL_PrivateJoystickButton(joystick, i, (buttons & 0x01));
             buttons >>= 1;
         }
     }
@@ -236,12 +228,12 @@ extern "C"
     {
         int i;
 
-        for (i = 0; SDL_joyport[i]; ++i) {
+        for (i = 0; i < SDL_SYS_numjoysticks; ++i) {
             SDL_free(SDL_joyport[i]);
         }
         SDL_joyport[0] = NULL;
 
-        for (i = 0; SDL_joyname[i]; ++i) {
+        for (i = 0; i < SDL_SYS_numjoysticks; ++i) {
             SDL_free(SDL_joyname[i]);
         }
         SDL_joyname[0] = NULL;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_coreaudio_h
-#define _SDL_coreaudio_h
+#ifndef SDL_coreaudio_h_
+#define SDL_coreaudio_h_
 
 #include "../SDL_sysaudio.h"
 
@@ -47,7 +47,7 @@ struct SDL_PrivateAudioData
 {
     SDL_Thread *thread;
     AudioQueueRef audioQueue;
-    AudioQueueBufferRef audioBuffer[2];
+    AudioQueueBufferRef *audioBuffer;
     void *buffer;
     UInt32 bufferOffset;
     UInt32 bufferSize;
@@ -63,5 +63,6 @@ struct SDL_PrivateAudioData
 #endif
 };
 
-#endif /* _SDL_coreaudio_h */
+#endif /* SDL_coreaudio_h_ */
+
 /* vi: set ts=4 sw=4 expandtab: */

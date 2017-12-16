@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,6 +31,7 @@
 #include "SDL_x11video.h"
 #include "SDL_x11touch.h"
 #include "SDL_x11xinput2.h"
+#include "../../core/unix/SDL_poll.h"
 #include "../../events/SDL_events_c.h"
 #include "../../events/SDL_mouse_c.h"
 #include "../../events/SDL_touch_c.h"
@@ -38,6 +39,7 @@
 #include "SDL_hints.h"
 #include "SDL_timer.h"
 #include "SDL_syswm.h"
+#include "SDL_assert.h"
 
 #include <stdio.h>
 
@@ -201,7 +203,7 @@ X11_IsWheelEvent(Display * display,XEvent * event,int * xticks,int * yticks)
 
    On error, -1 is returned.
  */
-int X11_URIDecode(char *buf, int len) {
+static int X11_URIDecode(char *buf, int len) {
     int ri, wi, di;
     char decode = '\0';
     if (buf == NULL || len < 0) {
@@ -301,10 +303,10 @@ static char* X11_URIToLocal(char* uri) {
 }
 
 #if SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS
-static void X11_HandleGenericEvent(SDL_VideoData *videodata,XEvent event)
+static void X11_HandleGenericEvent(SDL_VideoData *videodata, XEvent *xev)
 {
     /* event is a union, so cookie == &event, but this is type safe. */
-    XGenericEventCookie *cookie = &event.xcookie;
+    XGenericEventCookie *cookie = &xev->xcookie;
     if (X11_XGetEventData(videodata->display, cookie)) {
         X11_HandleXinput2Event(videodata, cookie);
         X11_XFreeEventData(videodata->display, cookie);
@@ -348,6 +350,7 @@ X11_ReconcileKeyboardState(_THIS)
     Window junk_window;
     int x, y;
     unsigned int mask;
+    const Uint8 *keyboardState;
 
     X11_XQueryKeymap(display, keys);
 
@@ -357,11 +360,16 @@ X11_ReconcileKeyboardState(_THIS)
         SDL_ToggleModState(KMOD_NUM, (mask & X11_GetNumLockModifierMask(_this)) != 0);
     }
 
+    keyboardState = SDL_GetKeyboardState(0);
     for (keycode = 0; keycode < 256; ++keycode) {
-        if (keys[keycode / 8] & (1 << (keycode % 8))) {
-            SDL_SendKeyboardKey(SDL_PRESSED, viddata->key_layout[keycode]);
-        } else {
-            SDL_SendKeyboardKey(SDL_RELEASED, viddata->key_layout[keycode]);
+        SDL_Scancode scancode = viddata->key_layout[keycode];
+        SDL_bool x11KeyPressed = (keys[keycode / 8] & (1 << (keycode % 8))) != 0;
+        SDL_bool sdlKeyPressed = keyboardState[scancode] == SDL_PRESSED;
+
+        if (x11KeyPressed && !sdlKeyPressed) {
+            SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+        } else if (!x11KeyPressed && sdlKeyPressed) {
+            SDL_SendKeyboardKey(SDL_RELEASED, scancode);
         }
     }
 }
@@ -531,6 +539,95 @@ X11_UpdateUserTime(SDL_WindowData *data, const unsigned long latest)
     }
 }
 
+static void
+X11_HandleClipboardEvent(_THIS, const XEvent *xevent)
+{
+    SDL_VideoData *videodata = (SDL_VideoData *) _this->driverdata;
+    Display *display = videodata->display;
+
+    SDL_assert(videodata->clipboard_window != None);
+    SDL_assert(xevent->xany.window == videodata->clipboard_window);
+
+    switch (xevent->type) {
+    /* Copy the selection from our own CUTBUFFER to the requested property */
+        case SelectionRequest: {
+            const XSelectionRequestEvent *req = &xevent->xselectionrequest;
+            XEvent sevent;
+            int seln_format;
+            unsigned long nbytes;
+            unsigned long overflow;
+            unsigned char *seln_data;
+
+#ifdef DEBUG_XEVENTS
+            printf("window CLIPBOARD: SelectionRequest (requestor = %ld, target = %ld)\n",
+                req->requestor, req->target);
+#endif
+
+            SDL_zero(sevent);
+            sevent.xany.type = SelectionNotify;
+            sevent.xselection.selection = req->selection;
+            sevent.xselection.target = None;
+            sevent.xselection.property = None;  /* tell them no by default */
+            sevent.xselection.requestor = req->requestor;
+            sevent.xselection.time = req->time;
+
+            /* !!! FIXME: We were probably storing this on the root window
+               because an SDL window might go away...? but we don't have to do
+               this now (or ever, really). */
+            if (X11_XGetWindowProperty(display, DefaultRootWindow(display),
+                    X11_GetSDLCutBufferClipboardType(display), 0, INT_MAX/4, False, req->target,
+                    &sevent.xselection.target, &seln_format, &nbytes,
+                    &overflow, &seln_data) == Success) {
+                /* !!! FIXME: cache atoms */
+                Atom XA_TARGETS = X11_XInternAtom(display, "TARGETS", 0);
+                if (sevent.xselection.target == req->target) {
+                    X11_XChangeProperty(display, req->requestor, req->property,
+                        sevent.xselection.target, seln_format, PropModeReplace,
+                        seln_data, nbytes);
+                    sevent.xselection.property = req->property;
+                } else if (XA_TARGETS == req->target) {
+                    Atom SupportedFormats[] = { XA_TARGETS, sevent.xselection.target };
+                    X11_XChangeProperty(display, req->requestor, req->property,
+                        XA_ATOM, 32, PropModeReplace,
+                        (unsigned char*)SupportedFormats,
+                        SDL_arraysize(SupportedFormats));
+                    sevent.xselection.property = req->property;
+                    sevent.xselection.target = XA_TARGETS;
+                }
+                X11_XFree(seln_data);
+            }
+            X11_XSendEvent(display, req->requestor, False, 0, &sevent);
+            X11_XSync(display, False);
+        }
+        break;
+
+        case SelectionNotify: {
+#ifdef DEBUG_XEVENTS
+            printf("window CLIPBOARD: SelectionNotify (requestor = %ld, target = %ld)\n",
+                xevent->xselection.requestor, xevent->xselection.target);
+#endif
+            videodata->selection_waiting = SDL_FALSE;
+        }
+        break;
+
+        case SelectionClear: {
+            /* !!! FIXME: cache atoms */
+            Atom XA_CLIPBOARD = X11_XInternAtom(display, "CLIPBOARD", 0);
+
+#ifdef DEBUG_XEVENTS
+            printf("window CLIPBOARD: SelectionClear (requestor = %ld, target = %ld)\n",
+                xevent->xselection.requestor, xevent->xselection.target);
+#endif
+
+            if (xevent->xselectionclear.selection == XA_PRIMARY ||
+                (XA_CLIPBOARD != None && xevent->xselectionclear.selection == XA_CLIPBOARD)) {
+                SDL_SendClipboardUpdate();
+            }
+        }
+        break;
+    }
+}
+
 
 static void
 X11_DispatchEvent(_THIS)
@@ -568,14 +665,21 @@ X11_DispatchEvent(_THIS)
         printf("Filtered event type = %d display = %d window = %d\n",
                xevent.type, xevent.xany.display, xevent.xany.window);
 #endif
+        /* Make sure dead key press/release events are sent */
+        /* But only if we're using one of the DBus IMEs, otherwise
+           some XIM IMEs will generate duplicate events */
         if (orig_keycode) {
-            /* Make sure dead key press/release events are sent */
+#if defined(HAVE_IBUS_IBUS_H) || defined(HAVE_FCITX_FRONTEND_H)
             SDL_Scancode scancode = videodata->key_layout[orig_keycode];
+            videodata->filter_code = orig_keycode;
+            videodata->filter_time = xevent.xkey.time;
+
             if (orig_event_type == KeyPress) {
                 SDL_SendKeyboardKey(SDL_PRESSED, scancode);
             } else {
                 SDL_SendKeyboardKey(SDL_RELEASED, scancode);
             }
+#endif
         }
         return;
     }
@@ -592,7 +696,7 @@ X11_DispatchEvent(_THIS)
 
 #if SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS
     if(xevent.type == GenericEvent) {
-        X11_HandleGenericEvent(videodata,xevent);
+        X11_HandleGenericEvent(videodata, &xevent);
         return;
     }
 #endif
@@ -601,6 +705,12 @@ X11_DispatchEvent(_THIS)
     printf("type = %d display = %d window = %d\n",
            xevent.type, xevent.xany.display, xevent.xany.window);
 #endif
+
+    if ((videodata->clipboard_window != None) &&
+        (videodata->clipboard_window == xevent.xany.window)) {
+        X11_HandleClipboardEvent(_this, &xevent);
+        return;
+    }
 
     data = NULL;
     if (videodata && videodata->windowlist) {
@@ -768,7 +878,7 @@ X11_DispatchEvent(_THIS)
                 X11_XDisplayKeycodes(display, &min_keycode, &max_keycode);
                 keysym = X11_KeyCodeToSym(_this, keycode, xevent.xkey.state >> 13);
                 fprintf(stderr,
-                        "The key you just pressed is not recognized by SDL. To help get this fixed, please report this to the SDL mailing list <sdl@libsdl.org> X11 KeyCode %d (%d), X11 KeySym 0x%lX (%s).\n",
+                        "The key you just pressed is not recognized by SDL. To help get this fixed, please report this to the SDL forums/mailing list <https://discourse.libsdl.org/> X11 KeyCode %d (%d), X11 KeySym 0x%lX (%s).\n",
                         keycode, keycode - min_keycode, keysym,
                         X11_XKeysymToString(keysym));
             }
@@ -792,7 +902,10 @@ X11_DispatchEvent(_THIS)
             }
 #endif
             if (!handled_by_ime) {
-                SDL_SendKeyboardKey(SDL_PRESSED, videodata->key_layout[keycode]);
+                /* Don't send the key if it looks like a duplicate of a filtered key sent by an IME */
+                if (xevent.xkey.keycode != videodata->filter_code || xevent.xkey.time != videodata->filter_time) {
+                    SDL_SendKeyboardKey(SDL_PRESSED, videodata->key_layout[keycode]);
+                }
                 if(*text) {
                     SDL_SendKeyboardText(text);
                 }
@@ -892,7 +1005,7 @@ X11_DispatchEvent(_THIS)
                 printf("Protocol version to use : %d\n", xdnd_version);
                 printf("More then 3 data types : %d\n", (int) use_list);
 #endif
- 
+
                 if (use_list) {
                     /* fetch conversion targets */
                     SDL_x11Prop p;
@@ -906,7 +1019,7 @@ X11_DispatchEvent(_THIS)
                 }
             }
             else if (xevent.xclient.message_type == videodata->XdndPosition) {
-            
+
 #ifdef DEBUG_XEVENTS
                 Atom act= videodata->XdndActionCopy;
                 if(xdnd_version >= 2) {
@@ -914,7 +1027,7 @@ X11_DispatchEvent(_THIS)
                 }
                 printf("Action requested by user is : %s\n", X11_XGetAtomName(display , act));
 #endif
-                
+
 
                 /* reply with status */
                 memset(&m, 0, sizeof(XClientMessageEvent));
@@ -1017,7 +1130,7 @@ X11_DispatchEvent(_THIS)
             printf("window %p: ButtonPress (X11 button = %d)\n", data, xevent.xbutton.button);
 #endif
             if (X11_IsWheelEvent(display,&xevent,&xticks, &yticks)) {
-                SDL_SendMouseWheel(data->window, 0, xticks, yticks, SDL_MOUSEWHEEL_NORMAL);
+                SDL_SendMouseWheel(data->window, 0, (float) xticks, (float) yticks, SDL_MOUSEWHEEL_NORMAL);
             } else {
                 SDL_bool ignore_click = SDL_FALSE;
                 int button = xevent.xbutton.button;
@@ -1207,55 +1320,6 @@ X11_DispatchEvent(_THIS)
         }
         break;
 
-    /* Copy the selection from our own CUTBUFFER to the requested property */
-    case SelectionRequest: {
-            XSelectionRequestEvent *req;
-            XEvent sevent;
-            int seln_format;
-            unsigned long nbytes;
-            unsigned long overflow;
-            unsigned char *seln_data;
-
-            req = &xevent.xselectionrequest;
-#ifdef DEBUG_XEVENTS
-            printf("window %p: SelectionRequest (requestor = %ld, target = %ld)\n", data,
-                req->requestor, req->target);
-#endif
-
-            SDL_zero(sevent);
-            sevent.xany.type = SelectionNotify;
-            sevent.xselection.selection = req->selection;
-            sevent.xselection.target = None;
-            sevent.xselection.property = None;
-            sevent.xselection.requestor = req->requestor;
-            sevent.xselection.time = req->time;
-
-            if (X11_XGetWindowProperty(display, DefaultRootWindow(display),
-                    X11_GetSDLCutBufferClipboardType(display), 0, INT_MAX/4, False, req->target,
-                    &sevent.xselection.target, &seln_format, &nbytes,
-                    &overflow, &seln_data) == Success) {
-                Atom XA_TARGETS = X11_XInternAtom(display, "TARGETS", 0);
-                if (sevent.xselection.target == req->target) {
-                    X11_XChangeProperty(display, req->requestor, req->property,
-                        sevent.xselection.target, seln_format, PropModeReplace,
-                        seln_data, nbytes);
-                    sevent.xselection.property = req->property;
-                } else if (XA_TARGETS == req->target) {
-                    Atom SupportedFormats[] = { XA_TARGETS, sevent.xselection.target };
-                    X11_XChangeProperty(display, req->requestor, req->property,
-                        XA_ATOM, 32, PropModeReplace,
-                        (unsigned char*)SupportedFormats,
-                        SDL_arraysize(SupportedFormats));
-                    sevent.xselection.property = req->property;
-                    sevent.xselection.target = XA_TARGETS;
-                }
-                X11_XFree(seln_data);
-            }
-            X11_XSendEvent(display, req->requestor, False, 0, &sevent);
-            X11_XSync(display, False);
-        }
-        break;
-
     case SelectionNotify: {
             Atom target = xevent.xselection.target;
 #ifdef DEBUG_XEVENTS
@@ -1299,19 +1363,6 @@ X11_DispatchEvent(_THIS)
                 X11_XSendEvent(display, data->xdnd_source, False, NoEventMask, (XEvent*)&m);
 
                 X11_XSync(display, False);
-
-            } else {
-                videodata->selection_waiting = SDL_FALSE;
-            }
-        }
-        break;
-
-    case SelectionClear: {
-            Atom XA_CLIPBOARD = X11_XInternAtom(display, "CLIPBOARD", 0);
-
-            if (xevent.xselectionclear.selection == XA_PRIMARY ||
-                (XA_CLIPBOARD != None && xevent.xselectionclear.selection == XA_CLIPBOARD)) {
-                SDL_SendClipboardUpdate();
             }
         }
         break;
@@ -1359,17 +1410,8 @@ X11_Pending(Display * display)
     }
 
     /* More drastic measures are required -- see if X is ready to talk */
-    {
-        static struct timeval zero_time;        /* static == 0 */
-        int x11_fd;
-        fd_set fdset;
-
-        x11_fd = ConnectionNumber(display);
-        FD_ZERO(&fdset);
-        FD_SET(x11_fd, &fdset);
-        if (select(x11_fd + 1, &fdset, NULL, NULL, &zero_time) == 1) {
-            return (X11_XPending(display));
-        }
+    if (SDL_IOReady(ConnectionNumber(display), SDL_FALSE, 0)) {
+        return (X11_XPending(display));
     }
 
     /* Oh well, nothing is ready .. */

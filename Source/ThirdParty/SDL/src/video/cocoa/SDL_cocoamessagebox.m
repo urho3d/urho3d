@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -57,11 +57,24 @@
 - (void)showAlert:(NSAlert*)alert
 {
     if (nswindow) {
-        [alert beginSheetModalForWindow:nswindow modalDelegate:self didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:) contextInfo:nil];
+#ifdef MAC_OS_X_VERSION_10_9
+        if ([alert respondsToSelector:@selector(beginSheetModalForWindow:completionHandler:)]) {
+            [alert beginSheetModalForWindow:nswindow completionHandler:^(NSModalResponse returnCode) {
+                clicked = returnCode;
+            }];
+        } else
+#endif
+        {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1090
+            [alert beginSheetModalForWindow:nswindow modalDelegate:self didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:) contextInfo:nil];
+#endif
+        }
+
         while (clicked < 0) {
             SDL_PumpEvents();
             SDL_Delay(100);
         }
+
         [nswindow release];
     } else {
         clicked = [alert runModal];
@@ -86,11 +99,11 @@ Cocoa_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
     NSAlert* alert = [[[NSAlert alloc] init] autorelease];
 
     if (messageboxdata->flags & SDL_MESSAGEBOX_ERROR) {
-        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleCritical];
     } else if (messageboxdata->flags & SDL_MESSAGEBOX_WARNING) {
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
     } else {
-        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleInformational];
     }
 
     [alert setMessageText:[NSString stringWithUTF8String:messageboxdata->title]];

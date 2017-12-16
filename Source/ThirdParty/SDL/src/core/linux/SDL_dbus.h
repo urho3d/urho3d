@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,8 +21,8 @@
 
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_dbus_h
-#define _SDL_dbus_h
+#ifndef SDL_dbus_h_
+#define SDL_dbus_h_
 
 #ifdef HAVE_DBUS_DBUS_H
 #define SDL_USE_LIBDBUS 1
@@ -32,6 +32,7 @@
 
 typedef struct SDL_DBusContext {
     DBusConnection *session_conn;
+    DBusConnection *system_conn;
 
     DBusConnection *(*bus_get_private)(DBusBusType, DBusError *);
     dbus_bool_t (*bus_register)(DBusConnection *, DBusError *);
@@ -53,7 +54,9 @@ typedef struct SDL_DBusContext {
     dbus_bool_t (*message_is_signal)(DBusMessage *, const char *, const char *); 	
     DBusMessage *(*message_new_method_call)(const char *, const char *, const char *, const char *);
     dbus_bool_t (*message_append_args)(DBusMessage *, int, ...);
+    dbus_bool_t (*message_append_args_valist)(DBusMessage *, int, va_list);
     dbus_bool_t (*message_get_args)(DBusMessage *, DBusError *, int, ...);
+    dbus_bool_t (*message_get_args_valist)(DBusMessage *, DBusError *, int, va_list);
     dbus_bool_t (*message_iter_init)(DBusMessage *, DBusMessageIter *);
     dbus_bool_t (*message_iter_next)(DBusMessageIter *);
     void (*message_iter_get_basic)(DBusMessageIter *, void *);
@@ -65,6 +68,7 @@ typedef struct SDL_DBusContext {
     void (*error_free)(DBusError *);
     char *(*get_local_machine_id)(void);
     void (*free)(void *);
+    void (*free_string_array)(char **);
     void (*shutdown)(void);
 
 } SDL_DBusContext;
@@ -72,11 +76,22 @@ typedef struct SDL_DBusContext {
 extern void SDL_DBus_Init(void);
 extern void SDL_DBus_Quit(void);
 extern SDL_DBusContext * SDL_DBus_GetContext(void);
+
+/* These use the built-in Session connection. */
+extern SDL_bool SDL_DBus_CallMethod(const char *node, const char *path, const char *interface, const char *method, ...);
+extern SDL_bool SDL_DBus_CallVoidMethod(const char *node, const char *path, const char *interface, const char *method, ...);
+extern SDL_bool SDL_DBus_QueryProperty(const char *node, const char *path, const char *interface, const char *property, const int expectedtype, void *result);
+
+/* These use whatever connection you like. */
+extern SDL_bool SDL_DBus_CallMethodOnConnection(DBusConnection *conn, const char *node, const char *path, const char *interface, const char *method, ...);
+extern SDL_bool SDL_DBus_CallVoidMethodOnConnection(DBusConnection *conn, const char *node, const char *path, const char *interface, const char *method, ...);
+extern SDL_bool SDL_DBus_QueryPropertyOnConnection(DBusConnection *conn, const char *node, const char *path, const char *interface, const char *property, const int expectedtype, void *result);
+
 extern void SDL_DBus_ScreensaverTickle(void);
 extern SDL_bool SDL_DBus_ScreensaverInhibit(SDL_bool inhibit);
 
 #endif /* HAVE_DBUS_DBUS_H */
 
-#endif /* _SDL_dbus_h */
+#endif /* SDL_dbus_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */
