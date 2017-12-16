@@ -39,12 +39,12 @@ public:
     /// Construct.
     Sound(Context* context);
     /// Destruct and free sound data.
-    virtual ~Sound();
+    virtual ~Sound() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
 
     /// Load raw sound data.
     bool LoadRaw(Deserializer& source);

@@ -45,10 +45,8 @@ static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, con
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        // Compare either the accessor or offset to avoid name string compare
+        // Compare accessor to avoid name string compare
         if (attr.accessor_.Get() && attr.accessor_.Get() == netAttr.accessor_.Get())
-            return i;
-        else if (!attr.accessor_.Get() && attr.offset_ == netAttr.offset_)
             return i;
     }
 
@@ -74,8 +72,9 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         return;
     }
 
-    // Calculate the destination address
-    void* dest = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
+    // Get the destination address
+    assert(attr.ptr_);
+    void* dest = attr.ptr_;
 
     switch (attr.type_)
     {
@@ -85,6 +84,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
             *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
         else
             *(reinterpret_cast<int*>(dest)) = src.GetInt();
+        break;
+
+    case VAR_INT64:
+        *(reinterpret_cast<long long*>(dest)) = src.GetInt64();
         break;
 
     case VAR_BOOL:
@@ -178,8 +181,9 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         return;
     }
 
-    // Calculate the source address
-    const void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<const unsigned char*>(this) + attr.offset_;
+    // Get the source address
+    assert(attr.ptr_);
+    const void* src = attr.ptr_;
 
     switch (attr.type_)
     {
@@ -189,6 +193,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
             dest = *(reinterpret_cast<const unsigned char*>(src));
         else
             dest = *(reinterpret_cast<const int*>(src));
+        break;
+
+    case VAR_INT64:
+        dest = *(reinterpret_cast<const long long*>(src));
         break;
 
     case VAR_BOOL:

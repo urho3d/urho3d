@@ -106,7 +106,7 @@ bool RenderSurface::GetAutoResolve() const
 
 Viewport* RenderSurface::GetViewport(unsigned index) const
 {
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+    return index < viewports_.Size() ? viewports_[index] : nullptr;
 }
 
 }

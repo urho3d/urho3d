@@ -791,11 +791,11 @@ bool Image::BeginLoad(Deserializer& source)
         bool decodeError(false);
         if (features.has_alpha)
         {
-            decodeError = WebPDecodeRGBAInto(data.Get(), dataSize, pixelData.Get(), imgSize, 4 * features.width) == NULL;
+            decodeError = WebPDecodeRGBAInto(data.Get(), dataSize, pixelData.Get(), imgSize, 4 * features.width) == nullptr;
         }
         else
         {
-            decodeError = WebPDecodeRGBInto(data.Get(), dataSize, pixelData.Get(), imgSize, 3 * features.width) == NULL;
+            decodeError = WebPDecodeRGBInto(data.Get(), dataSize, pixelData.Get(), imgSize, 3 * features.width) == nullptr;
         }
         if (decodeError)
         {
@@ -1981,7 +1981,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             {
                 URHO3D_LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
                          " Datasize: " + String(GetMemoryUse()));
-                level.data_ = 0;
+                level.data_ = nullptr;
                 return level;
             }
 
@@ -2019,7 +2019,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             {
                 URHO3D_LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
                          " Datasize: " + String(GetMemoryUse()));
-                level.data_ = 0;
+                level.data_ = nullptr;
                 return level;
             }
 
@@ -2057,7 +2057,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             {
                 URHO3D_LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
                          " Datasize: " + String(GetMemoryUse()));
-                level.data_ = 0;
+                level.data_ = nullptr;
                 return level;
             }
 
@@ -2075,18 +2075,18 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 Image* Image::GetSubimage(const IntRect& rect) const
 {
     if (!data_)
-        return 0;
+        return nullptr;
 
     if (depth_ > 1)
     {
         URHO3D_LOGERROR("Subimage not supported for 3D images");
-        return 0;
+        return nullptr;
     }
 
     if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
     {
         URHO3D_LOGERROR("Can not get subimage from image " + GetName() + " with invalid region");
-        return 0;
+        return nullptr;
     }
 
     if (!IsCompressed())
@@ -2162,7 +2162,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
         if (!subimageLevels)
         {
             URHO3D_LOGERROR("Subimage region from compressed image " + GetName() + " did not produce any data");
-            return 0;
+            return nullptr;
         }
 
         Image* image = new Image(context_);
@@ -2183,24 +2183,24 @@ Image* Image::GetSubimage(const IntRect& rect) const
 SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
 {
     if (!data_)
-        return 0;
+        return nullptr;
 
     if (depth_ > 1)
     {
         URHO3D_LOGERROR("Can not get SDL surface from 3D image");
-        return 0;
+        return nullptr;
     }
 
     if (IsCompressed())
     {
         URHO3D_LOGERROR("Can not get SDL surface from compressed image " + GetName());
-        return 0;
+        return nullptr;
     }
 
     if (components_ < 3)
     {
         URHO3D_LOGERROR("Can not get SDL surface from image " + GetName() + " with less than 3 components");
-        return 0;
+        return nullptr;
     }
 
     IntRect imageRect = rect;
@@ -2311,6 +2311,72 @@ void Image::FreeImageData(unsigned char* pixelData)
         return;
 
     stbi_image_free(pixelData);
+}
+
+bool Image::HasAlphaChannel() const
+{
+    return components_ > 3;
+}
+
+// Author: Josh Engebretson (AtomicGameEngine)
+bool Image::SetSubimage(const Image* image, const IntRect& rect)
+{
+    if (!data_)
+        return false;
+
+    if (depth_ > 1 || IsCompressed())
+    {
+        URHO3D_LOGERROR("Image::SetSubimage is not supported for compressed or 3D images");
+        return false;
+    }
+
+    if (components_ != image->components_)
+    {
+        URHO3D_LOGERROR("Can not set subimage in image " + GetName() + " with different number of components");
+        return false;
+    }
+
+    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
+    {
+        URHO3D_LOGERROR("Can not set subimage in image " + GetName() + " with invalid region");
+        return false;
+    }
+
+    const int destWidth = rect.Width();
+    const int destHeight = rect.Height();
+    if (destWidth == image->GetWidth() && destHeight == image->GetHeight())
+    {
+        unsigned char* src = image->GetData();
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        for (int i = 0; i < destHeight; ++i)
+        {
+            memcpy(dest, src, destWidth * components_);
+
+            src += destWidth * image->components_;
+            dest += width_ * components_;
+        }
+    }
+    else
+    {
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        for (int y = 0; y < destHeight; ++y)
+        {
+            for (int x = 0; x < destWidth; ++x)
+            {
+                // Calculate float coordinates between 0 - 1 for resampling
+                const float xF = (image->width_ > 1) ? static_cast<float>(x) / (destWidth - 1) : 0.0f;
+                const float yF = (image->height_ > 1) ? static_cast<float>(y) / (destHeight - 1) : 0.0f;
+                const unsigned uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
+
+                memcpy(dest, reinterpret_cast<const unsigned char*>(&uintColor), components_);
+
+                dest += components_;
+            }
+            dest += (width_ - destWidth) * components_;
+        }
+    }
+
+    return true;
 }
 
 }

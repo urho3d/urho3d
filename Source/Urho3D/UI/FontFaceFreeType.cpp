@@ -64,7 +64,7 @@ public:
     }
 
     /// Destruct.
-    virtual ~FreeTypeLibrary()
+    virtual ~FreeTypeLibrary() override
     {
         FT_Done_FreeType(library_);
     }
@@ -78,7 +78,7 @@ private:
 
 FontFaceFreeType::FontFaceFreeType(Font* font) :
     FontFace(font),
-    face_(0),
+    face_(nullptr),
     loadMode_(FT_LOAD_DEFAULT),
     hasMutableGlyph_(false)
 {
@@ -89,7 +89,7 @@ FontFaceFreeType::~FontFaceFreeType()
     if (face_)
     {
         FT_Done_Face((FT_Face)face_);
-        face_ = 0;
+        face_ = nullptr;
     }
 }
 
@@ -233,7 +233,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         // are 29354 glyphs in msyh.ttf
         FT_ULong tagKern = FT_MAKE_TAG('k', 'e', 'r', 'n');
         FT_ULong kerningTableSize = 0;
-        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, 0, &kerningTableSize);
+        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, nullptr, &kerningTableSize);
         if (error)
         {
             URHO3D_LOGERROR("Could not get kerning table length");
@@ -301,7 +301,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     if (!hasMutableGlyph_)
     {
         FT_Done_Face(face);
-        face_ = 0;
+        face_ = nullptr;
     }
 
     return true;
@@ -328,7 +328,7 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 bool FontFaceFreeType::SetupNextTexture(int textureWidth, int textureHeight)
@@ -487,7 +487,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         fontGlyph.x_ = (short)x;
         fontGlyph.y_ = (short)y;
 
-        unsigned char* dest = 0;
+        unsigned char* dest = nullptr;
         unsigned pitch = 0;
         if (image)
         {

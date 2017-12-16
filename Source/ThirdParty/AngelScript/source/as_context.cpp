@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -154,7 +154,6 @@ AS_API asIScriptContext *asGetActiveContext()
 }
 
 // internal
-// Note: There is no asPopActiveContext(), just call tld->activeContexts.PopLast() instead
 asCThreadLocalData *asPushActiveContext(asIScriptContext *ctx)
 {
 	asCThreadLocalData *tld = asCThreadManager::GetLocalData();
@@ -163,6 +162,14 @@ asCThreadLocalData *asPushActiveContext(asIScriptContext *ctx)
 		return 0;
 	tld->activeContexts.PushLast(ctx);
 	return tld;
+}
+
+// internal
+void asPopActiveContext(asCThreadLocalData *tld, asIScriptContext *ctx)
+{
+	asASSERT(tld && tld->activeContexts[tld->activeContexts.GetLength() - 1] == ctx);
+	if (tld)
+		tld->activeContexts.PopLast();
 }
 
 asCContext::asCContext(asCScriptEngine *engine, bool holdRef)
@@ -1192,7 +1199,11 @@ int asCContext::Execute()
 
 	asCThreadLocalData *tld = asPushActiveContext((asIScriptContext *)this);
 
-	if( m_regs.programPointer == 0 )
+	// Make sure there are not too many nested calls, as it could crash the application 
+	// by filling up the thread call stack
+	if (tld->activeContexts.GetLength() > m_engine->ep.maxNestedCalls)
+		SetInternalException(TXT_TOO_MANY_NESTED_CALLS);
+	else if( m_regs.programPointer == 0 )
 	{
 		if( m_currentFunction->funcType == asFUNC_DELEGATE )
 		{
@@ -1325,9 +1336,7 @@ int asCContext::Execute()
 	}
 
 	// Pop the active context
-	asASSERT(tld && tld->activeContexts[tld->activeContexts.GetLength()-1] == this);
-	if( tld )
-		tld->activeContexts.PopLast();
+	asPopActiveContext(tld, this);
 
 	if( m_status == asEXECUTION_FINISHED )
 	{

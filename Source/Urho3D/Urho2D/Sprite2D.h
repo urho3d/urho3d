@@ -39,14 +39,14 @@ public:
     /// Construct.
     Sprite2D(Context* context);
     /// Destruct.
-    virtual ~Sprite2D();
+    virtual ~Sprite2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    virtual bool EndLoad() override;
 
     /// Set texture.
     void SetTexture(Texture2D* texture);

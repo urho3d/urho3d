@@ -39,7 +39,7 @@ struct ShaderParameter
 {
     /// Construct with defaults.
     ShaderParameter() :
-        bufferPtr_(0)
+        bufferPtr_(nullptr)
     {
     }
 
@@ -81,12 +81,12 @@ public:
     /// Construct.
     ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
-    virtual ~ShaderVariation();
+    virtual ~ShaderVariation() override;
 
     /// Mark the GPU resource destroyed on graphics context destruction.
-    virtual void OnDeviceLost();
+    virtual void OnDeviceLost() override;
     /// Release the shader.
-    virtual void Release();
+    virtual void Release() override;
 
     /// Compile the shader. Return true if successful.
     bool Create();

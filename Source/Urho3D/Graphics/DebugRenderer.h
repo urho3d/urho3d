@@ -100,7 +100,7 @@ public:
     /// Construct.
     DebugRenderer(Context* context);
     /// Destruct.
-    virtual ~DebugRenderer();
+    virtual ~DebugRenderer() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -140,9 +140,11 @@ public:
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     /// Add a triangle mesh.
-    void AddTriangleMesh
-        (const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart,
-            unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData,
+        unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    /// Add a triangle mesh.
+    void AddTriangleMesh(const void* vertexData, unsigned vertexSize, unsigned vertexStart, const void* indexData,
+        unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
     /// Add a circle.
     void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
     /// Add a cross.

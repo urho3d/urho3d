@@ -48,12 +48,12 @@ const char* autoRemoveModeNames[] = {
     "Disabled",
     "Component",
     "Node",
-    0
+    nullptr
 };
 
 Component::Component(Context* context) :
     Animatable(context),
-    node_(0),
+    node_(nullptr),
     id_(0),
     networkUpdate_(false),
     enabled_(true)
@@ -151,7 +151,7 @@ void Component::Remove()
 
 Scene* Component::GetScene() const
 {
-    return node_ ? node_->GetScene() : 0;
+    return node_ ? node_->GetScene() : nullptr;
 }
 
 void Component::AddReplicationState(ComponentReplicationState* state)
@@ -261,7 +261,7 @@ void Component::SetNode(Node* node)
 
 Component* Component::GetComponent(StringHash type) const
 {
-    return node_ ? node_->GetComponent(type) : 0;
+    return node_ ? node_->GetComponent(type) : nullptr;
 }
 
 bool Component::IsEnabledEffective() const
@@ -286,7 +286,7 @@ void Component::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap&
 
 Component* Component::GetFixedUpdateSource()
 {
-    Component* ret = 0;
+    Component* ret = nullptr;
     Scene* scene = GetScene();
 
     if (scene)

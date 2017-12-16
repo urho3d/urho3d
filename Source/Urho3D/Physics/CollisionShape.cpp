@@ -52,8 +52,9 @@
 #include <Bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
 #include <Bullet/BulletCollision/CollisionShapes/btSphereShape.h>
 #include <Bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
-#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <Bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h>
+#include <Bullet/BulletCollision/Gimpact/btGImpactShape.h>
+#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <StanHull/hull.h>
 
 namespace Urho3D
@@ -76,7 +77,8 @@ static const char* typeNames[] =
     "TriangleMesh",
     "ConvexHull",
     "Terrain",
-    0
+    "GImpactMesh",
+    nullptr
 };
 
 extern const char* PHYSICS_CATEGORY;
@@ -212,8 +214,14 @@ TriangleMeshData::TriangleMeshData(CustomGeometry* custom)
     btGenerateInternalEdgeInfo(shape_.Get(), infoMap_.Get());
 }
 
-TriangleMeshData::~TriangleMeshData()
+GImpactMeshData::GImpactMeshData(Model* model, unsigned lodLevel)
 {
+    meshInterface_ = new TriangleMeshInterface(model, lodLevel);
+}
+
+GImpactMeshData::GImpactMeshData(CustomGeometry* custom)
+{
+    meshInterface_ = new TriangleMeshInterface(custom);
 }
 
 ConvexData::ConvexData(Model* model, unsigned lodLevel)
@@ -306,10 +314,6 @@ void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
     }
 }
 
-ConvexData::~ConvexData()
-{
-}
-
 HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
     heightData_(terrain->GetHeightData()),
     spacing_(terrain->GetSpacing()),
@@ -364,10 +368,6 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
     }
 }
 
-HeightfieldData::~HeightfieldData()
-{
-}
-
 bool HasDynamicBuffers(Model* model, unsigned lodLevel)
 {
     unsigned numGeometries = model->GetNumGeometries();
@@ -392,6 +392,65 @@ bool HasDynamicBuffers(Model* model, unsigned lodLevel)
     }
 
     return false;
+}
+
+CollisionGeometryData* CreateCollisionGeometryData(ShapeType shapeType, Model* model, unsigned lodLevel)
+{
+    switch (shapeType)
+    {
+    case SHAPE_TRIANGLEMESH:
+        return new TriangleMeshData(model, lodLevel);
+    case SHAPE_CONVEXHULL:
+        return new ConvexData(model, lodLevel);
+    case SHAPE_GIMPACTMESH:
+        return new GImpactMeshData(model, lodLevel);
+    default:
+        return nullptr;
+    }
+}
+
+CollisionGeometryData* CreateCollisionGeometryData(ShapeType shapeType, CustomGeometry* custom)
+{
+    switch (shapeType)
+    {
+    case SHAPE_TRIANGLEMESH:
+        return new TriangleMeshData(custom);
+    case SHAPE_CONVEXHULL:
+        return new ConvexData(custom);
+    case SHAPE_GIMPACTMESH:
+        return new GImpactMeshData(custom);
+    default:
+        return nullptr;
+    }
+}
+
+btCollisionShape* CreateCollisionGeometryDataShape(ShapeType shapeType, CollisionGeometryData* geometry, const Vector3& scale)
+{
+    switch (shapeType)
+    {
+    case SHAPE_TRIANGLEMESH:
+        {
+            TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry);
+            return new btScaledBvhTriangleMeshShape(triMesh->shape_.Get(), ToBtVector3(scale));
+        }
+    case SHAPE_CONVEXHULL:
+        {
+            ConvexData* convex = static_cast<ConvexData*>(geometry);
+            btConvexHullShape* shape = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
+            shape->setLocalScaling(ToBtVector3(scale));
+            return shape;
+        }
+    case SHAPE_GIMPACTMESH:
+        {
+            GImpactMeshData* gimpactMesh = static_cast<GImpactMeshData*>(geometry);
+            btGImpactMeshShape* shape = new btGImpactMeshShape(gimpactMesh->meshInterface_.Get());
+            shape->setLocalScaling(ToBtVector3(scale));
+            shape->updateBound();
+            return shape;
+        }
+    default:
+        return nullptr;
+    }
 }
 
 CollisionShape::CollisionShape(Context* context) :
@@ -422,23 +481,14 @@ void CollisionShape::RegisterObject(Context* context)
     context->RegisterFactory<CollisionShape>(PHYSICS_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ENUM_ATTRIBUTE("Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Size", Vector3, size_, Vector3::ONE, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE_EX("Shape Type", shapeType_, MarkShapeDirty, typeNames, SHAPE_BOX, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Size", Vector3, size_, MarkShapeDirty, Vector3::ONE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ATTRIBUTE("LOD Level", int, lodLevel_, 0, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Collision Margin", float, margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("CustomGeometry ComponentID", unsigned, customGeometryID_, 0, AM_DEFAULT | AM_COMPONENTID);
-}
-
-void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Serializable::OnSetAttribute(attr, src);
-
-    // Change of any non-accessor attribute requires recreation of the collision shape
-    if (!attr.accessor_)
-        recreateShape_ = true;
+    URHO3D_ATTRIBUTE_EX("LOD Level", int, lodLevel_, MarkShapeDirty, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Collision Margin", float, margin_, MarkShapeDirty, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("CustomGeometry ComponentID", unsigned, customGeometryID_, MarkShapeDirty, 0, AM_DEFAULT | AM_COMPONENTID);
 }
 
 void CollisionShape::ApplyAttributes()
@@ -512,7 +562,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_.Get(), bodyActive ?
                 WHITE : GREEN);
 
-            physicsWorld_->SetDebugRenderer(0);
+            physicsWorld_->SetDebugRenderer(nullptr);
         }
     }
 }
@@ -621,111 +671,37 @@ void CollisionShape::SetCone(float diameter, float height, const Vector3& positi
 void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
-    if (!model)
-    {
-        URHO3D_LOGERROR("Null model, can not set triangle mesh");
-        return;
-    }
-
-    if (model_)
-        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
-
-    shapeType_ = SHAPE_TRIANGLEMESH;
-    model_ = model;
-    lodLevel_ = lodLevel;
-    size_ = scale;
-    position_ = position;
-    rotation_ = rotation;
-    customGeometryID_ = 0;
-
-    UpdateShape();
-    NotifyRigidBody();
-    MarkNetworkUpdate();
+    SetModelShape(SHAPE_TRIANGLEMESH, model, lodLevel, scale, position, rotation);
 }
 
 void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
-    if (!custom)
-    {
-        URHO3D_LOGERROR("Null custom geometry, can not set triangle mesh");
-        return;
-    }
-    if (custom->GetScene() != GetScene())
-    {
-        URHO3D_LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set triangle mesh");
-        return;
-    }
-
-    if (model_)
-        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
-
-    shapeType_ = SHAPE_TRIANGLEMESH;
-    model_.Reset();
-    lodLevel_ = 0;
-    size_ = scale;
-    position_ = position;
-    rotation_ = rotation;
-    customGeometryID_ = custom->GetID();
-
-    UpdateShape();
-    NotifyRigidBody();
-    MarkNetworkUpdate();
+    SetCustomShape(SHAPE_TRIANGLEMESH, custom, scale, position, rotation);
 }
 
 void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
-    if (!model)
-    {
-        URHO3D_LOGERROR("Null model, can not set convex hull");
-        return;
-    }
-
-    if (model_)
-        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
-
-    shapeType_ = SHAPE_CONVEXHULL;
-    model_ = model;
-    lodLevel_ = lodLevel;
-    size_ = scale;
-    position_ = position;
-    rotation_ = rotation;
-    customGeometryID_ = 0;
-
-    UpdateShape();
-    NotifyRigidBody();
-    MarkNetworkUpdate();
+    SetModelShape(SHAPE_CONVEXHULL, model, lodLevel, scale, position, rotation);
 }
 
 void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
-    if (!custom)
-    {
-        URHO3D_LOGERROR("Null custom geometry, can not set convex hull");
-        return;
-    }
-    if (custom->GetScene() != GetScene())
-    {
-        URHO3D_LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set convex hull");
-        return;
-    }
+    SetCustomShape(SHAPE_CONVEXHULL, custom, scale, position, rotation);
+}
 
-    if (model_)
-        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+void CollisionShape::SetGImpactMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
+    const Quaternion& rotation)
+{
+    SetModelShape(SHAPE_GIMPACTMESH, model, lodLevel, scale, position, rotation);
+}
 
-    shapeType_ = SHAPE_CONVEXHULL;
-    model_.Reset();
-    lodLevel_ = 0;
-    size_ = scale;
-    position_ = position;
-    rotation_ = rotation;
-    customGeometryID_ = custom->GetID();
-
-    UpdateShape();
-    NotifyRigidBody();
-    MarkNetworkUpdate();
+void CollisionShape::SetCustomGImpactMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position,
+    const Quaternion& rotation)
+{
+    SetCustomShape(SHAPE_GIMPACTMESH, custom, scale, position, rotation);
 }
 
 void CollisionShape::SetTerrain(unsigned lodLevel)
@@ -1019,7 +995,7 @@ btCompoundShape* CollisionShape::GetParentCompoundShape()
     if (!rigidBody_)
         rigidBody_ = GetComponent<RigidBody>();
 
-    return rigidBody_ ? rigidBody_->GetCompoundShape() : 0;
+    return rigidBody_ ? rigidBody_->GetCompoundShape() : nullptr;
 }
 
 void CollisionShape::UpdateShape()
@@ -1037,19 +1013,18 @@ void CollisionShape::UpdateShape()
 
     if (node_)
     {
-        Scene* scene = GetScene();
-        Vector3 newWorldScale = node_->GetWorldScale();
+        cachedWorldScale_ = node_->GetWorldScale();
 
         switch (shapeType_)
         {
         case SHAPE_BOX:
             shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
-            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            shape_->setLocalScaling(ToBtVector3(cachedWorldScale_));
             break;
 
         case SHAPE_SPHERE:
             shape_ = new btSphereShape(size_.x_ * 0.5f);
-            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            shape_->setLocalScaling(ToBtVector3(cachedWorldScale_));
             break;
 
         case SHAPE_STATICPLANE:
@@ -1058,94 +1033,29 @@ void CollisionShape::UpdateShape()
 
         case SHAPE_CYLINDER:
             shape_ = new btCylinderShape(btVector3(size_.x_ * 0.5f, size_.y_ * 0.5f, size_.x_ * 0.5f));
-            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            shape_->setLocalScaling(ToBtVector3(cachedWorldScale_));
             break;
 
         case SHAPE_CAPSULE:
             shape_ = new btCapsuleShape(size_.x_ * 0.5f, Max(size_.y_ - size_.x_, 0.0f));
-            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            shape_->setLocalScaling(ToBtVector3(cachedWorldScale_));
             break;
 
         case SHAPE_CONE:
             shape_ = new btConeShape(size_.x_ * 0.5f, size_.y_);
-            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            shape_->setLocalScaling(ToBtVector3(cachedWorldScale_));
             break;
 
         case SHAPE_TRIANGLEMESH:
-            size_ = size_.Abs();
-            if (customGeometryID_ && scene)
-            {
-                CustomGeometry* custom = dynamic_cast<CustomGeometry*>(scene->GetComponent(customGeometryID_));
-                if (custom)
-                {
-                    geometry_ = new TriangleMeshData(custom);
-                    TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry_.Get());
-                    shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_.Get(), ToBtVector3(newWorldScale * size_));
-                }
-                else
-                    URHO3D_LOGWARNING("Could not find custom geometry component ID " + String(customGeometryID_) +
-                               " for triangle mesh shape creation");
-            }
-            else if (model_ && model_->GetNumGeometries())
-            {
-                // Check the geometry cache
-                Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
-                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetTriMeshCache();
-                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
-                if (j != cache.End())
-                    geometry_ = j->second_;
-                else
-                {
-                    geometry_ = new TriangleMeshData(model_, lodLevel_);
-                    // Check if model has dynamic buffers, do not cache in that case
-                    if (!HasDynamicBuffers(model_, lodLevel_))
-                        cache[id] = geometry_;
-                }
-
-                TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry_.Get());
-                shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_.Get(), ToBtVector3(newWorldScale * size_));
-                // Watch for live reloads of the collision model to reload the geometry if necessary
-                SubscribeToEvent(model_, E_RELOADFINISHED, URHO3D_HANDLER(CollisionShape, HandleModelReloadFinished));
-            }
+            UpdateCachedGeometryShape(physicsWorld_->GetTriMeshCache());
             break;
 
         case SHAPE_CONVEXHULL:
-            size_ = size_.Abs();
-            if (customGeometryID_ && scene)
-            {
-                CustomGeometry* custom = dynamic_cast<CustomGeometry*>(scene->GetComponent(customGeometryID_));
-                if (custom)
-                {
-                    geometry_ = new ConvexData(custom);
-                    ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
-                    shape_ = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
-                    shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
-                }
-                else
-                    URHO3D_LOGWARNING("Could not find custom geometry component ID " + String(customGeometryID_) +
-                               " for convex shape creation");
-            }
-            else if (model_ && model_->GetNumGeometries())
-            {
-                // Check the geometry cache
-                Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
-                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetConvexCache();
-                HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
-                if (j != cache.End())
-                    geometry_ = j->second_;
-                else
-                {
-                    geometry_ = new ConvexData(model_, lodLevel_);
-                    // Check if model has dynamic buffers, do not cache in that case
-                    if (!HasDynamicBuffers(model_, lodLevel_))
-                        cache[id] = geometry_;
-                }
+            UpdateCachedGeometryShape(physicsWorld_->GetConvexCache());
+            break;
 
-                ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
-                shape_ = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
-                shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
-                SubscribeToEvent(model_, E_RELOADFINISHED, URHO3D_HANDLER(CollisionShape, HandleModelReloadFinished));
-            }
+        case SHAPE_GIMPACTMESH:
+            UpdateCachedGeometryShape(physicsWorld_->GetGImpactTrimeshCache());
             break;
 
         case SHAPE_TERRAIN:
@@ -1161,13 +1071,13 @@ void CollisionShape::UpdateShape()
                         new btHeightfieldTerrainShape(heightfield->size_.x_, heightfield->size_.y_, heightfield->heightData_.Get(),
                             1.0f, heightfield->minHeight_, heightfield->maxHeight_, 1, PHY_FLOAT, false);
                     shape_->setLocalScaling(
-                        ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) * newWorldScale * size_));
+                        ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) * cachedWorldScale_ * size_));
                 }
             }
             break;
 
         default:
-            shape_ = this->UpdateDerivedShape(shapeType_, newWorldScale);
+            shape_ = this->UpdateDerivedShape(shapeType_, cachedWorldScale_);
             break;
         }
 
@@ -1176,8 +1086,6 @@ void CollisionShape::UpdateShape()
             shape_->setUserPointer(this);
             shape_->setMargin(margin_);
         }
-
-        cachedWorldScale_ = newWorldScale;
     }
 
     if (physicsWorld_)
@@ -1187,12 +1095,107 @@ void CollisionShape::UpdateShape()
     retryCreation_ = false;
 }
 
+void CollisionShape::UpdateCachedGeometryShape(CollisionGeometryDataCache& cache)
+{
+    Scene* scene = GetScene();
+    size_ = size_.Abs();
+    if (customGeometryID_ && scene)
+    {
+        CustomGeometry* custom = dynamic_cast<CustomGeometry*>(scene->GetComponent(customGeometryID_));
+        if (custom)
+        {
+            geometry_ = CreateCollisionGeometryData(shapeType_, custom);
+            assert(geometry_);
+            shape_ = CreateCollisionGeometryDataShape(shapeType_, geometry_.Get(), cachedWorldScale_ * size_);
+            assert(shape_);
+        }
+        else
+            URHO3D_LOGWARNING("Could not find custom geometry component ID " + String(customGeometryID_) +
+                " for collision shape creation");
+    }
+    else if (model_ && model_->GetNumGeometries())
+    {
+        // Check the geometry cache
+        Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
+        auto cachedGeometry = cache.Find(id);
+        if (cachedGeometry != cache.End())
+            geometry_ = cachedGeometry->second_;
+        else
+        {
+            geometry_ = CreateCollisionGeometryData(shapeType_, model_, lodLevel_);
+            assert(geometry_);
+            // Check if model has dynamic buffers, do not cache in that case
+            if (!HasDynamicBuffers(model_, lodLevel_))
+                cache[id] = geometry_;
+        }
+
+        shape_ = CreateCollisionGeometryDataShape(shapeType_, geometry_.Get(), cachedWorldScale_ * size_);
+        assert(shape_);
+        // Watch for live reloads of the collision model to reload the geometry if necessary
+        SubscribeToEvent(model_, E_RELOADFINISHED, URHO3D_HANDLER(CollisionShape, HandleModelReloadFinished));
+    }
+}
+
+void CollisionShape::SetModelShape(ShapeType shapeType, Model* model, unsigned lodLevel,
+    const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+{
+    if (!model)
+    {
+        URHO3D_LOGERROR("Null model, can not set collsion shape");
+        return;
+    }
+
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
+    shapeType_ = shapeType;
+    model_ = model;
+    lodLevel_ = lodLevel;
+    size_ = scale;
+    position_ = position;
+    rotation_ = rotation;
+    customGeometryID_ = 0;
+
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
+}
+
+void CollisionShape::SetCustomShape(ShapeType shapeType, CustomGeometry* custom,
+    const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+{
+    if (!custom)
+    {
+        URHO3D_LOGERROR("Null custom geometry, can not set collsion shape");
+        return;
+    }
+    if (custom->GetScene() != GetScene())
+    {
+        URHO3D_LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set collsion shape");
+        return;
+    }
+
+    if (model_)
+        UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+
+    shapeType_ = shapeType;
+    model_.Reset();
+    lodLevel_ = 0;
+    size_ = scale;
+    position_ = position;
+    rotation_ = rotation;
+    customGeometryID_ = custom->GetID();
+
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
+}
+
 btCollisionShape* CollisionShape::UpdateDerivedShape(int shapeType, const Vector3& newWorldScale)
 {
     // To be overridden in derived classes.
-    return 0;
+    return nullptr;
 }
-
 
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
 {

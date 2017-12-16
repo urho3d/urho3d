@@ -60,13 +60,13 @@ enum JSONNumberType
 class JSONValue;
 
 /// JSON array type.
-typedef Vector<JSONValue> JSONArray;
+using JSONArray = Vector<JSONValue>;
 /// JSON object type.
-typedef HashMap<String, JSONValue> JSONObject;
+using JSONObject = HashMap<String, JSONValue>;
 /// JSON object iterator.
-typedef JSONObject::Iterator JSONObjectIterator;
+using JSONObjectIterator = JSONObject::Iterator;
 /// Constant JSON object iterator.
-typedef JSONObject::ConstIterator ConstJSONObjectIterator;
+using ConstJSONObjectIterator = JSONObject::ConstIterator;
 
 /// JSON value class.
 class URHO3D_API JSONValue
@@ -199,7 +199,7 @@ public:
     /// Return string value.
     const String& GetString() const { return IsString() ? *stringValue_ : String::EMPTY;}
     /// Return C string value.
-    const char* GetCString() const { return IsString() ? stringValue_->CString() : 0;}
+    const char* GetCString() const { return IsString() ? stringValue_->CString() : nullptr;}
     /// Return JSON array value.
     const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.
@@ -252,19 +252,19 @@ public:
     void SetType(JSONValueType valueType, JSONNumberType numberType = JSONNT_NAN);
 
     /// Set variant, context must provide for resource ref.
-    void SetVariant(const Variant& variant, Context* context = 0);
+    void SetVariant(const Variant& variant, Context* context = nullptr);
     /// Return a variant.
     Variant GetVariant() const;
     /// Set variant value, context must provide for resource ref.
-    void SetVariantValue(const Variant& variant, Context* context = 0);
+    void SetVariantValue(const Variant& variant, Context* context = nullptr);
     /// Return a variant with type.
     Variant GetVariantValue(VariantType type) const;
     /// Set variant map, context must provide for resource ref.
-    void SetVariantMap(const VariantMap& variantMap, Context* context = 0);
+    void SetVariantMap(const VariantMap& variantMap, Context* context = nullptr);
     /// Return a variant map.
     VariantMap GetVariantMap() const;
     /// Set variant vector, context must provide for resource ref.
-    void SetVariantVector(const VariantVector& variantVector, Context* context = 0);
+    void SetVariantVector(const VariantVector& variantVector, Context* context = nullptr);
     /// Return a variant vector.
     VariantVector GetVariantVector() const;
 

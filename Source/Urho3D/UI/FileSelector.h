@@ -56,7 +56,7 @@ public:
     /// Construct.
     FileSelector(Context* context);
     /// Destruct.
-    virtual ~FileSelector();
+    virtual ~FileSelector() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

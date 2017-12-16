@@ -62,7 +62,7 @@ task :cmake do
     case option
     when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
+    when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2013', 'vs2015', 'vs2017', 'xcode'
       script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
@@ -103,7 +103,7 @@ task :make do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
+    when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2013', 'vs2015', 'vs2017', 'xcode'
       # do nothing
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
@@ -353,7 +353,9 @@ task :ci do
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
   # LuaJIT on Web platform is not possible
   jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
+  system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if ENV['OSX'] && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
   system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
+  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include}" if ENV['OSX'] && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
@@ -381,7 +383,7 @@ task :ci do
   # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform
   unless ENV['CI'] && (ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
-    ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
+    ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
     if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
       abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
       $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
@@ -577,7 +579,7 @@ task :ci_create_mirrors do
   stage = stream[0]['stage'] || 'test'
   # Install Travis CLI Ruby gem to interface with Travis
   system 'gem install travis >/dev/null 2>&1'
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; doc['notifications'] = notifications unless doc['notifications']; doc['matrix']['include'].delete_if { |build| build['condition'] && !ENV[build['condition']] } && doc['matrix']['include'].each_with_index { |build, index| stage = build['stage'] || stage; build['before_script'].flatten! if build['before_script']; doc['matrix']['include'][index].merge! preset[stage] if preset[stage] } if doc['matrix'] && doc['matrix']['include']; doc_name = '.travis.yml'; else doc_name = '.appveyor.yml'; end; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; puts "Creating #{ci_branch} mirror branch..."; alt = system("travis branches --org --no-interactive -r #{ENV['TRAVIS_REPO_SLUG']} |grep ^#{ci_branch}: |grep -cqP 'started|created'") ? '-alt' : nil; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch}:#{ci_branch}#{alt} >/dev/null 2>&1 && git checkout -q - && sleep 5" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; doc['notifications'] = notifications unless doc['notifications']; doc['matrix']['include'].delete_if { |build| build['condition'] && !ENV[build['condition']] } && doc['matrix']['include'].each_with_index { |build, index| stage = build['stage'] || stage; build['env'] = build['env'].join(' ') if build['env'] && build['env'].kind_of?(Array); build['before_script'].flatten! if build['before_script']; doc['matrix']['include'][index].merge! preset[stage] if preset[stage] } if doc['matrix'] && doc['matrix']['include']; doc_name = '.travis.yml'; else doc_name = '.appveyor.yml'; end; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; puts "Creating #{ci_branch} mirror branch..."; alt = system("travis branches --org --no-interactive -r #{ENV['TRAVIS_REPO_SLUG']} |grep ^#{ci_branch}: |grep -cqP 'started|created'") ? '-alt' : nil; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch}:#{ci_branch}#{alt} >/dev/null 2>&1 && git checkout -q - && sleep 5" or abort "Failed to create #{ci_branch} mirror branch" }
   # Push pending commits if any
   system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if head_moved
 end
@@ -635,7 +637,6 @@ task :ci_package_upload do
      end
     system "#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package" or abort 'Failed to make binary package'
   end
-  next if timeup
   # Determine the upload location
   puts "Uploading artifacts...\n\n"; $stdout.flush
   setup_digital_keys

@@ -168,7 +168,7 @@ public:
     /// Construct an IK root component.
     IKSolver(Context* context);
     /// Default destructor.
-    virtual ~IKSolver();
+    virtual ~IKSolver() override;
     /// Registers this class to the context.
     static void RegisterObject(Context* context);
 
@@ -306,7 +306,7 @@ public:
     void ApplyOriginalPoseToActivePose();
 
     void DrawDebugGeometry(bool depthTest);
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
 private:
     friend class IKEffector;
@@ -319,9 +319,9 @@ private:
     bool IsSolverTreeValid() const;
 
     /// Subscribe to drawable update finished event here
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Destroys and creates the tree
-    virtual void OnNodeSet(Node* scene);
+    virtual void OnNodeSet(Node* scene) override;
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
     ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);

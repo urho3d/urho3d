@@ -38,7 +38,7 @@ GPUObject::GPUObject(Graphics* graphics) :
 #ifdef URHO3D_OPENGL
     object_.name_ = 0;
 #else
-    object_.ptr_ = 0;
+    object_.ptr_ = nullptr;
 #endif
 
     if (graphics_)

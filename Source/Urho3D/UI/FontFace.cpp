@@ -67,7 +67,7 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
         return &glyph;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 float FontFace::GetKerning(unsigned c, unsigned d) const

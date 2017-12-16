@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Container/RefCounted.h"
+#include "../Container/Swap.h"
 
 #include <cassert>
 #include <cstddef>
@@ -80,9 +81,8 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
 
-        ReleaseRef();
-        ptr_ = rhs.ptr_;
-        AddRef();
+        SharedPtr<T> copy(rhs);
+        Swap(copy);
 
         return *this;
     }
@@ -93,9 +93,8 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
 
-        ReleaseRef();
-        ptr_ = rhs.ptr_;
-        AddRef();
+        SharedPtr<T> copy(rhs);
+        Swap(copy);
 
         return *this;
     }
@@ -106,9 +105,8 @@ public:
         if (ptr_ == ptr)
             return *this;
 
-        ReleaseRef();
-        ptr_ = ptr;
-        AddRef();
+        SharedPtr<T> copy(ptr);
+        Swap(copy);
 
         return *this;
     }
@@ -146,6 +144,9 @@ public:
     /// Convert to a raw pointer.
     operator T*() const { return ptr_; }
 
+    /// Swap with another SharedPtr.
+    void Swap(SharedPtr& rhs) { Urho3D::Swap(ptr_, rhs.ptr_); }
+
     /// Reset to null and release the object reference.
     void Reset() { ReleaseRef(); }
 
@@ -166,17 +167,15 @@ public:
     /// Perform a static cast from a shared pointer of another type.
     template <class U> void StaticCast(const SharedPtr<U>& rhs)
     {
-        ReleaseRef();
-        ptr_ = static_cast<T*>(rhs.Get());
-        AddRef();
+        SharedPtr<T> copy(static_cast<T*>(rhs.Get()));
+        Swap(copy);
     }
 
     /// Perform a dynamic cast from a shared pointer of another type.
     template <class U> void DynamicCast(const SharedPtr<U>& rhs)
     {
-        ReleaseRef();
-        ptr_ = dynamic_cast<T*>(rhs.Get());
-        AddRef();
+        SharedPtr<T> copy(dynamic_cast<T*>(rhs.Get()));
+        Swap(copy);
     }
 
     /// Check if the pointer is null.
@@ -247,14 +246,14 @@ public:
     /// Construct a null weak pointer.
     WeakPtr() :
         ptr_(0),
-        refCount_(0)
+        refCount_(nullptr)
     {
     }
 
     /// Construct a null weak pointer.
     WeakPtr(std::nullptr_t) :
         ptr_(0),
-        refCount_(0)
+        refCount_(nullptr)
     {
     }
 
@@ -517,7 +516,7 @@ template <class T, class U> WeakPtr<T> DynamicCast(const WeakPtr<U>& ptr)
 template<class T> inline void CheckedDelete(T* x)
 {
     // intentionally complex - simplification causes regressions
-    typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
+    using type_must_be_complete = char[sizeof(T) ? 1 : -1];
     (void) sizeof(type_must_be_complete);
     delete x;
 }
@@ -586,7 +585,7 @@ public:
     operator bool() const { return !!ptr_; }
 
     /// Swap with another UniquePtr.
-    void Swap(UniquePtr& up) { Swap(ptr_, up.ptr_); }
+    void Swap(UniquePtr& up) { Urho3D::Swap(ptr_, up.ptr_); }
 
     /// Detach pointer from UniquePtr without destroying.
     T* Detach()

@@ -89,12 +89,12 @@ public:
     /// Construct.
     AnimationController(Context* context);
     /// Destruct.
-    virtual ~AnimationController();
+    virtual ~AnimationController() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
 
     /// Update the animations. Is called from HandleScenePostUpdate().
     virtual void Update(float timeStep);
@@ -190,7 +190,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
 
 private:
     /// Add an animation state either to AnimatedModel or as a node animation.

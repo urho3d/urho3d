@@ -42,7 +42,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKEffector::IKEffector(Context* context) :
     Component(context),
-    ikEffectorNode_(NULL),
+    ikEffectorNode_(nullptr),
     chainLength_(0),
     weight_(1.0f),
     rotationWeight_(1.0),
@@ -92,7 +92,7 @@ void IKEffector::SetTargetNode(Node* targetNode)
 
     // Finally change the target node
     targetNode_ = targetNode;
-    targetName_ = targetNode != NULL ? targetNode->GetName() : "";
+    targetName_ = targetNode != nullptr ? targetNode->GetName() : "";
 }
 
 // ----------------------------------------------------------------------------
@@ -105,7 +105,7 @@ const String& IKEffector::GetTargetName() const
 void IKEffector::SetTargetName(const String& nodeName)
 {
     targetName_ = nodeName;
-    targetNode_ = NULL;
+    targetNode_ = nullptr;
 }
 
 // ----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ const Vector3& IKEffector::GetTargetPosition() const
 void IKEffector::SetTargetPosition(const Vector3& targetPosition)
 {
     targetPosition_ = targetPosition;
-    if (ikEffectorNode_ != NULL)
+    if (ikEffectorNode_ != nullptr)
         ikEffectorNode_->effector->target_position = Vec3Urho2IK(targetPosition);
 }
 
@@ -158,7 +158,7 @@ unsigned int IKEffector::GetChainLength() const
 void IKEffector::SetChainLength(unsigned chainLength)
 {
     chainLength_ = chainLength;
-    if (ikEffectorNode_ != NULL)
+    if (ikEffectorNode_ != nullptr)
     {
         ikEffectorNode_->effector->chain_length = chainLength;
         solver_->MarkChainsNeedUpdating();
@@ -175,7 +175,7 @@ float IKEffector::GetWeight() const
 void IKEffector::SetWeight(float weight)
 {
     weight_ = Clamp(weight, 0.0f, 1.0f);
-    if (ikEffectorNode_ != NULL)
+    if (ikEffectorNode_ != nullptr)
         ikEffectorNode_->effector->weight = weight_;
 }
 
@@ -189,7 +189,7 @@ float IKEffector::GetRotationWeight() const
 void IKEffector::SetRotationWeight(float weight)
 {
     rotationWeight_ = Clamp(weight, 0.0f, 1.0f);
-    if (ikEffectorNode_ != NULL)
+    if (ikEffectorNode_ != nullptr)
     {
         ikEffectorNode_->rotation_weight = rotationWeight_;
         ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
@@ -206,7 +206,7 @@ float IKEffector::GetRotationDecay() const
 void IKEffector::SetRotationDecay(float decay)
 {
     rotationDecay_ = Clamp(decay, 0.0f, 1.0f);
-    if (ikEffectorNode_ != NULL)
+    if (ikEffectorNode_ != nullptr)
     {
         ikEffectorNode_->effector->rotation_decay = rotationDecay_;
         ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
@@ -220,7 +220,7 @@ void IKEffector::SetFeature(Feature feature, bool enable)
     {
         case WEIGHT_NLERP:
         {
-            if (ikEffectorNode_ != NULL)
+            if (ikEffectorNode_ != nullptr)
             {
                 ikEffectorNode_->effector->flags &= ~EFFECTOR_WEIGHT_NLERP;
                 if (enable)
@@ -246,12 +246,12 @@ bool IKEffector::GetFeature(Feature feature) const
 // ----------------------------------------------------------------------------
 void IKEffector::UpdateTargetNodePosition()
 {
-    if (targetNode_ != NULL || targetName_.Empty())
+    if (targetNode_ != nullptr || targetName_.Empty())
         return;
 
     // Try to find a node with the same name as our target name
     SetTargetNode(node_->GetScene()->GetChild(targetName_, true));
-    if (targetNode_ == NULL)
+    if (targetNode_ == nullptr)
         return;
 
     SetTargetPosition(targetNode_->GetWorldPosition());
@@ -270,7 +270,7 @@ void IKEffector::DrawDebugGeometry(bool depthTest)
 void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     Node* terminationNode;
-    if (solver_ == NULL)
+    if (solver_ == nullptr)
         terminationNode = GetScene();
     else
         terminationNode = solver_->GetNode();

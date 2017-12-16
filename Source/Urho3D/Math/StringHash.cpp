@@ -44,10 +44,8 @@ StringHash::StringHash(const String& str) :
 {
 }
 
-unsigned StringHash::Calculate(const char* str)
+unsigned StringHash::Calculate(const char* str, unsigned hash)
 {
-    unsigned hash = 0;
-
     if (!str)
         return hash;
 

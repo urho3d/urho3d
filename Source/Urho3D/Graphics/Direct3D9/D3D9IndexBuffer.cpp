@@ -59,7 +59,7 @@ void IndexBuffer::Release()
     Unlock();
 
     if (graphics_ && graphics_->GetIndexBuffer() == this)
-        graphics_->SetIndexBuffer(0);
+        graphics_->SetIndexBuffer(nullptr);
 
     URHO3D_SAFE_RELEASE(object_.ptr_);
 }
@@ -160,23 +160,23 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Index buffer already locked");
-        return 0;
+        return nullptr;
     }
 
     if (!indexSize_)
     {
         URHO3D_LOGERROR("Index size not defined, can not lock index buffer");
-        return 0;
+        return nullptr;
     }
 
     if (start + count > indexCount_)
     {
         URHO3D_LOGERROR("Illegal range for locking index buffer");
-        return 0;
+        return nullptr;
     }
 
     if (!count)
-        return 0;
+        return nullptr;
 
     lockStart_ = start;
     lockCount_ = count;
@@ -196,7 +196,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return lockScratchData_;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 void IndexBuffer::Unlock()
@@ -216,7 +216,7 @@ void IndexBuffer::Unlock()
         SetDataRange(lockScratchData_, lockStart_, lockCount_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
-        lockScratchData_ = 0;
+        lockScratchData_ = nullptr;
         lockState_ = LOCK_NONE;
         break;
 
@@ -249,7 +249,7 @@ bool IndexBuffer::Create()
             indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
             (D3DPOOL)pool,
             (IDirect3DIndexBuffer9**)&object_,
-            0);
+            nullptr);
         if (FAILED(hr))
         {
             URHO3D_SAFE_RELEASE(object_.ptr_)
@@ -271,7 +271,7 @@ bool IndexBuffer::UpdateToGPU()
 
 void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
-    void* hwData = 0;
+    void* hwData = nullptr;
 
     if (object_.ptr_)
     {

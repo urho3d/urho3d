@@ -153,7 +153,7 @@ TmxFile2D* TileMap2D::GetTmxFile() const
 TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
 {
     if (index >= layers_.Size())
-        return 0;
+        return nullptr;
 
     return layers_[index];
 }

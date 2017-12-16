@@ -51,12 +51,12 @@ public:
     /// Construct.
     Font(Context* context);
     /// Destruct.
-    virtual ~Font();
+    virtual ~Font() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false, const String& indentation = "\t");
     /// Set absolute (in pixels) position adjustment for glyphs.

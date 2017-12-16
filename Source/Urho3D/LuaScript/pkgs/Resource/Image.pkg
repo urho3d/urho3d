@@ -53,9 +53,11 @@ class Image : public Resource
     CompressedFormat GetCompressedFormat() const;
     unsigned GetNumCompressedLevels() const;
     Image* GetSubimage(const IntRect& rect) const;
+    bool SetSubimage(const Image* image, const IntRect rect);
     bool IsCubemap() const;
     bool IsArray() const;
     bool IsSRGB() const;
+    bool HasAlphaChannel() const;
 
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;

@@ -50,7 +50,7 @@ public:
     /// Construct.
     DebugHud(Context* context);
     /// Destruct.
-    ~DebugHud();
+    virtual ~DebugHud() override;
 
     /// Update. Called by HandlePostUpdate().
     void Update();

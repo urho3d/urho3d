@@ -47,14 +47,14 @@ static const char* commandTypeNames[] =
     "lightvolumes",
     "renderui",
     "sendevent",
-    0
+    nullptr
 };
 
 static const char* sortModeNames[] =
 {
     "fronttoback",
     "backtofront",
-    0
+    nullptr
 };
 
 extern const char* blendModeNames[];
@@ -377,6 +377,40 @@ void RenderPath::SetEnabled(const String& tag, bool active)
         if (!commands_[i].tag_.Compare(tag, false))
             commands_[i].enabled_ = active;
     }
+}
+
+bool RenderPath::IsEnabled(const String& tag) const
+{
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false) && renderTargets_[i].enabled_)
+            return true;
+    }
+
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false) && commands_[i].enabled_)
+            return true;
+    }
+
+    return false;
+}
+
+bool RenderPath::IsAdded(const String& tag) const
+{
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false))
+            return true;
+    }
+
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false))
+            return true;
+    }
+
+    return false;
 }
 
 void RenderPath::ToggleEnabled(const String& tag)

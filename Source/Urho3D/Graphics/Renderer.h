@@ -43,6 +43,7 @@ class Graphics;
 class RenderPath;
 class RenderSurface;
 class ResourceCache;
+class Scene;
 class Skeleton;
 class OcclusionBuffer;
 class Technique;
@@ -174,12 +175,12 @@ class URHO3D_API Renderer : public Object
     URHO3D_OBJECT(Renderer, Object);
 
 public:
-    typedef void(Object::*ShadowMapFilter)(View* view, Texture2D* shadowMap, float blurScale);
+    using ShadowMapFilter = void(Object::*)(View* view, Texture2D* shadowMap, float blurScale);
 
     /// Construct.
     Renderer(Context* context);
     /// Destruct.
-    virtual ~Renderer();
+    virtual ~Renderer() override;
 
     /// Set number of backbuffer viewports to render.
     void SetNumViewports(unsigned num);
@@ -254,6 +255,8 @@ public:
 
     /// Return backbuffer viewport by index.
     Viewport* GetViewport(unsigned index) const;
+    /// Return nth backbuffer viewport associated to a scene. Index 0 returns the first.
+    Viewport* GetViewportForScene(Scene* scene, unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
     /// Return default non-textured material technique.
@@ -371,7 +374,7 @@ public:
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
 
     /// Return the instancing vertex buffer
-    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
+    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_.Get() : nullptr; }
 
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() const { return frame_; }

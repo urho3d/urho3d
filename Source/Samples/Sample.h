@@ -59,11 +59,11 @@ public:
     Sample(Context* context);
 
     /// Setup before engine initialization. Modifies the engine parameters.
-    virtual void Setup();
+    virtual void Setup() override;
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
-    virtual void Start();
+    virtual void Start() override;
     /// Cleanup after the main loop. Called by Application.
-    virtual void Stop();
+    virtual void Stop() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.

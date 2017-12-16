@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -313,6 +313,7 @@ const char * const SET_TOKEN       = "set";
 const char * const ABSTRACT_TOKEN  = "abstract";
 const char * const FUNCTION_TOKEN  = "function";
 const char * const IF_HANDLE_TOKEN = "if_handle_then_const";
+const char * const EXTERNAL_TOKEN  = "external";
 
 END_AS_NAMESPACE
 

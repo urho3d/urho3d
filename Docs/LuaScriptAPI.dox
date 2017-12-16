@@ -209,6 +209,7 @@ namespace Urho3D
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
 <a href="#Class_TouchState"><b>TouchState</b></a>
 <a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -771,12 +772,15 @@ Methods:
 - void delete()
 - void SetPressedOffset(const IntVector2& offset)
 - void SetPressedOffset(int x, int y)
+- void SetDisabledOffset(const IntVector2& offset)
+- void SetDisabledOffset(int x, int y)
 - void SetPressedChildOffset(const IntVector2& offset)
 - void SetPressedChildOffset(int x, int y)
 - void SetRepeat(float delay, float rate)
 - void SetRepeatDelay(float delay)
 - void SetRepeatRate(float rate)
 - const IntVector2& GetPressedOffset() const
+- const IntVector2& GetDisabledOffset() const
 - const IntVector2& GetPressedChildOffset() const
 - float GetRepeatDelay() const
 - float GetRepeatRate() const
@@ -785,6 +789,7 @@ Methods:
 Properties:
 
 - IntVector2& pressedOffset
+- IntVector2& disabledOffset
 - IntVector2& pressedChildOffset
 - float repeatDelay
 - float repeatRate
@@ -1128,6 +1133,7 @@ Methods:
 - unsigned ToUInt() const
 - Vector3 ToHSL() const
 - Vector3 ToHSV() const
+- void FromUInt(unsigned color)
 - void FromHSL(float h, float s, float l, float a)
 - void FromHSV(float h, float s, float v, float a)
 - Vector3 ToVector3() const
@@ -1962,6 +1968,7 @@ Methods:
 - void AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle, bool drawLines, const Color& color, bool depthTest = true)
 - void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true)
 - void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true)
+- void AddTriangleMesh(const void* vertexData, unsigned vertexSize, unsigned vertexStart, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true)
 - void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true)
 - void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true)
 - void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true)
@@ -2444,6 +2451,7 @@ Methods:
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
 - String GetAppPreferencesDir(const String org, const String app) const
+- String GetTemporaryDir() const
 
 <a name="Class_FocusParameters"></a>
 ### FocusParameters
@@ -2573,6 +2581,7 @@ Methods:
 - bool ToggleFullscreen()
 - void Maximize()
 - void Minimize()
+- void Raise()
 - void Close()
 - bool TakeScreenShot(Image& destImage)
 - void BeginDumpShaders(const String fileName)
@@ -2616,6 +2625,10 @@ Methods:
 - IntVector2 GetDesktopResolution(int monitor) const
 - int GetMonitorCount() const
 - const String GetShaderCacheDir() const
+- int GetCurrentMonitor() const
+- bool GetMaximized() const
+- void Raise() const
+- Vector3 GetDisplayDPI(int monitor = 0) const
 - unsigned GetAlphaFormat()
 - unsigned GetLuminanceFormat()
 - unsigned GetLuminanceAlphaFormat()
@@ -2853,9 +2866,11 @@ Methods:
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
 - Image* GetSubimage(const IntRect& rect) const
+- bool SetSubimage(const Image* image, const IntRect rect)
 - bool IsCubemap() const
 - bool IsArray() const
 - bool IsSRGB() const
+- bool HasAlphaChannel() const
 
 Properties:
 
@@ -3031,7 +3046,9 @@ Methods:
 - IntVector2 operator-() const
 - IntVector2 operator-(const IntVector2& rhs) const
 - IntVector2 operator*(int rhs) const
+- IntVector2 operator*(const IntVector2& rhs) const
 - IntVector2 operator/(int rhs) const
+- IntVector2 operator/(const IntVector2& rhs) const
 - String ToString() const
 - unsigned ToHash() const
 - float Length() const
@@ -3041,6 +3058,11 @@ Properties:
 - int x
 - int y
 - const IntVector2 ZERO
+- const IntVector2 LEFT
+- const IntVector2 RIGHT
+- const IntVector2 UP
+- const IntVector2 DOWN
+- const IntVector2 ONE
 
 <a name="Class_IntVector3"></a>
 ### IntVector3
@@ -3060,7 +3082,9 @@ Methods:
 - IntVector3 operator-() const
 - IntVector3 operator-(const IntVector3& rhs) const
 - IntVector3 operator*(int rhs) const
+- IntVector3 operator*(const IntVector3& rhs) const
 - IntVector3 operator/(int rhs) const
+- IntVector3 operator/(const IntVector3& rhs) const
 - String ToString() const
 - unsigned ToHash() const
 - float Length() const
@@ -3329,6 +3353,9 @@ Methods:
 - ListView() (GC)
 - ListView* new()
 - void delete()
+- void UpdateInternalLayout()
+- void DisableInternalLayoutUpdate()
+- void EnableInternalLayoutUpdate()
 - void AddItem(UIElement* item)
 - void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0)
 - void RemoveItem(UIElement* item, unsigned index = 0)
@@ -4272,6 +4299,8 @@ Methods:
 - StringHash GetType() const
 - const String GetTypeName() const
 - const String GetCategory() const
+- void SetBlockEvents(bool block)
+- bool GetBlockEvents() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
 - bool HasSubscribedToEvent(const String eventName) const
 - bool HasSubscribedToEvent(Object* sender, const String eventName) const
@@ -5145,6 +5174,8 @@ Methods:
 - bool Load(XMLFile* file)
 - bool Append(XMLFile* file)
 - void SetEnabled(const String tag, bool active)
+- bool IsEnabled(const String tag) const
+- bool IsAdded(const String tag) const
 - void ToggleEnabled(const String tag)
 - void SetRenderTarget(unsigned index, const RenderTargetInfo& info)
 - void AddRenderTarget(const RenderTargetInfo& info)
@@ -5312,6 +5343,7 @@ Methods:
 - void ReloadShaders()
 - unsigned GetNumViewports() const
 - Viewport* GetViewport(unsigned index) const
+- Viewport* GetViewportForScene(Scene* scene, unsigned index) const
 - RenderPath* GetDefaultRenderPath() const
 - Technique* GetDefaultTechnique() const
 - bool GetHDRRendering() const
@@ -5882,6 +5914,8 @@ Properties:
 - ScrollBar* verticalScrollBar (readonly)
 - BorderImage* scrollPanel (readonly)
 - bool scrollBarsAutoVisible
+- bool horizontalScrollBarVisible
+- bool verticalScrollBarVisible
 - float scrollStep
 - float pageStep
 - float scrollDeceleration
@@ -6400,7 +6434,7 @@ Methods:
 - unsigned Value() const
 - String ToString() const
 - unsigned ToHash() const
-- unsigned Calculate(const char* str)
+- unsigned Calculate(const char* str, unsigned hash = 0)
 
 Properties:
 
@@ -6972,6 +7006,7 @@ Methods:
 - float GetTimeStep() const
 - unsigned GetTimerPeriod() const
 - float GetElapsedTime()
+- float GetFramesPerSecond() const
 - unsigned GetSystemTime()
 - unsigned GetTimeSinceEpoch()
 - String GetTimeStamp()
@@ -7105,6 +7140,23 @@ Properties:
 - bool modalElement (readonly)
 - float scale
 - IntVector2& customSize
+
+<a name="Class_UIComponent"></a>
+### UIComponent : Component
+
+Methods:
+
+- UIComponent() (GC)
+- UIComponent* new()
+- UIElement* GetRoot() const
+- Material* GetMaterial() const
+- Texture2D* GetTexture() const
+
+Properties:
+
+- UIElement* root (readonly)
+- Material* material (readonly)
+- Texture2D* texture (readonly)
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable
@@ -7260,6 +7312,7 @@ Methods:
 - unsigned GetDragButtonCount() const
 - UIElement* GetChild(const String name, bool recursive = false) const
 - UIElement* GetChild(unsigned index) const
+- bool IsChildOf(UIElement* element) const
 - UIElement* GetParent() const
 - UIElement* GetRoot() const
 - const Color& GetDerivedColor() const
@@ -7467,7 +7520,6 @@ Methods:
 - Vector2 operator*(float rhs) const
 - Vector2 operator*(const Vector2& rhs) const
 - Vector2 operator/(float rhs) const
-- Vector2 operator/(const Vector2& rhs) const
 - Vector2 operator/(const Vector2& rhs) const
 - void Normalize()
 - float Length() const
@@ -7872,12 +7924,14 @@ Properties:
 
 Methods:
 
+- bool AppendChild(XMLElement element, bool asCopy)
 - XMLElement CreateChild(const String name)
 - XMLElement GetOrCreateChild(const String name)
 - bool RemoveChild(const XMLElement& element)
 - bool RemoveChild(const String name)
 - bool RemoveChildren(const String name = String::EMPTY)
 - bool RemoveAttribute(const String name = String::EMPTY)
+- bool Remove()
 - bool SetValue(const String value)
 - bool SetAttribute(const String name, const String value)
 - bool SetAttribute(const String value)
@@ -8924,19 +8978,60 @@ Properties:
 - int KEY_8
 - int KEY_9
 - int KEY_A
+- int KEY_AC_BACK
+- int KEY_AC_BOOKMARKS
+- int KEY_AC_FORWARD
+- int KEY_AC_HOME
+- int KEY_AC_REFRESH
+- int KEY_AC_SEARCH
+- int KEY_AC_STOP
+- int KEY_AGAIN
 - int KEY_ALT
+- int KEY_ALTERASE
+- int KEY_AMPERSAND
 - int KEY_APPLICATION
+- int KEY_ASTERISK
+- int KEY_AT
+- int KEY_AUDIOMUTE
+- int KEY_AUDIONEXT
+- int KEY_AUDIOPLAY
+- int KEY_AUDIOPREV
+- int KEY_AUDIOSTOP
 - int KEY_B
+- int KEY_BACKQUOTE
+- int KEY_BACKSLASH
 - int KEY_BACKSPACE
+- int KEY_BRIGHTNESSDOWN
+- int KEY_BRIGHTNESSUP
 - int KEY_C
+- int KEY_CALCULATOR
+- int KEY_CANCEL
 - int KEY_CAPSLOCK
+- int KEY_CARET
+- int KEY_CLEAR
+- int KEY_CLEARAGAIN
+- int KEY_COLON
+- int KEY_COMMA
+- int KEY_COMPUTER
+- int KEY_COPY
+- int KEY_CRSEL
 - int KEY_CTRL
+- int KEY_CURRENCYSUBUNIT
+- int KEY_CURRENCYUNIT
+- int KEY_CUT
 - int KEY_D
+- int KEY_DECIMALSEPARATOR
 - int KEY_DELETE
+- int KEY_DISPLAYSWITCH
+- int KEY_DOLLAR
 - int KEY_DOWN
 - int KEY_E
+- int KEY_EJECT
 - int KEY_END
+- int KEY_EQUALS
 - int KEY_ESCAPE
+- int KEY_EXCLAIM
+- int KEY_EXSEL
 - int KEY_F
 - int KEY_F1
 - int KEY_F10
@@ -8962,15 +9057,24 @@ Properties:
 - int KEY_F7
 - int KEY_F8
 - int KEY_F9
+- int KEY_FIND
 - int KEY_G
+- int KEY_GREATER
 - int KEY_GUI
 - int KEY_H
+- int KEY_HASH
+- int KEY_HELP
 - int KEY_HOME
 - int KEY_I
 - int KEY_INSERT
 - int KEY_J
 - int KEY_K
+- int KEY_KBDILLUMDOWN
+- int KEY_KBDILLUMTOGGLE
+- int KEY_KBDILLUMUP
 - int KEY_KP_0
+- int KEY_KP_00
+- int KEY_KP_000
 - int KEY_KP_1
 - int KEY_KP_2
 - int KEY_KP_3
@@ -8980,28 +9084,91 @@ Properties:
 - int KEY_KP_7
 - int KEY_KP_8
 - int KEY_KP_9
+- int KEY_KP_A
+- int KEY_KP_AMPERSAND
+- int KEY_KP_AT
+- int KEY_KP_B
+- int KEY_KP_BACKSPACE
+- int KEY_KP_BINARY
+- int KEY_KP_C
+- int KEY_KP_CLEAR
+- int KEY_KP_CLEARENTRY
+- int KEY_KP_COLON
+- int KEY_KP_COMMA
+- int KEY_KP_D
+- int KEY_KP_DBLAMPERSAND
+- int KEY_KP_DBLVERTICALBAR
+- int KEY_KP_DECIMAL
 - int KEY_KP_DIVIDE
+- int KEY_KP_E
 - int KEY_KP_ENTER
+- int KEY_KP_EQUALS
+- int KEY_KP_EQUALSAS400
+- int KEY_KP_EXCLAM
+- int KEY_KP_F
+- int KEY_KP_GREATER
+- int KEY_KP_HASH
+- int KEY_KP_HEXADECIMAL
+- int KEY_KP_LEFTBRACE
+- int KEY_KP_LEFTPAREN
+- int KEY_KP_LESS
+- int KEY_KP_MEMADD
+- int KEY_KP_MEMCLEAR
+- int KEY_KP_MEMDIVIDE
+- int KEY_KP_MEMMULTIPLY
+- int KEY_KP_MEMRECALL
+- int KEY_KP_MEMSTORE
+- int KEY_KP_MEMSUBTRACT
 - int KEY_KP_MINUS
 - int KEY_KP_MULTIPLY
+- int KEY_KP_OCTAL
+- int KEY_KP_PERCENT
 - int KEY_KP_PERIOD
 - int KEY_KP_PLUS
+- int KEY_KP_PLUSMINUS
+- int KEY_KP_POWER
+- int KEY_KP_RIGHTBRACE
+- int KEY_KP_RIGHTPAREN
+- int KEY_KP_SPACE
+- int KEY_KP_TAB
+- int KEY_KP_VERTICALBAR
+- int KEY_KP_XOR
 - int KEY_L
 - int KEY_LALT
 - int KEY_LCTRL
 - int KEY_LEFT
+- int KEY_LEFTBRACKET
+- int KEY_LEFTPAREN
+- int KEY_LESS
 - int KEY_LGUI
 - int KEY_LSHIFT
 - int KEY_M
+- int KEY_MAIL
+- int KEY_MEDIASELECT
+- int KEY_MENU
+- int KEY_MINUS
+- int KEY_MODE
+- int KEY_MUTE
 - int KEY_N
 - int KEY_NUMLOCKCLEAR
 - int KEY_O
+- int KEY_OPER
+- int KEY_OUT
 - int KEY_P
 - int KEY_PAGEDOWN
 - int KEY_PAGEUP
+- int KEY_PASTE
 - int KEY_PAUSE
+- int KEY_PERCENT
+- int KEY_PERIOD
+- int KEY_PLUS
+- int KEY_POWER
 - int KEY_PRINTSCREEN
+- int KEY_PRIOR
 - int KEY_Q
+- int KEY_QUESTION
+- int KEY_QUOTE
+- int KEY_QUOTEDBL
 - int KEY_R
 - int KEY_RALT
 - int KEY_RCTRL
@@ -9009,19 +9176,33 @@ Properties:
 - int KEY_RETURN2
 - int KEY_RGUI
 - int KEY_RIGHT
+- int KEY_RIGHTBRACKET
+- int KEY_RIGHTPAREN
 - int KEY_RSHIFT
 - int KEY_S
 - int KEY_SCROLLLOCK
 - int KEY_SELECT
+- int KEY_SEMICOLON
+- int KEY_SEPARATOR
 - int KEY_SHIFT
+- int KEY_SLASH
+- int KEY_SLEEP
 - int KEY_SPACE
+- int KEY_STOP
+- int KEY_SYSREQ
 - int KEY_T
 - int KEY_TAB
+- int KEY_THOUSANDSSEPARATOR
 - int KEY_U
+- int KEY_UNDERSCORE
+- int KEY_UNDO
 - int KEY_UNKNOWN
 - int KEY_UP
 - int KEY_V
+- int KEY_VOLUMEDOWN
+- int KEY_VOLUMEUP
 - int KEY_W
+- int KEY_WWW
 - int KEY_X
 - int KEY_Y
 - int KEY_Z
@@ -9031,6 +9212,7 @@ Properties:
 - int LOG_ERROR
 - int LOG_INFO
 - int LOG_NONE
+- int LOG_TRACE
 - int LOG_WARNING
 - unsigned MASK_BLENDINDICES
 - unsigned MASK_BLENDWEIGHTS

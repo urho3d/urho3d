@@ -37,7 +37,7 @@ public:
     /// Construct.
     AbstractFile(unsigned int size) : Deserializer(size) { }
     /// Destruct.
-    virtual ~AbstractFile() { }
+    virtual ~AbstractFile() override { }
 };
 
 };

@@ -278,7 +278,7 @@ void Decals::PaintDecal()
 
 bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 {
-    hitDrawable = 0;
+    hitDrawable = nullptr;
 
     UI* ui = GetSubsystem<UI>();
     IntVector2 pos = ui->GetCursorPosition();

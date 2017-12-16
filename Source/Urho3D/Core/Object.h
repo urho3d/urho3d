@@ -66,11 +66,11 @@ private:
 
 #define URHO3D_OBJECT(typeName, baseTypeName) \
     public: \
-        typedef typeName ClassName; \
-        typedef baseTypeName BaseClassName; \
-        virtual Urho3D::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
-        virtual const Urho3D::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
+        using ClassName = typeName; \
+        using BaseClassName = baseTypeName; \
+        virtual Urho3D::StringHash GetType() const override { return GetTypeInfoStatic()->GetType(); } \
+        virtual const Urho3D::String& GetTypeName() const override { return GetTypeInfoStatic()->GetTypeName(); } \
+        virtual const Urho3D::TypeInfo* GetTypeInfo() const override { return GetTypeInfoStatic(); } \
         static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
         static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
         static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
@@ -84,7 +84,7 @@ public:
     /// Construct.
     Object(Context* context);
     /// Destruct. Clean up self from event sender & receiver structures.
-    virtual ~Object();
+    virtual ~Object() override;
 
     /// Return type hash.
     virtual StringHash GetType() const = 0;
@@ -96,22 +96,26 @@ public:
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
 
     /// Return type info static.
-    static const TypeInfo* GetTypeInfoStatic() { return 0; }
+    static const TypeInfo* GetTypeInfoStatic() { return nullptr; }
     /// Check current instance is type of specified type.
     bool IsInstanceOf(StringHash type) const;
     /// Check current instance is type of specified type.
     bool IsInstanceOf(const TypeInfo* typeInfo) const;
     /// Check current instance is type of specified class.
     template<typename T> bool IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()); }
+    /// Cast the object to specified most derived class.
+    template<typename T> T* Cast() { return IsInstanceOf<T>() ? static_cast<T*>(this) : nullptr; }
+    /// Cast the object to specified most derived class.
+    template<typename T> const T* Cast() const { return IsInstanceOf<T>() ? static_cast<const T*>(this) : nullptr; }
 
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event.
     void SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler);
     /// Subscribe to an event that can be sent by any sender.
-    void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
+    void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr);
     /// Subscribe to a specific sender's event.
-    void SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
+    void SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr);
     /// Unsubscribe from an event.
     void UnsubscribeFromEvent(StringHash eventType);
     /// Unsubscribe from a specific sender's event.
@@ -161,22 +165,30 @@ public:
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
 
+    /// Block object from sending and receiving events.
+    void SetBlockEvents(bool block) { blockEvents_ = block; }
+    /// Return sending and receiving events blocking status.
+    bool GetBlockEvents() const { return blockEvents_; }
+
 protected:
     /// Execution context.
     Context* context_;
 
 private:
     /// Find the first event handler with no specific sender.
-    EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = 0) const;
+    EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = nullptr) const;
     /// Find the first event handler with specific sender.
-    EventHandler* FindSpecificEventHandler(Object* sender, EventHandler** previous = 0) const;
+    EventHandler* FindSpecificEventHandler(Object* sender, EventHandler** previous = nullptr) const;
     /// Find the first event handler with specific sender and event type.
-    EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = 0) const;
+    EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = nullptr) const;
     /// Remove event handlers related to a specific sender.
     void RemoveEventSender(Object* sender);
 
     /// Event handlers. Sender is null for non-specific handlers.
     LinkedList<EventHandler> eventHandlers_;
+
+    /// Block object from sending and receiving any events.
+    bool blockEvents_;
 };
 
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
@@ -226,7 +238,7 @@ public:
     }
 
     /// Create an object of the specific type.
-    virtual SharedPtr<Object> CreateObject() { return SharedPtr<Object>(new T(context_)); }
+    virtual SharedPtr<Object> CreateObject() override { return SharedPtr<Object>(new T(context_)); }
 };
 
 /// Internal helper class for invoking event handler functions.
@@ -234,9 +246,9 @@ class URHO3D_API EventHandler : public LinkedListNode
 {
 public:
     /// Construct with specified receiver and userdata.
-    EventHandler(Object* receiver, void* userData = 0) :
+    EventHandler(Object* receiver, void* userData = nullptr) :
         receiver_(receiver),
-        sender_(0),
+        sender_(nullptr),
         userData_(userData)
     {
     }
@@ -283,10 +295,10 @@ protected:
 template <class T> class EventHandlerImpl : public EventHandler
 {
 public:
-    typedef void (T::*HandlerFunctionPtr)(StringHash, VariantMap&);
+    using HandlerFunctionPtr = void (T::*)(StringHash, VariantMap&);
 
     /// Construct with receiver and function pointers and userdata.
-    EventHandlerImpl(T* receiver, HandlerFunctionPtr function, void* userData = 0) :
+    EventHandlerImpl(T* receiver, HandlerFunctionPtr function, void* userData = nullptr) :
         EventHandler(receiver, userData),
         function_(function)
     {
@@ -295,14 +307,14 @@ public:
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData)
+    virtual void Invoke(VariantMap& eventData) override
     {
         T* receiver = static_cast<T*>(receiver_);
         (receiver->*function_)(eventType_, eventData);
     }
 
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const
+    virtual EventHandler* Clone() const override
     {
         return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
     }
@@ -317,21 +329,21 @@ class EventHandler11Impl : public EventHandler
 {
 public:
     /// Construct with receiver and function pointers and userdata.
-    EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = 0) :
-        EventHandler(0, userData),
+    EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = nullptr) :
+        EventHandler(nullptr, userData),
         function_(function)
     {
         assert(function_);
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData)
+    virtual void Invoke(VariantMap& eventData) override
     {
         function_(eventType_, eventData);
     }
 
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const
+    virtual EventHandler* Clone() const override
     {
         return new EventHandler11Impl(function_, userData_);
     }

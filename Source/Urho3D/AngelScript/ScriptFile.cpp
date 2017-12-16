@@ -51,13 +51,13 @@ public:
     }
 
     /// Read from stream (no-op).
-    virtual void Read(void* ptr, asUINT size)
+    virtual void Read(void* ptr, asUINT size) override
     {
         // No-op, can not read from a Serializer
     }
 
     /// Write to stream.
-    virtual void Write(const void* ptr, asUINT size)
+    virtual void Write(const void* ptr, asUINT size) override
     {
         dest_.Write(ptr, size);
     }
@@ -78,13 +78,13 @@ public:
     }
 
     /// Read from stream.
-    virtual void Read(void* ptr, asUINT size)
+    virtual void Read(void* ptr, asUINT size) override
     {
         source_.Read(ptr, size);
     }
 
     /// Write to stream (no-op).
-    virtual void Write(const void* ptr, asUINT size)
+    virtual void Write(const void* ptr, asUINT size) override
     {
     }
 
@@ -96,7 +96,7 @@ private:
 ScriptFile::ScriptFile(Context* context) :
     Resource(context),
     script_(GetSubsystem<Script>()),
-    scriptModule_(0),
+    scriptModule_(nullptr),
     compiled_(false),
     subscribed_(false)
 {
@@ -193,7 +193,7 @@ void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName
     if (!compiled_)
         return;
 
-    AddEventHandlerInternal(0, eventType, handlerName);
+    AddEventHandlerInternal(nullptr, eventType, handlerName);
 }
 
 void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
@@ -409,16 +409,16 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     URHO3D_PROFILE(CreateObject);
 
     if (!compiled_)
-        return 0;
+        return nullptr;
 
     asIScriptContext* context = script_->GetScriptFileContext();
-    asITypeInfo* type = 0;
+    asITypeInfo* type = nullptr;
     if (useInterface)
     {
         asITypeInfo* interfaceType = scriptModule_->GetTypeInfoByDecl(className.CString());
 
         if (!interfaceType)
-            return 0;
+            return nullptr;
 
         for (unsigned i = 0; i < scriptModule_->GetObjectTypeCount(); ++i)
         {
@@ -436,7 +436,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     }
 
     if (!type)
-        return 0;
+        return nullptr;
 
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
     bool found;
@@ -454,18 +454,18 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     if (!found)
     {
         URHO3D_LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
-        return 0;
+        return nullptr;
     }
 
     // Get the factory function id from the object type
     String factoryName = String(type->GetName()) + "@ " + type->GetName() + "()";
     asIScriptFunction* factory = type->GetFactoryByDecl(factoryName.CString());
     if (!factory || context->Prepare(factory) < 0 || context->Execute() < 0)
-        return 0;
+        return nullptr;
 
     void* objAddress = context->GetAddressOfReturnValue();
     if (!objAddress)
-        return 0;
+        return nullptr;
 
     asIScriptObject* obj = *(static_cast<asIScriptObject**>(objAddress));
     if (obj)
@@ -489,7 +489,7 @@ bool ScriptFile::SaveByteCode(Serializer& dest)
 asIScriptFunction* ScriptFile::GetFunction(const String& declarationIn)
 {
     if (!compiled_)
-        return 0;
+        return nullptr;
 
     String declaration = declarationIn.Trimmed();
     // If not a full declaration, assume void with no parameters
@@ -508,7 +508,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declarationIn)
 asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declarationIn)
 {
     if (!compiled_ || !object)
-        return 0;
+        return nullptr;
 
     String declaration = declarationIn.Trimmed();
     // If not a full declaration, assume void with no parameters
@@ -517,7 +517,7 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
 
     asITypeInfo* type = object->GetObjectType();
     if (!type)
-        return 0;
+        return nullptr;
 
     HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
     if (i != methods_.End())
@@ -540,7 +540,7 @@ void ScriptFile::CleanupEventInvoker(asIScriptObject* object)
 void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, const String& handlerName)
 {
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* function = 0;
+    asIScriptFunction* function = nullptr;
     asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
 
     if (receiver)
@@ -843,7 +843,7 @@ void ScriptFile::ReleaseModule()
         eventInvokers_.Clear();
 
         asIScriptEngine* engine = script_->GetScriptEngine();
-        scriptModule_->SetUserData(0);
+        scriptModule_->SetUserData(nullptr);
 
         // Remove the module
         {
@@ -853,7 +853,7 @@ void ScriptFile::ReleaseModule()
             engine->DiscardModule(GetName().CString());
         }
 
-        scriptModule_ = 0;
+        scriptModule_ = nullptr;
         compiled_ = false;
         SetMemoryUse(0);
 
@@ -899,7 +899,7 @@ void ScriptFile::HandleUpdate(StringHash eventType, VariantMap& eventData)
 ScriptEventInvoker::ScriptEventInvoker(ScriptFile* file, asIScriptObject* object) :
     Object(file->GetContext()),
     file_(file),
-    sharedBool_(0),
+    sharedBool_(nullptr),
     object_(object)
 {
     if (object_)
@@ -915,8 +915,8 @@ ScriptEventInvoker::~ScriptEventInvoker()
     if (sharedBool_)
         sharedBool_->Release();
 
-    sharedBool_ = 0;
-    object_ = 0;
+    sharedBool_ = nullptr;
+    object_ = nullptr;
 }
 
 bool ScriptEventInvoker::IsObjectAlive() const
@@ -959,12 +959,12 @@ void ScriptEventInvoker::HandleScriptEvent(StringHash eventType, VariantMap& eve
 ScriptFile* GetScriptContextFile()
 {
     asIScriptContext* context = asGetActiveContext();
-    asIScriptFunction* function = context ? context->GetFunction() : 0;
-    asIScriptModule* module = function ? function->GetEngine()->GetModule(function->GetModuleName()) : 0;
+    asIScriptFunction* function = context ? context->GetFunction() : nullptr;
+    asIScriptModule* module = function ? function->GetEngine()->GetModule(function->GetModuleName()) : nullptr;
     if (module)
         return static_cast<ScriptFile*>(module->GetUserData());
     else
-        return 0;
+        return nullptr;
 }
 
 }

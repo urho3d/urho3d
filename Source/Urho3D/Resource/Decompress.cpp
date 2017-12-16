@@ -828,8 +828,8 @@ void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, in
     // Local neighbourhood of blocks
     AMTC_BLOCK_STRUCT* pBlocks[2][2];
 
-    AMTC_BLOCK_STRUCT* pPrevious[2][2] = {{NULL, NULL},
-                                          {NULL, NULL}};
+    AMTC_BLOCK_STRUCT* pPrevious[2][2] = {{nullptr, nullptr},
+                                          {nullptr, nullptr}};
 
     // Low precision colours extracted from the blocks
     struct

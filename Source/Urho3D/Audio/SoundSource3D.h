@@ -41,9 +41,9 @@ public:
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Update sound source.
-    virtual void Update(float timeStep);
+    virtual void Update(float timeStep) override;
 
     /// Set attenuation parameters.
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);

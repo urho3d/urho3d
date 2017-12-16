@@ -44,7 +44,7 @@ public:
     /// Construct.
     SoundSource(Context* context);
     /// Destruct. Remove self from the audio subsystem
-    virtual ~SoundSource();
+    virtual ~SoundSource() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

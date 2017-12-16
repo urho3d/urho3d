@@ -676,7 +676,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             if (!material_)
             {
                 Technique* tech = material->GetTechnique(0);
-                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                Pass* pass = tech ? tech->GetPass("alpha") : nullptr;
                 if (pass)
                 {
                     switch (GetTextEffect())
@@ -721,7 +721,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             if (!material_)
             {
                 Technique* tech = material->GetTechnique(0);
-                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                Pass* pass = tech ? tech->GetPass("alpha") : nullptr;
                 if (pass)
                 {
                     if (texture && texture->GetFormat() == Graphics::GetAlphaFormat())

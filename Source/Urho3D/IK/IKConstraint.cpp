@@ -37,7 +37,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKConstraint::IKConstraint(Context* context) :
     Component(context),
-    ikConstraintNode_(NULL),
+    ikConstraintNode_(nullptr),
     stiffness_(0.0f),
     stretchiness_(0.0f)
 {
@@ -68,7 +68,7 @@ float IKConstraint::GetStiffness() const
 void IKConstraint::SetStiffness(float stiffness)
 {
     stiffness_ = Clamp(stiffness, 0.0f, 1.0f);
-    if (ikConstraintNode_ != NULL)
+    if (ikConstraintNode_ != nullptr)
         /* TODO ikNode_->stiffness = stiffness_; */
         ;
 }
@@ -98,7 +98,7 @@ const Vector2& IKConstraint::GetLengthConstraints() const
 void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 {
     lengthConstraints_ = lengthConstraints;
-    if (ikConstraintNode_ != NULL)
+    if (ikConstraintNode_ != nullptr)
     {
         /* TODO
         ikNode_->min_length = lengthConstraints_.x_;
@@ -110,7 +110,7 @@ void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 void IKConstraint::SetIKConstraintNode(ik_node_t* constraintNode)
 {
     ikConstraintNode_ = constraintNode;
-    if (constraintNode != NULL)
+    if (constraintNode != nullptr)
     {
         /* TODO
         node->stiffness = stiffness_;

@@ -41,11 +41,11 @@ public:
     MemoryBuffer(const PODVector<unsigned char>& data);
 
     /// Read bytes from the memory area. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size);
+    virtual unsigned Read(void* dest, unsigned size) override;
     /// Set position from the beginning of the memory area. Return actual new position.
-    virtual unsigned Seek(unsigned position);
+    virtual unsigned Seek(unsigned position) override;
     /// Write bytes to the memory area.
-    virtual unsigned Write(const void* data, unsigned size);
+    virtual unsigned Write(const void* data, unsigned size) override;
 
     /// Return memory area.
     unsigned char* GetData() { return buffer_; }

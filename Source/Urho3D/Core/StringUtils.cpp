@@ -122,7 +122,7 @@ int ToInt(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return (int)strtol(source, 0, base);
+    return (int)strtol(source, nullptr, base);
 }
 
 long long ToInt64(const char* source, int base)
@@ -134,7 +134,7 @@ long long ToInt64(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return strtoll(source, 0, base);
+    return strtoll(source, nullptr, base);
 }
 
 long long ToInt64(const String& source, int base)
@@ -156,7 +156,7 @@ unsigned long long ToUInt64(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return strtoull(source, 0, base);
+    return strtoull(source, nullptr, base);
 }
 
 unsigned long long ToUInt64(const String& source, int base)
@@ -172,7 +172,7 @@ unsigned ToUInt(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return (unsigned)strtoul(source, 0, base);
+    return (unsigned)strtoul(source, nullptr, base);
 }
 
 float ToFloat(const String& source)
@@ -185,7 +185,7 @@ float ToFloat(const char* source)
     if (!source)
         return 0;
 
-    return (float)strtod(source, 0);
+    return (float)strtod(source, nullptr);
 }
 
 double ToDouble(const String& source)
@@ -198,7 +198,7 @@ double ToDouble(const char* source)
     if (!source)
         return 0;
 
-    return strtod(source, 0);
+    return strtod(source, nullptr);
 }
 
 Color ToColor(const String& source)

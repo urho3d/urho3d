@@ -39,7 +39,7 @@ public:
     /// Set rotation speed about the Euler axes. Will be scaled with scene update time step.
     void SetRotationSpeed(const Vector3& speed);
     /// Handle scene update. Called by LogicComponent base class.
-    virtual void Update(float timeStep);
+    virtual void Update(float timeStep) override;
     
     /// Return rotation speed.
     const Vector3& GetRotationSpeed() const { return rotationSpeed_; }

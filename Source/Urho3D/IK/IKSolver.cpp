@@ -47,7 +47,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKSolver::IKSolver(Context* context) :
     Component(context),
-    solver_(NULL),
+    solver_(nullptr),
     algorithm_(FABRIK),
     features_(AUTO_SOLVE | JOINT_ROTATIONS | UPDATE_ACTIVE_POSE),
     chainTreesNeedUpdating_(false),
@@ -70,7 +70,7 @@ IKSolver::~IKSolver()
     // Destroying the solver tree will destroy the effector objects, so remove
     // any references any of the IKEffector objects could be holding
     for (PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
-        (*it)->SetIKEffectorNode(NULL);
+        (*it)->SetIKEffectorNode(nullptr);
 
     ik_solver_destroy(solver_);
     context_->ReleaseIK();
@@ -89,7 +89,7 @@ void IKSolver::RegisterObject(Context* context)
         "MSD (Mass/Spring/Damper)",
         "Jacobian Inverse",
         "Jacobian Transpose",*/
-        NULL
+        nullptr
     };
 
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, FABRIK, AM_DEFAULT);
@@ -117,14 +117,14 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
 
     /* We need to rebuild the tree so make sure that the scene is in the
      * initial pose when this occurs.*/
-    if (node_ != NULL)
+    if (node_ != nullptr)
         ApplyOriginalPoseToScene();
 
     // Initial flags for when there is no solver to destroy
     uint8_t initialFlags = 0;
 
     // Destroys the tree and the solver
-    if (solver_ != NULL)
+    if (solver_ != nullptr)
     {
         initialFlags = solver_->flags;
         DestroyTree();
@@ -141,7 +141,7 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
 
     solver_->flags = initialFlags;
 
-    if (node_ != NULL)
+    if (node_ != nullptr)
         RebuildTree();
 }
 
@@ -232,7 +232,7 @@ ik_node_t* IKSolver::CreateIKNodeFromUrhoNode(const Node* node)
      * purposes and log if it does.
      */
     IKEffector* effector = node->GetComponent<IKEffector>();
-    if (effector != NULL)
+    if (effector != nullptr)
     {
 #ifdef DEBUG
         if (effector->ikEffectorNode_ != NULL)
@@ -247,7 +247,7 @@ ik_node_t* IKSolver::CreateIKNodeFromUrhoNode(const Node* node)
 
     // Exact same deal with the constraint
     IKConstraint* constraint = node->GetComponent<IKConstraint>();
-    if (constraint != NULL)
+    if (constraint != nullptr)
     {
 #ifdef DEBUG
         if (constraint->ikConstraintNode_ != NULL)
@@ -271,7 +271,7 @@ void IKSolver::DestroyTree()
 // ----------------------------------------------------------------------------
 void IKSolver::RebuildTree()
 {
-    assert (node_ != NULL);
+    assert (node_ != nullptr);
 
     // Destroy current tree and set a new root node
     DestroyTree();
@@ -327,13 +327,13 @@ bool IKSolver::BuildTreeToEffector(IKEffector* effector)
     const Node* iterNode = effector->GetNode();
     ik_node_t* ikNode;
     PODVector<const Node*> missingNodes;
-    while ((ikNode = ik_node_find_child(solver_->tree, iterNode->GetID())) == NULL)
+    while ((ikNode = ik_node_find_child(solver_->tree, iterNode->GetID())) == nullptr)
     {
         missingNodes.Push(iterNode);
         iterNode = iterNode->GetParent();
 
         // Assert the assumptions made (described in the beginning of this function)
-        assert(iterNode != NULL);
+        assert(iterNode != nullptr);
         assert (iterNode->HasComponent<IKSolver>() == false || iterNode == node_);
     }
 
@@ -358,14 +358,14 @@ bool IKSolver::ComponentIsInOurSubtree(Component* component) const
     while (true)
     {
         // Note part of our subtree
-        if (iterNode == NULL)
+        if (iterNode == nullptr)
             return false;
         // Reached the root node, it's part of our subtree!
         if (iterNode == node_)
             return true;
         // Path to us is being blocked by another solver
         Component* otherSolver = iterNode->GetComponent<IKSolver>();
-        if (otherSolver != NULL && otherSolver != component)
+        if (otherSolver != nullptr && otherSolver != component)
             return false;
 
         iterNode = iterNode->GetParent();
@@ -528,7 +528,7 @@ void IKSolver::OnNodeSet(Node* node)
     ApplyOriginalPoseToScene();
     DestroyTree();
 
-    if (node != NULL)
+    if (node != nullptr)
         RebuildTree();
 }
 
@@ -548,10 +548,10 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
      */
     if (component->GetType() == IKSolver::GetTypeStatic())
     {
-        for (Node* iterNode = node; iterNode != NULL; iterNode = iterNode->GetParent())
+        for (Node* iterNode = node; iterNode != nullptr; iterNode = iterNode->GetParent())
         {
             IKSolver* parentSolver = iterNode->GetComponent<IKSolver>();
-            if (parentSolver != NULL)
+            if (parentSolver != nullptr)
                 parentSolver->MarkTreeNeedsRebuild();
 
         }
@@ -559,7 +559,7 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
         return; // No need to continue processing effectors or constraints
     }
 
-    if (solver_->tree == NULL)
+    if (solver_->tree == nullptr)
         return;
 
     /*
@@ -590,7 +590,7 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
 {
     using namespace ComponentRemoved;
 
-    if (solver_->tree == NULL)
+    if (solver_->tree == nullptr)
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
@@ -603,10 +603,10 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
      */
     if (component->GetType() == IKSolver::GetTypeStatic())
     {
-        for (Node* iterNode = node; iterNode != NULL; iterNode = iterNode->GetParent())
+        for (Node* iterNode = node; iterNode != nullptr; iterNode = iterNode->GetParent())
         {
             IKSolver* parentSolver = iterNode->GetComponent<IKSolver>();
-            if (parentSolver != NULL)
+            if (parentSolver != nullptr)
                 parentSolver->MarkTreeNeedsRebuild();
 
         }
@@ -621,10 +621,10 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
             return;
 
         ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
-        assert(ikNode != NULL);
+        assert(ikNode != nullptr);
 
         ik_node_destroy_effector(ikNode);
-        static_cast<IKEffector*>(component)->SetIKEffectorNode(NULL);
+        static_cast<IKEffector*>(component)->SetIKEffectorNode(nullptr);
         effectorList_.RemoveSwap(static_cast<IKEffector*>(component));
 
         ApplyOriginalPoseToScene();
@@ -639,9 +639,9 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
             return;
 
         ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
-        assert(ikNode != NULL);
+        assert(ikNode != nullptr);
 
-        static_cast<IKConstraint*>(component)->SetIKConstraintNode(NULL);
+        static_cast<IKConstraint*>(component)->SetIKConstraintNode(nullptr);
         constraintList_.RemoveSwap(static_cast<IKConstraint*>(component));
     }
 }
@@ -651,7 +651,7 @@ void IKSolver::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 {
     using namespace NodeAdded;
 
-    if (solver_->tree == NULL)
+    if (solver_->tree == nullptr)
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
@@ -683,7 +683,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     using namespace NodeRemoved;
 
-    if (solver_->tree == NULL)
+    if (solver_->tree == nullptr)
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
@@ -693,7 +693,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     node->GetComponents<IKEffector>(effectors, true);
     for (PODVector<IKEffector*>::ConstIterator it = effectors.Begin(); it != effectors.End(); ++it)
     {
-        (*it)->SetIKEffectorNode(NULL);
+        (*it)->SetIKEffectorNode(nullptr);
         effectorList_.RemoveSwap(*it);
     }
 
@@ -708,7 +708,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     // solver's tree instead of destroying the single node. Calling
     // ik_node_destroy() on the solver's root node will cause segfaults.
     ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
-    if (ikNode != NULL)
+    if (ikNode != nullptr)
     {
         if (ikNode == solver_->tree)
             ik_solver_destroy_tree(solver_);

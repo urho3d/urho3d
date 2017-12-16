@@ -47,7 +47,7 @@ public:
     /// Construct.
     FileSystem(Context* context);
     /// Destruct.
-    ~FileSystem();
+    virtual ~FileSystem() override;
 
     /// Set the current working directory.
     bool SetCurrentDir(const String& pathName);
@@ -101,6 +101,8 @@ public:
     String GetUserDocumentsDir() const;
     /// Return the application preferences directory.
     String GetAppPreferencesDir(const String& org, const String& app) const;
+    /// Return path of temporary directory. Path always ends with a forward slash.
+    String GetTemporaryDir() const;
 
 private:
     /// Scan directory, called internally.

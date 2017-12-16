@@ -81,7 +81,7 @@ void ShaderProgram::OnDeviceLost()
     GPUObject::OnDeviceLost();
 
     if (graphics_ && graphics_->GetShaderProgram() == this)
-        graphics_->SetShaders(0, 0);
+        graphics_->SetShaders(nullptr, nullptr);
 
     linkerOutput_.Clear();
 }
@@ -96,7 +96,7 @@ void ShaderProgram::Release()
         if (!graphics_->IsDeviceLost())
         {
             if (graphics_->GetShaderProgram() == this)
-                graphics_->SetShaders(0, 0);
+                graphics_->SetShaders(nullptr, nullptr);
 
             glDeleteProgram(object_.name_);
         }
@@ -258,7 +258,7 @@ bool ShaderProgram::Link()
     glGetProgramiv(object_.name_, GL_ACTIVE_UNIFORMS, &uniformCount);
     for (int i = 0; i < uniformCount; ++i)
     {
-        glGetActiveUniform(object_.name_, (GLuint)i, MAX_NAME_LENGTH, 0, &elementCount, &type, nameBuffer);
+        glGetActiveUniform(object_.name_, (GLuint)i, MAX_NAME_LENGTH, nullptr, &elementCount, &type, nameBuffer);
         int location = glGetUniformLocation(object_.name_, nameBuffer);
 
         // Check for array index included in the name and strip it
@@ -345,7 +345,7 @@ const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
     if (i != shaderParameters_.End())
         return &i->second_;
     else
-        return 0;
+        return nullptr;
 }
 
 bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* source)

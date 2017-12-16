@@ -31,13 +31,13 @@ namespace Urho3D
 DbConnection::DbConnection(Context* context, const String& connectionString) :
     Object(context),
     connectionString_(connectionString),
-    connectionImpl_(0)
+    connectionImpl_(nullptr)
 {
     if (sqlite3_open(connectionString.CString(), &connectionImpl_) != SQLITE_OK)
     {
         URHO3D_LOGERRORF("Could not connect: %s", sqlite3_errmsg(connectionImpl_));
         sqlite3_close(connectionImpl_);
-        connectionImpl_ = 0;
+        connectionImpl_ = nullptr;
     }
 }
 
@@ -50,7 +50,7 @@ DbConnection::~DbConnection()
         URHO3D_LOGERRORF("Could not disconnect: %s", sqlite3_errmsg(connectionImpl_));
         assert(false);
     }
-    connectionImpl_ = 0;
+    connectionImpl_ = nullptr;
 }
 
 void DbConnection::Finalize()
@@ -61,8 +61,8 @@ void DbConnection::Finalize()
 DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 {
     DbResult result;
-    const char* zLeftover = 0;
-    sqlite3_stmt* pStmt = 0;
+    const char* zLeftover = nullptr;
+    sqlite3_stmt* pStmt = nullptr;
     assert(connectionImpl_);
 
     // 2016-10-09: Prevent string corruption when trimmed is returned.

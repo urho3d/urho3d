@@ -16,6 +16,7 @@ class Color
     unsigned ToUInt() const;
     Vector3 ToHSL() const;
     Vector3 ToHSV() const;
+    void FromUInt(unsigned color);
     void FromHSL(float h, float s, float l, float a);
     void FromHSV(float h, float s, float v, float a);
 

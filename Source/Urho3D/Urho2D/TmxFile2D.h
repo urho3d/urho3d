@@ -39,7 +39,7 @@ class TmxLayer2D : public RefCounted
 {
 public:
     TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
-    virtual ~TmxLayer2D();
+    virtual ~TmxLayer2D() override;
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
@@ -162,14 +162,14 @@ public:
     /// Construct.
     TmxFile2D(Context* context);
     /// Destruct.
-    virtual ~TmxFile2D();
+    virtual ~TmxFile2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    virtual bool EndLoad() override;
 
     /// Set Tilemap information.
     bool SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight);

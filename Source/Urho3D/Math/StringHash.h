@@ -101,7 +101,7 @@ public:
     unsigned ToHash() const { return value_; }
 
     /// Calculate hash value case-insensitively from a C string.
-    static unsigned Calculate(const char* str);
+    static unsigned Calculate(const char* str, unsigned hash = 0);
 
     /// Zero hash.
     static const StringHash ZERO;

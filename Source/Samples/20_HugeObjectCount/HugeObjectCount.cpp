@@ -126,7 +126,7 @@ void HugeObjectCount::CreateScene()
         light->SetSpecularIntensity(1.5f);
 
         // Create StaticModelGroups in the scene
-        StaticModelGroup* lastGroup = 0;
+        StaticModelGroup* lastGroup = nullptr;
 
         for (int y = -125; y < 125; ++y)
         {

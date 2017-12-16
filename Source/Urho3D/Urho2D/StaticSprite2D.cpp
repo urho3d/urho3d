@@ -349,7 +349,7 @@ void StaticSprite2D::UpdateMaterial()
         if (sprite_ && renderer_)
             sourceBatches_[0].material_ = renderer_->GetMaterial(sprite_->GetTexture(), blendMode_);
         else
-            sourceBatches_[0].material_ = 0;
+            sourceBatches_[0].material_ = nullptr;
     }
 }
 

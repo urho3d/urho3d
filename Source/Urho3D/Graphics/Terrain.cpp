@@ -128,14 +128,14 @@ void Terrain::RegisterObject(Context* context)
         AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE("North Neighbor NodeID", unsigned, northID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("South Neighbor NodeID", unsigned, southID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("West Neighbor NodeID", unsigned, westID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("East Neighbor NodeID", unsigned, eastID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("Vertex Spacing", Vector3, spacing_, DEFAULT_SPACING, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("North Neighbor NodeID", unsigned, northID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("South Neighbor NodeID", unsigned, southID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("West Neighbor NodeID", unsigned, westID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("East Neighbor NodeID", unsigned, eastID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("Vertex Spacing", Vector3, spacing_, MarkTerrainDirty, DEFAULT_SPACING, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Smooth Height Map", bool, smoothing_, false, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Smooth Height Map", bool, smoothing_, MarkTerrainDirty, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
@@ -150,20 +150,6 @@ void Terrain::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
-void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Serializable::OnSetAttribute(attr, src);
-
-    // Change of any non-accessor attribute requires recreation of the terrain, or setting the neighbor terrains
-    if (!attr.accessor_)
-    {
-        if (attr.mode_ & AM_NODEID)
-            neighborsDirty_ = true;
-        else
-            recreateTerrain_ = true;
-    }
-}
-
 void Terrain::ApplyAttributes()
 {
     if (recreateTerrain_)
@@ -172,14 +158,14 @@ void Terrain::ApplyAttributes()
     if (neighborsDirty_)
     {
         Scene* scene = GetScene();
-        Node* north = scene ? scene->GetNode(northID_) : (Node*)0;
-        Node* south = scene ? scene->GetNode(southID_) : (Node*)0;
-        Node* west = scene ? scene->GetNode(westID_) : (Node*)0;
-        Node* east = scene ? scene->GetNode(eastID_) : (Node*)0;
-        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : (Terrain*)0;
+        Node* north = scene ? scene->GetNode(northID_) : nullptr;
+        Node* south = scene ? scene->GetNode(southID_) : nullptr;
+        Node* west = scene ? scene->GetNode(westID_) : nullptr;
+        Node* east = scene ? scene->GetNode(eastID_) : nullptr;
+        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : nullptr;
+        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : nullptr;
+        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : nullptr;
+        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : nullptr;
         SetNeighbors(northTerrain, southTerrain, westTerrain, eastTerrain);
         neighborsDirty_ = false;
     }
@@ -543,13 +529,13 @@ Material* Terrain::GetMaterial() const
 
 TerrainPatch* Terrain::GetPatch(unsigned index) const
 {
-    return index < patches_.Size() ? patches_[index] : (TerrainPatch*)0;
+    return index < patches_.Size() ? patches_[index] : nullptr;
 }
 
 TerrainPatch* Terrain::GetPatch(int x, int z) const
 {
     if (x < 0 || x >= numPatches_.x_ || z < 0 || z >= numPatches_.y_)
-        return 0;
+        return nullptr;
     else
         return GetPatch((unsigned)(z * numPatches_.x_ + x));
 }

@@ -42,12 +42,12 @@ public:
     /// Construct.
     View3D(Context* context);
     /// Destruct.
-    ~View3D();
+    virtual ~View3D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Define the scene and camera to use in rendering. When ownScene is true the View3D will take ownership of them with shared pointers.
     void SetView(Scene* scene, Camera* camera, bool ownScene = true);

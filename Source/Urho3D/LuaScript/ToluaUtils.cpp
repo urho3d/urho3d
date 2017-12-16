@@ -55,10 +55,10 @@ Context* GetContext(lua_State* L)
     if (lua_isnil(L, -1))
     {
         lua_State* L1 = lua_getmainthread(L);
-        return (L == L1) ? 0 : GetContext(L1);
+        return (L == L1) ? nullptr : GetContext(L1);
     }
     tolua_Error error;      // Ensure we are indeed getting a Context object before casting
-    return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, 0)) : 0;
+    return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, nullptr)) : nullptr;
 }
 
 // Explicit template specialization for StringVector
@@ -71,7 +71,7 @@ template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* /*type*/
 template <> void* ToluaToVector<String>(lua_State* L, int narg, void* /*def*/)
 {
     if (!lua_istable(L, narg))
-        return 0;
+        return nullptr;
     static Vector<String> result;
     result.Clear();
     result.Resize((unsigned)lua_objlen(L, narg));
@@ -106,7 +106,7 @@ template <> int ToluaIsPODVector<bool>(double /*overload*/, lua_State* L, int lo
 template <> void* ToluaToPODVector<bool>(double /*overload*/, lua_State* L, int narg, void* /*def*/)
 {
     if (!lua_istable(L, narg))
-        return 0;
+        return nullptr;
     static PODVector<bool> result;
     result.Clear();
     result.Resize((unsigned)lua_objlen(L, narg));
@@ -136,7 +136,7 @@ template <> int ToluaPushPODVector<bool>(double /*overload*/, lua_State* L, void
 template <> void* ToluaToVector<SharedPtr<IndexBuffer> >(lua_State* L, int narg, void* def)
 {
     if (!lua_istable(L, narg))
-        return 0;
+        return nullptr;
     static Vector<SharedPtr<IndexBuffer> > result;
     result.Clear();
     result.Resize((unsigned)lua_objlen(L, narg));
@@ -152,7 +152,7 @@ template <> void* ToluaToVector<SharedPtr<IndexBuffer> >(lua_State* L, int narg,
 template <> void* ToluaToVector<SharedPtr<VertexBuffer> >(lua_State* L, int narg, void* def)
 {
     if (!lua_istable(L, narg))
-        return 0;
+        return nullptr;
     static Vector<SharedPtr<VertexBuffer> > result;
     result.Clear();
     result.Resize((unsigned)lua_objlen(L, narg));
@@ -407,9 +407,15 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
         break;
 
     case VAR_MATRIX3:
+        tolua_pushusertype(L, variant->Get<const VariantValue*>()->matrix3_, "Matrix3");
+        break;
+
     case VAR_MATRIX3X4:
+        tolua_pushusertype(L, variant->Get<const VariantValue*>()->matrix3x4_, "Matrix3x4");
+        break;
+
     case VAR_MATRIX4:
-        tolua_pushusertype(L, variant->Get<const VariantValue*>()->ptr_, variant->GetTypeName().CString());
+        tolua_pushusertype(L, variant->Get<const VariantValue*>()->matrix4_, "Matrix4");
         break;
 
     default:

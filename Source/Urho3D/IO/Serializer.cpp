@@ -286,9 +286,11 @@ bool Serializer::WriteVariantData(const Variant& value)
     case VAR_BUFFER:
         return WriteBuffer(value.GetBuffer());
 
-        // Serializing pointers is not supported. Write null
+        // Serializing pointers and custom values is not supported. Write null
     case VAR_VOIDPTR:
     case VAR_PTR:
+    case VAR_CUSTOM_HEAP:
+    case VAR_CUSTOM_STACK:
         return WriteUInt(0);
 
     case VAR_RESOURCEREF:

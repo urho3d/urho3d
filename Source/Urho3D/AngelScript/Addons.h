@@ -106,6 +106,8 @@ public:
     int  Find(asUINT startAt, void *value) const;
     int  FindByRef(void *ref) const;
     int  FindByRef(asUINT startAt, void *ref) const;
+    // Swap content of two arrays for avoid copy
+    bool Swap(CScriptArray& other);
 
     // GC methods
     int  GetRefCount();

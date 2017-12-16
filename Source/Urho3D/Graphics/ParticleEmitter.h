@@ -59,14 +59,14 @@ public:
     /// Construct.
     ParticleEmitter(Context* context);
     /// Destruct.
-    virtual ~ParticleEmitter();
+    virtual ~ParticleEmitter() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
     /// Update before octree reinsertion. Is called from a worker thread.
-    virtual void Update(const FrameInfo& frame);
+    virtual void Update(const FrameInfo& frame) override;
 
     /// Set particle effect.
     void SetEffect(ParticleEffect* effect);
@@ -115,7 +115,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
 
     /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();

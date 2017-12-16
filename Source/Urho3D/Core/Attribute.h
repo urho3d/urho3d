@@ -65,103 +65,73 @@ public:
 struct AttributeInfo
 {
     /// Construct empty.
-    AttributeInfo() :
-        type_(VAR_NONE),
-        offset_(0),
-        enumNames_(0),
-        variantStructureElementNames_(0),
-        mode_(AM_DEFAULT),
-        ptr_(0)
-    {
-    }
+    AttributeInfo() { }
 
-    /// Construct offset attribute.
-    AttributeInfo(VariantType type, const char* name, size_t offset, const Variant& defaultValue, unsigned mode) :
+    /// Construct attribute.
+    AttributeInfo(VariantType type, const char* name, SharedPtr<AttributeAccessor> accessor, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
-        offset_((unsigned)offset),
-        enumNames_(0),
-        variantStructureElementNames_(0),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(0)
-    {
-    }
-
-    /// Construct offset enum attribute.
-    AttributeInfo(const char* name, size_t offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
-        type_(VAR_INT),
-        name_(name),
-        offset_((unsigned)offset),
         enumNames_(enumNames),
-        variantStructureElementNames_(0),
+        accessor_(accessor),
         defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(0)
+        mode_(mode)
     {
     }
 
-    /// Construct accessor attribute.
-    AttributeInfo(VariantType type, const char* name, AttributeAccessor* accessor, const Variant& defaultValue, unsigned mode) :
-        type_(type),
-        name_(name),
-        offset_(0),
-        enumNames_(0),
-        variantStructureElementNames_(0),
-        accessor_(accessor),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(0)
+    /// Get attribute metadata.
+    const Variant& GetMetadata(const StringHash& key) const
     {
+        auto elem = metadata_.Find(key);
+        return elem != metadata_.End() ? elem->second_ : Variant::EMPTY;
     }
 
-    /// Construct accessor enum attribute.
-    AttributeInfo(const char* name, AttributeAccessor* accessor, const char** enumNames, const Variant& defaultValue,
-        unsigned mode) :
-        type_(VAR_INT),
-        name_(name),
-        offset_(0),
-        enumNames_(enumNames),
-        variantStructureElementNames_(0),
-        accessor_(accessor),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(0)
+    /// Get attribute metadata of specified type.
+    template <class T> T GetMetadata(const StringHash& key) const
     {
-    }
-
-    /// Construct variant structure (structure, which packed to VariantVector) attribute.
-    AttributeInfo(VariantType type, const char* name, AttributeAccessor* accessor, const Variant& defaultValue, const char** variantStructureElementNames, unsigned mode) :
-        type_(type),
-        name_(name),
-        offset_(0),
-        enumNames_(0),
-        variantStructureElementNames_(variantStructureElementNames),
-        accessor_(accessor),
-        defaultValue_(defaultValue),
-        mode_(mode),
-        ptr_(0)
-    {
+        return GetMetadata(key).Get<T>();
     }
 
     /// Attribute type.
-    VariantType type_;
+    VariantType type_ = VAR_NONE;
     /// Name.
     String name_;
-    /// Byte offset from start of object.
-    unsigned offset_;
     /// Enum names.
-    const char** enumNames_;
-    /// Variant structure elements names.
-    const char** variantStructureElementNames_;
+    const char** enumNames_ = nullptr;
     /// Helper object for accessor mode.
     SharedPtr<AttributeAccessor> accessor_;
     /// Default value for network replication.
     Variant defaultValue_;
     /// Attribute mode: whether to use for serialization, network replication, or both.
-    unsigned mode_;
+    unsigned mode_ = AM_DEFAULT;
+    /// Attribute metadata.
+    VariantMap metadata_;
     /// Attribute data pointer if elsewhere than in the Serializable.
-    void* ptr_;
+    void* ptr_ = nullptr;
+};
+
+/// Attribute handle returned by Context::RegisterAttribute and used to chain attribute setup calls.
+struct AttributeHandle
+{
+    friend class Context;
+private:
+    /// Construct default.
+    AttributeHandle() = default;
+    /// Construct from another handle.
+    AttributeHandle(const AttributeHandle& another) = default;
+    /// Attribute info.
+    AttributeInfo* attributeInfo_ = nullptr;
+    /// Network attribute info.
+    AttributeInfo* networkAttributeInfo_ = nullptr;
+public:
+    /// Set metadata.
+    AttributeHandle& SetMetadata(StringHash key, const Variant& value)
+    {
+        if (attributeInfo_)
+            attributeInfo_->metadata_[key] = value;
+        if (networkAttributeInfo_)
+            networkAttributeInfo_->metadata_[key] = value;
+        return *this;
+    }
 };
 
 }

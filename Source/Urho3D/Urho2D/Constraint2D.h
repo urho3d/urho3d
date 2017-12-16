@@ -41,16 +41,14 @@ public:
     /// Construct.
     Constraint2D(Context* context);
     /// Destruct.
-    virtual ~Constraint2D();
+    virtual ~Constraint2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
     /// Create joint.
     void CreateJoint();
     /// Release joint.
@@ -80,15 +78,17 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Return joint def.
-    virtual b2JointDef* GetJointDef() { return 0; };
+    virtual b2JointDef* GetJointDef() { return nullptr; };
     /// Recreate joint.
     void RecreateJoint();
     /// Initialize joint def.
     void InitializeJointDef(b2JointDef* jointDef);
+    /// Mark other body node ID dirty.
+    void MarkOtherBodyNodeIDDirty() { otherBodyNodeIDDirty_ = true; }
 
     /// Physics world.
     WeakPtr<PhysicsWorld2D> physicsWorld_;

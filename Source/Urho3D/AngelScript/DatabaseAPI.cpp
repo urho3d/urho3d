@@ -56,7 +56,7 @@ static CScriptArray* DbResultGetRow(unsigned index, DbResult* ptr)
     if (index >= rows.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return VectorToArray<Variant>(rows[index], "Array<Variant>");
