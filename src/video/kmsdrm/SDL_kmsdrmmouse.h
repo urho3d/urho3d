@@ -18,34 +18,25 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_bsdaudio_h
-#define _SDL_bsdaudio_h
+#ifndef SDL_KMSDRM_mouse_h_
+#define SDL_KMSDRM_mouse_h_
 
-#include "../SDL_sysaudio.h"
+#include <gbm.h>
 
-#define _THIS   SDL_AudioDevice *this
-
-struct SDL_PrivateAudioData
+typedef struct _KMSDRM_CursorData
 {
-    /* The file descriptor for the audio device */
-    int audio_fd;
+    struct gbm_bo *bo;
+    uint32_t       crtc_id;
+    int            hot_x, hot_y;
+    int            w, h;
+} KMSDRM_CursorData;
 
-    /* The parent process id, to detect when application quits */
-    pid_t parent;
+extern void KMSDRM_InitMouse(_THIS);
+extern void KMSDRM_QuitMouse(_THIS);
 
-    /* Raw mixing buffer */
-    Uint8 *mixbuf;
-    int mixlen;
-
-    /* Support for audio timing using a timer, in addition to select() */
-    float frame_ticks;
-    float next_frame;
-};
-
-#define FUDGE_TICKS 10      /* The scheduler overhead ticks per frame */
-
-#endif /* _SDL_bsdaudio_h */
+#endif /* SDL_KMSDRM_mouse_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

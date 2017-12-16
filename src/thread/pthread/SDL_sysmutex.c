@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,9 +20,6 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
 #include <errno.h>
 #include <pthread.h>
 
@@ -137,7 +134,7 @@ SDL_TryLockMutex(SDL_mutex * mutex)
          We set the locking thread id after we obtain the lock
          so unlocks from other threads will fail.
          */
-        if (pthread_mutex_lock(&mutex->id) == 0) {
+        if (pthread_mutex_trylock(&mutex->id) == 0) {
             mutex->owner = this_thread;
             mutex->recursive = 0;
         } else if (errno == EBUSY) {

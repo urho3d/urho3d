@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -345,7 +345,7 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 165 */   SDL_SCANCODE_AUDIOPREV,
     /* 166 */   SDL_SCANCODE_AUDIOSTOP,
     /* 167 */   SDL_SCANCODE_UNKNOWN,   /* XF86AudioRecord */
-    /* 168 */   SDL_SCANCODE_UNKNOWN,   /* XF86AudioRewind */
+    /* 168 */   SDL_SCANCODE_AUDIOREWIND,   /* XF86AudioRewind */
     /* 169 */   SDL_SCANCODE_UNKNOWN,   /* XF86Phone */
     /* 170 */   SDL_SCANCODE_UNKNOWN,
     /* 171 */   SDL_SCANCODE_F13,       /* XF86Tools */

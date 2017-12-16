@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -326,7 +326,7 @@ SDL_MasksToPixelFormatEnum(int bpp, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask,
         if (Rmask == 0) {
             return SDL_PIXELFORMAT_RGB555;
         }
-        /* Fall through to 16-bit checks */
+	/* fallthrough */
     case 16:
         if (Rmask == 0) {
             return SDL_PIXELFORMAT_RGB565;
@@ -402,6 +402,13 @@ SDL_MasksToPixelFormatEnum(int bpp, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask,
             Bmask == 0xF800 &&
             Amask == 0x0000) {
             return SDL_PIXELFORMAT_BGR565;
+        }
+        if (Rmask == 0x003F &&
+            Gmask == 0x07C0 &&
+            Bmask == 0xF800 &&
+            Amask == 0x0000) {
+            /* Technically this would be BGR556, but Witek says this works in bug 3158 */
+            return SDL_PIXELFORMAT_RGB565;
         }
         break;
     case 24:
@@ -651,7 +658,7 @@ SDL_SetPixelFormatPalette(SDL_PixelFormat * format, SDL_Palette *palette)
         return SDL_SetError("SDL_SetPixelFormatPalette() passed NULL format");
     }
 
-    if (palette && palette->ncolors != (1 << format->BitsPerPixel)) {
+    if (palette && palette->ncolors > (1 << format->BitsPerPixel)) {
         return SDL_SetError("SDL_SetPixelFormatPalette() passed a palette that doesn't match the format");
     }
 

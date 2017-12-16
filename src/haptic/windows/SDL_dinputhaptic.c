@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -56,15 +56,6 @@ DI_SetError(const char *str, HRESULT err)
        DXGetErrorString8A(err), DXGetErrorDescription8A(err));
      */
     return SDL_SetError("Haptic error %s", str);
-}
-
-/*
- * Checks to see if two GUID are the same.
- */
-static int
-DI_GUIDIsSame(const GUID * a, const GUID * b)
-{
-    return (SDL_memcmp(a, b, sizeof (GUID)) == 0);
 }
 
 /*
@@ -219,17 +210,17 @@ DI_DeviceObjectCallback(LPCDIDEVICEOBJECTINSTANCE dev, LPVOID pvRef)
     if ((dev->dwType & DIDFT_AXIS) && (dev->dwFlags & DIDOI_FFACTUATOR)) {
         const GUID *guid = &dev->guidType;
         DWORD offset = 0;
-        if (DI_GUIDIsSame(guid, &GUID_XAxis)) {
+        if (WIN_IsEqualGUID(guid, &GUID_XAxis)) {
             offset = DIJOFS_X;
-        } else if (DI_GUIDIsSame(guid, &GUID_YAxis)) {
+        } else if (WIN_IsEqualGUID(guid, &GUID_YAxis)) {
             offset = DIJOFS_Y;
-        } else if (DI_GUIDIsSame(guid, &GUID_ZAxis)) {
+        } else if (WIN_IsEqualGUID(guid, &GUID_ZAxis)) {
             offset = DIJOFS_Z;
-        } else if (DI_GUIDIsSame(guid, &GUID_RxAxis)) {
+        } else if (WIN_IsEqualGUID(guid, &GUID_RxAxis)) {
             offset = DIJOFS_RX;
-        } else if (DI_GUIDIsSame(guid, &GUID_RyAxis)) {
+        } else if (WIN_IsEqualGUID(guid, &GUID_RyAxis)) {
             offset = DIJOFS_RY;
-        } else if (DI_GUIDIsSame(guid, &GUID_RzAxis)) {
+        } else if (WIN_IsEqualGUID(guid, &GUID_RzAxis)) {
             offset = DIJOFS_RZ;
         } else {
             return DIENUM_CONTINUE;   /* can't use this, go on. */
@@ -251,7 +242,7 @@ DI_DeviceObjectCallback(LPCDIDEVICEOBJECTINSTANCE dev, LPVOID pvRef)
  * Callback to get all supported effects.
  */
 #define EFFECT_TEST(e,s)               \
-if (DI_GUIDIsSame(&pei->guid, &(e)))   \
+if (WIN_IsEqualGUID(&pei->guid, &(e)))   \
    haptic->supported |= (s)
 static BOOL CALLBACK
 DI_EffectCallback(LPCDIEFFECTINFO pei, LPVOID pv)
@@ -481,7 +472,7 @@ SDL_DINPUT_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
         return 0;
     }
 
-    return DI_GUIDIsSame(&hap_instance.guidInstance, &joy_instance.guidInstance);
+    return WIN_IsEqualGUID(&hap_instance.guidInstance, &joy_instance.guidInstance);
 }
 
 int
@@ -500,7 +491,7 @@ SDL_DINPUT_HapticOpenFromJoystick(SDL_Haptic * haptic, SDL_Joystick * joystick)
 
     /* Since it comes from a joystick we have to try to match it with a haptic device on our haptic list. */
     for (item = SDL_hapticlist; item != NULL; item = item->next) {
-        if (!item->bXInputHaptic && DI_GUIDIsSame(&item->instance.guidInstance, &joy_instance.guidInstance)) {
+        if (!item->bXInputHaptic && WIN_IsEqualGUID(&item->instance.guidInstance, &joy_instance.guidInstance)) {
             haptic->index = index;
             return SDL_DINPUT_HapticOpenFromDevice(haptic, joystick->hwdata->InputDevice, SDL_TRUE);
         }
@@ -1016,6 +1007,19 @@ SDL_DINPUT_HapticUpdateEffect(SDL_Haptic * haptic, struct haptic_effect *effect,
     /* Create the actual effect. */
     ret =
         IDirectInputEffect_SetParameters(effect->hweffect->ref, &temp, flags);
+    if (ret == DIERR_NOTEXCLUSIVEACQUIRED) {
+        IDirectInputDevice8_Unacquire(haptic->hwdata->device);
+        ret = IDirectInputDevice8_SetCooperativeLevel(haptic->hwdata->device, SDL_HelperWindow, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+        if (SUCCEEDED(ret)) {
+            ret = DIERR_NOTACQUIRED;
+        }
+    }
+    if (ret == DIERR_INPUTLOST || ret == DIERR_NOTACQUIRED) {
+        ret = IDirectInputDevice8_Acquire(haptic->hwdata->device);
+        if (SUCCEEDED(ret)) {
+            ret = IDirectInputEffect_SetParameters(effect->hweffect->ref, &temp, flags);
+        }
+    }
     if (FAILED(ret)) {
         DI_SetError("Unable to update effect", ret);
         goto err_update;

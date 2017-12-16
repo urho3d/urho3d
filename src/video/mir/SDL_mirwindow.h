@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,8 +23,8 @@
   Contributed by Brandon Schaefer, <brandon.schaefer@canonical.com>
 */
 
-#ifndef _SDL_mirwindow_h
-#define _SDL_mirwindow_h
+#ifndef SDL_mirwindow_h_
+#define SDL_mirwindow_h_
 
 #include "../SDL_sysvideo.h"
 #include "SDL_syswm.h"
@@ -35,7 +35,7 @@ struct MIR_Window {
     SDL_Window* sdl_window;
     MIR_Data*   mir_data;
 
-    MirSurface* surface;
+    MirWindow*  window;
     EGLSurface  egl_surface;
 };
 
@@ -87,7 +87,7 @@ MIR_SetWindowGammaRamp(_THIS, SDL_Window* window, Uint16 const* ramp);
 extern int
 MIR_GetWindowGammaRamp(_THIS, SDL_Window* window, Uint16* ramp);
 
-#endif /* _SDL_mirwindow_h */
+#endif /* SDL_mirwindow_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */
 

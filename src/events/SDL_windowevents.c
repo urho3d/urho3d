@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 #include "../video/SDL_sysvideo.h"
 
 
-static int
+static int SDLCALL
 RemovePendingResizedEvents(void * userdata, SDL_Event *event)
 {
     SDL_Event *new_event = (SDL_Event *)userdata;
@@ -42,7 +42,7 @@ RemovePendingResizedEvents(void * userdata, SDL_Event *event)
     return 1;
 }
 
-static int
+static int SDLCALL
 RemovePendingSizeChangedEvents(void * userdata, SDL_Event *event)
 {
     SDL_Event *new_event = (SDL_Event *)userdata;
@@ -56,7 +56,7 @@ RemovePendingSizeChangedEvents(void * userdata, SDL_Event *event)
     return 1;
 }
 
-static int
+static int SDLCALL
 RemovePendingMoveEvents(void * userdata, SDL_Event *event)
 {
     SDL_Event *new_event = (SDL_Event *)userdata;
@@ -70,7 +70,7 @@ RemovePendingMoveEvents(void * userdata, SDL_Event *event)
     return 1;
 }
 
-static int
+static int SDLCALL
 RemovePendingExposedEvents(void * userdata, SDL_Event *event)
 {
     SDL_Event *new_event = (SDL_Event *)userdata;

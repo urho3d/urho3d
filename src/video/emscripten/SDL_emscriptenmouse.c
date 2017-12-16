@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,9 +32,8 @@
 #include "../../events/SDL_mouse_c.h"
 #include "SDL_assert.h"
 
-
 static SDL_Cursor*
-Emscripten_CreateDefaultCursor()
+Emscripten_CreateCursorFromString(const char* cursor_str, SDL_bool is_custom)
 {
     SDL_Cursor* cursor;
     Emscripten_CursorData *curdata;
@@ -48,7 +47,8 @@ Emscripten_CreateDefaultCursor()
             return NULL;
         }
 
-        curdata->system_cursor = "default";
+        curdata->system_cursor = cursor_str;
+        curdata->is_custom = is_custom;
         cursor->driverdata = curdata;
     }
     else {
@@ -58,19 +58,78 @@ Emscripten_CreateDefaultCursor()
     return cursor;
 }
 
-/*
 static SDL_Cursor*
-Emscripten_CreateCursor(SDL_Surface* sruface, int hot_x, int hot_y)
+Emscripten_CreateDefaultCursor()
 {
-    return Emscripten_CreateDefaultCursor();
+    return Emscripten_CreateCursorFromString("default", SDL_FALSE);
 }
-*/
+
+static SDL_Cursor*
+Emscripten_CreateCursor(SDL_Surface* surface, int hot_x, int hot_y)
+{
+    const char *cursor_url = NULL;
+    SDL_Surface *conv_surf;
+
+    conv_surf = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ABGR8888, 0);
+
+    if (!conv_surf) {
+        return NULL;
+    }
+
+    cursor_url = (const char *)EM_ASM_INT({
+        var w = $0;
+        var h = $1;
+        var pixels = $2;
+
+        var canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+
+        var ctx = canvas.getContext("2d");
+
+        var image = ctx.createImageData(w, h);
+        var data = image.data;
+        var src = pixels >> 2;
+        var dst = 0;
+        var num;
+        if (typeof CanvasPixelArray !== 'undefined' && data instanceof CanvasPixelArray) {
+            // IE10/IE11: ImageData objects are backed by the deprecated CanvasPixelArray,
+            // not UInt8ClampedArray. These don't have buffers, so we need to revert
+            // to copying a byte at a time. We do the undefined check because modern
+            // browsers do not define CanvasPixelArray anymore.
+            num = data.length;
+            while (dst < num) {
+                var val = HEAP32[src]; // This is optimized. Instead, we could do {{{ makeGetValue('buffer', 'dst', 'i32') }}};
+                data[dst  ] = val & 0xff;
+                data[dst+1] = (val >> 8) & 0xff;
+                data[dst+2] = (val >> 16) & 0xff;
+                data[dst+3] = (val >> 24) & 0xff;
+                src++;
+                dst += 4;
+            }
+        } else {
+            var data32 = new Int32Array(data.buffer);
+            num = data32.length;
+            data32.set(HEAP32.subarray(src, src + num));
+        }
+
+        ctx.putImageData(image, 0, 0);
+        var url = "url(" + canvas.toDataURL() + "), auto";
+
+        var urlBuf = _malloc(url.length + 1);
+        stringToUTF8(url, urlBuf, url.length + 1);
+
+        return urlBuf;
+    }, surface->w, surface->h, conv_surf->pixels);
+
+    SDL_FreeSurface(conv_surf);
+
+    return Emscripten_CreateCursorFromString(cursor_url, SDL_TRUE);
+}
 
 static SDL_Cursor*
 Emscripten_CreateSystemCursor(SDL_SystemCursor id)
 {
-    SDL_Cursor *cursor;
-    Emscripten_CursorData *curdata;
     const char *cursor_name = NULL;
 
     switch(id) {
@@ -114,22 +173,7 @@ Emscripten_CreateSystemCursor(SDL_SystemCursor id)
             return NULL;
     }
 
-    cursor = (SDL_Cursor *) SDL_calloc(1, sizeof(*cursor));
-    if (!cursor) {
-        SDL_OutOfMemory();
-        return NULL;
-    }
-    curdata = (Emscripten_CursorData *) SDL_calloc(1, sizeof(*curdata));
-    if (!curdata) {
-        SDL_OutOfMemory();
-        SDL_free(cursor);
-        return NULL;
-    }
-
-    curdata->system_cursor = cursor_name;
-    cursor->driverdata = curdata;
-
-    return cursor;
+    return Emscripten_CreateCursorFromString(cursor_name, SDL_FALSE);
 }
 
 static void
@@ -140,6 +184,9 @@ Emscripten_FreeCursor(SDL_Cursor* cursor)
         curdata = (Emscripten_CursorData *) cursor->driverdata;
 
         if (curdata != NULL) {
+            if (curdata->is_custom) {
+                SDL_free((char *)curdata->system_cursor);
+            }
             SDL_free(cursor->driverdata);
         }
 
@@ -202,9 +249,7 @@ Emscripten_InitMouse()
 {
     SDL_Mouse* mouse = SDL_GetMouse();
 
-/*
     mouse->CreateCursor         = Emscripten_CreateCursor;
-*/ 
     mouse->ShowCursor           = Emscripten_ShowCursor;
     mouse->FreeCursor           = Emscripten_FreeCursor;
     mouse->WarpMouse            = Emscripten_WarpMouse;
@@ -217,17 +262,6 @@ Emscripten_InitMouse()
 void
 Emscripten_FiniMouse()
 {
-    SDL_Mouse* mouse = SDL_GetMouse();
-
-    Emscripten_FreeCursor(mouse->def_cursor);
-    mouse->def_cursor = NULL;
-
-    mouse->CreateCursor         = NULL;
-    mouse->ShowCursor           = NULL;
-    mouse->FreeCursor           = NULL;
-    mouse->WarpMouse            = NULL;
-    mouse->CreateSystemCursor   = NULL;
-    mouse->SetRelativeMouseMode = NULL;
 }
 
 #endif /* SDL_VIDEO_DRIVER_EMSCRIPTEN */
