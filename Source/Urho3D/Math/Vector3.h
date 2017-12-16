@@ -401,6 +401,12 @@ public:
         return from + direction * factor;
     }
 
+    /// Calculate distance to another position vector.
+    float DistanceToPoint(const Vector3& point) const { return (*this - point).Length(); }
+
+    /// Calculate distance to the plane with given origin and normal.
+    float DistanceToPlane(const Vector3& origin, const Vector3& normal) const { return (*this - origin).ProjectOntoAxis(normal); }
+
     /// Make vector orthogonal to the axis.
     Vector3 Orthogonalize(const Vector3& axis) const { return axis.CrossProduct(*this).CrossProduct(axis).Normalized(); }
 
