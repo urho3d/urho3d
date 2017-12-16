@@ -378,8 +378,28 @@ public:
         return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_);
     }
 
-    /// Project vector onto axis.
+    /// Project direction vector onto axis.
     float ProjectOntoAxis(const Vector3& axis) const { return DotProduct(axis.Normalized()); }
+
+    /// Project position vector onto plane with given origin and normal.
+    Vector3 ProjectOntoPlane(const Vector3& origin, const Vector3& normal) const
+    {
+        const Vector3 delta = *this - origin;
+        return *this - normal.Normalized() * delta.ProjectOntoAxis(normal);
+    }
+
+    /// Project position vector onto line segment.
+    Vector3 ProjectOntoLine(const Vector3& from, const Vector3& to, bool clamped = false) const
+    {
+        const Vector3 direction = to - from;
+        const float lengthSquared = direction.LengthSquared();
+        float factor = (*this - from).DotProduct(direction) / lengthSquared;
+
+        if (clamped)
+            factor = Clamp(factor, 0.0f, 1.0f);
+
+        return from + direction * factor;
+    }
 
     /// Make vector orthogonal to the axis.
     Vector3 Orthogonalize(const Vector3& axis) const { return axis.CrossProduct(*this).CrossProduct(axis).Normalized(); }

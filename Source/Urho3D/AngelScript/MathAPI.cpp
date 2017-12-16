@@ -455,6 +455,8 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "float DotProduct(const Vector3&in) const", asMETHOD(Vector3, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float AbsDotProduct(const Vector3&in) const", asMETHOD(Vector3, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float ProjectOntoAxis(const Vector3&in) const", asMETHOD(Vector3, ProjectOntoAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "Vector3 ProjectOntoPlane(const Vector3&in, const Vector3&in) const", asMETHOD(Vector3, ProjectOntoPlane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "Vector3 ProjectOntoLine(const Vector3&in, const Vector3&in) const", asMETHOD(Vector3, ProjectOntoLine), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Orthogonalize(const Vector3&in) const", asMETHOD(Vector3, Orthogonalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Abs() const", asMETHOD(Vector3, Abs), asCALL_THISCALL);
