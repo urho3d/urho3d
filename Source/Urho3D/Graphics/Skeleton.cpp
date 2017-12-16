@@ -152,6 +152,34 @@ Bone* Skeleton::GetRootBone()
     return GetBone(rootBoneIndex_);
 }
 
+unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
+{
+    const unsigned numBones = bones_.Size();
+    for (unsigned i = 0; i < numBones; ++i)
+    {
+        if (bones_[i].nameHash_ == boneNameHash)
+            return i;
+    }
+
+    return numBones;
+}
+
+unsigned Skeleton::GetBoneIndex(const Bone* bone) const
+{
+    if (bones_.Empty() || bone < &bones_.Front() || bone > &bones_.Back())
+        return bones_.Size();
+
+    return static_cast<unsigned>(bone - &bones_.Front());
+}
+
+Bone* Skeleton::GetBoneParent(const Bone* bone)
+{
+    if (GetBoneIndex(bone) == bone->parentIndex_)
+        return nullptr;
+    else
+        return GetBone(bone->parentIndex_);
+}
+
 Bone* Skeleton::GetBone(unsigned index)
 {
     return index < bones_.Size() ? &bones_[index] : nullptr;
@@ -167,15 +195,10 @@ Bone* Skeleton::GetBone(const char* name)
     return GetBone(StringHash(name));
 }
 
-Bone* Skeleton::GetBone(StringHash nameHash)
+Bone* Skeleton::GetBone(const StringHash& boneNameHash)
 {
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
-    {
-        if (i->nameHash_ == nameHash)
-            return &(*i);
-    }
-
-    return nullptr;
+    const unsigned index = GetBoneIndex(boneNameHash);
+    return index < bones_.Size() ? &bones_[index] : nullptr;
 }
 
 }
