@@ -27,7 +27,7 @@
 #include "../Core/ProcessUtils.h"
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
-#include "../IO/File.h"
+#include "../IO/PhysicalFile.h"
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
 
@@ -92,7 +92,7 @@ void Log::Open(const String& fileName)
             Close();
     }
 
-    logFile_ = new File(context_);
+    logFile_ = new PhysicalFile(context_);
     if (logFile_->Open(fileName, FILE_WRITE))
         Write(LOG_INFO, "Opened log file " + fileName);
     else

@@ -25,6 +25,7 @@
 #include "../Container/HashSet.h"
 #include "../Container/List.h"
 #include "../Core/Object.h"
+#include "../IO/FileSource.h"
 
 namespace Urho3D
 {
@@ -104,6 +105,11 @@ public:
     /// Return path of temporary directory. Path always ends with a forward slash.
     String GetTemporaryDir() const;
 
+    /// Returns a regestired file source for a given file type
+    FileSource* GetFileSource(StringHash fileType) const; // TODO: should this return a WeakPtr?
+    /// Registers a FileSources as the default. Pass nullptr to unregister.
+    void RegisterFileSource(StringHash filetype, FileSource* source);
+
 private:
     /// Scan directory, called internally.
     void ScanDirInternal
@@ -121,6 +127,8 @@ private:
     unsigned nextAsyncExecID_;
     /// Flag for executing engine console commands as OS-specific system command. Default to true.
     bool executeConsoleCommands_;
+    /// Registered File Sources
+    HashMap<StringHash, SharedPtr<FileSource>> fileSources_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.

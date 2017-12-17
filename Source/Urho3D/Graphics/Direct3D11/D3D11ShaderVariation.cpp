@@ -26,7 +26,7 @@
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../IO/File.h"
+#include "../../IO/PhysicalFile.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
@@ -432,7 +432,7 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     if (!fileSystem->DirExists(path))
         fileSystem->CreateDir(path);
 
-    SharedPtr<File> file(new File(owner_->GetContext(), fullName, FILE_WRITE));
+    SharedPtr<File> file(new PhysicalFile(owner_->GetContext(), fullName, FILE_WRITE));
     if (!file->IsOpen())
         return;
 

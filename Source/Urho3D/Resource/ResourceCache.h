@@ -34,6 +34,7 @@ namespace Urho3D
 class BackgroundLoader;
 class FileWatcher;
 class PackageFile;
+class FileSource;
 
 /// Sets to priority so that a package or file is pushed to the end of the vector.
 static const unsigned PRIORITY_LAST = 0xffffffff;
@@ -94,13 +95,24 @@ public:
     bool AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST);
     /// Add a package file for loading resources from by name. Optional priority parameter which will control search order.
     bool AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST);
+    // TODO: NEL: convert ResourceDirs to SystemFileSources
+    /// Add a different file source for loading resources from. Optional priority parameter which will control search order.
+    bool AddFileSource(FileSource* source, unsigned priority = PRIORITY_LAST);
+    /// Add a file source of a Context-registered type for loading resources. Optional priority parameter which will control search order.
+    bool AddFileSource(const StringHash sourceType, const String& filename, unsigned priority = PRIORITY_LAST);
+    /// Template version to add a file source for loading resources from. Optional priority parameter which will control search order.
+    template <class T> bool AddFileSource(const String& filename, unsigned priority = PRIORITY_LAST);
     /// Add a manually created resource. Must be uniquely named within its type.
     bool AddManualResource(Resource* resource);
     /// Remove a resource load directory.
     void RemoveResourceDir(const String& pathName);
-    /// Remove a package file. Optionally release the resources loaded from it.
+    /// Remove a file source. Optionally release the resources loaded from it.
+    void RemoveFileSource(FileSource* source, bool releaseResources = true, bool forceRelease = false);
+    /// Remove a file source by name (not path). Optionally release the resources loaded from it.
+    void RemoveFileSource(const String& fileName, bool releaseResources = true, bool forceRelease = false);
+    /// Deprecated for RemoveFileSource
     void RemovePackageFile(PackageFile* package, bool releaseResources = true, bool forceRelease = false);
-    /// Remove a package file by name. Optionally release the resources loaded from it.
+    /// Deprecated for RemoveFileSource
     void RemovePackageFile(const String& fileName, bool releaseResources = true, bool forceRelease = false);
     /// Release a resource by name.
     void ReleaseResource(StringHash type, const String& name, bool force = false);
@@ -156,7 +168,7 @@ public:
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
 
     /// Return added package files.
-    const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
+    const Vector<SharedPtr<FileSource> >& GetPackageFiles() const { return fileSources_; }
 
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
@@ -215,8 +227,8 @@ private:
     const SharedPtr<Resource>& FindResource(StringHash type, StringHash nameHash);
     /// Find a resource by name only. Searches all type groups.
     const SharedPtr<Resource>& FindResource(StringHash nameHash);
-    /// Release resources loaded from a package file.
-    void ReleasePackageResources(PackageFile* package, bool force = false);
+    /// Release resources loaded from a file source.
+    void ReleaseSourceResources(FileSource* package, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
     void UpdateResourceGroup(StringHash type);
     /// Handle begin frame event. Automatic resource reloads and the finalization of background loaded resources are processed here.
@@ -224,7 +236,7 @@ private:
     /// Search FileSystem for file.
     File* SearchResourceDirs(const String& nameIn);
     /// Search resource packages for file.
-    File* SearchPackages(const String& nameIn);
+    File* SearchPackages(const String& nameIn); //TODO: NEL: Reimplent for file sources
 
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
@@ -235,7 +247,7 @@ private:
     /// File watchers for resource directories, if automatic reloading enabled.
     Vector<SharedPtr<FileWatcher> > fileWatchers_;
     /// Package files.
-    Vector<SharedPtr<PackageFile> > packages_;
+    Vector<SharedPtr<FileSource> > fileSources_;
     /// Dependent resources. Only used with automatic reload to eg. trigger reload of a cube texture when any of its faces change.
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Resource background loader.
@@ -253,6 +265,12 @@ private:
     /// How many milliseconds maximum per frame to spend on finishing background loaded resources.
     int finishBackgroundResourcesMs_;
 };
+
+template <class T> bool ResourceCache::AddFileSource(const String& filename, unsigned priority = PRIORITY_LAST)
+{
+    StringHash sourceType = T::GetTypeStatic();
+    return AddFileSource(sourceType, filename, priority);
+}
 
 template <class T> T* ResourceCache::GetExistingResource(const String& name)
 {

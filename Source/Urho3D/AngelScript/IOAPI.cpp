@@ -27,6 +27,7 @@
 #include "../IO/FileSystem.h"
 #include "../IO/NamedPipe.h"
 #include "../IO/PackageFile.h"
+#include "../IO/PhysicalFile.h"
 
 namespace Urho3D
 {
@@ -184,12 +185,14 @@ static void RegisterLog(asIScriptEngine* engine)
 
 static File* ConstructFile()
 {
-    return new File(GetScriptContext());
+    // TODO: NEL: Fix File Script API
+    return new PhysicalFile(GetScriptContext());
 }
 
 static File* ConstructFileAndOpen(const String& fileName, FileMode mode)
 {
-    return new File(GetScriptContext(), fileName, mode);
+    // TODO: NEL: Fix File Script API
+    return new PhysicalFile(GetScriptContext(), fileName, mode);
 }
 
 static NamedPipe* ConstructNamedPipe()

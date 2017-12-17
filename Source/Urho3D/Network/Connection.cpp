@@ -24,6 +24,7 @@
 
 #include "../Core/Profiler.h"
 #include "../IO/File.h"
+#include "../IO/PhysicalFile.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
@@ -752,7 +753,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     }
 
                     // Try to open the file now
-                    SharedPtr<File> file(new File(context_, packageFullName));
+                    SharedPtr<File> file(new PhysicalFile(context_, packageFullName));
                     if (!file->IsOpen())
                     {
                         URHO3D_LOGERROR("Failed to transmit package file " + name);
@@ -804,7 +805,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             // If file has not yet been opened, try to open now. Prepend the checksum to the filename to allow multiple versions
             if (!download.file_)
             {
-                download.file_ = new File(context_,
+                download.file_ = new PhysicalFile(context_,
                     GetSubsystem<Network>()->GetPackageCacheDir() + ToStringHex(download.checksum_) + "_" + download.name_,
                     FILE_WRITE);
                 if (!download.file_->IsOpen())
@@ -1398,7 +1399,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         {
             PackageFile* package = packages[j];
             if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
-                package->GetChecksum() == checksum)
+                package->GetChecksum() == checksum) //TODO: Swap order of comparisons as size and checksum are fast-fail
             {
                 found = true;
                 break;

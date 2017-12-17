@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../Core/Object.h"
+#include "../IO/FileSource.h"
 
 namespace Urho3D
 {
@@ -38,10 +38,12 @@ struct PackageEntry
     unsigned checksum_;
 };
 
+class PackedFile;
+
 /// Stores files of a directory tree sequentially for convenient access.
-class URHO3D_API PackageFile : public Object
+class URHO3D_API PackageFile : public FileSource
 {
-    URHO3D_OBJECT(PackageFile, Object);
+    URHO3D_OBJECT(PackageFile, FileSource);
 
 public:
     /// Construct.
@@ -52,46 +54,39 @@ public:
     virtual ~PackageFile() override;
 
     /// Open the package file. Return true if successful.
-    bool Open(const String& fileName, unsigned startOffset = 0);
+    virtual bool Open(const String& fileName, unsigned startOffset = 0) override;
     /// Check if a file exists within the package file. This will be case-insensitive on Windows and case-sensitive on other platforms.
-    bool Exists(const String& fileName) const;
+    virtual bool Exists(const String& fileName) const override;
+    /// TODO: NEL: If this SharedPtr thing doesn't work, just have it return SharedPtr<File> and add another GetNewFile that returns the raw pointer
+    /// Get a PackedFile from the package contents
+    virtual SharedPtr<PackedFile> GetFile(const String& fileName, FileMode mode = FILE_READ) const override;
     /// Return the file entry corresponding to the name, or null if not found. This will be case-insensitive on Windows and case-sensitive on other platforms.
     const PackageEntry* GetEntry(const String& fileName) const;
 
     /// Return all file entries.
     const HashMap<String, PackageEntry>& GetEntries() const { return entries_; }
 
-    /// Return the package file name.
-    const String& GetName() const { return fileName_; }
-
-    /// Return hash of the package file name.
-    StringHash GetNameHash() const { return nameHash_; }
-
     /// Return number of files.
-    unsigned GetNumFiles() const { return entries_.Size(); }
+    virtual unsigned GetNumFiles() const override { return entries_.Size(); }
 
     /// Return total size of the package file.
-    unsigned GetTotalSize() const { return totalSize_; }
+    virtual unsigned GetTotalSize() const override { return totalSize_; }
 
     /// Return total data size from all the file entries in the package file.
-    unsigned GetTotalDataSize() const { return totalDataSize_; }
+    virtual unsigned GetTotalDataSize() const override { return totalDataSize_; }
 
     /// Return checksum of the package file contents.
-    unsigned GetChecksum() const { return checksum_; }
+    virtual unsigned GetChecksum() const override { return checksum_; }
 
     /// Return whether the files are compressed.
-    bool IsCompressed() const { return compressed_; }
+    virtual bool IsCompressed() const override { return compressed_; }
 
     /// Return list of file names in the package.
-    const Vector<String> GetEntryNames() const { return entries_.Keys(); }
+    virtual const Vector<String> GetEntryNames() const override { return entries_.Keys(); }
 
 private:
     /// File entries.
     HashMap<String, PackageEntry> entries_;
-    /// File name.
-    String fileName_;
-    /// Package file name hash.
-    StringHash nameHash_;
     /// Package file total size.
     unsigned totalSize_;
     /// Total data size in the package using each entry's actual size if it is a compressed package file.

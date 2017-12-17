@@ -26,25 +26,8 @@
 #include "../Core/Object.h"
 #include "../IO/AbstractFile.h"
 
-#ifdef __ANDROID__
-struct SDL_RWops;
-#endif
-
 namespace Urho3D
 {
-
-#ifdef __ANDROID__
-extern const char* APK;
-
-// Macro for checking if a given pathname is inside APK's assets directory
-#define URHO3D_IS_ASSET(p) p.StartsWith(APK)
-// Macro for truncating the APK prefix string from the asset pathname and at the same time patching the directory name components (see custom_rules.xml)
-#ifdef ASSET_DIR_INDICATOR
-#define URHO3D_ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
-#else
-#define URHO3D_ASSET(p) p.Substring(5).CString()
-#endif
-#endif
 
 /// File open mode.
 enum FileMode
@@ -54,9 +37,9 @@ enum FileMode
     FILE_READWRITE
 };
 
-class PackageFile;
+class FileSource;
 
-/// %File opened either through the filesystem or from within a package file.
+/// Base class for files, physical or archived.
 class URHO3D_API File : public Object, public AbstractFile
 {
     URHO3D_OBJECT(File, Object);
@@ -64,85 +47,54 @@ class URHO3D_API File : public Object, public AbstractFile
 public:
     /// Construct.
     File(Context* context);
+    //TODO: Should these be for derived class to implement? What is Constructor call order? Base Initilization->Derived Init-> Base Function->Derived function?
     /// Construct and open a filesystem file.
     File(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file.
-    File(Context* context, PackageFile* package, const String& fileName);
-    /// Destruct. Close the file if open.
-    virtual ~File() override;
+    File(Context* context, FileSource* source, const String& fileName, FileMode mode = FILE_READ);
+    /// Destruct. Derived class must close the file if open.
+    virtual ~File() override { }
 
-    /// Read bytes from the file. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size) override;
-    /// Set position from the beginning of the file.
-    virtual unsigned Seek(unsigned position) override;
-    /// Write bytes to the file. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size) override;
+    /* From Deserializer
+    /// Read bytes from the stream. Return number of bytes actually read.
+    virtual unsigned Read(void* dest, unsigned size) = 0;
+    /// Set position from the beginning of the stream. Return actual new position.
+    virtual unsigned Seek(unsigned position) = 0;
+    /// Return a checksum if applicable.
+    virtual unsigned GetChecksum();
+    /// Return whether the end of stream has been reached.
+    virtual bool IsEof() const { return position_ >= size_; } */
 
-    /// Return the file name.
+    /// Return name of the stream.
     virtual const String& GetName() const override { return fileName_; }
 
-    /// Return a checksum of the file contents using the SDBM hash algorithm.
-    virtual unsigned GetChecksum() override;
 
-    /// Open a filesystem file. Return true if successful.
+    // File Specific things
+    /// Open a file with the default FileSource for this file kind of file, as registered in the resource cache. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);
-    /// Open from within a package file. Return true if successful.
-    bool Open(PackageFile* package, const String& fileName);
+    /// Open from within a given file source. Return true if successful. FileModes beyond FILE_READ may not be supported.
+    virtual bool Open(FileSource* source, const String& fileName, FileMode mode = FILE_READ) = 0;
     /// Close the file.
-    void Close();
+    virtual void Close() = 0;
     /// Flush any buffered output to the file.
-    void Flush();
+    virtual void Flush() = 0;
+    /// Return whether is open.
+    virtual bool IsOpen() const = 0;
+    /// Return a derived-class determined file handle, if appropriate.
+    virtual void* GetHandle() const { return nullptr; }
+
     /// Change the file name. Used by the resource system.
     void SetName(const String& name);
-
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
 
-    /// Return whether is open.
-    bool IsOpen() const;
+    /// Returns the file's FileSource
 
-    /// Return the file handle.
-    void* GetHandle() const { return handle_; }
-
-    /// Return whether the file originates from a package.
-    bool IsPackaged() const { return offset_ != 0; }
-
-private:
-    /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.
-    bool OpenInternal(const String& fileName, FileMode mode, bool fromPackage = false);
-    /// Perform the file read internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful. This does not handle compressed package file reading.
-    bool ReadInternal(void* dest, unsigned size);
-    /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
-    void SeekInternal(unsigned newPosition);
-
+protected:
     /// File name.
     String fileName_;
     /// Open mode.
     FileMode mode_;
-    /// File handle.
-    void* handle_;
-#ifdef __ANDROID__
-    /// SDL RWops context for Android asset loading.
-    SDL_RWops* assetHandle_;
-#endif
-    /// Read buffer for Android asset or compressed file loading.
-    SharedArrayPtr<unsigned char> readBuffer_;
-    /// Decompression input buffer for compressed file loading.
-    SharedArrayPtr<unsigned char> inputBuffer_;
-    /// Read buffer position.
-    unsigned readBufferOffset_;
-    /// Bytes in the current read buffer.
-    unsigned readBufferSize_;
-    /// Start position within a package file, 0 for regular files.
-    unsigned offset_;
-    /// Content checksum.
-    unsigned checksum_;
-    /// Compression flag.
-    bool compressed_;
-    /// Synchronization needed before read -flag.
-    bool readSyncNeeded_;
-    /// Synchronization needed before write -flag.
-    bool writeSyncNeeded_;
 };
 
 }

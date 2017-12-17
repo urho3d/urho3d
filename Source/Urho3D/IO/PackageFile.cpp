@@ -22,7 +22,7 @@
 
 #include "../Precompiled.h"
 
-#include "../IO/File.h"
+#include "../IO/PhysicalFile.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
 
@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 PackageFile::PackageFile(Context* context) :
-    Object(context),
+    FileSource(context),
     totalSize_(0),
     totalDataSize_(0),
     checksum_(0),
@@ -39,7 +39,7 @@ PackageFile::PackageFile(Context* context) :
 }
 
 PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset) :
-    Object(context),
+    FileSource(context),
     totalSize_(0),
     totalDataSize_(0),
     checksum_(0),
@@ -54,7 +54,7 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
-    SharedPtr<File> file(new File(context_, fileName));
+    SharedPtr<File> file(new PhysicalFile(context_, fileName));
     if (!file->IsOpen())
         return false;
 
@@ -132,6 +132,11 @@ bool PackageFile::Exists(const String& fileName) const
 #endif
 
     return found;
+}
+
+SharedPtr<PackedFile> PackageFile::GetFile(const String &fileName, FileMode mode) const
+{
+    return new PackedFile(context_,this,fileName,mode);
 }
 
 const PackageEntry* PackageFile::GetEntry(const String& fileName) const
