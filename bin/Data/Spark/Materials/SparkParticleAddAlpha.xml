@@ -1,0 +1,4 @@
+<material>
+    <technique name="Spark/Techniques/DiffUnlitParticleAddAlpha.xml" />
+    <texture unit="diffuse" name="Textures/Flare.dds" />
+</material>
