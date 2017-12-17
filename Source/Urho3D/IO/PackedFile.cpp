@@ -50,8 +50,7 @@ static const unsigned READ_BUFFER_SIZE = 32768;
 static const unsigned SKIP_BUFFER_SIZE = 1024;
 
 PackedFile::PackedFile(Context* context) :
-    Object(context),
-    mode_(FILE_READ),
+    File(context),
     handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
@@ -61,14 +60,12 @@ PackedFile::PackedFile(Context* context) :
     offset_(0),
     checksum_(0),
     compressed_(false),
-    readSyncNeeded_(false),
-    writeSyncNeeded_(false)
+    readSyncNeeded_(false)
 {
 }
 
-PackedFile::PackedFile(Context* context, PackageFile* package, const String& fileName) :
-    Object(context),
-    mode_(FILE_READ),
+PackedFile::PackedFile(Context* context, PackageFile* package, const String& fileName, FileMode mode) :
+    File(context),
     handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
@@ -78,8 +75,7 @@ PackedFile::PackedFile(Context* context, PackageFile* package, const String& fil
     offset_(0),
     checksum_(0),
     compressed_(false),
-    readSyncNeeded_(false),
-    writeSyncNeeded_(false)
+    readSyncNeeded_(false)
 {
     Open(package, fileName);
 }
@@ -90,7 +86,7 @@ PackedFile::~PackedFile()
 }
 
 
-bool PackedFile::Open(PackageFile* package, const String& fileName)
+bool PackedFile::Open(PackageFile* package, const String& fileName, FileMode mode)
 {
     if (!package)
         return false;
@@ -115,6 +111,11 @@ bool PackedFile::Open(PackageFile* package, const String& fileName)
     // Seek to beginning of package entry's file data
     SeekInternal(offset_);
     return true;
+}
+
+bool PackedFile::Open(FileSource *package, const String &fileName, FileMode mode)
+{
+    return Open(dynamic_cast<PackageFile*>(package), fileName, mode);
 }
 
 unsigned PackedFile::Read(void* dest, unsigned size)
@@ -227,7 +228,6 @@ unsigned PackedFile::Read(void* dest, unsigned size)
         return 0;
     }
 
-    writeSyncNeeded_ = true;
     position_ += size;
     return size;
 }
@@ -270,7 +270,6 @@ unsigned PackedFile::Seek(unsigned position)
     SeekInternal(position + offset_);
     position_ = position;
     readSyncNeeded_ = false;
-    writeSyncNeeded_ = false;
     return position_;
 }
 
@@ -365,7 +364,6 @@ bool PackedFile::OpenInternal(const String& fileName)
 
     compressed_ = false;
     readSyncNeeded_ = false;
-    writeSyncNeeded_ = false;
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))

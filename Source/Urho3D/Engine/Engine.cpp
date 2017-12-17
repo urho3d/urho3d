@@ -329,11 +329,11 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     if (removeOld)
     {
         Vector<String> resourceDirs = cache->GetResourceDirs();
-        Vector<SharedPtr<PackageFile> > packageFiles = cache->GetPackageFiles();
+        Vector<SharedPtr<FileSource> > packageFiles = cache->GetFileSources();
         for (unsigned i = 0; i < resourceDirs.Size(); ++i)
             cache->RemoveResourceDir(resourceDirs[i]);
         for (unsigned i = 0; i < packageFiles.Size(); ++i)
-            cache->RemovePackageFile(packageFiles[i]);
+            cache->RemoveFileSource(packageFiles[i]);
     }
 
     // Add resource paths

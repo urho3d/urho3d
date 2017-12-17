@@ -474,12 +474,10 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
-    Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
-    for (unsigned i = 0; i < packages.Size(); ++i)
+    for (const SharedPtr<FileSource>& source : cache->GetFileSources())
     {
-        PackageFile* package = packages[i];
-        if (!package->GetName().Find(packageCacheDir))
-            cache->RemovePackageFile(package, true);
+        if (!source->GetName().Find(packageCacheDir))
+            cache->RemoveFileSource(source, true);
     }
 
     // Now check which packages we have in the resource cache or in the download cache, and which we need to download
@@ -1382,7 +1380,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
-    Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
+    Vector<SharedPtr<FileSource> > packages = cache->GetFileSources();
     Vector<String> downloadedPackages;
     bool packagesScanned = false;
 
@@ -1397,7 +1395,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         // Check first the resource cache
         for (unsigned j = 0; j < packages.Size(); ++j)
         {
-            PackageFile* package = packages[j];
+            FileSource* package = packages[j];
             if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
                 package->GetChecksum() == checksum) //TODO: Swap order of comparisons as size and checksum are fast-fail
             {

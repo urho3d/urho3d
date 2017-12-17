@@ -38,19 +38,17 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ)
 {
-    Open(fileName, mode);
 }
 
-File::File(Context* context, PackageFile* package, const String& fileName, FileMode mode) :
+File::File(Context* context, FileSource* package, const String& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ)
 {
-    Open(package, fileName, mode);
 }
 
 bool File::Open(const String& fileName, FileMode mode)
 {
-    return Open(GetSubsystem<FileSystem>()->GetFileSource(this->GetType()), fileName, mode);
+    return this->Open(GetSubsystem<FileSystem>()->GetFileSource(this->GetType()), fileName, mode);
 }
 
 void File::SetName(const String& name)
@@ -58,13 +56,5 @@ void File::SetName(const String& name)
     fileName_ = name;
 }
 
-bool File::IsOpen() const
-{
-#ifdef __ANDROID__
-    return handle_ != 0 || assetHandle_ != 0;
-#else
-    return handle_ != nullptr;
-#endif
-}
 
 }

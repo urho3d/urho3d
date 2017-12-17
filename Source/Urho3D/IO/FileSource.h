@@ -45,8 +45,11 @@ public:
     /// Return list of file names in the package, if available. Otherwise must store list of used resource names and use those.
     virtual const Vector<String> GetEntryNames() const = 0;
 
-    /// Return a file of the kind associate with this type of file source.
-    virtual SharedPtr<File> GetFile(const String& fileName, FileMode mode = FILE_READ) const = 0;
+    /// Opens a new file of the kind associate with this type of file source with the given name.
+    virtual File* GetNewFile(const String& fileName, FileMode mode = FILE_READ) = 0;
+
+    /// Opens a file with the given name and returns a file shared pointer from the source.
+    SharedPtr<File> GetFile(const String& fileName, FileMode mode = FILE_READ);
 
     /// Open the package file, if applicable.
     virtual bool Open(const String& filename) { return true; }
@@ -79,8 +82,6 @@ protected:
         nameHash_ = fileName_;
     }
 
-    /// File entries.
-    HashMap<String, PackageEntry> entries_;
     /// File name.
     String fileName_;
     /// Package file name hash.

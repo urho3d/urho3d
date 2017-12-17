@@ -167,7 +167,9 @@ public:
     /// Return added resource load directories.
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
 
-    /// Return added package files.
+    /// Return added file sources.
+    const Vector<SharedPtr<FileSource> >& GetFileSources() const { return fileSources_; }
+    /// Deprecated for GetFileSources
     const Vector<SharedPtr<FileSource> >& GetPackageFiles() const { return fileSources_; }
 
     /// Template version of returning a resource by name.
@@ -228,7 +230,7 @@ private:
     /// Find a resource by name only. Searches all type groups.
     const SharedPtr<Resource>& FindResource(StringHash nameHash);
     /// Release resources loaded from a file source.
-    void ReleaseSourceResources(FileSource* package, bool force = false);
+    void ReleaseSourceResources(FileSource* source, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
     void UpdateResourceGroup(StringHash type);
     /// Handle begin frame event. Automatic resource reloads and the finalization of background loaded resources are processed here.
@@ -266,7 +268,7 @@ private:
     int finishBackgroundResourcesMs_;
 };
 
-template <class T> bool ResourceCache::AddFileSource(const String& filename, unsigned priority = PRIORITY_LAST)
+template <class T> bool ResourceCache::AddFileSource(const String& filename, unsigned priority)
 {
     StringHash sourceType = T::GetTypeStatic();
     return AddFileSource(sourceType, filename, priority);

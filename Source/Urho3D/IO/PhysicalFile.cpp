@@ -65,7 +65,7 @@ static const unsigned READ_BUFFER_SIZE = 32768;
 static const unsigned SKIP_BUFFER_SIZE = 1024;
 
 PhysicalFile::PhysicalFile(Context* context) :
-    Object(context),
+    File(context),
     mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__
@@ -80,7 +80,7 @@ PhysicalFile::PhysicalFile(Context* context) :
 }
 
 PhysicalFile::PhysicalFile(Context* context, const String& fileName, FileMode mode) :
-    Object(context),
+    File(context),
     mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__
@@ -163,7 +163,7 @@ unsigned PhysicalFile::Read(void* dest, unsigned size)
     // Need to reassign the position due to internal buffering when transitioning from writing to reading
     if (readSyncNeeded_)
     {
-        SeekInternal(position_ + offset_);
+        SeekInternal(position_);
         readSyncNeeded_ = false;
     }
 
@@ -219,7 +219,7 @@ unsigned PhysicalFile::Write(const void* data, unsigned size)
     // Need to reassign the position due to internal buffering when transitioning from reading to writing
     if (writeSyncNeeded_)
     {
-        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        fseek((FILE*)handle_, position_, SEEK_SET);
         writeSyncNeeded_ = false;
     }
 
@@ -352,7 +352,6 @@ bool PhysicalFile::OpenInternal(const String& fileName, FileMode mode)
             mode_ = mode;
             position_ = 0;
             size_ = SDL_RWsize(assetHandle_);
-            offset_ = 0;
             checksum_ = 0;
             return true;
         }

@@ -46,17 +46,9 @@ extern const char* APK;
 #endif
 #endif
 
-/// PhysicalFile open mode.
-enum FileMode
-{
-    FILE_READ = 0,
-    FILE_WRITE,
-    FILE_READWRITE
-};
-
 /// %PhysicalFile opened either through the filesystem or from within a package file.
 /// TODO: would SystemFile be a prefered name?
-class URHO3D_API PhysicalFile : public Object, public File
+class URHO3D_API PhysicalFile : public File
 {
     URHO3D_OBJECT(PhysicalFile, File);
 
@@ -81,6 +73,8 @@ public:
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     virtual unsigned GetChecksum() override;
 
+    /// Open a filesystem file. Return true if successful.
+    bool Open(FileSource* source, const String& fileName, FileMode mode = FILE_READ) { return Open(fileName, mode); }
     /// Open a filesystem file. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);
     /// Close the file.

@@ -134,7 +134,7 @@ bool PackageFile::Exists(const String& fileName) const
     return found;
 }
 
-SharedPtr<PackedFile> PackageFile::GetFile(const String &fileName, FileMode mode) const
+PackedFile* PackageFile::GetNewFile(const String &fileName, FileMode mode)
 {
     return new PackedFile(context_,this,fileName,mode);
 }

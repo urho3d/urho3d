@@ -34,4 +34,9 @@ FileSource::FileSource(Context* context) :
 {
 }
 
+SharedPtr<File> FileSource::GetFile(const String &fileName, FileMode mode)
+{
+    return SharedPtr<File>(GetNewFile(fileName, mode));
+}
+
 }

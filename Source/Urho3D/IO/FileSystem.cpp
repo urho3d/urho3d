@@ -1085,7 +1085,7 @@ String FileSystem::GetTemporaryDir() const
 #endif
 }
 
-FileSource *FileSystem::GetFileSource(StringHash fileType) const
+FileSource *FileSystem::GetFileSource(StringHash fileType)
 {
     return fileSources_[fileType];
 }

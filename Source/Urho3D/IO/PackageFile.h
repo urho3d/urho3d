@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../IO/FileSource.h"
+#include "../IO/PackedFile.h"
 
 namespace Urho3D
 {
@@ -38,8 +39,6 @@ struct PackageEntry
     unsigned checksum_;
 };
 
-class PackedFile;
-
 /// Stores files of a directory tree sequentially for convenient access.
 class URHO3D_API PackageFile : public FileSource
 {
@@ -54,12 +53,11 @@ public:
     virtual ~PackageFile() override;
 
     /// Open the package file. Return true if successful.
-    virtual bool Open(const String& fileName, unsigned startOffset = 0) override;
+    virtual bool Open(const String& fileName, unsigned startOffset = 0);// override;
     /// Check if a file exists within the package file. This will be case-insensitive on Windows and case-sensitive on other platforms.
     virtual bool Exists(const String& fileName) const override;
-    /// TODO: NEL: If this SharedPtr thing doesn't work, just have it return SharedPtr<File> and add another GetNewFile that returns the raw pointer
     /// Get a PackedFile from the package contents
-    virtual SharedPtr<PackedFile> GetFile(const String& fileName, FileMode mode = FILE_READ) const override;
+    virtual PackedFile* GetNewFile(const String& fileName, FileMode mode = FILE_READ) override;
     /// Return the file entry corresponding to the name, or null if not found. This will be case-insensitive on Windows and case-sensitive on other platforms.
     const PackageEntry* GetEntry(const String& fileName) const;
 

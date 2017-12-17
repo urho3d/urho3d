@@ -29,6 +29,7 @@
 #include "../IO/Deserializer.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
+#include "../IO/PhysicalFile.h"
 #include "../Resource/ResourceCache.h"
 
 #include "../DebugNew.h"
@@ -163,7 +164,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 
     // If the source if a non-packaged file, store the timestamp
     File* file = dynamic_cast<File*>(&source);
-    if (file && !file->IsPackaged())
+    if (file && file->GetType() == PhysicalFile::GetTypeStatic())
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
         String fullName = cache->GetResourceFileName(file->GetName());

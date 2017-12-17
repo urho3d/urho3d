@@ -24,7 +24,7 @@
 
 #include "../Container/ArrayPtr.h"
 #include "../Core/Object.h"
-#include "../IO/AbstractFile.h"
+#include "../IO/File.h"
 
 #ifdef __ANDROID__
 struct SDL_RWops;
@@ -48,10 +48,9 @@ extern const char* APK;
 
 
 class PackageFile;
-class File;
 
 /// %File opened either through the filesystem or from within a package file.
-class URHO3D_API PackedFile : public Object, public File
+class URHO3D_API PackedFile : public File
 {
     URHO3D_OBJECT(PackedFile, File);
 
@@ -59,7 +58,7 @@ public:
     /// Construct.
     PackedFile(Context* context);
     /// Construct and open from a package file.
-    PackedFile(Context* context, PackageFile* package, const String& fileName);
+    PackedFile(Context* context, PackageFile* package, const String& fileName, FileMode mode = FILE_READ);
     /// Destruct. Close the file if open.
     virtual ~PackedFile() override;
 
@@ -74,7 +73,9 @@ public:
     virtual unsigned GetChecksum() override;
 
     /// Open from within a package file. Return true if successful.
-    bool Open(PackageFile* package, const String& fileName);
+    bool Open(PackageFile* package, const String& fileName, FileMode mode = FILE_READ);
+    /// Open from within a package file. Return true if successful.
+    virtual bool Open(FileSource* package, const String& fileName, FileMode mode = FILE_READ) override;
     /// Close the file.
     void Close();
     /// Flush any buffered output to the file.
@@ -83,7 +84,7 @@ public:
     void SetName(const String& name);
 
     /// Return the open mode.
-    FileMode GetMode() const { return mode_; }
+    FileMode GetMode() const { return FILE_READ; }
 
     /// Return whether is open.
     bool IsOpen() const;

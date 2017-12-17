@@ -192,8 +192,13 @@ bool ResourceCache::AddFileSource(FileSource* source, unsigned priority)
 
 bool ResourceCache::AddFileSource(const StringHash sourceType, const String& fileName, unsigned priority)
 {
-    SharedPtr<FileSource> source(context_->CreateObject(sourceType));
-    return source->Open(fileName) && AddFileSource(source);
+    SharedPtr<Object> obj(context_->CreateObject(sourceType));
+    if (obj && obj->IsInstanceOf<FileSource>())
+    {
+        SharedPtr<FileSource> source((FileSource*)obj.Get());
+        return source->Open(fileName) && AddFileSource(source);
+    }
+    return false;
 }
 
 bool ResourceCache::AddManualResource(Resource* resource)

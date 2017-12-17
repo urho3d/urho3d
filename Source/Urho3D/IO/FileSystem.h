@@ -106,7 +106,7 @@ public:
     String GetTemporaryDir() const;
 
     /// Returns a regestired file source for a given file type
-    FileSource* GetFileSource(StringHash fileType) const; // TODO: should this return a WeakPtr?
+    FileSource* GetFileSource(StringHash fileType); // TODO: should this return a WeakPtr?
     /// Registers a FileSources as the default. Pass nullptr to unregister.
     void RegisterFileSource(StringHash filetype, FileSource* source);
 
