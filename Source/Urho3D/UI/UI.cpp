@@ -640,6 +640,41 @@ void UI::SetFontOversampling(int oversampling)
     }
 }
 
+void UI::SetScaleAuto()
+{
+	float a, b, c;
+	SDL_GetDisplayDPI(0, &a, &b, &c);;
+	//URHO3D_LOGINFO("diagonal dots per inch (ddpi) = " + String(a));
+
+	//get current window size
+	Graphics* g = GetSubsystem<Graphics>();
+
+	// check to see if we should scale based on windowsize : drawable size ratio
+	// only relevant for OSX Retina displays?
+	SDL_Window* curwindow = g->GetWindow();
+	int gl_w, gl_h;
+	SDL_GL_GetDrawableSize(curwindow, &gl_w, &gl_h);
+
+	int sdl_w, sdl_h;
+	SDL_GetWindowSize(curwindow, &sdl_w, &sdl_h);
+
+	float multiplier = 1.0f;
+	if (sdl_w != 0)
+		multiplier = gl_w / sdl_w;
+
+	// do less scaling for small screens
+	if (sdl_w < 1450 && multiplier > 1.5)
+		multiplier *= 0.75f;
+
+	int realDPI = multiplier * a;
+	float scale = Max(0.4f * (realDPI / 50.0f), 1.0f);
+
+	UI* ui = GetSubsystem<UI>();
+	float curScale = ui->GetScale();
+	if (Abs(scale - curScale) > 0.001f)
+		ui->SetScale(scale);
+}
+
 void UI::SetScale(float scale)
 {
     uiScale_ = Max(scale, M_EPSILON);

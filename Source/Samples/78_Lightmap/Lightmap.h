@@ -37,6 +37,7 @@ class BoundingBox;
 class Material;
 class StaticModel;
 class Viewport;
+class DebugRenderer;
 }
 
 //=============================================================================
@@ -73,7 +74,14 @@ public:
     static void RegisterObject(Context* context);
 
     void BeginIndirectLighting(const String &filepath, unsigned imageSize=DEFAULT_INDIRECT_IMAGE_SIZE);
+
     SharedPtr<Image> GetIndirectLightImage() { return indirectLightImage_; }
+
+    void SetLumaOutputColor(bool bset)       { lumaOutputColor_ = bset; }
+    bool GetLumaOutputColor() const          { return lumaOutputColor_; }
+
+    // dbg
+    void DrawDebugGeometry(DebugRenderer* debug, const Color &color, bool depthTest, unsigned &triIdx);
 
 protected:
     void InitBakeLightSettings(const BoundingBox& worldBoundingBox);
@@ -96,8 +104,8 @@ protected:
     void BackgroundProcessIndirectImage(void *data);
     void QueueIndirectImage(unsigned idx, SharedPtr<Image> image);
     SharedPtr<Image> GetFrontIndirectQueueImage(unsigned &idx);
-    void PopFrontIndirectQueueIdx();
-    void CalculateSolidAngleColor(unsigned idx, SharedPtr<Image> scrnImage);
+    void PopFrontIndirectQueue();
+    void CalculateIrradiance(unsigned idx, SharedPtr<Image> scrnImage);
     void FinalizeIndirectImage();
     void ProcessIndirectRenderSurface(unsigned parserIdx);
     void SmoothAndDilate(SharedPtr<Image> image, bool dilate=true);
@@ -112,15 +120,9 @@ protected:
     unsigned                texWidth_;
     unsigned                texHeight_;
     bool                    saveFile_;
+    bool                    lumaOutputColor_;
 
     Mutex                   mutexStateLock_;
-
-    struct IndirectData
-    {
-        SharedPtr<Image> image_;
-        unsigned         idx_;
-    };
-    Vector<IndirectData>    indirectDataList_;
     Mutex                   mutexIndirectQueueLock_;
 
     unsigned                stateProcess_;
@@ -133,7 +135,6 @@ private:
     enum StateType
     {
         State_UnInit,
-        State_DirectLight,
         State_CreateGeomData,
         State_CreatePixelData,
         State_IndirectLightSetup,
@@ -142,6 +143,13 @@ private:
         State_IndirectLightWaitBackground,
         State_IndirectLightEnd
     };
+
+    struct IndirectData
+    {
+        SharedPtr<Image> image_;
+        unsigned         idx_;
+    };
+    Vector<IndirectData>    indirectDataList_;
 
     struct CaptureData
     {
@@ -189,6 +197,7 @@ private:
     SharedArrayPtr<unsigned> indexBuff_;
     unsigned numIndices_;
     unsigned indexSize_;
+    String name_;
 
     //=============================================================================
     // http://answers.unity3d.com/questions/383804/calculate-uv-coordinates-of-3d-point-on-plane-of-m.html

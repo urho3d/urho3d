@@ -60,16 +60,19 @@ public:
 
     void Init(Scene *scene, const String& outputPath);
     void GenerateLightmaps();
+    void ProcessAdditionalLightBounce();
 
 protected:
     void CreateTechniquesToAvoidList();
     unsigned ParseModelsInScene();
     bool HasTexCoord2(StaticModel *staticModel);
+    void EnableLightsInScene(bool enable);
     void SetupIndirectProcess();
     void SetupBakeIndirectProcess();
+    void SwitchToLightmapTechnique();
+
     void QueueNodesForLightBaking();
     void QueueNodesForIndirectLightProcess();
-
     void BakeDirectLight(Node *node);
     void BakeIndirectLight(Node *node);
 
@@ -103,6 +106,8 @@ protected:
     unsigned totalTriangleCnt_;
     unsigned trianglesCompleted_;
     unsigned numObjectsCompletedIndirect_;
+
+    bool firstLightBounce_;
 
 private:
     enum LightMapState

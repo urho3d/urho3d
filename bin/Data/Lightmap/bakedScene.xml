@@ -13,7 +13,6 @@
 	<attribute name="Variable Names" value="" />
 	<component type="PhysicsWorld" id="1" />
 	<component type="Octree" id="2" />
-	<component type="DebugRenderer" id="3" />
 	<node id="2">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Zone" />
@@ -48,8 +47,6 @@
 		<component type="StaticModel" id="6">
 			<attribute name="Model" value="Model;Lightmap/Models/box.mdl" />
 			<attribute name="Material" value="Material;Lightmap/Materials/node5BakedMat.xml" />
-			<attribute name="Cast Shadows" value="true" />
-			<attribute name="View Mask" value="1" />
 		</component>
 	</node>
 	<node id="6">
@@ -63,8 +60,6 @@
 		<component type="StaticModel" id="7">
 			<attribute name="Model" value="Model;Lightmap/Models/sphere.mdl" />
 			<attribute name="Material" value="Material;Lightmap/Materials/node6BakedMat.xml" />
-			<attribute name="Cast Shadows" value="true" />
-			<attribute name="View Mask" value="1" />
 		</component>
 	</node>
 	<node id="7">
@@ -72,14 +67,12 @@
 		<attribute name="Name" value="pillar" />
 		<attribute name="Tags" />
 		<attribute name="Position" value="0 0 -0" />
-		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Rotation" value="0.985783 0 0.16802 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="8">
 			<attribute name="Model" value="Model;Lightmap/Models/pillar.mdl" />
 			<attribute name="Material" value="Material;Lightmap/Materials/node7BakedMat.xml" />
-			<attribute name="Cast Shadows" value="true" />
-			<attribute name="View Mask" value="1" />
 		</component>
 	</node>
 	<node id="8">
@@ -93,8 +86,6 @@
 		<component type="StaticModel" id="9">
 			<attribute name="Model" value="Model;Lightmap/Models/room.mdl" />
 			<attribute name="Material" value="Material;Lightmap/Materials/node8BakedMat.xml;" />
-			<attribute name="Cast Shadows" value="true" />
-			<attribute name="View Mask" value="1" />
 		</component>
 	</node>
 	<node id="9">
@@ -102,14 +93,12 @@
 		<attribute name="Name" value="pillar1" />
 		<attribute name="Tags" />
 		<attribute name="Position" value="0 0 -6" />
-		<attribute name="Rotation" value="0.923051 0 -0.384679 0" />
+		<attribute name="Rotation" value="0.992921 0 0.118774 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="10">
 			<attribute name="Model" value="Model;Lightmap/Models/pillar.mdl" />
 			<attribute name="Material" value="Material;Lightmap/Materials/node9BakedMat.xml" />
-			<attribute name="Cast Shadows" value="true" />
-			<attribute name="View Mask" value="1" />
 		</component>
 	</node>
 	<node id="10">
@@ -123,8 +112,6 @@
 		<component type="StaticModel" id="11">
 			<attribute name="Model" value="Model;Lightmap/Models/pillar.mdl" />
 			<attribute name="Material" value="Material;Lightmap/Materials/node10BakedMat.xml" />
-			<attribute name="Cast Shadows" value="true" />
-			<attribute name="View Mask" value="1" />
 		</component>
 	</node>
 </scene>

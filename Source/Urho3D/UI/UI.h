@@ -124,6 +124,8 @@ public:
     void SetCustomSize(const IntVector2& size);
     /// Set custom size of the root element.
     void SetCustomSize(int width, int height);
+	/// Tries to automatically find best ui scale (for hdpi devices)
+	void SetScaleAuto();
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }

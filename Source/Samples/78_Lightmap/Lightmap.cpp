@@ -38,6 +38,7 @@
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/VertexBuffer.h>
 #include <Urho3D/Graphics/IndexBuffer.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/IO/FileSystem.h>
@@ -58,16 +59,18 @@ void ImageDilate(SharedPtr<Image> image, SharedPtr<Image> outImage);
 
 // this is defined by default and helps when having multiple 
 // captureParsers to pump images to the thread queue
-#define SOLIDANGLE_COLOR_THREADED
+#define IRRADIANCE_THREADED
 
 //=============================================================================
 //=============================================================================
 Lightmap::Lightmap(Context* context)
     : Component(context)
+    , stateProcess_(State_UnInit)
     , texWidth_(512)
     , texHeight_(512)
     , saveFile_(true)
     , numCaptureParsers_(4)
+    , lumaOutputColor_(true)
 {
 }
 
@@ -92,15 +95,22 @@ void Lightmap::BeginIndirectLighting(const String &filepath, unsigned imageSize)
         texWidth_ = texHeight_ = imageSize;
         filepath_ = filepath;
 
-        // hemisphere solid angle - the max fov is actually 160, not 180
+        // hemisphere solid angle
         // 360       = 4 * pi and 
         // M_MAX_FOV = x * pi 
         const float x = M_MAX_FOV * 4.0f/360.0f;
         solidangle_ = x * M_PI /(float)(FIXED_INDIRECT_TEXSIZE * FIXED_INDIRECT_TEXSIZE);
 
-        // state change
-        SetState(State_CreateGeomData);
-        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Lightmap, HandleUpdate));
+        // setup geom and pixel data on the 1st round
+        if (GetState() == State_UnInit)
+        {
+            SetState(State_CreateGeomData);
+            SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Lightmap, HandleUpdate));
+        }
+        else
+        {
+            SetState(State_IndirectLightBegin);
+        }
     }
 }
 
@@ -120,7 +130,6 @@ void Lightmap::InitIndirectLightSettings()
         captureParser_[i].camera_->SetFov(M_MAX_FOV);
         captureParser_[i].camera_->SetNearClip(0.0001f);
         captureParser_[i].camera_->SetFarClip(300.0f);
-        captureParser_[i].camera_->SetAspectRatio(1.0f);
 
         captureParser_[i].viewport_ = new Viewport(context_, GetScene(), captureParser_[i].camera_);
         captureParser_[i].viewport_->SetRenderPath(GetSubsystem<Renderer>()->GetViewport(0)->GetRenderPath());
@@ -195,7 +204,7 @@ void Lightmap::ForegroundProcess()
 
             SetState(State_IndirectLightProcess);
 
-            #ifdef SOLIDANGLE_COLOR_THREADED
+            #ifdef IRRADIANCE_THREADED
             // reserve a few spaces
             indirectDataList_.Reserve(10);
 
@@ -208,7 +217,7 @@ void Lightmap::ForegroundProcess()
 
     case State_IndirectLightWaitBackground:
         {
-            #ifdef SOLIDANGLE_COLOR_THREADED
+            #ifdef IRRADIANCE_THREADED
             unsigned idx;
             if (GetFrontIndirectQueueImage(idx) == NULL)
             {
@@ -282,8 +291,8 @@ void Lightmap::BackgroundProcessIndirectImage(void *data)
 
     while (image)
     {
-        lightmap->CalculateSolidAngleColor(idx, image);
-        lightmap->PopFrontIndirectQueueIdx();
+        lightmap->CalculateIrradiance(idx, image);
+        lightmap->PopFrontIndirectQueue();
         image = lightmap->GetFrontIndirectQueueImage(idx);
     }
 }
@@ -314,7 +323,7 @@ SharedPtr<Image> Lightmap::GetFrontIndirectQueueImage(unsigned &idx)
     return image;
 }
 
-void Lightmap::PopFrontIndirectQueueIdx()
+void Lightmap::PopFrontIndirectQueue()
 {
     MutexLock lock(mutexIndirectQueueLock_);
 
@@ -324,7 +333,7 @@ void Lightmap::PopFrontIndirectQueueIdx()
     }
 }
 
-void Lightmap::CalculateSolidAngleColor(unsigned idx, SharedPtr<Image> srcImage)
+void Lightmap::CalculateIrradiance(unsigned idx, SharedPtr<Image> srcImage)
 {
     pixelData_[idx].col_ = Color::TRANSPARENT;
     for ( int y = 0; y < srcImage->GetHeight(); ++y )
@@ -335,6 +344,12 @@ void Lightmap::CalculateSolidAngleColor(unsigned idx, SharedPtr<Image> srcImage)
         }
     }
     pixelData_[idx].col_ = pixelData_[idx].col_ * solidangle_;
+
+    if (lumaOutputColor_)
+    {
+        float luma = pixelData_[idx].col_.Luma();
+        pixelData_[idx].col_ = Color(luma, luma, luma);
+    }
 }
 
 void Lightmap::FinalizeIndirectImage()
@@ -374,9 +389,11 @@ void Lightmap::SetCameraPosRotForCapture(unsigned idx)
     {
         const PixelPoint &pixelPoint = pixelData_[curPixelIdx_];
         unsigned prevTriIdx = pixelPoint.triIdx_;
+        Quaternion qrot;
+        qrot.FromLookRotation(pixelPoint.normal_);
 
         captureParser_[idx].camNode_->SetPosition(pixelPoint.pos_);
-        captureParser_[idx].camNode_->SetDirection(pixelPoint.normal_);
+        captureParser_[idx].camNode_->SetRotation(qrot);
         captureParser_[idx].pixelIdx_  = curPixelIdx_;
         captureParser_[idx].triIdx_    = pixelPoint.triIdx_;
         captureParser_[idx].isStopped_ = false;
@@ -407,10 +424,10 @@ void Lightmap::ProcessIndirectRenderSurface(unsigned parserIdx)
 {
     unsigned pixelIdx = captureParser_[parserIdx].pixelIdx_;
 
-    #ifdef SOLIDANGLE_COLOR_THREADED
+    #ifdef IRRADIANCE_THREADED
     QueueIndirectImage(pixelIdx, captureParser_[parserIdx].renderTexture_->GetImage());
     #else
-    CalculateSolidAngleColor(pixelIdx, captureParser_[parserIdx].renderTexture_->GetImage());
+    CalculateIrradiance(pixelIdx, captureParser_[parserIdx].renderTexture_->GetImage());
     #endif
 
     // update pixel idx and surfaceupdate mode 
@@ -421,10 +438,11 @@ void Lightmap::ProcessIndirectRenderSurface(unsigned parserIdx)
     {
         UnsubscribeFromEvent(E_ENDVIEWRENDER);
 
-        #ifdef SOLIDANGLE_COLOR_THREADED
+        #ifdef IRRADIANCE_THREADED
         SetState(State_IndirectLightWaitBackground);
         #else
         FinalizeIndirectImage();
+        SetState(State_IndirectLightEnd);
         #endif
     }
 }
@@ -461,6 +479,22 @@ void Lightmap::HandleEndViewRender(StringHash eventType, VariantMap& eventData)
             // process render surface
             ProcessIndirectRenderSurface(i);
             break;
+        }
+    }
+}
+
+void Lightmap::DrawDebugGeometry(DebugRenderer* debug, const Color &color, bool depthTest, unsigned &triIdx)
+{
+    if (triIdx > pixelData_[pixelData_.Size() - 1].triIdx_)
+    {
+        triIdx = 0;
+    }
+
+    for (unsigned i = 0; i < pixelData_.Size(); ++i)
+    {
+        if (triIdx == pixelData_[i].triIdx_)
+        {
+            debug->AddLine(pixelData_[i].pos_, pixelData_[i].pos_ + pixelData_[i].normal_ * 0.05f, color, depthTest);
         }
     }
 }
@@ -546,19 +580,22 @@ void Lightmap::SetupPixelData()
 {
     const int texSizeX = texWidth_;
     const int texSizeY = texHeight_;
-    const float texSizeXINV = 1.0f/(float)texSizeX;
-    const float texSizeYINV = 1.0f/(float)texSizeY;
+    const float ftexSizeX = (float)texWidth_;
+    const float ftexSizeY = (float)texHeight_;
+    const float texSizeXINV = 1.0f/ftexSizeX;
+    const float texSizeYINV = 1.0f/ftexSizeY;
 
-    pixelData_.Reserve((int)((float)(texSizeX * texSizeY) * 1.05f));
+    pixelData_.Clear();
+    pixelData_.Reserve((int)(ftexSizeX * ftexSizeY * 1.05f));
     triangleData_.Resize(numIndices_/3);
     bool isShort = (indexSize_ == sizeof(unsigned short));
 
     // build sh coeff
     for( unsigned i = 0; i < numIndices_; i += 3 )
     {
-        const unsigned idx0 = (const unsigned)(isShort?(indexBuffShort_[i+0]):(indexBuff_[i+0]));
-        const unsigned idx1 = (const unsigned)(isShort?(indexBuffShort_[i+1]):(indexBuff_[i+1]));
-        const unsigned idx2 = (const unsigned)(isShort?(indexBuffShort_[i+2]):(indexBuff_[i+2]));
+        const unsigned idx0 = (const unsigned)(isShort?indexBuffShort_[i+0]:indexBuff_[i+0]);
+        const unsigned idx1 = (const unsigned)(isShort?indexBuffShort_[i+1]:indexBuff_[i+1]);
+        const unsigned idx2 = (const unsigned)(isShort?indexBuffShort_[i+2]:indexBuff_[i+2]);
 
         const Vector3 &v0 = geomData_[idx0].pos_;	
         const Vector3 &v1 = geomData_[idx1].pos_;	
@@ -593,10 +630,10 @@ void Lightmap::SetupPixelData()
         if (uv1.y_ > yMax) yMax = uv1.y_;
         if (uv2.y_ > yMax) yMax = uv2.y_;
 
-        const int pixMinX = (int)Max((float)floor(xMin*texSizeX)-1, 0.0f); 
-        const int pixMaxX = (int)Min((float)ceil(xMax*texSizeX)+1, (float)texSizeX); 
-        const int pixMinY = (int)Max((float)floor(yMin*texSizeY)-1, 0.0f); 
-        const int pixMaxY = (int)Min((float)ceil(yMax*texSizeY)+1, (float)texSizeY);
+        const int pixMinX = (int)Max(Floor(xMin * ftexSizeX)-1, 0.0f); 
+        const int pixMaxX = (int)Min( Ceil(xMax * ftexSizeX)+1, ftexSizeX); 
+        const int pixMinY = (int)Max(Floor(yMin * ftexSizeY)-1, 0.0f); 
+        const int pixMaxY = (int)Min( Ceil(yMax * ftexSizeY)+1, ftexSizeY);
 
         // gather info on triangle data
         TriangleData &triangleData = triangleData_[i/3];
@@ -651,7 +688,21 @@ void ImageSmooth(SharedPtr<Image> image, SharedPtr<Image> outImage)
     {
         for ( int x = 0; x < w; ++x )
         {
-            Color color(0,0,0,0);
+            Color ocolor = image->GetPixel(x, y);
+            bool ovalid = false;
+
+            // avoid having black transp value blend with valid colors
+            for ( int i = 0; i < 4; ++i )
+            {
+                ovalid |= ocolor.Data()[i] > 0.0f;
+            }
+            if (!ovalid)
+            {
+                outImage->SetPixel(x, y, Color::TRANSPARENT);
+                continue;
+            }
+
+            Color color(Color::TRANSPARENT);
             int n = 0;
 
             for ( int dy = -1; dy <= 1; ++dy )
@@ -685,7 +736,7 @@ void ImageSmooth(SharedPtr<Image> image, SharedPtr<Image> outImage)
             }
             else
             {
-                outImage->SetPixel(x, y, Color(0,0,0,0));
+                outImage->SetPixel(x, y, Color::TRANSPARENT);
             }
         }
     }
@@ -702,7 +753,7 @@ void ImageDilate(SharedPtr<Image> image, SharedPtr<Image> outImage)
         {
             Color color = image->GetPixel(x, y);
             bool valid = false;
-            for (int i = 0; i < 4; i++)
+            for ( int i = 0; i < 4; ++i )
             {
                 valid |= color.Data()[i] > 0.0f;
             }

@@ -34,6 +34,7 @@
 #include <Urho3D/Graphics/Technique.h>
 #include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -53,6 +54,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(LightmapDemo)
 //=============================================================================
 LightmapDemo::LightmapDemo(Context* context)
     : Sample(context)
+    , lightingProcessComplete_(false)
     , startLightmapProcess_(false)
 {
 }
@@ -93,6 +95,8 @@ void LightmapDemo::CreateScene()
     XMLFile *xmlLevel = cache->GetResource<XMLFile>("Lightmap/roomScene.xml");
     scene_->LoadXML(xmlLevel->GetRoot());
 
+    scene_->CreateComponent<DebugRenderer>();
+
     // cam
     cameraNode_ = scene_->CreateChild("Camera");
     Camera* camera = cameraNode_->CreateComponent<Camera>();
@@ -122,7 +126,7 @@ void LightmapDemo::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     instructionText_ = ui->GetRoot()->CreateChild<Text>();
-    instructionText_->SetText("Use WASD keys and mouse/touch to move\nF5 to start lightmap process");
+    instructionText_->SetText("F5 to start lightmap process");
     instructionText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 12);
     instructionText_->SetColor(Color::CYAN);
 
@@ -217,6 +221,8 @@ void LightmapDemo::HandleLightingStatus(StringHash eventType, VariantMap& eventD
     else
     {
         textProcessStatus_->SetText("");
+        instructionText_->SetText("F5 to process light bounce");
+        lightingProcessComplete_ = true;
     }
 }
 
@@ -239,8 +245,18 @@ void LightmapDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         lightmapCreator->Init(scene_, outputPath);
         lightmapCreator->GenerateLightmaps();
 
-        instructionText_->SetText("Use WASD keys and mouse/touch to move");
+        instructionText_->SetText("");
 
         startLightmapProcess_ = true;
     }
+
+    if (input->GetKeyDown(KEY_F5) && lightingProcessComplete_)
+    {
+        LightmapCreator *lightmapCreator = GetSubsystem<LightmapCreator>();
+        lightmapCreator->ProcessAdditionalLightBounce();
+        instructionText_->SetText("");
+
+        lightingProcessComplete_ = false;
+    }
+
 }

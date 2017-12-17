@@ -39,10 +39,6 @@
 		<component type="Light" id="5">
 			<attribute name="Light Type" value="Directional" />
 			<attribute name="Cast Shadows" value="true" />
-			<attribute name="CSM Splits" value="10 50 100 200" />
-			<attribute name="CSM Fade Start" value="1" />
-			<attribute name="View Size Quantize" value="4" />
-			<attribute name="View Size Minimum" value="4" />
 			<attribute name="Depth Constant Bias" value="0.0001" />
 			<attribute name="Depth Slope Bias" value="0.05" />
 			<attribute name="Normal Offset" value="0.021" />
@@ -98,7 +94,7 @@
 		<attribute name="Variables" />
 		<component type="StaticModel" id="8">
 			<attribute name="Model" value="Model;Lightmap/Models/pillar.mdl" />
-			<attribute name="Material" value="Material;Lightmap/Materials/defaultMat.xml" />
+			<attribute name="Material" value="Material;Lightmap/Materials/pillarMat.xml" />
 			<attribute name="Cast Shadows" value="true" />
 			<attribute name="View Mask" value="1" />
 		</component>
@@ -128,7 +124,7 @@
 		<attribute name="Variables" />
 		<component type="StaticModel" id="10">
 			<attribute name="Model" value="Model;Lightmap/Models/pillar.mdl" />
-			<attribute name="Material" value="Material;Lightmap/Materials/defaultMat.xml" />
+			<attribute name="Material" value="Material;Lightmap/Materials/pillarMat.xml" />
 			<attribute name="Cast Shadows" value="true" />
 			<attribute name="View Mask" value="1" />
 		</component>
@@ -143,7 +139,7 @@
 		<attribute name="Variables" />
 		<component type="StaticModel" id="11">
 			<attribute name="Model" value="Model;Lightmap/Models/pillar.mdl" />
-			<attribute name="Material" value="Material;Lightmap/Materials/defaultMat.xml" />
+			<attribute name="Material" value="Material;Lightmap/Materials/pillarMat.xml" />
 			<attribute name="Cast Shadows" value="true" />
 			<attribute name="View Mask" value="1" />
 		</component>

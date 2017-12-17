@@ -33,6 +33,7 @@
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/VertexBuffer.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
 
@@ -49,6 +50,7 @@ LightmapCreator::LightmapCreator(Context* context)
     , numProcessed_(0)
     , maxNodesToProcess_(8)
     , lightmapState_(LightMap_UnInit)
+    , firstLightBounce_(true)
 {
     TextureBake::RegisterObject(context);
     Lightmap::RegisterObject(context);
@@ -84,6 +86,12 @@ void LightmapCreator::GenerateLightmaps()
     SubscribeToEvent(E_BAKELIGHTINGDONE, URHO3D_HANDLER(LightmapCreator, HandleBakeLightBuildEvent));
 }
 
+void LightmapCreator::ProcessAdditionalLightBounce()
+{
+    firstLightBounce_ = false;
+    lightmapState_ = LightMap_IndirectLightBegin;
+}
+
 void LightmapCreator::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     switch (lightmapState_)
@@ -97,6 +105,9 @@ void LightmapCreator::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     case LightMap_IndirectLightBegin:
         {
+            // shut off lights in the scene
+            EnableLightsInScene(false);
+
             SetupIndirectProcess();
 
             // state chng
@@ -116,13 +127,6 @@ void LightmapCreator::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     case LightMap_SwapToLightmapTexture:
         {
-            for ( unsigned i = 0; i < origNodeList_.Size(); ++i )
-            {
-                Lightmap *lightmap = origNodeList_[i]->GetComponent<Lightmap>();
-                TextureBake *textureBake = origNodeList_[i]->GetComponent<TextureBake>();
-                textureBake->SwitchToLightmapTechnique(lightmap->GetIndirectLightImage());
-            }
-
             // setup for indirect baking - change state prior to calling the below fn
             lightmapState_ = LightMap_BakeIndirectLight;
             SetupBakeIndirectProcess();
@@ -143,6 +147,11 @@ void LightmapCreator::HandleUpdate(StringHash eventType, VariantMap& eventData)
             {
                 zone->SetFogColor(origFogColor_);
             }
+
+            // enable lights
+            EnableLightsInScene(true);
+
+            SwitchToLightmapTechnique();
 
             lightmapState_ = LightMap_Complete;
         }
@@ -194,6 +203,17 @@ bool LightmapCreator::HasTexCoord2(StaticModel *staticModel)
     return hasTexCoord2;
 }
 
+void LightmapCreator::EnableLightsInScene(bool enable)
+{
+    PODVector<Node*> result;
+    scene_->GetChildrenWithComponent(result, "Light", true);
+
+    for ( unsigned i = 0; i < result.Size(); ++i )
+    {
+        result[i]->SetEnabled(enable);
+    }
+}
+
 void LightmapCreator::SetupIndirectProcess()
 {
     // clear vars
@@ -201,19 +221,31 @@ void LightmapCreator::SetupIndirectProcess()
     trianglesCompleted_ = 0;
     numObjectsCompletedIndirect_ = 0;
 
-    SubscribeToEvent(E_TRIANGLEINFO, URHO3D_HANDLER(LightmapCreator, HandleTriangleInfoEvent));
-    SubscribeToEvent(E_TRIANGLECOMPLETED, URHO3D_HANDLER(LightmapCreator, HandleTriangleCompletedEvent));
-    SubscribeToEvent(E_INDIRECTCOMPLETED, URHO3D_HANDLER(LightmapCreator, HandleIndirectCompletedEvent));
-
     buildRequiredNodeList_.Resize(origNodeList_.Size());
     processingNodeList_.Clear();
 
     for ( unsigned i = 0; i < origNodeList_.Size(); ++i )
     {
+        Lightmap *lightmap = origNodeList_[i]->GetComponent<Lightmap>();
+        TextureBake *textureBake = origNodeList_[i]->GetComponent<TextureBake>();
+
+        if (firstLightBounce_)
+        {
+            textureBake->SwitchToDirectImageUnlitTechnique();
+        }
+        else
+        {
+            textureBake->SwitchToLightmapTechnique(lightmap->GetIndirectLightImage());
+        }
+
         buildRequiredNodeList_[i] = origNodeList_[i];
     }
 
     QueueNodesForIndirectLightProcess();
+
+    SubscribeToEvent(E_TRIANGLEINFO, URHO3D_HANDLER(LightmapCreator, HandleTriangleInfoEvent));
+    SubscribeToEvent(E_TRIANGLECOMPLETED, URHO3D_HANDLER(LightmapCreator, HandleTriangleCompletedEvent));
+    SubscribeToEvent(E_INDIRECTCOMPLETED, URHO3D_HANDLER(LightmapCreator, HandleIndirectCompletedEvent));
 }
 
 void LightmapCreator::SetupBakeIndirectProcess()
@@ -224,13 +256,22 @@ void LightmapCreator::SetupBakeIndirectProcess()
 
     for ( unsigned i = 0; i < origNodeList_.Size(); ++i )
     {
-        TextureBake *textureBake = origNodeList_[i]->GetComponent<TextureBake>();
-        textureBake->InitModelSetting(ViewMask_Default);
-
         buildRequiredNodeList_[i] = origNodeList_[i];
     }
 
+    SwitchToLightmapTechnique();
     QueueNodesForLightBaking();
+}
+
+void LightmapCreator::SwitchToLightmapTechnique()
+{
+    for ( unsigned i = 0; i < origNodeList_.Size(); ++i )
+    {
+        TextureBake *textureBake = origNodeList_[i]->GetComponent<TextureBake>();
+        Lightmap *lightmap = origNodeList_[i]->GetComponent<Lightmap>();
+
+        textureBake->SwitchToLightmapTechnique(lightmap->GetIndirectLightImage());
+    }
 }
 
 void LightmapCreator::QueueNodesForLightBaking()
@@ -262,7 +303,6 @@ void LightmapCreator::QueueNodesForIndirectLightProcess()
         Node* node = buildRequiredNodeList_[0];
         Lightmap *lightmap = node->GetComponent<Lightmap>();
 
-        // specify lightmap resolution - e.g. BeginIndirectLighting(outputPath_, 128), default = 64
         lightmap->BeginIndirectLighting(outputPath_);
 
         processingNodeList_.Push(node);
@@ -273,7 +313,9 @@ void LightmapCreator::QueueNodesForIndirectLightProcess()
 void LightmapCreator::BakeDirectLight(Node *node)
 {
     TextureBake *textureBake = node->GetComponent<TextureBake>();
-    textureBake->BakeDirectLight(outputPath_);
+
+    //**note** not every object needs high res texture size to capture smooth shadow
+    textureBake->BakeDirectLight(outputPath_, 1024);
 }
 
 void LightmapCreator::BakeIndirectLight(Node *node)
@@ -304,7 +346,8 @@ void LightmapCreator::RemoveCompletedNode(Node *node)
 
 void LightmapCreator::RestoreModelSettigs()
 {
-    for ( unsigned i = 0; i < origNodeList_.Size(); ++i )
+    // could probably do away with this since state transitions keep changing model materials
+    for (unsigned i = 0; i < origNodeList_.Size(); ++i)
     {
         TextureBake *textureBake = origNodeList_[i]->GetComponent<TextureBake>();
         textureBake->RestoreModelSetting();
