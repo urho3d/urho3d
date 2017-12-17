@@ -161,15 +161,20 @@ unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
             return i;
     }
 
-    return numBones;
+    return M_MAX_UNSIGNED;
 }
 
 unsigned Skeleton::GetBoneIndex(const Bone* bone) const
 {
     if (bones_.Empty() || bone < &bones_.Front() || bone > &bones_.Back())
-        return bones_.Size();
+        return M_MAX_UNSIGNED;
 
     return static_cast<unsigned>(bone - &bones_.Front());
+}
+
+unsigned Skeleton::GetBoneIndex(const String& boneName) const
+{
+    return GetBoneIndex(StringHash(boneName));
 }
 
 Bone* Skeleton::GetBoneParent(const Bone* bone)
