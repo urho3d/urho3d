@@ -7,13 +7,14 @@ struct PackageEntry
     unsigned checksum_ @ checksum;
 };
 
-class PackageFile : public Object
+class PackageFile : public FileSource
 {
     PackageFile();
     PackageFile(const String fileName, unsigned startOffset = 0);
     ~PackageFile();
 
-    bool Open(const String fileName, unsigned startOffset = 0);
+    bool Open(const String fileName);
+    bool Open(const String fileName, unsigned startOffset);
     bool Exists(const String fileName) const;
     const PackageEntry* GetEntry(const String fileName) const;
     const HashMap<String, PackageEntry>& GetEntries() const;
