@@ -199,7 +199,7 @@ void FileWatcher::StopWatching()
         // TODO: Remove this temp write approach as it depends on user write privilege
 #ifdef _WIN32
         String dummyFileName = path_ + "dummy.tmp";
-        File file(context_, dummyFileName, FILE_WRITE);
+        SystemFile file(context_, dummyFileName, FILE_WRITE);
         file.Close();
         if (fileSystem_)
             fileSystem_->Delete(dummyFileName);
