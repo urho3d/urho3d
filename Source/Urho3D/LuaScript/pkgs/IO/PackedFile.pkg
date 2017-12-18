@@ -17,7 +17,6 @@ class PackedFile : public File
     FileMode GetMode() const;
     bool IsOpen() const;
     void* GetHandle() const;
-    // bool IsPackaged() const;
     
     // From Deserializer
     // unsigned Read(void* dest, unsigned size);
@@ -123,7 +122,6 @@ class PackedFile : public File
     
     tolua_readonly tolua_property__get_set FileMode mode;
     tolua_readonly tolua_property__is_set bool open;
-    // tolua_readonly tolua_property__is_set bool packaged;
     
     // From Deserializer
     tolua_readonly tolua_property__get_set String name;

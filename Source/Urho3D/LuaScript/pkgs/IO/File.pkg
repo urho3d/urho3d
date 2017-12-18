@@ -123,7 +123,6 @@ class File : public Object
     
     tolua_readonly tolua_property__get_set FileMode mode;
     tolua_readonly tolua_property__is_set bool open;
-    // tolua_readonly tolua_property__is_set bool packaged;
     
     // From Deserializer
     tolua_readonly tolua_property__get_set String name;
