@@ -80,11 +80,6 @@ public:
     void Close();
     /// Flush any buffered output to the file.
     void Flush();
-    /// Change the file name. Used by the resource system.
-    void SetName(const String& name);
-
-    /// Return the open mode.
-    FileMode GetMode() const { return FILE_READ; }
 
     /// Return whether is open.
     bool IsOpen() const;
@@ -103,8 +98,6 @@ private:
     /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
     void SeekInternal(unsigned newPosition);
 
-    /// File name.
-    String fileName_;
     /// File handle.
     void* handle_;
 #ifdef __ANDROID__

@@ -53,7 +53,9 @@ public:
     virtual ~PackageFile() override;
 
     /// Open the package file. Return true if successful.
-    virtual bool Open(const String& fileName, unsigned startOffset = 0);// override;
+    virtual bool Open(const String& fileName, unsigned startOffset);
+    /// Open the package file. Return true if successful.
+    virtual bool Open(const String& fileName) override { return Open(fileName, 0); }
     /// Check if a file exists within the package file. This will be case-insensitive on Windows and case-sensitive on other platforms.
     virtual bool Exists(const String& fileName) const override;
     /// Get a PackedFile from the package contents
@@ -81,6 +83,9 @@ public:
 
     /// Return list of file names in the package.
     virtual const Vector<String> GetEntryNames() const override { return entries_.Keys(); }
+
+    /// Register object factory.
+    static void RegisterObject(Context* context);
 
 private:
     /// File entries.

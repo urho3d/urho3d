@@ -24,7 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/Decompress.h"
@@ -1251,7 +1251,7 @@ bool Image::SavePNG(const String& fileName) const
 {
     URHO3D_PROFILE(SaveImagePNG);
 
-    PhysicalFile outFile(context_, fileName, FILE_WRITE);
+    SystemFile outFile(context_, fileName, FILE_WRITE);
     if (outFile.IsOpen())
         return Image::Save(outFile); // Save uses PNG format
     else
@@ -1308,7 +1308,7 @@ bool Image::SaveDDS(const String& fileName) const
 {
     URHO3D_PROFILE(SaveImageDDS);
 
-    PhysicalFile outFile(context_, fileName, FILE_WRITE);
+    SystemFile outFile(context_, fileName, FILE_WRITE);
     if (!outFile.IsOpen())
     {
         URHO3D_LOGERROR("Access denied to " + fileName);
@@ -1362,7 +1362,7 @@ bool Image::SaveWEBP(const String& fileName, float compression /* = 0.0f */) con
     URHO3D_PROFILE(SaveImageWEBP);
 
     FileSystem* fileSystem(GetSubsystem<FileSystem>());
-    PhysicalFile outFile(context_, fileName, FILE_WRITE);
+    SystemFile outFile(context_, fileName, FILE_WRITE);
 
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {

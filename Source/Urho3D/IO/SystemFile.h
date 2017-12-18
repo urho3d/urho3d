@@ -46,19 +46,19 @@ extern const char* APK;
 #endif
 #endif
 
-/// %PhysicalFile opened either through the filesystem or from within a package file.
+/// %SystemFile opened either through the filesystem or from within a package file.
 /// TODO: would SystemFile be a prefered name?
-class URHO3D_API PhysicalFile : public File
+class URHO3D_API SystemFile : public File
 {
-    URHO3D_OBJECT(PhysicalFile, File);
+    URHO3D_OBJECT(SystemFile, File);
 
 public:
     /// Construct.
-    PhysicalFile(Context* context);
+    SystemFile(Context* context);
     /// Construct and open a filesystem file.
-    PhysicalFile(Context* context, const String& fileName, FileMode mode = FILE_READ);
+    SystemFile(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Destruct. Close the file if open.
-    virtual ~PhysicalFile() override;
+    virtual ~SystemFile() override;
 
     /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size) override;
@@ -66,9 +66,6 @@ public:
     virtual unsigned Seek(unsigned position) override;
     /// Write bytes to the file. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size) override;
-
-    /// Return the file name.
-    virtual const String& GetName() const override { return fileName_; }
 
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     virtual unsigned GetChecksum() override;
@@ -81,11 +78,6 @@ public:
     void Close();
     /// Flush any buffered output to the file.
     void Flush();
-    /// Change the file name. Used by the resource system.
-    void SetName(const String& name);
-
-    /// Return the open mode.
-    FileMode GetMode() const { return mode_; }
 
     /// Return whether is open.
     bool IsOpen() const;
@@ -104,11 +96,7 @@ private:
     /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
     void SeekInternal(unsigned newPosition);
 
-    /// PhysicalFile name.
-    String fileName_;
-    /// Open mode.
-    FileMode mode_;
-    /// PhysicalFile handle.
+    /// File handle.
     void* handle_;
 #ifdef __ANDROID__
     /// SDL RWops context for Android asset loading.

@@ -30,7 +30,7 @@
 #include "../IO/FileWatcher.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../Resource/BackgroundLoader.h"
 #include "../Resource/Image.h"
 #include "../Resource/JSONFile.h"
@@ -67,6 +67,8 @@ static const char* checkDirs[] =
 };
 
 static const SharedPtr<Resource> noResource;
+
+const char* FILESOURCE_CATEGORY = "FileSource";
 
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
@@ -196,8 +198,14 @@ bool ResourceCache::AddFileSource(const StringHash sourceType, const String& fil
     if (obj && obj->IsInstanceOf<FileSource>())
     {
         SharedPtr<FileSource> source((FileSource*)obj.Get());
-        return source->Open(fileName) && AddFileSource(source);
+        if (source->Open(fileName) && AddFileSource(source))
+            return true;
+        else
+            URHO3D_LOGERROR("Could not add file source " + fileName);
     }
+    else
+        URHO3D_LOGERROR("Could not create FileSource with type hash " + sourceType.ToString() + " for file " + fileName);
+
     return false;
 }
 
@@ -1158,7 +1166,7 @@ File* ResourceCache::SearchResourceDirs(const String& nameIn)
         {
             // Construct the file first with full path, then rename it to not contain the resource path,
             // so that the file's name can be used in further GetFile() calls (for example over the network)
-            File* file(new PhysicalFile(context_, resourceDirs_[i] + nameIn));
+            File* file(new SystemFile(context_, resourceDirs_[i] + nameIn));
             file->SetName(nameIn);
             return file;
         }
@@ -1166,7 +1174,7 @@ File* ResourceCache::SearchResourceDirs(const String& nameIn)
 
     // Fallback using absolute path
     if (fileSystem->FileExists(nameIn))
-        return new PhysicalFile(context_, nameIn);
+        return new SystemFile(context_, nameIn);
 
     return nullptr;
 }
@@ -1176,7 +1184,7 @@ File* ResourceCache::SearchPackages(const String& nameIn)
     for (unsigned i = 0; i < fileSources_.Size(); ++i)
     {
         if (fileSources_[i]->Exists(nameIn))
-            return fileSources_[i]->GetFile(nameIn);
+            return fileSources_[i]->GetNewFile(nameIn);
     }
 
     return nullptr;
@@ -1188,6 +1196,8 @@ void RegisterResourceLibrary(Context* context)
     JSONFile::RegisterObject(context);
     PListFile::RegisterObject(context);
     XMLFile::RegisterObject(context);
+
+    PackageFile::RegisterObject(context);
 }
 
 }

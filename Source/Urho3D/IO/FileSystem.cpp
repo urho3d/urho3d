@@ -27,7 +27,7 @@
 #include "../Core/CoreEvents.h"
 #include "../Core/Thread.h"
 #include "../Engine/EngineEvents.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../IO/FileSystem.h"
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
@@ -127,7 +127,7 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     // Capture the standard error stream
     if (!stderrFilename.Empty())
     {
-        SharedPtr<File> errFile(new PhysicalFile(context, stderrFilename, FILE_READ));
+        SharedPtr<File> errFile(new SystemFile(context, stderrFilename, FILE_READ));
         while (!errFile->IsEof())
         {
             unsigned numRead = errFile->Read(buffer, sizeof(buffer));
@@ -485,10 +485,10 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
         return false;
     }
 
-    SharedPtr<File> srcFile(new PhysicalFile(context_, srcFileName, FILE_READ));
+    SharedPtr<File> srcFile(new SystemFile(context_, srcFileName, FILE_READ));
     if (!srcFile->IsOpen())
         return false;
-    SharedPtr<File> destFile(new PhysicalFile(context_, destFileName, FILE_WRITE));
+    SharedPtr<File> destFile(new SystemFile(context_, destFileName, FILE_WRITE));
     if (!destFile->IsOpen())
         return false;
 

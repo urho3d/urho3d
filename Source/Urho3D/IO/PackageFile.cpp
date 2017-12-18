@@ -22,12 +22,15 @@
 
 #include "../Precompiled.h"
 
-#include "../IO/PhysicalFile.h"
+#include "../Core/Context.h"
+#include "../IO/SystemFile.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
 
 namespace Urho3D
 {
+
+extern const char* FILESOURCE_CATEGORY;
 
 PackageFile::PackageFile(Context* context) :
     FileSource(context),
@@ -54,7 +57,7 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
-    SharedPtr<File> file(new PhysicalFile(context_, fileName));
+    SharedPtr<File> file(new SystemFile(context_, fileName));
     if (!file->IsOpen())
         return false;
 
@@ -158,6 +161,11 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 #endif
 
     return nullptr;
+}
+
+void PackageFile::RegisterObject(Context *context)
+{
+    context->RegisterFactory<PackageFile>();
 }
 
 }

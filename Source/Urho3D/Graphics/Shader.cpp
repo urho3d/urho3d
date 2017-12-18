@@ -29,7 +29,7 @@
 #include "../IO/Deserializer.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../Resource/ResourceCache.h"
 
 #include "../DebugNew.h"
@@ -164,7 +164,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 
     // If the source if a non-packaged file, store the timestamp
     File* file = dynamic_cast<File*>(&source);
-    if (file && file->GetType() == PhysicalFile::GetTypeStatic())
+    if (file && file->GetType() == SystemFile::GetTypeStatic())
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
         String fullName = cache->GetResourceFileName(file->GetName());
@@ -187,11 +187,17 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 
             SharedPtr<File> includeFile = cache->GetFile(includeFileName);
             if (!includeFile)
+            {
+                URHO3D_LOGERROR("Could not open shader include file " + includeFileName);
                 return false;
+            }
 
             // Add the include file into the current code recursively
             if (!ProcessSource(code, *includeFile))
+            {
+                URHO3D_LOGERROR("Could not process shader include file " + includeFileName);
                 return false;
+            }
         }
         else
         {

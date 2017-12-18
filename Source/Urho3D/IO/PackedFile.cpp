@@ -344,11 +344,6 @@ void PackedFile::Flush()
         fflush((FILE*)handle_);
 }
 
-void PackedFile::SetName(const String& name)
-{
-    fileName_ = name;
-}
-
 bool PackedFile::IsOpen() const
 {
 #ifdef __ANDROID__

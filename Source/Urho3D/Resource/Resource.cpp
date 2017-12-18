@@ -23,7 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Profiler.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../IO/Log.h"
 #include "../Resource/Resource.h"
 #include "../Resource/XMLElement.h"
@@ -86,13 +86,13 @@ bool Resource::Save(Serializer& dest) const
 
 bool Resource::LoadFile(const String& fileName)
 {
-    PhysicalFile file(context_);
+    SystemFile file(context_);
     return file.Open(fileName, FILE_READ) && Load(file);
 }
 
 bool Resource::SaveFile(const String& fileName) const
 {
-    PhysicalFile file(context_);
+    SystemFile file(context_);
     return file.Open(fileName, FILE_WRITE) && Save(file);
 }
 

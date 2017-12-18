@@ -30,7 +30,7 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 #include "../Resource/JSONFile.h"
@@ -274,7 +274,7 @@ bool Animation::Save(Serializer& dest) const
 
             SaveMetadataToXML(rootElem);
 
-            PhysicalFile xmlFile(context_, xmlName, FILE_WRITE);
+            SystemFile xmlFile(context_, xmlName, FILE_WRITE);
             xml->Save(xmlFile);
         }
         else

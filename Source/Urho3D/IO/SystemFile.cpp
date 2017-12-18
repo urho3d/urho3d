@@ -23,7 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Profiler.h"
-#include "../IO/PhysicalFile.h"
+#include "../IO/SystemFile.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
@@ -64,9 +64,8 @@ static const unsigned READ_BUFFER_SIZE = 32768;
 #endif
 static const unsigned SKIP_BUFFER_SIZE = 1024;
 
-PhysicalFile::PhysicalFile(Context* context) :
+SystemFile::SystemFile(Context* context) :
     File(context),
-    mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
@@ -79,9 +78,8 @@ PhysicalFile::PhysicalFile(Context* context) :
 {
 }
 
-PhysicalFile::PhysicalFile(Context* context, const String& fileName, FileMode mode) :
+SystemFile::SystemFile(Context* context, const String& fileName, FileMode mode) :
     File(context),
-    mode_(FILE_READ),
     handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
@@ -95,17 +93,17 @@ PhysicalFile::PhysicalFile(Context* context, const String& fileName, FileMode mo
     Open(fileName, mode);
 }
 
-PhysicalFile::~PhysicalFile()
+SystemFile::~SystemFile()
 {
     Close();
 }
 
-bool PhysicalFile::Open(const String& fileName, FileMode mode)
+bool SystemFile::Open(const String& fileName, FileMode mode)
 {
     return OpenInternal(fileName, mode);
 }
 
-unsigned PhysicalFile::Read(void* dest, unsigned size)
+unsigned SystemFile::Read(void* dest, unsigned size)
 {
     if (!IsOpen())
     {
@@ -115,7 +113,7 @@ unsigned PhysicalFile::Read(void* dest, unsigned size)
 
     if (mode_ == FILE_WRITE)
     {
-        URHO3D_LOGERROR("PhysicalFile not opened for reading");
+        URHO3D_LOGERROR("File not opened for reading");
         return 0;
     }
 
@@ -180,7 +178,7 @@ unsigned PhysicalFile::Read(void* dest, unsigned size)
     return size;
 }
 
-unsigned PhysicalFile::Seek(unsigned position)
+unsigned SystemFile::Seek(unsigned position)
 {
     if (!IsOpen())
     {
@@ -199,7 +197,7 @@ unsigned PhysicalFile::Seek(unsigned position)
     return position_;
 }
 
-unsigned PhysicalFile::Write(const void* data, unsigned size)
+unsigned SystemFile::Write(const void* data, unsigned size)
 {
     if (!IsOpen())
     {
@@ -209,7 +207,7 @@ unsigned PhysicalFile::Write(const void* data, unsigned size)
 
     if (mode_ == FILE_READ)
     {
-        URHO3D_LOGERROR("PhysicalFile not opened for writing");
+        URHO3D_LOGERROR("File not opened for writing");
         return 0;
     }
 
@@ -239,7 +237,7 @@ unsigned PhysicalFile::Write(const void* data, unsigned size)
     return size;
 }
 
-unsigned PhysicalFile::GetChecksum()
+unsigned SystemFile::GetChecksum()
 {
     if (checksum_)
         return checksum_;
@@ -268,7 +266,7 @@ unsigned PhysicalFile::GetChecksum()
     return checksum_;
 }
 
-void PhysicalFile::Close()
+void SystemFile::Close()
 {
 #ifdef __ANDROID__
     if (assetHandle_)
@@ -291,18 +289,13 @@ void PhysicalFile::Close()
     }
 }
 
-void PhysicalFile::Flush()
+void SystemFile::Flush()
 {
     if (handle_)
         fflush((FILE*)handle_);
 }
 
-void PhysicalFile::SetName(const String& name)
-{
-    fileName_ = name;
-}
-
-bool PhysicalFile::IsOpen() const
+bool SystemFile::IsOpen() const
 {
 #ifdef __ANDROID__
     return handle_ != 0 || assetHandle_ != 0;
@@ -311,7 +304,7 @@ bool PhysicalFile::IsOpen() const
 #endif
 }
 
-bool PhysicalFile::OpenInternal(const String& fileName, FileMode mode)
+bool SystemFile::OpenInternal(const String& fileName, FileMode mode)
 {
     Close();
 
@@ -400,7 +393,7 @@ bool PhysicalFile::OpenInternal(const String& fileName, FileMode mode)
     return true;
 }
 
-bool PhysicalFile::ReadInternal(void* dest, unsigned size)
+bool SystemFile::ReadInternal(void* dest, unsigned size)
 {
 #ifdef __ANDROID__
     if (assetHandle_)
@@ -412,7 +405,7 @@ bool PhysicalFile::ReadInternal(void* dest, unsigned size)
         return fread(dest, size, 1, (FILE*)handle_) == 1;
 }
 
-void PhysicalFile::SeekInternal(unsigned newPosition)
+void SystemFile::SeekInternal(unsigned newPosition)
 {
 #ifdef __ANDROID__
     if (assetHandle_)
