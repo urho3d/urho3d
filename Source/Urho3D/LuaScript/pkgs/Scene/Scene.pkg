@@ -126,13 +126,13 @@ static bool SceneSave(const Scene* scene, File* file)
 
 static bool SceneLoad(Scene* scene, const String& fileName)
 {
-    File file(scene->GetContext(), fileName, FILE_READ);
+    SystemFile file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() && scene->Load(file);
 }
 
 static bool SceneSave(const Scene* scene, const String& fileName)
 {
-    File file(scene->GetContext(), fileName, FILE_WRITE);
+    SystemFile file(scene->GetContext(), fileName, FILE_WRITE);
     return file.IsOpen() && scene->Save(file);
 }
 
@@ -148,7 +148,7 @@ static bool SceneSaveXML(const Scene* scene, File* file, const String& indentati
 
 static bool SceneLoadXML(Scene* scene, const String& fileName)
 {
-    File file(scene->GetContext(), fileName, FILE_READ);
+    SystemFile file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() && scene->LoadXML(file);
 }
 
@@ -162,7 +162,7 @@ static const PODVector<Node*>& SceneGetNodesWithTag(const Scene* scene, const St
 
 static bool SceneSaveXML(const Scene* scene, const String& fileName, const String& indentation)
 {
-    File file(scene->GetContext(), fileName, FILE_WRITE);
+    SystemFile file(scene->GetContext(), fileName, FILE_WRITE);
     if (!file.IsOpen())
         return false;
     return scene->SaveXML(file, indentation);
@@ -180,13 +180,13 @@ static bool SceneSaveJSON(const Scene* scene, File* file, const String& indentat
 
 static bool SceneLoadJSON(Scene* scene, const String& fileName)
 {
-    File file(scene->GetContext(), fileName, FILE_READ);
+    SystemFile file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() && scene->LoadJSON(file);
 }
 
 static bool SceneSaveJSON(const Scene* scene, const String& fileName, const String& indentation)
 {
-    File file(scene->GetContext(), fileName, FILE_WRITE);
+    SystemFile file(scene->GetContext(), fileName, FILE_WRITE);
     if (!file.IsOpen())
         return false;
     return scene->SaveJSON(file, indentation);
@@ -194,13 +194,13 @@ static bool SceneSaveJSON(const Scene* scene, const String& fileName, const Stri
 
 static bool SceneLoadAsync(Scene* scene, const String& fileName, LoadMode mode)
 {
-    SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
+    SharedPtr<File> file(new SystemFile(scene->GetContext(), fileName, FILE_READ));
     return file->IsOpen() && scene->LoadAsync(file, mode);
 }
 
 static bool SceneLoadAsyncXML(Scene* scene, const String& fileName, LoadMode mode)
 {
-    SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
+    SharedPtr<File> file(new SystemFile(scene->GetContext(), fileName, FILE_READ));
     return file->IsOpen() && scene->LoadAsyncXML(file, mode);
 }
 
@@ -211,7 +211,7 @@ static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position,
 
 static Node* SceneInstantiate(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    File file(scene->GetContext(), fileName, FILE_READ);
+    SystemFile file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() ? scene->Instantiate(file, position, rotation, mode) : 0;
 }
 
@@ -222,13 +222,13 @@ static Node* SceneInstantiateXML(Scene* scene, File* file, const Vector3& positi
 
 static Node* SceneInstantiateXML(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    File file(scene->GetContext(), fileName, FILE_READ);
+    SystemFile file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() ? scene->InstantiateXML(file, position, rotation, mode) : 0;
 }
 
 static Node* SceneInstantiateJSON(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    File file(scene->GetContext(), fileName, FILE_READ);
+    SystemFile file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() ? scene->InstantiateJSON(file, position, rotation, mode) : 0;
 }
 $}

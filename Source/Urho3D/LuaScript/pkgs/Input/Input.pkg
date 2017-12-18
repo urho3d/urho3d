@@ -1,4 +1,4 @@
-$#include "IO/File.h"
+$#include "IO/SystemFile.h"
 $#include "Input/Input.h"
 
 enum MouseMode
@@ -147,19 +147,19 @@ static unsigned InputLoadGestures(Input* input, File* file)
 
 static bool InputSaveGestures(Input* input, const String& fileName)
 {
-    File file(input->GetContext(), fileName, FILE_WRITE);
+    SystemFile file(input->GetContext(), fileName, FILE_WRITE);
     return file.IsOpen() ? input->SaveGestures(file) : false;
 }
 
 static bool InputSaveGesture(Input* input, const String& fileName, unsigned gestureID)
 {
-    File file(input->GetContext(), fileName, FILE_WRITE);
+    SystemFile file(input->GetContext(), fileName, FILE_WRITE);
     return file.IsOpen() ? input->SaveGesture(file, gestureID) : false;
 }
 
 static unsigned InputLoadGestures(Input* input, const String& fileName)
 {
-    File file(input->GetContext(), fileName, FILE_READ);
+    SystemFile file(input->GetContext(), fileName, FILE_READ);
     return file.IsOpen() ? input->LoadGestures(file) : 0;
 }
 

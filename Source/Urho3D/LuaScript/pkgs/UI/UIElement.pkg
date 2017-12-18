@@ -1,4 +1,4 @@
-$#include "IO/File.h"
+$#include "IO/SystemFile.h"
 $#include "UI/UIElement.h"
 
 enum HorizontalAlignment
@@ -332,7 +332,7 @@ static bool UIElementLoadXML(UIElement* element, const String& fileName)
     if (!element)
         return false;
 
-    File file(element->GetContext());
+    SystemFile file(element->GetContext());
     if (!file.Open(fileName, FILE_READ))
         return false;
 
@@ -344,7 +344,7 @@ static bool UIElementSaveXML(const UIElement* element, const String& fileName, c
     if (!element)
         return false;
 
-    File file(element->GetContext());
+    SystemFile file(element->GetContext());
     if (!file.Open(fileName, FILE_WRITE))
         return false;
 

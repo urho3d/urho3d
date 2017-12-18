@@ -90,7 +90,7 @@ public:
     void* GetHandle() const { return handle_; }
 
     /// Return whether the file originates from a package.
-    bool IsPackaged() const { return true; }
+    // bool IsPackaged() const { return true; }
 
 private:
     /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.

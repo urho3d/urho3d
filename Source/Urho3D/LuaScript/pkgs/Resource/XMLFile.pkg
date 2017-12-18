@@ -37,7 +37,7 @@ static bool XMLFileSave(const XMLFile* resource, const String& fileName, const S
     if (!resource)
         return false;
 
-    File file(resource->GetContext());
+    SystemFile file(resource->GetContext());
     return file.Open(fileName, FILE_WRITE) && resource->Save(file, indentation);
 }
 $}

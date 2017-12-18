@@ -1,4 +1,4 @@
-$#include "IO/File.h"
+$#include "IO/SystemFile.h"
 $#include "LuaScript/LuaFile.h"
 $#include "LuaScript/LuaScriptInstance.h"
 $#include "Scene/Node.h"
