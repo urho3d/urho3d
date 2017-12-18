@@ -24,7 +24,7 @@
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Core/StringUtils.h>
 #include <Urho3D/Graphics/Tangent.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Resource/XMLFile.h>
 
@@ -150,7 +150,7 @@ void LoadSkeleton(const String& skeletonFileName)
 {
     // Process skeleton first (if found)
     XMLElement skeletonRoot;
-    File skeletonFileSource(context_);
+    SystemFile skeletonFileSource(context_);
     skeletonFileSource.Open(skeletonFileName);
     if (!skelFile_->Load(skeletonFileSource))
         PrintLine("Failed to load skeleton " + skeletonFileName);
@@ -247,7 +247,7 @@ void LoadSkeleton(const String& skeletonFileName)
 
 void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool exportMorphs)
 {
-    File meshFileSource(context_);
+    SystemFile meshFileSource(context_);
     meshFileSource.Open(inputFileName);
     if (!meshFile_->Load(meshFileSource))
         ErrorExit("Could not load input file " + inputFileName);
@@ -851,7 +851,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
 
     // Begin serialization
     {
-        File dest(context_);
+        SystemFile dest(context_);
         if (!dest.Open(outputFileName, FILE_WRITE))
             ErrorExit("Could not open output file " + outputFileName);
 
@@ -927,7 +927,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
     if (saveMaterialList)
     {
         String materialListName = ReplaceExtension(outputFileName, ".txt");
-        File listFile(context_);
+        SystemFile listFile(context_);
         if (listFile.Open(materialListName, FILE_WRITE))
         {
             for (unsigned i = 0; i < materialNames_.Size(); ++i)
@@ -1026,7 +1026,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 String animationFileName = outputFileName.Replaced(".mdl", "");
                 animationFileName += "_" + newAnimation.name_ + ".ani";
 
-                File dest(context_);
+                SystemFile dest(context_);
                 if (!dest.Open(animationFileName, FILE_WRITE))
                     ErrorExit("Could not open output file " + animationFileName);
 

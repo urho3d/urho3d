@@ -22,7 +22,7 @@
 
 #include <Urho3D/Container/ArrayPtr.h>
 #include <Urho3D/Core/Context.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Core/StringUtils.h>
@@ -92,7 +92,7 @@ void Run(const Vector<String>& arguments)
         const int height = dim == 2 ? width : 1;
 
         Context context;
-        File file(&context);
+        SystemFile file(&context);
         file.Open(inputFile);
 
         PODVector<float> horizontal;
