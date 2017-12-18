@@ -31,7 +31,7 @@
 #include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
-#include <Urho3D/LuaScript/LuaSystemFile.h>
+#include <Urho3D/LuaScript/LuaFile.h>
 #include <Urho3D/LuaScript/LuaFunction.h>
 #include <Urho3D/LuaScript/LuaScript.h>
 #include <Urho3D/LuaScript/LuaScriptInstance.h>
