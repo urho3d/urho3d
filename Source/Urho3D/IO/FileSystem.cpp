@@ -441,7 +441,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
     if (allowedPaths_.Empty())
     {
-        if (!FileExists(fileName) && !DirExists(fileName))
+        if (!FileExists(fileName) && !DirExists(fileName) && !fileName.Contains("http"))
         {
             URHO3D_LOGERROR("File or directory " + fileName + " not found");
             return false;

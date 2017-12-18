@@ -190,16 +190,24 @@ bool Script::Execute(const String& line)
         module = defaultScriptFile_->GetScriptModule();
     if (!module)
         module = scriptEngine_->GetModule("ExecuteImmediate", asGM_CREATE_IF_NOT_EXISTS);
-    if (!module)
-        return false;
+	if (!module)
+	{
+		URHO3D_LOGINFO("Could not execute in immediate mode.");
+		return false;
+	}
 
-    asIScriptFunction* function = nullptr;
-    if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
-        return false;
+
+    asIScriptFunction* function = 0;
+	if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
+	{
+		URHO3D_LOGINFO("Could compile function in immediate mode.");
+		return false;
+	}
 
     if (immediateContext_->Prepare(function) < 0)
     {
         function->Release();
+		URHO3D_LOGINFO("Could not prepare immediate mode function.");
         return false;
     }
 
@@ -251,12 +259,23 @@ void Script::MessageCallback(const asSMessageInfo* msg)
         URHO3D_LOGINFO(message);
         break;
     }
+
+	if (msg->type == asMSGTYPE_ERROR) {
+		//also send error event
+		VariantMap& eventData = GetEventDataMap();
+		eventData[ScriptError::P_SCRIPTPATH] = msg->section;
+		eventData[ScriptError::P_ROW] = msg->row;
+		eventData[ScriptError::P_COL] = msg->col;
+		eventData[ScriptError::P_MSG] = msg->message;
+		SendEvent(E_SCRIPTERROR, eventData);
+	}
+
 }
 
 void Script::ExceptionCallback(asIScriptContext* context)
 {
     String message;
-    message.AppendWithFormat("- Exception '%s' in '%s'\n%s", context->GetExceptionString(),
+    message.AppendWithFormat("Exception '%s' in '%s'\n%s", context->GetExceptionString(),
         context->GetExceptionFunction()->GetDeclaration(), GetCallStack(context).CString());
 
     asSMessageInfo msg;

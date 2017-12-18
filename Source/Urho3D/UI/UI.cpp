@@ -60,6 +60,7 @@
 #include "../UI/UIEvents.h"
 #include "../UI/Window.h"
 #include "../UI/View3D.h"
+#include "../UI/MultiLineEdit.h"
 #include "../UI/UIComponent.h"
 
 #include <assert.h>
@@ -95,6 +96,7 @@ UI::UI(Context* context) :
     dragBeginDistance_(DEFAULT_DRAGBEGIN_DISTANCE),
     mouseButtons_(0),
     lastMouseButtons_(0),
+    maxDoubleClickDist_(M_LARGE_VALUE),
     qualifiers_(0),
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
     initialized_(false),
@@ -632,6 +634,11 @@ void UI::SetClipboardText(const String& text)
 void UI::SetDoubleClickInterval(float interval)
 {
     doubleClickInterval_ = Max(interval, 0.0f);
+}
+
+void UI::SetMaxDoubleClickDistance(float distPixels)
+{
+    maxDoubleClickDist_ = distPixels;
 }
 
 void UI::SetDragBeginInterval(float interval)
@@ -1380,17 +1387,18 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             element->OnClickBegin(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            // Fire double click event if element matches and is in time
+            // Fire double click event if element matches and is in time and is within max distance from the original click
             if (doubleClickElement_ && element == doubleClickElement_ &&
-                clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
+                (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000)) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
+                SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
             }
             else
             {
                 doubleClickElement_ = element;
+                doubleClickFirstPos_ = windowCursorPos;
                 clickTimer_.Reset();
             }
 
@@ -1426,8 +1434,8 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
                 SetFocusElement(nullptr);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
+            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
+                SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;
@@ -1473,7 +1481,6 @@ void UI::ProcessClickEnd(const IntVector2& windowCursorPos, int button, int butt
                 {
                     bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
                     bool dragDropFinish = dragSource && dragTarget && element != dragElement;
-
                     if (dragDropFinish)
                     {
                         bool accept = element->OnDragDropFinish(dragElement);
@@ -1481,7 +1488,8 @@ void UI::ProcessClickEnd(const IntVector2& windowCursorPos, int button, int butt
                         // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
                         if (accept && dragElement && element)
                         {
-                            using namespace DragDropFinish;
+							
+							using namespace DragDropFinish;
 
                             VariantMap& eventData = GetEventDataMap();
                             eventData[P_SOURCE] = dragElement.Get();
@@ -1635,13 +1643,36 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
             endElement->SendEvent(E_CLICK, eventData);
         else if (eventType == E_UIMOUSECLICKEND)
             endElement->SendEvent(E_CLICKEND, eventData);
-        else if (eventType == E_UIMOUSEDOUBLECLICK)
-            endElement->SendEvent(E_DOUBLECLICK, eventData);
     }
 
     // Send the global event from the UI subsystem last
     SendEvent(eventType, eventData);
 }
+
+void UI::SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button,
+    int buttons, int qualifiers)
+{
+    VariantMap& eventData = GetEventDataMap();
+    eventData[UIMouseDoubleClick::P_ELEMENT] = endElement;
+    eventData[UIMouseDoubleClick::P_X] = secondPos.x_;
+    eventData[UIMouseDoubleClick::P_Y] = secondPos.y_;
+    eventData[UIMouseDoubleClick::P_XBEGIN] = firstPos.x_;
+    eventData[UIMouseDoubleClick::P_YBEGIN] = firstPos.y_;
+    eventData[UIMouseDoubleClick::P_BUTTON] = button;
+    eventData[UIMouseDoubleClick::P_BUTTONS] = buttons;
+    eventData[UIMouseDoubleClick::P_QUALIFIERS] = qualifiers;
+
+
+    if (endElement)
+    {
+        // Send also element version of the event
+        endElement->SendEvent(E_DOUBLECLICK, eventData);
+    }
+
+    // Send the global event from the UI subsystem last
+    SendEvent(E_UIMOUSEDOUBLECLICK, eventData);
+}
+
 
 void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
@@ -1887,7 +1918,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (element)
     {
         // Switch focus between focusable elements in the same top level window
-        if (key == KEY_TAB)
+        if (key == KEY_TAB & qualifiers_ & QUAL_CTRL)
         {
             UIElement* topLevel = element->GetParent();
             while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
@@ -2133,6 +2164,7 @@ void RegisterUILibrary(Context* context)
     ProgressBar::RegisterObject(context);
     ToolTip::RegisterObject(context);
     UIComponent::RegisterObject(context);
+	MultiLineEdit::RegisterObject(context);
 }
 
 }

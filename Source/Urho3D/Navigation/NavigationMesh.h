@@ -271,8 +271,8 @@ public:
 
     /// Return whether to draw NavArea components.
     bool GetDrawNavAreas() const { return drawNavAreas_; }
-
-private:
+	/// Get nav mesh geometry data
+	void GetNavMeshGeometry(Vector<Vector<Vector3> >& polygons);
     /// Write tile data.
     void WriteTile(Serializer& dest, int x, int z) const;
     /// Read tile data to the navigation mesh.
