@@ -57,8 +57,10 @@ class URHO3D_API PackedFile : public File
 public:
     /// Construct.
     PackedFile(Context* context);
+    /// Construct and open from the default package.
+    PackedFile(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file.
-    PackedFile(Context* context, PackageFile* package, const String& fileName, FileMode mode = FILE_READ);
+    PackedFile(Context* context, FileSource* package, const String& fileName, FileMode mode = FILE_READ);
     /// Destruct. Close the file if open.
     virtual ~PackedFile() override;
 
@@ -72,8 +74,8 @@ public:
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     virtual unsigned GetChecksum() override;
 
-    /// Open from within a package file. Return true if successful.
-    bool Open(PackageFile* package, const String& fileName, FileMode mode = FILE_READ);
+    // Open a file with the default PackageFile, as registered in the resource cache. Return true if successful.
+    using File::Open;
     /// Open from within a package file. Return true if successful.
     virtual bool Open(FileSource* package, const String& fileName, FileMode mode = FILE_READ) override;
     /// Close the file.

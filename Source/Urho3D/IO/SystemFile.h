@@ -57,6 +57,8 @@ public:
     SystemFile(Context* context);
     /// Construct and open a filesystem file.
     SystemFile(Context* context, const String& fileName, FileMode mode = FILE_READ);
+    /// Construct and open a filesystem file. FilseSource* ignored.
+    SystemFile(Context* context, FileSource*, const String& fileName, FileMode mode = FILE_READ);
     /// Destruct. Close the file if open.
     virtual ~SystemFile() override;
 

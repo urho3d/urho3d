@@ -604,7 +604,7 @@ bool PickFile()
     if (action.empty)
         return false;
 
-    // File (Scene related)
+    // SystemFile (Scene related)
     if (action == "Open scene...")
     {
         CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
@@ -1232,7 +1232,7 @@ void ExecuteScript(const String&in fileName)
     if (fileName.empty)
         return;
 
-    File@ file = File(fileName, FILE_READ);
+    File@ file = SystemFile(fileName, FILE_READ);
     if (file.open)
     {
         String scriptCode;
@@ -1880,7 +1880,7 @@ XMLFile@ GetEditorUIXMLFile(const String&in fileName)
     String fullFileName = fileSystem.programDir + "Data/" + fileName;
     if (fileSystem.FileExists(fullFileName))
     {
-        File@ file = File(fullFileName, FILE_READ);
+        File@ file = SystemFile(fullFileName, FILE_READ);
         XMLFile@ xml = XMLFile();
         xml.name = fileName;
         if (xml.Load(file))

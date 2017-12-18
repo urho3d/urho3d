@@ -33,6 +33,7 @@
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/Texture.h"
 #include "../IO/File.h"
+#include "../IO/FileSource.h"
 #include "../IO/Log.h"
 #include "../IO/VectorBuffer.h"
 #include "../Resource/Resource.h"
@@ -796,6 +797,104 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Node@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST);
 }
+
+template <class T> T* ConstructFileAndOpen(const String& fileName, FileMode mode)
+{
+    return new T(GetScriptContext(), fileName, mode);
+}
+
+template <class T> T* ConstructSourcedFileAndOpen(FileSource* source, const String& fileName, FileMode mode)
+{
+    return new T(GetScriptContext(), source, fileName, mode);
+}
+
+/// Template function for registering a named constructor for a class derived from Object.
+template <class T> void RegisterFileConstructors(asIScriptEngine* engine, const char* className)
+{
+    String declFactoryWithSource(String(className) + "@+ f(FileSource@+, const String&in, FileMode, FileMode mode = FILE_READ)");
+    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithSource.CString(), asFUNCTION(ConstructSourcedFileAndOpen<T>), asCALL_CDECL);
+
+    String declFactoryWithName(String(className) + "@+ f(const String&in, FileMode, FileMode mode = FILE_READ)");
+    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.CString(), asFUNCTION(ConstructFileAndOpen<T>), asCALL_CDECL);
+}
+
+
+/// Template function for registering a class derived from File.
+template <class T> void RegisterFile(asIScriptEngine* engine, const char* className)
+{
+    RegisterObject<T>(engine, className);
+    // Do not register factory for the base class. Done with template specialization.
+//    if (strcmp("File", className))
+//    {
+        RegisterSubclass<File, T>(engine, "File", className);
+        RegisterObjectConstructor<T>(engine, className);
+        RegisterFileConstructors<T>(engine, className);
+//    }
+//    RegisterObject<File>(engine, "File");
+//    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
+//    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod(className, "bool Open(const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool Open(FileSource@+, const String&in, FileMode mode = FILE_READ)", asMETHODPR(T, Open, (FileSource*, const String&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Close()", asMETHOD(T, Close), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Flush()", asMETHOD(T, Flush), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "FileMode get_mode() const", asMETHOD(T, GetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_open()", asMETHOD(T, IsOpen), asCALL_THISCALL);
+//    engine->RegisterObjectMethod(className, "bool get_packaged()", asMETHOD(T, IsPackaged), asCALL_THISCALL); Removed
+    RegisterSerializer<T>(engine, className);
+    RegisterDeserializer<T>(engine, className);
+}
+
+/// Template function for registering a class derived from File.
+template <> void RegisterFile<File>(asIScriptEngine* engine, const char* className);
+
+
+template <class T> T* ConstructAndOpenFileSource(const String& fileName)
+{
+    return new T(GetScriptContext(), fileName);
+}
+
+/// Template function for registering a named constructor for a class derived from Object.
+template <class T> void RegisterFileSourceConstructor(asIScriptEngine* engine, const char* className)
+{
+    String declFactoryWithName(String(className) + "@+ f(FileSource@+, const String&in, FileMode, FileMode mode = FILE_READ)");
+    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.CString(), asFUNCTION(ConstructAndOpenFileSource<T>), asCALL_CDECL);
+}
+
+static const CScriptArray* FileSourceGetEntryNames(FileSource* fileSource)
+{
+    return VectorToArray<String>(fileSource->GetEntryNames(), "Array<String>");
+}
+
+/// Template function for registering a class derived from FileSource.
+template <class T> void RegisterFileSource(asIScriptEngine* engine, const char* className)
+{
+    RegisterObject<T>(engine, className);
+    // Do not register factory for the base class
+//    if (strcmp("FileSource", className))
+//    {
+        RegisterSubclass<File, T>(engine, "FileSource", className);
+        RegisterObjectConstructor<T>(engine, className);
+        //Cannot use RegisterNamedObjectConstructor as SetName is not public
+        RegisterFileSourceConstructor<T>(engine, className);
+//    }
+//    RegisterObject<FileSource>(engine, className);
+//    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
+// NOT GENERAL    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset = 0)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+    engine->RegisterObjectMethod(className, "bool Open(const String&in) const", asMETHODPR(T, Open, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool Exists(const String&in) const", asMETHOD(T, Exists), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "File@+ GetFile(const String&in, FileMode mode)", asMETHOD(T, GetFile), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHOD(T, GetName), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_numFiles() const", asMETHOD(T, GetNumFiles), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_totalSize() const", asMETHOD(T, GetTotalSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_totalDataSize() const", asMETHOD(T, GetTotalDataSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_checksum() const", asMETHOD(T, GetChecksum), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool compressed() const", asMETHOD(T, IsCompressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<String>@ GetEntryNames() const", asFUNCTION(FileSourceGetEntryNames), asCALL_CDECL_OBJLAST);
+}
+
+
+/// Template specialization for registering the FileSource class (because it cannot be constructed).
+template <> void RegisterFileSource<FileSource>(asIScriptEngine* engine, const char* className);
 
 static bool ResourceLoad(File* file, Resource* ptr)
 {

@@ -294,6 +294,25 @@ static unsigned FileSystemSystemRunAsync(const String& fileName, CScriptArray* s
     return ptr->SystemRunAsync(fileName, destArguments);
 }
 
+/// Template function for registering a class derived from File.
+template <> void RegisterFile<File>(asIScriptEngine* engine, const char* className)
+{
+    RegisterObject<File>(engine, className);
+    // Do not register factory for the base class
+//    RegisterObject<File>(engine, "File");
+//    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
+//    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod(className, "bool Open(const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool Open(FileSource@+, const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (FileSource*, const String&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Flush()", asMETHOD(File, Flush), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);
+//    engine->RegisterObjectMethod(className, "bool get_packaged()", asMETHOD(T, IsPackaged), asCALL_THISCALL); Removed
+    RegisterSerializer<File>(engine, className);
+    RegisterDeserializer<File>(engine, className);
+}
+
 static void RegisterSerialization(asIScriptEngine* engine)
 {
     engine->RegisterEnum("FileMode");
@@ -316,16 +335,22 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     RegisterDeserializer<Deserializer>(engine, "Deserializer");
 
-    RegisterObject<File>(engine, "File");
-    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
-    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
-    engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("File", "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);
-    engine->RegisterObjectMethod("File", "bool get_packaged()", asMETHOD(File, IsPackaged), asCALL_THISCALL);
-    RegisterSerializer<File>(engine, "File");
-    RegisterDeserializer<File>(engine, "File");
+    //Pre-register FileSource object as it is needed for File's Open
+    RegisterObject<FileSource>(engine, "FileSource");
+
+    RegisterFile<File>(engine, "File");
+    RegisterFile<SystemFile>(engine, "SystemFile");
+    RegisterFile<PackedFile>(engine, "PackedFile");
+//    RegisterObject<File>(engine, "File");
+//    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
+//    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
+//    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("File", "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("File", "bool get_packaged()", asMETHOD(File, IsPackaged), asCALL_THISCALL);
+//    RegisterSerializer<File>(engine, "File");
+//    RegisterDeserializer<File>(engine, "File");
 
     RegisterObject<NamedPipe>(engine, "NamedPipe");
     engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f()", asFUNCTION(ConstructNamedPipe), asCALL_CDECL);
@@ -400,35 +425,60 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("bool IsAbsolutePath(const String&in)", asFUNCTION(IsAbsolutePath), asCALL_CDECL);
 }
 
-static PackageFile* ConstructPackageFile()
-{
-    return new PackageFile(GetScriptContext());
-}
+//static PackageFile* ConstructPackageFile()
+//{
+//    return new PackageFile(GetScriptContext());
+//}
 
 static PackageFile* ConstructAndOpenPackageFile(const String& fileName, unsigned startOffset)
 {
     return new PackageFile(GetScriptContext(), fileName, startOffset);
 }
 
-static const CScriptArray* PackageFileGetEntryNames(PackageFile* packageFile)
+//static const CScriptArray* PackageFileGetEntryNames(PackageFile* packageFile)
+//{
+//    return VectorToArray<String>(packageFile->GetEntryNames(), "Array<String>");
+//}
+
+/// Template specialization for registering the FileSource class (because it cannot be constructed).
+template <> void RegisterFileSource<FileSource>(asIScriptEngine* engine, const char* className)
 {
-    return VectorToArray<String>(packageFile->GetEntryNames(), "Array<String>");
+    //FileSource was registered as an object already, before File.
+    //RegisterObject<FileSource>(engine, className);
+    // Do not register factory for the base class
+//    RegisterObject<FileSource>(engine, className);
+//    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
+// NOT GENERAL    engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset = 0)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+    engine->RegisterObjectMethod(className, "bool Open(const String&in) const", asMETHODPR(FileSource, Open, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool Exists(const String&in) const", asMETHOD(FileSource, Exists), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "File@+ GetFile(const String&in, FileMode mode)", asMETHOD(FileSource, GetFile), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHOD(FileSource, GetName), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_numFiles() const", asMETHOD(FileSource, GetNumFiles), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_totalSize() const", asMETHOD(FileSource, GetTotalSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_totalDataSize() const", asMETHOD(FileSource, GetTotalDataSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_checksum() const", asMETHOD(FileSource, GetChecksum), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool compressed() const", asMETHOD(FileSource, IsCompressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<String>@ GetEntryNames() const", asFUNCTION(FileSourceGetEntryNames), asCALL_CDECL_OBJLAST);
 }
 
-static void RegisterPackageFile(asIScriptEngine* engine)
+static void RegisterFileSources(asIScriptEngine* engine)
 {
-    RegisterObject<PackageFile>(engine, "PackageFile");
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset = 0)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
-    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint startOffset = 0) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHOD(PackageFile, Exists), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHOD(PackageFile, GetName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHOD(PackageFile, GetNumFiles), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHOD(PackageFile, GetTotalSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_totalDataSize() const", asMETHOD(PackageFile, GetTotalDataSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHOD(PackageFile, GetChecksum), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "bool compressed() const", asMETHOD(PackageFile, IsCompressed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFileGetEntryNames), asCALL_CDECL_OBJLAST);
+//    RegisterObject<PackageFile>(engine, "PackageFile");
+//    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
+//    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset = 0)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+//    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint startOffset = 0) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHOD(PackageFile, Exists), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHOD(PackageFile, GetName), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHOD(PackageFile, GetNumFiles), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHOD(PackageFile, GetTotalSize), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "uint get_totalDataSize() const", asMETHOD(PackageFile, GetTotalDataSize), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHOD(PackageFile, GetChecksum), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "bool compressed() const", asMETHOD(PackageFile, IsCompressed), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFileGetEntryNames), asCALL_CDECL_OBJLAST);
+    RegisterFileSource<FileSource>(engine, "FileSource");
+    RegisterFileSource<PackageFile>(engine, "PackageFile");
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint startOffset) const", asMETHODPR(PackageFile, Open, (const String&, unsigned), bool), asCALL_THISCALL);
 }
 
 void RegisterIOAPI(asIScriptEngine* engine)
@@ -436,7 +486,7 @@ void RegisterIOAPI(asIScriptEngine* engine)
     RegisterLog(engine);
     RegisterSerialization(engine);
     RegisterFileSystem(engine);
-    RegisterPackageFile(engine);
+    RegisterFileSources(engine);
 }
 
 }

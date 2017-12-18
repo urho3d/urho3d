@@ -1672,7 +1672,7 @@ void SaveParticleEffect()
     if (fullName.empty)
         return;
 
-    File saveFile(fullName, FILE_WRITE);
+    SystemFile saveFile(fullName, FILE_WRITE);
     editParticleEffect.Save(saveFile);
 }
 
@@ -1714,7 +1714,7 @@ void SaveParticleEffectAsDone(StringHash eventType, VariantMap& eventData)
     if (GetExtension(fullName).empty && filter != "*.*")
         fullName = fullName + filter.Substring(1);
 
-    File saveFile(fullName, FILE_WRITE);
+    SystemFile saveFile(fullName, FILE_WRITE);
     if (editParticleEffect.Save(saveFile))
     {
         saveFile.Close();

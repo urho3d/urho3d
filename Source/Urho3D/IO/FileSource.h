@@ -51,8 +51,8 @@ public:
     /// Opens a file with the given name and returns a file shared pointer from the source.
     SharedPtr<File> GetFile(const String& fileName, FileMode mode = FILE_READ);
 
-    /// Open the package file, if applicable.
-    virtual bool Open(const String& filename) { return true; }
+    /// Open the package file, if applicable. Returns true on success.
+    virtual bool Open(const String& filename) = 0;
 
     // TODO: NEL: Possibly replace the -1 with a 0 and add a separate [Is]Loaded() or LoadSuccessful() function
     /// Return number of files if available. Should return non-zero if load successful.

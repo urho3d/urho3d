@@ -27,6 +27,7 @@
 #include <Urho3D/Core/Main.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
 #ifdef URHO3D_LUA
@@ -59,7 +60,7 @@ void Urho3DPlayer::Setup()
     const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
-        SharedPtr<File> commandFile(new File(context_, commandFileName));
+        SharedPtr<File> commandFile(new SystemFile(context_, commandFileName));
         if (commandFile->IsOpen())
         {
             commandLineRead_ = true;

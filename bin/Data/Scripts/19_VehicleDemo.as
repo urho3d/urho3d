@@ -198,12 +198,12 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Check for loading / saving the scene
         if (input.keyPress[KEY_F5])
         {
-            File saveFile(fileSystem.programDir + "Data/Scenes/VehicleDemo.xml", FILE_WRITE);
+            SystemFile saveFile(fileSystem.programDir + "Data/Scenes/VehicleDemo.xml", FILE_WRITE);
             scene_.SaveXML(saveFile);
         }
         if (input.keyPress[KEY_F7])
         {
-            File loadFile(fileSystem.programDir + "Data/Scenes/VehicleDemo.xml", FILE_READ);
+            SystemFile loadFile(fileSystem.programDir + "Data/Scenes/VehicleDemo.xml", FILE_READ);
             scene_.LoadXML(loadFile);
             // After loading we have to reacquire the vehicle scene node, as it has been recreated
             // Simply find by name as there's only one of them

@@ -64,7 +64,7 @@ PackedFile::PackedFile(Context* context) :
 {
 }
 
-PackedFile::PackedFile(Context* context, PackageFile* package, const String& fileName, FileMode mode) :
+PackedFile::PackedFile(Context *context, const String &fileName, FileMode mode) :
     File(context),
     handle_(nullptr),
 #ifdef __ANDROID__
@@ -77,7 +77,23 @@ PackedFile::PackedFile(Context* context, PackageFile* package, const String& fil
     compressed_(false),
     readSyncNeeded_(false)
 {
-    Open(package, fileName);
+    Open(fileName, mode);
+}
+
+PackedFile::PackedFile(Context* context, FileSource* package, const String& fileName, FileMode mode) :
+    File(context),
+    handle_(nullptr),
+#ifdef __ANDROID__
+    assetHandle_(0),
+#endif
+    readBufferOffset_(0),
+    readBufferSize_(0),
+    offset_(0),
+    checksum_(0),
+    compressed_(false),
+    readSyncNeeded_(false)
+{
+    Open(package, fileName, mode);
 }
 
 PackedFile::~PackedFile()
@@ -86,10 +102,18 @@ PackedFile::~PackedFile()
 }
 
 
-bool PackedFile::Open(PackageFile* package, const String& fileName, FileMode mode)
+bool PackedFile::Open(FileSource *source, const String &fileName, FileMode mode)
 {
-    if (!package)
+    if (!source)
         return false;
+
+    if (!source->IsInstanceOf(PackageFile::GetTypeStatic()))
+    {
+        URHO3D_LOGERROR("Could not open packed file " + fileName + " from non-PackageFile source");
+        return false;
+    }
+
+    PackageFile* package = (PackageFile*)(source);
 
     const PackageEntry* entry = package->GetEntry(fileName);
     if (!entry)
@@ -111,11 +135,6 @@ bool PackedFile::Open(PackageFile* package, const String& fileName, FileMode mod
     // Seek to beginning of package entry's file data
     SeekInternal(offset_);
     return true;
-}
-
-bool PackedFile::Open(FileSource *package, const String &fileName, FileMode mode)
-{
-    return Open(dynamic_cast<PackageFile*>(package), fileName, mode);
 }
 
 unsigned PackedFile::Read(void* dest, unsigned size)

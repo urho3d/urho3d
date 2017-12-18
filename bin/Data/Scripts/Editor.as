@@ -178,7 +178,7 @@ void LoadConfig()
         return;
 
     XMLFile config;
-    config.Load(File(configFileName, FILE_READ));
+    config.Load(SystemFile(configFileName, FILE_READ));
 
     XMLElement configElem = config.root;
     if (configElem.isNull)
@@ -439,7 +439,7 @@ void SaveConfig()
     
     SaveSoundTypes(soundTypesElem);
 
-    config.Save(File(configFileName, FILE_WRITE));
+    config.Save(SystemFile(configFileName, FILE_WRITE));
 }
 
 void MakeBackup(const String&in fileName)

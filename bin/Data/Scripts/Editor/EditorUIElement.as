@@ -107,7 +107,7 @@ void OpenUILayout(const String&in fileName)
         return;
     }
 
-    File file(fileName, FILE_READ);
+    SystemFile file(fileName, FILE_READ);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
@@ -244,7 +244,7 @@ bool SaveUILayout(const String&in fileName)
     ui.cursor.shape = CS_BUSY;
 
     MakeBackup(fileName);
-    File file(fileName, FILE_WRITE);
+    SystemFile file(fileName, FILE_WRITE);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
@@ -304,7 +304,7 @@ void LoadChildUIElement(const String&in fileName)
         return;
     }
 
-    File file(fileName, FILE_READ);
+    SystemFile file(fileName, FILE_READ);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
@@ -350,7 +350,7 @@ bool SaveChildUIElement(const String&in fileName)
     ui.cursor.shape = CS_BUSY;
 
     MakeBackup(fileName);
-    File file(fileName, FILE_WRITE);
+    SystemFile file(fileName, FILE_WRITE);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
@@ -389,7 +389,7 @@ void SetUIElementDefaultStyle(const String&in fileName)
         return;
     }
 
-    File file(fileName, FILE_READ);
+    SystemFile file(fileName, FILE_READ);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);

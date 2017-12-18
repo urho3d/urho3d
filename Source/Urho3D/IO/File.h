@@ -71,7 +71,7 @@ public:
 
     // File Specific things
     /// Open a file with the default FileSource for this file kind of file, as registered in the resource cache. Return true if successful.
-    bool Open(const String& fileName, FileMode mode = FILE_READ);
+    virtual bool Open(const String& fileName, FileMode mode = FILE_READ);
     /// Open from within a given file source. Return true if successful. FileModes beyond FILE_READ may not be supported.
     virtual bool Open(FileSource* source, const String& fileName, FileMode mode = FILE_READ) = 0;
     /// Close the file.

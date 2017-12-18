@@ -190,7 +190,7 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
             faceElem.SetAttribute("name", GetResourceNameFromFullName(basePath + cubeName + String(target_.id) + "_" + GetFaceName(CubeMapFace(i)) + ".png"));
         }
 
-        file.Save(File(xmlPath, FILE_WRITE), "    ");
+        file.Save(SystemFile(xmlPath, FILE_WRITE), "    ");
 
         ResourceRef ref;
         ref.type = StringHash("TextureCube");

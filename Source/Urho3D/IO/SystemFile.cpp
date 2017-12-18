@@ -93,6 +93,12 @@ SystemFile::SystemFile(Context* context, const String& fileName, FileMode mode) 
     Open(fileName, mode);
 }
 
+SystemFile::SystemFile(Context *context, FileSource*, const String &fileName, FileMode mode) :
+    SystemFile(context, fileName, mode)
+{
+
+}
+
 SystemFile::~SystemFile()
 {
     Close();

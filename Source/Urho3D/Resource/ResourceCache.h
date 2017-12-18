@@ -170,7 +170,7 @@ public:
 
     /// Return added file sources.
     const Vector<SharedPtr<FileSource> >& GetFileSources() const { return fileSources_; }
-    /// Deprecated for GetFileSources
+    /// Deprecated for GetFileSources. Returns copy of sources including only PackageFiles.
     const Vector<SharedPtr<FileSource> >& GetPackageFiles() const { return fileSources_; }
 
     /// Template version of returning a resource by name.

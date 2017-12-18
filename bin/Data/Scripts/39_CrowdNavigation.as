@@ -403,12 +403,12 @@ void MoveCamera(float timeStep)
     // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
     if (input.keyPress[KEY_F5])
     {
-        File saveFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_WRITE);
+        SystemFile saveFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_WRITE);
         scene_.SaveXML(saveFile);
     }
     else if (input.keyPress[KEY_F7])
     {
-        File loadFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_READ);
+        SystemFile loadFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_READ);
         scene_.LoadXML(loadFile);
     }
 

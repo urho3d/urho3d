@@ -26,7 +26,7 @@
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Resource/ResourceCache.h>
@@ -157,7 +157,7 @@ void CompileScript(Context* context, const String& fileName)
 {
     PrintLine("Compiling script file " + fileName);
 
-    File inFile(context, fileName, FILE_READ);
+    SystemFile inFile(context, fileName, FILE_READ);
     if (!inFile.IsOpen())
         ErrorExit("Failed to open script file " + fileName);
 
@@ -166,7 +166,7 @@ void CompileScript(Context* context, const String& fileName)
         ErrorExit();
 
     String outFileName = ReplaceExtension(fileName, ".asc");
-    File outFile(context, outFileName, FILE_WRITE);
+    SystemFile outFile(context, outFileName, FILE_WRITE);
     if (!outFile.IsOpen())
         ErrorExit("Failed to open output file " + fileName);
 

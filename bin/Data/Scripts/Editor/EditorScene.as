@@ -191,7 +191,7 @@ bool LoadScene(const String&in fileName)
         return false;
     }
 
-    File file(fileName, FILE_READ);
+    SystemFile file(fileName, FILE_READ);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
@@ -256,7 +256,7 @@ bool SaveScene(const String&in fileName)
     editorScene.updateEnabled = true;
 
     MakeBackup(fileName);
-    File file(fileName, FILE_WRITE);
+    SystemFile file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
     bool success;
     if (extension == ".xml")
@@ -366,7 +366,7 @@ Node@ LoadNode(const String&in fileName, Node@ parent = null, bool raycastToMous
         return null;
     }
 
-    File file(fileName, FILE_READ);
+    SystemFile file(fileName, FILE_READ);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);
@@ -454,7 +454,7 @@ bool SaveNode(const String&in fileName)
     ui.cursor.shape = CS_BUSY;
 
     MakeBackup(fileName);
-    File file(fileName, FILE_WRITE);
+    SystemFile file(fileName, FILE_WRITE);
     if (!file.open)
     {
         MessageBox("Could not open file.\n" + fileName);

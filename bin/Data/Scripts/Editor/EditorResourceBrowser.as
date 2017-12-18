@@ -1295,7 +1295,7 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
     }
     else
     {
-        File@ file = File();
+        File@ file = SystemFile();
         if (!file.Open(path))
             return false;
 
@@ -1344,7 +1344,7 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
     }
     else
     {
-        File@ file = File();
+        File@ file = SystemFile();
         if (!file.Open(path))
             return false;
 
@@ -1573,7 +1573,7 @@ void CreateResourcePreview(String path, Node@ previewNode)
     int resourceType = GetResourceType(path); 
     if (resourceType > 0)
     {
-        File file;
+        SystemFile file;
         file.Open(path);
 
         if (resourceType == RESOURCE_TYPE_MODEL)

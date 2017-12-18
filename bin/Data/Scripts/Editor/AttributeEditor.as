@@ -26,7 +26,7 @@ String sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 bool rememberResourcePath = true;
 
 // Exceptions for string attributes that should not be continuously edited
-Array<String> noTextChangedAttrs = {"Script File", "Class Name", "Script Object Type", "Script File Name"};
+Array<String> noTextChangedAttrs = {"Script File", "Class Name", "Script Object Type", "Script SystemFile Name"};
 
 // List of attributes that should be created with a bit selection editor
 const Array<String> bitSelectionAttrs = {"Collision Mask", "Collision Layer", "Light Mask", "Zone Mask", "View Mask", "Shadow Mask"};

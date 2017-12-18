@@ -453,7 +453,7 @@ void SaveMaterial()
         return;
 
     MakeBackup(fullName);
-    File saveFile(fullName, FILE_WRITE);
+    SystemFile saveFile(fullName, FILE_WRITE);
     bool success;
     if (GetExtension(fullName) == ".json")
     {
@@ -505,7 +505,7 @@ void SaveMaterialAsDone(StringHash eventType, VariantMap& eventData)
         fullName = fullName + filter.Substring(1);
 
     MakeBackup(fullName);
-    File saveFile(fullName, FILE_WRITE);
+    SystemFile saveFile(fullName, FILE_WRITE);
     bool success;
     if (GetExtension(fullName) == ".json")
     {
