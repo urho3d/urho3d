@@ -34,7 +34,7 @@
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/Input/Input.h>
@@ -497,7 +497,7 @@ void Sample2D::SaveScene(bool initial)
     String filename = demoFilename_;
     if (!initial)
         filename += "InGame";
-    File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/" + filename + ".xml", FILE_WRITE);
+    SystemFile saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/" + filename + ".xml", FILE_WRITE);
     scene_->SaveXML(saveFile);
 }
 

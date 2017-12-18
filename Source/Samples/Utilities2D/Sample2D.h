@@ -107,7 +107,7 @@ public:
     /// Play a non-looping sound effect.
     void PlaySoundEffect(String soundName);
 
-    /// Filename used in load/save functions.
+    /// SystemFilename used in load/save functions.
     String demoFilename_;
     /// The scene.
     Scene* scene_;

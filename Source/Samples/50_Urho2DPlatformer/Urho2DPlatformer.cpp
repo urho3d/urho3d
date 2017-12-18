@@ -393,7 +393,7 @@ void Urho2DPlatformer::ReloadScene(bool reInit)
     if (!reInit)
         filename += "InGame";
 
-    File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/" + filename + ".xml", FILE_READ);
+    SystemFile loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/" + filename + ".xml", FILE_READ);
     scene_->LoadXML(loadFile);
     // After loading we have to reacquire the weak pointer to the Character2D component, as it has been recreated
     // Simply find the character's scene node by name as there's only one of them
