@@ -820,7 +820,16 @@ void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
     if (type == ITEM_NODE)
     {
         Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
-        LocateNode(node);
+        Array<Node@> nodes;
+        nodes.Push(node);
+        LocateNodes(nodes);
+    }
+    else if (type == ITEM_COMPONENT)
+    {
+        Component@ component = editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetUInt());
+        Array<Component@> components;
+        components.Push(component);
+        LocateComponents(components);
     }
 
     bool isExpanded = hierarchyList.IsExpanded(hierarchyList.selection);
