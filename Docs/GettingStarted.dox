@@ -826,23 +826,25 @@ Hint: to get more content to look at, run the Physics sample application (bin/Da
 \verbatim
 Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift to
                      select components instead. Hold Ctrl to multiselect.
-Right mouse        - Hold down and move mouse to rotate camera
-Middle mouse       - Hold down orbits the camera around selected objects
+Right mouse        - Hold down and move mouse to look around
+Middle mouse       - Hold down orbits the camera
 Shift+Middle mouse - Hold down pans the camera
+Mouse wheel        - Camera zoom in/out
 WSAD or arrows     - Move
 Shift+WSAD         - Move faster
 E                  - Ascend
 Q                  - Descend
 Shift+E,Q          - Ascend or descend faster
 
-Home               - Center view on currently selected object
-Numpad5            - Toggle orthographic / perspective camera
+F/Home             - Center view on currently selected
+Numpad5            - Toggle orthographic/perspective camera
 Numpad1            - Front view
 Numpad3            - Right hand view
-Numpad7            - Top view
+Numpad7/9          - Top view
+
 Ctrl+Numpad1       - Back view
 Ctrl+Numpad3       - Left view
-Ctrl+Numpad7       - Bottom view
+Ctrl+Numpad7/9     - Bottom view
 
 Ctrl+1,2,3         - Object manipulation mode: move/rotate/scale
 Ctrl+4             - Object selection mode, no manipulation
@@ -886,8 +888,10 @@ The editor setting "Pan using middle mouse button" switches the controls to the 
 
 \verbatim
 Middle mouse       - Hold down pans the camera
-Shift+Middle mouse - Hold down orbits the camera around selected objects
+Shift+Middle mouse - Hold down orbits the camera
 \endverbatim
+
+The editor setting "Rotate around selection" controls if the camera orbits around selection or the center of the view
 
 The PaintSelect-tool usage:
 
@@ -915,10 +919,9 @@ Alt+P              - Unparent scene node
 Ctrl+P             - Parent all selected scene nodes to last selected node
 Z                  - Cycle through solid, wireframe and point rendering
 M                  - Show/Hide LayerEditor
-F                  - Focus on selected object (LookAt)
 X                  - Delete node or component
 Alt+D              - Smart Duplicate (note: select one of axises on gizmo to show direction for next instance)
-Key "." or Del     - View Closer selected node(s)
+Key "." or Del     - Center view on currently selected
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
