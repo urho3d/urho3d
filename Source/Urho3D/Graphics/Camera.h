@@ -76,6 +76,7 @@ public:
     void SetLodBias(float bias);
     /// Set view mask. Will be and'ed with object's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
+    void SetViewShadowMask(unsigned mask);
     /// Set view override flags.
     void SetViewOverrideFlags(unsigned flags);
     /// Set orthographic mode enabled/disabled.
@@ -123,6 +124,7 @@ public:
 
     /// Return view mask.
     unsigned GetViewMask() const { return viewMask_; }
+    unsigned GetShadowViewMask() const { return viewShadowMask_; }
 
     /// Return view override flags.
     unsigned GetViewOverrideFlags() const { return viewOverrideFlags_; }
@@ -254,6 +256,7 @@ private:
     float lodBias_;
     /// View mask.
     unsigned viewMask_;
+    unsigned viewShadowMask_;
     /// View override flags.
     unsigned viewOverrideFlags_;
     /// Fill mode.

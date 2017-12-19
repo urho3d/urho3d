@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<material>
+	<technique name="Lightmap/Techniques/DiffUnlitLightMap.xml" />
+	<texture unit="diffuse" name="Lightmap/Textures/ProtoWhite256.jpg" />
+	<texture unit="emissive" name="Lightmap/BakedTextures/node9_unlit.png" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+</material>

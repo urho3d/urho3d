@@ -1,0 +1,6 @@
+<technique vs="UnlitLightMap" ps="UnlitLightMap" >
+    <pass name="base" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" />
+    <pass name="deferred" psdefines="DEFERRED" />
+</technique>
