@@ -113,6 +113,7 @@ Urho3D development, contributions and bugfixes by:
 - PredatorMF
 - Scellow
 - Skrylar
+- SuperWangKai
 - TheComet93
 - Y-way
 - 1vanK
