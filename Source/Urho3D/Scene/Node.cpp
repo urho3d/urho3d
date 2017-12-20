@@ -28,6 +28,7 @@
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/XMLFile.h"
 #include "../Resource/JSONFile.h"
+#include "../Resource/ResourceCache.h"
 #include "../Scene/Component.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/ReplicationState.h"
@@ -1596,8 +1597,45 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     RemoveAllChildren();
     RemoveAllComponents();
 
+    // Load prefab data if it is present (after children and components have been removed)
+    String file = source.GetAttribute("prefab");
+    if (!file.Empty())
+    {
+        if (file.EndsWith(".xml"))
+        {
+            XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file,source.GetBasePath());
+            if (xml && xml->Load(source) && LoadXML(xml->GetRoot()))
+                URHO3D_LOGINFO("Loaded prefab from " + file);
+            else // Continue to try to load, logging warning
+                URHO3D_LOGWARNING("Could not load prefab " + file);
+        }
+        else if (file.EndsWith(".json"))
+        {
+            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file,source.GetBasePath());
+            if (json && json->Load(source) && LoadJSON(json->GetRoot()))
+                URHO3D_LOGINFO("Loaded prefab from " + file);
+            else // Continue to try to load, logging warning
+                URHO3D_LOGWARNING("Could not load prefab " + file);
+        }
+        else
+        {
+            // Fall back to loading xml since this is in LoadXML, but log debug note
+            URHO3D_LOGDEBUG("Falling back to loading " + file + " as XML.");
+            XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file,source.GetBasePath());
+            if (xml && xml->Load(source) && LoadXML(xml->GetRoot()))
+                URHO3D_LOGINFO("Loaded prefab from " + file);
+            else // Continue to try to load, logging warning
+                URHO3D_LOGWARNING("Could not load prefab " + file);
+        }
+        //Continue to load node normally so as to allow modification of prefabs
+    }
+
     if (!Animatable::LoadXML(source))
         return false;
+
+    // Reset the BasePath to the prefab's path after normal loading
+    if (!file.Empty())
+        SetBasePath(file);
 
     XMLElement compElem = source.GetChild("component");
     while (compElem)
@@ -1641,8 +1679,45 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readC
     RemoveAllChildren();
     RemoveAllComponents();
 
+    // Load prefab data if it is present (after children and components have been removed)
+    String file = source.Get("prefab").GetString();
+    if (!file.Empty())
+    {
+        if (file.EndsWith(".json"))
+        {
+            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file,source.GetBasePath());
+            if (json && json->Load(source) && LoadJSON(json->GetRoot()))
+                URHO3D_LOGINFO("Loaded prefab from " + file);
+            else // Continue to try to load, logging warning
+                URHO3D_LOGWARNING("Could not load prefab " + file);
+        }
+        else if (file.EndsWith(".xml"))
+        {
+            XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file,source.GetBasePath());
+            if (xml && xml->Load(source) && LoadXML(xml->GetRoot()))
+                URHO3D_LOGINFO("Loaded prefab from " + file);
+            else // Continue to try to load, logging warning
+                URHO3D_LOGWARNING("Could not load prefab " + file);
+        }
+        else
+        {
+            // Fall back to loading xml since this is in LoadXML, but log debug note
+            URHO3D_LOGDEBUG("Falling back to loading " + file + " as JSON.");
+            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file,source.GetBasePath());
+            if (json && json->Load(source) && LoadJSON(json->GetRoot()))
+                URHO3D_LOGINFO("Loaded prefab from " + file);
+            else // Continue to try to load, logging warning
+                URHO3D_LOGWARNING("Could not load prefab " + file);
+        }
+        //Continue to load node normally so as to allow modification of prefabs
+    }
+
     if (!Animatable::LoadJSON(source))
         return false;
+
+    // Reset the BasePath to the prefab's path after normal loading
+    if (!file.Empty())
+        SetBasePath(file);
 
     const JSONArray& componentsArray = source.Get("components").GetArray();
 
