@@ -94,7 +94,7 @@ Cursor::~Cursor()
         if (i->second_.osCursor_)
         {
             SDL_FreeCursor(i->second_.osCursor_);
-            i->second_.osCursor_ = 0;
+            i->second_.osCursor_ = nullptr;
         }
     }
 }
@@ -163,7 +163,7 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     if (info.osCursor_)
     {
         SDL_FreeCursor(info.osCursor_);
-        info.osCursor_ = 0;
+        info.osCursor_ = nullptr;
     }
 
     // Reset current shape if it was edited
@@ -266,7 +266,7 @@ void Cursor::ApplyOSCursorShape()
     if (info.osCursor_ && info.systemDefined_ != useSystemShapes_)
     {
         SDL_FreeCursor(info.osCursor_);
-        info.osCursor_ = 0;
+        info.osCursor_ = nullptr;
     }
 
     // Create SDL cursor now if necessary

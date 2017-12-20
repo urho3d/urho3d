@@ -318,6 +318,18 @@ void ScrollView::SetScrollBarsVisible(bool horizontal, bool vertical)
     verticalScrollBar_->SetVisible(vertical);
 }
 
+void ScrollView::SetHorizontalScrollBarVisible(bool visible)
+{
+    scrollBarsAutoVisible_ = false;
+    horizontalScrollBar_->SetVisible(visible);
+}
+
+void ScrollView::SetVerticalScrollBarVisible(bool visible)
+{
+    scrollBarsAutoVisible_ = false;
+    verticalScrollBar_->SetVisible(visible);
+}
+
 void ScrollView::SetScrollBarsAutoVisible(bool enable)
 {
     if (enable != scrollBarsAutoVisible_)
@@ -343,6 +355,16 @@ void ScrollView::SetScrollStep(float step)
 void ScrollView::SetPageStep(float step)
 {
     pageStep_ = Max(step, 0.0f);
+}
+
+bool ScrollView::GetHorizontalScrollBarVisible() const
+{
+    return horizontalScrollBar_->IsVisible();
+}
+
+bool ScrollView::GetVerticalScrollBarVisible() const
+{
+    return verticalScrollBar_->IsVisible();
 }
 
 float ScrollView::GetScrollStep() const

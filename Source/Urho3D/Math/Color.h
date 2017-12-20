@@ -89,7 +89,7 @@ public:
         a_(data[3])
     {
     }
-    
+
     /// Assign from another color.
     Color& operator =(const Color& rhs)
     {
@@ -98,7 +98,7 @@ public:
         b_ = rhs.b_;
         a_ = rhs.a_;
         return *this;
-    }    
+    }
 
     /// Test for equality with another color without epsilon.
     bool operator ==(const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }
@@ -137,6 +137,8 @@ public:
     Vector3 ToHSL() const;
     /// Return HSV color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSV() const;
+    /// Set RGBA values from packed 32-bit integer, with R component in the lowest 8 bits (format 0xAABBGGRR).
+    void FromUInt(unsigned color);
     /// Set RGBA values from specified HSL values and alpha.
     void FromHSL(float h, float s, float l, float a = 1.0f);
     /// Set RGBA values from specified HSV values and alpha.
@@ -199,6 +201,9 @@ public:
 
     /// Return as string.
     String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return ToUInt(); }
 
     /// Red value.
     float r_;

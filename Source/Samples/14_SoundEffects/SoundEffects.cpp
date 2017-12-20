@@ -60,7 +60,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(SoundEffects)
 
 SoundEffects::SoundEffects(Context* context) :
     Sample(context),
-    musicSource_(0)
+    musicSource_(nullptr)
 {
 }
 

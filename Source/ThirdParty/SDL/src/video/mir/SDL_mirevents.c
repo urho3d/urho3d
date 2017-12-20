@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -141,7 +141,7 @@ HandleTouchMotion(int device_id, int source_id, float x, float y, float pressure
 }
 
 static void
-HandleMouseScroll(SDL_Window* sdl_window, int hscroll, int vscroll)
+HandleMouseScroll(SDL_Window* sdl_window, float hscroll, float vscroll)
 {
     SDL_SendMouseWheel(sdl_window, 0, hscroll, vscroll, SDL_MOUSEWHEEL_NORMAL);
 }
@@ -205,7 +205,7 @@ HandleMouseEvent(MirPointerEvent const* pointer, SDL_Window* sdl_window)
             break;
         case mir_pointer_action_motion: {
             int x, y;
-            int hscroll, vscroll;
+            float hscroll, vscroll;
             SDL_Mouse* mouse = SDL_GetMouse();
             x = MIR_mir_pointer_event_axis_value(pointer, mir_pointer_axis_x);
             y = MIR_mir_pointer_event_axis_value(pointer, mir_pointer_axis_y);
@@ -237,7 +237,7 @@ HandleMouseEvent(MirPointerEvent const* pointer, SDL_Window* sdl_window)
 }
 
 static void
-MIR_HandleInput(MirInputEvent const* input_event, SDL_Window* window)
+HandleInput(MirInputEvent const* input_event, SDL_Window* window)
 {
     switch (MIR_mir_input_event_get_type(input_event)) {
         case (mir_input_event_type_key):
@@ -257,7 +257,7 @@ MIR_HandleInput(MirInputEvent const* input_event, SDL_Window* window)
 }
 
 static void
-MIR_HandleResize(MirResizeEvent const* resize_event, SDL_Window* window)
+HandleResize(MirResizeEvent const* resize_event, SDL_Window* window)
 {
     int new_w = MIR_mir_resize_event_get_width (resize_event);
     int new_h = MIR_mir_resize_event_get_height(resize_event);
@@ -270,23 +270,23 @@ MIR_HandleResize(MirResizeEvent const* resize_event, SDL_Window* window)
 }
 
 static void
-MIR_HandleSurface(MirSurfaceEvent const* surface_event, SDL_Window* window)
+HandleWindow(MirWindowEvent const* event, SDL_Window* window)
 {
-    MirSurfaceAttrib attrib = MIR_mir_surface_event_get_attribute(surface_event);
-    int value               = MIR_mir_surface_event_get_attribute_value(surface_event);
+    MirWindowAttrib attrib = MIR_mir_window_event_get_attribute(event);
+    int value              = MIR_mir_window_event_get_attribute_value(event);
 
-    if (attrib == mir_surface_attrib_focus) {
-        if (value == mir_surface_focused) {
+    if (attrib == mir_window_attrib_focus) {
+        if (value == mir_window_focus_state_focused) {
             SDL_SetKeyboardFocus(window);
         }
-        else if (value == mir_surface_unfocused) {
+        else if (value == mir_window_focus_state_unfocused) {
             SDL_SetKeyboardFocus(NULL);
         }
     }
 }
 
 void
-MIR_HandleEvent(MirSurface* surface, MirEvent const* ev, void* context)
+MIR_HandleEvent(MirWindow* mirwindow, MirEvent const* ev, void* context)
 {
     MirEventType event_type = MIR_mir_event_get_type(ev);
     SDL_Window* window      = (SDL_Window*)context;
@@ -294,13 +294,13 @@ MIR_HandleEvent(MirSurface* surface, MirEvent const* ev, void* context)
     if (window) {
         switch (event_type) {
             case (mir_event_type_input):
-                MIR_HandleInput(MIR_mir_event_get_input_event(ev), window);
+                HandleInput(MIR_mir_event_get_input_event(ev), window);
                 break;
             case (mir_event_type_resize):
-                MIR_HandleResize(MIR_mir_event_get_resize_event(ev), window);
+                HandleResize(MIR_mir_event_get_resize_event(ev), window);
                 break;
-            case (mir_event_type_surface):
-                MIR_HandleSurface(MIR_mir_event_get_surface_event(ev), window);
+            case (mir_event_type_window):
+                HandleWindow(MIR_mir_event_get_window_event(ev), window);
                 break;
             default:
                 break;

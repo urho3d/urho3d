@@ -44,7 +44,7 @@ public:
     RibbonTrailDemo(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    virtual void Start() override;
 
 protected:
     /// Trail that emitted from sword.

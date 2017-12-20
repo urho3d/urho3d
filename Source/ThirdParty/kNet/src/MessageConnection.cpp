@@ -12,6 +12,8 @@
    See the License for the specific language governing permissions and
    limitations under the License. */
 
+// Modified by Henrik Heino for Urho3D
+
 /** @file MessageConnection.cpp
 	@brief */
 
@@ -738,7 +740,8 @@ void MessageConnection::SendMessage(unsigned long id, bool reliable, bool inOrde
 	msg->inOrder = inOrder;
 	msg->priority = priority;
 	msg->contentID = contentID;
-	assert(msg->data);
+	// Urho3D: Allow NULL data if there is zero bytes.
+	assert(msg->data || !numBytes);
 	assert(msg->Size() == numBytes);
 	memcpy(msg->data, data, numBytes);
 	EndAndQueueMessage(msg);

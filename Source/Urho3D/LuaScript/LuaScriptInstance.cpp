@@ -74,7 +74,7 @@ LuaScriptInstance::LuaScriptInstance(Context* context) :
     eventInvoker_ = new LuaScriptEventInvoker(this);
 
     for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethods_[i] = 0;
+        scriptObjectMethods_[i] = nullptr;
 }
 
 LuaScriptInstance::~LuaScriptInstance()
@@ -254,28 +254,28 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         dest = tolua_tourho3dstring(luaState_, -1, "");
         break;
     case VAR_VECTOR2:
-        dest = *((Vector2*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Vector2*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_VECTOR3:
-        dest = *((Vector3*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Vector3*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_VECTOR4:
-        dest = *((Vector4*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Vector4*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_QUATERNION:
-        dest = *((Quaternion*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Quaternion*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_COLOR:
-        dest = *((Color*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Color*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_INTRECT:
-        dest = *((IntRect*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((IntRect*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_INTVECTOR2:
-        dest = *((IntVector2*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((IntVector2*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_INTVECTOR3:
-        dest = *((IntVector3*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((IntVector3*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     default:
         URHO3D_LOGERROR("Unsupported data type");
@@ -304,7 +304,7 @@ void LuaScriptInstance::AddEventHandler(const String& eventName, int functionInd
 {
     LuaFunction* function = luaScript_->GetFunction(functionIndex);
     if (function)
-        eventInvoker_->AddEventHandler(0, eventName, function);
+        eventInvoker_->AddEventHandler(nullptr, eventName, function);
 }
 
 void LuaScriptInstance::AddEventHandler(const String& eventName, const String& functionName)
@@ -312,7 +312,7 @@ void LuaScriptInstance::AddEventHandler(const String& eventName, const String& f
     String realFunctionName = functionName.Replaced(":", ".");
     LuaFunction* function = luaScript_->GetFunction(realFunctionName);
     if (function)
-        eventInvoker_->AddEventHandler(0, eventName, function);
+        eventInvoker_->AddEventHandler(nullptr, eventName, function);
 }
 
 void LuaScriptInstance::AddEventHandler(Object* sender, const String& eventName, int functionIndex)
@@ -383,7 +383,7 @@ bool LuaScriptInstance::HasEventHandler(Object* sender, const String& eventName)
 
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
-    SetScriptFile(0);
+    SetScriptFile(nullptr);
     SetScriptObjectType(scriptObjectType);
     return scriptObjectRef_ != LUA_REFNIL;
 }
@@ -667,7 +667,7 @@ void LuaScriptInstance::HandleUpdate(StringHash eventType, VariantMap& eventData
     {
         if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
             scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
-        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     LuaFunction* function = scriptObjectMethods_[LSOM_UPDATE];
@@ -700,7 +700,7 @@ void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& even
     {
         if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
             scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
-        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     using namespace PhysicsPreStep;
@@ -751,7 +751,7 @@ void LuaScriptInstance::ReleaseObject()
     }
 
     for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethods_[i] = 0;
+        scriptObjectMethods_[i] = nullptr;
 }
 
 LuaFunction* LuaScriptInstance::GetScriptObjectFunction(const String& functionName) const

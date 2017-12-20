@@ -54,21 +54,21 @@ public :
     /// Construct.
     Vehicle(Context* context);
     /// Destruct.
-    ~Vehicle();
+    virtual ~Vehicle() override;
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
 
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
 
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
     void Init();
 
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep);
+    virtual void FixedUpdate(float timeStep) override;
     /// Updating wheel effects here.
-    virtual void PostUpdate(float timeStep);
+    virtual void PostUpdate(float timeStep) override;
 
     /// Movement controls.
     Controls controls_;

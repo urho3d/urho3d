@@ -110,7 +110,7 @@ struct URHO3D_API CascadeParameters
     }
 
     /// Far clip values of the splits.
-    float splits_[4];
+    Vector4 splits_;
     /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
     float fadeStart_;
     /// Automatic depth bias adjustment strength.
@@ -159,18 +159,16 @@ public:
     /// Construct.
     Light(Context* context);
     /// Destruct.
-    virtual ~Light();
+    virtual ~Light() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute change.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
+    virtual void UpdateBatches(const FrameInfo& frame) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set light type.
     void SetLightType(LightType type);
@@ -340,9 +338,15 @@ public:
 
 protected:
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    virtual void OnWorldBoundingBoxUpdate() override;
 
 private:
+    /// Validate shadow focus.
+    void ValidateShadowFocus() { shadowFocus_.Validate(); }
+    /// Validate shadow cascade.
+    void ValidateShadowCascade() { shadowCascade_.Validate(); }
+    /// Validate shadow bias.
+    void ValidateShadowBias() { shadowBias_.Validate(); }
     /// Light type.
     LightType lightType_;
     /// Color.

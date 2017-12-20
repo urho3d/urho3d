@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,9 +50,7 @@ typedef struct SDL_LogLevel
 } SDL_LogLevel;
 
 /* The default log output function */
-static void SDL_LogOutput(void *userdata,
-                          int category, SDL_LogPriority priority,
-                          const char *message);
+static void SDLCALL SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority, const char *message);
 
 static SDL_LogLevel *SDL_loglevels;
 static SDL_LogPriority SDL_default_priority = DEFAULT_PRIORITY;
@@ -304,7 +302,7 @@ SDL_LogMessageV(int category, SDL_LogPriority priority, const char *fmt, va_list
     SDL_stack_free(message);
 }
 
-#if defined(__WIN32__)
+#if defined(__WIN32__) && !defined(HAVE_STDIO_H) && !defined(__WINRT__)
 /* Flag tracking the attachment of the console: 0=unattached, 1=attached, -1=error */
 static int consoleAttached = 0;
 
@@ -312,7 +310,7 @@ static int consoleAttached = 0;
 static HANDLE stderrHandle = NULL;
 #endif
 
-static void
+static void SDLCALL
 SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority,
               const char *message)
 {
@@ -335,7 +333,8 @@ SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority,
             if (!attachResult) {
                     attachError = GetLastError();
                     if (attachError == ERROR_INVALID_HANDLE) {
-                        OutputDebugString(TEXT("Parent process has no console\r\n"));
+                        /* This is expected when running from Visual Studio */
+                        /*OutputDebugString(TEXT("Parent process has no console\r\n"));*/
                         consoleAttached = -1;
                     } else if (attachError == ERROR_GEN_FAILURE) {
                          OutputDebugString(TEXT("Could not attach to console of parent process\r\n"));

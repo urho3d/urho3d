@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -43,7 +43,7 @@ struct joystick_hwdata
     } *balls;
 
     /* Support for the Linux 2.4 unified input interface */
-    Uint8 key_map[KEY_MAX - BTN_MISC];
+    Uint8 key_map[KEY_MAX];
     Uint8 abs_map[ABS_MAX];
     struct axis_correct
     {
@@ -52,6 +52,9 @@ struct joystick_hwdata
     } abs_correct[ABS_MAX];
 
     int fresh;
+
+    /* Steam Controller support */
+    SDL_bool m_bSteamController;
 };
 
 /* vi: set ts=4 sw=4 expandtab: */

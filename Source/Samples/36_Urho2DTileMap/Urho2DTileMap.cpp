@@ -215,7 +215,7 @@ void Urho2DTileMap::HandleMouseButtonDown(StringHash eventType, VariantMap& even
                 sprite->SetSprite(layer->GetTile(0, 0)->GetSprite()); // Replace grass by water sprite used in top tile
             else sprite->SetSprite(layer->GetTile(24, 24)->GetSprite()); // Replace water by grass sprite used in bottom tile
         }
-        else sprite->SetSprite(NULL); // 'Remove' sprite
+        else sprite->SetSprite(nullptr); // 'Remove' sprite
     }
 }
 

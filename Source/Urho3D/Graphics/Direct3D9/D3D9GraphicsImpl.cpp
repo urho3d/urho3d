@@ -31,14 +31,14 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    interface_(0),
-    device_(0),
-    defaultColorSurface_(0),
-    defaultDepthStencilSurface_(0),
-    frameQuery_(0),
+    interface_(nullptr),
+    device_(nullptr),
+    defaultColorSurface_(nullptr),
+    defaultDepthStencilSurface_(nullptr),
+    frameQuery_(nullptr),
     adapter_(D3DADAPTER_DEFAULT),
     deviceType_(D3DDEVTYPE_HAL),
-    shaderProgram_(0),
+    shaderProgram_(nullptr),
     deviceLost_(false),
     queryIssued_(false)
 {
@@ -54,7 +54,7 @@ bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCE
 bool GraphicsImpl::CheckMultiSampleSupport(D3DFORMAT format, int level)
 {
     return interface_ ? SUCCEEDED(interface_->CheckDeviceMultiSampleType(adapter_, deviceType_, format, FALSE,
-        (D3DMULTISAMPLE_TYPE)level, NULL)) : false;
+        (D3DMULTISAMPLE_TYPE)level, nullptr)) : false;
 }
 
 }

@@ -71,14 +71,14 @@ public:
     /// Construct.
     ValueAnimation(Context* context);
     /// Destruct.
-    virtual ~ValueAnimation();
+    virtual ~ValueAnimation() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    virtual bool Save(Serializer& dest) const override;
     /// Load from XML data. Return true if successful.
     bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
@@ -124,7 +124,7 @@ public:
     float GetEndTime() const { return endTime_; }
 
     /// Return animation value.
-    Variant GetAnimationValue(float scaledTime);
+    Variant GetAnimationValue(float scaledTime) const;
 
     /// Has event frames.
     bool HasEventFrames() const { return !eventFrames_.Empty(); }
@@ -136,9 +136,9 @@ protected:
     /// Linear interpolation.
     Variant LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const;
     /// Spline interpolation.
-    Variant SplineInterpolation(unsigned index1, unsigned index2, float scaledTime);
+    Variant SplineInterpolation(unsigned index1, unsigned index2, float scaledTime) const;
     /// Update spline tangents.
-    void UpdateSplineTangents();
+    void UpdateSplineTangents() const;
     /// Return (value1 - value2) * t.
     Variant SubstractAndMultiply(const Variant& value1, const Variant& value2, float t) const;
 
@@ -159,9 +159,9 @@ protected:
     /// Key frames.
     Vector<VAnimKeyFrame> keyFrames_;
     /// Spline tangents.
-    VariantVector splineTangents_;
+    mutable VariantVector splineTangents_;
     /// Spline tangents dirty.
-    bool splineTangentsDirty_;
+    mutable bool splineTangentsDirty_;
     /// Event frames.
     Vector<VAnimEventFrame> eventFrames_;
 };

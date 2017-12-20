@@ -91,8 +91,14 @@ public:
     /// Multiply with a scalar.
     IntVector3 operator *(int rhs) const { return IntVector3(x_ * rhs, y_ * rhs, z_ * rhs); }
 
+    /// Multiply with a vector.
+    IntVector3 operator *(const IntVector3& rhs) const { return IntVector3(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_); }
+
     /// Divide by a scalar.
     IntVector3 operator /(int rhs) const { return IntVector3(x_ / rhs, y_ / rhs, z_ / rhs); }
+
+    /// Divide by a vector.
+    IntVector3 operator /(const IntVector3& rhs) const { return IntVector3(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_); }
 
     /// Add-assign a vector.
     IntVector3& operator +=(const IntVector3& rhs)
@@ -121,12 +127,30 @@ public:
         return *this;
     }
 
+    /// Multiply-assign a vector.
+    IntVector3& operator *=(const IntVector3& rhs)
+    {
+        x_ *= rhs.x_;
+        y_ *= rhs.y_;
+        z_ *= rhs.z_;
+        return *this;
+    }
+
     /// Divide-assign a scalar.
     IntVector3& operator /=(int rhs)
     {
         x_ /= rhs;
         y_ /= rhs;
         z_ /= rhs;
+        return *this;
+    }
+
+    /// Divide-assign a vector.
+    IntVector3& operator /=(const IntVector3& rhs)
+    {
+        x_ /= rhs.x_;
+        y_ /= rhs.y_;
+        z_ /= rhs.z_;
         return *this;
     }
 

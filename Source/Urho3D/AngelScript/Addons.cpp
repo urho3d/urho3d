@@ -87,12 +87,12 @@ CScriptArray* CScriptArray::Create(asITypeInfo *ot, asUINT length)
 
     // Allocate the memory
     void *mem = userAlloc(sizeof(CScriptArray));
-    if( mem == 0 )
+    if( mem == nullptr )
     {
         if( ctx )
             ctx->SetException("Out of memory");
 
-        return 0;
+        return nullptr;
     }
 
     // Initialize the object
@@ -103,7 +103,7 @@ CScriptArray* CScriptArray::Create(asITypeInfo *ot, asUINT length)
     if( ctx && ctx->GetState() == asEXECUTION_EXCEPTION )
     {
         a->Release();
-        return 0;
+        return nullptr;
     }
 
     return a;
@@ -115,12 +115,12 @@ CScriptArray* CScriptArray::Create(asITypeInfo *ot, void *initList)
 
     // Allocate the memory
     void *mem = userAlloc(sizeof(CScriptArray));
-    if( mem == 0 )
+    if( mem == nullptr )
     {
         if( ctx )
             ctx->SetException("Out of memory");
 
-        return 0;
+        return nullptr;
     }
 
     // Initialize the object
@@ -131,7 +131,7 @@ CScriptArray* CScriptArray::Create(asITypeInfo *ot, void *initList)
     if( ctx && ctx->GetState() == asEXECUTION_EXCEPTION )
     {
         a->Release();
-        return 0;
+        return nullptr;
     }
 
     return a;
@@ -143,12 +143,12 @@ CScriptArray* CScriptArray::Create(asITypeInfo *ot, asUINT length, void *defVal)
 
     // Allocate the memory
     void *mem = userAlloc(sizeof(CScriptArray));
-    if( mem == 0 )
+    if( mem == nullptr )
     {
         if( ctx )
             ctx->SetException("Out of memory");
 
-        return 0;
+        return nullptr;
     }
 
     // Initialize the object
@@ -159,7 +159,7 @@ CScriptArray* CScriptArray::Create(asITypeInfo *ot, asUINT length, void *defVal)
     if( ctx && ctx->GetState() == asEXECUTION_EXCEPTION )
     {
         a->Release();
-        return 0;
+        return nullptr;
     }
 
     return a;
@@ -258,7 +258,7 @@ static bool ScriptArrayTemplateCallback(asITypeInfo *ti, bool &dontGarbageCollec
 
         // It is not necessary to set the array as garbage collected for all handle types.
         // If it is possible to determine that the handle cannot refer to an object type
-        // that can potentially form a circular reference with the array then it is not 
+        // that can potentially form a circular reference with the array then it is not
         // necessary to make the array garbage collected.
         asITypeInfo *subtype = ti->GetEngine()->GetTypeInfoById(typeId);
         asDWORD flags = subtype->GetFlags();
@@ -267,7 +267,7 @@ static bool ScriptArrayTemplateCallback(asITypeInfo *ti, bool &dontGarbageCollec
             if ((flags & asOBJ_SCRIPT_OBJECT))
             {
                 // Even if a script class is by itself not garbage collected, it is possible
-                // that classes that derive from it may be, so it is not possible to know 
+                // that classes that derive from it may be, so it is not possible to know
                 // that no circular reference can occur.
                 if ((flags & asOBJ_NOINHERIT))
                 {
@@ -312,7 +312,7 @@ CScriptArray::CScriptArray(asITypeInfo *ot, void *buf)
     gcFlag = false;
     objType = ot;
     objType->AddRef();
-    buffer = 0;
+    buffer = nullptr;
 
     Precache();
 
@@ -402,7 +402,7 @@ CScriptArray::CScriptArray(asUINT length, asITypeInfo *ot)
     gcFlag = false;
     objType = ot;
     objType->AddRef();
-    buffer = 0;
+    buffer = nullptr;
 
     Precache();
 
@@ -435,7 +435,7 @@ CScriptArray::CScriptArray(const CScriptArray &other)
     gcFlag = false;
     objType = other.objType;
     objType->AddRef();
-    buffer = 0;
+    buffer = nullptr;
 
     Precache();
 
@@ -459,7 +459,7 @@ CScriptArray::CScriptArray(asUINT length, void *defVal, asITypeInfo *ot)
     gcFlag = false;
     objType = ot;
     objType->AddRef();
-    buffer = 0;
+    buffer = nullptr;
 
     Precache();
 
@@ -495,7 +495,7 @@ void CScriptArray::SetValue(asUINT index, void *value)
     // At() will take care of the out-of-bounds checking, though
     // if called from the application then nothing will be done
     void *ptr = At(index);
-    if( ptr == 0 ) return;
+    if( ptr == nullptr ) return;
 
     if( (subTypeId & ~asTYPEID_MASK_SEQNBR) && !(subTypeId & asTYPEID_OBJHANDLE) )
         objType->GetEngine()->AssignScriptObject(ptr, value, objType->GetSubType());
@@ -530,7 +530,7 @@ CScriptArray::~CScriptArray()
     if( buffer )
     {
         DeleteBuffer(buffer);
-        buffer = 0;
+        buffer = nullptr;
     }
     if( objType ) objType->Release();
 }
@@ -747,13 +747,13 @@ void CScriptArray::RemoveLast()
 // Return a pointer to the array element. Returns 0 if the index is out of bounds
 const void *CScriptArray::At(asUINT index) const
 {
-    if( buffer == 0 || index >= buffer->numElements )
+    if( buffer == nullptr || index >= buffer->numElements )
     {
         // If this is called from a script we raise a script exception
         asIScriptContext *ctx = asGetActiveContext();
         if( ctx )
             ctx->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
 
     if( (subTypeId & asTYPEID_MASK_OBJECT) && !(subTypeId & asTYPEID_OBJHANDLE) )
@@ -811,7 +811,7 @@ void CScriptArray::Construct(SArrayBuffer *buf, asUINT start, asUINT end)
         for( ; d < max; d++ )
         {
             *d = (void*)engine->CreateScriptObject(subType);
-            if( *d == 0 )
+            if( *d == nullptr )
             {
                 // Set the remaining entries to null so the destructor
                 // won't attempt to destroy invalid objects later
@@ -887,8 +887,8 @@ bool CScriptArray::Less(const void *a, const void *b, bool asc, asIScriptContext
         if( subTypeId & asTYPEID_OBJHANDLE )
         {
             // Allow sort to work even if the array contains null handles
-            if( *(void**)a == 0 ) return true;
-            if( *(void**)b == 0 ) return false;
+            if( *(void**)a == nullptr ) return true;
+            if( *(void**)b == nullptr ) return false;
         }
 
         // Execute object opCmp
@@ -945,7 +945,7 @@ bool CScriptArray::operator==(const CScriptArray &other) const
     if( GetSize() != other.GetSize() )
         return false;
 
-    asIScriptContext *cmpContext = 0;
+    asIScriptContext *cmpContext = nullptr;
     bool isNested = false;
 
     if( subTypeId & ~asTYPEID_MASK_SEQNBR )
@@ -957,9 +957,9 @@ bool CScriptArray::operator==(const CScriptArray &other) const
             if( cmpContext->GetEngine() == objType->GetEngine() && cmpContext->PushState() >= 0 )
                 isNested = true;
             else
-                cmpContext = 0;
+                cmpContext = nullptr;
         }
-        if( cmpContext == 0 )
+        if( cmpContext == nullptr )
         {
             // TODO: Ideally this context would be retrieved from a pool, so we don't have to
             //       create a new one every time. We could keep a context with the array object
@@ -1112,6 +1112,16 @@ int CScriptArray::FindByRef(asUINT startAt, void *ref) const
     return -1;
 }
 
+bool CScriptArray::Swap(CScriptArray& other)
+{
+    if (other.GetArrayObjectType() == GetArrayObjectType())
+    {
+        Urho3D::Swap(buffer, other.buffer);
+        return true;
+    }
+    return false;
+}
+
 int CScriptArray::Find(void *value) const
 {
     return Find(0, value);
@@ -1121,11 +1131,11 @@ int CScriptArray::Find(asUINT startAt, void *value) const
 {
     // Check if the subtype really supports find()
     // TODO: Can't this be done at compile time too by the template callback
-    SArrayCache *cache = 0;
+    SArrayCache *cache = nullptr;
     if( subTypeId & ~asTYPEID_MASK_SEQNBR )
     {
         cache = reinterpret_cast<SArrayCache*>(objType->GetUserData(ARRAY_CACHE));
-        if( !cache || (cache->cmpFunc == 0 && cache->eqFunc == 0) )
+        if( !cache || (cache->cmpFunc == nullptr && cache->eqFunc == nullptr) )
         {
             asIScriptContext *ctx = asGetActiveContext();
             asITypeInfo* subType = objType->GetEngine()->GetTypeInfoById(subTypeId);
@@ -1154,7 +1164,7 @@ int CScriptArray::Find(asUINT startAt, void *value) const
         }
     }
 
-    asIScriptContext *cmpContext = 0;
+    asIScriptContext *cmpContext = nullptr;
     bool isNested = false;
 
     if( subTypeId & ~asTYPEID_MASK_SEQNBR )
@@ -1166,9 +1176,9 @@ int CScriptArray::Find(asUINT startAt, void *value) const
             if( cmpContext->GetEngine() == objType->GetEngine() && cmpContext->PushState() >= 0 )
                 isNested = true;
             else
-                cmpContext = 0;
+                cmpContext = nullptr;
         }
-        if( cmpContext == 0 )
+        if( cmpContext == nullptr )
         {
             // TODO: Ideally this context would be retrieved from a pool, so we don't have to
             //       create a new one every time. We could keep a context with the array object
@@ -1273,7 +1283,7 @@ void CScriptArray::Sort(asUINT startAt, asUINT count, bool asc)
     SArrayCache *cache = reinterpret_cast<SArrayCache*>(objType->GetUserData(ARRAY_CACHE));
     if( subTypeId & ~asTYPEID_MASK_SEQNBR )
     {
-        if( !cache || cache->cmpFunc == 0 )
+        if( !cache || cache->cmpFunc == nullptr )
         {
             asIScriptContext *ctx = asGetActiveContext();
             asITypeInfo* subType = objType->GetEngine()->GetTypeInfoById(subTypeId);
@@ -1327,7 +1337,7 @@ void CScriptArray::Sort(asUINT startAt, asUINT count, bool asc)
     }
 
     asBYTE tmp[16];
-    asIScriptContext *cmpContext = 0;
+    asIScriptContext *cmpContext = nullptr;
     bool isNested = false;
 
     if( subTypeId & ~asTYPEID_MASK_SEQNBR )
@@ -1339,9 +1349,9 @@ void CScriptArray::Sort(asUINT startAt, asUINT count, bool asc)
             if( cmpContext->GetEngine() == objType->GetEngine() && cmpContext->PushState() >= 0 )
                 isNested = true;
             else
-                cmpContext = 0;
+                cmpContext = nullptr;
         }
-        if( cmpContext == 0 )
+        if( cmpContext == nullptr )
         {
             // TODO: Ideally this context would be retrieved from a pool, so we don't have to
             //       create a new one every time. We could keep a context with the array object
@@ -1520,7 +1530,7 @@ void CScriptArray::Precache()
                 {
                     if( cache->cmpFunc || cache->cmpFuncReturnCode )
                     {
-                        cache->cmpFunc = 0;
+                        cache->cmpFunc = nullptr;
                         cache->cmpFuncReturnCode = asMULTIPLE_FUNCTIONS;
                     }
                     else
@@ -1530,7 +1540,7 @@ void CScriptArray::Precache()
                 {
                     if( cache->eqFunc || cache->eqFuncReturnCode )
                     {
-                        cache->eqFunc = 0;
+                        cache->eqFunc = nullptr;
                         cache->eqFuncReturnCode = asMULTIPLE_FUNCTIONS;
                     }
                     else
@@ -1540,9 +1550,9 @@ void CScriptArray::Precache()
         }
     }
 
-    if( cache->eqFunc == 0 && cache->eqFuncReturnCode == 0 )
+    if( cache->eqFunc == nullptr && cache->eqFuncReturnCode == 0 )
         cache->eqFuncReturnCode = asNO_FUNCTION;
-    if( cache->cmpFunc == 0 && cache->cmpFuncReturnCode == 0 )
+    if( cache->cmpFunc == nullptr && cache->cmpFuncReturnCode == 0 )
         cache->cmpFuncReturnCode = asNO_FUNCTION;
 
     // Set the user data only at the end so others that retrieve it will know it is complete
@@ -1647,6 +1657,7 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "int Find(uint, const T&in) const", asMETHODPR(CScriptArray, Find, (asUINT, void*) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "int FindByRef(const T&in) const", asMETHODPR(CScriptArray, FindByRef, (void*) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "int FindByRef(uint, const T&in) const", asMETHODPR(CScriptArray, FindByRef, (asUINT, void*) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "bool Swap(Array<T>&inout)", asMETHOD(CScriptArray, Swap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "bool opEquals(const Array<T>&in) const", asMETHOD(CScriptArray, operator==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "uint get_length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void set_length(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
@@ -1888,7 +1899,7 @@ const CScriptDictValue *CScriptDictionary::operator[](const String &key) const
     if( ctx )
         ctx->SetException("Invalid access to non-existing value");
 
-    return 0;
+    return nullptr;
 }
 
 void CScriptDictionary::Set(const String &key, void *value, int typeId)
@@ -2034,13 +2045,13 @@ void ScriptDictionaryListFactory_Generic(asIScriptGeneric *gen)
 
 CScriptDictValue::CScriptDictValue()
 {
-    m_valueObj = 0;
+    m_valueObj = nullptr;
     m_typeId   = 0;
 }
 
 CScriptDictValue::CScriptDictValue(asIScriptEngine *engine, void *value, int typeId)
 {
-    m_valueObj = 0;
+    m_valueObj = nullptr;
     m_typeId   = 0;
     Set(engine, value, typeId);
 }
@@ -2058,7 +2069,7 @@ void CScriptDictValue::FreeValue(asIScriptEngine *engine)
     {
         // Let the engine release the object
         engine->ReleaseScriptObject(m_valueObj, engine->GetTypeInfoById(m_typeId));
-        m_valueObj = 0;
+        m_valueObj = nullptr;
         m_typeId = 0;
     }
 
@@ -2116,8 +2127,8 @@ bool CScriptDictValue::Get(asIScriptEngine *engine, void *value, int typeId) con
     {
         // A handle can be retrieved if the stored type is a handle of same or compatible type
         // or if the stored type is an object that implements the interface that the handle refer to.
-        
-        void* cast = 0x0;
+
+        void* cast = nullptr;
         if ((m_typeId & asTYPEID_MASK_OBJECT) &&
             engine->RefCastObject(m_valueObj, engine->GetTypeInfoById(m_typeId), engine->GetTypeInfoById(typeId), &cast) >= 0)
         {
@@ -2306,7 +2317,7 @@ static char* StringCharAt(unsigned i, String& str)
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     return &str[i];
 }

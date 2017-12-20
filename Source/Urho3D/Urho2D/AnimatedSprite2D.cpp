@@ -49,7 +49,7 @@ const char* loopModeNames[] =
     "Default",
     "ForceLooped",
     "ForceClamped",
-    0
+    nullptr
 };
 
 AnimatedSprite2D::AnimatedSprite2D(Context* context) :

@@ -49,7 +49,7 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-const char* animationStatesStructureElementNames[] =
+static const StringVector animationStatesStructureElementNames =
 {
     "Anim State Count",
     "   Animation",
@@ -57,8 +57,7 @@ const char* animationStatesStructureElementNames[] =
     "   Is Looped",
     "   Weight",
     "   Time",
-    "   Layer",
-    0
+    "   Layer"
 };
 
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
@@ -119,9 +118,9 @@ void AnimatedModel::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
-                                                            VariantVector, Variant::emptyVariantVector,
-                                                            animationStatesStructureElementNames, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
+        VariantVector, Variant::emptyVariantVector, AM_FILE)
+        .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, animationStatesStructureElementNames);
     URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
@@ -446,11 +445,11 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
     if (!isMaster_)
     {
         URHO3D_LOGERROR("Can not add animation state to non-master model");
-        return 0;
+        return nullptr;
     }
 
     if (!animation || !skeleton_.GetNumBones())
-        return 0;
+        return nullptr;
 
     // Check for not adding twice
     AnimationState* existing = GetAnimationState(animation);
@@ -663,7 +662,7 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
             return *i;
     }
 
-    return 0;
+    return nullptr;
 }
 
 AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const
@@ -684,12 +683,12 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
 {
-    return index < animationStates_.Size() ? animationStates_[index].Get() : 0;
+    return index < animationStates_.Size() ? animationStates_[index].Get() : nullptr;
 }
 
 void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
@@ -842,7 +841,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
         else
         {
             // If not enough data, just add an empty animation state
-            SharedPtr<AnimationState> newState(new AnimationState(this, 0));
+            SharedPtr<AnimationState> newState(new AnimationState(this, nullptr));
             animationStates_.Push(newState);
         }
     }

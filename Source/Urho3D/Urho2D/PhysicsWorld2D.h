@@ -39,7 +39,7 @@ struct URHO3D_API PhysicsRaycastResult2D
 {
     /// Construct with defaults.
     PhysicsRaycastResult2D() :
-        body_(0)
+        body_(nullptr)
     {
     }
 
@@ -81,36 +81,36 @@ public:
     /// Construct.
     PhysicsWorld2D(Context* context);
     /// Destruct.
-    virtual ~PhysicsWorld2D();
+    virtual ~PhysicsWorld2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     // Implement b2ContactListener
     /// Called when two fixtures begin to touch.
-    virtual void BeginContact(b2Contact* contact);
+    virtual void BeginContact(b2Contact* contact) override;
     /// Called when two fixtures cease to touch.
-    virtual void EndContact(b2Contact* contact);
+    virtual void EndContact(b2Contact* contact) override;
     /// Called when contact is updated.
-    virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
+    virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 
     // Implement b2Draw
     /// Draw a closed polygon provided in CCW order.
-    virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
+    virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
     /// Draw a solid closed polygon provided in CCW order.
-    virtual void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
+    virtual void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
     /// Draw a circle.
-    virtual void DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color);
+    virtual void DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color) override;
     /// Draw a solid circle.
-    virtual void DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color);
+    virtual void DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) override;
     /// Draw a line segment.
-    virtual void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
+    virtual void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
     /// Draw a transform. Choose your own length scale.
-    virtual void DrawTransform(const b2Transform& xf);
+    virtual void DrawTransform(const b2Transform& xf) override;
     /// Draw a point.
-    virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
+    virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color) override;
 
     /// Step the simulation forward.
     void Update(float timeStep);
@@ -213,7 +213,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
 
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);

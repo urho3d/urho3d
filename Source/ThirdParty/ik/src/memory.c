@@ -8,21 +8,21 @@
 
 #define BACKTRACE_OMIT_COUNT 2
 
-#if IK_MEMORY_DEBUGGING == ON
+#ifdef IK_MEMORY_DEBUGGING
 static uintptr_t g_allocations = 0;
 static uintptr_t d_deg_allocations = 0;
 static uintptr_t g_ignore_bstv_malloc = 0;
-static struct bstv_t report;
+static bstv_t report;
 
-struct report_info_t
+typedef struct report_info_t
 {
     uintptr_t location;
     uintptr_t size;
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
     int backtrace_size;
     char** backtrace;
 #   endif
-};
+} report_info_t;
 
 /* ------------------------------------------------------------------------- */
 void
@@ -47,14 +47,14 @@ void*
 malloc_wrapper(intptr_t size)
 {
     void* p = NULL;
-    struct report_info_t* info = NULL;
+    report_info_t* info = NULL;
 
     /* breaking from this will clean up and return NULL */
-    for(;;)
+    for (;;)
     {
         /* allocate */
         p = malloc(size);
-        if(p)
+        if (p)
             ++g_allocations;
         else
             break;
@@ -63,11 +63,11 @@ malloc_wrapper(intptr_t size)
         * Record allocation info. Call to bstv may allocate memory,
         * so set flag to ignore the call to malloc() when inserting.
         */
-        if(!g_ignore_bstv_malloc)
+        if (!g_ignore_bstv_malloc)
         {
             g_ignore_bstv_malloc = 1;
-            info = (struct report_info_t*)malloc(sizeof(struct report_info_t));
-            if(!info)
+            info = (report_info_t*)malloc(sizeof(report_info_t));
+            if (!info)
             {
                 fprintf(stderr, "[memory] ERROR: malloc() for report_info_t failed"
                     " -- not enough memory.\n");
@@ -79,15 +79,15 @@ malloc_wrapper(intptr_t size)
             info->location = (uintptr_t)p;
             info->size = size;
 
-            /* if enabled, generate a backtrace so we know where memory leaks
+            /* if (enabled, generate a backtrace so we know where memory leaks
             * occurred */
-#   if IK_MEMORY_BACKTRACE == ON
-            if(!(info->backtrace = get_backtrace(&info->backtrace_size)))
+#   ifdef IK_MEMORY_BACKTRACE
+            if (!(info->backtrace = get_backtrace(&info->backtrace_size)))
                 fprintf(stderr, "[memory] WARNING: Failed to generate backtrace\n");
 #   endif
 
             /* insert into bstv */
-            if(bstv_insert(&report, (uintptr_t)p, info) == 1)
+            if (bstv_insert(&report, (uintptr_t)p, info) == 1)
             {
                 fprintf(stderr,
                 "[memory] WARNING: Hash collision occurred when inserting\n"
@@ -97,14 +97,14 @@ malloc_wrapper(intptr_t size)
                 "The matching call to FREE() will generate a warning saying\n"
                 "something is being freed that was never allocated. This is to\n"
                 "be expected and can be ignored.\n");
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
                 {
                     char** bt;
                     int bt_size, i;
-                    if((bt = get_backtrace(&bt_size)))
+                    if ((bt = get_backtrace(&bt_size)))
                     {
                         printf("  backtrace to where malloc() was called:\n");
-                        for(i = 0; i < bt_size; ++i)
+                        for (i = 0; i < bt_size; ++i)
                             printf("      %s\n", bt[i]);
                         printf("  -----------------------------------------\n");
                         free(bt);
@@ -122,16 +122,16 @@ malloc_wrapper(intptr_t size)
     }
 
     /* failure */
-    if(p)
+    if (p)
     {
         free(p);
         --g_allocations;
     }
 
-    if(info)
+    if (info)
     {
-#   if IK_MEMORY_BACKTRACE == ON
-        if(info->backtrace)
+#   ifdef IK_MEMORY_BACKTRACE
+        if (info->backtrace)
             free(info->backtrace);
 #   endif
         free(info);
@@ -145,13 +145,13 @@ void
 free_wrapper(void* ptr)
 {
     /* find matching allocation and remove from bstv */
-    if(!g_ignore_bstv_malloc)
+    if (!g_ignore_bstv_malloc)
     {
-        struct report_info_t* info = (struct report_info_t*)bstv_erase(&report, (uintptr_t)ptr);
-        if(info)
+        report_info_t* info = (report_info_t*)bstv_erase(&report, (uintptr_t)ptr);
+        if (info)
         {
-#   if IK_MEMORY_BACKTRACE == ON
-            if(info->backtrace)
+#   ifdef IK_MEMORY_BACKTRACE
+            if (info->backtrace)
                 free(info->backtrace);
             else
                 fprintf(stderr, "[memory] WARNING: free(): Allocation didn't "
@@ -161,17 +161,17 @@ free_wrapper(void* ptr)
         }
         else
         {
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             char** bt;
             int bt_size, i;
             fprintf(stderr, "  -----------------------------------------\n");
 #   endif
             fprintf(stderr, "  WARNING: Freeing something that was never allocated\n");
-#   if IK_MEMORY_BACKTRACE == ON
-            if((bt = get_backtrace(&bt_size)))
+#   ifdef IK_MEMORY_BACKTRACE
+            if ((bt = get_backtrace(&bt_size)))
             {
                 fprintf(stderr, "  backtrace to where free() was called:\n");
-                for(i = 0; i < bt_size; ++i)
+                for (i = 0; i < bt_size; ++i)
                     fprintf(stderr, "      %s\n", bt[i]);
                 fprintf(stderr, "  -----------------------------------------\n");
                 free(bt);
@@ -182,7 +182,7 @@ free_wrapper(void* ptr)
         }
     }
 
-    if(ptr)
+    if (ptr)
     {
         ++d_deg_allocations;
         free(ptr);
@@ -204,18 +204,18 @@ ik_memory_deinit(void)
     printf("=========================================\n");
 
     /* report details on any g_allocations that were not de-allocated */
-    if(report.vector.count != 0)
+    if (report.vector.count != 0)
     {
-        BSTV_FOR_EACH(&report, struct report_info_t, key, info)
+        BSTV_FOR_EACH(&report, report_info_t, key, info)
 
             printf("  un-freed memory at %p, size %p\n", (void*)info->location, (void*)info->size);
             mutated_string_and_hex_dump((void*)info->location, info->size);
 
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             printf("  Backtrace to where malloc() was called:\n");
             {
                 intptr_t i;
-                for(i = BACKTRACE_OMIT_COUNT; i < info->backtrace_size; ++i)
+                for (i = BACKTRACE_OMIT_COUNT; i < info->backtrace_size; ++i)
                     printf("      %s\n", info->backtrace[i]);
             }
             free(info->backtrace); /* this was allocated when malloc() was called */
@@ -257,7 +257,7 @@ mutated_string_and_hex_dump(void* data, intptr_t length_in_bytes)
     intptr_t i;
 
     /* allocate and copy data into new buffer */
-    if(!(dump = malloc(length_in_bytes + 1)))
+    if (!(dump = malloc(length_in_bytes + 1)))
     {
         fprintf(stderr, "[memory] WARNING: Failed to malloc() space for dump\n");
         return;
@@ -266,14 +266,14 @@ mutated_string_and_hex_dump(void* data, intptr_t length_in_bytes)
     dump[length_in_bytes] = '\0';
 
     /* mutate null terminators into dots */
-    for(i = 0; i != length_in_bytes; ++i)
-        if(dump[i] == '\0')
+    for (i = 0; i != length_in_bytes; ++i)
+        if (dump[i] == '\0')
             dump[i] = '.';
 
     /* dump */
     printf("  mutated string dump: %s\n", dump);
     printf("  hex dump: ");
-    for(i = 0; i != length_in_bytes; ++i)
+    for (i = 0; i != length_in_bytes; ++i)
         printf(" %02x", (unsigned char)dump[i]);
     printf("\n");
 

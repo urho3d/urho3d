@@ -37,6 +37,10 @@
 #  HAVE_3DNOW
 #  HAVE_SSE
 #  HAVE_SSE2
+#  HAVE_SSE3
+#  HAVE_SSE4
+#  HAVE_AVX
+#  HAVE_AVX2
 #  HAVE_ALTIVEC
 #
 # CPU SIMD instruction extension support for arm/arm64 archs:
@@ -143,7 +147,7 @@ if (MSVC)
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     set (NATIVE_64BIT ${CMAKE_CL_64})
     # We only support one target arch when using MSVC for now and make certain assumptions as per documentation instead of querying the compiler
-    foreach (VAR X86 HAVE_MMX HAVE_SSE HAVE_SSE2 RTTI EXCEPTIONS)
+    foreach (VAR X86 HAVE_MMX HAVE_SSE HAVE_SSE2 HAVE_SSE3 HAVE_SSE4 HAVE_AVX RTTI EXCEPTIONS)
         set (${VAR} 1)
     endforeach ()
 else ()
@@ -189,11 +193,12 @@ else ()
     elseif (POWERPC)
         check_extension (altivec)
     elseif (X86)
-        check_extension (sse)
-        check_extension (sse2)
+        foreach (ext sse sse2 sse3 sse4 avx avx2)
+            check_extension (${ext})
+        endforeach ()
         if (CMAKE_SYSTEM_NAME STREQUAL Linux)
-            check_extension (mmx)
-            check_extension (3dnow __3dNOW__)
+            check_native_define (__MMX__ HAVE_MMX)
+            check_native_define (__3dNOW__ HAVE_3DNOW)
         endif ()
     endif ()
     # Check if C++ feature is being turned on/off in the configured compiler flags

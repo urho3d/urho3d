@@ -51,7 +51,7 @@ public:
     }
 
     /// Write bytes to output.
-    void write(const void* data, size_t size)
+    virtual void write(const void* data, size_t size) override
     {
         if (dest_.Write(data, (unsigned)size) != size)
             success_ = false;

@@ -43,7 +43,7 @@ static PhysicsWorld* SceneGetPhysicsWorld(Scene* ptr)
 static PhysicsWorld* GetPhysicsWorld()
 {
     Scene* scene = GetScriptContextScene();
-    return scene ? scene->GetComponent<PhysicsWorld>() : 0;
+    return scene ? scene->GetComponent<PhysicsWorld>() : nullptr;
 }
 
 static void ConstructPhysicsRaycastResult(PhysicsRaycastResult* ptr)

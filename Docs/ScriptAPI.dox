@@ -306,6 +306,20 @@ namespace Urho3D
 - %BoundsMin : Vector3
 - %BoundsMax : Vector3
 
+### NavigationTileAdded
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %Tile : IntVector2
+
+### NavigationTileRemoved
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %Tile : IntVector2
+
+### NavigationAllTilesRemoved
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+
 ### CrowdAgentFormation
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
@@ -1090,6 +1104,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1507,6 +1522,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1536,11 +1552,6 @@ namespace Urho3D
 - %Max %Layers : int
 - %Draw %Obstacles : bool
 
-### IKConstraint
-- %Stiffness : float
-- %Stretchiness : float
-- %Length %Constraints : Vector2
-
 ### IKEffector
 - %Target %Node : String
 - %Chain %Length : int
@@ -1556,10 +1567,12 @@ namespace Urho3D
 - %Algorithm : int
 - %Max %Iterations : int
 - %Convergence %Tolerance : float
-- %Bone %Rotations : bool
-- %Target %Rotation : bool
-- %Continuous %Solving : bool
-- %Update %Pose : bool
+- %Joint %Rotations : bool
+- %Target %Rotations : bool
+- %Update %Original %Pose : bool
+- %Update %Active %Pose : bool
+- %Use %Original %Pose : bool
+- %Enable %Constraints : bool
 - %Auto %Solve : bool
 
 ### Light
@@ -1764,6 +1777,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -2724,7 +2738,6 @@ namespace Urho3D
 <a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
-<a href="#Class_IKConstraint"><b>IKConstraint</b></a>
 <a href="#Class_IKEffector"><b>IKEffector</b></a>
 <a href="#Class_IKSolver"><b>IKSolver</b></a>
 <a href="#Class_Image"><b>Image</b></a>
@@ -2844,6 +2857,7 @@ namespace Urho3D
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
 <a href="#Class_TouchState"><b>TouchState</b></a>
 <a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -3395,6 +3409,7 @@ Methods:
 - void Sort(uint, uint)
 - void SortReverse()
 - void SortReverse(uint, uint)
+- bool Swap(T[]&)
 
 Properties:
 
@@ -3409,10 +3424,10 @@ Properties:
 
 - Variant defaultValue
 - String[]@ enumNames // readonly
+- VariantMap metadata
 - uint mode
 - String name
 - VariantType type
-- String[]@ variantStructureElementNames // readonly
 
 <a name="Class_Audio"></a>
 
@@ -3606,6 +3621,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -3774,6 +3790,7 @@ Methods:
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
 - bool Defined() const
+- float DistanceToPoint(const Vector3&) const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
@@ -3832,6 +3849,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -3872,6 +3890,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -3918,6 +3937,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -4128,6 +4148,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -4811,6 +4832,7 @@ Methods:
 - bool Equals() const
 - void FromHSL(float, float, float, float)
 - void FromHSV(float, float, float, float)
+- void FromUInt(uint)
 - float Hue() const
 - void Invert(bool)
 - Color Lerp(const Color&, float) const
@@ -6094,6 +6116,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -6458,6 +6481,7 @@ Methods:
 - void AddQuad(const Vector3&, float, float, const Color&, bool = true)
 - void AddSkeleton(Skeleton@, const Color&, bool = true)
 - void AddSphere(const Sphere&, const Color&, bool = true)
+- void AddSphereSector(const Sphere&, const Quaternion&, float, bool, const Color&, bool = true)
 - void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true)
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -6639,6 +6663,8 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
+- uint Tell() const
 
 Properties:
 
@@ -6860,6 +6886,7 @@ Methods:
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -6904,6 +6931,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -6953,6 +6981,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -7042,9 +7071,12 @@ Properties:
 
 Methods:
 
+- bool AddTile(const VectorBuffer&) const
+- bool Allocate(const BoundingBox&, uint)
 - void ApplyAttributes()
 - bool Build()
 - bool Build(const BoundingBox&)
+- bool Build(const IntVector2&, const IntVector2&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -7060,8 +7092,12 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- VectorBuffer GetTileData(const IntVector2&) const
+- IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTile(const IntVector2&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -7070,9 +7106,11 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
+- void RemoveAllTiles()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- void RemoveTile(const IntVector2&)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -7210,7 +7248,9 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -7330,6 +7370,7 @@ Properties:
 - bool executeConsoleCommands
 - String programDir // readonly
 - int refs // readonly
+- String temporaryDir // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - String userDocumentsDir // readonly
@@ -7455,6 +7496,7 @@ Methods:
 - void Minimize()
 - void PrecacheShaders(File@)
 - void PrecacheShaders(VectorBuffer&)
+- void Raise()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
 - bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int)
@@ -7467,9 +7509,11 @@ Properties:
 - String apiName // readonly
 - bool borderless // readonly
 - String category // readonly
+- int currentMonitor // readonly
 - bool deferredSupport // readonly
 - IntVector2[] desktopResolution // readonly
 - bool deviceLost // readonly
+- Vector3[] displayDPI // readonly
 - bool dither
 - bool flushGPU
 - bool fullscreen // readonly
@@ -7478,6 +7522,7 @@ Properties:
 - bool initialized // readonly
 - bool instancingSupport // readonly
 - bool lightPrepassSupport // readonly
+- bool maximized // readonly
 - int monitorCount // readonly
 - int multiSample // readonly
 - int[]@ multiSampleLevels // readonly
@@ -7544,6 +7589,8 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
+- uint Tell() const
 
 Properties:
 
@@ -7559,65 +7606,6 @@ Properties:
 - HttpRequestState state // readonly
 - String url // readonly
 - String verb // readonly
-- int weakRefs // readonly
-
-<a name="Class_IKConstraint"></a>
-
-### IKConstraint
-
-Methods:
-
-- void ApplyAttributes()
-- void DrawDebugGeometry(DebugRenderer@, bool)
-- Variant GetAttribute(const String&) const
-- ValueAnimation@ GetAttributeAnimation(const String&) const
-- float GetAttributeAnimationSpeed(const String&) const
-- float GetAttributeAnimationTime(const String&) const
-- WrapMode GetAttributeAnimationWrapMode(const String&) const
-- Variant GetAttributeDefault(const String&) const
-- bool GetInterceptNetworkUpdate(const String&) const
-- bool HasSubscribedToEvent(Object@, const String&)
-- bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
-- void MarkNetworkUpdate() const
-- void Remove()
-- void RemoveAttributeAnimation(const String&)
-- void RemoveInstanceDefault()
-- void RemoveObjectAnimation()
-- void ResetToDefault()
-- bool Save(File@) const
-- bool Save(VectorBuffer&) const
-- bool SaveJSON(JSONValue&) const
-- bool SaveXML(XMLElement&) const
-- void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetAnimationTime(float)
-- bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
-- void SetAttributeAnimationSpeed(const String&, float)
-- void SetAttributeAnimationTime(const String&, float)
-- void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetInterceptNetworkUpdate(const String&, bool)
-
-Properties:
-
-- bool animationEnabled
-- Variant[] attributeDefaults // readonly
-- AttributeInfo[] attributeInfos // readonly
-- Variant[] attributes
-- String category // readonly
-- bool enabled
-- bool enabledEffective // readonly
-- uint id // readonly
-- Node@ node // readonly
-- uint numAttributes // readonly
-- ObjectAnimation@ objectAnimation
-- int refs // readonly
-- bool temporary
-- StringHash type // readonly
-- String typeName // readonly
 - int weakRefs // readonly
 
 <a name="Class_IKEffector"></a>
@@ -7672,7 +7660,6 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
-- bool inheritParentRotation
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -7688,7 +7675,6 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 - float weight
-- bool weightedNlerp
 
 <a name="Class_IKSolver"></a>
 
@@ -7696,7 +7682,13 @@ Properties:
 
 Methods:
 
+- void ApplyActivePoseToScene()
 - void ApplyAttributes()
+- void ApplyOriginalPoseToActivePose()
+- void ApplyOriginalPoseToScene()
+- void ApplySceneToActivePose()
+- void ApplySceneToInitialPose()
+- void CalculateJointRotations()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Variant GetAttribute(const String&) const
@@ -7713,12 +7705,13 @@ Methods:
 - bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
+- void RebuildChainTrees()
+- void RecalculateSegmentLengths()
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - void ResetToDefault()
-- void ResetToInitialPose()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
@@ -7732,19 +7725,22 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void Solve()
-- void UpdateInitialPose()
 
 Properties:
 
+- bool AUTO_SOLVE
+- bool CONSTRAINTS
+- bool JOINT_ROTATIONS
+- bool TARGET_ROTATIONS
+- bool UPDATE_ACTIVE_POSE
+- bool UPDATE_ORIGINAL_POSE
+- bool USE_ORIGINAL_POSE
 - IKAlgorithm algorithm
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- bool autoSolve
-- bool boneRotations
 - String category // readonly
-- bool continuousSolving
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -7753,12 +7749,10 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
-- bool targetRotation
 - bool temporary
 - float tolerance
 - StringHash type // readonly
 - String typeName // readonly
-- bool updatePose
 - int weakRefs // readonly
 
 <a name="Class_Image"></a>
@@ -7794,6 +7788,7 @@ Methods:
 - bool SaveJPG(const String&, int) const
 - bool SavePNG(const String&) const
 - bool SaveTGA(const String&) const
+- bool SaveWEBP(const String&, float = 0.0f) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetPixel(int, int, const Color&)
 - void SetPixel(int, int, int, const Color&)
@@ -7801,6 +7796,7 @@ Methods:
 - void SetPixelInt(int, int, uint)
 - bool SetSize(int, int, int, uint)
 - bool SetSize(int, int, uint)
+- bool SetSubimage(const Image@, const IntRect&) const
 
 Properties:
 
@@ -7811,6 +7807,7 @@ Properties:
 - CompressedFormat compressedFormat // readonly
 - bool cubemap // readonly
 - int depth // readonly
+- bool hasAlphaChannel // readonly
 - int height // readonly
 - uint memoryUse // readonly
 - String name
@@ -7929,7 +7926,9 @@ Properties:
 
 Methods:
 
+- int Clip(const IntRect&)
 - Intersection IsInside(const IntVector2&) const
+- int Merge(const IntRect&)
 
 Properties:
 
@@ -8222,6 +8221,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -8401,8 +8401,10 @@ Methods:
 - void ClearSelection()
 - void CopySelectedItemsToClipboard()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
+- void DisableInternalLayoutUpdate()
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
+- void EnableInternalLayoutUpdate()
 - void EnableLayoutUpdate()
 - void Expand(uint, bool, bool = false)
 - uint FindChild(UIElement@) const
@@ -8426,6 +8428,7 @@ Methods:
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@, UIElement@ = null)
+- bool IsChildOf(UIElement@) const
 - bool IsExpanded(uint) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -8494,6 +8497,7 @@ Methods:
 - void SetViewPosition(int, int)
 - void ToggleExpand(uint, bool = false)
 - void ToggleSelection(uint)
+- void UpdateInternalLayout()
 - void UpdateLayout()
 - const Variant& GetVar(const StringHash&)
 
@@ -8647,6 +8651,7 @@ Methods:
 - void Info(const String&)
 - void Open(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void Trace(const String&)
 - void Warning(const String&)
 - void Write(const String&, bool = false)
 
@@ -8881,6 +8886,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -8922,6 +8928,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -8971,6 +8978,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -9157,7 +9165,9 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -9336,9 +9346,12 @@ Properties:
 
 Methods:
 
+- bool AddTile(const VectorBuffer&) const
+- bool Allocate(const BoundingBox&, uint)
 - void ApplyAttributes()
 - bool Build()
 - bool Build(const BoundingBox&)
+- bool Build(const IntVector2&, const IntVector2&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -9354,8 +9367,12 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- VectorBuffer GetTileData(const IntVector2&) const
+- IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTile(const IntVector2&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9364,9 +9381,11 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
+- void RemoveAllTiles()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- void RemoveTile(const IntVector2&)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -10789,7 +10808,9 @@ Methods:
 
 Properties:
 
+- bool[] added // readonly
 - RenderPathCommand[] commands
+- bool[] enabled // readonly
 - uint numCommands // readonly
 - uint numRenderTargets // readonly
 - int refs // readonly
@@ -10882,6 +10903,7 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry(bool) const
+- Viewport@ GetViewportForScene(Scene@, uint)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - void ReloadShaders() const
@@ -11681,6 +11703,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -11868,6 +11891,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -11968,6 +11992,7 @@ Properties:
 - int height
 - HorizontalAlignment horizontalAlignment
 - ScrollBar@ horizontalScrollBar // readonly
+- bool horizontalScrollBarVisible
 - bool hovering // readonly
 - int indent
 - int indentSpacing
@@ -12019,6 +12044,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - ScrollBar@ verticalScrollBar // readonly
+- bool verticalScrollBarVisible
 - IntVector2 viewPosition
 - bool visible
 - bool visibleEffective // readonly
@@ -12235,6 +12261,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -12724,6 +12751,8 @@ Methods:
 - void Define(const Vector3&, float)
 - bool Defined() const
 - float Distance(const Vector3&) const
+- Vector3 GetLocalPoint(float, float) const
+- Vector3 GetPoint(float, float) const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
@@ -12863,6 +12892,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -13480,6 +13510,7 @@ Methods:
 - TerrainPatch@ GetPatch(int, int) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- Vector3 HeightMapToWorld(const IntVector2&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -13657,6 +13688,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -13702,7 +13734,7 @@ Methods:
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - bool SetFont(Font@, float)
-- bool SetFont(const String&, int)
+- bool SetFont(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxAnchor(float, float)
@@ -14260,6 +14292,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
+- TileMapObject2D@[]@ GetTileCollisionShapes(int) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
@@ -14433,6 +14466,7 @@ Properties:
 - String category // readonly
 - float elapsedTime // readonly
 - uint frameNumber // readonly
+- float framesPerSecond // readonly
 - int refs // readonly
 - uint systemTime // readonly
 - uint timeSinceEpoch // readonly
@@ -14511,6 +14545,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -14727,6 +14762,67 @@ Properties:
 - bool useSystemClipboard
 - int weakRefs // readonly
 
+<a name="Class_UIComponent"></a>
+
+### UIComponent
+
+Methods:
+
+- void ApplyAttributes()
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Material@ material // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- UIElement@ root // readonly
+- bool temporary
+- Texture2D@ texture // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 <a name="Class_UIElement"></a>
 
 ### UIElement
@@ -14760,6 +14856,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -15141,7 +15238,9 @@ Methods:
 - VectorBuffer ReadVectorBuffer(uint)
 - void Resize(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SetData(Deserializer@, uint)
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -15263,6 +15362,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -15509,6 +15609,7 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
@@ -15677,6 +15778,7 @@ Properties:
 
 Methods:
 
+- bool AppendChild(XMLElement, bool)
 - XMLElement CreateChild(const String&)
 - String GetAttribute(const String& = String ( )) const
 - String GetAttributeLower(const String&) const
@@ -15713,6 +15815,7 @@ Methods:
 - Variant GetVectorVariant(const String&) const
 - bool HasAttribute(const String&) const
 - bool HasChild(const String&) const
+- bool Remove()
 - bool RemoveAttribute(const String& = String ( ))
 - bool RemoveChild(const String&)
 - bool RemoveChild(const XMLElement&)
@@ -16160,6 +16263,8 @@ Properties:
 
 ### IKAlgorithm
 
+- ONE_BONE
+- TWO_BONE
 - FABRIK
 
 
@@ -16603,6 +16708,7 @@ Properties:
 - String Join(String[]&, const String&)
 - float Lerp(float, float, float)
 - float Ln(float)
+- uint LogBaseTwo(uint)
 - void MarkNetworkUpdate()
 - float Max(float, float)
 - int Max(int, int)
@@ -16793,19 +16899,60 @@ Properties:
 - int KEY_8
 - int KEY_9
 - int KEY_A
+- int KEY_AC_BACK
+- int KEY_AC_BOOKMARKS
+- int KEY_AC_FORWARD
+- int KEY_AC_HOME
+- int KEY_AC_REFRESH
+- int KEY_AC_SEARCH
+- int KEY_AC_STOP
+- int KEY_AGAIN
 - int KEY_ALT
+- int KEY_ALTERASE
+- int KEY_AMPERSAND
 - int KEY_APPLICATION
+- int KEY_ASTERISK
+- int KEY_AT
+- int KEY_AUDIOMUTE
+- int KEY_AUDIONEXT
+- int KEY_AUDIOPLAY
+- int KEY_AUDIOPREV
+- int KEY_AUDIOSTOP
 - int KEY_B
+- int KEY_BACKQUOTE
+- int KEY_BACKSLASH
 - int KEY_BACKSPACE
+- int KEY_BRIGHTNESSDOWN
+- int KEY_BRIGHTNESSUP
 - int KEY_C
+- int KEY_CALCULATOR
+- int KEY_CANCEL
 - int KEY_CAPSLOCK
+- int KEY_CARET
+- int KEY_CLEAR
+- int KEY_CLEARAGAIN
+- int KEY_COLON
+- int KEY_COMMA
+- int KEY_COMPUTER
+- int KEY_COPY
+- int KEY_CRSEL
 - int KEY_CTRL
+- int KEY_CURRENCYSUBUNIT
+- int KEY_CURRENCYUNIT
+- int KEY_CUT
 - int KEY_D
+- int KEY_DECIMALSEPARATOR
 - int KEY_DELETE
+- int KEY_DISPLAYSWITCH
+- int KEY_DOLLAR
 - int KEY_DOWN
 - int KEY_E
+- int KEY_EJECT
 - int KEY_END
+- int KEY_EQUALS
 - int KEY_ESCAPE
+- int KEY_EXCLAIM
+- int KEY_EXSEL
 - int KEY_F
 - int KEY_F1
 - int KEY_F10
@@ -16831,15 +16978,24 @@ Properties:
 - int KEY_F7
 - int KEY_F8
 - int KEY_F9
+- int KEY_FIND
 - int KEY_G
+- int KEY_GREATER
 - int KEY_GUI
 - int KEY_H
+- int KEY_HASH
+- int KEY_HELP
 - int KEY_HOME
 - int KEY_I
 - int KEY_INSERT
 - int KEY_J
 - int KEY_K
+- int KEY_KBDILLUMDOWN
+- int KEY_KBDILLUMTOGGLE
+- int KEY_KBDILLUMUP
 - int KEY_KP_0
+- int KEY_KP_00
+- int KEY_KP_000
 - int KEY_KP_1
 - int KEY_KP_2
 - int KEY_KP_3
@@ -16849,28 +17005,91 @@ Properties:
 - int KEY_KP_7
 - int KEY_KP_8
 - int KEY_KP_9
+- int KEY_KP_A
+- int KEY_KP_AMPERSAND
+- int KEY_KP_AT
+- int KEY_KP_B
+- int KEY_KP_BACKSPACE
+- int KEY_KP_BINARY
+- int KEY_KP_C
+- int KEY_KP_CLEAR
+- int KEY_KP_CLEARENTRY
+- int KEY_KP_COLON
+- int KEY_KP_COMMA
+- int KEY_KP_D
+- int KEY_KP_DBLAMPERSAND
+- int KEY_KP_DBLVERTICALBAR
+- int KEY_KP_DECIMAL
 - int KEY_KP_DIVIDE
+- int KEY_KP_E
 - int KEY_KP_ENTER
+- int KEY_KP_EQUALS
+- int KEY_KP_EQUALSAS400
+- int KEY_KP_EXCLAM
+- int KEY_KP_F
+- int KEY_KP_GREATER
+- int KEY_KP_HASH
+- int KEY_KP_HEXADECIMAL
+- int KEY_KP_LEFTBRACE
+- int KEY_KP_LEFTPAREN
+- int KEY_KP_LESS
+- int KEY_KP_MEMADD
+- int KEY_KP_MEMCLEAR
+- int KEY_KP_MEMDIVIDE
+- int KEY_KP_MEMMULTIPLY
+- int KEY_KP_MEMRECALL
+- int KEY_KP_MEMSTORE
+- int KEY_KP_MEMSUBTRACT
 - int KEY_KP_MINUS
 - int KEY_KP_MULTIPLY
+- int KEY_KP_OCTAL
+- int KEY_KP_PERCENT
 - int KEY_KP_PERIOD
 - int KEY_KP_PLUS
+- int KEY_KP_PLUSMINUS
+- int KEY_KP_POWER
+- int KEY_KP_RIGHTBRACE
+- int KEY_KP_RIGHTPAREN
+- int KEY_KP_SPACE
+- int KEY_KP_TAB
+- int KEY_KP_VERTICALBAR
+- int KEY_KP_XOR
 - int KEY_L
 - int KEY_LALT
 - int KEY_LCTRL
 - int KEY_LEFT
+- int KEY_LEFTBRACKET
+- int KEY_LEFTPAREN
+- int KEY_LESS
 - int KEY_LGUI
 - int KEY_LSHIFT
 - int KEY_M
+- int KEY_MAIL
+- int KEY_MEDIASELECT
+- int KEY_MENU
+- int KEY_MINUS
+- int KEY_MODE
+- int KEY_MUTE
 - int KEY_N
 - int KEY_NUMLOCKCLEAR
 - int KEY_O
+- int KEY_OPER
+- int KEY_OUT
 - int KEY_P
 - int KEY_PAGEDOWN
 - int KEY_PAGEUP
+- int KEY_PASTE
 - int KEY_PAUSE
+- int KEY_PERCENT
+- int KEY_PERIOD
+- int KEY_PLUS
+- int KEY_POWER
 - int KEY_PRINTSCREEN
+- int KEY_PRIOR
 - int KEY_Q
+- int KEY_QUESTION
+- int KEY_QUOTE
+- int KEY_QUOTEDBL
 - int KEY_R
 - int KEY_RALT
 - int KEY_RCTRL
@@ -16878,19 +17097,33 @@ Properties:
 - int KEY_RETURN2
 - int KEY_RGUI
 - int KEY_RIGHT
+- int KEY_RIGHTBRACKET
+- int KEY_RIGHTPAREN
 - int KEY_RSHIFT
 - int KEY_S
 - int KEY_SCROLLLOCK
 - int KEY_SELECT
+- int KEY_SEMICOLON
+- int KEY_SEPARATOR
 - int KEY_SHIFT
+- int KEY_SLASH
+- int KEY_SLEEP
 - int KEY_SPACE
+- int KEY_STOP
+- int KEY_SYSREQ
 - int KEY_T
 - int KEY_TAB
+- int KEY_THOUSANDSSEPARATOR
 - int KEY_U
+- int KEY_UNDERSCORE
+- int KEY_UNDO
 - int KEY_UNKNOWN
 - int KEY_UP
 - int KEY_V
+- int KEY_VOLUMEDOWN
+- int KEY_VOLUMEUP
 - int KEY_W
+- int KEY_WWW
 - int KEY_X
 - int KEY_Y
 - int KEY_Z
@@ -16900,6 +17133,7 @@ Properties:
 - int LOG_ERROR
 - int LOG_INFO
 - int LOG_NONE
+- int LOG_TRACE
 - int LOG_WARNING
 - Color MAGENTA
 - uint MASK_BLENDINDICES

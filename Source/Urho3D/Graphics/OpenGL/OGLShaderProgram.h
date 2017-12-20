@@ -41,12 +41,12 @@ public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);
     /// Destruct.
-    ~ShaderProgram();
+    virtual ~ShaderProgram() override;
 
     /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost();
+    virtual void OnDeviceLost() override;
     /// Release shader program.
-    virtual void Release();
+    virtual void Release() override;
 
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful.
     bool Link();

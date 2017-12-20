@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"
 #include "../IO/Log.h"
+#include "../UI/LineEdit.h"
 #include "../UI/Menu.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
@@ -168,7 +169,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
         if (typeName.Empty())
             typeName = "UIElement";
         unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
-        UIElement* child = 0;
+        UIElement* child = nullptr;
 
         if (!internalElem)
         {
@@ -430,8 +431,10 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() == acceleratorQualifiers_) &&
         eventData[P_REPEAT].GetBool() == false)
     {
-        // Ignore if UI has modal element
-        if (GetSubsystem<UI>()->HasModalElement())
+        // Ignore if UI has modal element or focused LineEdit
+        UI* ui = GetSubsystem<UI>();
+        UIElement* focusElement = ui->GetFocusElement();
+        if (ui->HasModalElement() || (focusElement && focusElement->GetType() == LineEdit::GetTypeStatic()))
             return;
 
         HandlePressedReleased(eventType, eventData);

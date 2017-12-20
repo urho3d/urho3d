@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,13 @@
 #if defined(__WIN32__)
 #include "../core/windows/SDL_windows.h"
 #endif
+#if defined(__OS2__)
+#define INCL_DOS
+#include <os2.h>
+#ifndef QSV_NUMPROCESSORS
+#define QSV_NUMPROCESSORS 26
+#endif
+#endif
 
 /* CPU feature detection for SDL */
 
@@ -50,6 +57,25 @@
 #include <setjmp.h>
 #endif
 
+#if defined(__QNXNTO__)
+#include <sys/syspage.h>
+#endif
+
+#if (defined(__LINUX__) || defined(__ANDROID__)) && defined(__ARM_ARCH)
+/*#include <asm/hwcap.h>*/
+#ifndef AT_HWCAP
+#define AT_HWCAP 16
+#endif
+#ifndef HWCAP_NEON
+#define HWCAP_NEON (1 << 12)
+#endif
+#if defined HAVE_GETAUXVAL
+#include <sys/auxv.h>
+#else
+#include <fcntl.h>
+#endif
+#endif
+
 #define CPU_HAS_RDTSC   0x00000001
 #define CPU_HAS_ALTIVEC 0x00000002
 #define CPU_HAS_MMX     0x00000004
@@ -61,6 +87,7 @@
 #define CPU_HAS_SSE42   0x00000200
 #define CPU_HAS_AVX     0x00000400
 #define CPU_HAS_AVX2    0x00000800
+#define CPU_HAS_NEON    0x00001000
 
 #if SDL_ALTIVEC_BLITTERS && HAVE_SETJMP && !__MACOSX__ && !__OpenBSD__
 /* This is the brute force way of detecting instruction sets...
@@ -78,6 +105,7 @@ static int
 CPU_haveCPUID(void)
 {
     int has_CPUID = 0;
+
 /* *INDENT-OFF* */
 #ifndef SDL_CPUINFO_DISABLED
 #if defined(__GNUC__) && defined(i386)
@@ -212,62 +240,50 @@ done:
 }
 #else
 #define cpuid(func, a, b, c, d) \
-    a = b = c = d = 0
+    do { a = b = c = d = 0; (void) a; (void) b; (void) c; (void) d; } while (0)
 #endif
 
-static int
-CPU_getCPUIDFeatures(void)
+static int CPU_CPUIDFeatures[4];
+static int CPU_CPUIDMaxFunction = 0;
+static SDL_bool CPU_OSSavesYMM = SDL_FALSE;
+
+static void
+CPU_calcCPUIDFeatures(void)
 {
-    int features = 0;
-    int a, b, c, d;
+    static SDL_bool checked = SDL_FALSE;
+    if (!checked) {
+        checked = SDL_TRUE;
+        if (CPU_haveCPUID()) {
+            int a, b, c, d;
+            cpuid(0, a, b, c, d);
+            CPU_CPUIDMaxFunction = a;
+            if (CPU_CPUIDMaxFunction >= 1) {
+                cpuid(1, a, b, c, d);
+                CPU_CPUIDFeatures[0] = a;
+                CPU_CPUIDFeatures[1] = b;
+                CPU_CPUIDFeatures[2] = c;
+                CPU_CPUIDFeatures[3] = d;
 
-    cpuid(0, a, b, c, d);
-    if (a >= 1) {
-        cpuid(1, a, b, c, d);
-        features = d;
-    }
-    return features;
-}
-
-static SDL_bool
-CPU_OSSavesYMM(void)
-{
-    int a, b, c, d;
-
-    /* Check to make sure we can call xgetbv */
-    cpuid(0, a, b, c, d);
-    if (a < 1) {
-        return SDL_FALSE;
-    }
-    cpuid(1, a, b, c, d);
-    if (!(c & 0x08000000)) {
-        return SDL_FALSE;
-    }
-
-    /* Call xgetbv to see if YMM register state is saved */
-    a = 0;
+                /* Check to make sure we can call xgetbv */
+                if (c & 0x08000000) {
+                    /* Call xgetbv to see if YMM register state is saved */
 #if defined(__GNUC__) && (defined(i386) || defined(__x86_64__))
-    asm(".byte 0x0f, 0x01, 0xd0" : "=a" (a) : "c" (0) : "%edx");
+                    __asm__(".byte 0x0f, 0x01, 0xd0" : "=a" (a) : "c" (0) : "%edx");
 #elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64)) && (_MSC_FULL_VER >= 160040219) /* VS2010 SP1 */
-    a = (int)_xgetbv(0);
+                    a = (int)_xgetbv(0);
 #elif (defined(_MSC_VER) && defined(_M_IX86)) || defined(__WATCOMC__)
-    __asm
-    {
-        xor ecx, ecx
-        _asm _emit 0x0f _asm _emit 0x01 _asm _emit 0xd0
-        mov a, eax
-    }
+                    __asm
+                    {
+                        xor ecx, ecx
+                        _asm _emit 0x0f _asm _emit 0x01 _asm _emit 0xd0
+                        mov a, eax
+                    }
 #endif
-    return ((a & 6) == 6) ? SDL_TRUE : SDL_FALSE;
-}
-
-static int
-CPU_haveRDTSC(void)
-{
-    if (CPU_haveCPUID()) {
-        return (CPU_getCPUIDFeatures() & 0x00000010);
+                    CPU_OSSavesYMM = ((a & 6) == 6) ? SDL_TRUE : SDL_FALSE;
+                }
+            }
+        }
     }
-    return 0;
 }
 
 static int
@@ -299,21 +315,61 @@ CPU_haveAltiVec(void)
     return altivec;
 }
 
+#if (defined(__LINUX__) || defined(__ANDROID__)) && defined(__ARM_ARCH) && !defined(HAVE_GETAUXVAL)
 static int
-CPU_haveMMX(void)
+readProcAuxvForNeon(void)
 {
-    if (CPU_haveCPUID()) {
-        return (CPU_getCPUIDFeatures() & 0x00800000);
+    int neon = 0;
+    int kv[2];
+    const int fd = open("/proc/self/auxv", O_RDONLY);
+    if (fd != -1) {
+        while (read(fd, kv, sizeof (kv)) == sizeof (kv)) {
+            if (kv[0] == AT_HWCAP) {
+                neon = ((kv[1] & HWCAP_NEON) == HWCAP_NEON);
+                break;
+            }
+        }
+        close(fd);
     }
+    return neon;
+}
+#endif
+
+
+static int
+CPU_haveNEON(void)
+{
+/* The way you detect NEON is a privileged instruction on ARM, so you have
+   query the OS kernel in a platform-specific way. :/ */
+#if defined(SDL_CPUINFO_DISABLED) || !defined(__ARM_ARCH)
+    return 0;  /* disabled or not an ARM CPU at all. */
+#elif __ARM_ARCH >= 8
+    return 1;  /* ARMv8 always has non-optional NEON support. */
+#elif defined(__APPLE__) && (__ARM_ARCH >= 7)
+    /* (note that sysctlbyname("hw.optional.neon") doesn't work!) */
+    return 1;  /* all Apple ARMv7 chips and later have NEON. */
+#elif defined(__APPLE__)
+    return 0;  /* assune anything else from Apple doesn't have NEON. */
+#elif defined(__QNXNTO__)
+    return SYSPAGE_ENTRY(cpuinfo)->flags & ARM_CPU_FLAG_NEON;
+#elif (defined(__LINUX__) || defined(__ANDROID__)) && defined(HAVE_GETAUXVAL)
+    return ((getauxval(AT_HWCAP) & HWCAP_NEON) == HWCAP_NEON);
+#elif (defined(__LINUX__) || defined(__ANDROID__))
+    return readProcAuxvForNeon();   /* Android offers a static library for this, but it just parses /proc/self/auxv */
+#elif (defined(__WINDOWS__) || defined(__WINRT__)) && defined(_M_ARM)
+    /* All WinRT ARM devices are required to support NEON, but just in case. */
+    return IsProcessorFeaturePresent(PF_ARM_NEON_INSTRUCTIONS_AVAILABLE) != 0;
+#else
+#warning SDL_HasNEON is not implemented for this ARM platform. Write me.
     return 0;
+#endif
 }
 
 static int
 CPU_have3DNow(void)
 {
-    if (CPU_haveCPUID()) {
+    if (CPU_CPUIDMaxFunction > 0) {  /* that is, do we have CPUID at all? */
         int a, b, c, d;
-
         cpuid(0x80000000, a, b, c, d);
         if (a >= 0x80000001) {
             cpuid(0x80000001, a, b, c, d);
@@ -323,95 +379,23 @@ CPU_have3DNow(void)
     return 0;
 }
 
-static int
-CPU_haveSSE(void)
-{
-    if (CPU_haveCPUID()) {
-        return (CPU_getCPUIDFeatures() & 0x02000000);
-    }
-    return 0;
-}
-
-static int
-CPU_haveSSE2(void)
-{
-    if (CPU_haveCPUID()) {
-        return (CPU_getCPUIDFeatures() & 0x04000000);
-    }
-    return 0;
-}
-
-static int
-CPU_haveSSE3(void)
-{
-    if (CPU_haveCPUID()) {
-        int a, b, c, d;
-
-        cpuid(0, a, b, c, d);
-        if (a >= 1) {
-            cpuid(1, a, b, c, d);
-            return (c & 0x00000001);
-        }
-    }
-    return 0;
-}
-
-static int
-CPU_haveSSE41(void)
-{
-    if (CPU_haveCPUID()) {
-        int a, b, c, d;
-
-        cpuid(0, a, b, c, d);
-        if (a >= 1) {
-            cpuid(1, a, b, c, d);
-            return (c & 0x00080000);
-        }
-    }
-    return 0;
-}
-
-static int
-CPU_haveSSE42(void)
-{
-    if (CPU_haveCPUID()) {
-        int a, b, c, d;
-
-        cpuid(0, a, b, c, d);
-        if (a >= 1) {
-            cpuid(1, a, b, c, d);
-            return (c & 0x00100000);
-        }
-    }
-    return 0;
-}
-
-static int
-CPU_haveAVX(void)
-{
-    if (CPU_haveCPUID() && CPU_OSSavesYMM()) {
-        int a, b, c, d;
-
-        cpuid(0, a, b, c, d);
-        if (a >= 1) {
-            cpuid(1, a, b, c, d);
-            return (c & 0x10000000);
-        }
-    }
-    return 0;
-}
+#define CPU_haveRDTSC() (CPU_CPUIDFeatures[3] & 0x00000010)
+#define CPU_haveMMX() (CPU_CPUIDFeatures[3] & 0x00800000)
+#define CPU_haveSSE() (CPU_CPUIDFeatures[3] & 0x02000000)
+#define CPU_haveSSE2() (CPU_CPUIDFeatures[3] & 0x04000000)
+#define CPU_haveSSE3() (CPU_CPUIDFeatures[2] & 0x00000001)
+#define CPU_haveSSE41() (CPU_CPUIDFeatures[2] & 0x00080000)
+#define CPU_haveSSE42() (CPU_CPUIDFeatures[2] & 0x00100000)
+#define CPU_haveAVX() (CPU_OSSavesYMM && (CPU_CPUIDFeatures[2] & 0x10000000))
 
 static int
 CPU_haveAVX2(void)
 {
-    if (CPU_haveCPUID() && CPU_OSSavesYMM()) {
+    if (CPU_OSSavesYMM && (CPU_CPUIDMaxFunction >= 7)) {
         int a, b, c, d;
-
-        cpuid(0, a, b, c, d);
-        if (a >= 7) {
-            cpuid(7, a, b, c, d);
-            return (b & 0x00000020);
-        }
+        (void) a; (void) b; (void) c; (void) d;  /* compiler warnings... */
+        cpuid(7, a, b, c, d);
+        return (b & 0x00000020);
     }
     return 0;
 }
@@ -441,6 +425,12 @@ SDL_GetCPUCount(void)
             SDL_CPUCount = info.dwNumberOfProcessors;
         }
 #endif
+#ifdef __OS2__
+        if (SDL_CPUCount <= 0) {
+            DosQuerySysInfo(QSV_NUMPROCESSORS, QSV_NUMPROCESSORS,
+                            &SDL_CPUCount, sizeof(SDL_CPUCount) );
+        }
+#endif
 #endif
         /* There has to be at least 1, right? :) */
         if (SDL_CPUCount <= 0) {
@@ -459,7 +449,8 @@ SDL_GetCPUType(void)
     if (!SDL_CPUType[0]) {
         int i = 0;
 
-        if (CPU_haveCPUID()) {
+        CPU_calcCPUIDFeatures();
+        if (CPU_CPUIDMaxFunction > 0) {  /* do we have CPUID at all? */
             int a, b, c, d;
             cpuid(0x00000000, a, b, c, d);
             (void) a;
@@ -496,7 +487,8 @@ SDL_GetCPUName(void)
         int i = 0;
         int a, b, c, d;
 
-        if (CPU_haveCPUID()) {
+        CPU_calcCPUIDFeatures();
+        if (CPU_CPUIDMaxFunction > 0) {  /* do we have CPUID at all? */
             cpuid(0x80000000, a, b, c, d);
             if (a >= 0x80000004) {
                 cpuid(0x80000002, a, b, c, d);
@@ -584,6 +576,7 @@ static Uint32
 SDL_GetCPUFeatures(void)
 {
     if (SDL_CPUFeatures == 0xFFFFFFFF) {
+        CPU_calcCPUIDFeatures();
         SDL_CPUFeatures = 0;
         if (CPU_haveRDTSC()) {
             SDL_CPUFeatures |= CPU_HAS_RDTSC;
@@ -618,107 +611,84 @@ SDL_GetCPUFeatures(void)
         if (CPU_haveAVX2()) {
             SDL_CPUFeatures |= CPU_HAS_AVX2;
         }
+        if (CPU_haveNEON()) {
+            SDL_CPUFeatures |= CPU_HAS_NEON;
+        }
     }
     return SDL_CPUFeatures;
 }
 
-SDL_bool
-SDL_HasRDTSC(void)
+#define CPU_FEATURE_AVAILABLE(f) ((SDL_GetCPUFeatures() & f) ? SDL_TRUE : SDL_FALSE)
+
+SDL_bool SDL_HasRDTSC(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_RDTSC) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_RDTSC);
 }
 
 SDL_bool
 SDL_HasAltiVec(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_ALTIVEC) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_ALTIVEC);
 }
 
 SDL_bool
 SDL_HasMMX(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_MMX) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_MMX);
 }
 
 SDL_bool
 SDL_Has3DNow(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_3DNOW) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_3DNOW);
 }
 
 SDL_bool
 SDL_HasSSE(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_SSE) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_SSE);
 }
 
 SDL_bool
 SDL_HasSSE2(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_SSE2) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_SSE2);
 }
 
 SDL_bool
 SDL_HasSSE3(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_SSE3) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_SSE3);
 }
 
 SDL_bool
 SDL_HasSSE41(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_SSE41) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_SSE41);
 }
 
 SDL_bool
 SDL_HasSSE42(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_SSE42) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_SSE42);
 }
 
 SDL_bool
 SDL_HasAVX(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_AVX) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_AVX);
 }
 
 SDL_bool
 SDL_HasAVX2(void)
 {
-    if (SDL_GetCPUFeatures() & CPU_HAS_AVX2) {
-        return SDL_TRUE;
-    }
-    return SDL_FALSE;
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_AVX2);
+}
+
+SDL_bool
+SDL_HasNEON(void)
+{
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_NEON);
 }
 
 static int SDL_SystemRAM = 0;
@@ -762,6 +732,13 @@ SDL_GetSystemRAM(void)
             }
         }
 #endif
+#ifdef __OS2__
+        if (SDL_SystemRAM <= 0) {
+            Uint32 sysram = 0;
+            DosQuerySysInfo(QSV_TOTPHYSMEM, QSV_TOTPHYSMEM, &sysram, 4);
+            SDL_SystemRAM = (int) (sysram / 0x100000U);
+        }
+#endif
 #endif
     }
     return SDL_SystemRAM;
@@ -790,6 +767,7 @@ main()
     printf("SSE4.2: %d\n", SDL_HasSSE42());
     printf("AVX: %d\n", SDL_HasAVX());
     printf("AVX2: %d\n", SDL_HasAVX2());
+    printf("NEON: %d\n", SDL_HasNEON());
     printf("RAM: %d MB\n", SDL_GetSystemRAM());
     return 0;
 }

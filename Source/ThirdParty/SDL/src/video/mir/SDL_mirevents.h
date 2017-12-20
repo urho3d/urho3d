@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,15 +23,15 @@
   Contributed by Brandon Schaefer, <brandon.schaefer@canonical.com>
 */
 
-#ifndef _SDL_mirevents_h
-#define _SDL_mirevents_h
+#ifndef SDL_mirevents_h_
+#define SDL_mirevents_h_
 
 #include <mir_toolkit/mir_client_library.h>
 
 extern void
-MIR_HandleEvent(MirSurface* surface, MirEvent const* ev, void* context);
+MIR_HandleEvent(MirWindow*, MirEvent const* ev, void* context);
 
-#endif /* _SDL_mirevents_h */
+#endif /* SDL_mirevents_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */
 

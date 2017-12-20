@@ -61,7 +61,7 @@ static void ScriptFileDelayedExecute(float delay, bool repeat, const String& dec
 static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const String& className, CreateMode mode, Node* ptr)
 {
     if (!file)
-        return 0;
+        return nullptr;
 
     // Try first to reuse an existing, empty ScriptInstance
     const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
@@ -116,7 +116,7 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
@@ -136,7 +136,7 @@ asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 static bool ScriptInstanceExecute(const String& declaration, CScriptArray* srcParams, ScriptInstance* ptr)

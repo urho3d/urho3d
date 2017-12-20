@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1164,6 +1164,12 @@ void asCByteCode::Optimize()
 					DeleteInstruction(instr);
 					instr = GoBack(DeleteInstruction(curr));
 				}
+				// LINE, VarDecl, LINE -> VarDecl, LINE
+				else if (instrOp == asBC_VarDecl && instr->next && instr->next->op == asBC_LINE )
+				{
+					// Delete the first instruction
+					instr = GoBack(DeleteInstruction(curr));
+				}
 				// LINE, LINE -> LINE
 				else if( instrOp == asBC_LINE )
 				{
@@ -1390,6 +1396,7 @@ bool asCByteCode::IsTempRegUsed(asCByteInstruction *curr)
 			curr->op == asBC_PopRPtr   ||
 			curr->op == asBC_CALLSYS   ||
 			curr->op == asBC_CALLBND   ||
+			curr->op == asBC_Thiscall1 ||
 			curr->op == asBC_SUSPEND   ||
 			curr->op == asBC_ALLOC     ||
 			curr->op == asBC_CpyVtoR4  ||
@@ -1444,7 +1451,8 @@ bool asCByteCode::IsSimpleExpression()
 			instr->op == asBC_FREE ||
 			instr->op == asBC_CallPtr ||
 			instr->op == asBC_CALLINTF ||
-			instr->op == asBC_CALLBND )
+			instr->op == asBC_CALLBND || 
+			instr->op == asBC_Thiscall1 )
 			return false;
 
 		instr = instr->next;

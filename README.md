@@ -22,6 +22,7 @@ Urho3D development, contributions and bugfixes by:
 - Aster Jian
 - Ricardo Abreu
 - Vivienne Anthony
+- Christopher Augustus
 - Colin Barrett
 - Erik Beran
 - Gauthier Billot
@@ -35,6 +36,7 @@ Urho3D development, contributions and bugfixes by:
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
 - Stanislav Demyanovich
+- Rainer Deyke
 - Josh Engebretson
 - Simon Flores
 - Manuel Freiberger
@@ -65,6 +67,7 @@ Urho3D development, contributions and bugfixes by:
 - Nathanial Lydick
 - Xavier Maupeu
 - Iain Merrick
+- Justin Miller
 - Jonne Nauha
 - Huy Nguyen
 - Paul Noome
@@ -76,6 +79,7 @@ Urho3D development, contributions and bugfixes by:
 - Vladimir Pobedinsky
 - Franck Poulain
 - Pranjal Raihan
+- Alexey Rassikhin
 - Svyatoslav Razmyslov
 - Mariusz Richtscheid
 - Nick Royer
@@ -109,6 +113,7 @@ Urho3D development, contributions and bugfixes by:
 - PredatorMF
 - Scellow
 - Skrylar
+- SuperWangKai
 - TheComet93
 - Y-way
 - 1vanK
@@ -116,6 +121,7 @@ Urho3D development, contributions and bugfixes by:
 - amadeus_osa
 - atship
 - att
+- att-kin9
 - celeron55
 - cosmy1
 - damu
@@ -124,6 +130,7 @@ Urho3D development, contributions and bugfixes by:
 - fredakilla
 - gleblebedev
 - hdunderscore
+- hsnabn
 - lhinuz
 - lvshiling
 - marynate
@@ -170,7 +177,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.31.2 (http://www.angelcode.com/angelscript)
+- AngelScript 2.32.0 WIP (http://www.angelcode.com/angelscript)
 - Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 2.86.1 (http://www.bulletphysics.org)
@@ -185,19 +192,20 @@ Urho3D uses the following third-party libraries:
 - LZ4 1.7.5 (https://github.com/lz4/lz4)
 - MojoShader (https://icculus.org/mojoshader)
 - Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
-- nanodbc 2.12.4 (https://lexicalunit.github.io/nanodbc)
-- Open Asset Import Library 3.2 (http://assimp.sourceforge.net)
+- nanodbc 2.12.4+ (https://lexicalunit.github.io/nanodbc)
+- Open Asset Import Library 4.0.1 (http://assimp.sourceforge.net)
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
-- SDL 2.0.5 (https://www.libsdl.org)
-- SQLite 3.18.0 (https://www.sqlite.org)
+- SDL 2.0.7 (https://www.libsdl.org)
+- SQLite 3.20.1 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (https://nothings.org)
 - stb_image_write 1.02 (https://nothings.org)
 - stb_rect_pack 0.08 (https://nothings.org)
 - stb_vorbis 1.09 (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
+- WebP (https://chromium.googlesource.com/webm/libwebp)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.

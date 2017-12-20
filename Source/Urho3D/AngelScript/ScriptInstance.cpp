@@ -25,6 +25,8 @@
 #include "../AngelScript/Script.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../AngelScript/ScriptInstance.h"
+#include "../AngelScript/Addons.h"
+#include "../AngelScript/APITemplates.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
@@ -62,7 +64,7 @@ static const char* methodDeclarations[] = {
 
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
-    scriptObject_(0),
+    scriptObject_(nullptr),
     subscribed_(false),
     subscribedPostFixed_(false)
 {
@@ -119,6 +121,30 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         if (resourcePtr)
             resourcePtr->AddRef();
     }
+    else if (attr.type_ == VAR_VARIANTVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+        {
+            const Vector<Variant>& vector = src.GetVariantVector();
+            unsigned size = vector.Size();
+            arr->Resize(size);
+            for (unsigned i = 0; i < size; i++)
+                *(static_cast<Variant*>(arr->At(i))) = vector[i];
+        }
+    }
+    else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+        {
+            const Vector<String>& vector = src.GetStringVector();
+            unsigned size = vector.Size();
+            arr->Resize(size);
+            for (unsigned i = 0; i < size; i++)
+                *(static_cast<String*>(arr->At(i))) = vector[i];
+        }
+    }
     else
         Serializable::OnSetAttribute(attr, src);
 }
@@ -154,7 +180,18 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
         // If resource is non-null get its type and name hash. Otherwise get type from the default value
         dest = GetResourceRef(resource, attr.defaultValue_.GetResourceRef().type_);
     }
-    else
+    else if (attr.type_ == VAR_VARIANTVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+            dest = ArrayToVector<Variant>(arr);
+    }
+    else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
+    {
+        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        if (arr)
+            dest = ArrayToVector<String>(arr);
+    } else
         Serializable::OnGetAttribute(attr, dest);
 }
 
@@ -201,7 +238,7 @@ bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const String& classNam
     className_ = String::EMPTY; // Do not create object during SetScriptFile()
     SetScriptFile(scriptFile);
     SetClassName(className);
-    return scriptObject_ != 0;
+    return scriptObject_ != nullptr;
 }
 
 void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
@@ -387,14 +424,10 @@ bool ScriptInstance::IsA(const String& className) const
         return true;
     if (scriptObject_)
     {
-        // Start immediately at the first base class because we already checked the early out
-        asITypeInfo* currentType = scriptObject_->GetObjectType()->GetBaseType();
-        while (currentType)
-        {
-            if (className == currentType->GetName())
-                return true;
-            currentType = currentType->GetBaseType();
-        }
+        asITypeInfo* myType = scriptObject_->GetObjectType();
+        asITypeInfo* searchType = myType->GetModule()->GetTypeInfoByName(className.CString());
+        return searchType && (searchType->GetTypeId() & asTYPEID_MASK_OBJECT) != 0 &&
+            (myType->DerivesFrom(searchType) || myType->Implements(searchType));
     }
     return false;
 }
@@ -404,7 +437,7 @@ bool ScriptInstance::HasMethod(const String& declaration) const
     if (!scriptFile_ || !scriptObject_)
         return false;
     else
-        return scriptFile_->GetMethod(scriptObject_, declaration) != 0;
+        return scriptFile_->GetMethod(scriptObject_, declaration) != nullptr;
 }
 
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
@@ -574,16 +607,16 @@ void ScriptInstance::ReleaseObject()
         ClearScriptMethods();
         ClearScriptAttributes();
 
-        scriptObject_->SetUserData(0);
+        scriptObject_->SetUserData(nullptr);
         scriptObject_->Release();
-        scriptObject_ = 0;
+        scriptObject_ = nullptr;
     }
 }
 
 void ScriptInstance::ClearScriptMethods()
 {
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
-        methods_[i] = 0;
+        methods_[i] = nullptr;
 
     delayedCalls_.Clear();
 }
@@ -646,7 +679,12 @@ void ScriptInstance::GetScriptAttributes()
                 break;
 
             default:
-                info.type_ = Variant::GetTypeFromName(typeName);
+                if (typeName == "Variant[]")
+                    info.type_ = VAR_VARIANTVECTOR;
+                else if (typeName == "String[]")
+                    info.type_ = VAR_STRINGVECTOR;
+                else
+                    info.type_ = Variant::GetTypeFromName(typeName);
                 break;
             }
         }
@@ -829,7 +867,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     if (methods_[METHOD_DELAYEDSTART])
     {
         scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
-        methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
+        methods_[METHOD_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     if (methods_[METHOD_UPDATE])
@@ -863,7 +901,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
     if (methods_[METHOD_DELAYEDSTART])
     {
         scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
-        methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
+        methods_[METHOD_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     using namespace PhysicsPreStep;
@@ -930,28 +968,28 @@ Context* GetScriptContext()
     if (context)
         return static_cast<Script*>(context->GetEngine()->GetUserData())->GetContext();
     else
-        return 0;
+        return nullptr;
 }
 
 ScriptInstance* GetScriptContextInstance()
 {
     asIScriptContext* context = asGetActiveContext();
-    asIScriptObject* object = context ? static_cast<asIScriptObject*>(context->GetThisPointer()) : 0;
+    asIScriptObject* object = context ? static_cast<asIScriptObject*>(context->GetThisPointer()) : nullptr;
     if (object)
         return static_cast<ScriptInstance*>(object->GetUserData());
     else
-        return 0;
+        return nullptr;
 }
 
 Node* GetScriptContextNode()
 {
     ScriptInstance* instance = GetScriptContextInstance();
-    return instance ? instance->GetNode() : 0;
+    return instance ? instance->GetNode() : nullptr;
 }
 
 Scene* GetScriptContextScene()
 {
-    Scene* scene = 0;
+    Scene* scene = nullptr;
     Node* node = GetScriptContextNode();
     if (node)
         scene = node->GetScene();
@@ -975,7 +1013,7 @@ ScriptEventListener* GetScriptContextEventListener()
             return GetScriptContextFile();
     }
     else
-        return 0;
+        return nullptr;
 }
 
 Object* GetScriptContextEventListenerObject()

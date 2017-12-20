@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -87,8 +87,20 @@ SDL_IME_Init(void)
 {
     InitIME();
 
-    if (SDL_IME_Init_Real)
-        return SDL_IME_Init_Real();
+    if (SDL_IME_Init_Real) {
+        if (SDL_IME_Init_Real()) {
+            return SDL_TRUE;
+        }
+
+        /* uhoh, the IME implementation's init failed! Disable IME support. */
+        SDL_IME_Init_Real = NULL;
+        SDL_IME_Quit_Real = NULL;
+        SDL_IME_SetFocus_Real = NULL;
+        SDL_IME_Reset_Real = NULL;
+        SDL_IME_ProcessKeyEvent_Real = NULL;
+        SDL_IME_UpdateTextRect_Real = NULL;
+        SDL_IME_PumpEvents_Real = NULL;
+    }
 
     return SDL_FALSE;
 }

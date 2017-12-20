@@ -99,7 +99,7 @@ void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
     ResetScene();
 
     scene_ = scene;
-    cameraNode_ = camera ? camera->GetNode() : 0;
+    cameraNode_ = camera ? camera->GetNode() : nullptr;
     ownScene_ = ownScene;
 
     viewport_->SetScene(scene_);
@@ -162,11 +162,11 @@ void View3D::ResetScene()
     {
         RefCount* refCount = scene_->RefCountPtr();
         ++refCount->refs_;
-        scene_ = 0;
+        scene_ = nullptr;
         --refCount->refs_;
     }
     else
-        scene_ = 0;
+        scene_ = nullptr;
 }
 
 void View3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

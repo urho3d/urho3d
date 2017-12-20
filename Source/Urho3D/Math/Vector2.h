@@ -47,12 +47,18 @@ public:
     }
 
     /// Construct from an int array.
-    IntVector2(const int* data) :
+    explicit IntVector2(const int* data) :
         x_(data[0]),
         y_(data[1])
     {
     }
 
+    /// Construct from an float array.
+    explicit IntVector2(const float* data) :
+        x_((int)data[0]),
+        y_((int)data[1])
+    {
+    }
     /// Copy-construct from another vector.
     IntVector2(const IntVector2& rhs) :
         x_(rhs.x_),
@@ -86,8 +92,14 @@ public:
     /// Multiply with a scalar.
     IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
 
+    /// Multiply with a vector.
+    IntVector2 operator *(const IntVector2& rhs) const { return IntVector2(x_ * rhs.x_, y_ * rhs.y_); }
+
     /// Divide by a scalar.
     IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
+
+    /// Divide by a vector.
+    IntVector2 operator /(const IntVector2& rhs) const { return IntVector2(x_ / rhs.x_, y_ / rhs.y_); }
 
     /// Add-assign a vector.
     IntVector2& operator +=(const IntVector2& rhs)
@@ -113,11 +125,27 @@ public:
         return *this;
     }
 
+    /// Multiply-assign a vector.
+    IntVector2& operator *=(const IntVector2& rhs)
+    {
+        x_ *= rhs.x_;
+        y_ *= rhs.y_;
+        return *this;
+    }
+
     /// Divide-assign a scalar.
     IntVector2& operator /=(int rhs)
     {
         x_ /= rhs;
         y_ /= rhs;
+        return *this;
+    }
+
+    /// Divide-assign a vector.
+    IntVector2& operator /=(const IntVector2& rhs)
+    {
+        x_ /= rhs.x_;
+        y_ /= rhs.y_;
         return *this;
     }
 

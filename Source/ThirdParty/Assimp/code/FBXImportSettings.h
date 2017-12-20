@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -55,12 +56,14 @@ struct ImportSettings
         , readAllLayers(true)
         , readAllMaterials(false)
         , readMaterials(true)
+        , readTextures(true)
         , readCameras(true)
         , readLights(true)
         , readAnimations(true)
         , readWeights(true)
         , preservePivots(true)
         , optimizeEmptyAnimationCurves(true)
+		, searchEmbeddedTextures(false)
     {}
 
 
@@ -91,6 +94,9 @@ struct ImportSettings
     /** import materials (true) or skip them and assign a default
      *  material. The default value is true.*/
     bool readMaterials;
+
+    /** import embedded textures? Default value is true.*/
+    bool readTextures;
 
     /** import cameras? Default value is true.*/
     bool readCameras;
@@ -132,6 +138,10 @@ struct ImportSettings
      *  values matching the corresponding node transformation.
      *  The default value is true. */
     bool optimizeEmptyAnimationCurves;
+
+	/** search for embedded loaded textures, where no embedded texture data is provided.
+	*  The default value is false. */
+	bool searchEmbeddedTextures;
 };
 
 

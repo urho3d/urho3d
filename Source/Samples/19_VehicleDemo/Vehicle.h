@@ -59,9 +59,9 @@ public:
     static void RegisterObject(Context* context);
     
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep);
+    virtual void FixedUpdate(float timeStep) override;
     
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
     void Init();

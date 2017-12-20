@@ -64,27 +64,27 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-typedef void *SDL_GLContext;
+using SDL_GLContext = void *;
 
 namespace Urho3D
 {
 
 class Context;
 
-typedef HashMap<unsigned, SharedPtr<ConstantBuffer> > ConstantBufferMap;
-typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
+using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
+using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
 
 /// Cached state of a frame buffer object
 struct FrameBufferObject
 {
     FrameBufferObject() :
         fbo_(0),
-        depthAttachment_(0),
+        depthAttachment_(nullptr),
         readBuffers_(M_MAX_UNSIGNED),
         drawBuffers_(M_MAX_UNSIGNED)
     {
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-            colorAttachments_[i] = 0;
+            colorAttachments_[i] = nullptr;
     }
 
     /// Frame buffer handle.

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_config_winrt_h
-#define _SDL_config_winrt_h
+#ifndef SDL_config_winrt_h_
+#define SDL_config_winrt_h_
+#define SDL_config_h_
 
 #include "SDL_platform.h"
 
@@ -97,13 +98,14 @@ typedef unsigned int uintptr_t;
 #define HAVE_XINPUT_H 1
 #endif
 #define HAVE_LIBC 1
-#define HAVE_STDIO_H 1
 #define STDC_HEADERS 1
-#define HAVE_STRING_H 1
 #define HAVE_CTYPE_H 1
-#define HAVE_MATH_H 1
 #define HAVE_FLOAT_H 1
+#define HAVE_LIMITS_H 1
+#define HAVE_MATH_H 1
 #define HAVE_SIGNAL_H 1
+#define HAVE_STDIO_H 1
+#define HAVE_STRING_H 1
 
 /* C library functions */
 #define HAVE_MALLOC 1
@@ -211,4 +213,4 @@ typedef unsigned int uintptr_t;
 #define SDL_ASSEMBLY_ROUTINES	1
 #endif
 
-#endif /* _SDL_config_winrt_h */
+#endif /* SDL_config_winrt_h_ */

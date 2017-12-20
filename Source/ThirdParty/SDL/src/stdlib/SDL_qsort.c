@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -275,7 +275,7 @@ typedef struct { char * first; char * last; } stack_entry;
 
 /* and so is the pivoting logic (note: last is inclusive): */
 #define Pivot(swapper,sz)			\
-  if (last-first>PIVOT_THRESHOLD*sz) mid=pivot_big(first,mid,last,sz,compare);\
+  if ((size_t)(last-first)>PIVOT_THRESHOLD*sz) mid=pivot_big(first,mid,last,sz,compare);\
   else {	\
     if (compare(first,mid)<0) {			\
       if (compare(mid,last)>0) {		\
@@ -362,7 +362,7 @@ typedef struct { char * first; char * last; } stack_entry;
 
 static char * pivot_big(char *first, char *mid, char *last, size_t size,
                         int compare(const void *, const void *)) {
-  int d=(((last-first)/size)>>3)*size;
+  size_t d=(((last-first)/size)>>3)*size;
 #ifdef DEBUG_QSORT
 fprintf(stderr, "pivot_big: first=%p last=%p size=%lu n=%lu\n", first, (unsigned long)last, size, (unsigned long)((last-first+1)/size));
 #endif
@@ -413,7 +413,7 @@ static void qsort_nonaligned(void *base, size_t nmemb, size_t size,
 
   first=(char*)base; last=first+(nmemb-1)*size;
 
-  if (last-first>=trunc) {
+  if ((size_t)(last-first)>=trunc) {
     char *ffirst=first, *llast=last;
     while (1) {
       /* Select pivot */
@@ -444,7 +444,7 @@ static void qsort_aligned(void *base, size_t nmemb, size_t size,
 
   first=(char*)base; last=first+(nmemb-1)*size;
 
-  if (last-first>=trunc) {
+  if ((size_t)(last-first)>=trunc) {
     char *ffirst=first,*llast=last;
     while (1) {
       /* Select pivot */
@@ -519,7 +519,7 @@ extern void qsortG(void *base, size_t nmemb, size_t size,
            int (*compare)(const void *, const void *)) {
 
   if (nmemb<=1) return;
-  if (((int)base|size)&(WORD_BYTES-1))
+  if (((size_t)base|size)&(WORD_BYTES-1))
     qsort_nonaligned(base,nmemb,size,compare);
   else if (size!=WORD_BYTES)
     qsort_aligned(base,nmemb,size,compare);

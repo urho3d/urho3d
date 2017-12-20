@@ -46,7 +46,7 @@ public:
     /// Copy construct.
     ValueAnimationInfo(const ValueAnimationInfo& other);
     /// Destruct.
-    ~ValueAnimationInfo();
+    virtual ~ValueAnimationInfo() override;
 
     /// Advance time position and apply. Return true when the animation is finished. No-op when the target object is not defined.
     bool Update(float timeStep);

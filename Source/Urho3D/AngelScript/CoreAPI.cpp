@@ -385,11 +385,11 @@ static asIScriptObject* VariantGetScriptObject(Variant* ptr)
 {
     asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
     if (!object)
-        return 0;
+        return nullptr;
 
     asITypeInfo* scriptObjectInterface = object->GetEngine()->GetTypeInfoByName("ScriptObject");
     if (!object->GetObjectType()->Implements(scriptObjectInterface))
-        return 0;
+        return nullptr;
 
     return object;
 }
@@ -807,6 +807,7 @@ static void RegisterTimer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Time", "uint get_frameNumber() const", asMETHOD(Time, GetFrameNumber), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_timeStep() const", asMETHOD(Time, GetTimeStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_elapsedTime()", asMETHOD(Time, GetElapsedTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Time", "float get_framesPerSecond() const", asMETHOD(Time, GetFramesPerSecond), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "uint get_systemTime() const", asFUNCTION(TimeGetSystemTime), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Time", "uint get_timeSinceEpoch() const", asFUNCTION(TimeGetTimeSinceEpoch), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Time", "String get_timeStamp() const", asFUNCTION(TimeGetTimeStamp), asCALL_CDECL_OBJLAST);
@@ -859,15 +860,6 @@ static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
     return VectorToArray<String>(enumNames, "Array<String>");
 }
 
-static CScriptArray* AttributeInfoGetVariantStructureElementNames(AttributeInfo* ptr)
-{
-    Vector<String> variantStructureElementNames;
-    const char** variantStructureElementNamesPtrs = ptr->variantStructureElementNames_;
-    while (variantStructureElementNamesPtrs && *variantStructureElementNamesPtrs)
-        variantStructureElementNames.Push(*variantStructureElementNamesPtrs++);
-    return VectorToArray<String>(variantStructureElementNames, "Array<String>");
-}
-
 static Object* CreateObject(const String& objectType)
 {
     if (Context* context = GetScriptContext())
@@ -878,7 +870,7 @@ static Object* CreateObject(const String& objectType)
             return object;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 static void SendEvent(const String& eventType, VariantMap& eventData)
@@ -1014,11 +1006,11 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames() const", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_variantStructureElementNames() const", asFUNCTION(AttributeInfoGetVariantStructureElementNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
     engine->RegisterObjectProperty("AttributeInfo", "String name", offsetof(AttributeInfo, name_));
     engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
     engine->RegisterObjectProperty("AttributeInfo", "uint mode", offsetof(AttributeInfo, mode_));
+    engine->RegisterObjectProperty("AttributeInfo", "VariantMap metadata", offsetof(AttributeInfo, metadata_));
 
     RegisterObject<Object>(engine, "Object");
 

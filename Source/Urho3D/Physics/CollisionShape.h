@@ -30,6 +30,7 @@
 class btBvhTriangleMeshShape;
 class btCollisionShape;
 class btCompoundShape;
+class btGImpactMeshShape;
 class btTriangleMesh;
 
 struct btTriangleInfoMap;
@@ -56,13 +57,18 @@ enum ShapeType
     SHAPE_CONE,
     SHAPE_TRIANGLEMESH,
     SHAPE_CONVEXHULL,
-    SHAPE_TERRAIN
+    SHAPE_TERRAIN,
+    SHAPE_GIMPACTMESH
 };
 
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
 };
+
+/// Cache of collision geometry data.
+/// \todo Remove duplicate declaration
+using CollisionGeometryDataCache = HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >;
 
 /// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
@@ -71,8 +77,6 @@ struct TriangleMeshData : public CollisionGeometryData
     TriangleMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
     TriangleMeshData(CustomGeometry* custom);
-    /// Destruct. Free geometry data.
-    ~TriangleMeshData();
 
     /// Bullet triangle mesh interface.
     UniquePtr<TriangleMeshInterface> meshInterface_;
@@ -82,6 +86,18 @@ struct TriangleMeshData : public CollisionGeometryData
     UniquePtr<btTriangleInfoMap> infoMap_;
 };
 
+/// Triangle mesh geometry data.
+struct GImpactMeshData : public CollisionGeometryData
+{
+    /// Construct from a model.
+    GImpactMeshData(Model* model, unsigned lodLevel);
+    /// Construct from a custom geometry.
+    GImpactMeshData(CustomGeometry* custom);
+
+    /// Bullet triangle mesh interface.
+    UniquePtr<TriangleMeshInterface> meshInterface_;
+};
+
 /// Convex hull geometry data.
 struct ConvexData : public CollisionGeometryData
 {
@@ -89,8 +105,6 @@ struct ConvexData : public CollisionGeometryData
     ConvexData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
     ConvexData(CustomGeometry* custom);
-    /// Destruct. Free geometry data.
-    ~ConvexData();
 
     /// Build the convex hull from vertices.
     void BuildHull(const PODVector<Vector3>& vertices);
@@ -110,8 +124,6 @@ struct HeightfieldData : public CollisionGeometryData
 {
     /// Construct from a terrain.
     HeightfieldData(Terrain* terrain, unsigned lodLevel);
-    /// Destruct. Free geometry data.
-    ~HeightfieldData();
 
     /// Height data. On LOD level 0 the original height data will be used.
     SharedArrayPtr<float> heightData_;
@@ -134,18 +146,16 @@ public:
     /// Construct.
     CollisionShape(Context* context);
     /// Destruct. Free the geometry data and clean up unused data from the geometry data cache.
-    virtual ~CollisionShape();
+    virtual ~CollisionShape() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
@@ -154,27 +164,28 @@ public:
     /// Set as a static plane.
     void SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a cylinder.
-    void SetCylinder
-        (float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a capsule.
-    void SetCapsule
-        (float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a cone.
-    void SetCone
-        (float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-    void SetTriangleMesh
-        (Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
-            const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+        const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from CustomGeometry.
     void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from Model.
-    void SetConvexHull
-        (Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
-            const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+        const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from CustomGeometry.
     void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+        const Quaternion& rotation = Quaternion::IDENTITY);
+    /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
+    void SetGImpactMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+        const Quaternion& rotation = Quaternion::IDENTITY);
+    /// Set as a triangle mesh from CustomGeometry.
+    void SetCustomGImpactMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
     void SetTerrain(unsigned lodLevel = 0);
@@ -239,11 +250,11 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
     /**
      * Called when instantiating a collision shape that is not one of ShapeType (default no-op).
      *
@@ -258,10 +269,20 @@ private:
     btCompoundShape* GetParentCompoundShape();
     /// Update the collision shape after attribute changes.
     void UpdateShape();
+    /// Update cached geometry collision shape.
+    void UpdateCachedGeometryShape(CollisionGeometryDataCache& cache);
+    /// Set as specified shape type using model and LOD.
+    void SetModelShape(ShapeType shapeType, Model* model, unsigned lodLevel,
+        const Vector3& scale, const Vector3& position, const Quaternion& rotation);
+    /// Set as specified shape type using CustomGeometry.
+    void SetCustomShape(ShapeType shapeType, CustomGeometry* custom,
+        const Vector3& scale, const Vector3& position, const Quaternion& rotation);
     /// Update terrain collision shape from the terrain component.
     void HandleTerrainCreated(StringHash eventType, VariantMap& eventData);
     /// Update trimesh or convex shape after a model has reloaded itself.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
+    /// Mark shape dirty.
+    void MarkShapeDirty() { recreateShape_ = true; }
 
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;

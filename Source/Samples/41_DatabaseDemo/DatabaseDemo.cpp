@@ -38,7 +38,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(DatabaseDemo)
 
 DatabaseDemo::DatabaseDemo(Context* context) :
     Sample(context),
-    connection_(0),
+    connection_(nullptr),
     row_(0),
     maxRows_(50)
 {
@@ -49,7 +49,7 @@ DatabaseDemo::~DatabaseDemo()
     // Although the managed database connection will be disconnected by Database subsystem automatically in its destructor,
     // it is a good practice for a class to balance the number of connect() and disconnect() calls.
     GetSubsystem<Database>()->Disconnect(connection_);
-    connection_ = 0;
+    connection_ = nullptr;
 }
 
 void DatabaseDemo::Start()

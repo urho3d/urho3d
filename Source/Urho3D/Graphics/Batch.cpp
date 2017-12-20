@@ -182,9 +182,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
 
     Graphics* graphics = view->GetGraphics();
     Renderer* renderer = view->GetRenderer();
-    Node* cameraNode = camera ? camera->GetNode() : 0;
-    Light* light = lightQueue_ ? lightQueue_->light_ : 0;
-    Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : 0;
+    Node* cameraNode = camera ? camera->GetNode() : nullptr;
+    Light* light = lightQueue_ ? lightQueue_->light_ : nullptr;
+    Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : nullptr;
 
     // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
@@ -224,7 +224,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     }
 
     // Set global (per-frame) shader parameters
-    if (graphics->NeedParameterUpdate(SP_FRAME, (void*)0))
+    if (graphics->NeedParameterUpdate(SP_FRAME, nullptr))
         view->SetGlobalShaderParameters();
 
     // Set camera & viewport shader parameters
@@ -399,7 +399,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         Matrix4 shadowMatrices[2];
 
                         CalculateSpotMatrix(shadowMatrices[0], light);
-                        bool isShadowed = lightQueue_->shadowMap_ != 0;
+                        bool isShadowed = lightQueue_->shadowMap_ != nullptr;
                         if (isShadowed)
                             CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
 

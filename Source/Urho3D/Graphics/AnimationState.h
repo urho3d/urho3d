@@ -74,7 +74,7 @@ public:
     /// Construct with root scene node and animation pointers.
     AnimationState(Node* node, Animation* animation);
     /// Destruct.
-    ~AnimationState();
+    virtual ~AnimationState() override;
 
     /// Set start bone. Not supported in node animation mode. Resets any assigned per-bone weights.
     void SetStartBone(Bone* bone);

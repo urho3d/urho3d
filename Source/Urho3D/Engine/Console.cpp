@@ -376,14 +376,9 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
-#if URHO3D_CXX11
-        SendEvent(E_CONSOLECOMMAND, P_COMMAND, line, P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
-#else
-        VariantMap& newEventData = GetEventDataMap();
-        newEventData[P_COMMAND] = line;
-        newEventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
-        SendEvent(E_CONSOLECOMMAND, newEventData);
-#endif
+        SendEvent(E_CONSOLECOMMAND,
+            P_COMMAND, line,
+            P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
 
         // Make sure the line isn't the same as the last one
         if (history_.Empty() || line != history_.Back())
@@ -440,7 +435,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
                 historyPosition_ = history_.Size();
             }
         }
-        
+
         // If no more auto complete options and history options left
         if (autoCompletePosition_ == autoComplete_.Size() && historyPosition_ > 0)
         {
@@ -566,13 +561,13 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
 
-    Text* text = 0;
+    Text* text = nullptr;
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
         rowContainer_->RemoveItem((unsigned)0);
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
-        
+
         // Highlight console messages based on their type
         text->SetStyle(logStyles[pendingRows_[i].first_]);
 

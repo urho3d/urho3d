@@ -39,14 +39,14 @@ public:
     /// Construct.
     LuaFile(Context* context);
     /// Destruct.
-    virtual ~LuaFile();
+    virtual ~LuaFile() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    virtual bool Save(Serializer& dest) const override;
 
     /// Load buffer as chunk. Return true if the resource is successfully loaded as a Lua function on top of the stack.
     bool LoadChunk(lua_State* luaState);

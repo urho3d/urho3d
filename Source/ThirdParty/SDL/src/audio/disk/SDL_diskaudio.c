@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,6 +33,7 @@
 #include "SDL_audio.h"
 #include "../SDL_audio_c.h"
 #include "SDL_diskaudio.h"
+#include "SDL_log.h"
 
 /* !!! FIXME: these should be SDL hints, not environment variables. */
 /* environment variables and defaults. */
@@ -160,12 +161,11 @@ DISKAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
         SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
     }
 
-#if HAVE_STDIO_H
-    fprintf(stderr,
-            "WARNING: You are using the SDL disk i/o audio driver!\n"
-            " %s file [%s].\n", iscapture ? "Reading from" : "Writing to",
-            fname);
-#endif
+    SDL_LogCritical(SDL_LOG_CATEGORY_AUDIO,
+                "You are using the SDL disk i/o audio driver!\n");
+    SDL_LogCritical(SDL_LOG_CATEGORY_AUDIO,
+                " %s file [%s].\n", iscapture ? "Reading from" : "Writing to",
+                fname);
 
     /* We're ready to rock and roll. :-) */
     return 0;

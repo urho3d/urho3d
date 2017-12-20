@@ -34,7 +34,7 @@ public:
     /// Construct.
     SoundStream();
     /// Destruct.
-    ~SoundStream();
+    virtual ~SoundStream() override;
 
     /// Seek to sample number. Return true on success. Need not be implemented by all streams.
     virtual bool Seek(unsigned sample_number);

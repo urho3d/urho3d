@@ -83,7 +83,7 @@ Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::Me
 Connection::~Connection()
 {
     // Reset scene (remove possible owner references), as this connection is about to be destroyed
-    SetScene(0);
+    SetScene(nullptr);
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)

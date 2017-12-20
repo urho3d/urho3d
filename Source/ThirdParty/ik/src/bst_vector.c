@@ -6,11 +6,11 @@
 const uint32_t BST_VECTOR_INVALID_HASH = (uint32_t)-1;
 
 /* ------------------------------------------------------------------------- */
-struct bstv_t*
+bstv_t*
 bstv_create(void)
 {
-    struct bstv_t* bstv;
-    if(!(bstv = (struct bstv_t*)MALLOC(sizeof *bstv)))
+    bstv_t* bstv;
+    if (!(bstv = (bstv_t*)MALLOC(sizeof *bstv)))
         return NULL;
     bstv_construct(bstv);
     return bstv;
@@ -18,15 +18,15 @@ bstv_create(void)
 
 /* ------------------------------------------------------------------------- */
 void
-bstv_construct(struct bstv_t* bstv)
+bstv_construct(bstv_t* bstv)
 {
     assert(bstv);
-    ordered_vector_construct(&bstv->vector, sizeof(struct bstv_hash_value_t));
+    ordered_vector_construct(&bstv->vector, sizeof(bstv_hash_value_t));
 }
 
 /* ------------------------------------------------------------------------- */
 void
-bstv_destroy(struct bstv_t* bstv)
+bstv_destroy(bstv_t* bstv)
 {
     assert(bstv);
     bstv_clear_free(bstv);
@@ -36,28 +36,28 @@ bstv_destroy(struct bstv_t* bstv)
 /* ------------------------------------------------------------------------- */
 /* algorithm taken from GNU GCC stdlibc++'s lower_bound function, line 2121 in stl_algo.h */
 /* https://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.3/a02014.html */
-static struct bstv_hash_value_t*
-bstv_find_lower_bound(const struct bstv_t* bstv, uint32_t hash)
+static bstv_hash_value_t*
+bstv_find_lower_bound(const bstv_t* bstv, uint32_t hash)
 {
     uint32_t half;
-    struct bstv_hash_value_t* middle;
-    struct bstv_hash_value_t* data;
+    bstv_hash_value_t* middle;
+    bstv_hash_value_t* data;
     uint32_t len;
 
     assert(bstv);
 
-    data = (struct bstv_hash_value_t*)bstv->vector.data;
+    data = (bstv_hash_value_t*)bstv->vector.data;
     len = bstv->vector.count;
 
-    /* if the vector has no data, return NULL */
-    if(!len)
+    /* if (the vector has no data, return NULL */
+    if (!len)
         return NULL;
 
-    while(len > 0)
+    while (len > 0)
     {
         half = len >> 1;
         middle = data + half;
-        if(middle->hash < hash)
+        if (middle->hash < hash)
         {
             data = middle;
             ++data;
@@ -67,8 +67,8 @@ bstv_find_lower_bound(const struct bstv_t* bstv, uint32_t hash)
             len = half;
     }
 
-    /* if "data" is pointing outside of the valid elements in the vector, also return NULL */
-    if((intptr_t)data >= (intptr_t)bstv->vector.data + (intptr_t)bstv->vector.count * (intptr_t)bstv->vector.element_size)
+    /* if ("data" is pointing outside of the valid elements in the vector, also return NULL */
+    if ((intptr_t)data >= (intptr_t)bstv->vector.data + (intptr_t)bstv->vector.count * (intptr_t)bstv->vector.element_size)
         return NULL;
     else
         return data;
@@ -76,31 +76,31 @@ bstv_find_lower_bound(const struct bstv_t* bstv, uint32_t hash)
 
 /* ------------------------------------------------------------------------- */
 int
-bstv_insert(struct bstv_t* bstv, uint32_t hash, void* value)
+bstv_insert(bstv_t* bstv, uint32_t hash, void* value)
 {
-    struct bstv_hash_value_t* emplaced_data;
-    struct bstv_hash_value_t* lower_bound;
+    bstv_hash_value_t* emplaced_data;
+    bstv_hash_value_t* lower_bound;
 
     assert(bstv);
 
     /* don't insert reserved hashes */
-    if(hash == BST_VECTOR_INVALID_HASH)
+    if (hash == BST_VECTOR_INVALID_HASH)
         return -1;
 
     /* lookup location in bstv to insert */
     lower_bound = bstv_find_lower_bound(bstv, hash);
-    if(lower_bound && lower_bound->hash == hash)
+    if (lower_bound && lower_bound->hash == hash)
         return 1;
 
     /* either push back or insert, depending on whether there is already data
      * in the bstv */
-    if(!lower_bound)
-        emplaced_data = (struct bstv_hash_value_t*)ordered_vector_push_emplace(&bstv->vector);
+    if (!lower_bound)
+        emplaced_data = (bstv_hash_value_t*)ordered_vector_push_emplace(&bstv->vector);
     else
         emplaced_data = ordered_vector_insert_emplace(&bstv->vector,
-                          lower_bound - (struct bstv_hash_value_t*)bstv->vector.data);
+                          lower_bound - (bstv_hash_value_t*)bstv->vector.data);
 
-    if(!emplaced_data)
+    if (!emplaced_data)
         return -1;
 
     memset(emplaced_data, 0, sizeof *emplaced_data);
@@ -112,20 +112,20 @@ bstv_insert(struct bstv_t* bstv, uint32_t hash, void* value)
 
 /* ------------------------------------------------------------------------- */
 void
-bstv_set(struct bstv_t* bstv, uint32_t hash, void* value)
+bstv_set(bstv_t* bstv, uint32_t hash, void* value)
 {
-    struct bstv_hash_value_t* data;
+    bstv_hash_value_t* data;
 
     assert(bstv);
 
     data = bstv_find_lower_bound(bstv, hash);
-    if(data && data->hash == hash)
+    if (data && data->hash == hash)
         data->value = value;
 }
 
 /* ------------------------------------------------------------------------- */
 void*
-bstv_find(const struct bstv_t* bstv, uint32_t hash)
+bstv_find(const bstv_t* bstv, uint32_t hash)
 {
     void** result = bstv_find_ptr(bstv, hash);
     return result == NULL ? NULL : *result;
@@ -133,26 +133,26 @@ bstv_find(const struct bstv_t* bstv, uint32_t hash)
 
 /* ------------------------------------------------------------------------- */
 void**
-bstv_find_ptr(const struct bstv_t* bstv, uint32_t hash)
+bstv_find_ptr(const bstv_t* bstv, uint32_t hash)
 {
-    struct bstv_hash_value_t* data;
+    bstv_hash_value_t* data;
 
     assert(bstv);
 
     data = bstv_find_lower_bound(bstv, hash);
-    if(!data || data->hash != hash)
+    if (!data || data->hash != hash)
         return NULL;
     return &data->value;
 }
 
 /* ------------------------------------------------------------------------- */
 uint32_t
-bstv_find_element(const struct bstv_t* bstv, const void* value)
+bstv_find_element(const bstv_t* bstv, const void* value)
 {
     assert(bstv);
 
-    ORDERED_VECTOR_FOR_EACH(&bstv->vector, struct bstv_hash_value_t, kv)
-        if(kv->value == value)
+    ORDERED_VECTOR_FOR_EACH(&bstv->vector, bstv_hash_value_t, kv)
+        if (kv->value == value)
             return kv->hash;
     ORDERED_VECTOR_END_EACH
     return BST_VECTOR_INVALID_HASH;
@@ -160,40 +160,40 @@ bstv_find_element(const struct bstv_t* bstv, const void* value)
 
 /* ------------------------------------------------------------------------- */
 void*
-bstv_get_any_element(const struct bstv_t* bstv)
+bstv_get_any_element(const bstv_t* bstv)
 {
-    struct bstv_hash_value_t* kv;
+    bstv_hash_value_t* kv;
     assert(bstv);
-    kv = (struct bstv_hash_value_t*)ordered_vector_back(&bstv->vector);
-    if(kv)
+    kv = (bstv_hash_value_t*)ordered_vector_back(&bstv->vector);
+    if (kv)
         return kv->value;
     return NULL;
 }
 
 /* ------------------------------------------------------------------------- */
 int
-bstv_hash_exists(struct bstv_t* bstv, uint32_t hash)
+bstv_hash_exists(bstv_t* bstv, uint32_t hash)
 {
-    struct bstv_hash_value_t* data;
+    bstv_hash_value_t* data;
 
     assert(bstv);
 
     data = bstv_find_lower_bound(bstv, hash);
-    if(data && data->hash == hash)
+    if (data && data->hash == hash)
         return 0;
     return -1;
 }
 
 /* ------------------------------------------------------------------------- */
 uint32_t
-bstv_find_unused_hash(struct bstv_t* bstv)
+bstv_find_unused_hash(bstv_t* bstv)
 {
     uint32_t i = 0;
 
     assert(bstv);
 
     BSTV_FOR_EACH(bstv, void, key, value)
-        if(i != key)
+        if (i != key)
             break;
         ++i;
     BSTV_END_EACH
@@ -202,15 +202,15 @@ bstv_find_unused_hash(struct bstv_t* bstv)
 
 /* ------------------------------------------------------------------------- */
 void*
-bstv_erase(struct bstv_t* bstv, uint32_t hash)
+bstv_erase(bstv_t* bstv, uint32_t hash)
 {
     void* value;
-    struct bstv_hash_value_t* data;
+    bstv_hash_value_t* data;
 
     assert(bstv);
 
     data = bstv_find_lower_bound(bstv, hash);
-    if(!data || data->hash != hash)
+    if (!data || data->hash != hash)
         return NULL;
 
     value = data->value;
@@ -220,7 +220,7 @@ bstv_erase(struct bstv_t* bstv, uint32_t hash)
 
 /* ------------------------------------------------------------------------- */
 void*
-bstv_erase_element(struct bstv_t* bstv, void* value)
+bstv_erase_element(bstv_t* bstv, void* value)
 {
     void* data;
     uint32_t hash;
@@ -228,7 +228,7 @@ bstv_erase_element(struct bstv_t* bstv, void* value)
     assert(bstv);
 
     hash = bstv_find_element(bstv, value);
-    if(hash == BST_VECTOR_INVALID_HASH)
+    if (hash == BST_VECTOR_INVALID_HASH)
         return NULL;
 
     data = bstv_find_lower_bound(bstv, hash);
@@ -239,14 +239,14 @@ bstv_erase_element(struct bstv_t* bstv, void* value)
 
 /* ------------------------------------------------------------------------- */
 void
-bstv_clear(struct bstv_t* bstv)
+bstv_clear(bstv_t* bstv)
 {
     assert(bstv);
     ordered_vector_clear(&bstv->vector);
 }
 
 /* ------------------------------------------------------------------------- */
-void bstv_clear_free(struct bstv_t* bstv)
+void bstv_clear_free(bstv_t* bstv)
 {
     assert(bstv);
     ordered_vector_clear_free(&bstv->vector);

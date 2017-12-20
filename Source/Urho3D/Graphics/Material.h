@@ -82,14 +82,14 @@ public:
     /// Copy construct.
     ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other);
     /// Destruct.
-    ~ShaderParameterAnimationInfo();
+    virtual ~ShaderParameterAnimationInfo() override;
 
     /// Return shader parameter name.
     const String& GetName() const { return name_; }
 
 protected:
     /// Apply new animation value to the target object. Called by Update().
-    virtual void ApplyValue(const Variant& newValue);
+    virtual void ApplyValue(const Variant& newValue) override;
 
 private:
     /// Shader parameter name.
@@ -111,16 +111,16 @@ public:
     /// Construct.
     Material(Context* context);
     /// Destruct.
-    ~Material();
+    virtual ~Material() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    virtual bool EndLoad() override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    virtual bool Save(Serializer& dest) const override;
 
     /// Load from an XML element. Return true if successful.
     bool Load(const XMLElement& source);

@@ -37,7 +37,7 @@ public:
     /// Construct.
     Localization(Context* context);
     /// Destruct. Free all resources.
-    virtual ~Localization();
+    virtual ~Localization() override;
 
     /// Return the number of languages.
     int GetNumLanguages() const { return (int)languages_.Size(); }

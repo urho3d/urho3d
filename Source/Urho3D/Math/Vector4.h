@@ -174,6 +174,12 @@ public:
         return *this;
     }
 
+    /// Return const value by index.
+    float operator[](unsigned index) const { return (&x_)[index]; }
+
+    /// Return mutable value by index.
+    float& operator[](unsigned index) { return (&x_)[index]; }
+
     /// Calculate dot product.
     float DotProduct(const Vector4& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ + w_ * rhs.w_; }
 
@@ -206,6 +212,18 @@ public:
 
     /// Return as string.
     String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const
+    {
+        unsigned hash = 37;
+        hash = 37 * hash + FloatToRawIntBits(x_);
+        hash = 37 * hash + FloatToRawIntBits(y_);
+        hash = 37 * hash + FloatToRawIntBits(z_);
+        hash = 37 * hash + FloatToRawIntBits(w_);
+
+        return hash;
+    }
 
     /// X coordinate.
     float x_;

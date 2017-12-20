@@ -629,6 +629,7 @@ void Sort();
 void Sort(uint, uint);
 void SortReverse();
 void SortReverse(uint, uint);
+bool Swap(Array<T>&);
 
 // Properties:
 /* readonly */
@@ -647,11 +648,10 @@ AttributeInfo(const AttributeInfo&in);
 Variant defaultValue;
 /* readonly */
 Array<String> enumNames;
+VariantMap metadata;
 uint mode;
 String name;
 VariantType type;
-/* readonly */
-Array<String> variantStructureElementNames;
 };
 
 class Audio
@@ -872,6 +872,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -1075,6 +1076,7 @@ void Define(const Vector3&);
 void Define(const Vector3&, const Vector3&);
 void Define(float, float);
 bool Defined() const;
+float DistanceToPoint(const Vector3&) const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
@@ -1136,6 +1138,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -1176,6 +1179,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -1230,6 +1234,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -1480,6 +1485,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -2277,6 +2283,7 @@ void Clip(bool);
 bool Equals() const;
 void FromHSL(float, float, float, float);
 void FromHSV(float, float, float, float);
+void FromUInt(uint);
 float Hue() const;
 void Invert(bool);
 Color Lerp(const Color&, float) const;
@@ -3761,6 +3768,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -4191,6 +4199,7 @@ void AddPolyhedron(const Polyhedron&, const Color&, bool = true);
 void AddQuad(const Vector3&, float, float, const Color&, bool = true);
 void AddSkeleton(Skeleton, const Color&, bool = true);
 void AddSphere(const Sphere&, const Color&, bool = true);
+void AddSphereSector(const Sphere&, const Quaternion&, float, bool, const Color&, bool = true);
 void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true);
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
@@ -4397,6 +4406,8 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
+uint Tell() const;
 
 // Properties:
 /* readonly */
@@ -4652,6 +4663,7 @@ bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 void InsertItem(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -4696,6 +4708,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -4755,6 +4768,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -4869,9 +4883,12 @@ class DynamicNavigationMesh
 {
 public:
 // Methods:
+bool AddTile(const VectorBuffer&) const;
+bool Allocate(const BoundingBox&, uint);
 void ApplyAttributes();
 bool Build();
 bool Build(const BoundingBox&);
+bool Build(const IntVector2&, const IntVector2&);
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
@@ -4887,8 +4904,12 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+BoundingBox GetTileBoudningBox(const IntVector2&) const;
+VectorBuffer GetTileData(const IntVector2&) const;
+IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTile(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -4897,9 +4918,11 @@ void MarkNetworkUpdate() const;
 Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3);
 Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 void Remove();
+void RemoveAllTiles();
 void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+void RemoveTile(const IntVector2&);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -5058,7 +5081,9 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+uint Tell() const;
 uint Write(Array<uint8>);
 bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
@@ -5205,6 +5230,8 @@ bool executeConsoleCommands;
 String programDir;
 /* readonly */
 int refs;
+/* readonly */
+String temporaryDir;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -5357,6 +5384,7 @@ void Maximize();
 void Minimize();
 void PrecacheShaders(File);
 void PrecacheShaders(VectorBuffer&);
+void Raise();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetMode(int, int);
 bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int);
@@ -5372,11 +5400,15 @@ bool borderless;
 /* readonly */
 String category;
 /* readonly */
+int currentMonitor;
+/* readonly */
 bool deferredSupport;
 /* readonly */
 Array<IntVector2> desktopResolution;
 /* readonly */
 bool deviceLost;
+/* readonly */
+Array<Vector3> displayDPI;
 bool dither;
 bool flushGPU;
 /* readonly */
@@ -5391,6 +5423,8 @@ bool initialized;
 bool instancingSupport;
 /* readonly */
 bool lightPrepassSupport;
+/* readonly */
+bool maximized;
 /* readonly */
 int monitorCount;
 /* readonly */
@@ -5475,6 +5509,8 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
+uint Tell() const;
 
 // Properties:
 /* readonly */
@@ -5501,74 +5537,6 @@ HttpRequestState state;
 String url;
 /* readonly */
 String verb;
-/* readonly */
-int weakRefs;
-};
-
-class IKConstraint
-{
-public:
-// Methods:
-void ApplyAttributes();
-void DrawDebugGeometry(DebugRenderer, bool);
-Variant GetAttribute(const String&) const;
-ValueAnimation GetAttributeAnimation(const String&) const;
-float GetAttributeAnimationSpeed(const String&) const;
-float GetAttributeAnimationTime(const String&) const;
-WrapMode GetAttributeAnimationWrapMode(const String&) const;
-Variant GetAttributeDefault(const String&) const;
-bool GetInterceptNetworkUpdate(const String&) const;
-bool HasSubscribedToEvent(Object, const String&);
-bool HasSubscribedToEvent(const String&);
-bool Load(File, bool = false);
-bool Load(VectorBuffer&, bool = false);
-bool LoadJSON(const JSONValue&, bool = false);
-bool LoadXML(const XMLElement&, bool = false);
-void MarkNetworkUpdate() const;
-void Remove();
-void RemoveAttributeAnimation(const String&);
-void RemoveInstanceDefault();
-void RemoveObjectAnimation();
-void ResetToDefault();
-bool Save(File) const;
-bool Save(VectorBuffer&) const;
-bool SaveJSON(JSONValue&) const;
-bool SaveXML(XMLElement&) const;
-void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAnimationTime(float);
-bool SetAttribute(const String&, const Variant&);
-void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
-void SetAttributeAnimationSpeed(const String&, float);
-void SetAttributeAnimationTime(const String&, float);
-void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetInterceptNetworkUpdate(const String&, bool);
-
-// Properties:
-bool animationEnabled;
-/* readonly */
-Array<Variant> attributeDefaults;
-/* readonly */
-Array<AttributeInfo> attributeInfos;
-Array<Variant> attributes;
-/* readonly */
-String category;
-bool enabled;
-/* readonly */
-bool enabledEffective;
-/* readonly */
-uint id;
-/* readonly */
-Node node;
-/* readonly */
-uint numAttributes;
-ObjectAnimation objectAnimation;
-/* readonly */
-int refs;
-bool temporary;
-/* readonly */
-StringHash type;
-/* readonly */
-String typeName;
 /* readonly */
 int weakRefs;
 };
@@ -5627,7 +5595,6 @@ bool enabled;
 bool enabledEffective;
 /* readonly */
 uint id;
-bool inheritParentRotation;
 /* readonly */
 Node node;
 /* readonly */
@@ -5649,14 +5616,19 @@ String typeName;
 /* readonly */
 int weakRefs;
 float weight;
-bool weightedNlerp;
 };
 
 class IKSolver
 {
 public:
 // Methods:
+void ApplyActivePoseToScene();
 void ApplyAttributes();
+void ApplyOriginalPoseToActivePose();
+void ApplyOriginalPoseToScene();
+void ApplySceneToActivePose();
+void ApplySceneToInitialPose();
+void CalculateJointRotations();
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Variant GetAttribute(const String&) const;
@@ -5673,12 +5645,13 @@ bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
+void RebuildChainTrees();
+void RecalculateSegmentLengths();
 void Remove();
 void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
 void ResetToDefault();
-void ResetToInitialPose();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveJSON(JSONValue&) const;
@@ -5692,9 +5665,15 @@ void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
 void Solve();
-void UpdateInitialPose();
 
 // Properties:
+bool AUTO_SOLVE;
+bool CONSTRAINTS;
+bool JOINT_ROTATIONS;
+bool TARGET_ROTATIONS;
+bool UPDATE_ACTIVE_POSE;
+bool UPDATE_ORIGINAL_POSE;
+bool USE_ORIGINAL_POSE;
 IKAlgorithm algorithm;
 bool animationEnabled;
 /* readonly */
@@ -5702,11 +5681,8 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoSolve;
-bool boneRotations;
 /* readonly */
 String category;
-bool continuousSolving;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -5720,14 +5696,12 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
-bool targetRotation;
 bool temporary;
 float tolerance;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
-bool updatePose;
 /* readonly */
 int weakRefs;
 };
@@ -5765,6 +5739,7 @@ bool SaveDDS(const String&) const;
 bool SaveJPG(const String&, int) const;
 bool SavePNG(const String&) const;
 bool SaveTGA(const String&) const;
+bool SaveWEBP(const String&, float = 0.0f) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetPixel(int, int, const Color&);
 void SetPixel(int, int, int, const Color&);
@@ -5772,6 +5747,7 @@ void SetPixelInt(int, int, int, uint);
 void SetPixelInt(int, int, uint);
 bool SetSize(int, int, int, uint);
 bool SetSize(int, int, uint);
+bool SetSubimage(const Image, const IntRect&) const;
 
 // Properties:
 /* readonly */
@@ -5788,6 +5764,8 @@ CompressedFormat compressedFormat;
 bool cubemap;
 /* readonly */
 int depth;
+/* readonly */
+bool hasAlphaChannel;
 /* readonly */
 int height;
 /* readonly */
@@ -5951,9 +5929,12 @@ public:
 IntRect();
 IntRect(const IntRect&in);
 IntRect(int, int, int, int);
+IntRect(const IntVector2&in, const IntVector2&in);
 IntRect(int[]&inout);
 // Methods:
+int Clip(const IntRect&);
 Intersection IsInside(const IntVector2&) const;
+int Merge(const IntRect&);
 
 // Properties:
 int bottom;
@@ -6308,6 +6289,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -6518,8 +6500,10 @@ void ChangeSelection(int, bool);
 void ClearSelection();
 void CopySelectedItemsToClipboard();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
+void DisableInternalLayoutUpdate();
 void DisableLayoutUpdate();
 IntVector2 ElementToScreen(const IntVector2&);
+void EnableInternalLayoutUpdate();
 void EnableLayoutUpdate();
 void Expand(uint, bool, bool = false);
 uint FindChild(UIElement) const;
@@ -6543,6 +6527,7 @@ bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 void InsertItem(uint, UIElement, UIElement = null);
+bool IsChildOf(UIElement) const;
 bool IsExpanded(uint) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -6611,6 +6596,7 @@ bool SetStyleAuto(XMLFile = null);
 void SetViewPosition(int, int);
 void ToggleExpand(uint, bool = false);
 void ToggleSelection(uint);
+void UpdateInternalLayout();
 void UpdateLayout();
 const Variant& GetVar(const StringHash&);
 
@@ -6806,6 +6792,7 @@ bool HasSubscribedToEvent(const String&);
 void Info(const String&);
 void Open(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void Trace(const String&);
 void Warning(const String&);
 void Write(const String&, bool = false);
 
@@ -7065,6 +7052,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -7106,6 +7094,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -7165,6 +7154,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -7388,7 +7378,9 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+uint Tell() const;
 uint Write(Array<uint8>);
 bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
@@ -7596,9 +7588,12 @@ class NavigationMesh
 {
 public:
 // Methods:
+bool AddTile(const VectorBuffer&) const;
+bool Allocate(const BoundingBox&, uint);
 void ApplyAttributes();
 bool Build();
 bool Build(const BoundingBox&);
+bool Build(const IntVector2&, const IntVector2&);
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
@@ -7614,8 +7609,12 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+BoundingBox GetTileBoudningBox(const IntVector2&) const;
+VectorBuffer GetTileData(const IntVector2&) const;
+IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTile(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -7624,9 +7623,11 @@ void MarkNetworkUpdate() const;
 Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3);
 Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 void Remove();
+void RemoveAllTiles();
 void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+void RemoveTile(const IntVector2&);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -9273,7 +9274,11 @@ void SetEnabled(const String&, bool);
 void ToggleEnabled(const String&);
 
 // Properties:
+/* readonly */
+Array<bool> added;
 Array<RenderPathCommand> commands;
+/* readonly */
+Array<bool> enabled;
 /* readonly */
 uint numCommands;
 /* readonly */
@@ -9376,6 +9381,7 @@ class Renderer
 public:
 // Methods:
 void DrawDebugGeometry(bool) const;
+Viewport GetViewportForScene(Scene, uint);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 void ReloadShaders() const;
@@ -10304,6 +10310,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -10524,6 +10531,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -10639,6 +10647,7 @@ int height;
 HorizontalAlignment horizontalAlignment;
 /* readonly */
 ScrollBar horizontalScrollBar;
+bool horizontalScrollBarVisible;
 /* readonly */
 bool hovering;
 int indent;
@@ -10704,6 +10713,7 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 /* readonly */
 ScrollBar verticalScrollBar;
+bool verticalScrollBarVisible;
 IntVector2 viewPosition;
 bool visible;
 /* readonly */
@@ -10944,6 +10954,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -11527,6 +11538,8 @@ void Define(const Sphere&);
 void Define(const Vector3&, float);
 bool Defined() const;
 float Distance(const Vector3&) const;
+Vector3 GetLocalPoint(float, float) const;
+Vector3 GetPoint(float, float) const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
@@ -11679,6 +11692,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -12407,6 +12421,7 @@ Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+Vector3 HeightMapToWorld(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -12610,6 +12625,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -12655,7 +12671,7 @@ void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
 bool SetFont(Font, float);
-bool SetFont(const String&, int);
+bool SetFont(const String&, float);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxAnchor(float, float);
@@ -13385,6 +13401,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 TileMapLayer2D GetLayer(uint) const;
+Array<TileMapObject2D> GetTileCollisionShapes(int) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
@@ -13596,6 +13613,8 @@ float elapsedTime;
 /* readonly */
 uint frameNumber;
 /* readonly */
+float framesPerSecond;
+/* readonly */
 int refs;
 /* readonly */
 uint systemTime;
@@ -13689,6 +13708,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -13942,6 +13962,79 @@ bool useSystemClipboard;
 int weakRefs;
 };
 
+class UIComponent
+{
+public:
+// Methods:
+void ApplyAttributes();
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+Material material;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+/* readonly */
+UIElement root;
+bool temporary;
+/* readonly */
+Texture2D texture;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class UIElement
 {
 public:
@@ -13975,6 +14068,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -14451,7 +14545,9 @@ Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 void Resize(uint);
 uint Seek(uint);
+uint SeekRelative(int);
 void SetData(Deserializer, uint);
+uint Tell() const;
 uint Write(Array<uint8>);
 bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
@@ -14591,6 +14687,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -14882,6 +14979,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
+bool IsChildOf(UIElement) const;
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
 bool Load(File, bool = false);
@@ -15080,6 +15178,7 @@ public:
 XMLElement();
 XMLElement(const XMLElement&in);
 // Methods:
+bool AppendChild(XMLElement, bool);
 XMLElement CreateChild(const String&);
 String GetAttribute(const String& = String ( )) const;
 String GetAttributeLower(const String&) const;
@@ -15116,6 +15215,7 @@ Vector4 GetVector4(const String&) const;
 Variant GetVectorVariant(const String&) const;
 bool HasAttribute(const String&) const;
 bool HasChild(const String&) const;
+bool Remove();
 bool RemoveAttribute(const String& = String ( ));
 bool RemoveChild(const String&);
 bool RemoveChild(const XMLElement&);
@@ -15599,6 +15699,8 @@ HTTP_CLOSED,
 
 enum IKAlgorithm
 {
+ONE_BONE,
+TWO_BONE,
 FABRIK,
 };
 
@@ -16043,6 +16145,7 @@ bool IsPowerOfTwo(uint);
 String Join(Array<String>&, const String&);
 float Lerp(float, float, float);
 float Ln(float);
+uint LogBaseTwo(uint);
 void MarkNetworkUpdate();
 float Max(float, float);
 int Max(int, int);
@@ -16235,19 +16338,60 @@ int KEY_7;
 int KEY_8;
 int KEY_9;
 int KEY_A;
+int KEY_AC_BACK;
+int KEY_AC_BOOKMARKS;
+int KEY_AC_FORWARD;
+int KEY_AC_HOME;
+int KEY_AC_REFRESH;
+int KEY_AC_SEARCH;
+int KEY_AC_STOP;
+int KEY_AGAIN;
 int KEY_ALT;
+int KEY_ALTERASE;
+int KEY_AMPERSAND;
 int KEY_APPLICATION;
+int KEY_ASTERISK;
+int KEY_AT;
+int KEY_AUDIOMUTE;
+int KEY_AUDIONEXT;
+int KEY_AUDIOPLAY;
+int KEY_AUDIOPREV;
+int KEY_AUDIOSTOP;
 int KEY_B;
+int KEY_BACKQUOTE;
+int KEY_BACKSLASH;
 int KEY_BACKSPACE;
+int KEY_BRIGHTNESSDOWN;
+int KEY_BRIGHTNESSUP;
 int KEY_C;
+int KEY_CALCULATOR;
+int KEY_CANCEL;
 int KEY_CAPSLOCK;
+int KEY_CARET;
+int KEY_CLEAR;
+int KEY_CLEARAGAIN;
+int KEY_COLON;
+int KEY_COMMA;
+int KEY_COMPUTER;
+int KEY_COPY;
+int KEY_CRSEL;
 int KEY_CTRL;
+int KEY_CURRENCYSUBUNIT;
+int KEY_CURRENCYUNIT;
+int KEY_CUT;
 int KEY_D;
+int KEY_DECIMALSEPARATOR;
 int KEY_DELETE;
+int KEY_DISPLAYSWITCH;
+int KEY_DOLLAR;
 int KEY_DOWN;
 int KEY_E;
+int KEY_EJECT;
 int KEY_END;
+int KEY_EQUALS;
 int KEY_ESCAPE;
+int KEY_EXCLAIM;
+int KEY_EXSEL;
 int KEY_F;
 int KEY_F1;
 int KEY_F10;
@@ -16273,15 +16417,24 @@ int KEY_F6;
 int KEY_F7;
 int KEY_F8;
 int KEY_F9;
+int KEY_FIND;
 int KEY_G;
+int KEY_GREATER;
 int KEY_GUI;
 int KEY_H;
+int KEY_HASH;
+int KEY_HELP;
 int KEY_HOME;
 int KEY_I;
 int KEY_INSERT;
 int KEY_J;
 int KEY_K;
+int KEY_KBDILLUMDOWN;
+int KEY_KBDILLUMTOGGLE;
+int KEY_KBDILLUMUP;
 int KEY_KP_0;
+int KEY_KP_00;
+int KEY_KP_000;
 int KEY_KP_1;
 int KEY_KP_2;
 int KEY_KP_3;
@@ -16291,28 +16444,91 @@ int KEY_KP_6;
 int KEY_KP_7;
 int KEY_KP_8;
 int KEY_KP_9;
+int KEY_KP_A;
+int KEY_KP_AMPERSAND;
+int KEY_KP_AT;
+int KEY_KP_B;
+int KEY_KP_BACKSPACE;
+int KEY_KP_BINARY;
+int KEY_KP_C;
+int KEY_KP_CLEAR;
+int KEY_KP_CLEARENTRY;
+int KEY_KP_COLON;
+int KEY_KP_COMMA;
+int KEY_KP_D;
+int KEY_KP_DBLAMPERSAND;
+int KEY_KP_DBLVERTICALBAR;
+int KEY_KP_DECIMAL;
 int KEY_KP_DIVIDE;
+int KEY_KP_E;
 int KEY_KP_ENTER;
+int KEY_KP_EQUALS;
+int KEY_KP_EQUALSAS400;
+int KEY_KP_EXCLAM;
+int KEY_KP_F;
+int KEY_KP_GREATER;
+int KEY_KP_HASH;
+int KEY_KP_HEXADECIMAL;
+int KEY_KP_LEFTBRACE;
+int KEY_KP_LEFTPAREN;
+int KEY_KP_LESS;
+int KEY_KP_MEMADD;
+int KEY_KP_MEMCLEAR;
+int KEY_KP_MEMDIVIDE;
+int KEY_KP_MEMMULTIPLY;
+int KEY_KP_MEMRECALL;
+int KEY_KP_MEMSTORE;
+int KEY_KP_MEMSUBTRACT;
 int KEY_KP_MINUS;
 int KEY_KP_MULTIPLY;
+int KEY_KP_OCTAL;
+int KEY_KP_PERCENT;
 int KEY_KP_PERIOD;
 int KEY_KP_PLUS;
+int KEY_KP_PLUSMINUS;
+int KEY_KP_POWER;
+int KEY_KP_RIGHTBRACE;
+int KEY_KP_RIGHTPAREN;
+int KEY_KP_SPACE;
+int KEY_KP_TAB;
+int KEY_KP_VERTICALBAR;
+int KEY_KP_XOR;
 int KEY_L;
 int KEY_LALT;
 int KEY_LCTRL;
 int KEY_LEFT;
+int KEY_LEFTBRACKET;
+int KEY_LEFTPAREN;
+int KEY_LESS;
 int KEY_LGUI;
 int KEY_LSHIFT;
 int KEY_M;
+int KEY_MAIL;
+int KEY_MEDIASELECT;
+int KEY_MENU;
+int KEY_MINUS;
+int KEY_MODE;
+int KEY_MUTE;
 int KEY_N;
 int KEY_NUMLOCKCLEAR;
 int KEY_O;
+int KEY_OPER;
+int KEY_OUT;
 int KEY_P;
 int KEY_PAGEDOWN;
 int KEY_PAGEUP;
+int KEY_PASTE;
 int KEY_PAUSE;
+int KEY_PERCENT;
+int KEY_PERIOD;
+int KEY_PLUS;
+int KEY_POWER;
 int KEY_PRINTSCREEN;
+int KEY_PRIOR;
 int KEY_Q;
+int KEY_QUESTION;
+int KEY_QUOTE;
+int KEY_QUOTEDBL;
 int KEY_R;
 int KEY_RALT;
 int KEY_RCTRL;
@@ -16320,19 +16536,33 @@ int KEY_RETURN;
 int KEY_RETURN2;
 int KEY_RGUI;
 int KEY_RIGHT;
+int KEY_RIGHTBRACKET;
+int KEY_RIGHTPAREN;
 int KEY_RSHIFT;
 int KEY_S;
 int KEY_SCROLLLOCK;
 int KEY_SELECT;
+int KEY_SEMICOLON;
+int KEY_SEPARATOR;
 int KEY_SHIFT;
+int KEY_SLASH;
+int KEY_SLEEP;
 int KEY_SPACE;
+int KEY_STOP;
+int KEY_SYSREQ;
 int KEY_T;
 int KEY_TAB;
+int KEY_THOUSANDSSEPARATOR;
 int KEY_U;
+int KEY_UNDERSCORE;
+int KEY_UNDO;
 int KEY_UNKNOWN;
 int KEY_UP;
 int KEY_V;
+int KEY_VOLUMEDOWN;
+int KEY_VOLUMEUP;
 int KEY_W;
+int KEY_WWW;
 int KEY_X;
 int KEY_Y;
 int KEY_Z;
@@ -16342,6 +16572,7 @@ int LOG_DEBUG;
 int LOG_ERROR;
 int LOG_INFO;
 int LOG_NONE;
+int LOG_TRACE;
 int LOG_WARNING;
 Color MAGENTA;
 uint MASK_BLENDINDICES;

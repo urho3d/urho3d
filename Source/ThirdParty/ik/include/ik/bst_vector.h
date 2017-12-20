@@ -13,15 +13,15 @@
 
 C_HEADER_BEGIN
 
-struct bstv_hash_value_t
+typedef struct bstv_hash_value_t
 {
     uint32_t hash;
     void*    value;
-};
+} bstv_hash_value_t;
 
 struct bstv_t
 {
-    struct ordered_vector_t   vector;
+    ordered_vector_t   vector;
 };
 
 /*!
@@ -29,7 +29,7 @@ struct bstv_t
  * @return Returns the newly created bstv object. It must be freed with
  * bstv_destroy() when no longer required.
  */
-IK_PUBLIC_API struct bstv_t*
+IK_PUBLIC_API bstv_t*
 bstv_create(void);
 
 /*!
@@ -40,7 +40,7 @@ bstv_create(void);
  * @param[in] bstv The bstv object to initialise.
  */
 IK_PUBLIC_API void
-bstv_construct(struct bstv_t* bstv);
+bstv_construct(bstv_t* bstv);
 
 /*!
  * @brief Destroys an existing bstv object and FREEs the underlying memory.
@@ -48,7 +48,7 @@ bstv_construct(struct bstv_t* bstv);
  * @param[in] bstv The bstv object to destroy.
  */
 IK_PUBLIC_API void
-bstv_destroy(struct bstv_t* bstv);
+bstv_destroy(bstv_t* bstv);
 
 /*!
  * @brief Inserts an element into the bstv using a hashed key.
@@ -69,7 +69,7 @@ bstv_destroy(struct bstv_t* bstv);
  * existed (in which case nothing is inserted). Returns -1 on failure.
  */
 IK_PUBLIC_API int
-bstv_insert(struct bstv_t* bstv, uint32_t hash, void* value);
+bstv_insert(bstv_t* bstv, uint32_t hash, void* value);
 
 /*!
  * @brief Sets the value bstvped to the specified hash in the bstv.
@@ -79,7 +79,7 @@ bstv_insert(struct bstv_t* bstv, uint32_t hash, void* value);
  * @param[in] value The new value to set.
  */
 IK_PUBLIC_API void
-bstv_set(struct bstv_t* bstv, uint32_t hash, void* value);
+bstv_set(bstv_t* bstv, uint32_t hash, void* value);
 
 /*!
  * @brief Looks for an element in the bstv and returns it if found.
@@ -93,7 +93,7 @@ bstv_set(struct bstv_t* bstv, uint32_t hash, void* value);
  * hash exists, use bstv_key_exists() instead.
  */
 IK_PUBLIC_API void*
-bstv_find(const struct bstv_t* bstv, uint32_t hash);
+bstv_find(const bstv_t* bstv, uint32_t hash);
 
 /*!
  * @brief Looks for an element in the bstv and returns a pointer to the element
@@ -105,7 +105,7 @@ bstv_find(const struct bstv_t* bstv, uint32_t hash);
  * @param[in] hash The has to search for.
  */
 IK_PUBLIC_API void**
-bstv_find_ptr(const struct bstv_t* bstv, uint32_t hash);
+bstv_find_ptr(const bstv_t* bstv, uint32_t hash);
 
 /*!
  * @brief Finds the specified element in the bstv and returns its key.
@@ -116,7 +116,7 @@ bstv_find_ptr(const struct bstv_t* bstv, uint32_t hash);
  * otherwise.
  */
 IK_PUBLIC_API uint32_t
-bstv_find_element(const struct bstv_t* bstv, const void* value);
+bstv_find_element(const bstv_t* bstv, const void* value);
 
 /*!
  * @brief Gets any element from the bstv.
@@ -126,7 +126,7 @@ bstv_find_element(const struct bstv_t* bstv, const void* value);
  * @return Returns an element as a void pointer. Which element is random.
  */
 IK_PUBLIC_API void*
-bstv_get_any_element(const struct bstv_t* bstv);
+bstv_get_any_element(const bstv_t* bstv);
 
 /*!
  * @brief Returns 1 if the specified hash exists, 0 if otherwise.
@@ -135,7 +135,7 @@ bstv_get_any_element(const struct bstv_t* bstv);
  * @return 0 if the hash was found, -1 if the hash was not found.
  */
 IK_PUBLIC_API int
-bstv_hash_exists(struct bstv_t* bstv, uint32_t hash);
+bstv_hash_exists(bstv_t* bstv, uint32_t hash);
 
 /*!
  * @brief Returns a hash that does not yet exist in the bstv.
@@ -144,7 +144,7 @@ bstv_hash_exists(struct bstv_t* bstv, uint32_t hash);
  * @return Returns a hash that does not yet exist in the bstv.
  */
 IK_PUBLIC_API uint32_t
-bstv_find_unused_hash(struct bstv_t* bstv);
+bstv_find_unused_hash(bstv_t* bstv);
 
 /*!
  * @brief Erases an element from the bstv using a hash.
@@ -162,10 +162,10 @@ bstv_find_unused_hash(struct bstv_t* bstv);
  * bstv.
  */
 IK_PUBLIC_API void*
-bstv_erase(struct bstv_t* bstv, uint32_t hash);
+bstv_erase(bstv_t* bstv, uint32_t hash);
 
 IK_PUBLIC_API void*
-bstv_erase_element(struct bstv_t* bstv, void* value);
+bstv_erase_element(bstv_t* bstv, void* value);
 
 /*!
  * @brief Erases the entire bstv, including the underlying memory.
@@ -175,10 +175,10 @@ bstv_erase_element(struct bstv_t* bstv, void* value);
  * @param[in] bstv The bstv to clear.
  */
 IK_PUBLIC_API void
-bstv_clear(struct bstv_t* bstv);
+bstv_clear(bstv_t* bstv);
 
 IK_PUBLIC_API void
-bstv_clear_free(struct bstv_t* bstv);
+bstv_clear_free(bstv_t* bstv);
 
 /*!
  * @brief Returns the number of elements in the specified bstv.
@@ -201,8 +201,8 @@ bstv_clear_free(struct bstv_t* bstv);
     var_t* var_v;                                                                                        \
     for(i_##var_v = 0;                                                                                   \
         i_##var_v != bstv_count(bstv) &&                                                                 \
-            ((hash_v = ((struct bstv_hash_value_t*) (bstv)->vector.data)[i_##var_v].hash) || 1) &&       \
-            ((var_v  = (var_t*)((struct bstv_hash_value_t*)(bstv)->vector.data)[i_##var_v].value) || 1); \
+            ((hash_v = ((bstv_hash_value_t*) (bstv)->vector.data)[i_##var_v].hash) || 1) &&       \
+            ((var_v  = (var_t*)((bstv_hash_value_t*)(bstv)->vector.data)[i_##var_v].value) || 1); \
         ++i_##var_v) {
 
 /*!
@@ -218,7 +218,7 @@ bstv_clear_free(struct bstv_t* bstv);
  * @param[in] bstv A pointer to the bstv object currently being iterated.
  */
 #define BSTV_ERASE_CURRENT_ITEM_IN_FOR_LOOP(bstv, var_v) do { \
-    ordered_vector_erase_element(&(bstv)->vector, ((struct bstv_hash_value_t*)(bstv)->vector.data) + i_##var_v); \
+    ordered_vector_erase_element(&(bstv)->vector, ((bstv_hash_value_t*)(bstv)->vector.data) + i_##var_v); \
     --i_##var_v; } while(0)
 
 C_HEADER_END

@@ -81,7 +81,7 @@ template <typename T> int ToluaIsVector(lua_State* L, int lo, const char* type, 
 template <typename T> void* ToluaToVector(lua_State* L, int narg, void* def)
 {
     if (!lua_istable(L, narg))
-        return 0;
+        return nullptr;
     static Vector<T> result;
     result.Clear();
     result.Resize((unsigned)lua_objlen(L, narg));
@@ -130,7 +130,7 @@ template <typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def)
 template <typename T> void* ToluaToPODVector(double /*overload*/, lua_State* L, int narg, void* /*def*/)
 {
     if (!lua_istable(L, narg))
-        return 0;
+        return nullptr;
     static PODVector<T> result;
     result.Clear();
     result.Resize((unsigned)lua_objlen(L, narg));
@@ -196,7 +196,7 @@ template <> void* ToluaToVector<SharedPtr<VertexBuffer> >(lua_State* L, int narg
 void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant);
 
 /// Push object stored in a Variant to stack. Empty variant value is pushed as nil.
-void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type = 0);
+void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type = nullptr);
 
 /// Push a registered Lua user type to stack. If the specified type is not yet registered, a nil is pushed instead.
 void ToluaPushRegisteredUserType(lua_State* L, void* data, const char* type);

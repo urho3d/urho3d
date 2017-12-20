@@ -40,8 +40,8 @@ class WString;
 class URHO3D_API String
 {
 public:
-    typedef RandomAccessIterator<char> Iterator;
-    typedef RandomAccessConstIterator<char> ConstIterator;
+    using Iterator = RandomAccessIterator<char>;
+    using ConstIterator = RandomAccessConstIterator<char>;
 
     /// Construct empty.
     String() :

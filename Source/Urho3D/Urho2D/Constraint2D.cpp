@@ -40,7 +40,7 @@ extern const char* URHO2D_CATEGORY;
 
 Constraint2D::Constraint2D(Context* context) :
     Component(context),
-    joint_(0),
+    joint_(nullptr),
     collideConnected_(false),
     otherBodyNodeIDDirty_(false)
 {
@@ -55,15 +55,7 @@ Constraint2D::~Constraint2D()
 void Constraint2D::RegisterObject(Context* context)
 {
     URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
-}
-
-void Constraint2D::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Serializable::OnSetAttribute(attr, src);
-
-    if (!attr.accessor_ && attr.offset_ == offsetof(Constraint2D, otherBodyNodeID_))
-        otherBodyNodeIDDirty_ = true;
+    URHO3D_ATTRIBUTE_EX("Other Body NodeID", unsigned, otherBodyNodeID_, MarkOtherBodyNodeIDDirty, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void Constraint2D::ApplyAttributes()
@@ -123,7 +115,7 @@ void Constraint2D::ReleaseJoint()
     if (physicsWorld_)
         physicsWorld_->GetWorld()->DestroyJoint(joint_);
 
-    joint_ = 0;
+    joint_ = nullptr;
 }
 
 void Constraint2D::SetOtherBody(RigidBody2D* body)
@@ -133,7 +125,7 @@ void Constraint2D::SetOtherBody(RigidBody2D* body)
 
     otherBody_ = body;
 
-    Node* otherNode = body ? body->GetNode() : (Node*)0;
+    Node* otherNode = body ? body->GetNode() : nullptr;
     otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
 
     RecreateJoint();

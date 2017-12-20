@@ -43,7 +43,7 @@ const char* textEffects[] =
     "None",
     "Shadow",
     "Stroke",
-    0
+    nullptr
 };
 
 static const float MIN_ROW_SPACING = 0.5f;
@@ -125,7 +125,7 @@ void Text::ApplyAttributes()
 
 void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    FontFace* face = font_ ? font_->GetFace(fontSize_) : (FontFace*)0;
+    FontFace* face = font_ ? font_->GetFace(fontSize_) : nullptr;
     if (!face)
     {
         hovering_ = false;
@@ -146,7 +146,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
         bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+        UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
         batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
             (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
         batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
@@ -156,7 +156,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     // Partial selection batch
     if (!selected_ && selectionLength_ && charLocations_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+        UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
         batch.SetColor(selectionColor_);
 
         Vector2 currentStart = charLocations_[selectionStart_].position_;
@@ -238,7 +238,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                         if (x > -thickness && x < thickness &&
                             y > -thickness && y < thickness)
                             continue;
-    
+
                         ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
                     }
                 }
@@ -267,7 +267,7 @@ void Text::OnIndentSet()
     charLocationsDirty_ = true;
 }
 
-bool Text::SetFont(const String& fontName, int size)
+bool Text::SetFont(const String& fontName, float size)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     return SetFont(cache->GetResource<Font>(fontName, GetBasePath()), size);
@@ -675,8 +675,13 @@ void Text::UpdateText(bool onResize)
         // Set minimum and current size according to the text size, but respect fixed width if set
         if (!IsFixedWidth())
         {
-            SetMinWidth(wordWrap_ ? 0 : width);
-            SetWidth(width);
+            if (wordWrap_)
+                SetMinWidth(0);
+            else
+            {
+                SetMinWidth(width);
+                SetWidth(width);
+            }
         }
         SetFixedHeight(height);
 
@@ -701,7 +706,7 @@ void Text::UpdateText(bool onResize)
 void Text::UpdateCharLocations()
 {
     // Remember the font face to see if it's still valid when it's time to render
-    FontFace* face = font_ ? font_->GetFace(fontSize_) : (FontFace*)0;
+    FontFace* face = font_ ? font_->GetFace(fontSize_) : nullptr;
     if (!face)
         return;
     fontFace_ = face;

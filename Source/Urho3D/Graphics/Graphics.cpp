@@ -168,8 +168,12 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 IntVector2 Graphics::GetWindowPosition() const
 {
     if (window_)
-        return position_;
-    return IntVector2::ZERO;
+    {
+        IntVector2 position;
+        SDL_GetWindowPosition(window_, &position.x_, &position.y_);
+        return position;
+    }
+    return position_;
 }
 
 PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
@@ -223,6 +227,29 @@ int Graphics::GetMonitorCount() const
     return SDL_GetNumVideoDisplays();
 }
 
+int Graphics::GetCurrentMonitor() const
+{
+    if (!window_)
+        return 0;
+
+    return SDL_GetWindowDisplayIndex(window_);
+}
+
+bool Graphics::GetMaximized() const
+{
+    if (!window_)
+        return false;
+
+    return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
+}
+
+Vector3 Graphics::GetDisplayDPI(int monitor) const
+{
+    Vector3 result;
+    SDL_GetDisplayDPI(monitor, &result.z_, &result.x_, &result.y_);
+    return result;
+}
+
 void Graphics::Maximize()
 {
     if (!window_)
@@ -237,6 +264,14 @@ void Graphics::Minimize()
         return;
 
     SDL_MinimizeWindow(window_);
+}
+
+void Graphics::Raise() const
+{
+    if (!window_)
+        return;
+
+    SDL_RaiseWindow(window_);
 }
 
 void Graphics::BeginDumpShaders(const String& fileName)
@@ -280,7 +315,7 @@ void Graphics::RemoveGPUObject(GPUObject* object)
 void* Graphics::ReserveScratchBuffer(unsigned size)
 {
     if (!size)
-        return 0;
+        return nullptr;
 
     if (size > maxScratchBufferRequest_)
         maxScratchBufferRequest_ = size;
@@ -344,7 +379,7 @@ void Graphics::CleanupScratchBuffers()
     {
         if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
         {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
+            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : nullptr;
             i->size_ = maxScratchBufferRequest_;
 
             URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));

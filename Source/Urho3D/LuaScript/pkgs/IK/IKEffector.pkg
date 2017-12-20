@@ -2,6 +2,12 @@ $#include "IK/IKEffector.h"
 
 class IKEffector : public Component
 {
+    enum Feature
+    {
+        WEIGHT_NLERP = 0x01,
+        INHERIT_PARENT_ROTATION = 0x02
+    };
+
     Node* GetTargetNode() const;
     void SetTargetNode(Node* targetNode);
 
@@ -26,12 +32,6 @@ class IKEffector : public Component
     float GetRotationDecay() const;
     void SetRotationDecay(float decay);
 
-    bool WeightedNlerpEnabled() const;
-    void EnableWeightedNlerp(bool enable);
-
-    bool InheritParentRotationEnabled() const;
-    void EnableInheritParentRotation(bool enable);
-
     tolua_property__get_set Node* targetNode;
     tolua_property__get_set String targetName;
     tolua_property__get_set Vector3 targetPosition;
@@ -40,4 +40,7 @@ class IKEffector : public Component
     tolua_property__get_set float weight;
     tolua_property__get_set float rotationWeight;
     tolua_property__get_set float rotationDecay;
+
+    tolua_property__get_set bool WEIGHT_NLERP;
+    tolua_property__get_set bool INHERIT_PARENT_ROTATION;
 };

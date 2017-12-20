@@ -134,7 +134,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     renderSurface_.Reset();
 
     usage_ = usage;
-    
+
     if (usage >= TEXTURE_RENDERTARGET)
     {
         renderSurface_ = new RenderSurface(this);
@@ -160,24 +160,25 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     return Create();
 }
 
-SharedPtr<Image> Texture2D::GetImage() const
+bool Texture2D::GetImage(Image& image) const
 {
     if (format_ != Graphics::GetRGBAFormat() && format_ != Graphics::GetRGBFormat())
     {
         URHO3D_LOGERROR("Unsupported texture format, can not convert to Image");
-        return SharedPtr<Image>();
+        return false;
     }
 
-    Image* rawImage = new Image(context_);
-    if (format_ == Graphics::GetRGBAFormat())
-        rawImage->SetSize(width_, height_, 4);
-    else if (format_ == Graphics::GetRGBFormat())
-        rawImage->SetSize(width_, height_, 3);
-    else
-        assert(0);
+    image.SetSize(width_, height_, GetComponents());
+    GetData(0, image.GetData());
+    return true;
+}
 
-    GetData(0, rawImage->GetData());
-    return SharedPtr<Image>(rawImage);
+SharedPtr<Image> Texture2D::GetImage() const
+{
+    auto rawImage = MakeShared<Image>(context_);
+    if (!GetImage(*rawImage))
+        return nullptr;
+    return rawImage;
 }
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

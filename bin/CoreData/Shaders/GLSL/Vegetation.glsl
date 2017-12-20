@@ -48,9 +48,8 @@ void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
-    float height = worldPos.y - modelMatrix[1][3];
 
-    float windStrength = max(height - cWindHeightPivot, 0.0) * cWindHeightFactor;
+    float windStrength = max(iPos.y - cWindHeightPivot, 0.0) * cWindHeightFactor;
     float windPeriod = cElapsedTime * cWindPeriod + dot(worldPos.xz, cWindWorldSpacing);
     worldPos.x += windStrength * sin(windPeriod);
     worldPos.z -= windStrength * cos(windPeriod);

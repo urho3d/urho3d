@@ -93,10 +93,10 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         WString(nativePath).CString(),
         FILE_LIST_DIRECTORY,
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
-        0,
+        nullptr,
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS,
-        0);
+        nullptr);
 
     if (dirHandle_ != INVALID_HANDLE_VALUE)
     {
@@ -250,8 +250,8 @@ void FileWatcher::ThreadFunction()
             FILE_NOTIFY_CHANGE_FILE_NAME |
             FILE_NOTIFY_CHANGE_LAST_WRITE,
             &bytesFilled,
-            0,
-            0))
+            nullptr,
+            nullptr))
         {
             unsigned offset = 0;
 

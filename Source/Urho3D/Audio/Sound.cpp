@@ -30,7 +30,9 @@
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#ifndef STB_VORBIS_HEADER_ONLY
 #define STB_VORBIS_HEADER_ONLY
+#endif
 #include <STB/stb_vorbis.h>
 
 #include "../DebugNew.h"
@@ -60,8 +62,8 @@ static const unsigned IP_SAFETY = 4;
 
 Sound::Sound(Context* context) :
     ResourceWithMetadata(context),
-    repeat_(0),
-    end_(0),
+    repeat_(nullptr),
+    end_(nullptr),
     dataSize_(0),
     frequency_(44100),
     looped_(false),
@@ -108,7 +110,7 @@ bool Sound::LoadOggVorbis(Deserializer& source)
 
     // Check for validity of data
     int error;
-    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data.Get(), dataSize, &error, 0);
+    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data.Get(), dataSize, &error, nullptr);
     if (!vorbis)
     {
         URHO3D_LOGERROR("Could not read Ogg Vorbis data from " + source.GetName());

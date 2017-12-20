@@ -1,3 +1,6 @@
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file Copyright.txt or https://cmake.org/licensing for details.
+
 #.rst:
 # GenerateExportHeader
 # --------------------
@@ -20,6 +23,7 @@
 #              [NO_DEPRECATED_MACRO_NAME <no_deprecated_macro_name>]
 #              [DEFINE_NO_DEPRECATED]
 #              [PREFIX_NAME <prefix_name>]
+#              [CUSTOM_CONTENT_FROM_VARIABLE <variable>]
 #    )
 #
 #
@@ -60,8 +64,10 @@
 # The CMake fragment will generate a file in the
 # ``${CMAKE_CURRENT_BINARY_DIR}`` called ``somelib_export.h`` containing the
 # macros ``SOMELIB_EXPORT``, ``SOMELIB_NO_EXPORT``, ``SOMELIB_DEPRECATED``,
-# ``SOMELIB_DEPRECATED_EXPORT`` and ``SOMELIB_DEPRECATED_NO_EXPORT``.  The
-# resulting file should be installed with other headers in the library.
+# ``SOMELIB_DEPRECATED_EXPORT`` and ``SOMELIB_DEPRECATED_NO_EXPORT``.
+# They will be followed by content taken from the variable specified by
+# the ``CUSTOM_CONTENT_FROM_VARIABLE`` option, if any.
+# The resulting file should be installed with other headers in the library.
 #
 # The ``BASE_NAME`` argument can be used to override the file name and the
 # names used for the macros:
@@ -178,22 +184,8 @@
 # :prop_tgt:`CXX_VISIBILITY_PRESET <<LANG>_VISIBILITY_PRESET>` and
 # :prop_tgt:`VISIBILITY_INLINES_HIDDEN` instead.
 
-#=============================================================================
-# Copyright 2011 Stephen Kelly <steveire@gmail.com>
-#
-# Distributed under the OSI-approved BSD License (the "License");
-# see accompanying file Copyright.txt for details.
-#
-# This software is distributed WITHOUT ANY WARRANTY; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the License for more information.
-#=============================================================================
-# (To distribute this file outside of CMake, substitute the full
-#  License text for the above reference.)
-
 # Modified by Yao Wei Tjong for Urho3D
 
-include(CMakeParseArguments)
 include(CheckCXXCompilerFlag)
 
 # TODO: Install this macro separately?
@@ -207,7 +199,7 @@ macro(_test_compiler_hidden_visibility)
 
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.2")
     set(GCC_TOO_OLD TRUE)
-  elseif(CMAKE_COMPILER_IS_GNUC AND CMAKE_C_COMPILER_VERSION VERSION_LESS "4.2")
+  elseif(CMAKE_COMPILER_IS_GNUCC AND CMAKE_C_COMPILER_VERSION VERSION_LESS "4.2")
     set(GCC_TOO_OLD TRUE)
   elseif(CMAKE_CXX_COMPILER_ID MATCHES Intel AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0")
     set(_INTEL_TOO_OLD TRUE)
@@ -222,17 +214,20 @@ macro(_test_compiler_hidden_visibility)
       AND NOT CMAKE_CXX_COMPILER_ID MATCHES XL
       AND NOT CMAKE_CXX_COMPILER_ID MATCHES PGI
       AND NOT CMAKE_CXX_COMPILER_ID MATCHES Watcom)
-    check_cxx_compiler_flag(-fvisibility=hidden COMPILER_HAS_HIDDEN_VISIBILITY)
-    check_cxx_compiler_flag(-fvisibility-inlines-hidden
-      COMPILER_HAS_HIDDEN_INLINE_VISIBILITY)
-    option(USE_COMPILER_HIDDEN_VISIBILITY
-      "Use HIDDEN visibility support if available." ON)
-    mark_as_advanced(USE_COMPILER_HIDDEN_VISIBILITY)
+    # Urho3D - set the flags in a variable before testing
+    set (COMPILER_HIDDEN_VISIBILITY_FLAGS -fvisibility=hidden)
+    set (COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS -fvisibility-inlines-hidden)
+    check_cxx_compiler_flag(${COMPILER_HIDDEN_VISIBILITY_FLAGS} COMPILER_HAS_HIDDEN_VISIBILITY)
+    check_cxx_compiler_flag(${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} COMPILER_HAS_HIDDEN_INLINE_VISIBILITY)
   endif()
 endmacro()
 
 macro(_test_compiler_has_deprecated)
+  # NOTE:  Some Embarcadero compilers silently compile __declspec(deprecated)
+  # without error, but this is not a documented feature and the attribute does
+  # not actually generate any warnings.
   if(CMAKE_CXX_COMPILER_ID MATCHES Borland
+      OR CMAKE_CXX_COMPILER_ID MATCHES Embarcadero
       OR CMAKE_CXX_COMPILER_ID MATCHES HP
       OR GCC_TOO_OLD
       OR CMAKE_CXX_COMPILER_ID MATCHES PGI
@@ -268,10 +263,10 @@ macro(_DO_SET_MACRO_VALUES TARGET_LIBRARY)
   endif()
 
   # Urho3D: always generate header file regardless of target type
-    if(WIN32)
+    if(WIN32 OR CYGWIN)
       set(DEFINE_EXPORT "__declspec(dllexport)")
       set(DEFINE_IMPORT "__declspec(dllimport)")
-    elseif(COMPILER_HAS_HIDDEN_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY)
+    elseif(COMPILER_HAS_HIDDEN_VISIBILITY)
       set(DEFINE_EXPORT "__attribute__((visibility(\"default\")))")
       set(DEFINE_IMPORT "__attribute__((visibility(\"default\")))")
       set(DEFINE_NO_EXPORT "__attribute__((visibility(\"hidden\")))")
@@ -283,7 +278,7 @@ macro(_DO_GENERATE_EXPORT_HEADER TARGET_LIBRARY)
   set(options DEFINE_NO_DEPRECATED)
   set(oneValueArgs PREFIX_NAME BASE_NAME EXPORT_MACRO_NAME EXPORT_FILE_NAME
     DEPRECATED_MACRO_NAME NO_EXPORT_MACRO_NAME STATIC_DEFINE
-    NO_DEPRECATED_MACRO_NAME)
+    NO_DEPRECATED_MACRO_NAME CUSTOM_CONTENT_FROM_VARIABLE)
   set(multiValueArgs)
 
   cmake_parse_arguments(_GEH "${options}" "${oneValueArgs}" "${multiValueArgs}"
@@ -314,8 +309,7 @@ macro(_DO_GENERATE_EXPORT_HEADER TARGET_LIBRARY)
   if(_GEH_EXPORT_MACRO_NAME)
     set(EXPORT_MACRO_NAME ${_GEH_PREFIX_NAME}${_GEH_EXPORT_MACRO_NAME})
   endif()
-  # Urho3D: CMake version less than 2.8.12 does not have this sub-command yet, so comment it out until the cmake minimum required is 2.8.12
-  #string(MAKE_C_IDENTIFIER ${EXPORT_MACRO_NAME} EXPORT_MACRO_NAME)
+  string(MAKE_C_IDENTIFIER ${EXPORT_MACRO_NAME} EXPORT_MACRO_NAME)
   if(_GEH_EXPORT_FILE_NAME)
     if(IS_ABSOLUTE ${_GEH_EXPORT_FILE_NAME})
       set(EXPORT_FILE_NAME ${_GEH_EXPORT_FILE_NAME})
@@ -326,31 +320,41 @@ macro(_DO_GENERATE_EXPORT_HEADER TARGET_LIBRARY)
   if(_GEH_DEPRECATED_MACRO_NAME)
     set(DEPRECATED_MACRO_NAME ${_GEH_PREFIX_NAME}${_GEH_DEPRECATED_MACRO_NAME})
   endif()
-  #string(MAKE_C_IDENTIFIER ${DEPRECATED_MACRO_NAME} DEPRECATED_MACRO_NAME)
+  string(MAKE_C_IDENTIFIER ${DEPRECATED_MACRO_NAME} DEPRECATED_MACRO_NAME)
   if(_GEH_NO_EXPORT_MACRO_NAME)
     set(NO_EXPORT_MACRO_NAME ${_GEH_PREFIX_NAME}${_GEH_NO_EXPORT_MACRO_NAME})
   endif()
-  #string(MAKE_C_IDENTIFIER ${NO_EXPORT_MACRO_NAME} NO_EXPORT_MACRO_NAME)
+  string(MAKE_C_IDENTIFIER ${NO_EXPORT_MACRO_NAME} NO_EXPORT_MACRO_NAME)
   if(_GEH_STATIC_DEFINE)
     set(STATIC_DEFINE ${_GEH_PREFIX_NAME}${_GEH_STATIC_DEFINE})
   endif()
-  #string(MAKE_C_IDENTIFIER ${STATIC_DEFINE} STATIC_DEFINE)
+  string(MAKE_C_IDENTIFIER ${STATIC_DEFINE} STATIC_DEFINE)
 
   if(_GEH_DEFINE_NO_DEPRECATED)
-    set(DEFINE_NO_DEPRECATED TRUE)
+    set(DEFINE_NO_DEPRECATED 1)
+  else()
+    set(DEFINE_NO_DEPRECATED 0)
   endif()
 
   if(_GEH_NO_DEPRECATED_MACRO_NAME)
     set(NO_DEPRECATED_MACRO_NAME
       ${_GEH_PREFIX_NAME}${_GEH_NO_DEPRECATED_MACRO_NAME})
   endif()
-  #string(MAKE_C_IDENTIFIER ${NO_DEPRECATED_MACRO_NAME} NO_DEPRECATED_MACRO_NAME)
+  string(MAKE_C_IDENTIFIER ${NO_DEPRECATED_MACRO_NAME} NO_DEPRECATED_MACRO_NAME)
 
   set(INCLUDE_GUARD_NAME "${EXPORT_MACRO_NAME}_H")
 
   # Urho3D: Our revised version does not depend on the target to be added first, so always derive the variable value from target name instead
   set(EXPORT_IMPORT_CONDITION ${TARGET_LIBRARY}_EXPORTS)
-  #string(MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
+  string(MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
+
+  if(_GEH_CUSTOM_CONTENT_FROM_VARIABLE)
+    if(DEFINED "${_GEH_CUSTOM_CONTENT_FROM_VARIABLE}")
+      set(CUSTOM_CONTENT "${${_GEH_CUSTOM_CONTENT_FROM_VARIABLE}}")
+    else()
+      set(CUSTOM_CONTENT "")
+    endif()
+  endif()
 
   configure_file("${_GENERATE_EXPORT_HEADER_MODULE_DIR}/exportheader.cmake.in"
     "${EXPORT_FILE_NAME}" @ONLY)
@@ -368,30 +372,3 @@ function(GENERATE_EXPORT_HEADER TARGET_LIBRARY type)
   _do_generate_export_header(${TARGET_LIBRARY} ${ARGN})
 endfunction()
 
-function(add_compiler_export_flags)
-  if(NOT CMAKE_MINIMUM_REQUIRED_VERSION VERSION_LESS 2.8.12)
-    message(DEPRECATION "The add_compiler_export_flags function is obsolete. Use the CXX_VISIBILITY_PRESET and VISIBILITY_INLINES_HIDDEN target properties instead.")
-  endif()
-
-  _test_compiler_hidden_visibility()
-  _test_compiler_has_deprecated()
-
-  if(NOT (USE_COMPILER_HIDDEN_VISIBILITY AND COMPILER_HAS_HIDDEN_VISIBILITY))
-    # Just return if there are no flags to add.
-    return()
-  endif()
-
-  set (EXTRA_FLAGS "-fvisibility=hidden")
-
-  if(COMPILER_HAS_HIDDEN_INLINE_VISIBILITY)
-    set (EXTRA_FLAGS "${EXTRA_FLAGS} -fvisibility-inlines-hidden")
-  endif()
-
-  # Either return the extra flags needed in the supplied argument, or to the
-  # CMAKE_CXX_FLAGS if no argument is supplied.
-  if(ARGV0)
-    set(${ARGV0} "${EXTRA_FLAGS}" PARENT_SCOPE)
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
-  endif()
-endfunction()

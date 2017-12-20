@@ -98,7 +98,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
             PIPE_BUFFER_SIZE,
             PIPE_BUFFER_SIZE,
             0,
-            0
+            nullptr
         );
 
         if (handle_ == INVALID_HANDLE_VALUE)
@@ -120,10 +120,10 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
             WString(pipePath + pipeName).CString(),
             GENERIC_READ | GENERIC_WRITE,
             0,
-            0,
+            nullptr,
             OPEN_EXISTING,
             0,
-            0
+            nullptr
         );
 
         if (handle_ == INVALID_HANDLE_VALUE)
@@ -145,7 +145,7 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD read = 0;
-        ReadFile(handle_, dest, size, &read, 0);
+        ReadFile(handle_, dest, size, &read, nullptr);
         return read;
     }
 
@@ -157,7 +157,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD written = 0;
-        WriteFile(handle_, data, size, &written, 0);
+        WriteFile(handle_, data, size, &written, nullptr);
         return written;
     }
 
@@ -194,7 +194,7 @@ bool NamedPipe::IsEof() const
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD bytesAvailable = 0;
-        PeekNamedPipe(handle_, 0, 0, 0, &bytesAvailable, 0);
+        PeekNamedPipe(handle_, nullptr, 0, nullptr, &bytesAvailable, nullptr);
         return bytesAvailable == 0;
     }
     else

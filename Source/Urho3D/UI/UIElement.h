@@ -109,6 +109,7 @@ static const unsigned DD_SOURCE_AND_TARGET = 0x3;
 
 class Cursor;
 class ResourceCache;
+class Texture2D;
 
 /// Base class for %UI elements.
 class URHO3D_API UIElement : public Animatable
@@ -119,20 +120,20 @@ public:
     /// Construct.
     UIElement(Context* context);
     /// Destruct.
-    virtual ~UIElement();
+    virtual ~UIElement() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
     /// Load from XML data with style. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
     /// Create a child by loading from XML data with style. Returns the child element if successful, null if otherwise.
-    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = 0, bool setInstanceDefault = false);
+    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = nullptr, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const;
+    virtual bool SaveXML(XMLElement& dest) const override;
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -196,6 +197,9 @@ public:
     virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
     /// Convert element coordinates to screen coordinates.
     virtual IntVector2 ElementToScreen(const IntVector2& position);
+
+    /// Return whether the element could handle wheel input.
+    virtual bool IsWheelHandler() const { return false; }
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -307,11 +311,11 @@ public:
     /// Set drag and drop flags.
     void SetDragDropMode(unsigned mode);
     /// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
-    bool SetStyle(const String& styleName, XMLFile* file = 0);
+    bool SetStyle(const String& styleName, XMLFile* file = nullptr);
     /// Set style from an XML element. Return true if the style is applied successfully.
     bool SetStyle(const XMLElement& element);
     /// Set style from an XML file. Find the style element automatically by using the element's typename. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
-    bool SetStyleAuto(XMLFile* file = 0);
+    bool SetStyleAuto(XMLFile* file = nullptr);
     /// Set default style file for later use by children elements.
     void SetDefaultStyle(XMLFile* style);
     /// Set layout parameters.
@@ -496,6 +500,9 @@ public:
     /// Return whether has focus.
     bool HasFocus() const;
 
+    /// Return whether is a direct or indirect child of specified element.
+    bool IsChildOf(UIElement* element) const;
+
     /// Return whether reacts to input.
     bool IsEnabled() const { return enabled_; }
 
@@ -640,13 +647,16 @@ public:
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
 
+    /// Set texture to which element will be rendered.
+    void SetRenderTexture(Texture2D* texture);
+
 protected:
     /// Handle attribute animation added.
-    virtual void OnAttributeAnimationAdded();
+    virtual void OnAttributeAnimationAdded() override;
     /// Handle attribute animation removed.
-    virtual void OnAttributeAnimationRemoved();
+    virtual void OnAttributeAnimationRemoved() override;
     /// Find target of an attribute animation from object hierarchy by name.
-    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
+    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.

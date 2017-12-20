@@ -959,7 +959,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 while (track)
                 {
                     String trackName = track.GetAttribute("bone");
-                    ModelBone* bone = 0;
+                    ModelBone* bone = nullptr;
                     for (unsigned i = 0; i < bones_.Size(); ++i)
                     {
                         if (bones_[i].name_ == trackName)

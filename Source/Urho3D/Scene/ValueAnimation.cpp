@@ -43,12 +43,12 @@ const char* interpMethodNames[] =
     "None",
     "Linear",
     "Spline",
-    0
+    nullptr
 };
 
 ValueAnimation::ValueAnimation(Context* context) :
     Resource(context),
-    owner_(0),
+    owner_(nullptr),
     interpolationMethod_(IM_LINEAR),
     splineTension_(0.5f),
     valueType_(VAR_NONE),
@@ -340,7 +340,7 @@ bool ValueAnimation::IsValid() const
            (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
 }
 
-Variant ValueAnimation::GetAnimationValue(float scaledTime)
+Variant ValueAnimation::GetAnimationValue(float scaledTime) const
 {
     unsigned index = 1;
     for (; index < keyFrames_.Size(); ++index)
@@ -436,7 +436,7 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     }
 }
 
-Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime)
+Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime) const
 {
     if (splineTangentsDirty_)
         UpdateSplineTangents();
@@ -488,7 +488,7 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
     }
 }
 
-void ValueAnimation::UpdateSplineTangents()
+void ValueAnimation::UpdateSplineTangents() const
 {
     splineTangents_.Clear();
 

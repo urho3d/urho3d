@@ -37,7 +37,7 @@ namespace Urho3D
 
 CollisionShape2D::CollisionShape2D(Context* context) :
     Component(context),
-    fixture_(0),
+    fixture_(nullptr),
     cachedWorldScale_(Vector3::ONE)
 {
 
@@ -249,7 +249,7 @@ void CollisionShape2D::ReleaseFixture()
     body->DestroyFixture(fixture_);
     if (!rigidBody_->GetUseFixtureMass()) // Workaround for resetting mass in DestroyFixture().
         body->SetMassData(&massData);
-    fixture_ = 0;
+    fixture_ = nullptr;
 }
 
 float CollisionShape2D::GetMass() const
@@ -320,8 +320,7 @@ void CollisionShape2D::OnMarkedDirty(Node* node)
 
     cachedWorldScale_ = newWorldScale;
 
-    if (fixture_)
-        ApplyNodeWorldScale();
+    ApplyNodeWorldScale();
 }
 
 }

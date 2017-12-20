@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,7 +30,7 @@
 #include "SDL_pixels_c.h"
 
 /* The general purpose software blit routine */
-static int
+static int SDLCALL
 SDL_SoftBlit(SDL_Surface * src, SDL_Rect * srcrect,
              SDL_Surface * dst, SDL_Rect * dstrect)
 {
@@ -219,6 +219,12 @@ SDL_CalculateBlit(SDL_Surface * surface)
     SDL_BlitMap *map = surface->map;
     SDL_Surface *dst = map->dst;
 
+    /* We don't currently support blitting to < 8 bpp surfaces */
+    if (dst->format->BitsPerPixel < 8) {
+        SDL_InvalidateMap(map);
+        return SDL_SetError("Blit combination not supported");
+    }
+
     /* Clean everything out to start */
     if ((surface->flags & SDL_RLEACCEL) == SDL_RLEACCEL) {
         SDL_UnRLESurface(surface, 1);
@@ -239,6 +245,10 @@ SDL_CalculateBlit(SDL_Surface * surface)
     /* Choose a standard blit function */
     if (map->identity && !(map->info.flags & ~SDL_COPY_RLE_DESIRED)) {
         blit = SDL_BlitCopy;
+    } else if (surface->format->Rloss > 8 || dst->format->Rloss > 8) {
+        /* Greater than 8 bits per channel not supported yet */
+        SDL_InvalidateMap(map);
+        return SDL_SetError("Blit combination not supported");
     } else if (surface->format->BitsPerPixel < 8 &&
                SDL_ISPIXELFORMAT_INDEXED(surface->format->format)) {
         blit = SDL_CalculateBlit0(surface);

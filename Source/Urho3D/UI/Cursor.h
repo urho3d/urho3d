@@ -56,7 +56,7 @@ struct URHO3D_API CursorShapeInfo
     CursorShapeInfo() :
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
-        osCursor_(0),
+        osCursor_(nullptr),
         systemDefined_(false),
         systemCursor_(-1)
     {
@@ -66,7 +66,7 @@ struct URHO3D_API CursorShapeInfo
     CursorShapeInfo(int systemCursor) :
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
-        osCursor_(0),
+        osCursor_(nullptr),
         systemDefined_(false),
         systemCursor_(systemCursor)
     {
@@ -97,12 +97,12 @@ public:
     /// Construct.
     Cursor(Context* context);
     /// Destruct.
-    virtual ~Cursor();
+    virtual ~Cursor() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// Define a shape.
     void DefineShape(const String& shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);

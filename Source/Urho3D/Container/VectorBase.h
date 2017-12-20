@@ -295,7 +295,7 @@ public:
     VectorBase() :
         size_(0),
         capacity_(0),
-        buffer_(0)
+        buffer_(nullptr)
     {
     }
 

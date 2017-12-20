@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -110,7 +110,7 @@ static int SDL_EVDEV_device_removed(const char *dev_path);
 
 #if SDL_USE_LIBUDEV
 static int SDL_EVDEV_device_added(const char *dev_path, int udev_class);
-void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_type, int udev_class,
+static void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_type, int udev_class,
     const char *dev_path);
 #endif /* SDL_USE_LIBUDEV */
 
@@ -195,7 +195,7 @@ SDL_EVDEV_Quit(void)
 }
 
 #if SDL_USE_LIBUDEV
-void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_event, int udev_class,
+static void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_event, int udev_class,
     const char* dev_path)
 {
     if (dev_path == NULL) {
@@ -398,8 +398,8 @@ SDL_EVDEV_translate_keycode(int keycode)
 
     if (scancode == SDL_SCANCODE_UNKNOWN) {
         SDL_Log("The key you just pressed is not recognized by SDL. To help "
-            "get this fixed, please report this to the SDL mailing list "
-            "<sdl@libsdl.org> EVDEV KeyCode %d\n", keycode);
+            "get this fixed, please report this to the SDL forums/mailing list "
+            "<https://discourse.libsdl.org/> EVDEV KeyCode %d", keycode);
     }
 
     return scancode;

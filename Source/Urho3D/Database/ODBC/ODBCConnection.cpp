@@ -113,7 +113,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 
                         default:
                             // All other types are stored using their string representation in the Variant
-                            colValues[i] = result.resultImpl_.get<nanodbc::string_type>((short)i).c_str();
+                            colValues[i] = result.resultImpl_.get<nanodbc::string>((short)i).c_str();
                             break;
                         }
                     }

@@ -49,7 +49,7 @@ static const char* cubeMapLayoutNames[] = {
     "horizontalcross",
     "verticalcross",
     "blender",
-    0
+    nullptr
 };
 
 static SharedPtr<Image> GetTileImage(Image* src, int tileX, int tileY, int tileWidth, int tileHeight)
