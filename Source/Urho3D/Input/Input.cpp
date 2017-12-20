@@ -1373,6 +1373,7 @@ IntVector2 Input::GetMousePosition() const
         return ret;
 
     SDL_GetMouseState(&ret.x_, &ret.y_);
+
     ret.x_ = (int)(ret.x_ * inputScale_.x_);
     ret.y_ = (int)(ret.y_ * inputScale_.y_);
 
@@ -1763,6 +1764,8 @@ void Input::SetKey(int key, int scancode, bool newState)
     if (newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
+
+	URHO3D_LOGINFO("Sent key event");
 
     if ((key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER) && newState && !repeat && toggleFullscreen_ &&
         (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))

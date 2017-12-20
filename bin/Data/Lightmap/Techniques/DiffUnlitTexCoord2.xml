@@ -1,0 +1,6 @@
+<technique vs="UnlitTexCoord2" ps="UnlitTexCoord2" psdefines="DIFFMAP" >
+    <pass name="base" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" />
+    <pass name="deferred" psdefines="DEFERRED" />
+</technique>

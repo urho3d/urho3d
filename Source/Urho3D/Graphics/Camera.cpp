@@ -64,6 +64,7 @@ Camera::Camera(Context* context) :
     zoom_(1.0f),
     lodBias_(1.0f),
     viewMask_(DEFAULT_VIEWMASK),
+    viewShadowMask_(DEFAULT_VIEWMASK),
     viewOverrideFlags_(VO_NONE),
     fillMode_(FILL_SOLID),
     projectionOffset_(Vector2::ZERO),
@@ -179,6 +180,12 @@ void Camera::SetLodBias(float bias)
 void Camera::SetViewMask(unsigned mask)
 {
     viewMask_ = mask;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetViewShadowMask(unsigned mask)
+{
+    viewShadowMask_ = mask;
     MarkNetworkUpdate();
 }
 

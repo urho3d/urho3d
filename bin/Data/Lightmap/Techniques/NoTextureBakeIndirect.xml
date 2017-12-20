@@ -1,0 +1,7 @@
+<technique vs="LitSolidBake" ps="LitSolidBake" >
+    <pass name="base" vsdefines="BAKE LIGHTMAP" psdefines="LIGHTMAP" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="material" vsdefines="LIGHTMAP" psdefines="MATERIAL LIGHTMAP" depthtest="equal" depthwrite="false" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

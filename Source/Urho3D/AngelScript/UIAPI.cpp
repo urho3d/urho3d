@@ -778,6 +778,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipboardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHOD(UI, SetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHOD(UI, GetDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_maxDoubleClickDistance(float)", asMETHOD(UI, SetMaxDoubleClickDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_maxDoubleClickDistance() const", asMETHOD(UI, GetMaxDoubleClickDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_dragBeginInterval(float)", asMETHOD(UI, SetDragBeginInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_dragBeginInterval() const", asMETHOD(UI, GetDragBeginInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_dragBeginDistance(int)", asMETHOD(UI, SetDragBeginDistance), asCALL_THISCALL);
