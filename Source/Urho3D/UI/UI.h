@@ -92,7 +92,7 @@ public:
     void SetClipboardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
-    /// Set max screen distance in pixels for double clicks to register.  default is a very large distance as to have no effect.
+    /// Set max screen distance in pixels between double click clicks.
     void SetMaxDoubleClickDistance(float pixels);
     /// Set UI drag event start interval in seconds.
     void SetDragBeginInterval(float interval);
@@ -166,7 +166,7 @@ public:
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
     
-    /// Get max screen distance for double clicks to register.  default is FLT_MAX.
+    /// Get max screen distance in pixels for double clicks to register. 
     float GetMaxDoubleClickDistance() const { return maxDoubleClickDist_;}
     
     /// Return UI drag start event interval in seconds.
