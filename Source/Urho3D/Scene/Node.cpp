@@ -1604,16 +1604,16 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
         if (file.EndsWith(".xml"))
         {
             XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file,source.GetBasePath());
-            if (xml && xml->Load(source) && LoadXML(xml->GetRoot()))
-                URHO3D_LOGINFO("Loaded prefab from " + file);
+            if (xml && LoadXML(xml->GetRoot()))
+                URHO3D_LOGDEBUG("Loaded prefab from " + file);
             else // Continue to try to load, logging warning
                 URHO3D_LOGWARNING("Could not load prefab " + file);
         }
         else if (file.EndsWith(".json"))
         {
             JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file,source.GetBasePath());
-            if (json && json->Load(source) && LoadJSON(json->GetRoot()))
-                URHO3D_LOGINFO("Loaded prefab from " + file);
+            if (json && LoadJSON(json->GetRoot()))
+                URHO3D_LOGDEBUG("Loaded prefab from " + file);
             else // Continue to try to load, logging warning
                 URHO3D_LOGWARNING("Could not load prefab " + file);
         }
@@ -1622,8 +1622,8 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
             // Fall back to loading xml since this is in LoadXML, but log debug note
             URHO3D_LOGDEBUG("Falling back to loading " + file + " as XML.");
             XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file,source.GetBasePath());
-            if (xml && xml->Load(source) && LoadXML(xml->GetRoot()))
-                URHO3D_LOGINFO("Loaded prefab from " + file);
+            if (xml && LoadXML(xml->GetRoot()))
+                URHO3D_LOGDEBUG("Loaded prefab from " + file);
             else // Continue to try to load, logging warning
                 URHO3D_LOGWARNING("Could not load prefab " + file);
         }
@@ -1683,19 +1683,20 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readC
     String file = source.Get("prefab").GetString();
     if (!file.Empty())
     {
+#warning TODO: Need a way to get the base path from JSONValue
         if (file.EndsWith(".json"))
         {
-            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file,source.GetBasePath());
-            if (json && json->Load(source) && LoadJSON(json->GetRoot()))
-                URHO3D_LOGINFO("Loaded prefab from " + file);
+            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file);
+            if (json && LoadJSON(json->GetRoot()))
+                URHO3D_LOGDEBUG("Loaded prefab from " + file);
             else // Continue to try to load, logging warning
                 URHO3D_LOGWARNING("Could not load prefab " + file);
         }
         else if (file.EndsWith(".xml"))
         {
-            XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file,source.GetBasePath());
-            if (xml && xml->Load(source) && LoadXML(xml->GetRoot()))
-                URHO3D_LOGINFO("Loaded prefab from " + file);
+            XMLFile* xml = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(file);
+            if (xml && LoadXML(xml->GetRoot()))
+                URHO3D_LOGDEBUG("Loaded prefab from " + file);
             else // Continue to try to load, logging warning
                 URHO3D_LOGWARNING("Could not load prefab " + file);
         }
@@ -1703,9 +1704,9 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readC
         {
             // Fall back to loading xml since this is in LoadXML, but log debug note
             URHO3D_LOGDEBUG("Falling back to loading " + file + " as JSON.");
-            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file,source.GetBasePath());
-            if (json && json->Load(source) && LoadJSON(json->GetRoot()))
-                URHO3D_LOGINFO("Loaded prefab from " + file);
+            JSONFile* json = GetSubsystem<ResourceCache>()->GetResource<JSONFile>(file);
+            if (json && LoadJSON(json->GetRoot()))
+                URHO3D_LOGDEBUG("Loaded prefab from " + file);
             else // Continue to try to load, logging warning
                 URHO3D_LOGWARNING("Could not load prefab " + file);
         }
