@@ -26,33 +26,13 @@
 			<attribute name="Material" value="Material;Materials/Stone.xml" />
 		</component>
 	</node>
-	<node id="3">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Box" />
-		<attribute name="Tags" />
+	<node id="3" prefab="Objects/BoxStack.xml">
 		<attribute name="Position" value="1.32267 0.594299 -1.57271" />
 		<attribute name="Rotation" value="0.92388 0 0.382683 0" />
-		<attribute name="Scale" value="1 1 1" />
-		<attribute name="Variables" />
-		<component type="StaticModel" id="4">
-			<attribute name="Model" value="Model;Models/Box.mdl" />
-			<attribute name="Material" value="Material;Materials/Stone.xml" />
-			<attribute name="Cast Shadows" value="true" />
-		</component>
 	</node>
-	<node id="4">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Box" />
-		<attribute name="Tags" />
+	<node id="4" prefab="Objects/BoxStack.xml">
 		<attribute name="Position" value="-1.30641 0.594299 -1.3801" />
 		<attribute name="Rotation" value="0.966853 0 -0.255333 0" />
-		<attribute name="Scale" value="1 1 1" />
-		<attribute name="Variables" />
-		<component type="StaticModel" id="5">
-			<attribute name="Model" value="Model;Models/Box.mdl" />
-			<attribute name="Material" value="Material;Materials/Stone.xml" />
-			<attribute name="Cast Shadows" value="true" />
-		</component>
 	</node>
 	<node id="5">
 		<attribute name="Is Enabled" value="true" />
@@ -70,19 +50,9 @@
 			<attribute name="Depth Constant Bias" value="0.0001" />
 		</component>
 	</node>
-	<node id="6">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Box" />
-		<attribute name="Tags" />
+	<node id="6" prefab="Objects/BoxStack.xml">
 		<attribute name="Position" value="0.055109 0.594299 0.653738" />
 		<attribute name="Rotation" value="0.999947 0 0.0103017 0" />
-		<attribute name="Scale" value="1 1 1" />
-		<attribute name="Variables" />
-		<component type="StaticModel" id="7">
-			<attribute name="Model" value="Model;Models/Box.mdl" />
-			<attribute name="Material" value="Material;Materials/Stone.xml" />
-			<attribute name="Cast Shadows" value="true" />
-		</component>
 	</node>
 	<node id="7">
 		<attribute name="Is Enabled" value="true" />
