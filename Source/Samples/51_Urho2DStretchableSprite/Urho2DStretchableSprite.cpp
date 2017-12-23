@@ -82,13 +82,12 @@ void Urho2DStretchableSprite::CreateScene()
 
     Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Stretchable.png");
-
+    
     refSpriteNode_ = scene_->CreateChild("regular sprite");
     stretchSpriteNode_ = scene_->CreateChild("stretchable sprite");
 
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Stretchable.png");
     if(sprite)
     {
       refSpriteNode_->CreateComponent<StaticSprite2D>()->SetSprite(sprite);
@@ -176,8 +175,7 @@ void Urho2DStretchableSprite::OnKeyUp(StringHash eventType, VariantMap& eventDat
         ++selectTransform_;
         selectTransform_ %= 3;
     }
-
-    if(key == KEY_ESCAPE)
+    else if(key == KEY_ESCAPE)
         engine_->Exit();
 }
 
@@ -201,7 +199,6 @@ void Urho2DStretchableSprite::TranslateSprites(float timeStep)
         refSpriteNode_->Translate2D(translate);
         stretchSpriteNode_->Translate2D(translate);
     }
-
 }
 
 void Urho2DStretchableSprite::RotateSprites(float timeStep)
@@ -241,7 +238,7 @@ void Urho2DStretchableSprite::ScaleSprites(float timeStep)
                down = input->GetKeyDown(KEY_S);
     if(left || right || up || down)
     {
-        const auto quantum = speed * timeStep;
+        const auto quantum = timeStep * speed;
         const auto scale = Vector2{
             1.0f + (right ? quantum : left ? -quantum : 0.0f),
             1.0f + (up ? quantum : down ? -quantum : 0.0f)};
