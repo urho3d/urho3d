@@ -126,6 +126,9 @@ public:
     /// Return animation value.
     Variant GetAnimationValue(float scaledTime) const;
 
+    /// Return all key frames.
+    const Vector<VAnimKeyFrame>& GetKeyFrames() const { return keyFrames_; }
+
     /// Has event frames.
     bool HasEventFrames() const { return !eventFrames_.Empty(); }
 
