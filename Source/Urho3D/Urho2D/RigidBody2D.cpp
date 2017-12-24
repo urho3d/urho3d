@@ -610,4 +610,25 @@ void RigidBody2D::OnMarkedDirty(Node* node)
         body_->SetTransform(newPosition, newAngle);
 }
 
+void RigidBody2D::GetContactList(Vector<std::tuple<Node*, Vector2, Vector<Vector2>>> &contactList) const
+{
+    auto b2ContactList = this->body_->GetContactList();
+    while (b2ContactList != NULL)
+    {
+        auto otherNode = ((RigidBody2D *)b2ContactList->other->GetUserData())->GetNode();
+        b2WorldManifold worldManifold;
+        auto contact = b2ContactList->contact;
+        contact->GetWorldManifold(&worldManifold);
+        auto normal = Vector2(worldManifold.normal.x, worldManifold.normal.y);
+        auto numPoints = contact->GetManifold()->pointCount;
+        Vector<Vector2> contactPoints;
+        for (decltype(numPoints) i = 0; i < numPoints; ++i)
+        {
+            contactPoints.Push(Vector2(worldManifold.points[i].x, worldManifold.points[i].y));
+        }
+        contactList.Push(std::make_tuple(otherNode, normal, contactPoints));
+        b2ContactList = b2ContactList->next;
+    }
+}
+
 }

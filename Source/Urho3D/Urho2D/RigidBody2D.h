@@ -157,6 +157,9 @@ public:
     /// Return Box2D body.
     b2Body* GetBody() const { return body_; }
 
+    /// Return a list of all contacts.
+    void GetContactList(Vector<std::tuple<Node*, Vector2, Vector<Vector2>>> &contactList) const;
+
 private:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node) override;
