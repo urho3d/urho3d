@@ -836,6 +836,7 @@ Quaternion initialRotation;
 Vector3 initialScale;
 String name;
 Node node;
+uint parentIndex;
 float radius;
 };
 
@@ -10814,6 +10815,8 @@ class Skeleton
 public:
 // Methods:
 Bone GetBone(const String&) const;
+uint GetBoneIndex(const String&) const;
+Bone GetBoneParent(Bone) const;
 void Reset();
 
 // Properties:
@@ -13942,6 +13945,7 @@ float fontSubpixelThreshold;
 bool forceAutoHint;
 /* readonly */
 UIElement frontElement;
+float maxDoubleClickDistance;
 int maxFontTextureSize;
 /* readonly */
 UIElement modalRoot;
@@ -14441,6 +14445,8 @@ Vector3 Abs() const;
 float AbsDotProduct(const Vector3&) const;
 float Angle(const Vector3&) const;
 Vector3 CrossProduct(const Vector3&) const;
+float DistanceToPlane(const Vector3&, const Vector3&) const;
+float DistanceToPoint(const Vector3&) const;
 float DotProduct(const Vector3&) const;
 bool Equals(const Vector3&) const;
 bool IsNaN() const;
@@ -14449,6 +14455,8 @@ void Normalize();
 Vector3 Normalized() const;
 Vector3 Orthogonalize(const Vector3&) const;
 float ProjectOntoAxis(const Vector3&) const;
+Vector3 ProjectOntoLine(const Vector3&, const Vector3&, bool = false) const;
+Vector3 ProjectOntoPlane(const Vector3&, const Vector3&) const;
 String ToString() const;
 
 // Properties:

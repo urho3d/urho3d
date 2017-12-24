@@ -699,6 +699,8 @@ namespace Urho3D
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
+- %XBegin : int
+- %YBegin : int
 - %Button : int
 - %Buttons : int
 - %Qualifiers : int
@@ -724,6 +726,8 @@ namespace Urho3D
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
+- %XBegin : int
+- %YBegin : int
 - %Button : int
 - %Buttons : int
 - %Qualifiers : int
@@ -3586,6 +3590,7 @@ Properties:
 - Vector3 initialScale
 - String name
 - Node@ node
+- uint parentIndex
 - float radius
 
 <a name="Class_BorderImage"></a>
@@ -12139,6 +12144,8 @@ Methods:
 Methods:
 
 - Bone@ GetBone(const String&) const
+- uint GetBoneIndex(const String&) const
+- Bone@ GetBoneParent(Bone@) const
 - void Reset()
 
 Properties:
@@ -14749,6 +14756,7 @@ Properties:
 - float fontSubpixelThreshold
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
+- float maxDoubleClickDistance
 - int maxFontTextureSize
 - UIElement@ modalRoot // readonly
 - bool nonFocusedMouseWheel
@@ -15142,6 +15150,8 @@ Methods:
 - float AbsDotProduct(const Vector3&) const
 - float Angle(const Vector3&) const
 - Vector3 CrossProduct(const Vector3&) const
+- float DistanceToPlane(const Vector3&, const Vector3&) const
+- float DistanceToPoint(const Vector3&) const
 - float DotProduct(const Vector3&) const
 - bool Equals(const Vector3&) const
 - bool IsNaN() const
@@ -15150,6 +15160,8 @@ Methods:
 - Vector3 Normalized() const
 - Vector3 Orthogonalize(const Vector3&) const
 - float ProjectOntoAxis(const Vector3&) const
+- Vector3 ProjectOntoLine(const Vector3&, const Vector3&, bool = false) const
+- Vector3 ProjectOntoPlane(const Vector3&, const Vector3&) const
 - String ToString() const
 
 Properties:
