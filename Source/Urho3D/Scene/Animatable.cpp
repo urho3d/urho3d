@@ -158,7 +158,7 @@ bool Animatable::LoadJSON(const JSONValue& source)
         if (!attributeAnimation->LoadJSON(it->second_))
             return false;
 
-        String wrapModeString = source.Get("wrapmode").GetString();
+        String wrapModeString = value.Get("wrapmode").GetString();
         WrapMode wrapMode = WM_LOOP;
         for (int i = 0; i <= WM_CLAMP; ++i)
         {
@@ -244,7 +244,10 @@ bool Animatable::SaveJSON(JSONValue& dest) const
 
         attributeAnimationValue.Set(attr.name_, attributeValue);
     }
-
+    
+    if (!attributeAnimationValue.IsNull())
+        dest.Set("attributeanimation", attributeAnimationValue);
+    
     return true;
 }
 
