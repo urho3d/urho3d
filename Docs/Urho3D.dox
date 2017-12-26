@@ -220,7 +220,6 @@ Urho3D uses the following third-party libraries:
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
 - FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
-- jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.4.0 (https://github.com/anrieff/libcpuid)
 - Lua 5.1 (https://www.lua.org)
