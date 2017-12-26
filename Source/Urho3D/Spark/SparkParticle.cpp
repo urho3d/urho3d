@@ -21,6 +21,7 @@
 //
 
 #include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/IndexBuffer.h"
@@ -30,14 +31,11 @@
 #include "../Graphics/Geometry.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../Spark/SparkParticle.h"
+#include "../Spark/SparkParticleEffect.h"
+#include "../Spark/SPK_Urho3D_Renderer.h"
 #include "../Resource/ResourceCache.h"
 #include "../IO/Log.h"
-
-#include "SparkParticle.h"
-#include "SparkParticleEffect.h"
-#include "SPK_Urho3D_Renderer.h"
-#include "SPK_Urho3D_DEF.h"
-
 
 namespace Urho3D
 {
@@ -72,7 +70,7 @@ void SparkParticle::RegisterObject(Context* context)
 
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("SparkEffect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(SparkParticleEffect::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);   
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
 }
 
@@ -101,7 +99,7 @@ void SparkParticle::HandleScenePostUpdate(StringHash eventType, VariantMap& even
     // Update if :
     // - first render not yet effectued (needed to compute particles bounding box)
     // - frame has changed
-    // - update invibles
+    // - update invisible
     if (!firstRenderSet_ || updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         lastUpdateFrameNumber_ = viewFrameNumber_;
@@ -206,7 +204,7 @@ void SparkParticle::OnWorldBoundingBoxUpdate()
                                Vector3(AABBMax.x, AABBMax.y, AABBMax.z));
     }
 
-    worldBoundingBox_ = worldBox;  
+    worldBoundingBox_ = worldBox;
 }
 
 void SparkParticle::UpdateBufferSize()
@@ -362,9 +360,4 @@ ResourceRef SparkParticle::GetEffectAttr() const
     }
 }
 
-
 }
-
-
-
-

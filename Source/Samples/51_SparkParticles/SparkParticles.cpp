@@ -25,22 +25,21 @@
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Graphics/Zone.h>
-#include <Urho3D/Graphics/Technique.h>
-#include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Technique.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/LogicComponent.h>
 #include <Urho3D/Input/Input.h>
-#include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Spark/Spark.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
 
-#include <Urho3D/Spark/SPARK_URHO3D.h>
 #include <Spark/SPARK.h>
 
 #include "SparkParticles.h"

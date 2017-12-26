@@ -46,7 +46,7 @@ IUrho3DBuffer::IUrho3DBuffer(Urho3D::Context* context, size_t nbParticles, size_
 
 IUrho3DBuffer::~IUrho3DBuffer()
 {
-
 }
 
-}}
+}
+}

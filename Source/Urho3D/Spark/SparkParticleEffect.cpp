@@ -23,15 +23,13 @@
 #include "../Resource/ResourceCache.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
-
-#include "SparkParticleEffect.h"
-#include "SPK_Urho3D_DEF.h"
+#include "../Spark/SparkParticleEffect.h"
+#include "../Spark/SPK_Urho3D_DEF.h"
 
 #include "../DebugNew.h"
 
 namespace Urho3D
 {
-
 
 SparkParticleEffect::SparkParticleEffect(Context* context) :
     Resource(context)
@@ -69,12 +67,7 @@ bool SparkParticleEffect::BeginLoad(Deserializer& source)
 
 bool SparkParticleEffect::EndLoad()
 {
-    if(!loadedSystem_)
-    {
-       return false;
-    }
-
-    return true;
+    return !!loadedSystem_;
 }
 
 bool SparkParticleEffect::Save(const String& filename) const

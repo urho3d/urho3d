@@ -27,10 +27,10 @@ set (TARGET_NAME Spark)
 define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS include/*.h RECURSE)
 
 # Define dependency libs
-set (INCLUDE_DIRS include ${PROJECT_BINARY_DIR}/include ${PROJECT_BINARY_DIR}/include/Urho3D/ThirdParty/PugiXml)
+set (INCLUDE_DIRS include ../PugiXml/src)
 
 # Setup target
 setup_library ()
 
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Spark FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
+# Install headers for building and using the Urho3D library (install dependency for SparkParticle.h, SparkParticleEffect.h, etc)
+install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Spark FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant

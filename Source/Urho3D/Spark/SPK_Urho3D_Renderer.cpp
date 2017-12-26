@@ -20,8 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include <Spark/SPARK_Core.h>
-#include "SPK_Urho3D_Renderer.h"
+#include "../Spark/SPK_Urho3D_Renderer.h"
 
 namespace SPK {
 namespace URHO {
@@ -67,5 +66,5 @@ void IUrho3DRenderer::setMaterial(Urho3D::Material* material)
     _material =  material;
 }
 
-
-}}
+}
+}

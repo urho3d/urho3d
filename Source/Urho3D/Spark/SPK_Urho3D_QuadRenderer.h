@@ -22,14 +22,11 @@
 
 #pragma once
 
-#ifndef H_SPK_URHO3D_QUADRENDERER
-#define H_SPK_URHO3D_QUADRENDERER
+#include "../Core/Context.h"
+#include "../Spark/SPK_Urho3D_Renderer.h"
 
-#include "SPK_Urho3D_Renderer.h"
 #include <Spark/Extensions/Renderers/SPK_QuadRenderBehavior.h>
 #include <Spark/Extensions/Renderers/SPK_Oriented3DRenderBehavior.h>
-
-#include "../Core/Context.h"
 
 namespace SPK {
 namespace URHO {
@@ -87,6 +84,5 @@ inline Ref<Urho3DQuadRenderer> Urho3DQuadRenderer::create(Urho3D::Context* conte
 }
 
 
-}}
-
-#endif
+}
+}

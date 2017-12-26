@@ -20,14 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include <Spark/SPARK_Core.h>
-#include "SPK_Urho3D_QuadRenderer.h"
-
-#include "../Resource/ResourceCache.h"
 #include "../Graphics/IndexBuffer.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Texture2D.h"
+#include "../Resource/ResourceCache.h"
+#include "../Spark/SPK_Urho3D_QuadRenderer.h"
 
 namespace SPK {
 namespace URHO {
@@ -363,6 +361,5 @@ void Urho3DQuadRenderer::innerExport(IO::Descriptor& descriptor) const
     descriptor.getAttribute("atlasdim")->setValues(tmpAtlas,2);
 }
 
-
-
-}}
+}
+}

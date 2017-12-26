@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifndef H_SPARKPARTICLEEFFECT
-#define H_SPARKPARTICLEEFFECT
-
 #include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
@@ -56,18 +53,15 @@ public:
     /// Save resource. Return true if successful.
     bool Save(const String &filename) const;
 
-    /// Get Spark particle system loaded
+    /// Get Spark particle system loaded.
     const SPK::Ref<SPK::System> GetSystem() const;
 
-    /// Manually set spark particle system
+    /// Manually set spark particle system.
     void SetSystem(SPK::Ref<SPK::System> spkSystem);
 
 private:
-    /// loaded spark particle system
+    /// Loaded spark particle system.
     SPK::Ref<SPK::System> loadedSystem_;
-
 };
 
 }
-
-#endif // H_SPARKPARTICLEEFFECT

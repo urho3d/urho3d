@@ -22,31 +22,9 @@
 
 #pragma once
 
-#ifndef H_SPK_URHO3D_DEF
-#define H_SPK_URHO3D_DEF
-
 #include "../Core/Context.h"
 #include "../Math/Vector3.h"
 #include "../Math/Color.h"
-
-
-// for windows platform only
-#if defined(WIN32) || defined(_WIN32)
-#ifdef SPK_URHO_EXPORT
-#define SPK_URHO_PREFIX __declspec(dllexport)
-#elif defined(SPK_IMPORT) || defined(SPK_URHO_IMPORT)
-#define SPK_URHO_PREFIX __declspec(dllimport)
-#else
-#define SPK_URHO_PREFIX
-#endif
-
-#ifdef _MSC_VER
-#pragma warning(disable : 4275) // disables the warning about exporting DLL classes children of non DLL classes
-#endif
-
-#else
-#define SPK_URHO_PREFIX
-#endif
 
 namespace SPK {
 
@@ -54,7 +32,6 @@ class Vector3D;
 class Color;
 
 namespace URHO {
-
 
     /**
     * @brief Helper class to register Urho3D context
@@ -115,7 +92,5 @@ namespace URHO {
     */
     inline const Urho3D::Color spk2urho(SPK::Color c);
 
-
-}}
-
-#endif
+}
+}

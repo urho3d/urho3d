@@ -22,16 +22,12 @@
 
 #pragma once
 
-#ifndef H_SPK_URHO3D_RENDERER
-#define H_SPK_URHO3D_RENDERER
-
-#include "SPK_Urho3D_DEF.h"
-#include "SPK_Urho3D_Buffer.h"
-
-#include <Spark/Core/SPK_Renderer.h>
-
 #include "../Graphics/Camera.h"
 #include "../Graphics/Material.h"
+#include "../Spark/SPK_Urho3D_DEF.h"
+#include "../Spark/SPK_Urho3D_Buffer.h"
+
+#include <Spark/Core/SPK_Renderer.h>
 
 namespace SPK {
 namespace URHO {
@@ -59,7 +55,5 @@ protected :
     Urho3D::SharedPtr<Urho3D::Material>   _material;
 };
 
-
-}}
-
-#endif
+}
+}

@@ -20,11 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "SPK_Urho3D_DEF.h"
-#include "SPK_Urho3D_QuadRenderer.h"
-#include "SparkParticle.h"
-#include "SparkParticleEffect.h"
-#include <Spark/Core/IO/SPK_IO_Manager.h>
+#include "../Spark/SparkParticle.h"
+#include "../Spark/SparkParticleEffect.h"
+#include "../Spark/SPK_Urho3D_DEF.h"
+#include "../Spark/SPK_Urho3D_QuadRenderer.h"
 
 namespace Urho3D {
 
@@ -48,19 +47,19 @@ namespace SPK {
 namespace URHO {
 
     Urho3DContext::Urho3DContext()
-    {       
+    {
     }
 
     Urho3DContext& Urho3DContext::get()
     {
         static Urho3DContext instance;
         return instance;
-    }    
+    }
 
     void Urho3DContext::registerUrhoContext(Urho3D::Context* context)
     {
         SPK_ASSERT(context, "[registerUrhoContext] : Urho3D context is null.");
-        urhoContext = context;       
+        urhoContext = context;
     }
 
     Urho3D::Context* Urho3DContext::getUrhoContext()
@@ -95,4 +94,5 @@ namespace URHO {
         return Urho3D::Color(c.r, c.g, c.g, c.a);
     }
 
-}}
+}
+}

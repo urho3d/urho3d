@@ -38,6 +38,14 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/Localization.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../UI/UI.h"
+#ifdef URHO3D_DATABASE
+#include "../Database/Database.h"
+#endif
 #ifdef URHO3D_IK
 #include "../IK/IK.h"
 #endif
@@ -47,23 +55,15 @@
 #ifdef URHO3D_NETWORK
 #include "../Network/Network.h"
 #endif
-#ifdef URHO3D_DATABASE
-#include "../Database/Database.h"
-#endif
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #include "../Physics/RaycastVehicle.h"
 #endif
-#include "../Resource/ResourceCache.h"
-#include "../Resource/Localization.h"
-#include "../Scene/Scene.h"
-#include "../Scene/SceneEvents.h"
-#include "../UI/UI.h"
+#ifdef URHO3D_SPARK
+#include "../Spark/Spark.h"
+#endif
 #ifdef URHO3D_URHO2D
 #include "../Urho2D/Urho2D.h"
-#endif
-#ifdef URHO3D_SPARK
-#include <Spark/SPARK_URHO3D.h>
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
@@ -149,7 +149,7 @@ Engine::Engine(Context* context) :
 #ifdef URHO3D_IK
     RegisterIKLibrary(context_);
 #endif
-    
+
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
 #endif

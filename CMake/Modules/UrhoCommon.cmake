@@ -695,6 +695,7 @@ else ()
             # MinGW-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -fno-keep-inline-dllexport")
+            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-allow-multiple-definition")
             if (NOT URHO3D_64BIT)
                 set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
                 set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")

@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifndef H_SPARK_IRR
-#define H_SPARK_IRR
-
 #include "SPK_Urho3D_DEF.h"
 #include "SPK_Urho3D_Buffer.h"
 #include "SPK_Urho3D_Renderer.h"
@@ -39,5 +36,3 @@ namespace Urho3D
 void URHO3D_API RegisterSparkLibrary(Context* context);
 
 }
-
-#endif
