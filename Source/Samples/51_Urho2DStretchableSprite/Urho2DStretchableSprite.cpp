@@ -82,7 +82,7 @@ void Urho2DStretchableSprite::CreateScene()
 
     Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-    
+
     refSpriteNode_ = scene_->CreateChild("regular sprite");
     stretchSpriteNode_ = scene_->CreateChild("stretchable sprite");
 
@@ -247,4 +247,3 @@ void Urho2DStretchableSprite::ScaleSprites(float timeStep)
         stretchSpriteNode_->Scale2D(scale);
     }
 }
-

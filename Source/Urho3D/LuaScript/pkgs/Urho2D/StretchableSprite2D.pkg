@@ -4,8 +4,8 @@ class StretchableSprite2D : public StaticSprite2D
 {
 public:
     void SetBorder(const IntRect& border);
-    
+
     const IntRect& GetBorder() const;
-    
+
     tolua_property__get_set IntRect border;
 };

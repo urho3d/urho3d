@@ -61,11 +61,11 @@ void CreateScene()
     {
         StaticSprite2D@ staticSprite = refSpriteNode.CreateComponent("StaticSprite2D");
         staticSprite.sprite = sprite;
-        
+
         StretchableSprite2D@ stretchSprite = stretchSpriteNode.CreateComponent("StretchableSprite2D");
         stretchSprite.sprite = sprite;
         stretchSprite.border = IntRect(25, 25, 25, 25);
-        
+
         refSpriteNode.Translate2D(Vector2(-2.0f, 0.0f));
         stretchSpriteNode.Translate2D(Vector2(2.0f, 0.0f));
     }
@@ -100,7 +100,7 @@ void SubscribeToEvents()
 {
     // Subscribe to Key Up event, to handle individual key presses
     SubscribeToEvent("KeyUp", "OnKeyUp");
-    
+
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
 
@@ -112,7 +112,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
     float timeStep = eventData["TimeStep"].GetFloat();
-    
+
     switch(selectTransform)
     {
     case 0:
@@ -132,7 +132,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 void OnKeyUp(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
-    
+
     if(key == KEY_TAB)
     {
         ++selectTransform;

@@ -762,7 +762,7 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
 
     RegisterAnimationSet2D(engine);
     RegisterAnimatedSprite2D(engine);
-    
+
     RegisterStretchableSprite2D(engine);
 
     RegisterParticleEffect2D(engine);

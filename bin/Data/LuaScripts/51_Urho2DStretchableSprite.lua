@@ -27,7 +27,7 @@ function Start()
 
     -- Set the mouse mode to use in the sample
     SampleInitMouseMode(MM_FREE)
-    
+
     -- Hook up to the frame update events
     SubscribeToEvents()
 end
@@ -49,7 +49,7 @@ function CreateScene()
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
     camera.orthoSize = graphics.height * PIXEL_SIZE
-    
+
     -- Setup sprites and nodes on the scene
     refSpriteNode = scene_:CreateChild("regular sprite")
     stretchSpriteNode = scene_:CreateChild("stretch sprite")
@@ -61,7 +61,7 @@ function CreateScene()
         local stretchSprite = stretchSpriteNode:CreateComponent("StretchableSprite2D")
         stretchSprite.sprite = sprite
         stretchSprite.border = IntRect(25, 25, 25, 25)
-        
+
         refSpriteNode:Translate2D(Vector2(-2, 0))
         stretchSpriteNode:Translate2D(Vector2(2, 0))
     end
@@ -99,7 +99,7 @@ end
 
 function HandleUpdate(eventType, eventData)
     local timeStep = eventData["TimeStep"]:GetFloat()
-    
+
     if selectTransform == 0 then
         ScaleSprites(timeStep)
     elseif selectTransform == 1 then
@@ -127,12 +127,12 @@ function TranslateSprites(timeStep)
     local right = input:GetKeyDown(KEY_D)
     local up = input:GetKeyDown(KEY_W)
     local down = input:GetKeyDown(KEY_S)
-    
+
     if left or right or up or down then
         local quantum = timeStep * speed;
         local translate = Vector2((left and -quantum or 0) + (right and quantum or 0),
                                   (down and -quantum or 0) + (up and quantum or 0))
-        
+
         refSpriteNode:Translate2D(translate)
         stretchSpriteNode:Translate2D(translate)
     end
@@ -145,13 +145,13 @@ function RotateSprites(timeStep)
     local up = input:GetKeyDown(KEY_W)
     local down = input:GetKeyDown(KEY_S)
     local ctrl = input:GetKeyDown(KEY_CTRL)
-    
+
     if left or right or up or down then
         local quantum = timeStep * speed
         local xrot = (up and -quantum or 0) + (down and quantum or 0)
         local rot2 = (left and -quantum or 0) + (right and quantum or 0)
         local totalRot = Quaternion(xrot, ctrl and 0 or rot2, ctrl and rot2 or 0)
-        
+
         refSpriteNode:Rotate(totalRot)
         stretchSpriteNode:Rotate(totalRot)
     end
@@ -163,7 +163,7 @@ function ScaleSprites(timeStep)
     local right = input:GetKeyDown(KEY_D)
     local up = input:GetKeyDown(KEY_W)
     local down = input:GetKeyDown(KEY_S)
-    
+
     if left or right or up or down then
         local quantum = timeStep * speed
         local scale = Vector2(1 + (right and quantum or left and -quantum or 0),
