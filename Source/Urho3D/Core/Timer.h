@@ -43,8 +43,8 @@ public:
     /// Return the clock value in milliseconds when the timer was started.
     unsigned GetStartTime();
 
-	/// Sets a new timeout duration in milliseconds.  duration is from the starting time of the timer. optionally reset.
-	void SetTimeoutDuration(unsigned timeoutDurationMs, bool reset = false);
+    /// Sets a new timeout duration in milliseconds.  duration is from the starting time of the timer. optionally reset.
+    void SetTimeoutDuration(unsigned timeoutDurationMs, bool reset = false);
 
     /// Return the duration in milliseconds for the timeout.
     unsigned GetTimeoutDuration();
@@ -81,8 +81,8 @@ public:
     ///Return the microsecond clock value when the timer was started.
     long long GetStartTime();
 
-	/// Sets a new timeout duration in microseconds.  duration is from the starting time of the timer. optionally reset.
-	void SetTimeoutDuration(long long timeoutDurationUs, bool reset = false);
+    /// Sets a new timeout duration in microseconds.  duration is from the starting time of the timer. optionally reset.
+    void SetTimeoutDuration(long long timeoutDurationUs, bool reset = false);
 
     ///Returns the duration for the timeout. 0 if no timeout duration was specified.
     long long GetTimeoutDuration();

@@ -202,7 +202,7 @@ Timer::Timer()
 Timer::Timer(unsigned timeoutDurationMs)
 {
     Reset();
-	SetTimeoutDuration(timeoutDurationMs);
+    SetTimeoutDuration(timeoutDurationMs);
 }
 
 unsigned Timer::GetMSec(bool reset)
@@ -224,9 +224,9 @@ unsigned Timer::GetStartTime()
 
 void Timer::SetTimeoutDuration(unsigned timeoutDurationMs, bool reset)
 {
-	timeoutDuration_ = timeoutDurationMs;
-	if (reset)
-		Reset();
+    timeoutDuration_ = timeoutDurationMs;
+    if (reset)
+        Reset();
 }
 
 unsigned Timer::GetTimeoutDuration()
@@ -257,7 +257,7 @@ HiresTimer::HiresTimer()
 HiresTimer::HiresTimer(long long timeoutDurationUs)
 {
     Reset();
-	SetTimeoutDuration(timeoutDurationUs);
+    SetTimeoutDuration(timeoutDurationUs);
 }
 
 long long HiresTimer::GetUSec(bool reset)
@@ -270,8 +270,8 @@ long long HiresTimer::GetUSec(bool reset)
     if (elapsedTicks < 0)
         elapsedTicks = 0;
 
-	if (reset)
-		Reset();
+    if (reset)
+        Reset();
 
     return TicksToUSec(elapsedTicks);
 }
@@ -283,9 +283,9 @@ long long HiresTimer::GetStartTime()
 
 void HiresTimer::SetTimeoutDuration(long long timeoutDurationUs, bool reset)
 {
-	timeoutDurationTicks_ = USecToTicks(timeoutDurationUs);
-	if (reset)
-		Reset();
+    timeoutDurationTicks_ = USecToTicks(timeoutDurationUs);
+    if (reset)
+        Reset();
 }
 
 long long HiresTimer::GetTimeoutDuration()
