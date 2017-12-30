@@ -197,7 +197,7 @@ before_build:
         if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -notmatch "[^-]+-[^-]+-CI" -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE)))
         {
           $env:PACKAGE_UPLOAD = "1";
-          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
+          do { "Installing doxygen and graphviz..."; choco install doxygen.install graphviz >$null } until ($?);
         }
         else
         {
