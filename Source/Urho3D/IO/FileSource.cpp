@@ -23,38 +23,20 @@
 #include "../Precompiled.h"
 
 #include "../IO/File.h"
-#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../IO/FileSource.h"
 
 namespace Urho3D
 {
 
-File::File(Context* context) :
-    Object(context),
-    mode_(FILE_READ)
+FileSource::FileSource(Context* context) :
+    Object(context)
 {
 }
 
-File::File(Context* context, const String& fileName, FileMode mode) :
-    Object(context),
-    mode_(FILE_READ)
+SharedPtr<File> FileSource::GetFile(const String &fileName, FileMode mode)
 {
+    return SharedPtr<File>(GetNewFile(fileName, mode));
 }
-
-File::File(Context* context, FileSource* package, const String& fileName, FileMode mode) :
-    Object(context),
-    mode_(FILE_READ)
-{
-}
-
-bool File::Open(const String& fileName, FileMode mode)
-{
-    return this->Open(GetSubsystem<FileSystem>()->GetFileSource(this->GetType()), fileName, mode);
-}
-
-void File::SetName(const String& name)
-{
-    fileName_ = name;
-}
-
 
 }

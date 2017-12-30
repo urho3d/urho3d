@@ -378,7 +378,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.keyPress[KEY_SPACE]) drawDebug = !drawDebug; // Toggle debug geometry with space
     if (input.keyPress[KEY_F5]) // Save scene
     {
-        File saveFile(fileSystem.programDir + "Data/Scenes/Constraints.xml", FILE_WRITE);
+        SystemFile saveFile(fileSystem.programDir + "Data/Scenes/Constraints.xml", FILE_WRITE);
         scene_.SaveXML(saveFile);
     }
 }

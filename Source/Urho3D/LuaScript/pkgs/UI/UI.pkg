@@ -110,7 +110,7 @@ static UIElement* UILoadLayout(UI* ui, File* source, XMLFile* styleFile)
 
 static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFile)
 {
-    File file(ui->GetContext(), fileName, FILE_READ);
+    SystemFile file(ui->GetContext(), fileName, FILE_READ);
     if (!file.IsOpen())
         return 0;
 

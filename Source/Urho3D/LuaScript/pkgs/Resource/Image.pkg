@@ -89,7 +89,7 @@ static bool ImageLoadColorLUT(Image* image, const String& fileName)
     if (!image)
         return false;
 
-    File file(image->GetContext());
+    SystemFile file(image->GetContext());
     if (!file.Open(fileName, FILE_READ))
         return false;
 

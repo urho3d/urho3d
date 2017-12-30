@@ -1,6 +1,8 @@
 $pfile "IO/Compression.pkg"
 $pfile "IO/Deserializer.pkg"
 $pfile "IO/File.pkg"
+$pfile "IO/SystemFile.pkg"
+$pfile "IO/PackedFile.pkg"
 $pfile "IO/FileSystem.pkg"
 $pfile "IO/Log.pkg"
 $pfile "IO/NamedPipe.pkg"

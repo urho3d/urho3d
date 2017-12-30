@@ -470,7 +470,7 @@ void SaveScene(bool initial)
     if (!initial)
         filename = demoFilename + "InGame";
 
-    File saveFile(fileSystem.programDir + "Data/Scenes/" + filename + ".xml", FILE_WRITE);
+    SystemFile saveFile(fileSystem.programDir + "Data/Scenes/" + filename + ".xml", FILE_WRITE);
     scene_.SaveXML(saveFile);
 }
 
@@ -480,7 +480,7 @@ void ReloadScene(bool reInit)
     if (!reInit)
         filename = demoFilename + "InGame";
 
-    File loadFile(fileSystem.programDir + "Data/Scenes/" + filename + ".xml", FILE_READ);
+    SystemFile loadFile(fileSystem.programDir + "Data/Scenes/" + filename + ".xml", FILE_READ);
     scene_.LoadXML(loadFile);
     // After loading we have to reacquire the character2D scene node, as it has been recreated
     // Simply find by name as there's only one of them

@@ -23,7 +23,7 @@
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Core/StringUtils.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Resource/Image.h>
@@ -203,7 +203,7 @@ void Run(Vector<String>& arguments)
     {
         String path = inputFiles[i];
         String name = ReplaceExtension(GetFileName(path), "");
-        File file(context, path);
+        SystemFile file(context, path);
         Image image(context);
 
         if (!image.Load(file))
@@ -364,7 +364,7 @@ void Run(Vector<String>& arguments)
 
         URHO3D_LOGINFO("Transferring " + packerInfo->path + " to sprite sheet.");
 
-        File file(context, packerInfo->path);
+        SystemFile file(context, packerInfo->path);
         Image image(context);
         if (!image.Load(file))
             ErrorExit("Could not load image " + packerInfo->path + ".");
@@ -421,7 +421,7 @@ void Run(Vector<String>& arguments)
     spriteSheetImage.SavePNG(outputFile);
 
     URHO3D_LOGINFO("Saving SpriteSheet xml file.");
-    File spriteSheetFile(context);
+    SystemFile spriteSheetFile(context);
     spriteSheetFile.Open(spriteSheetFileName, FILE_WRITE);
     xml.Save(spriteSheetFile);
 }

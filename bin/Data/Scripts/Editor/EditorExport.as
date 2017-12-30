@@ -29,7 +29,7 @@ void ExportSceneToOBJ(String fileName)
 
     RemoveDebugDrawables(drawables);
 
-    File@ file = File(fileName, FILE_WRITE);
+    File@ file = SystemFile(fileName, FILE_WRITE);
     if (WriteDrawablesToOBJ(drawables, file, objExportZUp_, objExportRightHanded_))
     {
         MessageBox("OBJ file written to " + fileName, "Success");
@@ -80,7 +80,7 @@ void ExportSelectedToOBJ(String fileName)
 
     if (drawables.length > 0)
     {
-        File@ file = File(fileName, FILE_WRITE);
+        File@ file = SystemFile(fileName, FILE_WRITE);
         if (WriteDrawablesToOBJ(drawables, file, objExportZUp_, objExportRightHanded_))
         {
             MessageBox("OBJ file written to " + fileName, "Success");

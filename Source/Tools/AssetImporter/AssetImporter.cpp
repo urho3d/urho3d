@@ -1225,7 +1225,7 @@ void BuildAndSaveModel(OutModel& model)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
 
-    File outFile(context_);
+    SystemFile outFile(context_);
     if (!outFile.Open(model.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + model.outName_);
     outModel->Save(outFile);
@@ -1234,7 +1234,7 @@ void BuildAndSaveModel(OutModel& model)
     if (!noMaterials_ && saveMaterialList_)
     {
         String materialListName = ReplaceExtension(model.outName_, ".txt");
-        File listFile(context_);
+        SystemFile listFile(context_);
         if (listFile.Open(materialListName, FILE_WRITE))
         {
             for (unsigned i = 0; i < model.meshes_.Size(); ++i)
@@ -1486,7 +1486,7 @@ void BuildAndSaveAnimations(OutModel* model)
             }
         }
 
-        File outFile(context_);
+        SystemFile outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))
             ErrorExit("Could not open output file " + animOutName);
         outAnim->Save(outFile);
@@ -1782,7 +1782,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         }
     }
 
-    File file(context_);
+    SystemFile file(context_);
     if (!file.Open(scene.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + scene.outName_);
     if (!asPrefab)
@@ -1966,7 +1966,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 
     PrintLine("Writing material " + matName);
 
-    File outFile(context_);
+    SystemFile outFile(context_);
     if (!outFile.Open(outFileName, FILE_WRITE))
         ErrorExit("Could not open output file " + outFileName);
     outMaterial.Save(outFile);
@@ -2001,7 +2001,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
                 if (!tex->mHeight)
                 {
                     PrintLine("Saving embedded texture " + GetFileNameAndExtension(fullDestName));
-                    File dest(context_, fullDestName, FILE_WRITE);
+                    SystemFile dest(context_, fullDestName, FILE_WRITE);
                     dest.Write((const void*)tex->pcData, tex->mWidth);
                 }
                 // RGBA8 texture
@@ -2026,7 +2026,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
                 continue;
             }
             {
-                File test(context_, fullSourceName);
+                SystemFile test(context_, fullSourceName);
                 if (!test.GetSize())
                 {
                     PrintLine("Skipping copy of zero-size material texture " + *i);
@@ -2060,7 +2060,7 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
     for (unsigned i = 0; i < modelNames.Size(); ++i)
     {
         PrintLine("Reading LOD level " + String(i) + ": model " + modelNames[i] + " distance " + String(lodDistances[i]));
-        File srcFile(context_);
+        SystemFile srcFile(context_);
         srcFile.Open(modelNames[i]);
         SharedPtr<Model> srcModel(new Model(context_));
         if (!srcModel->Load(srcFile))
@@ -2137,7 +2137,7 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
 
     // Save the final model
     PrintLine("Writing output model");
-    File outFile(context_);
+    SystemFile outFile(context_);
     if (!outFile.Open(outName, FILE_WRITE))
         ErrorExit("Could not open output file " + outName);
     outModel->Save(outFile);

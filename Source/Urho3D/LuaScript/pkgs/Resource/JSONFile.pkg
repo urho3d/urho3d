@@ -29,7 +29,7 @@ static bool JSONFileSave(const JSONFile* resource, const String& fileName, const
     if (!resource)
         return false;
 
-    File file(resource->GetContext());
+    SystemFile file(resource->GetContext());
     return file.Open(fileName, FILE_WRITE) && resource->Save(file, indentation);
 }
 $}

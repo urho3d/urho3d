@@ -30,7 +30,7 @@
 #include "../Graphics/Graphics.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
-#include "../IO/File.h"
+#include "../IO/SystemFile.h"
 #include "../IO/FileSystem.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
@@ -475,7 +475,7 @@ bool Model::Save(Serializer& dest) const
             XMLElement rootElem = xml->CreateRoot("model");
             SaveMetadataToXML(rootElem);
 
-            File xmlFile(context_, xmlName, FILE_WRITE);
+            SystemFile xmlFile(context_, xmlName, FILE_WRITE);
             xml->Save(xmlFile);
         }
         else

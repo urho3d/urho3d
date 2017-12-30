@@ -202,12 +202,12 @@ void MoveCamera(float timeStep)
     // Check for loading / saving the scene
     if (input.keyPress[KEY_F5])
     {
-        File saveFile(fileSystem.programDir + "Data/Scenes/PhysicsStressTest.xml", FILE_WRITE);
+        SystemFile saveFile(fileSystem.programDir + "Data/Scenes/PhysicsStressTest.xml", FILE_WRITE);
         scene_.SaveXML(saveFile);
     }
     if (input.keyPress[KEY_F7])
     {
-        File loadFile(fileSystem.programDir + "Data/Scenes/PhysicsStressTest.xml", FILE_READ);
+        SystemFile loadFile(fileSystem.programDir + "Data/Scenes/PhysicsStressTest.xml", FILE_READ);
         scene_.LoadXML(loadFile);
     }
 

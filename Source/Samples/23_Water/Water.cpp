@@ -35,7 +35,7 @@
 #include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>

@@ -26,7 +26,7 @@
 #include "../Graphics/GraphicsImpl.h"
 #include "../Graphics/ShaderPrecache.h"
 #include "../Graphics/ShaderVariation.h"
-#include "../IO/File.h"
+#include "../IO/SystemFile.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 
@@ -43,7 +43,7 @@ ShaderPrecache::ShaderPrecache(Context* context, const String& fileName) :
     if (GetSubsystem<FileSystem>()->FileExists(fileName))
     {
         // If file exists, read the already listed combinations
-        File source(context_, fileName);
+        SystemFile source(context_, fileName);
         xmlFile_.Load(source);
 
         XMLElement shader = xmlFile_.GetRoot().GetChild("shader");
@@ -71,7 +71,7 @@ ShaderPrecache::~ShaderPrecache()
     if (usedCombinations_.Empty())
         return;
 
-    File dest(context_, fileName_, FILE_WRITE);
+    SystemFile dest(context_, fileName_, FILE_WRITE);
     xmlFile_.Save(dest);
 }
 

@@ -23,7 +23,7 @@
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Container/ArrayPtr.h>
 #include <Urho3D/Core/ProcessUtils.h>
-#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/SystemFile.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/PackageFile.h>
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void ProcessFile(const String& fileName, const String& rootDir);
 void WritePackageFile(const String& fileName, const String& rootDir);
-void WriteHeader(File& dest);
+void WriteHeader(SystemFile& dest);
 
 int main(int argc, char** argv)
 {
@@ -206,7 +206,7 @@ void Run(const Vector<String>& arguments)
 void ProcessFile(const String& fileName, const String& rootDir)
 {
     String fullPath = rootDir + "/" + fileName;
-    File file(context_);
+    SystemFile file(context_);
     if (!file.Open(fullPath))
         ErrorExit("Could not open file " + fileName);
     if (!file.GetSize())
@@ -225,7 +225,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     if (!quiet_)
         PrintLine("Writing package");
 
-    File dest(context_);
+    SystemFile dest(context_);
     if (!dest.Open(fileName, FILE_WRITE))
         ErrorExit("Could not open output file " + fileName);
 
@@ -250,7 +250,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         lastOffset = entries_[i].offset_ = dest.GetSize();
         String fileFullPath = rootDir + "/" + entries_[i].name_;
 
-        File srcFile(context_, fileFullPath);
+        SystemFile srcFile(context_, fileFullPath);
         if (!srcFile.IsOpen())
             ErrorExit("Could not open file " + fileFullPath);
 
@@ -334,7 +334,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     }
 }
 
-void WriteHeader(File& dest)
+void WriteHeader(SystemFile& dest)
 {
     if (!compress_)
         dest.WriteFileID("UPAK");

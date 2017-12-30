@@ -24,6 +24,7 @@
 
 #include "../AngelScript/APITemplates.h"
 #include "../Input/Input.h"
+#include "../IO/SystemFile.h"
 #include "../UI/CheckBox.h"
 #include "../UI/DropDownList.h"
 #include "../UI/FileSelector.h"
@@ -58,7 +59,7 @@ static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, 
     if (fileName.Empty())
         return false;
 
-    File file(ptr->GetContext(), fileName, FILE_WRITE);
+    SystemFile file(ptr->GetContext(), fileName, FILE_WRITE);
     return ptr->SaveXML(file, pointSize, usedGlyphs, indentation);
 }
 

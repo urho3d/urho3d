@@ -154,7 +154,7 @@ void ImportTundraScene(const String&in fileName)
     fileSystem.CreateDir(sceneResourcePath + "Textures");
 
     XMLFile source;
-    source.Load(File(fileName, FILE_READ));
+    source.Load(SystemFile(fileName, FILE_READ));
     String filePath = GetPath(fileName);
 
     XMLElement sceneElem = source.root;
@@ -501,7 +501,7 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
     Vector2 uvScale(1, 1);
     Color diffuse(1, 1, 1, 1);
 
-    File file(fileName, FILE_READ);
+    SystemFile file(fileName, FILE_READ);
     while (!file.eof)
     {
         String line = file.ReadLine().Trimmed();
@@ -568,7 +568,7 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
         diffuseElem.SetColor("value", diffuse);
     }
 
-    File outFile(outFileName, FILE_WRITE);
+    SystemFile outFile(outFileName, FILE_WRITE);
     outMat.Save(outFile);
     outFile.Close();
 

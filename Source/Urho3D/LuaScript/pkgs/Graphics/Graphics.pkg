@@ -1,4 +1,4 @@
-$#include "IO/File.h"
+$#include "IO/SystemFile.h"
 $#include "Graphics/Graphics.h"
 
 class Graphics : public Object
@@ -132,7 +132,7 @@ static void GraphicsPrecacheShaders(Graphics* graphics, const String& fileName)
     if (!graphics)
         return;
 
-    File file(graphics->GetContext());
+    SystemFile file(graphics->GetContext());
     if (file.Open(fileName, FILE_READ))
         graphics->PrecacheShaders(file);
 }

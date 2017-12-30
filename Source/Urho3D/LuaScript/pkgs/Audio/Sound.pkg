@@ -1,4 +1,4 @@
-$#include "IO/File.h"
+$#include "IO/SystemFile.h"
 $#include "Audio/Sound.h"
 
 class Sound : public ResourceWithMetadata
@@ -58,7 +58,7 @@ static bool SoundLoadRaw(Sound* sound, const String& fileName)
     if (!sound)
         return false;
 
-    File file(sound->GetContext());
+    SystemFile file(sound->GetContext());
     if (!file.Open(fileName, FILE_READ))
         return false;
 
@@ -70,7 +70,7 @@ static bool SoundLoadWav(Sound* sound, const String& fileName)
     if (!sound)
         return false;
 
-    File file(sound->GetContext());
+    SystemFile file(sound->GetContext());
     if (!file.Open(fileName, FILE_READ))
         return false;
 
@@ -82,7 +82,7 @@ static bool SoundLoadOggVorbis(Sound* sound, const String& fileName)
     if (!sound)
         return false;
 
-    File file(sound->GetContext());
+    SystemFile file(sound->GetContext());
     if (!file.Open(fileName, FILE_READ))
         return false;
 

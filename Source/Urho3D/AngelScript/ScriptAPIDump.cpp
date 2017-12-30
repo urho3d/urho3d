@@ -24,7 +24,7 @@
 
 #include "../AngelScript/Script.h"
 #include "../Core/Context.h"
-#include "../IO/File.h"
+#include "../IO/SystemFile.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 
@@ -229,7 +229,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
             for (unsigned i = 0; i < headerFiles.Size(); ++i)
             {
-                SharedPtr<File> file(new File(context_, path + headerFiles[i].fileName, FILE_READ));
+                SharedPtr<File> file(new SystemFile(context_, path + headerFiles[i].fileName, FILE_READ));
                 if (!file->IsOpen())
                     continue;
 

@@ -22,15 +22,18 @@
 
 #include "../Precompiled.h"
 
-#include "../IO/File.h"
+#include "../Core/Context.h"
+#include "../IO/SystemFile.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
 
 namespace Urho3D
 {
 
+extern const char* FILESOURCE_CATEGORY;
+
 PackageFile::PackageFile(Context* context) :
-    Object(context),
+    FileSource(context),
     totalSize_(0),
     totalDataSize_(0),
     checksum_(0),
@@ -39,7 +42,7 @@ PackageFile::PackageFile(Context* context) :
 }
 
 PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset) :
-    Object(context),
+    FileSource(context),
     totalSize_(0),
     totalDataSize_(0),
     checksum_(0),
@@ -54,7 +57,7 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
-    SharedPtr<File> file(new File(context_, fileName));
+    SharedPtr<File> file(new SystemFile(context_, fileName));
     if (!file->IsOpen())
         return false;
 
@@ -134,6 +137,11 @@ bool PackageFile::Exists(const String& fileName) const
     return found;
 }
 
+PackedFile* PackageFile::GetNewFile(const String &fileName, FileMode mode)
+{
+    return new PackedFile(context_,this,fileName,mode);
+}
+
 const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 {
     HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName);
@@ -153,6 +161,11 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 #endif
 
     return nullptr;
+}
+
+void PackageFile::RegisterObject(Context *context)
+{
+    context->RegisterFactory<PackageFile>();
 }
 
 }

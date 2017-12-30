@@ -30,6 +30,7 @@
 #include "../IO/FileWatcher.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
+#include "../IO/SystemFile.h"
 #include "../Resource/BackgroundLoader.h"
 #include "../Resource/Image.h"
 #include "../Resource/JSONFile.h"
@@ -66,6 +67,8 @@ static const char* checkDirs[] =
 };
 
 static const SharedPtr<Resource> noResource;
+
+const char* FILESOURCE_CATEGORY = "FileSource";
 
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
@@ -133,30 +136,77 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     return true;
 }
 
-bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
+bool ResourceCache::AddPackageFile(PackageFile *package, unsigned priority)
+{
+    return AddFileSource(package, priority);
+}
+
+bool ResourceCache::AddPackageFile(const String &fileName, unsigned priority)
+{
+    return AddFileSource(PackageFile::GetTypeStatic(), fileName, priority);
+}
+
+//bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
+//{
+//    MutexLock lock(resourceMutex_);
+
+//    // Do not add packages that failed to load
+//    if (!package || !package->GetNumFiles())
+//    {
+//        URHO3D_LOGERRORF("Could not add package file %s due to load failure", package->GetName().CString());
+//        return false;
+//    }
+
+//    if (priority < fileSources_.Size())
+//        fileSources_.Insert(priority, SharedPtr<PackageFile>(package));
+//    else
+//        fileSources_.Push(SharedPtr<PackageFile>(package));
+
+//    URHO3D_LOGINFO("Added resource package " + package->GetName());
+//    return true;
+//}
+
+//bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
+//{
+//    SharedPtr<PackageFile> package(new PackageFile(context_));
+//    return package->Open(fileName) && AddPackageFile(package);
+//}
+
+bool ResourceCache::AddFileSource(FileSource* source, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
 
     // Do not add packages that failed to load
-    if (!package || !package->GetNumFiles())
+    if (!source || !source->GetNumFiles())
     {
-        URHO3D_LOGERRORF("Could not add package file %s due to load failure", package->GetName().CString());
+        URHO3D_LOGERRORF("Could not add package file %s due to load failure", source->GetName().CString());
         return false;
     }
 
-    if (priority < packages_.Size())
-        packages_.Insert(priority, SharedPtr<PackageFile>(package));
+    if (priority < fileSources_.Size())
+        fileSources_.Insert(priority, SharedPtr<FileSource>(source));
     else
-        packages_.Push(SharedPtr<PackageFile>(package));
+        fileSources_.Push(SharedPtr<FileSource>(source));
 
-    URHO3D_LOGINFO("Added resource package " + package->GetName());
+    URHO3D_LOGINFO("Added resource package " + source->GetName());
     return true;
 }
 
-bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
+bool ResourceCache::AddFileSource(const StringHash sourceType, const String& fileName, unsigned priority)
 {
-    SharedPtr<PackageFile> package(new PackageFile(context_));
-    return package->Open(fileName) && AddPackageFile(package);
+    SharedPtr<Object> obj(context_->CreateObject(sourceType));
+    if (obj && obj->IsInstanceOf<FileSource>())
+    {
+        SharedPtr<FileSource> source((FileSource*)obj.Get());
+        if (source->Open(fileName) && AddFileSource(source))
+            return true;
+        else
+            URHO3D_LOGERROR("Could not add file source " + fileName);
+    }
+    else
+        URHO3D_LOGERROR("Could not create FileSource with type hash " + sourceType.ToString() + " for file " + fileName);
+
+    return false;
 }
 
 bool ResourceCache::AddManualResource(Resource* resource)
@@ -206,41 +256,51 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
     }
 }
 
-void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResources, bool forceRelease)
+void ResourceCache::RemoveFileSource(FileSource* source, bool releaseResources, bool forceRelease)
 {
     MutexLock lock(resourceMutex_);
 
-    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
+    for (Vector<SharedPtr<FileSource> >::Iterator i = fileSources_.Begin(); i != fileSources_.End(); ++i)
     {
-        if (*i == package)
+        if (*i == source)
         {
             if (releaseResources)
-                ReleasePackageResources(*i, forceRelease);
+                ReleaseSourceResources(*i, forceRelease);
             URHO3D_LOGINFO("Removed resource package " + (*i)->GetName());
-            packages_.Erase(i);
+            fileSources_.Erase(i);
             return;
         }
     }
 }
 
-void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResources, bool forceRelease)
+void ResourceCache::RemoveFileSource(const String& fileName, bool releaseResources, bool forceRelease)
 {
     MutexLock lock(resourceMutex_);
 
     // Compare the name and extension only, not the path
     String fileNameNoPath = GetFileNameAndExtension(fileName);
 
-    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
+    for (Vector<SharedPtr<FileSource> >::Iterator i = fileSources_.Begin(); i != fileSources_.End(); ++i)
     {
         if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
         {
             if (releaseResources)
-                ReleasePackageResources(*i, forceRelease);
+                ReleaseSourceResources(*i, forceRelease);
             URHO3D_LOGINFO("Removed resource package " + (*i)->GetName());
-            packages_.Erase(i);
+            fileSources_.Erase(i);
             return;
         }
     }
+}
+
+void ResourceCache::RemovePackageFile(PackageFile *package, bool releaseResources, bool forceRelease)
+{
+    RemoveFileSource(package, releaseResources, forceRelease);
+}
+
+void ResourceCache::RemovePackageFile(const String &fileName, bool releaseResources, bool forceRelease)
+{
+    RemoveFileSource(fileName, releaseResources, forceRelease);
 }
 
 void ResourceCache::ReleaseResource(StringHash type, const String& name, bool force)
@@ -745,9 +805,9 @@ bool ResourceCache::Exists(const String& nameIn) const
     if (name.Empty())
         return false;
 
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    for (unsigned i = 0; i < fileSources_.Size(); ++i)
     {
-        if (packages_[i]->Exists(name))
+        if (fileSources_[i]->Exists(name))
             return true;
     }
 
@@ -1000,14 +1060,13 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
     return noResource;
 }
 
-void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
+void ResourceCache::ReleaseSourceResources(FileSource *source, bool force)
 {
     HashSet<StringHash> affectedGroups;
 
-    const HashMap<String, PackageEntry>& entries = package->GetEntries();
-    for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
+    for (const String& entry : source->GetEntryNames())
     {
-        StringHash nameHash(i->first_);
+        StringHash nameHash(entry);
 
         // We do not know the actual resource type, so search all type containers
         for (HashMap<StringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin(); j != resourceGroups_.End(); ++j)
@@ -1107,7 +1166,7 @@ File* ResourceCache::SearchResourceDirs(const String& nameIn)
         {
             // Construct the file first with full path, then rename it to not contain the resource path,
             // so that the file's name can be used in further GetFile() calls (for example over the network)
-            File* file(new File(context_, resourceDirs_[i] + nameIn));
+            File* file(new SystemFile(context_, resourceDirs_[i] + nameIn));
             file->SetName(nameIn);
             return file;
         }
@@ -1115,17 +1174,17 @@ File* ResourceCache::SearchResourceDirs(const String& nameIn)
 
     // Fallback using absolute path
     if (fileSystem->FileExists(nameIn))
-        return new File(context_, nameIn);
+        return new SystemFile(context_, nameIn);
 
     return nullptr;
 }
 
 File* ResourceCache::SearchPackages(const String& nameIn)
 {
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    for (unsigned i = 0; i < fileSources_.Size(); ++i)
     {
-        if (packages_[i]->Exists(nameIn))
-            return new File(context_, packages_[i], nameIn);
+        if (fileSources_[i]->Exists(nameIn))
+            return fileSources_[i]->GetNewFile(nameIn);
     }
 
     return nullptr;
@@ -1137,6 +1196,8 @@ void RegisterResourceLibrary(Context* context)
     JSONFile::RegisterObject(context);
     PListFile::RegisterObject(context);
     XMLFile::RegisterObject(context);
+
+    PackageFile::RegisterObject(context);
 }
 
 }
