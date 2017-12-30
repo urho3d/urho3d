@@ -312,7 +312,7 @@ bool Model::BeginLoad(Deserializer& source)
     // Read metadata
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
-    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, GetName(), false));
     if (file)
         LoadMetadataFromXML(file->GetRoot());
 

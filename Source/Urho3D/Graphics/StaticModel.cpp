@@ -315,7 +315,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
     unsigned index = 0;
     while (!file->IsEof() && index < batches_.Size())
     {
-        Material* material = cache->GetResource<Material>(file->ReadLine());
+        Material* material = cache->GetResource<Material>(file->ReadLine(), GetBasePath());
         if (material)
             SetMaterial(index, material);
 
@@ -375,14 +375,14 @@ void StaticModel::SetNumGeometries(unsigned num)
 void StaticModel::SetModelAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetModel(cache->GetResource<Model>(value.name_));
+    SetModel(cache->GetResource<Model>(value.name_, GetBasePath()));
 }
 
 void StaticModel::SetMaterialsAttr(const ResourceRefList& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < value.names_.Size(); ++i)
-        SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
+        SetMaterial(i, cache->GetResource<Material>(value.names_[i], GetBasePath()));
 }
 
 ResourceRef StaticModel::GetModelAttr() const

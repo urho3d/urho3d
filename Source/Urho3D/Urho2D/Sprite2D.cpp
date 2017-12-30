@@ -203,7 +203,7 @@ ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite)
     return ResourceRef(spriteSheet->GetType(), spriteSheet->GetName() + "@" + sprite->GetName());
 }
 
-Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value)
+Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value, const String &basePath)
 {
     if (!object)
         return nullptr;
@@ -211,7 +211,7 @@ Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value
     ResourceCache* cache = object->GetSubsystem<ResourceCache>();
 
     if (value.type_ == Sprite2D::GetTypeStatic())
-        return cache->GetResource<Sprite2D>(value.name_);
+        return cache->GetResource<Sprite2D>(value.name_, basePath);
 
     if (value.type_ == SpriteSheet2D::GetTypeStatic())
     {
@@ -223,7 +223,7 @@ Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value
         const String& spriteSheetName = names[0];
         const String& spriteName = names[1];
 
-        SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName);
+        SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName, basePath);
         if (!spriteSheet)
             return nullptr;
 

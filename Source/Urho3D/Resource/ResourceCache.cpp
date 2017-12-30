@@ -559,9 +559,9 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const String& name
     return existing;
 }
 
-Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, const String &basePath, bool sendEventOnFailure)
 {
-    String name = SanitateResourceName(nameIn);
+    String name = SanitateResourceName(ResolvePath(GetInternalPath(nameIn),GetParentPath(basePath)));
 
     if (!Thread::IsMainThread())
     {
@@ -635,11 +635,11 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     return resource;
 }
 
-bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn, bool sendEventOnFailure, Resource* caller)
+bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn, const String& basePath, bool sendEventOnFailure, Resource* caller)
 {
 #ifdef URHO3D_THREADING
     // If empty name, fail immediately
-    String name = SanitateResourceName(nameIn);
+    String name = SanitateResourceName(ResolvePath(GetInternalPath(nameIn),GetParentPath(basePath)));
     if (name.Empty())
         return false;
 
@@ -651,13 +651,13 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn
     return backgroundLoader_->QueueResource(type, name, sendEventOnFailure, caller);
 #else
     // When threading not supported, fall back to synchronous loading
-    return GetResource(type, nameIn, sendEventOnFailure);
+    return GetResource(type, nameIn, basePath, sendEventOnFailure);
 #endif
 }
 
-SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, const String& basePath, bool sendEventOnFailure)
 {
-    String name = SanitateResourceName(nameIn);
+    String name = SanitateResourceName(ResolvePath(GetInternalPath(nameIn),GetParentPath(basePath)));
 
     // If empty name, return null pointer immediately
     if (name.Empty())
@@ -729,11 +729,11 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) 
     }
 }
 
-bool ResourceCache::Exists(const String& nameIn) const
+bool ResourceCache::Exists(const String& nameIn, const String& basePath) const
 {
     MutexLock lock(resourceMutex_);
 
-    String name = SanitateResourceName(nameIn);
+    String name = SanitateResourceName(ResolvePath(GetInternalPath(nameIn),GetParentPath(basePath)));
     if (!isRouting_)
     {
         isRouting_ = true;

@@ -90,7 +90,7 @@ public:
     /// Save sprite to ResourceRef.
     static ResourceRef SaveToResourceRef(Sprite2D* sprite);
     /// Load sprite from ResourceRef.
-    static Sprite2D* LoadFromResourceRef(Object* object, const ResourceRef& value);
+    static Sprite2D* LoadFromResourceRef(Object* object, const ResourceRef& value, const String& basePath);
 
 private:
     /// Texture.

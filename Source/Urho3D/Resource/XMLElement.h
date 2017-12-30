@@ -284,6 +284,9 @@ public:
     /// Return XML file.
     XMLFile* GetFile() const;
 
+    /// Convenience function to return the XMLFile's path for use in relative path resolution (or EMPTY if no file)
+    const String& GetBasePath() const;
+
     /// Return pugixml xml_node_struct.
     pugi::xml_node_struct* GetNode() const { return node_; }
 

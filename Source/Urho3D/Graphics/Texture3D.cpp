@@ -103,7 +103,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         if (volumeTexPath.Empty())
             name = texPath + name;
 
-        loadImage_ = cache->GetTempResource<Image>(name);
+        loadImage_ = cache->GetTempResource<Image>(name, GetName());
         // Precalculate mip levels if async loading
         if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
             loadImage_->PrecalculateLevels();

@@ -289,6 +289,8 @@ const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
 
 bool Serializable::Load(Deserializer& source, bool setInstanceDefault)
 {
+    SetBasePath(source.GetName());
+
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
@@ -343,6 +345,8 @@ bool Serializable::Save(Serializer& dest) const
 
 bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
+    SetBasePath(source.GetBasePath());
+
     if (source.IsNull())
     {
         URHO3D_LOGERROR("Could not load " + GetTypeName() + ", null source element");
@@ -423,6 +427,9 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
 
 bool Serializable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
 {
+//    SetBasePath(source.GetName());
+#warning TODO: Need a way to get the base path from JSONValue
+
     if (source.IsNull())
     {
         URHO3D_LOGERROR("Could not load " + GetTypeName() + ", null JSON source element");

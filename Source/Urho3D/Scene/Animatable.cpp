@@ -461,7 +461,7 @@ void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
     if (!value.name_.Empty())
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_));
+        SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_, GetBasePath()));
     }
 }
 

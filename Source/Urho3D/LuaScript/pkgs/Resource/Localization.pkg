@@ -12,7 +12,7 @@ class Localization : public Object
     String Get(const String id);
     void Reset();
     void LoadJSON(const JSONValue& source);
-    void LoadJSONFile(const String name);
+    void LoadJSONFile(const String name, const String basePath = String::EMPTY);
 
     tolua_readonly tolua_property__get_set int numLanguages;
     tolua_readonly tolua_property__get_set int languageIndex;

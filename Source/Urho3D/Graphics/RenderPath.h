@@ -168,6 +168,8 @@ struct URHO3D_API RenderPathCommand
     String pass_;
     /// Scene pass index. Filled by View.
     unsigned passIndex_;
+    /// Path to use in resolving relative paths in textures
+    String basePath_;
     /// Command/pass metadata.
     String metadata_;
     /// Vertex shader name.

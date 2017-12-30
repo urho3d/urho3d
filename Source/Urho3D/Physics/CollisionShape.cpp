@@ -876,7 +876,7 @@ void CollisionShape::NotifyRigidBody(bool updateMass)
 void CollisionShape::SetModelAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    model_ = cache->GetResource<Model>(value.name_);
+    model_ = cache->GetResource<Model>(value.name_, GetBasePath());
     recreateShape_ = true;
     MarkNetworkUpdate();
 }

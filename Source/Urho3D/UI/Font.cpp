@@ -193,7 +193,7 @@ void Font::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
-    SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, false);
+    SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, GetName(), false);
     if (!xml)
         return;
 

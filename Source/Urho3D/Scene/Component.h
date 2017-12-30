@@ -106,6 +106,9 @@ public:
     /// Clean up all references to a network connection that is about to be removed.
     void CleanupConnection(Connection* connection);
 
+    /// Returns the absolute path associated with this component, fetching it from the node or returning EMPTY if no node.
+    virtual const String& GetBasePath() const;
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded() override;

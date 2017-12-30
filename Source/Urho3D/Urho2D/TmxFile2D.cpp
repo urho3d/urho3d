@@ -36,7 +36,6 @@
 
 #include "../DebugNew.h"
 
-
 namespace Urho3D
 {
 
@@ -353,7 +352,7 @@ bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     source_ = imageElem.GetAttribute("source");
     String textureFilePath = GetParentPath(tmxFile_->GetName()) + source_;
     ResourceCache* cache = tmxFile_->GetSubsystem<ResourceCache>();
-    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath, GetName()));
     if (!texture)
     {
         URHO3D_LOGERROR("Could not load texture " + textureFilePath);
@@ -431,12 +430,12 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
 
                 String textureFilePath =
                     GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
-                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
             }
             else
             {
                 String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
-                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
             }
         }
 
@@ -444,7 +443,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
              imageLayerElem = imageLayerElem.GetNext("imagelayer"))
         {
             String textureFilePath = GetParentPath(GetName()) + imageLayerElem.GetChild("image").GetAttribute("source");
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
         }
     }
 
@@ -651,10 +650,11 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     {
         XMLElement imageElem = tileSetElem.GetChild("image");
         // Tileset based on single tileset image
-        if (imageElem.NotNull()) {
+        if (imageElem.NotNull()) 
+        {
             isSingleTileSet = true;
             String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
-            SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+            SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath, GetName()));
             if (!texture)
             {
                 URHO3D_LOGERROR("Could not load texture " + textureFilePath);
@@ -670,8 +670,8 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                 hotSpot.y_ += offsetElem.GetFloat("y") / (float)tileHeight;
             }
 
-            imageWidth = imageElem.GetInt("width");
-            imageHeight = imageElem.GetInt("height");
+                    imageWidth = imageElem.GetInt("width");
+                    imageHeight = imageElem.GetInt("height");
 
             int gid = firstgid;
             for (int y = margin; y + tileHeight <= imageHeight - margin; y += tileHeight + spacing)
@@ -699,7 +699,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             XMLElement imageElem = tileElem.GetChild("image");
             if (imageElem.NotNull()) {
                 String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
-                SharedPtr<Image> image(cache->GetResource<Image>(textureFilePath));
+                SharedPtr<Image> image(cache->GetResource<Image>(textureFilePath, GetName()));
                 if (!image)
                 {
                     URHO3D_LOGERROR("Could not load image " + textureFilePath);
@@ -737,14 +737,14 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     }
 
     if (!isSingleTileSet)
-    {
+        {
         if (tileImageInfos.Empty())
             return false;
 
         AreaAllocator allocator(128, 128, 2048, 2048);
 
         for (int i = 0; i < tileImageInfos.Size(); ++i)
-        {
+            {
             TileImageInfo& info = tileImageInfos[i];
             if (!allocator.Allocate(info.imageWidth + 1, info.imageHeight + 1, info.x, info.y))
             {

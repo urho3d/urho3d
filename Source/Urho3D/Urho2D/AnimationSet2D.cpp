@@ -308,17 +308,17 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".xml";
-    hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+    hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_, source.GetName());
     if (!hasSpriteSheet_)
     {
         spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".plist";
-        hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+        hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_, source.GetName());
     }
 
     if (GetAsyncLoadState() == ASYNC_LOADING)
     {
         if (hasSpriteSheet_)
-            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, true, this);
+            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, source.GetName(), true, this);
         else
         {
             for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
@@ -328,7 +328,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
                 {
                     Spriter::File* file = folder->files_[j];
                     String imagePath = parentPath + file->name_;
-                    cache->BackgroundLoadResource<Image>(imagePath, true, this);
+                    cache->BackgroundLoadResource<Image>(imagePath, source.GetName(), true, this);
                 }
             }
         }
@@ -356,7 +356,7 @@ bool AnimationSet2D::EndLoadSpriter()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     if (hasSpriteSheet_)
     {
-        spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_);
+        spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_, GetName());
         if (!spriteSheet_)
             return false;
 
@@ -409,7 +409,7 @@ bool AnimationSet2D::EndLoadSpriter()
             {
                 Spriter::File* file = folder->files_[j];
                 String imagePath = parentPath + file->name_;
-                SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
+                SharedPtr<Image> image(cache->GetResource<Image>(imagePath, GetName()));
                 if (!image)
                 {
                     URHO3D_LOGERROR("Could not load image");

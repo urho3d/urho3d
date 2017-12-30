@@ -106,7 +106,7 @@ bool Texture2DArray::BeginLoad(Deserializer& source)
         if (GetPath(name).Empty())
             name = texPath + name;
 
-        loadImages_.Push(cache->GetTempResource<Image>(name));
+        loadImages_.Push(cache->GetTempResource<Image>(name, GetName()));
         cache->StoreResourceDependency(this, name);
 
         layerElem = layerElem.GetNext("layer");

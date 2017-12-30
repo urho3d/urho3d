@@ -466,7 +466,7 @@ void SoundSource::UpdateMasterGain()
 void SoundSource::SetSoundAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Sound* newSound = cache->GetResource<Sound>(value.name_);
+    Sound* newSound = cache->GetResource<Sound>(value.name_, GetBasePath());
     if (IsPlaying())
         Play(newSound);
     else

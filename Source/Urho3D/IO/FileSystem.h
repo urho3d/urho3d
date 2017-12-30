@@ -150,5 +150,10 @@ URHO3D_API String GetNativePath(const String& pathName);
 URHO3D_API WString GetWideNativePath(const String& pathName);
 /// Return whether a path is absolute.
 URHO3D_API bool IsAbsolutePath(const String& pathName);
+/// Removes the extra .. and . directory references from path
+URHO3D_API String CompressRelativePath(const String& path);
+/// Resolves the relative path to the base (absolute, which must be a directory)
+URHO3D_API String ResolvePath(const String& relative, const String& absolute);
+
 
 }

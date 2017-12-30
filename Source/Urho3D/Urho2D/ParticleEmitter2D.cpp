@@ -152,7 +152,7 @@ Sprite2D* ParticleEmitter2D::GetSprite() const
 void ParticleEmitter2D::SetParticleEffectAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetEffect(cache->GetResource<ParticleEffect2D>(value.name_));
+    SetEffect(cache->GetResource<ParticleEffect2D>(value.name_, GetBasePath()));
 }
 
 ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
@@ -162,7 +162,7 @@ ResourceRef ParticleEmitter2D::GetParticleEffectAttr() const
 
 void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
 {
-    Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
+    Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value, GetBasePath());
     if (sprite)
         SetSprite(sprite);
 }

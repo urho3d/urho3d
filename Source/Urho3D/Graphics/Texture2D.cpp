@@ -86,7 +86,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
     // Load the optional parameters file
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
-    loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
+    loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, GetName(), false);
 
     return true;
 }

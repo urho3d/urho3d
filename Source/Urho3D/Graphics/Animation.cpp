@@ -169,7 +169,7 @@ bool Animation::BeginLoad(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
-    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, GetName(), false));
     if (file)
     {
         XMLElement rootElem = file->GetRoot();
@@ -191,7 +191,7 @@ bool Animation::BeginLoad(Deserializer& source)
     // Optionally read triggers from a JSON file
     String jsonName = ReplaceExtension(GetName(), ".json");
 
-    SharedPtr<JSONFile> jsonFile(cache->GetTempResource<JSONFile>(jsonName, false));
+    SharedPtr<JSONFile> jsonFile(cache->GetTempResource<JSONFile>(jsonName, GetName(), false));
     if (jsonFile)
     {
         const JSONValue& rootVal = jsonFile->GetRoot();
