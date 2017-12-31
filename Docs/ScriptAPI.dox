@@ -2899,10 +2899,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
@@ -2959,10 +2959,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllAnimationStates()
@@ -3008,7 +3008,7 @@ Properties:
 - bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -3054,10 +3054,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -3230,10 +3230,10 @@ Methods:
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
 - bool IsPlaying(uint8) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - bool Play(const String&, uint8, bool, float = 0.0f)
 - bool PlayExclusive(const String&, uint8, bool, float = 0.0f)
@@ -3510,10 +3510,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -3629,16 +3629,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -3857,16 +3857,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -4038,10 +4038,10 @@ Methods:
 - Frustum GetSplitFrustum(float, float) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4156,16 +4156,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -4326,10 +4326,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4401,10 +4401,10 @@ Methods:
 - Vector2[]@ GetVertices() const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4475,10 +4475,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4547,10 +4547,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4620,10 +4620,10 @@ Methods:
 - Vector2[]@ GetVertices() const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4693,10 +4693,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4772,10 +4772,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4891,10 +4891,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5032,10 +5032,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5106,10 +5106,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5168,10 +5168,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5235,10 +5235,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5300,10 +5300,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5365,10 +5365,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5432,10 +5432,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5498,10 +5498,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5568,10 +5568,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5635,10 +5635,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5704,10 +5704,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5769,10 +5769,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5834,10 +5834,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5922,10 +5922,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6012,10 +6012,10 @@ Methods:
 - Vector3 GetRandomPointInCircle(const Vector3&, float, int)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, int)
@@ -6124,16 +6124,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -6306,10 +6306,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6499,10 +6499,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6561,10 +6561,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllDecals()
@@ -6723,10 +6723,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6797,10 +6797,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6894,16 +6894,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -7103,10 +7103,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool HasTile(const IntVector2&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -7631,10 +7631,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -7705,10 +7705,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void RebuildChainTrees()
 - void RecalculateSegmentLengths()
@@ -8108,10 +8108,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -8229,16 +8229,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -8438,16 +8438,16 @@ Methods:
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool IsSelected(uint) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -8894,16 +8894,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -9240,10 +9240,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9302,10 +9302,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9378,10 +9378,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool HasTile(const IntVector2&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -9502,10 +9502,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9591,10 +9591,10 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&)
 - bool IsChildOf(Node@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector2 LocalToWorld2D(const Vector2&) const
@@ -9793,10 +9793,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9862,10 +9862,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
 - RayQueryResult RaycastSingle(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
@@ -9927,10 +9927,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -10124,10 +10124,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllParticles()
@@ -10216,10 +10216,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -10346,10 +10346,10 @@ Methods:
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float, uint = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float, uint = 0xffff)
@@ -10424,10 +10424,10 @@ Methods:
 - RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult2D[]@ Raycast(const Vector2&, const Vector2&, uint = 0xffff)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff)
@@ -10688,10 +10688,10 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - void Init()
 - bool IsFrontWheel(int)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11090,10 +11090,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11188,10 +11188,10 @@ Methods:
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void ReAddBodyToWorld()
 - void Remove()
@@ -11285,10 +11285,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11398,16 +11398,16 @@ Methods:
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - bool IsChildOf(Node@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadAsyncXML(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadJSON(File@)
 - bool LoadJSON(VectorBuffer&)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector2 LocalToWorld2D(const Vector2&) const
@@ -11625,10 +11625,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsA(const String&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11711,16 +11711,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -11899,16 +11899,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -12068,10 +12068,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
@@ -12173,10 +12173,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -12212,7 +12212,7 @@ Properties:
 - bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -12271,16 +12271,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -12443,10 +12443,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -12547,10 +12547,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -12606,10 +12606,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
 - void Play(Sound@, float)
@@ -12680,10 +12680,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
 - void Play(Sound@, float)
@@ -12815,10 +12815,10 @@ Methods:
 - Vector3 GetPosition() const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Move(float)
 - void Remove()
@@ -12902,16 +12902,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -13136,10 +13136,10 @@ Methods:
 - bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13175,7 +13175,7 @@ Properties:
 - bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -13217,10 +13217,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllInstanceNodes()
@@ -13259,7 +13259,7 @@ Properties:
 - Node@[] instanceNodes // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -13301,10 +13301,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13518,10 +13518,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - Vector3 HeightMapToWorld(const IntVector2&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13605,10 +13605,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13698,16 +13698,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -13882,10 +13882,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -14302,10 +14302,10 @@ Methods:
 - TileMapObject2D@[]@ GetTileCollisionShapes(int) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - bool PositionToTileIndex(int&, int&, const Vector2&) const
 - void Remove()
@@ -14385,10 +14385,10 @@ Methods:
 - bool HasProperty(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -14555,16 +14555,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -14786,10 +14786,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -14867,16 +14867,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -15377,16 +15377,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void QueueUpdate()
 - void Remove()
@@ -15624,16 +15624,16 @@ Methods:
 - bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -15962,10 +15962,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
