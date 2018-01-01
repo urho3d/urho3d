@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -183,7 +183,7 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2017 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2018 the Urho3D project.")
     endif ()
 endif ()
 
