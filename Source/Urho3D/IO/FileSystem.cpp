@@ -1070,10 +1070,14 @@ bool IsAbsolutePath(const String& pathName)
 String FileSystem::GetTemporaryDir() const
 {
 #if defined(_WIN32)
+#if defined(MINI_URHO)
+    return getenv("TMP");
+#else
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     GetTempPathW(SDL_arraysize(pathName), pathName);
     return AddTrailingSlash(String(pathName));
+#endif
 #else
     if (char* pathName = getenv("TMPDIR"))
         return AddTrailingSlash(pathName);
