@@ -641,9 +641,9 @@ void ScriptInstance::GetScriptAttributes()
     unsigned numProperties = scriptObject_->GetPropertyCount();
     for (unsigned i = 0; i < numProperties; ++i)
     {
-        const char* name;
-        int typeId;
-        bool isPrivate, isProtected, isHandle;
+        const char* name = nullptr;
+        int typeId = 0; // AngelScript void typeid
+        bool isPrivate=false, isProtected=false, isHandle=false, isEnum=false;
 
         scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate, &isProtected);
 
@@ -656,12 +656,20 @@ void ScriptInstance::GetScriptAttributes()
         if (isHandle)
             typeName = typeName.Substring(0, typeName.Length() - 1);
 
+        if (engine->GetTypeInfoById(typeId))
+            isEnum = engine->GetTypeInfoById(typeId)->GetFlags() & asOBJ_ENUM;
+
         AttributeInfo info;
         info.mode_ = AM_FILE;
         info.name_ = name;
         info.ptr_ = scriptObject_->GetAddressOfProperty(i);
 
-        if (!isHandle)
+        if (isEnum)
+        {
+            info.type_ = VAR_INT;
+            info.enumNames_ = GetSubsystem<Script>()->GetEnumValues(typeId);
+        }
+        else if (!isHandle)
         {
             switch (typeId)
             {
