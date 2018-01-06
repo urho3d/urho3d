@@ -125,13 +125,6 @@ public:
         return *ptr_;
     }
 
-    /// Subscript the object if applicable.
-    T& operator [](const int index)
-    {
-        assert(ptr_);
-        return ptr_[index];
-    }
-
     /// Test for less than with another shared pointer.
     template <class U> bool operator <(const SharedPtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
 
@@ -239,6 +232,192 @@ template <class T, class U> SharedPtr<T> DynamicCast(const SharedPtr<U>& ptr)
     return ret;
 }
 
+/// Shared pointer with external non-intrusive reference counting.
+template <class T> class ExternalPtr
+{
+public:
+    /// Construct a null external pointer.
+    ExternalPtr() noexcept {}
+
+    /// Construct a null external pointer.
+    ExternalPtr(std::nullptr_t) noexcept {}     // NOLINT
+
+    /// Construct from shared pointer.
+    template <class U> ExternalPtr(const SharedPtr<U>& rhs) :
+        ptr_(rhs.Get()),
+        refCount_(rhs.RefCountPtr())
+    {
+        AddRef();
+    }
+
+    /// Copy-construct from another external pointer.
+    ExternalPtr(const ExternalPtr<T>& rhs) noexcept :
+        ptr_(rhs.ptr_),
+        refCount_(rhs.refCount_)
+    {
+        AddRef();
+    }
+
+    /// Copy-construct from another external pointer allowing implicit upcasting.
+    template <class U> explicit ExternalPtr(const ExternalPtr<U>& rhs) noexcept :
+        ptr_(rhs.ptr_),
+        refCount_(rhs.refCount_)
+    {
+        AddRef();
+    }
+
+    /// Construct from a raw pointer.
+    ExternalPtr(T* ptr, RefCount* refCount) noexcept :
+        ptr_(ptr),
+        refCount_(refCount)
+    {
+        AddRef();
+    }
+
+    /// Destruct. Release the object reference.
+    ~ExternalPtr() noexcept
+    {
+        ReleaseRef();
+    }
+
+    /// Assign from another external pointer.
+    ExternalPtr<T>& operator =(const ExternalPtr<T>& rhs)
+    {
+        if (ptr_ == rhs.ptr_)
+            return *this;
+
+        ExternalPtr<T> copy(rhs);
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Assign from another external pointer allowing implicit upcasting.
+    template <class U> ExternalPtr<T>& operator =(const ExternalPtr<U>& rhs)
+    {
+        if (ptr_ == rhs.ptr_)
+            return *this;
+
+        ExternalPtr<T> copy(rhs);
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Assign from shared pointer allowing implicit upcasting.
+    template <class U> ExternalPtr<T>& operator =(const SharedPtr<U>& rhs)
+    {
+        if (ptr_ == rhs.ptr_)
+            return *this;
+
+        ExternalPtr<T> copy(rhs);
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Point to the object.
+    T* operator ->() const
+    {
+        assert(ptr_);
+        return ptr_;
+    }
+
+    /// Dereference the object.
+    T& operator *() const
+    {
+        assert(ptr_);
+        return *ptr_;
+    }
+
+    /// Test for less than with another external pointer.
+    template <class U> bool operator <(const ExternalPtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
+
+    /// Test for equality with another external pointer.
+    template <class U> bool operator ==(const ExternalPtr<U>& rhs) const { return ptr_ == rhs.ptr_; }
+
+    /// Test for inequality with another external pointer.
+    template <class U> bool operator !=(const ExternalPtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
+
+    /// Swap with another ExternalPtr.
+    void Swap(ExternalPtr& rhs)
+    {
+        Urho3D::Swap(ptr_, rhs.ptr_);
+        Urho3D::Swap(refCount_, rhs.refCount_);
+    }
+
+    /// Reset to null and release the object reference.
+    void Reset() { ReleaseRef(); }
+
+    /// Check if the pointer is null.
+    bool Null() const { return ptr_ == 0; }
+
+    /// Check if the pointer is not null.
+    bool NotNull() const { return ptr_ != 0; }
+
+    /// Return the raw pointer.
+    T* Get() const { return ptr_; }
+
+    /// Return the object's reference count, or 0 if the pointer is null.
+    int Refs() const { return refCount_ ? refCount_->refs_ : 0; }
+
+    /// Return the object's weak reference count, or 0 if the pointer is null.
+    int WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
+
+    /// Return pointer to the RefCount structure.
+    RefCount* RefCountPtr() const { return refCount_; }
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
+
+private:
+    template <class U> friend class ExternalPtr;
+
+    /// Add a reference to the object pointed to.
+    void AddRef()
+    {
+        if (ptr_)
+        {
+            // Hold weak reference onto RefCount
+            ++refCount_->weakRefs_;
+
+            // Hold the object
+            ++refCount_->refs_;
+        }
+    }
+
+    /// Release the object reference and delete it if necessary.
+    void ReleaseRef()
+    {
+        if (ptr_)
+        {
+            assert(refCount_->refs_ > 0);
+            assert(refCount_->weakRefs_ > 0);
+
+            // Release the object
+            --refCount_->refs_;
+            if (!refCount_->refs_)
+            {
+                delete ptr_;
+                refCount_->refs_ = -1;
+            }
+
+            // Release the counter
+            --refCount_->weakRefs_;
+            if (!refCount_->weakRefs_)
+                delete refCount_;
+
+            ptr_ = nullptr;
+            refCount_ = nullptr;
+        }
+    }
+
+    /// Pointer to the object.
+    T* ptr_ = nullptr;
+    /// Pointer to the counter.
+    RefCount* refCount_ = nullptr;
+};
+
 /// Weak pointer template class with intrusive reference counting. Does not keep the object pointed to alive.
 template <class T> class WeakPtr
 {
@@ -281,6 +460,14 @@ public:
         AddRef();
     }
 
+    /// Construct from an external pointer.
+    explicit WeakPtr(const ExternalPtr<T>& rhs) noexcept :
+        ptr_(rhs.Get()),
+        refCount_(rhs.RefCountPtr())
+    {
+        AddRef();
+    }
+
     /// Construct from a raw pointer.
     explicit WeakPtr(T* ptr) noexcept :
         ptr_(ptr),
@@ -297,6 +484,20 @@ public:
 
     /// Assign from a shared pointer.
     WeakPtr<T>& operator =(const SharedPtr<T>& rhs)
+    {
+        if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
+            return *this;
+
+        ReleaseRef();
+        ptr_ = rhs.Get();
+        refCount_ = rhs.RefCountPtr();
+        AddRef();
+
+        return *this;
+    }
+
+    /// Assign from an external pointer.
+    WeakPtr<T>& operator =(const ExternalPtr<T>& rhs)
     {
         if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
             return *this;
@@ -385,14 +586,6 @@ public:
         T* rawPtr = Get();
         assert(rawPtr);
         return *rawPtr;
-    }
-
-    /// Subscript the object if applicable.
-    T& operator [](const int index)
-    {
-        T* rawPtr = Get();
-        assert(rawPtr);
-        return (*rawPtr)[index];
     }
 
     /// Test for equality with another weak pointer.
@@ -642,6 +835,12 @@ template <class T, class ... Args> UniquePtr<T> MakeUnique(Args && ... args)
 template <class T, class ... Args> SharedPtr<T> MakeShared(Args && ... args)
 {
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
+
+/// Construct ExternalPtr.
+template <class T, class ... Args> ExternalPtr<T> MakeExternal(Args && ... args)
+{
+    return ExternalPtr<T>(new T(std::forward<Args>(args)...), new RefCount);
 }
 
 }
