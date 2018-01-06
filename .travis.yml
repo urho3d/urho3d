@@ -140,11 +140,6 @@ matrix:
       script: rake ci && rake ci_timer
     - <<: *debug-build-stage
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
-    - &debug-build-stage-clang
-      <<: *debug-build-stage
-      compiler: clang
-    - <<: *debug-build-stage-clang
-      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
 # TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' stages here
     - stage: lint (to be implemented)
       <<: *base
@@ -322,13 +317,13 @@ env:
     - &armeabi-v7a-static ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC             # Using default native API Level android-9
     - &armeabi-v7a-shared ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
-    - &x86_64-static ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21    # Using default native API level android-21
-    - &x86_64-shared ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
-    - &x86-static ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21   # At least android-12 is needed when LuaJIT is on
-    - &x86-shared ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21    # Using default native API level android-21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21   # At least android-12 is needed when LuaJIT is on
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
-    - &arm64-v8a-static ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1 # Using default native API level android-21
-    - &arm64-v8a-shared ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
+    - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1 # Using default native API level android-21
+    - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
 stage: release build configuration
 before_script:
   # Temporarily disable the test to build the APK as Travis-CI Trusty beta VM has not yet setup the environment for Android properly
@@ -357,18 +352,6 @@ matrix:
       script: rake ci && rake ci_timer
     - <<: *debug-build-stage
       env: [*armeabi-v7a-shared, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86_64-static, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86_64-shared, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86-static, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86-shared, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*arm64-v8a-static, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*arm64-v8a-shared, CMAKE_BUILD_TYPE=Debug]
     - stage: housekeep
 
 ---
