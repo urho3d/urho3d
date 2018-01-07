@@ -56,7 +56,7 @@ public:
     }
 
     /// Copy-construct from another shared pointer allowing implicit upcasting.
-    template <class U> explicit SharedPtr(const SharedPtr<U>& rhs) noexcept :
+    template <class U> SharedPtr(const SharedPtr<U>& rhs) noexcept :    // NOLINT
         ptr_(rhs.ptr_)
     {
         AddRef();
@@ -266,7 +266,7 @@ public:
     }
 
     /// Copy-construct from another weak pointer allowing implicit upcasting.
-    template <class U> explicit WeakPtr(const WeakPtr<U>& rhs) noexcept :
+    template <class U> WeakPtr(const WeakPtr<U>& rhs) noexcept :   // NOLINT
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
     {
@@ -274,7 +274,7 @@ public:
     }
 
     /// Construct from a shared pointer.
-    explicit WeakPtr(const SharedPtr<T>& rhs) noexcept :
+    WeakPtr(const SharedPtr<T>& rhs) noexcept : // NOLINT
         ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
     {
@@ -544,7 +544,7 @@ public:
     }
 
     /// Construct empty.
-    explicit UniquePtr(std::nullptr_t) { }
+    UniquePtr(std::nullptr_t) { }   // NOLINT
 
     /// Move-construct from UniquePtr.
     UniquePtr(UniquePtr && up) : ptr_(up.Detach()) { }
@@ -583,7 +583,7 @@ public:
     bool operator !=(const UniquePtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
 
     /// Cast pointer to bool.
-    explicit operator bool() const { return !!ptr_; }
+    operator bool() const { return !!ptr_; }    // NOLINT
 
     /// Swap with another UniquePtr.
     void Swap(UniquePtr& up) { Urho3D::Swap(ptr_, up.ptr_); }
