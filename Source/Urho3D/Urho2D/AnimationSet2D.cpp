@@ -29,7 +29,6 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Math/AreaAllocator.h"
-#include "../Resource/Image.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 #include "../Urho2D/AnimationSet2D.h"
@@ -42,9 +41,7 @@
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
 #include <spine/extension.h>
-#endif
 
-#ifdef URHO3D_SPINE
 // Current animation set
 static Urho3D::AnimationSet2D* currentAnimationSet = 0;
 

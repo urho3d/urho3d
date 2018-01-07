@@ -29,7 +29,6 @@
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
-#include "../Resource/Image.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/TmxFile2D.h"
 #include "../Math/AreaAllocator.h"

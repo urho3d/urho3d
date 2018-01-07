@@ -224,7 +224,7 @@ public:
     String& operator +=(bool rhs);
 
     /// Add-assign (concatenate as string) an arbitrary type.
-    template <class T> String operator +=(const T& rhs) { return *this += rhs.ToString(); }
+    template <class T> String& operator +=(const T& rhs) { return *this += rhs.ToString(); }
 
     /// Add a string.
     String operator +(const String& rhs) const

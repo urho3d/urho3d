@@ -66,8 +66,6 @@ Vector2 TileMapInfo2D::ConvertPosition(const Vector2& position) const
     default:
         return Vector2(position.x_ * PIXEL_SIZE, GetMapHeight() - position.y_ * PIXEL_SIZE);
     }
-
-    return Vector2::ZERO;
 }
 
 Vector2 TileMapInfo2D::TileIndexToPosition(int x, int y) const
@@ -93,8 +91,6 @@ Vector2 TileMapInfo2D::TileIndexToPosition(int x, int y) const
     default:
         return Vector2(x * tileWidth_, (height_ - 1 - y) * tileHeight_);
     }
-
-    return Vector2::ZERO;
 }
 
 bool TileMapInfo2D::PositionToTileIndex(int& x, int& y, const Vector2& position) const
