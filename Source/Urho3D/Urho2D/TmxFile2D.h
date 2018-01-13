@@ -198,6 +198,9 @@ public:
     /// Return layer at index.
     const TmxLayer2D* GetLayer(unsigned index) const;
 
+    /// Set texture edge offset for all sprites, in pixels.
+    void SetSpriteTextureEdgeOffset(float offset);
+
 private:
     /// Load TSX file.
     SharedPtr<XMLFile> LoadTSXFile(const String& source);
