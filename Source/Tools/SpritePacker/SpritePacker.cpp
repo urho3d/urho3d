@@ -65,7 +65,7 @@ public:
     int frameX;
     int frameY;
 
-    PackerInfo(String path_, String name_) :
+    PackerInfo(const String& path_, const String& name_) :
         path(path_),
         name(name_),
         x(0),
