@@ -347,7 +347,7 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     Node* characterNode = character_->GetNode();
 
     // Get camera lookat dir from character yaw + pitch
-    Quaternion rot = characterNode->GetRotation();
+    const Quaternion& rot = characterNode->GetRotation();
     Quaternion dir = rot * Quaternion(character_->controls_.pitch_, Vector3::RIGHT);
 
     // Turn head to camera pitch, but limit to avoid unnatural animation
