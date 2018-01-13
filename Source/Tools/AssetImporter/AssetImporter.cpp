@@ -2659,7 +2659,7 @@ void FillChainTransforms(OutModel &model, aiMatrix4x4 *chain, const String& main
     }
 }
 
-void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *channelIndices)
+void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, const int *channelIndices)
 {
     aiNodeAnim* channel = anim->mChannels[mainChannel];
     unsigned int poskeyFrames = channel->mNumPositionKeys;
