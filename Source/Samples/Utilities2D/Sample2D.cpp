@@ -357,8 +357,10 @@ float Sample2D::Zoom(Camera* camera)
     float zoom_ = camera->GetZoom();
 
     if (input->GetMouseMoveWheel() != 0)
+    {
         zoom_ = Clamp(zoom_ + input->GetMouseMoveWheel() * 0.1f, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
         camera->SetZoom(zoom_);
+    }
 
     if (input->GetKeyDown(KEY_PAGEUP))
     {
