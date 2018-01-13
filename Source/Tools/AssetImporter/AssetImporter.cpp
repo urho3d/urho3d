@@ -210,7 +210,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 
 void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
 
-void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
+void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& dest, aiNode* node);
 unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
