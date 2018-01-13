@@ -589,10 +589,9 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
 
 void TmxFile2D::SetSpriteTextureEdgeOffset(float offset)
 {
-    for (HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = gidToSpriteMapping_.Begin();
-         i != gidToSpriteMapping_.End(); ++i)
+    for (Urho3D::HashMap<int, Urho3D::SharedPtr<Urho3D::Sprite2D> >::KeyValue& i : gidToSpriteMapping_)
     {
-        i->second_->SetTextureEdgeOffset(offset);
+        i.second_->SetTextureEdgeOffset(offset);
     }
 }
 

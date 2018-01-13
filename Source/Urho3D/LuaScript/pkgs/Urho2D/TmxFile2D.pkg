@@ -2,4 +2,5 @@ $#include "Urho2D/TmxFile2D.h"
 
 class TmxFile2D : Resource
 {
+    void SetSpriteTextureEdgeOffset(float offset);
 };
