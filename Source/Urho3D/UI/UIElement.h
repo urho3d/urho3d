@@ -749,7 +749,7 @@ private:
     /// Calculate child widths/positions in the layout.
     void CalculateLayout
         (PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes,
-            const PODVector<float>& flexScales, int targetWidth, int begin, int end, int spacing);
+            const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing);
     /// Get child element constant position in a layout.
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.

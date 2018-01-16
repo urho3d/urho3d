@@ -569,7 +569,7 @@ class PointQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :
+    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :   // NOLINT(modernize-pass-by-value)
         point_(point),
         collisionMask_(collisionMask),
         rigidBody_(nullptr)

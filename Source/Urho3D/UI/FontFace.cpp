@@ -112,7 +112,7 @@ SharedPtr<Texture2D> FontFace::CreateFaceTexture()
     return texture;
 }
 
-SharedPtr<Texture2D> FontFace::LoadFaceTexture(SharedPtr<Image> image)
+SharedPtr<Texture2D> FontFace::LoadFaceTexture(const SharedPtr<Image>& image)
 {
     SharedPtr<Texture2D> texture = CreateFaceTexture();
     if (!texture->SetData(image, true))

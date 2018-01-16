@@ -576,7 +576,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     {
                         //16 bit indices
                         unsigned short indices[3];
-                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        memcpy(indices, indexData + (indexIdx * indexSize), (size_t)indexSize * 3);
                         longIndices[0] = indices[0] - indexOffset;
                         longIndices[1] = indices[1] - indexOffset;
                         longIndices[2] = indices[2] - indexOffset;
@@ -585,7 +585,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     {
                         //32 bit indices
                         unsigned indices[3];
-                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        memcpy(indices, indexData + (indexIdx * indexSize), (size_t)indexSize * 3);
                         longIndices[0] = indices[0] - indexOffset;
                         longIndices[1] = indices[1] - indexOffset;
                         longIndices[2] = indices[2] - indexOffset;

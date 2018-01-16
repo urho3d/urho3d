@@ -58,7 +58,7 @@ public:
     virtual void OnHidePopup() { }
 
     /// Set popup element to show on selection.
-    void SetPopup(UIElement* element);
+    void SetPopup(UIElement* popup);
     /// Set popup element offset.
     void SetPopupOffset(const IntVector2& offset);
     /// Set popup element offset.

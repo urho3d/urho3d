@@ -113,7 +113,7 @@ public:
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
 
     /// Store object.
-    void StoreObject(XMLElement objectElem, SharedPtr<TileMapObject2D> object, const TileMapInfo2D& info, bool isTile = false);
+    void StoreObject(const XMLElement& objectElem, const SharedPtr<TileMapObject2D>& object, const TileMapInfo2D& info, bool isTile = false);
 
     /// Return number of objects.
     unsigned GetNumObjects() const { return objects_.Size(); }

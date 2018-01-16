@@ -57,7 +57,7 @@ class Camera;
 template <class T, class U> U* RefCast(T* t)
 {
     if (!t)
-        return 0;
+        return nullptr;
 
     return dynamic_cast<U*>(t);
 }
@@ -833,7 +833,7 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     RegisterObject<T>(engine, className);
     RegisterSubclass<Resource, T>(engine, "Resource", className);
     // Do not register factory for the base class
-    if (strcmp("Resource", className))
+    if (strcmp("Resource", className) != 0)
     {
         RegisterObjectConstructor<T>(engine, className);
         RegisterNamedObjectConstructor<T>(engine, className);

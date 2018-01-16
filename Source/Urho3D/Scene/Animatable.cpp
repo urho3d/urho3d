@@ -39,9 +39,9 @@ namespace Urho3D
 
 extern const char* wrapModeNames[];
 
-AttributeAnimationInfo::AttributeAnimationInfo(Animatable* target, const AttributeInfo& attributeInfo,
+AttributeAnimationInfo::AttributeAnimationInfo(Animatable* animatable, const AttributeInfo& attributeInfo,
     ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
+    ValueAnimationInfo(animatable, attributeAnimation, wrapMode, speed),
     attributeInfo_(attributeInfo)
 {
 }

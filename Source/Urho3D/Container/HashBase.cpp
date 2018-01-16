@@ -29,10 +29,9 @@ namespace Urho3D
 
 void HashBase::AllocateBuckets(unsigned size, unsigned numBuckets)
 {
-    if (ptrs_)
-        delete[] ptrs_;
+    delete[] ptrs_;
 
-    auto** ptrs = new HashNodeBase* [numBuckets + 2];
+    auto ptrs = new HashNodeBase* [numBuckets + 2];
     auto* data = reinterpret_cast<unsigned*>(ptrs);
     data[0] = size;
     data[1] = numBuckets;

@@ -138,7 +138,7 @@ static void GetCPUData(struct CpuCoreCount* data)
     fp = fopen("/sys/devices/system/cpu/present", "r");
     if (fp)
     {
-        res = fscanf(fp, "%d-%d", &i, &j);
+        res = fscanf(fp, "%d-%d", &i, &j);                          // NOLINT(cert-err34-c)
         fclose(fp);
 
         if (res == 2 && i == 0)
@@ -148,7 +148,7 @@ static void GetCPUData(struct CpuCoreCount* data)
             fp = fopen("/sys/devices/system/cpu/cpu0/topology/thread_siblings_list", "r");
             if (fp)
             {
-                res = fscanf(fp, "%d,%d,%d,%d", &i, &j, &i, &j);
+                res = fscanf(fp, "%d,%d,%d,%d", &i, &j, &i, &j);    // NOLINT(cert-err34-c)
                 fclose(fp);
 
                 // Having sibling thread(s) indicates the CPU is using HT/SMT technology

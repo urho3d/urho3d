@@ -38,6 +38,8 @@ class XMLFile;
 /// Base class for texture resources.
 class URHO3D_API Texture : public ResourceWithMetadata, public GPUObject
 {
+    URHO3D_OBJECT(Texture, ResourceWithMetadata);
+
 public:
     /// Construct.
     explicit Texture(Context* context);
@@ -51,9 +53,9 @@ public:
      */
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
-    void SetFilterMode(TextureFilterMode filter);
+    void SetFilterMode(TextureFilterMode mode);
     /// Set addressing mode by texture coordinate.
-    void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    void SetAddressMode(TextureCoordinate coord, TextureAddressMode mode);
     /// Set texture max. anisotropy level. No effect if not using anisotropic filtering. Value 0 (default) uses the default setting from Renderer.
     void SetAnisotropy(unsigned level);
     /// Set shadow compare mode. Not used on Direct3D9.
@@ -143,7 +145,7 @@ public:
     bool GetParametersDirty() const;
 
     /// Set additional parameters from an XML file.
-    void SetParameters(XMLFile* xml);
+    void SetParameters(XMLFile* file);
     /// Set additional parameters from an XML element.
     void SetParameters(const XMLElement& element);
     /// Mark parameters dirty. Called by Graphics.

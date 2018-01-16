@@ -113,7 +113,7 @@ public:
     /// Return animation state by animation name.
     AnimationState* GetAnimationState(const String& animationName) const;
     /// Return animation state by animation name hash.
-    AnimationState* GetAnimationState(const StringHash animationNameHash) const;
+    AnimationState* GetAnimationState(StringHash animationNameHash) const;
     /// Return animation state by index.
     AnimationState* GetAnimationState(unsigned index) const;
 
@@ -196,7 +196,7 @@ private:
     /// Clone geometries for vertex morphing.
     void CloneGeometries();
     /// Copy morph vertices.
-    void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
+    void CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer, VertexBuffer* srcBuffer);
     /// Recalculate animations. Called from Update().
     void UpdateAnimation(const FrameInfo& frame);
     /// Recalculate skinning.

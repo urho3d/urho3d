@@ -88,7 +88,7 @@ public:
     /// Clip with a bounding box.
     void Clip(const BoundingBox& box);
     /// Clip with a frustum.
-    void Clip(const Frustum& box);
+    void Clip(const Frustum& frustum);
     /// Clear all faces.
     void Clear();
     /// Transform with a 3x3 matrix.

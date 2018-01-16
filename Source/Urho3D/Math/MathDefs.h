@@ -154,37 +154,37 @@ template <class T> inline T Atan(T x) { return M_RADTODEG * atan(x); }
 template <class T> inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
 
 /// Return X in power Y.
-template <class T> T Pow(T x, T y) { return pow(x, y); }
+template <class T> inline T Pow(T x, T y) { return pow(x, y); }
 
 /// Return natural logarithm of X.
-template <class T> T Ln(T x) { return log(x); }
+template <class T> inline T Ln(T x) { return log(x); }
 
 /// Return square root of X.
-template <class T> T Sqrt(T x) { return sqrt(x); }
+template <class T> inline T Sqrt(T x) { return sqrt(x); }
 
 /// Return floating-point remainder of X/Y.
-template <class T> T Mod(T x, T y) { return fmod(x, y); }
+template <class T> inline T Mod(T x, T y) { return fmod(x, y); }
 
 /// Return fractional part of passed value in range [0, 1).
-template <class T> T Fract(T value) { return value - floor(value); }
+template <class T> inline T Fract(T value) { return value - floor(value); }
 
 /// Round value down.
-template <class T> T Floor(T x) { return floor(x); }
+template <class T> inline T Floor(T x) { return floor(x); }
 
 /// Round value down. Returns integer value.
-template <class T> int FloorToInt(T x) { return static_cast<int>(floor(x)); }
+template <class T> inline int FloorToInt(T x) { return static_cast<int>(floor(x)); }
 
 /// Round value to nearest integer.
-template <class T> T Round(T x) { return floor(x + T(0.5)); }
+template <class T> inline T Round(T x) { return round(x); }
 
 /// Round value to nearest integer.
-template <class T> int RoundToInt(T x) { return static_cast<int>(floor(x + T(0.5))); }
+template <class T> inline int RoundToInt(T x) { return static_cast<int>(round(x)); }
 
 /// Round value up.
-template <class T> T Ceil(T x) { return ceil(x); }
+template <class T> inline T Ceil(T x) { return ceil(x); }
 
 /// Round value up.
-template <class T> int CeilToInt(T x) { return static_cast<int>(ceil(x)); }
+template <class T> inline int CeilToInt(T x) { return static_cast<int>(ceil(x)); }
 
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)

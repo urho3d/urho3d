@@ -101,7 +101,7 @@ public:
     /// Set finish particle size.
     void SetFinishParticleSize(float finishParticleSize);
     /// Set finish particle size variance.
-    void SetFinishParticleSizeVariance(float FinishParticleSizeVariance);
+    void SetFinishParticleSizeVariance(float finishParticleSizeVariance);
     /// Set duration.
     void SetDuration(float duration);
     /// Set emitter type.

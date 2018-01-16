@@ -181,7 +181,7 @@ FontFace* Font::GetFace(float pointSize)
 IntVector2 Font::GetTotalGlyphOffset(float pointSize) const
 {
     Vector2 multipliedOffset = pointSize * scaledOffset_;
-    return absoluteOffset_ + IntVector2((int)(multipliedOffset.x_ + 0.5f), (int)(multipliedOffset.y_ + 0.5f));
+    return absoluteOffset_ + IntVector2(RoundToInt(multipliedOffset.x_), RoundToInt(multipliedOffset.y_));
 }
 
 void Font::ReleaseFaces()

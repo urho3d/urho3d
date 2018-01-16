@@ -486,34 +486,34 @@ bool ScriptFile::SaveByteCode(Serializer& dest)
         return false;
 }
 
-asIScriptFunction* ScriptFile::GetFunction(const String& declarationIn)
+asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
 {
     if (!compiled_)
         return nullptr;
 
-    String declaration = declarationIn.Trimmed();
-    // If not a full declaration, assume void with no parameters
-    if (declaration.Find('(') == String::NPOS)
-        declaration = "void " + declaration + "()";
+    String trimDecl = declaration.Trimmed();
+    // If not a full trimDecl, assume void with no parameters
+    if (trimDecl.Find('(') == String::NPOS)
+        trimDecl = "void " + trimDecl + "()";
 
-    HashMap<String, asIScriptFunction*>::ConstIterator i = functions_.Find(declaration);
+    HashMap<String, asIScriptFunction*>::ConstIterator i = functions_.Find(trimDecl);
     if (i != functions_.End())
         return i->second_;
 
-    asIScriptFunction* function = scriptModule_->GetFunctionByDecl(declaration.CString());
-    functions_[declaration] = function;
+    asIScriptFunction* function = scriptModule_->GetFunctionByDecl(trimDecl.CString());
+    functions_[trimDecl] = function;
     return function;
 }
 
-asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declarationIn)
+asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declaration)
 {
     if (!compiled_ || !object)
         return nullptr;
 
-    String declaration = declarationIn.Trimmed();
-    // If not a full declaration, assume void with no parameters
-    if (declaration.Find('(') == String::NPOS)
-        declaration = "void " + declaration + "()";
+    String trimDecl = declaration.Trimmed();
+    // If not a full trimDecl, assume void with no parameters
+    if (trimDecl.Find('(') == String::NPOS)
+        trimDecl = "void " + trimDecl + "()";
 
     asITypeInfo* type = object->GetObjectType();
     if (!type)
@@ -522,13 +522,13 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
     HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
     if (i != methods_.End())
     {
-        HashMap<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(declaration);
+        HashMap<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(trimDecl);
         if (j != i->second_.End())
             return j->second_;
     }
 
-    asIScriptFunction* function = type->GetMethodByDecl(declaration.CString());
-    methods_[type][declaration] = function;
+    asIScriptFunction* function = type->GetMethodByDecl(trimDecl.CString());
+    methods_[type][trimDecl] = function;
     return function;
 }
 

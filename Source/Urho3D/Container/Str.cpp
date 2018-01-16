@@ -938,7 +938,7 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
     }
 }
 
-#define GET_NEXT_CONTINUATION_BYTE(ptr) *ptr; if ((unsigned char)*ptr < 0x80 || (unsigned char)*ptr >= 0xc0) return '?'; else ++ptr;
+#define GET_NEXT_CONTINUATION_BYTE(ptr) *(ptr); if ((unsigned char)*(ptr) < 0x80 || (unsigned char)*(ptr) >= 0xc0) return '?'; else ++(ptr);
 
 unsigned String::DecodeUTF8(const char*& src)
 {

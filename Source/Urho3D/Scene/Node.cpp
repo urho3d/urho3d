@@ -1535,7 +1535,7 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
     return impl_->attrBuffer_.GetBuffer();
 }
 
-bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs, CreateMode mode)
+bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren, bool rewriteIDs, CreateMode mode)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1562,7 +1562,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         }
     }
 
-    if (!readChildren)
+    if (!loadChildren)
         return true;
 
     unsigned numChildren = source.ReadVLE();
@@ -1572,14 +1572,14 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
-        if (!newNode->Load(source, resolver, readChildren, rewriteIDs, mode))
+        if (!newNode->Load(source, resolver, loadChildren, rewriteIDs, mode))
             return false;
     }
 
     return true;
 }
 
-bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs, CreateMode mode)
+bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren, bool rewriteIDs, CreateMode mode)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1605,7 +1605,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
         compElem = compElem.GetNext("component");
     }
 
-    if (!readChildren)
+    if (!loadChildren)
         return true;
 
     XMLElement childElem = source.GetChild("node");
@@ -1615,7 +1615,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
-        if (!newNode->LoadXML(childElem, resolver, readChildren, rewriteIDs, mode))
+        if (!newNode->LoadXML(childElem, resolver, loadChildren, rewriteIDs, mode))
             return false;
 
         childElem = childElem.GetNext("node");
@@ -1624,7 +1624,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     return true;
 }
 
-bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs, CreateMode mode)
+bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren, bool rewriteIDs, CreateMode mode)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1650,7 +1650,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readC
         }
     }
 
-    if (!readChildren)
+    if (!loadChildren)
         return true;
 
     const JSONArray& childrenArray = source.Get("children").GetArray();
@@ -1662,7 +1662,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readC
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
-        if (!newNode->LoadJSON(childVal, resolver, readChildren, rewriteIDs, mode))
+        if (!newNode->LoadJSON(childVal, resolver, loadChildren, rewriteIDs, mode))
             return false;
     }
 

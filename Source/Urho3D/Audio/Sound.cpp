@@ -141,7 +141,7 @@ bool Sound::LoadWav(Deserializer& source)
     header.totalLength_ = source.ReadUInt();
     source.Read(&header.waveText_, 4);
 
-    if (memcmp("RIFF", header.riffText_, 4) || memcmp("WAVE", header.waveText_, 4))
+    if (memcmp("RIFF", header.riffText_, 4) != 0 || memcmp("WAVE", header.waveText_, 4) != 0)
     {
         URHO3D_LOGERROR("Could not read WAV data from " + source.GetName());
         return false;

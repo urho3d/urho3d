@@ -321,7 +321,7 @@ private:
     /// Subscribe to drawable update finished event here
     void OnSceneSet(Scene* scene) override;
     /// Destroys and creates the tree
-    void OnNodeSet(Node* scene) override;
+    void OnNodeSet(Node* node) override;
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
     ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);

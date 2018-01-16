@@ -72,9 +72,9 @@ void ProgressBar::OnResize(const IntVector2& /*newSize*/, const IntVector2& /*de
     UpdateProgressBar();
 }
 
-void ProgressBar::SetOrientation(Orientation type)
+void ProgressBar::SetOrientation(Orientation orientation)
 {
-    orientation_ = type;
+    orientation_ = orientation;
     UpdateProgressBar();
 }
 
@@ -166,7 +166,7 @@ void ProgressBar::UpdateProgressBar()
     // Update the text.
     loadingText_->SetStyle(loadingPercentStyle_);
     loadingText_->SetAlignment(HA_CENTER, VA_CENTER);
-    loadingText_->SetText(Urho3D::ToString("%d %%", (int)((value_ / range_) * 100.0f + 0.5f)));
+    loadingText_->SetText(Urho3D::ToString("%d %%", RoundToInt((value_ / range_) * 100.0f)));
 }
 
 }

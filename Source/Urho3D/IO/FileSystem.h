@@ -133,7 +133,7 @@ URHO3D_API String GetFileName(const String& fullPath);
 /// Return the extension from a full path, converted to lowercase by default.
 URHO3D_API String GetExtension(const String& fullPath, bool lowercaseExtension = true);
 /// Return the filename and extension from a full path. The case of the extension is preserved by default, so that the file can be opened in case-sensitive operating systems.
-URHO3D_API String GetFileNameAndExtension(const String& fullPath, bool lowercaseExtension = false);
+URHO3D_API String GetFileNameAndExtension(const String& fileName, bool lowercaseExtension = false);
 /// Replace the extension of a file name with another.
 URHO3D_API String ReplaceExtension(const String& fullPath, const String& newExtension);
 /// Add a slash at the end of the path if missing and convert to internal format (use slashes.)
@@ -141,7 +141,7 @@ URHO3D_API String AddTrailingSlash(const String& pathName);
 /// Remove the slash from the end of a path if exists and convert to internal format (use slashes.)
 URHO3D_API String RemoveTrailingSlash(const String& pathName);
 /// Return the parent path, or the path itself if not available.
-URHO3D_API String GetParentPath(const String& pathName);
+URHO3D_API String GetParentPath(const String& path);
 /// Convert a path to internal format (use slashes.)
 URHO3D_API String GetInternalPath(const String& pathName);
 /// Convert a path to the format required by the operating system.

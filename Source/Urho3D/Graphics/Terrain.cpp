@@ -625,8 +625,8 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
         return IntVector2::ZERO;
 
     Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
-    auto xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_ + 0.5f);
-    auto zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_ + 0.5f);
+    auto xPos = RoundToInt((position.x_ - patchWorldOrigin_.x_) / spacing_.x_);
+    auto zPos = RoundToInt((position.z_ - patchWorldOrigin_.y_) / spacing_.z_);
     xPos = Clamp(xPos, 0, numVertices_.x_ - 1);
     zPos = Clamp(zPos, 0, numVertices_.y_ - 1);
 
@@ -639,8 +639,8 @@ Vector3 Terrain::HeightMapToWorld(const IntVector2& pixelPosition) const
         return Vector3::ZERO;
 
     IntVector2 pos(pixelPosition.x_, numVertices_.y_ - 1 - pixelPosition.y_);
-    auto xPos = (float)(pos.x_ * spacing_.x_ + patchWorldOrigin_.x_);
-    auto zPos = (float)(pos.y_ * spacing_.z_ + patchWorldOrigin_.y_);
+    auto xPos = pos.x_ * spacing_.x_ + patchWorldOrigin_.x_;
+    auto zPos = pos.y_ * spacing_.z_ + patchWorldOrigin_.y_;
     Vector3 lPos(xPos, 0.0f, zPos);
     Vector3 wPos = node_->GetWorldTransform() * lPos;
     wPos.y_ = GetHeight(wPos);
@@ -1438,12 +1438,12 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
     return true;
 }
 
-void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)
+void Terrain::HandleHeightMapReloadFinished(StringHash /*eventType*/, VariantMap& eventData)
 {
     CreateGeometry();
 }
 
-void Terrain::HandleNeighborTerrainCreated(StringHash eventType, VariantMap& eventData)
+void Terrain::HandleNeighborTerrainCreated(StringHash /*eventType*/, VariantMap& eventData)
 {
     UpdateEdgePatchNeighbors();
 }

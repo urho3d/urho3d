@@ -187,7 +187,7 @@ public:
     void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Add a color frame sorted in the correct position based on time.
-    void AddColorTime(const Color& color, const float time);
+    void AddColorTime(const Color& color, float time);
     /// Add a color frame sorted in the correct position based on time.
     void AddColorFrame(const ColorFrame& colorFrame);
     /// Remove color frame at index
@@ -202,13 +202,13 @@ public:
     void SortColorFrames();
 
     /// Add a texture frame sorted in the correct position based on time.
-    void AddTextureTime(const Rect& uv, const float time);
+    void AddTextureTime(const Rect& uv, float time);
     /// Add a texture frame sorted in the correct position based on time.
     void AddTextureFrame(const TextureFrame& textureFrame);
     /// Remove texture frame at index
     void RemoveTextureFrame(unsigned index);
     /// Set particle texture animation.
-    void SetTextureFrames(const Vector<TextureFrame>& animation);
+    void SetTextureFrames(const Vector<TextureFrame>& textureFrames);
     /// Set number of texture animation frames.
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
     /// Set number of texture frames.

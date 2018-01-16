@@ -174,7 +174,7 @@ private:
 
 public:
     /// Construct empty.
-    CustomVariantValue() : typeInfo_(typeid(void)) { }      // NOLINT
+    CustomVariantValue() : typeInfo_(typeid(void)) { }      // NOLINT(modernize-redundant-void-arg)
     /// Destruct.
     virtual ~CustomVariantValue() = default;
 
@@ -309,11 +309,11 @@ union VariantValue
     CustomVariantValue customValueStack_;
 
     /// Construct uninitialized.
-    VariantValue() { }      // NOLINT
+    VariantValue() { }      // NOLINT(modernize-use-equals-default)
     /// Non-copyable.
     VariantValue(const VariantValue& value) = delete;
     /// Destruct.
-    ~VariantValue() { }     // NOLINT
+    ~VariantValue() { }     // NOLINT(modernize-use-equals-default)
 };
 
 static_assert(sizeof(VariantValue) == VARIANT_VALUE_SIZE, "Unexpected size of VariantValue");
@@ -326,194 +326,194 @@ public:
     Variant() = default;
 
     /// Construct from integer.
-    Variant(int value)                  // NOLINT
+    Variant(int value)                  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from 64 bit integer.
-    Variant(long long value)            // NOLINT
+    Variant(long long value)            // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned value)             // NOLINT
+    Variant(unsigned value)             // NOLINT(google-explicit-constructor)
     {
         *this = (int)value;
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned long long value)   // NOLINT
+    Variant(unsigned long long value)   // NOLINT(google-explicit-constructor)
     {
         *this = (long long)value;
     }
 
     /// Construct from a string hash (convert to integer).
-    Variant(const StringHash& value)    // NOLINT
+    Variant(const StringHash& value)    // NOLINT(google-explicit-constructor)
     {
         *this = (int)value.Value();
     }
 
     /// Construct from a bool.
-    Variant(bool value)                 // NOLINT
+    Variant(bool value)                 // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a float.
-    Variant(float value)                // NOLINT
+    Variant(float value)                // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a double.
-    Variant(double value)               // NOLINT
+    Variant(double value)               // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Vector2.
-    Variant(const Vector2& value)       // NOLINT
+    Variant(const Vector2& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Vector3.
-    Variant(const Vector3& value)       // NOLINT
+    Variant(const Vector3& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Vector4.
-    Variant(const Vector4& value)       // NOLINT
+    Variant(const Vector4& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a quaternion.
-    Variant(const Quaternion& value)    // NOLINT
+    Variant(const Quaternion& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a color.
-    Variant(const Color& value)         // NOLINT
+    Variant(const Color& value)         // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a string.
-    Variant(const String& value)        // NOLINT
+    Variant(const String& value)        // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a C string.
-    Variant(const char* value)          // NOLINT
+    Variant(const char* value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a buffer.
-    Variant(const PODVector<unsigned char>& value)      // NOLINT
+    Variant(const PODVector<unsigned char>& value)      // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a %VectorBuffer and store as a buffer.
-    Variant(const VectorBuffer& value)  // NOLINT
+    Variant(const VectorBuffer& value)  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a pointer.
-    Variant(void* value)                // NOLINT
+    Variant(void* value)                // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a resource reference.
-    Variant(const ResourceRef& value)   // NOLINT
+    Variant(const ResourceRef& value)   // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a resource reference list.
-    Variant(const ResourceRefList& value)   // NOLINT
+    Variant(const ResourceRefList& value)   // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a variant vector.
-    Variant(const VariantVector& value) // NOLINT
+    Variant(const VariantVector& value) // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a variant map.
-    Variant(const VariantMap& value)    // NOLINT
+    Variant(const VariantMap& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a string vector.
-    Variant(const StringVector& value)  // NOLINT
+    Variant(const StringVector& value)  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a rect.
-    Variant(const Rect& value)          // NOLINT
+    Variant(const Rect& value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from an integer rect.
-    Variant(const IntRect& value)       // NOLINT
+    Variant(const IntRect& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from an IntVector2.
-    Variant(const IntVector2& value)    // NOLINT
+    Variant(const IntVector2& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from an IntVector3.
-    Variant(const IntVector3& value)    // NOLINT
+    Variant(const IntVector3& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
-    Variant(RefCounted* value)          // NOLINT
+    Variant(RefCounted* value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Matrix3.
-    Variant(const Matrix3& value)       // NOLINT
+    Variant(const Matrix3& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Matrix3x4.
-    Variant(const Matrix3x4& value)     // NOLINT
+    Variant(const Matrix3x4& value)     // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Matrix4.
-    Variant(const Matrix4& value)       // NOLINT
+    Variant(const Matrix4& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from custom value.
     template <class T>
-    Variant(const CustomVariantValueImpl<T>& value)     // NOLINT
+    Variant(const CustomVariantValueImpl<T>& value)     // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }

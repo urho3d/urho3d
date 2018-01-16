@@ -802,7 +802,7 @@ static unsigned TwiddleUV(unsigned YSize, unsigned XSize, unsigned YPos, unsigne
     return Twiddled;
 }
 
-void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, int height, CompressedFormat format)
+void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format)
 {
     auto* pCompressedData = (AMTC_BLOCK_STRUCT*)blocks;
     int AssumeImageTiles = 1;
@@ -940,10 +940,10 @@ void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, in
 
             // Store the result in the output image
             uPosition = (unsigned)((x + y * width) << 2);
-            dest[uPosition + 0] = (unsigned char)Result[0];
-            dest[uPosition + 1] = (unsigned char)Result[1];
-            dest[uPosition + 2] = (unsigned char)Result[2];
-            dest[uPosition + 3] = (unsigned char)Result[3];
+            rgba[uPosition + 0] = (unsigned char)Result[0];
+            rgba[uPosition + 1] = (unsigned char)Result[1];
+            rgba[uPosition + 2] = (unsigned char)Result[2];
+            rgba[uPosition + 3] = (unsigned char)Result[3];
         }
     }
 }

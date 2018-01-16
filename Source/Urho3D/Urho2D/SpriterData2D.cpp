@@ -65,7 +65,7 @@ bool SpriterData::Load(const pugi::xml_node& node)
 {
     Reset();
 
-    if (strcmp(node.name(), "spriter_data"))
+    if (strcmp(node.name(), "spriter_data") != 0)
         return false;
 
     scmlVersion_ = node.attribute("scml_version").as_int();
@@ -116,7 +116,7 @@ bool Folder::Load(const pugi::xml_node& node)
 {
     Reset();
 
-    if (strcmp(node.name(), "folder"))
+    if (strcmp(node.name(), "folder") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -141,7 +141,7 @@ File::~File() = default;
 
 bool File::Load(const pugi::xml_node& node)
 {
-    if (strcmp(node.name(), "file"))
+    if (strcmp(node.name(), "file") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -176,7 +176,7 @@ bool Entity::Load(const pugi::xml_node& node)
 {
     Reset();
 
-    if (strcmp(node.name(), "entity"))
+    if (strcmp(node.name(), "entity") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -214,7 +214,7 @@ bool CharacterMap::Load(const pugi::xml_node& node)
 {
     Reset();
 
-    if (strcmp(node.name(), "character_map"))
+    if (strcmp(node.name(), "character_map") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -236,7 +236,7 @@ MapInstruction::~MapInstruction() = default;
 
 bool MapInstruction::Load(const pugi::xml_node& node)
 {
-    if (strcmp(node.name(), "map"))
+    if (strcmp(node.name(), "map") != 0)
         return false;
 
     folder_ = node.attribute("folder").as_int();
@@ -272,7 +272,7 @@ bool Animation::Load(const pugi::xml_node& node)
 {
     Reset();
 
-    if (strcmp(node.name(), "animation"))
+    if (strcmp(node.name(), "animation") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -344,7 +344,7 @@ Ref::~Ref() = default;
 
 bool Ref::Load(const pugi::xml_node& node)
 {
-    if (strcmp(node.name(), "bone_ref") && strcmp(node.name(), "object_ref"))
+    if (strcmp(node.name(), "bone_ref") != 0 && strcmp(node.name(), "object_ref") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -374,7 +374,7 @@ bool Timeline::Load(const pugi::xml_node& node)
 {
     Reset();
 
-    if (strcmp(node.name(), "timeline"))
+    if (strcmp(node.name(), "timeline") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();
@@ -425,7 +425,7 @@ TimelineKey::~TimelineKey() = default;
 
 bool TimelineKey::Load(const pugi::xml_node& node)
 {
-    if (strcmp(node.name(), "key"))
+    if (strcmp(node.name(), "key") != 0)
         return false;
 
     id_ = node.attribute("id").as_int();

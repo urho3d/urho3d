@@ -480,15 +480,15 @@ void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenP
 {
 }
 
-void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
-    Cursor* cursor)
+void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int /*dragButtons*/, int /*releaseButton*/,
+    Cursor* /*cursor*/)
 {
     dragButtonCombo_ = 0;
     dragButtonCount_ = 0;
 }
 
-void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
-    Cursor* cursor)
+void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int /*dragButtons*/, int /*cancelButton*/,
+    Cursor* /*cursor*/)
 {
     dragButtonCombo_ = 0;
     dragButtonCount_ = 0;

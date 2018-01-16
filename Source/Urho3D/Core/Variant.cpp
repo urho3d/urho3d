@@ -72,7 +72,7 @@ static const char* typeNames[] =
     nullptr
 };
 
-static_assert(sizeof(typeNames) / sizeof(const char*) == MAX_VAR_TYPES + 1, "Variant type name array is out-of-date");
+static_assert(sizeof(typeNames) / sizeof(const char*) == (size_t)MAX_VAR_TYPES + 1, "Variant type name array is out-of-date");
 
 Variant& Variant::operator =(const Variant& rhs)
 {

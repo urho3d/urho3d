@@ -49,7 +49,7 @@ Context* GetContext(lua_State* L);
 /// Create object.
 template <typename T> int ToluaNewObject(lua_State* tolua_S)
 {
-    T* object = Mtolua_new(T(GetContext(tolua_S)));
+    auto* object = Mtolua_new(T(GetContext(tolua_S)));
     tolua_pushusertype(tolua_S, (void*)object, T::GetTypeNameStatic().CString());
     return 1;
 }
@@ -57,7 +57,7 @@ template <typename T> int ToluaNewObject(lua_State* tolua_S)
 /// Create object with garbage collection.
 template <typename T> int ToluaNewObjectGC(lua_State* tolua_S)
 {
-    T* object = Mtolua_new(T(GetContext(tolua_S)));
+    auto* object = Mtolua_new(T(GetContext(tolua_S)));
     tolua_pushusertype(tolua_S, (void*)object, T::GetTypeNameStatic().CString());
     tolua_register_gc(tolua_S, lua_gettop(tolua_S));
     return 1;

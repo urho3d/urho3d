@@ -76,7 +76,7 @@ public:
     /// Patch the XMLFile with another XMLFile. Based on RFC 5261.
     void Patch(XMLFile* patchFile);
     /// Patch the XMLFile with another XMLElement. Based on RFC 5261.
-    void Patch(XMLElement patchElement);
+    void Patch(const XMLElement& patchElement);
 
 private:
     /// Add an node in the Patch.

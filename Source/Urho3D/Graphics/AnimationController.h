@@ -107,7 +107,7 @@ public:
     /// Stop all animations on a specific layer. Zero fadetime is instant.
     void StopLayer(unsigned char layer, float fadeOutTime = 0.0f);
     /// Stop all animations. Zero fadetime is instant.
-    void StopAll(float fadeTime = 0.0f);
+    void StopAll(float fadeOutTime = 0.0f);
     /// Fade animation to target weight. Return true on success.
     bool Fade(const String& name, float targetWeight, float fadeTime);
     /// Fade other animations on the same layer to target weight. Return true on success.

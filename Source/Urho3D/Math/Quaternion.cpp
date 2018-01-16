@@ -148,13 +148,13 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
     }
 }
 
-bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
+bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& up)
 {
     Quaternion ret;
     Vector3 forward = direction.Normalized();
 
-    Vector3 v = forward.CrossProduct(upDirection);
-    // If direction & upDirection are parallel and crossproduct becomes zero, use FromRotationTo() fallback
+    Vector3 v = forward.CrossProduct(up);
+    // If direction & up are parallel and crossproduct becomes zero, use FromRotationTo() fallback
     if (v.LengthSquared() >= M_EPSILON)
     {
         v.Normalize();

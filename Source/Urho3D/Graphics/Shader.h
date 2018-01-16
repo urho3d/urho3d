@@ -61,7 +61,7 @@ public:
 
 private:
     /// Process source code and include files. Return true if successful.
-    bool ProcessSource(String& code, Deserializer& file);
+    bool ProcessSource(String& code, Deserializer& source);
     /// Sort the defines and strip extra spaces to prevent creation of unnecessary duplicate shader variations.
     String NormalizeDefines(const String& defines);
     /// Recalculate the memory used by the shader.

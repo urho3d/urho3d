@@ -60,7 +60,7 @@ struct URHO3D_API AnimationTrack
     }
 
     /// Assign keyframe at index.
-    void SetKeyFrame(unsigned index, const AnimationKeyFrame& command);
+    void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
     /// Add a keyframe at the end.
     void AddKeyFrame(const AnimationKeyFrame& keyFrame);
     /// Insert a keyframe at index.

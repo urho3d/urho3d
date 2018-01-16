@@ -983,7 +983,7 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
     ptr->~WeakPtr<RefCounted>();
 }
 
-static void SetGlobalVar(const String& key, Variant value)
+static void SetGlobalVar(const String& key, const Variant& value)
 {
     GetScriptContext()->SetGlobalVar(key, value);
 }

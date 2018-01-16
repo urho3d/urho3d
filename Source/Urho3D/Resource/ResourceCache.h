@@ -222,9 +222,9 @@ private:
     /// Handle begin frame event. Automatic resource reloads and the finalization of background loaded resources are processed here.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Search FileSystem for file.
-    File* SearchResourceDirs(const String& nameIn);
+    File* SearchResourceDirs(const String& name);
     /// Search resource packages for file.
-    File* SearchPackages(const String& nameIn);
+    File* SearchPackages(const String& name);
 
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;

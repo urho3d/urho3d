@@ -1159,7 +1159,7 @@ void XPathQuery::Clear()
     query_.Reset();
 }
 
-bool XPathQuery::EvaluateToBool(XMLElement element) const
+bool XPathQuery::EvaluateToBool(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return false;
@@ -1168,7 +1168,7 @@ bool XPathQuery::EvaluateToBool(XMLElement element) const
     return query_->evaluate_boolean(node);
 }
 
-float XPathQuery::EvaluateToFloat(XMLElement element) const
+float XPathQuery::EvaluateToFloat(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return 0.0f;
@@ -1177,7 +1177,7 @@ float XPathQuery::EvaluateToFloat(XMLElement element) const
     return (float)query_->evaluate_number(node);
 }
 
-String XPathQuery::EvaluateToString(XMLElement element) const
+String XPathQuery::EvaluateToString(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return String::EMPTY;
@@ -1191,7 +1191,7 @@ String XPathQuery::EvaluateToString(XMLElement element) const
     return result;
 }
 
-XPathResultSet XPathQuery::Evaluate(XMLElement element) const
+XPathResultSet XPathQuery::Evaluate(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return XPathResultSet();

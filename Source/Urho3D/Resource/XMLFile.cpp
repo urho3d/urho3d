@@ -193,7 +193,7 @@ void XMLFile::Patch(XMLFile* patchFile)
     Patch(patchFile->GetRoot());
 }
 
-void XMLFile::Patch(XMLElement patchElement)
+void XMLFile::Patch(const XMLElement& patchElement)
 {
     pugi::xml_node root = pugi::xml_node(patchElement.GetNode());
 

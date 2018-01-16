@@ -94,7 +94,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Filter implicit attributes in serialization process for internal button.
     bool FilterButtonImplicitAttributes(XMLElement& dest, const String& name) const;
 

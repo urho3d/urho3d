@@ -247,7 +247,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
     return true;
 }
 
-void TmxObjectGroup2D::StoreObject(XMLElement objectElem, SharedPtr<TileMapObject2D> object, const TileMapInfo2D& info, bool isTile)
+void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr<TileMapObject2D>& object, const TileMapInfo2D& info, bool isTile)
 {
         if (objectElem.HasAttribute("name"))
             object->name_ = objectElem.GetAttribute("name");
@@ -755,7 +755,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         texture->SetNumLevels(1);
         texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
 
-        unsigned textureDataSize = allocator.GetWidth() * allocator.GetHeight() * 4;
+        auto textureDataSize = (unsigned)allocator.GetWidth() * allocator.GetHeight() * 4;
         SharedArrayPtr<unsigned char> textureData(new unsigned char[textureDataSize]);
         memset(textureData.Get(), 0, textureDataSize);
 
@@ -767,7 +767,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             for (int y = 0; y < image->GetHeight(); ++y)
             {
                 memcpy(textureData.Get() + ((info.y + y) * allocator.GetWidth() + info.x) * 4,
-                    image->GetData() + y * image->GetWidth() * 4, image->GetWidth() * 4);
+                    image->GetData() + y * image->GetWidth() * 4, (size_t)image->GetWidth() * 4);
             }
 
             SharedPtr<Sprite2D> sprite(new Sprite2D(context_));

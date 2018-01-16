@@ -46,9 +46,9 @@ public:
     /// Buffer sound data. Makes a copy of it.
     void AddData(void* data, unsigned numBytes);
     /// Buffer sound data by taking ownership of it.
-    void AddData(SharedArrayPtr<signed char> data, unsigned numBytes);
+    void AddData(const SharedArrayPtr<signed char>& data, unsigned numBytes);
     /// Buffer sound data by taking ownership of it.
-    void AddData(SharedArrayPtr<signed short> data, unsigned numBytes);
+    void AddData(const SharedArrayPtr<signed short>& data, unsigned numBytes);
     /// Remove all buffered audio data.
     void Clear();
 

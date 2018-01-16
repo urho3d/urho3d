@@ -29,11 +29,11 @@ namespace Urho3D
 
 /// Decompress a DXT compressed image to RGBA.
 URHO3D_API void
-    DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, int depth, CompressedFormat format);
+    DecompressImageDXT(unsigned char* rgba, const void* blocks, int width, int height, int depth, CompressedFormat format);
 /// Decompress an ETC1 compressed image to RGBA.
-URHO3D_API void DecompressImageETC(unsigned char* dest, const void* blocks, int width, int height);
+URHO3D_API void DecompressImageETC(unsigned char* rgba, const void* blocks, int width, int height);
 /// Decompress a PVRTC compressed image to RGBA.
-URHO3D_API void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, int height, CompressedFormat format);
+URHO3D_API void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format);
 /// Flip a compressed block vertically.
 URHO3D_API void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat format);
 /// Flip a compressed block horizontally.

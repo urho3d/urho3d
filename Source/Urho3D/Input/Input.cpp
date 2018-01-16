@@ -2431,8 +2431,8 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
             return;
 
         // Determine whether to inject a joystick event or keyboard/mouse event
-        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        Variant mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
+        const Variant& keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        const Variant& mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
         if (keyBindingVar.IsEmpty() && mouseButtonBindingVar.IsEmpty())
         {
             evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;

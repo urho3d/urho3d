@@ -36,7 +36,7 @@ public:
     explicit Mover(Context* context);
 
     /// Set motion parameters: forward movement speed, rotation speed, and movement boundaries.
-    void SetParameters(float moveSpeed, float rotateSpeed, const BoundingBox& bounds);
+    void SetParameters(float moveSpeed, float rotationSpeed, const BoundingBox& bounds);
     /// Handle scene update. Called by LogicComponent base class.
     void Update(float timeStep) override;
 

@@ -215,7 +215,7 @@ IntRect PListValue::GetIntRect() const
         return IntRect::ZERO;
 
     int x, y, w, h;
-    sscanf(string_->CString(), "{{%d,%d},{%d,%d}}", &x, &y, &w, &h);
+    sscanf(string_->CString(), "{{%d,%d},{%d,%d}}", &x, &y, &w, &h);    // NOLINT(cert-err34-c)
     return {x, y, x + w, y + h};
 }
 
@@ -225,7 +225,7 @@ IntVector2 PListValue::GetIntVector2() const
         return IntVector2::ZERO;
 
     int x, y;
-    sscanf(string_->CString(), "{%d,%d}", &x, &y);
+    sscanf(string_->CString(), "{%d,%d}", &x, &y);                      // NOLINT(cert-err34-c)
     return IntVector2(x, y);
 }
 
@@ -235,7 +235,7 @@ IntVector3 PListValue::GetIntVector3() const
         return IntVector3::ZERO;
 
     int x, y, z;
-    sscanf(string_->CString(), "{%d,%d,%d}", &x, &y, &z);
+    sscanf(string_->CString(), "{%d,%d,%d}", &x, &y, &z);               // NOLINT(cert-err34-c)
     return IntVector3(x, y, z);
 }
 

@@ -242,7 +242,7 @@ void BackgroundLoader::FinishResources(int maxMs)
             }
 
             // Break when the time limit passed so that we keep sufficient FPS
-            if (timer.GetUSec(false) >= maxMs * 1000)
+            if (timer.GetUSec(false) >= maxMs * 1000LL)
                 break;
         }
 

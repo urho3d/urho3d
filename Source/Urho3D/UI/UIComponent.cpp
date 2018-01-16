@@ -52,9 +52,9 @@ class UIElement3D : public UIElement
     URHO3D_OBJECT(UIElement3D, UIElement);
 public:
     /// Construct.
-    UIElement3D(Context* context) : UIElement(context) { }
+    explicit UIElement3D(Context* context) : UIElement(context) { }
     /// Destruct.
-    virtual ~UIElement3D() override = default;
+    ~UIElement3D() override = default;
     /// Set UIComponent which is using this element as root element.
     void SetNode(Node* node) { node_ = node; }
     /// Set active viewport through which this element is rendered. If viewport is not set, it defaults to first viewport.

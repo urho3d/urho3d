@@ -85,7 +85,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
-    Matrix3x4 shadowView(shadowCamera->GetView());
+    const Matrix3x4& shadowView(shadowCamera->GetView());
     Matrix4 shadowProj(shadowCamera->GetGPUProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
 

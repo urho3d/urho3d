@@ -78,7 +78,7 @@ public:
     const String& GetLoadingPercentStyle() const { return loadingPercentStyle_; }
 
     /// Sets the flag to display the percent text.
-    void SetShowPercentText(bool showPercentText);
+    void SetShowPercentText(bool enable);
 
     /// Returns the flag to display the percent text.
     bool GetShowPercentText() const { return showPercentText_; }

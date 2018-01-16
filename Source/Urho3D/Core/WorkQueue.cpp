@@ -122,7 +122,7 @@ SharedPtr<WorkItem> WorkQueue::GetFreeItem()
     }
 }
 
-void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
+void WorkQueue::AddWorkItem(const SharedPtr<WorkItem>& item)
 {
     if (!item)
     {
@@ -407,7 +407,7 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 
         HiresTimer timer;
 
-        while (!queue_.Empty() && timer.GetUSec(false) < maxNonThreadedWorkMs_ * 1000)
+        while (!queue_.Empty() && timer.GetUSec(false) < maxNonThreadedWorkMs_ * 1000LL)
         {
             WorkItem* item = queue_.Front();
             queue_.PopFront();

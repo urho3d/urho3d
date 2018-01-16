@@ -620,10 +620,10 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XPathQuery", "bool SetVariable(const String&in, const XPathResultSet&in)", asMETHODPR(XPathQuery, SetVariable, (const String&, const XPathResultSet&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XPathQuery", "bool SetQuery(const String&, const String& arg1 = String(), bool arg2 = true)", asMETHOD(XPathQuery, SetQuery), asCALL_THISCALL);
     engine->RegisterObjectMethod("XPathQuery", "void Clear()", asMETHOD(XPathQuery, Clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathQuery", "bool EvaluateToBool(XMLElement)", asMETHOD(XPathQuery, EvaluateToBool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathQuery", "float EvaluateToFloat(XMLElement)", asMETHOD(XPathQuery, EvaluateToFloat), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathQuery", "String EvaluateToString(XMLElement)", asMETHOD(XPathQuery, EvaluateToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathQuery", "XPathResultSet Evaluate(XMLElement)", asMETHOD(XPathQuery, Evaluate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "bool EvaluateToBool(const XMLElement&in)", asMETHOD(XPathQuery, EvaluateToBool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "float EvaluateToFloat(const XMLElement&in)", asMETHOD(XPathQuery, EvaluateToFloat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "String EvaluateToString(const XMLElement&in)", asMETHOD(XPathQuery, EvaluateToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "XPathResultSet Evaluate(const XMLElement&in)", asMETHOD(XPathQuery, Evaluate), asCALL_THISCALL);
     engine->RegisterObjectMethod("XPathQuery", "void set_query(const String&)", asMETHOD(XPathQuery, SetQuery), asCALL_THISCALL);
     engine->RegisterObjectMethod("XPathQuery", "String get_query() const", asMETHOD(XPathQuery, GetQuery), asCALL_THISCALL);
 }
@@ -648,7 +648,7 @@ static void RegisterXMLFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLFile", "String ToString(const String&in = String(\"\t\")) const", asMETHOD(XMLFile, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement get_root()", asFUNCTION(XMLFileGetRootDefault), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "void Patch(XMLFile@+)", asMETHODPR(XMLFile, Patch, (XMLFile*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLFile", "void Patch(XMLElement)", asMETHODPR(XMLFile, Patch, (XMLElement), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLFile", "void Patch(const XMLElement&in)", asMETHODPR(XMLFile, Patch, (const XMLElement&), void), asCALL_THISCALL);
 }
 
 void RegisterResourceAPI(asIScriptEngine* engine)

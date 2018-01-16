@@ -171,7 +171,7 @@ public:
     /// Return transformed by a 3x4 matrix.
     Frustum Transformed(const Matrix3x4& transform) const;
     /// Return projected by a 4x4 projection matrix.
-    Rect Projected(const Matrix4& transform) const;
+    Rect Projected(const Matrix4& projection) const;
 
     /// Update the planes. Called internally.
     void UpdatePlanes();

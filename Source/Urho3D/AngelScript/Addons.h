@@ -51,8 +51,8 @@ public:
     // Factory functions
     static CScriptArray *Create(asITypeInfo *ot);
     static CScriptArray *Create(asITypeInfo *ot, asUINT length);
-    static CScriptArray *Create(asITypeInfo *ot, asUINT length, void *defaultValue);
-    static CScriptArray *Create(asITypeInfo *ot, void *listBuffer);
+    static CScriptArray *Create(asITypeInfo *ot, asUINT length, void *defVal);
+    static CScriptArray *Create(asITypeInfo *ot, void *initList);
 
     // Memory management
     void AddRef() const;
@@ -121,11 +121,11 @@ protected:
     mutable bool      gcFlag;
     asITypeInfo      *objType;
     SArrayBuffer     *buffer;
-    int               elementSize;
+    size_t            elementSize;
     int               subTypeId;
 
     // Constructors
-    CScriptArray(asITypeInfo *ot, void *initBuf); // Called from script when initialized with list
+    CScriptArray(asITypeInfo *ot, void *buf); // Called from script when initialized with list
     CScriptArray(asUINT length, asITypeInfo *ot);
     CScriptArray(asUINT length, void *defVal, asITypeInfo *ot);
     CScriptArray(const CScriptArray &other);

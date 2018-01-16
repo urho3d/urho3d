@@ -58,7 +58,7 @@ public:
     void OnSetEnabled() override;
 
     /// Set body type.
-    void SetBodyType(BodyType2D bodyType);
+    void SetBodyType(BodyType2D type);
     /// Set mass.
     void SetMass(float mass);
     /// Set inertia.

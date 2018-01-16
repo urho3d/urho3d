@@ -102,7 +102,7 @@ struct SimpleNavBuildData : public NavBuildData
 struct DynamicNavBuildData : public NavBuildData
 {
     /// Constructor.
-    explicit DynamicNavBuildData(dtTileCacheAlloc* alloc);
+    explicit DynamicNavBuildData(dtTileCacheAlloc* allocator);
     /// Destructor.
     ~DynamicNavBuildData() override;
 

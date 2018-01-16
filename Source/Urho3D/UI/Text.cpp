@@ -525,7 +525,7 @@ void Text::UpdateText(bool onResize)
         int width = 0;
         int height = 0;
         int rowWidth = 0;
-        auto rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
+        auto rowHeight = RoundToInt(rowSpacing_ * rowHeight_);
 
         // First see if the text must be split up
         if (!wordWrap_)
@@ -709,7 +709,7 @@ void Text::UpdateCharLocations()
         return;
     fontFace_ = face;
 
-    auto rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
+    auto rowHeight = RoundToInt(rowSpacing_ * rowHeight_);
 
     // Store position & size of each character, and locations per texture page
     unsigned numChars = unicodeText_.Size();
@@ -722,8 +722,8 @@ void Text::UpdateCharLocations()
 
     unsigned rowIndex = 0;
     unsigned lastFilled = 0;
-    float x = floor(GetRowStartPosition(rowIndex) + offset.x_ + 0.5f);
-    float y = floor(offset.y_ + 0.5f);
+    float x = Round(GetRowStartPosition(rowIndex) + offset.x_);
+    float y = Round(offset.y_);
 
     for (unsigned i = 0; i < printText_.Size(); ++i)
     {

@@ -377,14 +377,14 @@ public:
     /// Clear by removing all variables and XPath query object.
     void Clear();
     /// Evaluate XPath query and expecting a boolean return value.
-    bool EvaluateToBool(XMLElement element) const;
+    bool EvaluateToBool(const XMLElement& element) const;
     /// Evaluate XPath query and expecting a float return value.
-    float EvaluateToFloat(XMLElement element) const;
+    float EvaluateToFloat(const XMLElement& element) const;
     /// Evaluate XPath query and expecting a string return value.
-    String EvaluateToString(XMLElement element) const;
+    String EvaluateToString(const XMLElement& element) const;
     /// Evaluate XPath query and expecting an XPath query result set as return value.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
-    XPathResultSet Evaluate(XMLElement element) const;
+    XPathResultSet Evaluate(const XMLElement& element) const;
 
     /// Return query string.
     String GetQuery() const { return queryString_; }

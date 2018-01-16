@@ -345,9 +345,9 @@ void Network::SetSimulatedLatency(int ms)
     ConfigureNetworkSimulator();
 }
 
-void Network::SetSimulatedPacketLoss(float loss)
+void Network::SetSimulatedPacketLoss(float probability)
 {
-    simulatedPacketLoss_ = Clamp(loss, 0.0f, 1.0f);
+    simulatedPacketLoss_ = Clamp(probability, 0.0f, 1.0f);
     ConfigureNetworkSimulator();
 }
 

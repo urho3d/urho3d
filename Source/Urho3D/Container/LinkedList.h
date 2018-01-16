@@ -51,7 +51,7 @@ template <class T> class LinkedList
 public:
     /// Construct empty.
     LinkedList() :
-        head_(0)
+        head_(nullptr)
     {
     }
     /// Aggregate initialization constructor.
@@ -172,10 +172,10 @@ public:
     }
 
     /// Return next element, or null if no more elements.
-    T* Next(T* element) const { return element ? static_cast<T*>(element->next_) : 0; }
+    T* Next(T* element) const { return element ? static_cast<T*>(element->next_) : nullptr; }
 
     /// Return whether is empty.
-    bool Empty() const { return head_ == 0; }
+    bool Empty() const { return head_ == nullptr; }
 
 private:
     /// First element.

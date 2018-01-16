@@ -51,7 +51,7 @@ public:
     /// Set checked state.
     void SetChecked(bool enable);
     /// Set checked image offset.
-    void SetCheckedOffset(const IntVector2& rect);
+    void SetCheckedOffset(const IntVector2& offset);
     /// Set checked image offset.
     void SetCheckedOffset(int x, int y);
 

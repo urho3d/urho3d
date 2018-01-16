@@ -70,7 +70,7 @@ public:
     /// Set animation set.
     void SetAnimationSet(AnimationSet2D* animationSet);
     /// Set entity name (skin name for spine, entity name for spriter).
-    void SetEntity(const String& name);
+    void SetEntity(const String& entity);
     /// Set animation by name and loop mode.
     void SetAnimation(const String& name, LoopMode2D loopMode = LM_DEFAULT);
     /// Set loop mode.

@@ -46,6 +46,8 @@ FontFaceBitmap::FontFaceBitmap(Font* font) :
 
 FontFaceBitmap::~FontFaceBitmap() = default;
 
+// FIXME: The Load() and Save() should be refactored accordingly after the recent FontGlyph struct changes
+
 bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize)
 {
     Context* context = font_->GetContext();
@@ -232,7 +234,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
         }
 
         image->SetSize(width, height, components);
-        memset(image->GetData(), 0, width * height * components);
+        memset(image->GetData(), 0, (size_t)width * height * components);
 
         newImages[i] = image;
     }
@@ -375,7 +377,7 @@ void FontFaceBitmap::Blit(Image* dest, int x, int y, int width, int height, Imag
     unsigned char* sourceData = source->GetData() + (sourceY * source->GetWidth() + sourceX) * components;
     for (int i = 0; i < height; ++i)
     {
-        memcpy(destData, sourceData, (size_t)(width * components));
+        memcpy(destData, sourceData, (size_t)width * components);
         destData += dest->GetWidth() * components;
         sourceData += source->GetWidth() * components;
     }

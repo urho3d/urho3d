@@ -250,7 +250,7 @@ public:
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
 
     /// Set the partition type used for polygon generation.
-    void SetPartitionType(NavmeshPartitionType aType);
+    void SetPartitionType(NavmeshPartitionType partitionType);
 
     /// Return Partition Type.
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }

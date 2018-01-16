@@ -93,7 +93,7 @@ public:
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
     /// Set max screen distance in pixels between double click clicks.
-    void SetMaxDoubleClickDistance(float pixels);
+    void SetMaxDoubleClickDistance(float distPixels);
     /// Set UI drag event start interval in seconds.
     void SetDragBeginInterval(float interval);
     /// Set UI drag event start distance threshold in pixels.
@@ -331,7 +331,7 @@ private:
     /// Handle a file being drag-dropped into the application window.
     void HandleDropFile(StringHash eventType, VariantMap& eventData);
     /// Remove drag data and return next iterator.
-    HashMap<WeakPtr<UIElement>, DragData*>::Iterator DragElementErase(HashMap<WeakPtr<UIElement>, DragData*>::Iterator dragElement);
+    HashMap<WeakPtr<UIElement>, DragData*>::Iterator DragElementErase(HashMap<WeakPtr<UIElement>, DragData*>::Iterator i);
     /// Handle clean up on a drag cancel.
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.

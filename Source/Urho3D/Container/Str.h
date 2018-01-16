@@ -61,7 +61,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(const char* str) :   // NOLINT
+    String(const char* str) :   // NOLINT(google-explicit-constructor)
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -70,7 +70,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(char* str) :         // NOLINT
+    String(char* str) :         // NOLINT(google-explicit-constructor)
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -477,7 +477,7 @@ public:
     String& AppendWithFormatArgs(const char* formatString, va_list args);
 
     /// Compare two C strings.
-    static int Compare(const char* str1, const char* str2, bool caseSensitive);
+    static int Compare(const char* lhs, const char* rhs, bool caseSensitive);
 
     /// Position for "not found."
     static const unsigned NPOS = 0xffffffff;

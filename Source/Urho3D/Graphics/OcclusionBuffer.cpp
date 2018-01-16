@@ -385,10 +385,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     }
 
     // Expand the bounding box 1 pixel in each direction to be conservative and correct rasterization offset
-    IntRect rect(
-        (int)(minX - 1.5f), (int)(minY - 1.5f),
-        (int)(maxX + 0.5f), (int)(maxY + 0.5f)
-    );
+    IntRect rect((int)(minX - 1.5f), (int)(minY - 1.5f), RoundToInt(maxX), RoundToInt(maxY));
 
     // If the rect is outside, let frustum culling handle
     if (rect.right_ < 0 || rect.bottom_ < 0)
@@ -407,7 +404,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
         rect.bottom_ = height_ - 1;
 
     // Convert depth to integer and apply final bias
-    int z = (int)(minZ + 0.5f) - OCCLUSION_FIXED_BIAS;
+    int z = RoundToInt(minZ) - OCCLUSION_FIXED_BIAS;
 
     if (!depthHierarchyDirty_)
     {
@@ -804,10 +801,10 @@ struct Edge
         float yPreStep = (float)(topY + 1) - top.y_;
         float xPreStep = slope * yPreStep;
 
-        x_ = (int)((xPreStep + top.x_) * OCCLUSION_X_SCALE + 0.5f);
-        xStep_ = (int)(slope * OCCLUSION_X_SCALE + 0.5f);
-        invZ_ = (int)(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_ + 0.5f);
-        invZStep_ = (int)(slope * gradients.dInvZdX_ + gradients.dInvZdY_ + 0.5f);
+        x_ = RoundToInt((xPreStep + top.x_) * OCCLUSION_X_SCALE);
+        xStep_ = RoundToInt(slope * OCCLUSION_X_SCALE);
+        invZ_ = RoundToInt(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_);
+        invZStep_ = RoundToInt(slope * gradients.dInvZdX_ + gradients.dInvZdY_);
     }
 
     /// X coordinate.

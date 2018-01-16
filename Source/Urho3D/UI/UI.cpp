@@ -67,7 +67,7 @@
 
 #include "../DebugNew.h"
 
-#define TOUCHID_MASK(id) (1 << id)
+#define TOUCHID_MASK(id) (1 << (id))
 
 namespace Urho3D
 {
@@ -2101,8 +2101,8 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
 
     if (applyScale)
     {
-        size.x_ = (int)((float)size.x_ / uiScale_ + 0.5f);
-        size.y_ = (int)((float)size.y_ / uiScale_ + 0.5f);
+        size.x_ = RoundToInt((float)size.x_ / uiScale_);
+        size.y_ = RoundToInt((float)size.y_ / uiScale_);
     }
 
     return size;

@@ -86,12 +86,12 @@ void ParticleEmitter2D::OnSetEnabled()
     }
 }
 
-void ParticleEmitter2D::SetEffect(ParticleEffect2D* model)
+void ParticleEmitter2D::SetEffect(ParticleEffect2D* effect)
 {
-    if (model == effect_)
+    if (effect == effect_)
         return;
 
-    effect_ = model;
+    effect_ = effect;
     MarkNetworkUpdate();
 
     if (!effect_)

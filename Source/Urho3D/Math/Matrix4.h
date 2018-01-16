@@ -585,7 +585,7 @@ public:
         __m128 m1 = _mm_loadu_ps(&m10_);
         __m128 m2 = _mm_loadu_ps(&m20_);
         __m128 m3 = _mm_loadu_ps(&m30_);
-        _MM_TRANSPOSE4_PS(m0, m1, m2, m3);      // NOLINT
+        _MM_TRANSPOSE4_PS(m0, m1, m2, m3);      // NOLINT(modernize-use-bool-literals)
         Matrix4 out;
         _mm_storeu_ps(&out.m00_, m0);
         _mm_storeu_ps(&out.m10_, m1);
@@ -677,7 +677,7 @@ public:
             __m128 m1 = _mm_loadu_ps(src + 4);
             __m128 m2 = _mm_loadu_ps(src + 8);
             __m128 m3 = _mm_loadu_ps(src + 12);
-            _MM_TRANSPOSE4_PS(m0, m1, m2, m3);      // NOLINT
+            _MM_TRANSPOSE4_PS(m0, m1, m2, m3);      // NOLINT(modernize-use-bool-literals)
             _mm_storeu_ps(dest, m0);
             _mm_storeu_ps(dest + 4, m1);
             _mm_storeu_ps(dest + 8, m2);

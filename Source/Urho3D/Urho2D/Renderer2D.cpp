@@ -384,7 +384,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     }
 }
 
-void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
+void Renderer2D::GetDrawables(PODVector<Drawable2D*>& drawables, Node* node)
 {
     if (!node || !node->IsEnabled())
         return;
@@ -394,12 +394,12 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
     {
         auto* drawable = dynamic_cast<Drawable2D*>(i->Get());
         if (drawable && drawable->IsEnabled())
-            dest.Push(drawable);
+            drawables.Push(drawable);
     }
 
     const Vector<SharedPtr<Node> >& children = node->GetChildren();
     for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
-        GetDrawables(dest, i->Get());
+        GetDrawables(drawables, i->Get());
 }
 
 static inline bool CompareSourceBatch2Ds(const SourceBatch2D* lhs, const SourceBatch2D* rhs)

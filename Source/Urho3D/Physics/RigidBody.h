@@ -87,13 +87,13 @@ public:
     /// Set linear velocity damping factor.
     void SetLinearDamping(float damping);
     /// Set angular velocity.
-    void SetAngularVelocity(const Vector3& angularVelocity);
+    void SetAngularVelocity(const Vector3& velocity);
     /// Set angular degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
     void SetAngularFactor(const Vector3& factor);
     /// Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
     /// Set angular velocity damping factor.
-    void SetAngularDamping(float factor);
+    void SetAngularDamping(float damping);
     /// Set friction coefficient.
     void SetFriction(float friction);
     /// Set anisotropic friction.

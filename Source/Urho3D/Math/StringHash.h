@@ -47,9 +47,9 @@ public:
     }
 
     /// Construct from a C string case-insensitively.
-    StringHash(const char* str) noexcept;        // NOLINT
+    StringHash(const char* str) noexcept;        // NOLINT(google-explicit-constructor)
     /// Construct from a string case-insensitively.
-    StringHash(const String& str) noexcept;      // NOLINT
+    StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
 
     /// Assign from another hash.
     StringHash& operator =(const StringHash& rhs) noexcept = default;

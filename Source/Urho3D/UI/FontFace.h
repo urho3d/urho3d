@@ -101,7 +101,7 @@ protected:
     /// Create a texture for font rendering.
     SharedPtr<Texture2D> CreateFaceTexture();
     /// Load font face texture from image resource.
-    SharedPtr<Texture2D> LoadFaceTexture(SharedPtr<Image> image);
+    SharedPtr<Texture2D> LoadFaceTexture(const SharedPtr<Image>& image);
 
     /// Parent font.
     Font* font_;

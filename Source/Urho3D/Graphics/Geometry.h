@@ -59,11 +59,11 @@ public:
     /// Set the LOD distance.
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
-    void SetRawVertexData(SharedArrayPtr<unsigned char> data, const PODVector<VertexElement>& elements);
+    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements);
     /// Override raw vertex data to be returned for CPU-side operations using a legacy vertex bitmask.
-    void SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned elementMask);
+    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask);
     /// Override raw index data to be returned for CPU-side operations.
-    void SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize);
+    void SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize);
     /// Draw.
     void Draw(Graphics* graphics);
 

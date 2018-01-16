@@ -116,7 +116,7 @@ public:
         }
 
         /// Construct from a non-const iterator.
-        ConstIterator(const Iterator& rhs) :        // NOLINT
+        ConstIterator(const Iterator& rhs) :        // NOLINT(google-explicit-constructor)
             ListIteratorBase(rhs.ptr_)
         {
         }

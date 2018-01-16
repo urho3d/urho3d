@@ -460,7 +460,7 @@ bool Serializable::LoadJSON(const JSONValue& source)
                 // If enums specified, do enum lookup ad int assignment. Otherwise assign variant directly
                 if (attr.enumNames_)
                 {
-                    String valueStr = value.GetString();
+                    const String& valueStr = value.GetString();
                     bool enumFound = false;
                     int enumValue = 0;
                     const char** enumPtr = attr.enumNames_;

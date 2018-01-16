@@ -55,7 +55,7 @@ public:
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Return whether the element could handle wheel input.
-    virtual bool IsWheelHandler() const { return true; }
+    bool IsWheelHandler() const override { return true; }
 
     /// Set content element.
     void SetContentElement(UIElement* element);

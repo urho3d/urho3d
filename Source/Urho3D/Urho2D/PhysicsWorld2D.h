@@ -162,7 +162,7 @@ public:
     /// Return rigid body at screen point.
     RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 
     /// Return whether physics world will automatically simulate during scene update.
     bool IsUpdateEnabled() const { return updateEnabled_; }
@@ -255,7 +255,7 @@ protected:
         /// Construct.
         ContactInfo();
         /// Construct.
-        explicit ContactInfo(b2Contact* contract);
+        explicit ContactInfo(b2Contact* contact);
         /// Write contact info to buffer.
         const PODVector<unsigned char>& Serialize(VectorBuffer& buffer) const;
 

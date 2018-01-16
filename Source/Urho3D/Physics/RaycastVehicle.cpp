@@ -412,7 +412,7 @@ Vector3 RaycastVehicle::GetWheelPosition(int wheel)
 Quaternion RaycastVehicle::GetWheelRotation(int wheel)
 {
     btRaycastVehicle* vehicle = vehicleData_->Get();
-    btTransform transform = vehicle->getWheelTransformWS(wheel);
+    const btTransform& transform = vehicle->getWheelTransformWS(wheel);
     Quaternion rotation = ToQuaternion(transform.getRotation());
     return rotation;
 }

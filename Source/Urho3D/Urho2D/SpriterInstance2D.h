@@ -62,7 +62,7 @@ public:
     /// Set root spatial info.
     void setSpatialInfo(float x, float y, float angle, float scaleX, float scaleY);
     /// Update animation.
-    void Update(float delta_time);
+    void Update(float deltaTime);
 
     /// Return current entity.
     Entity* GetEntity() const { return entity_; }

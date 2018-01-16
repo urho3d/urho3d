@@ -2010,7 +2010,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
                     PrintLine("Saving embedded RGBA texture " + GetFileNameAndExtension(fullDestName));
                     Image image(context_);
                     image.SetSize(tex->mWidth, tex->mHeight, 4);
-                    memcpy(image.GetData(), (const void*)tex->pcData, tex->mWidth * tex->mHeight * 4);
+                    memcpy(image.GetData(), (const void*)tex->pcData, (size_t)tex->mWidth * tex->mHeight * 4);
                     image.SavePNG(fullDestName);
                 }
             }

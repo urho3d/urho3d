@@ -59,7 +59,7 @@ public:
     /// Set view rectangle. A zero rectangle (0 0 0 0) means to use the rendertarget's full dimensions.
     void SetRect(const IntRect& rect);
     /// Set rendering path.
-    void SetRenderPath(RenderPath* path);
+    void SetRenderPath(RenderPath* renderPath);
     /// Set rendering path from an XML file.
     void SetRenderPath(XMLFile* file);
     /// Set whether to render debug geometry. Default true.

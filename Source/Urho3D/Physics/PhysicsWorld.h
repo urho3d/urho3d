@@ -139,7 +139,7 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 
 public:
     /// Construct.
-    explicit PhysicsWorld(Context* scontext);
+    explicit PhysicsWorld(Context* context);
     /// Destruct.
     ~PhysicsWorld() override;
     /// Register object factory.
@@ -251,9 +251,9 @@ public:
     /// Remove a collision shape. Called by CollisionShape.
     void RemoveCollisionShape(CollisionShape* shape);
     /// Add a constraint to keep track of. Called by Constraint.
-    void AddConstraint(Constraint* joint);
+    void AddConstraint(Constraint* constraint);
     /// Remove a constraint. Called by Constraint.
-    void RemoveConstraint(Constraint* joint);
+    void RemoveConstraint(Constraint* constraint);
     /// Add a delayed world transform assignment. Called by RigidBody.
     void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
     /// Add debug geometry to the debug renderer.

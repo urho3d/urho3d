@@ -261,9 +261,9 @@ void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool dep
 {
     unsigned uintColor = color.ToUInt();
 
-    for (float j = 0; j < 180; j += 45)
+    for (auto j = 0; j < 180; j += 45)
     {
-        for (float i = 0; i < 360; i += 45)
+        for (auto i = 0; i < 360; i += 45)
         {
             Vector3 p1 = sphere.GetPoint(i, j);
             Vector3 p2 = sphere.GetPoint(i + 45, j);
@@ -338,7 +338,7 @@ void DebugRenderer::AddCylinder(const Vector3& position, float radius, float hei
     Vector3 heightVec(0, height, 0);
     Vector3 offsetXVec(radius, 0, 0);
     Vector3 offsetZVec(0, 0, radius);
-    for (float i = 0; i < 360; i += 45)
+    for (auto i = 0; i < 360; i += 45)
     {
         Vector3 p1 = sphere.GetPoint(i, 90);
         Vector3 p2 = sphere.GetPoint(i + 45, 90);

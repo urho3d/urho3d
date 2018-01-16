@@ -345,7 +345,7 @@ const char **Script::GetEnumValues(int asTypeID)
             enumValues_[asTypeID][i] = name;
         }
     }
-    enumValues_[asTypeID][count] = 0;
+    enumValues_[asTypeID][count] = nullptr;
     return enumValues_[asTypeID].Buffer();
 }
 

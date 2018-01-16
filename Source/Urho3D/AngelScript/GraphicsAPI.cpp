@@ -1632,7 +1632,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(ParticleEffect, SetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "FaceCameraMode get_faceCameraMode() const", asMETHOD(ParticleEffect, GetFaceCameraMode), asCALL_THISCALL);
 
-    engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(Color&, float)", asMETHOD(ParticleEffect, AddColorTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(const Color&, float)", asMETHOD(ParticleEffect, AddColorTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void AddColorFrame(ColorFrame@+)", asMETHOD(ParticleEffect, AddColorFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void SortColorFrames()", asMETHOD(ParticleEffect, SortColorFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void RemoveColorFrame(uint)", asMETHOD(ParticleEffect, RemoveColorFrame), asCALL_THISCALL);
@@ -1641,7 +1641,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "uint get_numColorFrames() const", asMETHOD(ParticleEffect, GetNumColorFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "ColorFrame@+ GetColorFrame(uint) const", asMETHOD(ParticleEffect, GetColorFrame), asCALL_THISCALL);
 
-    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureTime(Rect&, float)", asMETHOD(ParticleEffect, AddTextureTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureTime(const Rect&, float)", asMETHOD(ParticleEffect, AddTextureTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void AddTextureFrame(TextureFrame@+)", asMETHOD(ParticleEffect, AddTextureFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void SortTextureFrames()", asMETHOD(ParticleEffect, SortTextureFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void RemoveTextureFrame(uint)", asMETHOD(ParticleEffect, RemoveTextureFrame), asCALL_THISCALL);

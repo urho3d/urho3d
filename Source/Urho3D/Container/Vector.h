@@ -345,7 +345,7 @@ public:
     void Clear() { Resize(0); }
 
     /// Resize the vector.
-    void Resize(unsigned newSize) { Vector<T> tempBuffer; Resize(newSize, 0, tempBuffer); }
+    void Resize(unsigned newSize) { Vector<T> tempBuffer; Resize(newSize, nullptr, tempBuffer); }
 
     /// Resize the vector and fill new elements with default value.
     void Resize(unsigned newSize, const T& value)
@@ -365,7 +365,7 @@ public:
 
         if (newCapacity != capacity_)
         {
-            T* newBuffer = 0;
+            T* newBuffer = nullptr;
             capacity_ = newCapacity;
 
             if (capacity_)
@@ -512,7 +512,7 @@ private:
             pos = size_;
         auto length = (unsigned)(end - start);
         Vector<T> tempBuffer;
-        Resize(size_ + length, 0, tempBuffer);
+        Resize(size_ + length, nullptr, tempBuffer);
         MoveRange(pos + length, pos, size_ - pos - length);
 
         T* destPtr = Buffer() + pos;

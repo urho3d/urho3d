@@ -441,15 +441,15 @@ bool Image::BeginLoad(Deserializer& source)
                 unsigned numPixels = dataSize / sourcePixelByteSize;
 
 #define ADJUSTSHIFT(mask, l, r) \
-                if (mask && mask >= 0x100) \
+                if ((mask) >= 0x100) \
                 { \
-                    while ((mask >> r) >= 0x100) \
-                    ++r; \
+                    while (((mask) >> (r)) >= 0x100) \
+                    ++(r); \
                 } \
-                else if (mask && mask < 0x80) \
+                else if ((mask) && (mask) < 0x80) \
                 { \
-                    while ((mask << l) < 0x80) \
-                    ++l; \
+                    while (((mask) << (l)) < 0x80) \
+                    ++(l); \
                 }
 
                 unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
@@ -760,7 +760,7 @@ bool Image::BeginLoad(Deserializer& source)
             return false;
         }
         const uint8_t WEBP[TAG_SIZE] = {'W', 'E', 'B', 'P'};
-        if (memcmp(fourCC, WEBP, TAG_SIZE))
+        if (memcmp(fourCC, WEBP, TAG_SIZE) != 0)
         {
             // VP8_STATUS_BITSTREAM_ERROR
             URHO3D_LOGERROR("Invalid header");
@@ -783,7 +783,7 @@ bool Image::BeginLoad(Deserializer& source)
             return false;
         }
 
-        size_t imgSize(features.width * features.height * (features.has_alpha ? 4 : 3));
+        size_t imgSize = (size_t)features.width * features.height * (features.has_alpha ? 4 : 3);
         SharedArrayPtr<uint8_t> pixelData(new uint8_t[imgSize]);
 
         bool decodeError(false);
@@ -949,7 +949,7 @@ void Image::SetData(const unsigned char* pixelData)
         return;
     }
 
-    memcpy(data_.Get(), pixelData, width_ * height_ * depth_ * components_);
+    memcpy(data_.Get(), pixelData, (size_t)width_ * height_ * depth_ * components_);
     nextLevel_.Reset();
 }
 
@@ -2101,7 +2101,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
         unsigned char* src = data_.Get() + (y * width_ + x) * components_;
         for (int i = 0; i < height; ++i)
         {
-            memcpy(dest, src, width * components_);
+            memcpy(dest, src, (size_t)width * components_);
             dest += width * components_;
             src += width_ * components_;
         }
@@ -2231,7 +2231,7 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
         unsigned char* source = data_ + components_ * (imageWidth * imageRect.top_ + imageRect.left_);
         for (int i = 0; i < height; ++i)
         {
-            memcpy(destination, source, components_ * width);
+            memcpy(destination, source, (size_t)components_ * width);
             destination += surface->pitch;
             source += components_ * imageWidth;
         }
@@ -2348,7 +2348,7 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
         unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
         for (int i = 0; i < destHeight; ++i)
         {
-            memcpy(dest, src, destWidth * components_);
+            memcpy(dest, src, (size_t)destWidth * components_);
 
             src += destWidth * image->components_;
             dest += width_ * components_;

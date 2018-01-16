@@ -123,23 +123,23 @@ TextureUnit ParseTextureUnitName(String name)
     return unit;
 }
 
-StringHash ParseTextureTypeName(String name)
+StringHash ParseTextureTypeName(const String& name)
 {
-    name = name.ToLower().Trimmed();
+    String lowerCaseName = name.ToLower().Trimmed();
 
-    if (name == "texture")
+    if (lowerCaseName == "texture")
         return Texture2D::GetTypeStatic();
-    else if (name == "cubemap")
+    else if (lowerCaseName == "cubemap")
         return TextureCube::GetTypeStatic();
-    else if (name == "texture3d")
+    else if (lowerCaseName == "texture3d")
         return Texture3D::GetTypeStatic();
-    else if (name == "texturearray")
+    else if (lowerCaseName == "texturearray")
         return Texture2DArray::GetTypeStatic();
 
     return nullptr;
 }
 
-StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
+StringHash ParseTextureTypeXml(ResourceCache* cache, const String& filename)
 {
     StringHash type = nullptr;
     if (!cache)
@@ -179,9 +179,9 @@ TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lod
 {
 }
 
-ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* target, const String& name, ValueAnimation* attributeAnimation,
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation,
     WrapMode wrapMode, float speed) :
-    ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
+    ValueAnimationInfo(material, attributeAnimation, wrapMode, speed),
     name_(name)
 {
 }

@@ -79,7 +79,7 @@ void BufferedSoundStream::AddData(void* data, unsigned numBytes)
     }
 }
 
-void BufferedSoundStream::AddData(SharedArrayPtr<signed char> data, unsigned numBytes)
+void BufferedSoundStream::AddData(const SharedArrayPtr<signed char>& data, unsigned numBytes)
 {
     if (data && numBytes)
     {
@@ -89,7 +89,7 @@ void BufferedSoundStream::AddData(SharedArrayPtr<signed char> data, unsigned num
     }
 }
 
-void BufferedSoundStream::AddData(SharedArrayPtr<signed short> data, unsigned numBytes)
+void BufferedSoundStream::AddData(const SharedArrayPtr<signed short>& data, unsigned numBytes)
 {
     if (data && numBytes)
     {

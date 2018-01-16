@@ -332,14 +332,14 @@ unsigned File::Write(const void* data, unsigned size)
     // Need to reassign the position due to internal buffering when transitioning from reading to writing
     if (writeSyncNeeded_)
     {
-        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
         writeSyncNeeded_ = false;
     }
 
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began
-        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
         URHO3D_LOGERROR("Error while writing to file " + GetName());
         return 0;
     }

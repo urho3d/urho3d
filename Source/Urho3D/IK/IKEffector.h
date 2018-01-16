@@ -174,7 +174,7 @@ private:
     /// Intended to be used only by IKSolver
     void SetIKSolver(IKSolver* solver);
     /// Intended to be used only by IKSolver
-    void SetIKEffectorNode(ik_node_t* effector);
+    void SetIKEffectorNode(ik_node_t* effectorNode);
     /// Intended to be used by IKSolver. Copies the positions/rotations of the target node into the effector
     void UpdateTargetNodePosition();
 

@@ -54,7 +54,7 @@ Viewport::Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* r
     SetRenderPath(renderPath);
 }
 
-Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath) :
+Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath) :   // NOLINT(modernize-pass-by-value)
     Object(context),
     scene_(scene),
     camera_(camera),

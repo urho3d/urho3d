@@ -142,7 +142,7 @@ public:
     /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
     /// Set bone mappings when model has more bones than the skinning shader can handle.
-    void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
+    void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& geometryBoneMappings);
     /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
     /// Clone the model. The geometry data is deep-copied and can be modified in the clone without affecting the original.

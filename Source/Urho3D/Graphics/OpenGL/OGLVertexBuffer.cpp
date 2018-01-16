@@ -90,14 +90,14 @@ bool VertexBuffer::SetData(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
+        memcpy(shadowData_.Get(), data, vertexCount_ * (size_t)vertexSize_);
 
     if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
             graphics_->SetVBO(object_.name_);
-            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * (size_t)vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -137,7 +137,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         return true;
 
     if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
-        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
+        memcpy(shadowData_.Get() + start * vertexSize_, data, count * (size_t)vertexSize_);
 
     if (object_.name_)
     {
@@ -145,9 +145,9 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         {
             graphics_->SetVBO(object_.name_);
             if (!discard || start != 0)
-                glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, count * vertexSize_, data);
+                glBufferSubData(GL_ARRAY_BUFFER, start * (size_t)vertexSize_, count * vertexSize_, data);
             else
-                glBufferData(GL_ARRAY_BUFFER, count * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, count * (size_t)vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -248,7 +248,7 @@ bool VertexBuffer::Create()
         }
 
         graphics_->SetVBO(object_.name_);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * (size_t)vertexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;

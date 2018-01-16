@@ -121,9 +121,9 @@ public:
     /// Return bone by index.
     Bone* GetBone(unsigned index);
     /// Return bone by name.
-    Bone* GetBone(const String& boneName);
+    Bone* GetBone(const String& name);
     /// Return bone by name.
-    Bone* GetBone(const char* boneName);
+    Bone* GetBone(const char* name);
     /// Return bone by name hash.
     Bone* GetBone(const StringHash& boneNameHash);
 

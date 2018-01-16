@@ -1579,9 +1579,9 @@ void NavigationMesh::ReleaseNavigationMesh()
     boundingBox_.Clear();
 }
 
-void NavigationMesh::SetPartitionType(NavmeshPartitionType ptype)
+void NavigationMesh::SetPartitionType(NavmeshPartitionType partitionType)
 {
-    partitionType_ = ptype;
+    partitionType_ = partitionType;
     MarkNetworkUpdate();
 }
 

@@ -77,7 +77,7 @@ public:
     ~AnimationState() override;
 
     /// Set start bone. Not supported in node animation mode. Resets any assigned per-bone weights.
-    void SetStartBone(Bone* bone);
+    void SetStartBone(Bone* startBone);
     /// Set looping enabled/disabled.
     void SetLooped(bool looped);
     /// Set blending weight.

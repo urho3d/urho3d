@@ -38,7 +38,7 @@ template <class T> struct RandomAccessIterator
 {
     /// Construct.
     RandomAccessIterator() :
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -145,7 +145,7 @@ template <class T> struct RandomAccessConstIterator
     }
 
     /// Construct from a non-const iterator.
-    RandomAccessConstIterator(const RandomAccessIterator<T>& rhs) :     // NOLINT
+    RandomAccessConstIterator(const RandomAccessIterator<T>& rhs) :     // NOLINT(google-explicit-constructor)
         ptr_(rhs.ptr_)
     {
     }

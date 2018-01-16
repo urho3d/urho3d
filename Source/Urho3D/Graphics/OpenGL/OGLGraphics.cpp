@@ -220,8 +220,8 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 bool Graphics::gl3Support = false;
 
-Graphics::Graphics(Context* context_) :
-    Object(context_),
+Graphics::Graphics(Context* context) :
+    Object(context),
     impl_(new GraphicsImpl()),
     window_(nullptr),
     externalWindow_(nullptr),
@@ -2374,12 +2374,12 @@ void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
         impl_->shaderProgram_ = nullptr;
 }
 
-ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsigned bindingIndex, unsigned size)
+ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsigned index, unsigned size)
 {
     // Note: shaderType parameter is not used on OpenGL, instead binding index should already use the PS range
     // for PS constant buffers
 
-    unsigned key = (bindingIndex << 16) | size;
+    unsigned key = (index << 16) | size;
     HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = impl_->allConstantBuffers_.Find(key);
     if (i == impl_->allConstantBuffers_.End())
     {

@@ -117,7 +117,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     return true;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
+bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount,
     bool checkIllegal)
 {
     if (indexBuffer_)
@@ -139,7 +139,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     primitiveType_ = type;
     indexStart_ = indexStart;
     indexCount_ = indexCount;
-    vertexStart_ = minVertex;
+    vertexStart_ = vertexStart;
     vertexCount_ = vertexCount;
 
     return true;
@@ -153,21 +153,21 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, const PODVector<VertexElement>& elements)
+void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
     rawElements_ = elements;
 }
 
-void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned elementMask)
+void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elementMask);
     rawElements_ = VertexBuffer::GetElements(elementMask);
 }
 
-void Geometry::SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize)
+void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize)
 {
     rawIndexData_ = data;
     rawIndexSize_ = indexSize;

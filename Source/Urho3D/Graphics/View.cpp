@@ -55,16 +55,6 @@
 namespace Urho3D
 {
 
-static const Vector3* directions[] =
-{
-    &Vector3::RIGHT,
-    &Vector3::LEFT,
-    &Vector3::UP,
-    &Vector3::DOWN,
-    &Vector3::FORWARD,
-    &Vector3::BACK
-};
-
 /// %Frustum octree query for shadowcasters.
 class ShadowCasterOctreeQuery : public FrustumOctreeQuery
 {
@@ -287,7 +277,7 @@ void SortShadowQueueWork(const WorkItem* item, unsigned threadIndex)
         start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
 }
 
-StringHash ParseTextureTypeXml(ResourceCache* cache, String filename);
+StringHash ParseTextureTypeXml(ResourceCache* cache, const String& filename);
 
 View::View(Context* context) :
     Object(context),
@@ -2101,8 +2091,8 @@ void View::AllocateScreenBuffers()
             height = (float)viewSize_.y_ * height;
         }
 
-        auto intWidth = (int)(width + 0.5f);
-        auto intHeight = (int)(height + 0.5f);
+        auto intWidth = RoundToInt(width);
+        auto intHeight = RoundToInt(height);
 
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
         renderTargets_[rtInfo.name_] =
@@ -2142,7 +2132,7 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     graphics_->SetDepthStencil(GetDepthStencil(destination));
     graphics_->SetViewport(destRect);
 
-    static const String shaderName("CopyFramebuffer");
+    static const char* shaderName = "CopyFramebuffer";
     graphics_->SetShaders(graphics_->GetShader(VS, shaderName), graphics_->GetShader(PS, shaderName));
 
     SetGBufferShaderParameters(srcSize, srcRect);
@@ -2591,6 +2581,16 @@ void View::SetupShadowCameras(LightQueryResult& query)
 
     case LIGHT_POINT:
         {
+            static const Vector3* directions[] =
+            {
+                &Vector3::RIGHT,
+                &Vector3::LEFT,
+                &Vector3::UP,
+                &Vector3::DOWN,
+                &Vector3::FORWARD,
+                &Vector3::BACK
+            };
+
             for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
             {
                 Camera* shadowCamera = renderer_->GetShadowCamera();

@@ -65,7 +65,7 @@ public:
     /// Return animation name.
     String GetAnimation(unsigned index) const;
     /// Check has animation.
-    bool HasAnimation(const String& animation) const;
+    bool HasAnimation(const String& animationName) const;
 
     /// Return sprite.
     Sprite2D* GetSprite() const;

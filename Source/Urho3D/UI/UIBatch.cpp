@@ -45,7 +45,7 @@ UIBatch::UIBatch() :
     SetDefaultColor();
 }
 
-UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
+UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :     // NOLINT(modernize-pass-by-value)
     element_(element),
     blendMode_(blendMode),
     scissor_(scissor),

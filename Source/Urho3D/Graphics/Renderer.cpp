@@ -1143,7 +1143,7 @@ OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
     }
 
     int width = occlusionBufferSize_;
-    auto height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
+    auto height = RoundToInt(occlusionBufferSize_ / camera->GetAspectRatio());
 
     OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_++];
     buffer->SetSize(width, height, threadedOcclusion_);
@@ -2009,7 +2009,7 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap, float blurScale)
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
 
     // Get shaders
-    static const String shaderName("ShadowBlur");
+    static const char* shaderName = "ShadowBlur";
     ShaderVariation* vs = graphics_->GetShader(VS, shaderName);
     ShaderVariation* ps = graphics_->GetShader(PS, shaderName);
     graphics_->SetShaders(vs, ps);

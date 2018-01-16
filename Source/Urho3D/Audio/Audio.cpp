@@ -196,11 +196,11 @@ void Audio::SetListener(SoundListener* listener)
     listener_ = listener;
 }
 
-void Audio::StopSound(Sound* soundClip)
+void Audio::StopSound(Sound* sound)
 {
     for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
     {
-        if ((*i)->GetSound() == soundClip)
+        if ((*i)->GetSound() == sound)
             (*i)->Stop();
     }
 }
@@ -225,15 +225,15 @@ SoundListener* Audio::GetListener() const
     return listener_;
 }
 
-void Audio::AddSoundSource(SoundSource* channel)
+void Audio::AddSoundSource(SoundSource* soundSource)
 {
     MutexLock lock(audioMutex_);
-    soundSources_.Push(channel);
+    soundSources_.Push(soundSource);
 }
 
-void Audio::RemoveSoundSource(SoundSource* channel)
+void Audio::RemoveSoundSource(SoundSource* soundSource)
 {
-    PODVector<SoundSource*>::Iterator i = soundSources_.Find(channel);
+    PODVector<SoundSource*>::Iterator i = soundSources_.Find(soundSource);
     if (i != soundSources_.End())
     {
         MutexLock lock(audioMutex_);
@@ -269,7 +269,7 @@ void Audio::MixOutput(void* dest, unsigned samples)
 {
     if (!playing_ || !clipBuffer_)
     {
-        memset(dest, 0, samples * sampleSize_);
+        memset(dest, 0, samples * (size_t)sampleSize_);
         return;
     }
 

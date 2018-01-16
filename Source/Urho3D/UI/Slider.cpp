@@ -163,9 +163,9 @@ void Slider::OnResize(const IntVector2& newSize, const IntVector2& delta)
     UpdateSlider();
 }
 
-void Slider::SetOrientation(Orientation type)
+void Slider::SetOrientation(Orientation orientation)
 {
-    orientation_ = type;
+    orientation_ = orientation;
     UpdateSlider();
 }
 
@@ -242,7 +242,7 @@ void Slider::UpdateSlider()
             if (!knob_->IsFixedSize())
             {
                 knob_->SetSize(sliderLength, GetHeight());
-                knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+                knob_->SetPosition(Clamp(RoundToInt(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
             }
             else
                 knob_->SetPosition(Clamp((int)(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
@@ -259,10 +259,10 @@ void Slider::UpdateSlider()
             if (!knob_->IsFixedSize())
             {
                 knob_->SetSize(GetWidth(), sliderLength);
-                knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+                knob_->SetPosition(0, Clamp(RoundToInt(sliderPos), 0, GetHeight() - knob_->GetHeight()));
             }
             else
-                knob_->SetPosition(0, Clamp((int)(sliderPos), 0, GetHeight() - knob_->GetHeight()));
+                knob_->SetPosition(0, Clamp(RoundToInt(sliderPos), 0, GetHeight() - knob_->GetHeight()));
         }
     }
     else

@@ -78,55 +78,55 @@ public:
     {
     }
     /// Construct with a boolean.
-    JSONValue(bool value) :         // NOLINT
+    JSONValue(bool value) :         // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a integer.
-    JSONValue(int value) :          // NOLINT
+    JSONValue(int value) :          // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a unsigned integer.
-    JSONValue(unsigned value) :     // NOLINT
+    JSONValue(unsigned value) :     // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a float.
-    JSONValue(float value) :        // NOLINT
+    JSONValue(float value) :        // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a double.
-    JSONValue(double value) :       // NOLINT
+    JSONValue(double value) :       // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a string.
-    JSONValue(const String& value) :    // NOLINT
+    JSONValue(const String& value) :    // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a C string.
-    JSONValue(const char* value) :      // NOLINT
+    JSONValue(const char* value) :      // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON array.
-    JSONValue(const JSONArray& value) :     // NOLINT
+    JSONValue(const JSONArray& value) :     // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON object.
-    JSONValue(const JSONObject& value) :    // NOLINT
+    JSONValue(const JSONObject& value) :    // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
