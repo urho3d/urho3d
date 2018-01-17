@@ -54,7 +54,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'TVOS', 'APPLETVOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'DIRECTX_INC_SEARCH_PATHS', 'DIRECTX_LIB_SEARCH_PATHS', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_LINT', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'TVOS', 'APPLETVOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'DIRECTX_INC_SEARCH_PATHS', 'DIRECTX_LIB_SEARCH_PATHS', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -367,9 +367,24 @@ task :ci do
     system 'rake ci_push_bindings' or abort
     next
   end
-  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system 'rake make' }
+  redirect = '2>/tmp/lint.err' if ENV['URHO3D_LINT']
+  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make #{redirect}" }
     abort 'Failed to build Urho3D library' unless File.exists?('already_timeup.log')
     $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+    next
+  end
+  if ENV['URHO3D_LINT']
+    lint_err = File.read('/tmp/lint.err')
+    puts "\nLinter result:\n\n#{lint_err}\n"; $stdout.flush
+    # Exclude ThirdParty and generated code
+    # Also exclude a false positive caused by "modernize-use-bool-literals" check on FD_ZERO macro; TODO: to be removed after upgrading to version 4.0
+    filtered_lint_err = lint_err.scan(/(.+:\d+:\d+:.+\[.+\])/).flatten.select { |it| it =~ /\[\w+-.+\]/ }.reject { |it| it =~ /ThirdParty|generated|NamedPipe.cpp.+?modernize-use-bool-literals/ }
+    unless filtered_lint_err.empty?
+      puts "New linter error(s) found:\n"
+      filtered_lint_err.each { |it| puts it }
+      puts; $stdout.flush
+      abort 'Failed to pass linter checks'
+    end
     next
   end
   if ENV['URHO3D_TESTING'] && !ENV['WEB'] && !timeup

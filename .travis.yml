@@ -137,13 +137,15 @@ matrix:
       stage: debug build configuration
       addons: *pulseaudio
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=Debug
-      script: rake ci && rake ci_timer
+      script: &ci rake ci && rake ci_timer
     - <<: *debug-build-stage
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
 # TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' stages here
-    - stage: lint (to be implemented)
+    - stage: lint
       <<: *base
-      script: true  # Using clang-tidy or something like that or using CMake/clang-tidy integration (see <LANG>_CLANG_TIDY CMake property)
+      env: URHO3D_LINT=1
+      before_script: git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export PATH=$(pwd)/fastcomp-clang/bin:$PATH
+      script: *ci
 
 ---
 
