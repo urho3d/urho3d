@@ -35,11 +35,11 @@
 namespace Urho3D
 {
 
+static HashMap<StringHash, String> unknownTypeToName;
+static String letters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
 static String GenerateNameFromType(StringHash typeHash)
 {
-    static HashMap<StringHash, String> unknownTypeToName;
-    static String letters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-
     if (unknownTypeToName.Contains(typeHash))
         return unknownTypeToName[typeHash];
 

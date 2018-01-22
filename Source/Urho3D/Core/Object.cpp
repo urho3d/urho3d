@@ -530,19 +530,10 @@ void Object::RemoveEventSender(Object* sender)
     }
 }
 
-
-Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName) noexcept
+Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
 {
     StringHash id(eventName);
-    try
-    {
-        GetEventNameMap()[id] = eventName;
-    }
-    catch (std::bad_alloc&)
-    {
-        PrintLine("An out-of-memory error occurred. The application will now terminate.", true);
-        std::terminate();
-    }
+    GetEventNameMap()[id] = eventName;
     return id;
 }
 

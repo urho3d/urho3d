@@ -155,6 +155,8 @@ StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
     return type;
 }
 
+static TechniqueEntry noEntry;
+
 bool CompareTechniqueEntries(const TechniqueEntry& lhs, const TechniqueEntry& rhs)
 {
     if (lhs.lodDistance_ != rhs.lodDistance_)
@@ -1186,8 +1188,6 @@ void Material::MarkForAuxView(unsigned frameNumber)
 
 const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 {
-    static TechniqueEntry noEntry;
-
     return index < techniques_.Size() ? techniques_[index] : noEntry;
 }
 

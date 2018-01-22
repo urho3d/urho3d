@@ -46,6 +46,29 @@ extern const char* NAVIGATION_CATEGORY;
 static const unsigned DEFAULT_MAX_AGENTS = 512;
 static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
+static const StringVector filterTypesStructureElementNames =
+{
+    "Query Filter Type Count",
+    "   Include Flags",
+    "   Exclude Flags",
+    "   >AreaCost"
+};
+
+static const StringVector obstacleAvoidanceTypesStructureElementNames =
+{
+    "Obstacle Avoid. Type Count",
+    "   Velocity Bias",
+    "   Desired Velocity Weight",
+    "   Current Velocity Weight",
+    "   Side Bias Weight",
+    "   Time of Impact Weight",
+    "   Time Horizon",
+    "   Grid Size",
+    "   Adaptive Divs",
+    "   Adaptive Rings",
+    "   Adaptive Depth"
+};
+
 void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
 {
     static_cast<CrowdAgent*>(ag->params.userData)->OnCrowdUpdate(ag, dt);
@@ -74,29 +97,6 @@ CrowdManager::~CrowdManager()
 
 void CrowdManager::RegisterObject(Context* context)
 {
-    static const StringVector filterTypesStructureElementNames =
-        {
-            "Query Filter Type Count",
-            "   Include Flags",
-            "   Exclude Flags",
-            "   >AreaCost"
-        };
-
-    static const StringVector obstacleAvoidanceTypesStructureElementNames =
-        {
-            "Obstacle Avoid. Type Count",
-            "   Velocity Bias",
-            "   Desired Velocity Weight",
-            "   Current Velocity Weight",
-            "   Side Bias Weight",
-            "   Time of Impact Weight",
-            "   Time Horizon",
-            "   Grid Size",
-            "   Adaptive Divs",
-            "   Adaptive Rings",
-            "   Adaptive Depth"
-        };
-
     context->RegisterFactory<CrowdManager>(NAVIGATION_CATEGORY);
 
     URHO3D_ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);

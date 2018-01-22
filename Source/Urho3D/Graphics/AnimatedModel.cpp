@@ -49,6 +49,17 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
+static const StringVector animationStatesStructureElementNames =
+{
+    "Anim State Count",
+    "   Animation",
+    "   Start Bone",
+    "   Is Looped",
+    "   Weight",
+    "   Time",
+    "   Layer"
+};
+
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
     return lhs->GetLayer() < rhs->GetLayer();
@@ -90,17 +101,6 @@ AnimatedModel::~AnimatedModel()
 
 void AnimatedModel::RegisterObject(Context* context)
 {
-    static const StringVector animationStatesStructureElementNames =
-        {
-            "Anim State Count",
-            "   Animation",
-            "   Start Bone",
-            "   Is Looped",
-            "   Weight",
-            "   Time",
-            "   Layer"
-        };
-
     context->RegisterFactory<AnimatedModel>(GEOMETRY_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);

@@ -33,6 +33,12 @@ namespace Urho3D
 extern const char* interpolationModeNames[];
 extern const char* LOGIC_CATEGORY;
 
+static const StringVector controlPointsStructureElementNames =
+{
+    "Control Point Count",
+    "   NodeID"
+};
+
 SplinePath::SplinePath(Context* context) :
     Component(context),
     spline_(BEZIER_CURVE),
@@ -48,12 +54,6 @@ SplinePath::SplinePath(Context* context) :
 
 void SplinePath::RegisterObject(Context* context)
 {
-    static const StringVector controlPointsStructureElementNames =
-        {
-            "Control Point Count",
-            "   NodeID"
-        };
-
     context->RegisterFactory<SplinePath>(LOGIC_CATEGORY);
 
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Interpolation Mode", GetInterpolationMode, SetInterpolationMode, InterpolationMode,

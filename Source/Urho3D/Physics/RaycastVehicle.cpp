@@ -147,34 +147,34 @@ RaycastVehicle::~RaycastVehicle()
     wheelNodes_.Clear();
 }
 
+static const StringVector wheelElementNames =
+{
+    "Number of wheels",
+    "   Wheel node id",
+    "   Wheel direction",
+    "   Wheel axle",
+    "   Wheel rest length",
+    "   Wheel radius",
+    "   Wheel is front wheel",
+    "   Steering",
+    "   Connection point vector",
+    "   Original rotation",
+    "   Cumulative skid info",
+    "   Side skip speed",
+    "   Grounded",
+    "   Contact position",
+    "   Contact normal",
+    "   Suspension stiffness",
+    "   Damping relaxation",
+    "   Damping compression",
+    "   Friction slip",
+    "   Roll influence",
+    "   Engine force",
+    "   Brake"
+};
+
 void RaycastVehicle::RegisterObject(Context* context)
 {
-    static const StringVector wheelElementNames =
-        {
-            "Number of wheels",
-            "   Wheel node id",
-            "   Wheel direction",
-            "   Wheel axle",
-            "   Wheel rest length",
-            "   Wheel radius",
-            "   Wheel is front wheel",
-            "   Steering",
-            "   Connection point vector",
-            "   Original rotation",
-            "   Cumulative skid info",
-            "   Side skip speed",
-            "   Grounded",
-            "   Contact position",
-            "   Contact normal",
-            "   Suspension stiffness",
-            "   Damping relaxation",
-            "   Damping compression",
-            "   Friction slip",
-            "   Roll influence",
-            "   Engine force",
-            "   Brake"
-        };
-
     context->RegisterFactory<RaycastVehicle>();
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Wheel data", GetWheelDataAttr, SetWheelDataAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);

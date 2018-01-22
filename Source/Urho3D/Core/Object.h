@@ -358,7 +358,7 @@ private:
 struct URHO3D_API EventNameRegistrar
 {
     /// Register an event name for hash reverse mapping.
-    static StringHash RegisterEventName(const char* eventName) noexcept;
+    static StringHash RegisterEventName(const char* eventName);
     /// Return Event name or empty string if not found.
     static const String& GetEventName(StringHash eventID);
     /// Return Event name map.
