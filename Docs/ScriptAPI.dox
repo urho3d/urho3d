@@ -10008,9 +10008,9 @@ Properties:
 Methods:
 
 - void AddColorFrame(ColorFrame@)
-- void AddColorTime(Color&, float)
+- void AddColorTime(const Color&, float)
 - void AddTextureFrame(TextureFrame@)
-- void AddTextureTime(Rect&, float)
+- void AddTextureTime(const Rect&, float)
 - ParticleEffect@ Clone(const String& = String ( )) const
 - ColorFrame@ GetColorFrame(uint) const
 - TextureFrame@ GetTextureFrame(uint) const
@@ -15891,8 +15891,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
-- void Patch(XMLElement)
 - void Patch(XMLFile@)
+- void Patch(const XMLElement&)
 - bool Save(File@) const
 - bool Save(File@, const String&) const
 - bool Save(VectorBuffer&) const
@@ -15920,10 +15920,10 @@ Methods:
 
 - void Bind()
 - void Clear()
-- XPathResultSet Evaluate(XMLElement)
-- bool EvaluateToBool(XMLElement)
-- float EvaluateToFloat(XMLElement)
-- String EvaluateToString(XMLElement)
+- XPathResultSet Evaluate(const XMLElement&)
+- bool EvaluateToBool(const XMLElement&)
+- float EvaluateToFloat(const XMLElement&)
+- String EvaluateToString(const XMLElement&)
 - bool SetQuery(const String&, const String& = String ( ), bool = true)
 - bool SetVariable(const String&, bool)
 - bool SetVariable(const String&, const String&)
