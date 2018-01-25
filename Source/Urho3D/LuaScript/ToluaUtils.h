@@ -35,7 +35,7 @@ using namespace Urho3D;
 /// Check is String.
 #define tolua_isurho3dstring tolua_isstring
 /// Push String.
-#define tolua_pushurho3dstring(L, s) tolua_pushstring(L, s.CString())
+#define tolua_pushurho3dstring(L, s) tolua_pushstring(L, s.CString())       // NOLINT(misc-macro-parentheses)
 /// Convert to String.
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* str);
 /// Convert to String.

@@ -54,14 +54,10 @@ public:
     /// Constructor setting knots and interpolation mode.
     explicit Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE);
     /// Copy constructor.
-    Spline(const Spline& rhs);
+    Spline(const Spline& rhs) = default;
 
     /// Copy operator.
-    void operator =(const Spline& rhs)
-    {
-        knots_ = rhs.knots_;
-        interpolationMode_ = rhs.interpolationMode_;
-    }
+    Spline& operator =(const Spline& rhs) = default;
 
     /// Equality operator.
     bool operator ==(const Spline& rhs) const

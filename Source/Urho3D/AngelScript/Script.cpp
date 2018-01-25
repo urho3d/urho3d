@@ -259,7 +259,7 @@ void Script::ExceptionCallback(asIScriptContext* context)
     message.AppendWithFormat("- Exception '%s' in '%s'\n%s", context->GetExceptionString(),
         context->GetExceptionFunction()->GetDeclaration(), GetCallStack(context).CString());
 
-    asSMessageInfo msg;
+    asSMessageInfo msg{};
     msg.row = context->GetExceptionLineNumber(&msg.col, &msg.section);
     msg.type = asMSGTYPE_ERROR;
     msg.message = message.CString();

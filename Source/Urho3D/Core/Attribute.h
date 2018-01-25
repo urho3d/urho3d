@@ -65,10 +65,10 @@ public:
 struct AttributeInfo
 {
     /// Construct empty.
-    AttributeInfo() { }
+    AttributeInfo() = default;
 
     /// Construct attribute.
-    AttributeInfo(VariantType type, const char* name, SharedPtr<AttributeAccessor> accessor, const char** enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(VariantType type, const char* name, const SharedPtr<AttributeAccessor>& accessor, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
         enumNames_(enumNames),

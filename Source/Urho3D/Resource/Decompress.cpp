@@ -948,7 +948,7 @@ void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, in
     }
 }
 
-void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat format)
+void FlipBlockVertical(unsigned char* dest, const unsigned char* src, CompressedFormat format)
 {
     switch (format)
     {
@@ -1018,7 +1018,7 @@ static unsigned FlipDXT5AlphaHorizontal(unsigned src)
            ((src & 0x7000) << 9) | ((src & 0x38000) << 3) | ((src & 0x1c0000) >> 3) | ((src & 0xe00000) >> 9);
 }
 
-void FlipBlockHorizontal(unsigned char* dest, unsigned char* src, CompressedFormat format)
+void FlipBlockHorizontal(unsigned char* dest, const unsigned char* src, CompressedFormat format)
 {
     switch (format)
     {

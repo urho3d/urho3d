@@ -223,7 +223,7 @@ float Quaternion::RollAngle() const
 
 Urho3D::Vector3 Quaternion::Axis() const
 {
-    return Vector3(x_, y_, z_) / sqrt(1 - w_ * w_);
+    return Vector3(x_, y_, z_) / sqrt(1. - w_ * w_);
 }
 
 float Quaternion::Angle() const

@@ -131,7 +131,7 @@ void Run(const Vector<String>& arguments)
             {
                 float x = ((float)i) / ((float)(width - 1));
 
-                data[i] = (unsigned char)((1.0f - pow(x, power)) * 255.0f);
+                data[i] = (unsigned char)((1.0f - Pow(x, power)) * 255.0f);
             }
 
             // Ensure start is full bright & end is completely black
@@ -158,7 +158,7 @@ void Run(const Vector<String>& arguments)
                     if (dist > 1.0f)
                         dist = 1.0f;
 
-                    data[i] = (unsigned char)((1.0f - pow(dist, power)) * 255.0f);
+                    data[i] = (unsigned char)((1.0f - Pow(dist, power)) * 255.0f);
                 }
             }
 

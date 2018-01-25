@@ -139,7 +139,7 @@ void SpriterInstance::Update(float deltaTime)
 
         if (looping_)
         {
-            currentTime_ = fmod(currentTime_, animation_->length_);
+            currentTime_ = Mod(currentTime_, animation_->length_);
             sendFinishEvent = true;
         }
         else

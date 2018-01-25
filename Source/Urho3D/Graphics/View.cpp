@@ -421,7 +421,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         {
             hasScenePasses_ = true;
 
-            ScenePassInfo info;
+            ScenePassInfo info{};
             info.passIndex_ = command.passIndex_ = Technique::GetPassIndex(command.pass_);
             info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
             info.markToStencil_ = !noStencil_ && command.markToStencil_;

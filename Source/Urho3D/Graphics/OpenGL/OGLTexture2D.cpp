@@ -444,10 +444,14 @@ bool Texture2D::Create()
         glGetError();
 #ifndef GL_ES_VERSION_2_0
         if (multiSample_ > 1 && !autoResolve_)
+        {
             glTexImage2DMultisample(target_, multiSample_, format, width_, height_, GL_TRUE);
+        }
         else
 #endif
-        glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, nullptr);
+        {
+            glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, nullptr);
+        }
         if (glGetError())
         {
             URHO3D_LOGERROR("Failed to create texture");

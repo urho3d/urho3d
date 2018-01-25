@@ -544,10 +544,11 @@ public:
     UniquePtr(std::nullptr_t) { }   // NOLINT(google-explicit-constructor)
 
     /// Move-construct from UniquePtr.
-    UniquePtr(UniquePtr && up) : ptr_(up.Detach()) { }
+    UniquePtr(UniquePtr&& up) noexcept :
+        ptr_(up.Detach()) {}
 
     /// Move-assign from UniquePtr.
-    UniquePtr& operator = (UniquePtr && up)
+    UniquePtr& operator =(UniquePtr&& up) noexcept
     {
         Reset(up.Detach());
         return *this;

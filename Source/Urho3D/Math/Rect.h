@@ -363,37 +363,37 @@ public:
     /// Divide by scalar.
     IntRect operator /(float value) const
     {
-        return IntRect(
+        return {
             static_cast<int>(left_ / value), static_cast<int>(top_ / value),
             static_cast<int>(right_ / value), static_cast<int>(bottom_ / value)
-        );
+        };
     }
 
     /// Multiply by scalar.
     IntRect operator *(float value) const
     {
-        return IntRect(
+        return {
             static_cast<int>(left_ * value), static_cast<int>(top_ * value),
             static_cast<int>(right_ * value), static_cast<int>(bottom_ * value)
-        );
+        };
     }
 
     /// Add another rect.
     IntRect operator +(const IntRect& rhs) const
     {
-        return IntRect(
+        return {
             left_ + rhs.left_, top_ + rhs.top_,
             right_ + rhs.right_, bottom_ + rhs.bottom_
-        );
+        };
     }
 
     /// Subtract another rect.
     IntRect operator -(const IntRect& rhs) const
     {
-        return IntRect(
+        return {
             left_ - rhs.left_, top_ - rhs.top_,
             right_ - rhs.right_, bottom_ - rhs.bottom_
-        );
+        };
     }
 
     /// Return size.

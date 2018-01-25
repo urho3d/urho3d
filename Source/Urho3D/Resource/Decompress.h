@@ -35,8 +35,8 @@ URHO3D_API void DecompressImageETC(unsigned char* rgba, const void* blocks, int 
 /// Decompress a PVRTC compressed image to RGBA.
 URHO3D_API void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format);
 /// Flip a compressed block vertically.
-URHO3D_API void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat format);
+URHO3D_API void FlipBlockVertical(unsigned char* dest, const unsigned char* src, CompressedFormat format);
 /// Flip a compressed block horizontally.
-URHO3D_API void FlipBlockHorizontal(unsigned char* dest, unsigned char* src, CompressedFormat format);
+URHO3D_API void FlipBlockHorizontal(unsigned char* dest, const unsigned char* src, CompressedFormat format);
 
 }

@@ -45,10 +45,8 @@ struct RaycastVehicleData
 
     ~RaycastVehicleData()
     {
-        if (vehicleRayCaster_)
-        {
-            delete vehicleRayCaster_;
-        }
+        delete vehicleRayCaster_;
+
         vehicleRayCaster_ = nullptr;
         if (vehicle_)
         {
@@ -80,8 +78,7 @@ struct RaycastVehicleData
             return;
 
         // Delete old vehicle & action first
-        if (vehicleRayCaster_)
-            delete vehicleRayCaster_;
+        delete vehicleRayCaster_;
         if (vehicle_)
         {
             if (added_)

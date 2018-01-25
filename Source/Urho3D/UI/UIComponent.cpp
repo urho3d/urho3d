@@ -74,16 +74,16 @@ public:
             return result;
 
         Scene* scene = node_->GetScene();
-        StaticModel* model = node_->GetComponent<StaticModel>();
+        auto* model = node_->GetComponent<StaticModel>();
         if (scene == nullptr || model == nullptr)
             return result;
 
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer == nullptr)
             return result;
 
         // \todo Always uses the first viewport, in case there are multiple
-        Octree* octree = scene->GetComponent<Octree>();
+        auto* octree = scene->GetComponent<Octree>();
         if (viewport_ == nullptr)
             viewport_ = renderer->GetViewportForScene(scene, 0);
 
@@ -104,7 +104,7 @@ public:
         IntRect rect = viewport_->GetRect();
         if (rect == IntRect::ZERO)
         {
-            Graphics* graphics = GetSubsystem<Graphics>();
+            auto* graphics = GetSubsystem<Graphics>();
             rect.right_ = graphics->GetWidth();
             rect.bottom_ = graphics->GetHeight();
         }
@@ -197,8 +197,8 @@ void UIComponent::OnNodeSet(Node* node)
     rootElement_->SetNode(node);
     if (node)
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        StaticModel* model = node->GetComponent<StaticModel>();
+        auto* renderer = GetSubsystem<Renderer>();
+        auto* model = node->GetComponent<StaticModel>();
         rootElement_->SetViewport(renderer->GetViewportForScene(GetScene(), viewportIndex_));
         if (model == nullptr)
             model_ = model = node->CreateComponent<StaticModel>();

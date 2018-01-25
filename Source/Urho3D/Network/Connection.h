@@ -108,7 +108,7 @@ class URHO3D_API Connection : public Object
 
 public:
     /// Construct with context and kNet message connection pointers.
-    Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
+    Connection(Context* context, bool isClient, const kNet::SharedPtr<kNet::MessageConnection>& connection);
     /// Destruct.
     ~Connection() override;
 

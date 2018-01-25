@@ -133,7 +133,7 @@ bool Sound::LoadOggVorbis(Deserializer& source)
 
 bool Sound::LoadWav(Deserializer& source)
 {
-    WavHeader header;
+    WavHeader header{};
 
     // Try to open
     memset(&header, 0, sizeof header);

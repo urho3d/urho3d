@@ -53,8 +53,6 @@ Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode) :
 {
 }
 
-Spline::Spline(const Spline& rhs) = default;
-
 Variant Spline::GetPoint(float f) const
 {
     if (knots_.Size() < 2)

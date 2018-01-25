@@ -2282,7 +2282,7 @@ void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
 void UIElement::SetRenderTexture(Texture2D* texture)
 {
-    if (UI* ui = GetSubsystem<UI>())
+    if (auto* ui = GetSubsystem<UI>())
         ui->SetElementRenderTexture(this, texture);
 }
 
