@@ -171,8 +171,6 @@ bool Animatable::LoadJSON(const JSONValue& source)
 
         float speed = value.Get("speed").GetFloat();
         SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
-
-        it++;
     }
 
     return true;
