@@ -51,6 +51,7 @@
 #include "../Urho2D/RigidBody2D.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
+#include "../Urho2D/StretchableSprite2D.h"
 #include "../Urho2D/TileMap2D.h"
 #include "../Urho2D/TileMapLayer2D.h"
 #include "../Urho2D/TmxFile2D.h"
@@ -168,6 +169,13 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedSprite2D", "LoopMode2D get_loopMode() const", asMETHOD(AnimatedSprite2D, GetLoopMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
+}
+
+static void RegisterStretchableSprite2D(asIScriptEngine* engine)
+{
+    RegisterStaticSprite2D<StretchableSprite2D>(engine, "StretchableSprite2D");
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_border(const IntRect&in)", asMETHOD(StretchableSprite2D, SetBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const IntRect& get_border() const", asMETHOD(StretchableSprite2D, GetBorder), asCALL_THISCALL);
 }
 
 static ParticleEffect2D* ParticleEffect2DClone(const String& cloneName, ParticleEffect2D* ptr)
@@ -754,6 +762,8 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
 
     RegisterAnimationSet2D(engine);
     RegisterAnimatedSprite2D(engine);
+
+    RegisterStretchableSprite2D(engine);
 
     RegisterParticleEffect2D(engine);
     RegisterParticleEmitter2D(engine);

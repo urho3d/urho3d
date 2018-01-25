@@ -22,6 +22,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Urho2D/StretchableSprite2D.h"
 #include "../Urho2D/AnimatedSprite2D.h"
 #include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/CollisionBox2D.h"
@@ -70,6 +71,8 @@ void RegisterUrho2DLibrary(Context* context)
     // Must register objects from base to derived order
     Drawable2D::RegisterObject(context);
     StaticSprite2D::RegisterObject(context);
+
+    StretchableSprite2D::RegisterObject(context);
 
     AnimationSet2D::RegisterObject(context);
     AnimatedSprite2D::RegisterObject(context);
