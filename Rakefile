@@ -377,10 +377,9 @@ task :ci do
     lint_err = File.read('/tmp/lint.err')
     puts "\nLinter result:\n\n#{lint_err}\n"; $stdout.flush
     # Exclude ThirdParty and generated code
-    # Also exclude a false positive caused by "modernize-use-bool-literals" check on FD_ZERO macro; TODO: to be removed after upgrading to version 4.0
-    filtered_lint_err = lint_err.scan(/(.+:\d+:\d+:.+\[.+\])/).flatten.select { |it| it =~ /\[\w+-.+\]/ }.reject { |it| it =~ /ThirdParty|generated|NamedPipe.cpp.+?modernize-use-bool-literals/ }
+    filtered_lint_err = lint_err.scan(/(.+:\d+:\d+:.+\[.+\])/).flatten.select { |it| it =~ /\[\w+-.+\]/ }.reject { |it| it =~ /ThirdParty|generated|HashMap\.h.+?clang-analyzer-core.CallAndMessag/ }
     unless filtered_lint_err.empty?
-      puts "New linter error(s) found:\n"
+      puts "New linter error(s) found:\n\n"
       filtered_lint_err.each { |it| puts it }
       puts; $stdout.flush
       abort 'Failed to pass linter checks'

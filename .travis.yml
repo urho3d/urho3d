@@ -144,7 +144,7 @@ matrix:
     - stage: lint
       <<: *base
       env: URHO3D_LINT=1
-      before_script: git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export PATH=$(pwd)/fastcomp-clang/bin:$PATH
+      before_script: git clone --depth 1 -b incoming https://github.com/urho3d/fastcomp-clang.git && export PATH=$(pwd)/fastcomp-clang/bin:$PATH
       script: *ci
 
 ---
