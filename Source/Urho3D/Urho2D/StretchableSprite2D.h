@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ class URHO3D_API StretchableSprite2D : public StaticSprite2D
 
 public:
     /// Construct.
-    StretchableSprite2D(Context* context);
+    explicit StretchableSprite2D(Context* context);
     /// Register object factory. Drawable2D must be registered first.
     static void RegisterObject(Context* context);
 

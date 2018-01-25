@@ -760,10 +760,10 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
     RegisterDrawable2D(engine);
     RegisterStaticSprite2D(engine);
 
+    RegisterStretchableSprite2D(engine);
+
     RegisterAnimationSet2D(engine);
     RegisterAnimatedSprite2D(engine);
-
-    RegisterStretchableSprite2D(engine);
 
     RegisterParticleEffect2D(engine);
     RegisterParticleEmitter2D(engine);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,42 +77,42 @@ void Urho2DStretchableSprite::CreateScene()
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
     refSpriteNode_ = scene_->CreateChild("regular sprite");
     stretchSpriteNode_ = scene_->CreateChild("stretchable sprite");
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Stretchable.png");
-    if(sprite)
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* sprite = cache->GetResource<Sprite2D>("Urho2D/Stretchable.png");
+    if (sprite)
     {
-      refSpriteNode_->CreateComponent<StaticSprite2D>()->SetSprite(sprite);
+        refSpriteNode_->CreateComponent<StaticSprite2D>()->SetSprite(sprite);
 
-      auto stretchSprite = stretchSpriteNode_->CreateComponent<StretchableSprite2D>();
-      stretchSprite->SetSprite(sprite);
-      stretchSprite->SetBorder({25, 25, 25, 25});
+        auto stretchSprite = stretchSpriteNode_->CreateComponent<StretchableSprite2D>();
+        stretchSprite->SetSprite(sprite);
+        stretchSprite->SetBorder({25, 25, 25, 25});
 
-      refSpriteNode_->Translate2D(Vector2{-2.0f, 0.0f});
-      stretchSpriteNode_->Translate2D(Vector2{2.0f, 0.0f});
+        refSpriteNode_->Translate2D(Vector2{-2.0f, 0.0f});
+        stretchSpriteNode_->Translate2D(Vector2{2.0f, 0.0f});
     }
 }
 
 void Urho2DStretchableSprite::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-            "Use WASD keys to transform, Tab key to cycle through\n"
-            "Scale, Rotate, and Translate transform modes. In Rotate\n"
-            "mode, combine A/D keys with Ctrl key to rotate about\n"
-            "the Z axis");
+        "Use WASD keys to transform, Tab key to cycle through\n"
+        "Scale, Rotate, and Translate transform modes. In Rotate\n"
+        "mode, combine A/D keys with Ctrl key to rotate about\n"
+        "the Z axis");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 12);
 
     // Position the text relative to the screen center
@@ -123,7 +123,7 @@ void Urho2DStretchableSprite::CreateInstructions()
 
 void Urho2DStretchableSprite::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -141,41 +141,37 @@ void Urho2DStretchableSprite::SubscribeToEvents()
     UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
-void Urho2DStretchableSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void Urho2DStretchableSprite::HandleUpdate(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace Update;
 
     // Take the frame time step, which is stored as a float
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
-    switch(selectTransform_)
+    switch (selectTransform_)
     {
-    case 0:
-        ScaleSprites(timeStep);
+    case 0: ScaleSprites(timeStep);
         break;
-    case 1:
-        RotateSprites(timeStep);
+    case 1: RotateSprites(timeStep);
         break;
-    case 2:
-        TranslateSprites(timeStep);
+    case 2: TranslateSprites(timeStep);
         break;
-    default:
-        URHO3D_LOGERRORF("bad transform selection: %d", selectTransform_);
+    default: URHO3D_LOGERRORF("bad transform selection: %d", selectTransform_);
     }
 }
 
-void Urho2DStretchableSprite::OnKeyUp(StringHash eventType, VariantMap& eventData)
+void Urho2DStretchableSprite::OnKeyUp(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace KeyUp;
 
     const auto key = eventData[P_KEY].GetInt();
 
-    if(key == KEY_TAB)
+    if (key == KEY_TAB)
     {
         ++selectTransform_;
         selectTransform_ %= 3;
     }
-    else if(key == KEY_ESCAPE)
+    else if (key == KEY_ESCAPE)
         engine_->Exit();
 }
 
@@ -185,16 +181,15 @@ void Urho2DStretchableSprite::TranslateSprites(float timeStep)
     static constexpr auto speed = 1.0f;
     const auto input = GetSubsystem<Input>();
     const auto left = input->GetKeyDown(KEY_A),
-               right = input->GetKeyDown(KEY_D),
-               up = input->GetKeyDown(KEY_W),
-               down = input->GetKeyDown(KEY_S);
+        right = input->GetKeyDown(KEY_D),
+        up = input->GetKeyDown(KEY_W),
+        down = input->GetKeyDown(KEY_S);
 
-    if(left || right || up || down)
+    if (left || right || up || down)
     {
         const auto quantum = timeStep * speed;
-        const auto translate = Vector2{
-            (left ? -quantum : 0.0f) + (right ? quantum : 0.0f),
-            (down ? -quantum : 0.0f) + (up ? quantum : 0.0f)};
+        const auto translate = Vector2{(left ? -quantum : 0.0f) + (right ? quantum : 0.0f),
+                                       (down ? -quantum : 0.0f) + (up ? quantum : 0.0f)};
 
         refSpriteNode_->Translate2D(translate);
         stretchSpriteNode_->Translate2D(translate);
@@ -207,20 +202,18 @@ void Urho2DStretchableSprite::RotateSprites(float timeStep)
 
     const auto input = GetSubsystem<Input>();
     const auto left = input->GetKeyDown(KEY_A),
-               right = input->GetKeyDown(KEY_D),
-               up = input->GetKeyDown(KEY_W),
-               down = input->GetKeyDown(KEY_S),
-               ctrl = input->GetKeyDown(KEY_CTRL);
+        right = input->GetKeyDown(KEY_D),
+        up = input->GetKeyDown(KEY_W),
+        down = input->GetKeyDown(KEY_S),
+        ctrl = input->GetKeyDown(KEY_CTRL);
 
-    if(left || right || up || down)
+    if (left || right || up || down)
     {
         const auto quantum = timeStep * speed;
 
-        const auto xrot = (up ? -quantum : 0.0f) + (down ? quantum: 0.0f);
-        const auto rot2 = (left ? -quantum: 0.0f) + (right ? quantum : 0.0f);
-        const auto totalRot = Quaternion{xrot,
-                                         ctrl ? 0.0f : rot2,
-                                         ctrl ? rot2 : 0.0f};
+        const auto xrot = (up ? -quantum : 0.0f) + (down ? quantum : 0.0f);
+        const auto rot2 = (left ? -quantum : 0.0f) + (right ? quantum : 0.0f);
+        const auto totalRot = Quaternion{xrot, ctrl ? 0.0f : rot2, ctrl ? rot2 : 0.0f};
 
         refSpriteNode_->Rotate(totalRot);
         stretchSpriteNode_->Rotate(totalRot);
@@ -233,15 +226,14 @@ void Urho2DStretchableSprite::ScaleSprites(float timeStep)
 
     const auto input = GetSubsystem<Input>();
     const auto left = input->GetKeyDown(KEY_A),
-               right = input->GetKeyDown(KEY_D),
-               up = input->GetKeyDown(KEY_W),
-               down = input->GetKeyDown(KEY_S);
-    if(left || right || up || down)
+        right = input->GetKeyDown(KEY_D),
+        up = input->GetKeyDown(KEY_W),
+        down = input->GetKeyDown(KEY_S);
+    if (left || right || up || down)
     {
         const auto quantum = timeStep * speed;
-        const auto scale = Vector2{
-            1.0f + (right ? quantum : left ? -quantum : 0.0f),
-            1.0f + (up ? quantum : down ? -quantum : 0.0f)};
+        const auto scale = Vector2{1.0f + (right ? quantum : left ? -quantum : 0.0f),
+                                   1.0f + (up ? quantum : down ? -quantum : 0.0f)};
 
         refSpriteNode_->Scale2D(scale);
         stretchSpriteNode_->Scale2D(scale);

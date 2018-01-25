@@ -113,7 +113,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Take the frame time step, which is stored as a float
     float timeStep = eventData["TimeStep"].GetFloat();
 
-    switch(selectTransform)
+    switch (selectTransform)
     {
     case 0:
         ScaleSprites(timeStep);
@@ -150,7 +150,7 @@ void TranslateSprites(float timeStep)
                up = input.keyDown[KEY_W],
                down = input.keyDown[KEY_S];
 
-    if(left || right || up || down)
+    if (left || right || up || down)
     {
         const float quantum = timeStep * speed;
         const Vector2 translate = Vector2(
@@ -172,7 +172,7 @@ void RotateSprites(float timeStep)
                down = input.keyDown[KEY_S],
                ctrl = input.keyDown[KEY_CTRL];
 
-    if(left || right || up || down)
+    if (left || right || up || down)
     {
         const float quantum = timeStep * speed;
 
@@ -195,7 +195,7 @@ void ScaleSprites(float timeStep)
                right = input.keyDown[KEY_D],
                up = input.keyDown[KEY_W],
                down = input.keyDown[KEY_S];
-    if(left || right || up || down)
+    if (left || right || up || down)
     {
         const float quantum = timeStep * speed;
         const Vector2 scale = Vector2(
