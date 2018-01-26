@@ -187,6 +187,7 @@ namespace Urho3D
 <a href="#Class_StaticModel"><b>StaticModel</b></a>
 <a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
 <a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_StretchableSprite2D"><b>StretchableSprite2D</b></a>
 <a href="#Class_StringHash"><b>StringHash</b></a>
 <a href="#Class_Technique"><b>Technique</b></a>
 <a href="#Class_Terrain"><b>Terrain</b></a>
@@ -6415,6 +6416,18 @@ Properties:
 - bool useDrawRect
 - Rect textureRect
 - bool useTextureRect
+
+<a name="Class_StretchableSprite2D"></a>
+### StretchableSprite2D : StaticSprite2D
+
+Methods:
+
+- void SetBorder(const IntRect& border)
+- const IntRect& GetBorder() const
+
+Properties:
+
+- IntRect border
 
 <a name="Class_StringHash"></a>
 ### StringHash

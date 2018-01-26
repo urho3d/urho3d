@@ -12251,6 +12251,109 @@ BoundingBox worldBoundingBox;
 uint zoneMask;
 };
 
+class StretchableSprite2D
+{
+public:
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool IsInView(Camera) const;
+bool Load(File);
+bool Load(VectorBuffer&);
+bool LoadJSON(const JSONValue&);
+bool LoadXML(const XMLElement&);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetFlip(bool, bool);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+float alpha;
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+BlendMode blendMode;
+IntRect border;
+/* readonly */
+BoundingBox boundingBox;
+bool castShadows;
+/* readonly */
+String category;
+Color color;
+Material customMaterial;
+float drawDistance;
+Rect drawRect;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+bool flipX;
+bool flipY;
+Vector2 hotSpot;
+/* readonly */
+uint id;
+/* readonly */
+bool inView;
+int layer;
+uint lightMask;
+float lodBias;
+uint maxLights;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+bool occludee;
+bool occluder;
+int orderInLayer;
+/* readonly */
+int refs;
+float shadowDistance;
+uint shadowMask;
+Sprite2D sprite;
+bool temporary;
+Rect textureRect;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+bool useDrawRect;
+bool useHotSpot;
+bool useTextureRect;
+uint viewMask;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+uint zoneMask;
+};
+
 class String
 {
 public:

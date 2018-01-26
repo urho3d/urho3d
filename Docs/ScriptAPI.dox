@@ -2321,6 +2321,25 @@ namespace Urho3D
 - %Texture %Rectangle : Rect
 - %Use %Texture %Rectangle : bool
 
+### StretchableSprite2D
+- %Is %Enabled : bool
+- %Layer : int
+- %Order %in %Layer : int
+- %View %Mask : int
+- %Sprite : ResourceRef
+- %Blend %Mode : int
+- %Flip X : bool
+- %Flip Y : bool
+- %Color : Color
+- %Custom %material : ResourceRef
+- %Hot %Spot : Vector2
+- %Use %Hot %Spot : bool
+- %Draw %Rectangle : Rect
+- %Use %Draw %Rectangle : bool
+- %Texture %Rectangle : Rect
+- %Use %Texture %Rectangle : bool
+- %Border : IntRect
+
 ### Terrain
 - %Is %Enabled : bool
 - %Height %Map : ResourceRef
@@ -2836,6 +2855,7 @@ namespace Urho3D
 <a href="#Class_StaticModel"><b>StaticModel</b></a>
 <a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
 <a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_StretchableSprite2D"><b>StretchableSprite2D</b></a>
 <a href="#Class_String"><b>String</b></a>
 <a href="#Class_StringHash"><b>StringHash</b></a>
 <a href="#Class_Technique"><b>Technique</b></a>
@@ -13333,6 +13353,97 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - BlendMode blendMode
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- Color color
+- Material@ customMaterial
+- float drawDistance
+- Rect drawRect
+- bool enabled
+- bool enabledEffective // readonly
+- bool flipX
+- bool flipY
+- Vector2 hotSpot
+- uint id // readonly
+- bool inView // readonly
+- int layer
+- uint lightMask
+- float lodBias
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- bool occludee
+- bool occluder
+- int orderInLayer
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- Sprite2D@ sprite
+- bool temporary
+- Rect textureRect
+- StringHash type // readonly
+- String typeName // readonly
+- bool useDrawRect
+- bool useHotSpot
+- bool useTextureRect
+- uint viewMask
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- uint zoneMask
+
+<a name="Class_StretchableSprite2D"></a>
+
+### StretchableSprite2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool IsInView(Camera@) const
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetFlip(bool, bool)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- float alpha
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- BlendMode blendMode
+- IntRect border
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
