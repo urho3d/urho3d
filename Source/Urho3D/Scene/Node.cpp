@@ -979,6 +979,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
         cloneComponent->ApplyAttributes();
     }
 
+    if (scene_)
     {
         using namespace ComponentCloned;
 
@@ -2208,6 +2209,7 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         node->CloneRecursive(cloneNode, resolver, mode);
     }
 
+    if (scene_)
     {
         using namespace NodeCloned;
 
