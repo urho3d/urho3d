@@ -317,7 +317,7 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
         URHO3D_LOGERROR("Null sender node for remote node event");
         return;
     }
-    if (node->GetID() >= FIRST_LOCAL_ID)
+    if (!node->IsReplicated())
     {
         URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;

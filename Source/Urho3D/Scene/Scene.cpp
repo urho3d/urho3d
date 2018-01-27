@@ -982,7 +982,7 @@ void Scene::NodeRemoved(Node* node)
         return;
 
     unsigned id = node->GetID();
-    if (id < FIRST_LOCAL_ID)
+    if (node->IsReplicated())
     {
         replicatedNodes_.Erase(id);
         MarkReplicationDirty(node);
@@ -1055,7 +1055,7 @@ void Scene::ComponentRemoved(Component* component)
         return;
 
     unsigned id = component->GetID();
-    if (id < FIRST_LOCAL_ID)
+    if (component->IsReplicated())
         replicatedComponents_.Erase(id);
     else
         localComponents_.Erase(id);
@@ -1149,10 +1149,9 @@ void Scene::MarkNetworkUpdate(Component* component)
 
 void Scene::MarkReplicationDirty(Node* node)
 {
-    unsigned id = node->GetID();
-
-    if (id < FIRST_LOCAL_ID && networkState_)
+    if (networkState_ && node->IsReplicated())
     {
+        unsigned id = node->GetID();
         for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
              i != networkState_->replicationStates_.End(); ++i)
         {

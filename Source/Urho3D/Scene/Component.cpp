@@ -98,7 +98,7 @@ bool Component::SaveJSON(JSONValue& dest) const
 
 void Component::MarkNetworkUpdate()
 {
-    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
+    if (!networkUpdate_ && IsReplicated())
     {
         Scene* scene = GetScene();
         if (scene)
@@ -145,6 +145,11 @@ void Component::Remove()
 {
     if (node_)
         node_->RemoveComponent(this);
+}
+
+bool Component::IsReplicated() const
+{
+    return id_ < FIRST_LOCAL_ID;
 }
 
 Scene* Component::GetScene() const

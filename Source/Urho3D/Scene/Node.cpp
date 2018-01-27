@@ -283,7 +283,7 @@ void Node::ApplyAttributes()
 
 void Node::MarkNetworkUpdate()
 {
-    if (!networkUpdate_ && scene_ && id_ < FIRST_LOCAL_ID)
+    if (!networkUpdate_ && scene_ && IsReplicated())
     {
         scene_->MarkNetworkUpdate(this);
         networkUpdate_ = true;
@@ -887,9 +887,9 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
 
         if (recursive)
             childNode->RemoveChildren(removeReplicated, removeLocal, true);
-        if (childNode->GetID() < FIRST_LOCAL_ID && removeReplicated)
+        if (childNode->IsReplicated() && removeReplicated)
             remove = true;
-        else if (childNode->GetID() >= FIRST_LOCAL_ID && removeLocal)
+        else if (!childNode->IsReplicated() && removeLocal)
             remove = true;
 
         if (remove)
@@ -908,7 +908,7 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
-    if (id_ >= FIRST_LOCAL_ID && mode == REPLICATED)
+    if (mode == REPLICATED && !IsReplicated())
         mode = LOCAL;
 
     // Check that creation succeeds and that the object in fact is a component
@@ -940,7 +940,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
         return nullptr;
     }
 
-    return CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
+    return CloneComponent(component, component->IsReplicated() ? REPLICATED : LOCAL, id);
 }
 
 Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
@@ -1033,9 +1033,9 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
         bool remove = false;
         Component* component = components_[i];
 
-        if (component->GetID() < FIRST_LOCAL_ID && removeReplicated)
+        if (component->IsReplicated() && removeReplicated)
             remove = true;
-        else if (component->GetID() >= FIRST_LOCAL_ID && removeLocal)
+        else if (!component->IsReplicated() && removeLocal)
             remove = true;
 
         if (remove)
@@ -1330,7 +1330,7 @@ unsigned Node::GetNumNetworkComponents() const
     unsigned num = 0;
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        if ((*i)->GetID() < FIRST_LOCAL_ID)
+        if ((*i)->IsReplicated())
             ++num;
     }
 
@@ -1361,6 +1361,11 @@ bool Node::HasComponent(StringHash type) const
             return true;
     }
     return false;
+}
+
+bool Node::IsReplicated() const
+{
+    return id_ < FIRST_LOCAL_ID;
 }
 
 bool Node::HasTag(const String& tag) const
@@ -1524,7 +1529,7 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
             // Parent is local: traverse hierarchy to find a non-local base node
             // This iteration always stops due to the scene (root) being non-local
             Node* current = parent_;
-            while (current->GetID() >= FIRST_LOCAL_ID)
+            while (!current->IsReplicated())
                 current = current->GetParent();
 
             // Then write the base node ID and the parent's name hash
@@ -1679,7 +1684,7 @@ void Node::PrepareNetworkUpdate()
     if (parent_ && parent_ != scene_)
     {
         Node* current = parent_;
-        while (current->id_ >= FIRST_LOCAL_ID)
+        while (!current->IsReplicated())
             current = current->parent_;
         if (current && current != scene_)
             impl_->dependencyNodes_.Push(current);
@@ -1689,7 +1694,7 @@ void Node::PrepareNetworkUpdate()
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        if (component->GetID() < FIRST_LOCAL_ID)
+        if (component->IsReplicated())
             component->GetDependencyNodes(impl_->dependencyNodes_);
     }
 
@@ -2051,7 +2056,7 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
-    if (id_ >= FIRST_LOCAL_ID && mode == REPLICATED)
+    if (mode == REPLICATED && !IsReplicated())
         mode = LOCAL;
 
     // First check if factory for type exists
@@ -2169,7 +2174,7 @@ void Node::GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag
 Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode)
 {
     // Create clone node
-    Node* cloneNode = parent->CreateChild(0, (mode == REPLICATED && id_ < FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
+    Node* cloneNode = parent->CreateChild(0, (mode == REPLICATED && IsReplicated()) ? REPLICATED : LOCAL);
     resolver.AddNode(id_, cloneNode);
 
     // Copy attributes
@@ -2194,7 +2199,7 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
             continue;
 
         Component* cloneComponent = cloneNode->CloneComponent(component,
-            (mode == REPLICATED && component->GetID() < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, 0);
+            (mode == REPLICATED && component->IsReplicated()) ? REPLICATED : LOCAL, 0);
         if (cloneComponent)
             resolver.AddComponent(component->GetID(), cloneComponent);
     }

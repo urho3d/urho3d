@@ -146,7 +146,7 @@ void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder,
         URHO3D_LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
-    if (node->GetID() >= FIRST_LOCAL_ID)
+    if (!node->IsReplicated())
     {
         URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
@@ -1180,7 +1180,7 @@ void Connection::ProcessNewNode(Node* node)
     {
         Component* component = components[i];
         // Check if component is not to be replicated
-        if (component->GetID() >= FIRST_LOCAL_ID)
+        if (!component->IsReplicated())
             continue;
 
         ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
@@ -1348,7 +1348,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             Component* component = components[i];
             // Check if component is not to be replicated
-            if (component->GetID() >= FIRST_LOCAL_ID)
+            if (!component->IsReplicated())
                 continue;
 
             HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());

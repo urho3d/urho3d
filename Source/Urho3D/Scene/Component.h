@@ -78,6 +78,8 @@ public:
 
     /// Return ID.
     unsigned GetID() const { return id_; }
+    /// Return whether the component is replicated or local to a scene.
+    bool IsReplicated() const;
 
     /// Return scene node.
     Node* GetNode() const { return node_; }
@@ -87,9 +89,9 @@ public:
 
     /// Return whether is enabled.
     bool IsEnabled() const { return enabled_; }
-
-    /// Return whether is effectively enabled (node is also enabled.)
+    /// Return whether is effectively enabled (node is also enabled).
     bool IsEnabledEffective() const;
+
     /// Return component in the same scene node by type. If there are several, returns the first.
     Component* GetComponent(StringHash type) const;
     /// Return components in the same scene node by type.
