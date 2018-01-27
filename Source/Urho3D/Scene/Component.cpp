@@ -149,7 +149,7 @@ void Component::Remove()
 
 bool Component::IsReplicated() const
 {
-    return id_ < FIRST_LOCAL_ID;
+    return Scene::IsReplicatedID(id_);
 }
 
 Scene* Component::GetScene() const

@@ -1365,7 +1365,7 @@ bool Node::HasComponent(StringHash type) const
 
 bool Node::IsReplicated() const
 {
-    return id_ < FIRST_LOCAL_ID;
+    return Scene::IsReplicatedID(id_);
 }
 
 bool Node::HasTag(const String& tag) const
@@ -1522,7 +1522,7 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
     {
         // If parent is replicated, can write the ID directly
         unsigned parentID = parent_->GetID();
-        if (parentID < FIRST_LOCAL_ID)
+        if (Scene::IsReplicatedID(parentID))
             impl_->attrBuffer_.WriteNetID(parentID);
         else
         {
@@ -1559,7 +1559,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
         unsigned compID = compBuffer.ReadUInt();
 
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
-            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+            (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1575,7 +1575,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     for (unsigned i = 0; i < numChildren; ++i)
     {
         unsigned nodeID = source.ReadUInt();
-        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
         if (!newNode->Load(source, resolver, loadChildren, rewriteIDs, mode))
@@ -1600,7 +1600,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetUInt("id");
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
-            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+            (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1618,7 +1618,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     while (childElem)
     {
         unsigned nodeID = childElem.GetUInt("id");
-        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
         if (!newNode->LoadXML(childElem, resolver, loadChildren, rewriteIDs, mode))
@@ -1647,7 +1647,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
         String typeName = compVal.Get("type").GetString();
         unsigned compID = compVal.Get("id").GetUInt();
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
-            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+            (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1665,7 +1665,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
         const JSONValue& childVal = childrenArray.At(i);
 
         unsigned nodeID = childVal.Get("id").GetUInt();
-        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
         if (!newNode->LoadJSON(childVal, resolver, loadChildren, rewriteIDs, mode))

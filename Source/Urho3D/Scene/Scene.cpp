@@ -705,7 +705,7 @@ void Scene::UnregisterAllVars()
 
 Node* Scene::GetNode(unsigned id) const
 {
-    if (id < FIRST_LOCAL_ID)
+    if (IsReplicatedID(id))
     {
         HashMap<unsigned, Node*>::ConstIterator i = replicatedNodes_.Find(id);
         return i != replicatedNodes_.End() ? i->second_ : nullptr;
@@ -732,7 +732,7 @@ bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
 
 Component* Scene::GetComponent(unsigned id) const
 {
-    if (id < FIRST_LOCAL_ID)
+    if (IsReplicatedID(id))
     {
         HashMap<unsigned, Component*>::ConstIterator i = replicatedComponents_.Find(id);
         return i != replicatedComponents_.End() ? i->second_ : nullptr;
@@ -924,7 +924,7 @@ void Scene::NodeAdded(Node* node)
     }
 
     // If node with same ID exists, remove the scene reference from it and overwrite with the new node
-    if (id < FIRST_LOCAL_ID)
+    if (IsReplicatedID(id))
     {
         HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);
         if (i != replicatedNodes_.End() && i->second_ != node)
@@ -982,7 +982,7 @@ void Scene::NodeRemoved(Node* node)
         return;
 
     unsigned id = node->GetID();
-    if (node->IsReplicated())
+    if (Scene::IsReplicatedID(id))
     {
         replicatedNodes_.Erase(id);
         MarkReplicationDirty(node);
@@ -1023,7 +1023,7 @@ void Scene::ComponentAdded(Component* component)
         component->SetID(id);
     }
 
-    if (id < FIRST_LOCAL_ID)
+    if (IsReplicatedID(id))
     {
         HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
@@ -1055,7 +1055,7 @@ void Scene::ComponentRemoved(Component* component)
         return;
 
     unsigned id = component->GetID();
-    if (component->IsReplicated())
+    if (Scene::IsReplicatedID(id))
         replicatedComponents_.Erase(id);
     else
         localComponents_.Erase(id);
@@ -1209,7 +1209,7 @@ void Scene::UpdateAsyncLoading()
         if (asyncProgress_.xmlFile_)
         {
             unsigned nodeID = asyncProgress_.xmlElement_.GetUInt("id");
-            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadXML(asyncProgress_.xmlElement_, resolver_);
             asyncProgress_.xmlElement_ = asyncProgress_.xmlElement_.GetNext("node");
@@ -1219,7 +1219,7 @@ void Scene::UpdateAsyncLoading()
             const JSONValue& childValue = asyncProgress_.jsonFile_->GetRoot().Get("children").GetArray().At(asyncProgress_.jsonIndex_);
 
             unsigned nodeID =childValue.Get("id").GetUInt();
-            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadJSON(childValue, resolver_);
             ++asyncProgress_.jsonIndex_;
@@ -1227,7 +1227,7 @@ void Scene::UpdateAsyncLoading()
         else // Load from binary
         {
             unsigned nodeID = asyncProgress_.file_->ReadUInt();
-            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->Load(*asyncProgress_.file_, resolver_);
         }

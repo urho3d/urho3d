@@ -227,6 +227,8 @@ public:
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.
     unsigned GetFreeComponentID(CreateMode mode);
+    /// Return whether the specified id is a replicated id.
+    static bool IsReplicatedID(unsigned id) { return id < FIRST_LOCAL_ID; }
 
     /// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
     void NodeTagAdded(Node* node, const String& tag);

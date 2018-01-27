@@ -406,6 +406,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", asFUNCTION(GetObjectAttributeInfos), asCALL_CDECL);
+
+    engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", asFUNCTION(Scene::IsReplicatedID), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)
