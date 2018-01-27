@@ -5793,6 +5793,8 @@ Methods:
 - void SetSnapThreshold(float threshold)
 - void SetAsyncLoadingMs(int ms)
 - Node* GetNode(unsigned id) const
+- Component* GetComponent(unsigned id) const
+- bool IsReplicatedID(unsigned id)
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
 - float GetAsyncProgress() const

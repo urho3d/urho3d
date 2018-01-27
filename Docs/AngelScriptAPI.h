@@ -16393,6 +16393,7 @@ bool IsAlpha(uint);
 bool IsDigit(uint);
 bool IsNaN(float);
 bool IsPowerOfTwo(uint);
+bool IsReplicatedID(uint);
 String Join(Array<String>&, const String&);
 float Lerp(float, float, float);
 float Ln(float);
