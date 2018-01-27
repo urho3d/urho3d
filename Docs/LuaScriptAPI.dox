@@ -1204,6 +1204,7 @@ Methods:
 - void Remove()
 - void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - unsigned GetID() const
+- bool IsReplicated() const
 - Node* GetNode() const
 - Scene* GetScene() const
 - bool IsEnabled() const
@@ -1214,6 +1215,7 @@ Methods:
 Properties:
 
 - unsigned ID (readonly)
+- bool replicated (readonly)
 - bool enabled
 - bool enabledEffective (readonly)
 - Node* node (readonly)
@@ -4196,6 +4198,7 @@ Methods:
 - int GetScriptObject() const
 - int GetScriptObject(const String scriptObjectType) const
 - unsigned GetID() const
+- bool IsReplicated() const
 - const String GetName() const
 - StringHash GetNameHash() const
 - Node* GetParent() const
@@ -4260,6 +4263,7 @@ Methods:
 Properties:
 
 - unsigned ID (readonly)
+- bool replicated (readonly)
 - String name
 - StringHash nameHash (readonly)
 - Node* parent

@@ -3043,6 +3043,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Skeleton@ skeleton // readonly
@@ -3136,6 +3137,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - float speed
@@ -3304,6 +3306,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -3584,6 +3587,7 @@ Properties:
 - bool occluder
 - int refs // readonly
 - bool relative
+- bool replicated // readonly
 - bool scaled
 - float shadowDistance
 - uint shadowMask
@@ -4115,6 +4119,7 @@ Properties:
 - Vector2 projectionOffset
 - Plane reflectionPlane
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -4395,6 +4400,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - Vector2 size
 - bool temporary
@@ -4470,6 +4476,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4543,6 +4550,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4613,6 +4621,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4688,6 +4697,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4766,6 +4776,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
+- bool replicated // readonly
 - Quaternion rotation
 - ShapeType shapeType
 - Vector3 size
@@ -4837,6 +4848,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4948,6 +4960,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5102,6 +5115,7 @@ Properties:
 - RigidBody@ ownBody // readonly
 - Vector3 position
 - int refs // readonly
+- bool replicated // readonly
 - Quaternion rotation
 - bool temporary
 - StringHash type // readonly
@@ -5166,6 +5180,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5233,6 +5248,7 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - Vector2 ownerBodyAnchor
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5298,6 +5314,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5363,6 +5380,7 @@ Properties:
 - Constraint2D@ ownerConstraint
 - float ratio
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5430,6 +5448,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5495,6 +5514,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - Vector2 target
 - bool temporary
 - StringHash type // readonly
@@ -5565,6 +5585,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5633,6 +5654,7 @@ Properties:
 - Vector2 ownerBodyGroundAnchor
 - float ratio
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5701,6 +5723,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5767,6 +5790,7 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - Vector2 ownerBodyAnchor
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5832,6 +5856,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5901,6 +5926,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5994,6 +6020,7 @@ Properties:
 - uint queryFilterType
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - bool requestedTarget // readonly
 - CrowdAgentRequestedTarget requestedTargetType // readonly
 - Vector3 targetPosition
@@ -6084,6 +6111,7 @@ Properties:
 - uint numQueryFilterTypes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -6377,6 +6405,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6557,6 +6586,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -6636,6 +6666,7 @@ Properties:
 - bool occluder
 - bool optimizeBufferSize
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6789,6 +6820,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6865,6 +6897,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -7187,6 +7220,7 @@ Properties:
 - int refs // readonly
 - float regionMergeSize
 - float regionMinSize
+- bool replicated // readonly
 - bool temporary
 - int tileSize
 - StringHash type // readonly
@@ -7689,6 +7723,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float rotationDecay
 - float rotationWeight
 - String targetName
@@ -7774,6 +7809,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - float tolerance
 - StringHash type // readonly
@@ -8191,6 +8227,7 @@ Properties:
 - Texture@ rampTexture
 - float range
 - int refs // readonly
+- bool replicated // readonly
 - BiasParameters shadowBias
 - CascadeParameters shadowCascade
 - float shadowDistance
@@ -9299,6 +9336,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9360,6 +9398,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - bool recursive
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9459,6 +9498,7 @@ Properties:
 - int refs // readonly
 - float regionMergeSize
 - float regionMinSize
+- bool replicated // readonly
 - bool temporary
 - int tileSize
 - StringHash type // readonly
@@ -9563,6 +9603,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9714,6 +9755,7 @@ Properties:
 - Vector3 position
 - Vector2 position2D
 - int refs // readonly
+- bool replicated // readonly
 - Vector3 right // readonly
 - Quaternion rotation
 - float rotation2D
@@ -9853,6 +9895,7 @@ Properties:
 - uint obstacleId // readonly
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9924,6 +9967,7 @@ Properties:
 - uint numLevels // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9989,6 +10033,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -10204,6 +10249,7 @@ Properties:
 - bool occluder
 - int refs // readonly
 - bool relative
+- bool replicated // readonly
 - bool scaled
 - bool serializeParticles
 - float shadowDistance
@@ -10287,6 +10333,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Sprite2D@ sprite
@@ -10416,6 +10463,7 @@ Properties:
 - int numIterations
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool splitImpulse
 - bool temporary
 - StringHash type // readonly
@@ -10493,6 +10541,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - uint positionIterations
 - int refs // readonly
+- bool replicated // readonly
 - bool subStepping
 - bool temporary
 - StringHash type // readonly
@@ -10767,6 +10816,7 @@ Properties:
 - int numWheels // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -11162,6 +11212,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool sorted
@@ -11272,6 +11323,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - float rollingFriction
 - Quaternion rotation
@@ -11354,6 +11406,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -11537,6 +11590,7 @@ Properties:
 - Vector3 position
 - Vector2 position2D
 - int refs // readonly
+- bool replicated // readonly
 - PackageFile@[]@ requiredPackageFiles // readonly
 - Vector3 right // readonly
 - Quaternion rotation
@@ -11683,6 +11737,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - ScriptFile@ scriptFile
 - ScriptObject@ scriptObject // readonly
 - bool temporary
@@ -12243,6 +12298,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -12502,6 +12558,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - Vector3 targetPosition
 - Quaternion targetRotation
 - Vector3 targetWorldPosition
@@ -12604,6 +12661,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -12675,6 +12733,7 @@ Properties:
 - float panning
 - bool playing // readonly
 - int refs // readonly
+- bool replicated // readonly
 - Sound@ sound // readonly
 - String soundType
 - bool temporary
@@ -12755,6 +12814,7 @@ Properties:
 - float panning
 - bool playing // readonly
 - int refs // readonly
+- bool replicated // readonly
 - float rolloffFactor
 - Sound@ sound // readonly
 - String soundType
@@ -12880,6 +12940,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float speed
 - bool temporary
 - StringHash type // readonly
@@ -13207,6 +13268,7 @@ Properties:
 - bool occluder
 - uint occlusionLodLevel
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13292,6 +13354,7 @@ Properties:
 - bool occluder
 - uint occlusionLodLevel
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13378,6 +13441,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Sprite2D@ sprite
@@ -13469,6 +13533,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Sprite2D@ sprite
@@ -13685,6 +13750,7 @@ Properties:
 - int patchSize
 - TerrainPatch@[] patches // readonly
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool smoothing
@@ -13762,6 +13828,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -14061,6 +14128,7 @@ Properties:
 - bool occluder
 - float opacity
 - int refs // readonly
+- bool replicated // readonly
 - float rowHeight // readonly
 - float rowSpacing
 - float[] rowWidths // readonly
@@ -14454,6 +14522,7 @@ Properties:
 - uint numLayers // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - TmxFile2D@ tmxFile
 - StringHash type // readonly
@@ -14539,6 +14608,7 @@ Properties:
 - uint numObjects // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -14935,6 +15005,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - UIElement@ root // readonly
 - bool temporary
 - Texture2D@ texture // readonly
@@ -16132,6 +16203,7 @@ Properties:
 - bool override
 - int priority
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary

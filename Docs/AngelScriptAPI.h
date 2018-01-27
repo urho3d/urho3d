@@ -177,6 +177,8 @@ bool occludee;
 bool occluder;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 /* readonly */
@@ -284,6 +286,8 @@ bool occluder;
 int orderInLayer;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 float speed;
@@ -474,6 +478,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -804,6 +810,8 @@ bool occluder;
 /* readonly */
 int refs;
 bool relative;
+/* readonly */
+bool replicated;
 bool scaled;
 float shadowDistance;
 uint shadowMask;
@@ -1418,6 +1426,8 @@ Vector2 projectionOffset;
 Plane reflectionPlane;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -1744,6 +1754,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 Vector2 size;
 bool temporary;
@@ -1831,6 +1843,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 bool temporary;
 bool trigger;
@@ -1916,6 +1930,8 @@ ObjectAnimation objectAnimation;
 float radius;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 bool temporary;
 bool trigger;
@@ -1998,6 +2014,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 bool temporary;
 bool trigger;
@@ -2085,6 +2103,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 bool temporary;
 bool trigger;
@@ -2172,6 +2192,8 @@ ObjectAnimation objectAnimation;
 Vector3 position;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 Quaternion rotation;
 ShapeType shapeType;
 Vector3 size;
@@ -2256,6 +2278,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 bool temporary;
 bool trigger;
@@ -2382,6 +2406,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -2574,6 +2600,8 @@ RigidBody ownBody;
 Vector3 position;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 Quaternion rotation;
 bool temporary;
 /* readonly */
@@ -2648,6 +2676,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -2725,6 +2755,8 @@ RigidBody2D ownerBody;
 Vector2 ownerBodyAnchor;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -2800,6 +2832,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -2875,6 +2909,8 @@ Constraint2D ownerConstraint;
 float ratio;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -2952,6 +2988,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3027,6 +3065,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 Vector2 target;
 bool temporary;
 /* readonly */
@@ -3107,6 +3147,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3185,6 +3227,8 @@ Vector2 ownerBodyGroundAnchor;
 float ratio;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3263,6 +3307,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3339,6 +3385,8 @@ RigidBody2D ownerBody;
 Vector2 ownerBodyAnchor;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3414,6 +3462,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3493,6 +3543,8 @@ RigidBody2D otherBody;
 RigidBody2D ownerBody;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3603,6 +3655,8 @@ float radius;
 /* readonly */
 int refs;
 /* readonly */
+bool replicated;
+/* readonly */
 bool requestedTarget;
 /* readonly */
 CrowdAgentRequestedTarget requestedTargetType;
@@ -3707,6 +3761,8 @@ uint numQueryFilterTypes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -4042,6 +4098,8 @@ bool occludee;
 bool occluder;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -4257,6 +4315,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -4350,6 +4410,8 @@ bool occluder;
 bool optimizeBufferSize;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -4524,6 +4586,8 @@ bool occludee;
 bool occluder;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -4612,6 +4676,8 @@ bool occluder;
 int orderInLayer;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -4984,6 +5050,8 @@ NavmeshPartitionType partitionType;
 int refs;
 float regionMergeSize;
 float regionMinSize;
+/* readonly */
+bool replicated;
 bool temporary;
 int tileSize;
 /* readonly */
@@ -5602,6 +5670,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float rotationDecay;
 float rotationWeight;
 String targetName;
@@ -5696,6 +5766,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 float tolerance;
 /* readonly */
@@ -6229,6 +6301,8 @@ Texture rampTexture;
 float range;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 BiasParameters shadowBias;
 CascadeParameters shadowCascade;
 float shadowDistance;
@@ -7504,6 +7578,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -7575,6 +7651,8 @@ ObjectAnimation objectAnimation;
 bool recursive;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -7686,6 +7764,8 @@ NavmeshPartitionType partitionType;
 int refs;
 float regionMergeSize;
 float regionMinSize;
+/* readonly */
+bool replicated;
 bool temporary;
 int tileSize;
 /* readonly */
@@ -7806,6 +7886,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -7973,6 +8055,8 @@ Vector3 position;
 Vector2 position2D;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 /* readonly */
 Vector3 right;
 Quaternion rotation;
@@ -8146,6 +8230,8 @@ uint obstacleId;
 float radius;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -8227,6 +8313,8 @@ uint numLevels;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -8302,6 +8390,8 @@ ObjectAnimation objectAnimation;
 float radius;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -8553,6 +8643,8 @@ bool occluder;
 /* readonly */
 int refs;
 bool relative;
+/* readonly */
+bool replicated;
 bool scaled;
 bool serializeParticles;
 float shadowDistance;
@@ -8649,6 +8741,8 @@ bool occluder;
 int orderInLayer;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
@@ -8796,6 +8890,8 @@ int numIterations;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool splitImpulse;
 bool temporary;
 /* readonly */
@@ -8882,6 +8978,8 @@ ObjectAnimation objectAnimation;
 uint positionIterations;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool subStepping;
 bool temporary;
 /* readonly */
@@ -9198,6 +9296,8 @@ int numWheels;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -9660,6 +9760,8 @@ bool occludee;
 bool occluder;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool sorted;
@@ -9784,6 +9886,8 @@ ObjectAnimation objectAnimation;
 Vector3 position;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float restitution;
 float rollingFriction;
 Quaternion rotation;
@@ -9875,6 +9979,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -10083,6 +10189,8 @@ Vector2 position2D;
 /* readonly */
 int refs;
 /* readonly */
+bool replicated;
+/* readonly */
 Array<PackageFile> requiredPackageFiles;
 /* readonly */
 Vector3 right;
@@ -10259,6 +10367,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 ScriptFile scriptFile;
 /* readonly */
 ScriptObject scriptObject;
@@ -10904,6 +11014,8 @@ bool occludee;
 bool occluder;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -11205,6 +11317,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 Vector3 targetPosition;
 Quaternion targetRotation;
 Vector3 targetWorldPosition;
@@ -11330,6 +11444,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -11413,6 +11529,8 @@ float panning;
 bool playing;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 /* readonly */
 Sound sound;
 String soundType;
@@ -11506,6 +11624,8 @@ float panning;
 bool playing;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float rolloffFactor;
 /* readonly */
 Sound sound;
@@ -11650,6 +11770,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float speed;
 bool temporary;
 /* readonly */
@@ -12032,6 +12154,8 @@ bool occluder;
 uint occlusionLodLevel;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -12132,6 +12256,8 @@ bool occluder;
 uint occlusionLodLevel;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -12231,6 +12357,8 @@ bool occluder;
 int orderInLayer;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
@@ -12334,6 +12462,8 @@ bool occluder;
 int orderInLayer;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
@@ -12590,6 +12720,8 @@ int patchSize;
 Array<TerrainPatch> patches;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool smoothing;
@@ -12678,6 +12810,8 @@ bool occludee;
 bool occluder;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -13034,6 +13168,8 @@ bool occluder;
 float opacity;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 /* readonly */
 float rowHeight;
 float rowSpacing;
@@ -13556,6 +13692,8 @@ uint numLayers;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 TmxFile2D tmxFile;
 /* readonly */
@@ -13656,6 +13794,8 @@ uint numObjects;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -14125,6 +14265,8 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 /* readonly */
 UIElement root;
 bool temporary;
@@ -15547,6 +15689,8 @@ bool override;
 int priority;
 /* readonly */
 int refs;
+/* readonly */
+bool replicated;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
