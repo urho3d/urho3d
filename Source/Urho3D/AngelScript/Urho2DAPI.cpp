@@ -278,6 +278,8 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
 static void RegisterTmxFile2D(asIScriptEngine* engine)
 {
     RegisterResource<TmxFile2D>(engine, "TmxFile2D");
+    engine->RegisterObjectMethod("TmxFile2D", "void set_edgeOffset(float)", asMETHOD(TmxFile2D, SetSpriteTextureEdgeOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TmxFile2D", "float get_edgeOffset() const", asMETHOD(TmxFile2D, GetSpriteTextureEdgeOffset), asCALL_THISCALL);
 }
 
 static void RegisterTileMapLayer2D(asIScriptEngine* engine)

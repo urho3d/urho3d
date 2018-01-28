@@ -201,6 +201,9 @@ public:
     /// Set texture edge offset for all sprites, in pixels.
     void SetSpriteTextureEdgeOffset(float offset);
 
+    /// Return texture edge offset, in pixels.
+    float GetSpriteTextureEdgeOffset() const { return edgeOffset_; }
+
 private:
     /// Load TSX file.
     SharedPtr<XMLFile> LoadTSXFile(const String& source);
@@ -221,6 +224,8 @@ private:
     HashMap<int, Vector<SharedPtr<TileMapObject2D> > > gidToCollisionShapeMapping_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
+    /// Texture edge offset.
+    float edgeOffset_;
 };
 
 }
