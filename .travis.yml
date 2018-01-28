@@ -147,6 +147,11 @@ matrix:
       before_script: git clone --depth 1 -b incoming https://github.com/urho3d/fastcomp-clang.git && export PATH=$(pwd)/fastcomp-clang/bin:$PATH
       script: *ci
 
+stages:
+  - lint
+  - release build configuration
+  - debug build configuration
+
 ---
 
 branch: {name: MinGW-CI, active: yes, appveyor: yes}
