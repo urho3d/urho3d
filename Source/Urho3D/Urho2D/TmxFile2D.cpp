@@ -587,6 +587,14 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
+void TmxFile2D::SetSpriteTextureEdgeOffset(float offset)
+{
+    for (Urho3D::HashMap<int, Urho3D::SharedPtr<Urho3D::Sprite2D> >::KeyValue& i : gidToSpriteMapping_)
+    {
+        i.second_->SetTextureEdgeOffset(offset);
+    }
+}
+
 SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
 {
     String tsxFilePath = GetParentPath(GetName()) + source;
