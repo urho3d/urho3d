@@ -14692,6 +14692,7 @@ Methods:
 Properties:
 
 - String category // readonly
+- float edgeOffset
 - uint memoryUse // readonly
 - String name
 - int refs // readonly

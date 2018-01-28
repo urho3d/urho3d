@@ -13902,6 +13902,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 // Properties:
 /* readonly */
 String category;
+float edgeOffset;
 /* readonly */
 uint memoryUse;
 String name;

@@ -7045,6 +7045,15 @@ Properties:
 <a name="Class_TmxFile2D"></a>
 ### TmxFile2D : Resource
 
+Methods:
+
+- void SetSpriteTextureEdgeOffset(float offset)
+- float GetSpriteTextureEdgeOffset() const
+
+Properties:
+
+- float edgeOffset
+
 <a name="Class_ToolTip"></a>
 ### ToolTip : UIElement
 
