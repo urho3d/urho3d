@@ -39,6 +39,10 @@ class VertexBuffer;
 /// Trail is consisting of series of tails. Two connected points make a tail.
 struct URHO3D_API TrailPoint
 {
+    /// Construct a zero-initialized TrailPoint
+    TrailPoint();
+    /// Construct a TrailPoint with the given position and forward vector
+    TrailPoint(const Vector3& position, const Vector3& forward);
     /// Position.
     Vector3 position_;
     /// Forward vector.
