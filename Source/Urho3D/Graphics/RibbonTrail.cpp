@@ -53,6 +53,22 @@ inline bool CompareTails(TrailPoint* lhs, TrailPoint* rhs)
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
 
+TrailPoint::TrailPoint() :
+    TrailPoint{Vector3::ZERO, Vector3::ZERO}
+{
+}
+
+TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) :
+    position_{position},
+    forward_{forward},
+    parentPos_{Vector3::ZERO},
+    elapsedLength_{0.0f},
+    next_{nullptr},
+    lifetime_{0.0f},
+    sortDistance_{0.0f}
+{
+}
+
 RibbonTrail::RibbonTrail(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     geometry_(new Geometry(context_)),
@@ -60,6 +76,8 @@ RibbonTrail::RibbonTrail(Context* context) :
     animationLodTimer_(0.0f),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
+    transforms_(Matrix3x4::IDENTITY),
+    bufferSizeDirty_(false),
     bufferDirty_(true),
     previousPosition_(Vector3::ZERO),
     numPoints_(0),
@@ -68,6 +86,7 @@ RibbonTrail::RibbonTrail(Context* context) :
     width_(0.2f),
     startScale_(1.0f),
     endScale_(1.0f),
+    lastTimeStep_(0.0f),
     endColor_(Color(1.0f, 1.0f, 1.0f, 0.0f)),
     startColor_(Color(1.0f, 1.0f, 1.0f, 1.0f)),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED),
@@ -78,12 +97,11 @@ RibbonTrail::RibbonTrail(Context* context) :
     trailType_(TT_FACE_CAMERA),
     tailColumn_(1),
     updateInvisible_(false),
-    emitting_(true)
+    emitting_(true),
+    startEndTailTime_(0.0f)
 {
     geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetIndexBuffer(indexBuffer_);
-
-    transforms_ = Matrix3x4::IDENTITY;
 
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
@@ -258,15 +276,8 @@ void RibbonTrail::UpdateTail()
     {
         Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
 
-        TrailPoint startPoint;
-        startPoint.position_ = previousPosition_;
-        startPoint.lifetime_ = 0.0f;
-        startPoint.forward_ = forwardMotion;
-
-        TrailPoint nextPoint;
-        nextPoint.position_ = worldPosition;
-        nextPoint.lifetime_ = 0.0f;
-        nextPoint.forward_ = forwardMotion;
+        TrailPoint startPoint{previousPosition_, forwardMotion};
+        TrailPoint nextPoint{worldPosition, forwardMotion};
 
         if (node_->GetParent() != nullptr)
         {
@@ -290,10 +301,7 @@ void RibbonTrail::UpdateTail()
         // Add more points if path exceeded tail length
         if (path > vertexDistance_)
         {
-            TrailPoint newPoint;
-            newPoint.position_ = worldPosition;
-            newPoint.lifetime_ = 0.0f;
-            newPoint.forward_ = forwardMotion;
+            TrailPoint newPoint{worldPosition, forwardMotion};
             if (node_->GetParent() != nullptr)
                 newPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
 
