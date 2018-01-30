@@ -136,12 +136,12 @@ public:
     Tile2D();
 
     /// Return gid.
-    unsigned GetGid() const { return gid_; }
-    /// Return tile flip X.
+    int GetGid() const { return gid_ & ~FLIP_MASK; }
+    /// Return flip X.
     bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
-    /// Return tile flip Y.
+    /// Return flip Y.
     bool GetFlipY() const { return gid_ & FLIP_VERTICAL; }
-    /// Return tile flip diagonally.
+    /// Return flip XY.
     bool GetFlipXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return sprite.
@@ -189,7 +189,13 @@ public:
     const Vector2& GetPoint(unsigned index) const;
 
     /// Return tile Gid.
-    int GetTileGid() const { return gid_; }
+    int GetTileGid() const { return gid_ & ~FLIP_MASK; }
+    /// Return tile flip X.
+    bool GetTileFlipX() const { return gid_ & FLIP_HORIZONTAL; }
+    /// Return tile flip Y.
+    bool GetTileFlipY() const { return gid_ & FLIP_VERTICAL; }
+    /// Return tile flip XY.
+    bool GetTileFlipXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return tile sprite.
     Sprite2D* GetTileSprite() const;
@@ -214,7 +220,7 @@ private:
     /// Points(for polygon and polyline).
     Vector<Vector2> points_;
     /// Gid (for tile).
-    int gid_;
+    unsigned gid_;
     /// Sprite (for tile).
     SharedPtr<Sprite2D> sprite_;
     /// Property set.
