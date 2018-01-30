@@ -196,8 +196,10 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
             for (int x = 0; x < width_; ++x)
             {
                 // buffer contains 32-bit integers in little-endian format
-                unsigned gid = (buffer[currentIndex+3] << 24) | (buffer[currentIndex+2] << 16)
-                             | (buffer[currentIndex+1] << 8) | buffer[currentIndex];
+                unsigned gid = ((unsigned)buffer[currentIndex+3] << 24)
+                             | ((unsigned)buffer[currentIndex+2] << 16)
+                             | ((unsigned)buffer[currentIndex+1] << 8)
+                             | (unsigned)buffer[currentIndex];
                 if (gid > 0)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());
@@ -278,8 +280,8 @@ void TmxObjectGroup2D::StoreObject(XMLElement objectElem, SharedPtr<TileMapObjec
 
         case OT_TILE:
             object->position_ = info.ConvertPosition(position);
-            object->gid_ = objectElem.GetInt("gid");
-            object->sprite_ = tmxFile_->GetTileSprite(object->gid_);
+            object->gid_ = objectElem.GetUInt("gid");
+            object->sprite_ = tmxFile_->GetTileSprite(object->gid_ & ~FLIP_MASK);
 
             if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
             {
