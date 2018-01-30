@@ -118,6 +118,16 @@ protected:
     HashMap<String, String> nameToValueMapping_;
 };
 
+/// Tile flipping flag.
+enum TileFlippingFlag2D
+{
+    FLIP_HORIZONTAL = 0x80000000u,
+    FLIP_VERTICAL   = 0x40000000u,
+    FLIP_DIAGONAL   = 0x20000000u,
+    FLIP_RESERVED   = 0x10000000u,
+    FLIP_MASK       = 0xF0000000u
+};
+
 /// Tile define.
 class URHO3D_API Tile2D : public RefCounted
 {
@@ -126,7 +136,13 @@ public:
     Tile2D();
 
     /// Return gid.
-    int GetGid() const { return gid_; }
+    unsigned GetGid() const { return gid_; }
+    /// Return tile flip X.
+    bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
+    /// Return tile flip Y.
+    bool GetFlipY() const { return gid_ & FLIP_VERTICAL; }
+    /// Return tile flip diagonally.
+    bool GetFlipXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return sprite.
     Sprite2D* GetSprite() const;
@@ -139,7 +155,7 @@ private:
     friend class TmxTileLayer2D;
 
     /// Gid.
-    int gid_;
+    unsigned gid_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Property set.
