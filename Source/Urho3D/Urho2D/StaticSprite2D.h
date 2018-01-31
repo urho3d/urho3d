@@ -51,11 +51,13 @@ public:
     /// Set blend mode.
     void SetBlendMode(BlendMode blendMode);
     /// Set flip.
-    void SetFlip(bool flipX, bool flipY);
+    void SetFlip(bool flipX, bool flipY, bool swapXY = false);
     /// Set flip X.
     void SetFlipX(bool flipX);
     /// Set flip Y.
     void SetFlipY(bool flipY);
+    /// Set swap X and Y.
+    void SetSwapXY(bool swapXY);
     /// Set color.
     void SetColor(const Color& color);
     /// Set alpha.
@@ -88,6 +90,9 @@ public:
 
     /// Return flip Y.
     bool GetFlipY() const { return flipY_; }
+
+    /// Return swap X and Y.
+    bool GetSwapXY() const { return swapXY_; }
 
     /// Return color.
     const Color& GetColor() const { return color_; }
@@ -143,6 +148,8 @@ protected:
     bool flipX_;
     /// Flip Y.
     bool flipY_;
+    /// Swap X and Y.
+    bool swapXY_;
     /// Color.
     Color color_;
     /// Use hot spot flag.
