@@ -141,8 +141,8 @@ public:
     bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return flip Y.
     bool GetFlipY() const { return gid_ & FLIP_VERTICAL; }
-    /// Return flip XY.
-    bool GetFlipXY() const { return gid_ & FLIP_DIAGONAL; }
+    /// Return swap X and Y.
+    bool GetSwapXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return sprite.
     Sprite2D* GetSprite() const;
@@ -194,8 +194,8 @@ public:
     bool GetTileFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return tile flip Y.
     bool GetTileFlipY() const { return gid_ & FLIP_VERTICAL; }
-    /// Return tile flip XY.
-    bool GetTileFlipXY() const { return gid_ & FLIP_DIAGONAL; }
+    /// Return tile swap X and Y.
+    bool GetTileSwapXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return tile sprite.
     Sprite2D* GetTileSprite() const;
