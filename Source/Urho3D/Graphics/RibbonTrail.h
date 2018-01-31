@@ -40,7 +40,7 @@ class VertexBuffer;
 struct URHO3D_API TrailPoint
 {
     /// Construct a zero-initialized TrailPoint
-    TrailPoint();
+    TrailPoint() = default;
     /// Construct a TrailPoint with the given position and forward vector
     TrailPoint(const Vector3& position, const Vector3& forward);
     /// Position.
@@ -50,13 +50,13 @@ struct URHO3D_API TrailPoint
     /// Parent position. Trail bone type uses this.
     Vector3 parentPos_;
     /// Elapsed length inside the trail.
-    float elapsedLength_;
+    float elapsedLength_ = 0.0f;
     /// Next point to make a tail.
-    TrailPoint* next_;
+    TrailPoint* next_ = nullptr;
     /// Tail time to live.
-    float lifetime_;
+    float lifetime_ = 0.0f;
     /// Distance for sorting.
-    float sortDistance_;
+    float sortDistance_ = 0.0f;
 };
 
 /// Drawable component that creates a tail.

@@ -53,19 +53,9 @@ inline bool CompareTails(TrailPoint* lhs, TrailPoint* rhs)
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
 
-TrailPoint::TrailPoint() :
-    TrailPoint{Vector3::ZERO, Vector3::ZERO}
-{
-}
-
 TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) :
     position_{position},
-    forward_{forward},
-    parentPos_{Vector3::ZERO},
-    elapsedLength_{0.0f},
-    next_{nullptr},
-    lifetime_{0.0f},
-    sortDistance_{0.0f}
+    forward_{forward}
 {
 }
 
