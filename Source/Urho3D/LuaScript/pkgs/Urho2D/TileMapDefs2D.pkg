@@ -47,9 +47,18 @@ class PropertySet2D
     const String GetProperty(const String name) const;
 };
 
+static const unsigned FLIP_HORIZONTAL;
+static const unsigned FLIP_VERTICAL;
+static const unsigned FLIP_DIAGONAL;
+static const unsigned FLIP_RESERVED;
+static const unsigned FLIP_ALL;
+
 class Tile2D
 {
     int GetGid() const;
+    bool GetFlipX() const;
+    bool GetFlipY() const;
+    bool GetSwapXY() const;
     Sprite2D* GetSprite() const;
     bool HasProperty(const String name) const;
     const String GetProperty(const String name) const;
@@ -68,6 +77,9 @@ class TileMapObject2D
     unsigned GetNumPoints() const;
     const Vector2& GetPoint(unsigned index) const;
     int GetTileGid() const;
+    bool GetTileFlipX() const;
+    bool GetTileFlipY() const;
+    bool GetTileSwapXY() const;
     Sprite2D* GetTileSprite() const;
     bool HasProperty(const String name) const;
     const String GetProperty(const String name) const;

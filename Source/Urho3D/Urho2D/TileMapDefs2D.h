@@ -118,15 +118,12 @@ protected:
     HashMap<String, String> nameToValueMapping_;
 };
 
-/// Tile flipping flag.
-enum TileFlippingFlag2D
-{
-    FLIP_HORIZONTAL = 0x80000000u,
-    FLIP_VERTICAL   = 0x40000000u,
-    FLIP_DIAGONAL   = 0x20000000u,
-    FLIP_RESERVED   = 0x10000000u,
-    FLIP_MASK       = 0xF0000000u
-};
+/// Tile flipping flags.
+static const unsigned FLIP_HORIZONTAL = 0x80000000u;
+static const unsigned FLIP_VERTICAL   = 0x40000000u;
+static const unsigned FLIP_DIAGONAL   = 0x20000000u;
+static const unsigned FLIP_RESERVED   = 0x10000000u;
+static const unsigned FLIP_ALL = FLIP_HORIZONTAL | FLIP_VERTICAL | FLIP_DIAGONAL | FLIP_RESERVED;
 
 /// Tile define.
 class URHO3D_API Tile2D : public RefCounted
@@ -136,7 +133,7 @@ public:
     Tile2D();
 
     /// Return gid.
-    int GetGid() const { return gid_ & ~FLIP_MASK; }
+    int GetGid() const { return gid_ & ~FLIP_ALL; }
     /// Return flip X.
     bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return flip Y.
@@ -189,7 +186,7 @@ public:
     const Vector2& GetPoint(unsigned index) const;
 
     /// Return tile Gid.
-    int GetTileGid() const { return gid_ & ~FLIP_MASK; }
+    int GetTileGid() const { return gid_ & ~FLIP_ALL; }
     /// Return tile flip X.
     bool GetTileFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return tile flip Y.

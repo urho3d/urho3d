@@ -150,8 +150,8 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());
                     tile->gid_ = gid;
-                    tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_MASK);
-                    tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_MASK);
+                    tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_ALL);
+                    tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_ALL);
                     tiles_[y * width_ + x] = tile;
                 }
 
@@ -174,8 +174,8 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());
                     tile->gid_ = gid;
-                    tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_MASK);
-                    tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_MASK);
+                    tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_ALL);
+                    tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_ALL);
                     tiles_[y * width_ + x] = tile;
                 }
                 ++currentIndex;
@@ -204,8 +204,8 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());
                     tile->gid_ = gid;
-                    tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_MASK);
-                    tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_MASK);
+                    tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_ALL);
+                    tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_ALL);
                     tiles_[y * width_ + x] = tile;
                 }
                 currentIndex += 4;
@@ -281,7 +281,7 @@ void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr
         case OT_TILE:
             object->position_ = info.ConvertPosition(position);
             object->gid_ = objectElem.GetUInt("gid");
-            object->sprite_ = tmxFile_->GetTileSprite(object->gid_ & ~FLIP_MASK);
+            object->sprite_ = tmxFile_->GetTileSprite(object->gid_ & ~FLIP_ALL);
 
             if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
             {
