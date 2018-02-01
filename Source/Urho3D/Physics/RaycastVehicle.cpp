@@ -67,11 +67,8 @@ struct RaycastVehicleData
         return vehicle_;
     }
 
-    void Init(Scene* scene, RigidBody* body, bool enabled)
+    void Init(Scene* scene, RigidBody* body, bool enabled, const IntVector3& coordinateSystem)
     {
-        int rightIndex = 0;
-        int upIndex = 1;
-        int forwardIndex = 2;
         auto* pPhysWorld = scene->GetComponent<PhysicsWorld>();
         btDynamicsWorld* pbtDynWorld = pPhysWorld->GetWorld();
         if (!pbtDynWorld)
@@ -95,7 +92,7 @@ struct RaycastVehicleData
             added_ = true;
         }
 
-        vehicle_->setCoordinateSystem(rightIndex, upIndex, forwardIndex);
+        vehicle_->setCoordinateSystem(coordinateSystem.x_, coordinateSystem.y_, coordinateSystem.z_);
         physWorld_ = pPhysWorld;
     }
 
@@ -132,6 +129,7 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     // fixed update() for inputs and post update() to sync wheels for rendering
     SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
     vehicleData_ = new RaycastVehicleData();
+    coordinateSystem_ = IntVector3(0, 1, 2);
     wheelNodes_.Clear();
     activate_ = false;
     inAirRPM_ = 0.0f;
@@ -190,7 +188,7 @@ void RaycastVehicle::ApplyAttributes()
     int index = 0;
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_, IsEnabledEffective());
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem_);
     VariantVector& value = loadedWheelData_;
     int numObjects = value[index++].GetInt();
     int wheelIndex = 0;
@@ -264,11 +262,11 @@ void RaycastVehicle::ApplyAttributes()
     URHO3D_LOGDEBUG("loaded wheels: " + String(GetNumWheels()));
 }
 
-void RaycastVehicle::Init()
+void RaycastVehicle::Init(const IntVector3& coordinateSystem)
 {
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_, IsEnabledEffective());
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem);
 }
 
 void RaycastVehicle::FixedUpdate(float timeStep)

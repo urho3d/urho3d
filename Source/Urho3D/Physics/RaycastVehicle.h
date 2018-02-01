@@ -93,7 +93,7 @@ public:
     /// Set revolution per minute value for when wheel doesn't touch ground. If set to 0 (or not set), calculated from engine force (probably not what you want).
     void SetInAirRPM(float rpm);
     /// Init the vehicle component after creation
-    void Init();
+    void Init(const IntVector3& coordinateSystem = IntVector3(0, 1, 2));
     /// Perform fixed step pre-update.
     void FixedUpdate(float timeStep) override;
     /// Perform fixed step post-update.
@@ -168,6 +168,8 @@ private:
     WeakPtr<RigidBody> hullBody_;
     /// Opaque Bullet data hidden from public
     RaycastVehicleData* vehicleData_;
+    /// Coordinate system
+    IntVector3 coordinateSystem_;
     /// Nodes of all wheels
     Vector<Node*> wheelNodes_;
     /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle
