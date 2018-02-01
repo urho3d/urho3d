@@ -575,6 +575,7 @@ task :ci_create_mirrors do
   scan = ENV['TRAVIS_BRANCH'] == 'master'
   # Check if it is time to generate annotation
   #annotate = ENV['TRAVIS_BRANCH'] == 'master' && (ENV['PACKAGE_UPLOAD'] || /\[ci annotate\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
+  annotate = false
   # Determine which CI mirror branches to be auto created
   unless ENV['RELEASE_TAG']
     skip_travis = /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
