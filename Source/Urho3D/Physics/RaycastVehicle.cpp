@@ -34,6 +34,8 @@
 namespace Urho3D
 {
 
+const IntVector3 RaycastVehicle::DEFAULT_COORDINATE_SYSTEM(0, 1, 2);
+
 struct RaycastVehicleData
 {
     RaycastVehicleData()
@@ -92,8 +94,14 @@ struct RaycastVehicleData
             added_ = true;
         }
 
-        vehicle_->setCoordinateSystem(coordinateSystem.x_, coordinateSystem.y_, coordinateSystem.z_);
+        SetCoordinateSystem(coordinateSystem);
         physWorld_ = pPhysWorld;
+    }
+
+    void SetCoordinateSystem(const IntVector3& coordinateSystem)
+    {
+        if (vehicle_)
+            vehicle_->setCoordinateSystem(coordinateSystem.x_, coordinateSystem.y_, coordinateSystem.z_);
     }
 
     void SetEnabled(bool enabled)
@@ -129,7 +137,7 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     // fixed update() for inputs and post update() to sync wheels for rendering
     SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
     vehicleData_ = new RaycastVehicleData();
-    coordinateSystem_ = IntVector3(0, 1, 2);
+    coordinateSystem_ = DEFAULT_COORDINATE_SYSTEM;
     wheelNodes_.Clear();
     activate_ = false;
     inAirRPM_ = 0.0f;
@@ -175,6 +183,7 @@ void RaycastVehicle::RegisterObject(Context* context)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);
     URHO3D_ATTRIBUTE("Maximum side slip threshold", float, maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Coordinate system", IntVector3, coordinateSystem_, DEFAULT_COORDINATE_SYSTEM, AM_DEFAULT);
 }
 
 void RaycastVehicle::OnSetEnabled()
@@ -262,11 +271,11 @@ void RaycastVehicle::ApplyAttributes()
     URHO3D_LOGDEBUG("loaded wheels: " + String(GetNumWheels()));
 }
 
-void RaycastVehicle::Init(const IntVector3& coordinateSystem)
+void RaycastVehicle::Init()
 {
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem);
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem_);
 }
 
 void RaycastVehicle::FixedUpdate(float timeStep)
@@ -666,6 +675,17 @@ void RaycastVehicle::SetInAirRPM(float rpm)
 float RaycastVehicle::GetInAirRPM() const
 {
     return inAirRPM_;
+}
+
+void RaycastVehicle::SetCoordinateSystem(const IntVector3& coordinateSystem)
+{
+    coordinateSystem_ = coordinateSystem;
+    vehicleData_->SetCoordinateSystem(coordinateSystem_);
+}
+
+IntVector3 RaycastVehicle::GetCoordinateSystem()
+{
+    return coordinateSystem_;
 }
 
 void RaycastVehicle::ResetWheels()
