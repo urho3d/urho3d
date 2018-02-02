@@ -157,7 +157,7 @@ public:
     /// Get revolution per minute value for when wheel doesn't touch ground.
     float GetInAirRPM() const;
     /// Get the coordinate system.
-    IntVector3 GetCoordinateSystem();
+    IntVector3 GetCoordinateSystem() const { return coordinateSystem_; }
 
     /// Get wheel data attribute for serialization.
     VariantVector GetWheelDataAttr() const;

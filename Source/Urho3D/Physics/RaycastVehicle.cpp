@@ -683,11 +683,6 @@ void RaycastVehicle::SetCoordinateSystem(const IntVector3& coordinateSystem)
     vehicleData_->SetCoordinateSystem(coordinateSystem_);
 }
 
-IntVector3 RaycastVehicle::GetCoordinateSystem()
-{
-    return coordinateSystem_;
-}
-
 void RaycastVehicle::ResetWheels()
 {
     ResetSuspension();
