@@ -34,7 +34,12 @@
 namespace Urho3D
 {
 
-const IntVector3 RaycastVehicle::DEFAULT_COORDINATE_SYSTEM(0, 1, 2);
+const IntVector3 RaycastVehicle::RIGHT_UP_FORWARD(0, 1, 2);
+const IntVector3 RaycastVehicle::RIGHT_FORWARD_UP(0, 2, 1);
+const IntVector3 RaycastVehicle::UP_FORWARD_RIGHT(1, 2, 0);
+const IntVector3 RaycastVehicle::UP_RIGHT_FORWARD(1, 0, 2);
+const IntVector3 RaycastVehicle::FORWARD_RIGHT_UP(2, 0, 1);
+const IntVector3 RaycastVehicle::FORWARD_UP_RIGHT(2, 1, 0);
 
 struct RaycastVehicleData
 {
@@ -137,7 +142,7 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     // fixed update() for inputs and post update() to sync wheels for rendering
     SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
     vehicleData_ = new RaycastVehicleData();
-    coordinateSystem_ = DEFAULT_COORDINATE_SYSTEM;
+    coordinateSystem_ = RIGHT_UP_FORWARD;
     wheelNodes_.Clear();
     activate_ = false;
     inAirRPM_ = 0.0f;
@@ -183,7 +188,7 @@ void RaycastVehicle::RegisterObject(Context* context)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);
     URHO3D_ATTRIBUTE("Maximum side slip threshold", float, maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Coordinate system", IntVector3, coordinateSystem_, DEFAULT_COORDINATE_SYSTEM, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Coordinate system", IntVector3, coordinateSystem_, RIGHT_UP_FORWARD, AM_DEFAULT);
 }
 
 void RaycastVehicle::OnSetEnabled()
