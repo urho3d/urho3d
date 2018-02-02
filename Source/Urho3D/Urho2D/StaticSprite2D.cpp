@@ -330,10 +330,10 @@ void StaticSprite2D::UpdateSourceBatches()
     vertex2.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.max_.y_, 0.0f);
     vertex3.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.min_.y_, 0.0f);
 
-    vertex0.uv_ = swapXY_ ? textureRect_.max_ : textureRect_.min_;
-    vertex1.uv_ = Vector2(textureRect_.min_.x_, textureRect_.max_.y_);
-    vertex2.uv_ = swapXY_ ? textureRect_.min_ : textureRect_.max_;
-    vertex3.uv_ = Vector2(textureRect_.max_.x_, textureRect_.min_.y_);
+    vertex0.uv_ = textureRect_.min_;
+    (swapXY_ ? vertex3.uv_ : vertex1.uv_) = Vector2(textureRect_.min_.x_, textureRect_.max_.y_);
+    vertex2.uv_ = textureRect_.max_;
+    (swapXY_ ? vertex1.uv_ : vertex3.uv_) = Vector2(textureRect_.max_.x_, textureRect_.min_.y_);
 
     vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
 

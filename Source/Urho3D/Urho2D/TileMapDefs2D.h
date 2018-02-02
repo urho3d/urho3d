@@ -135,9 +135,9 @@ public:
     /// Return gid.
     int GetGid() const { return gid_ & ~FLIP_ALL; }
     /// Return flip X.
-    bool GetFlipX() const { return gid_ & FLIP_VERTICAL; }
+    bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return flip Y.
-    bool GetFlipY() const { return gid_ & FLIP_HORIZONTAL; }
+    bool GetFlipY() const { return gid_ & FLIP_VERTICAL; }
     /// Return swap X and Y.
     bool GetSwapXY() const { return gid_ & FLIP_DIAGONAL; }
 
@@ -188,9 +188,9 @@ public:
     /// Return tile Gid.
     int GetTileGid() const { return gid_ & ~FLIP_ALL; }
     /// Return tile flip X.
-    bool GetTileFlipX() const { return gid_ & FLIP_VERTICAL; }
+    bool GetTileFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return tile flip Y.
-    bool GetTileFlipY() const { return gid_ & FLIP_HORIZONTAL; }
+    bool GetTileFlipY() const { return gid_ & FLIP_VERTICAL; }
     /// Return tile swap X and Y.
     bool GetTileSwapXY() const { return gid_ & FLIP_DIAGONAL; }
 
