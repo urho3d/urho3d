@@ -28,7 +28,6 @@
 
 namespace Urho3D
 {
-
 struct RaycastVehicleData;
 
 class URHO3D_API RaycastVehicle : public LogicComponent
@@ -92,7 +91,9 @@ public:
     void SetWheelSkidInfoCumulative(int wheel, float skid);
     /// Set revolution per minute value for when wheel doesn't touch ground. If set to 0 (or not set), calculated from engine force (probably not what you want).
     void SetInAirRPM(float rpm);
-    /// Init the vehicle component after creation
+    /// Set the coordinate system. The default is (0, 1, 2).
+    void SetCoordinateSystem(const IntVector3& coordinateSystem = RIGHT_FORWARD_UP);
+    /// Init the vehicle component after creation.
     void Init();
     /// Perform fixed step pre-update.
     void FixedUpdate(float timeStep) override;
@@ -155,11 +156,26 @@ public:
     Vector3 GetContactNormal(int wheel) const;
     /// Get revolution per minute value for when wheel doesn't touch ground.
     float GetInAirRPM() const;
+    /// Get the coordinate system.
+    IntVector3 GetCoordinateSystem() const { return coordinateSystem_; }
 
     /// Get wheel data attribute for serialization.
     VariantVector GetWheelDataAttr() const;
     /// Set wheel data attribute during loading.
     void SetWheelDataAttr(const VariantVector& value);
+
+    /// (0, 1, 2) coordinate system (default).
+    static const IntVector3 RIGHT_UP_FORWARD;
+    /// (0, 2, 1) coordinate system.
+    static const IntVector3 RIGHT_FORWARD_UP;
+    /// (1, 2, 0) coordinate system.
+    static const IntVector3 UP_FORWARD_RIGHT;
+    /// (1, 0, 2) coordinate system.
+    static const IntVector3 UP_RIGHT_FORWARD;
+    /// (2, 0, 1) coordinate system.
+    static const IntVector3 FORWARD_RIGHT_UP;
+    /// (2, 1, 0) coordinate system.
+    static const IntVector3 FORWARD_UP_RIGHT;
 
 private:
     /// If the RigidBody should be activated.
@@ -168,6 +184,8 @@ private:
     WeakPtr<RigidBody> hullBody_;
     /// Opaque Bullet data hidden from public
     RaycastVehicleData* vehicleData_;
+    /// Coordinate system.
+    IntVector3 coordinateSystem_;
     /// Nodes of all wheels
     Vector<Node*> wheelNodes_;
     /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle

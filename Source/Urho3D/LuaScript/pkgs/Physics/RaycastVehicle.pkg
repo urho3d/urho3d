@@ -28,6 +28,7 @@ class RaycastVehicle : public LogicComponent
     void SetMaxSideSlipSpeed(float speed);
     void SetWheelSkidInfoCumulative(int wheel, float skid);
     void SetInAirRPM(float rpm);
+    void SetCoordinateSystem(const IntVector3& coordinateSystem = RIGHT_UP_FORWARD);
     void Init();
 
     Vector3 GetWheelPosition(int wheel);
@@ -56,5 +57,12 @@ class RaycastVehicle : public LogicComponent
     Vector3 GetContactPosition(int wheel) const;
     Vector3 GetContactNormal(int wheel) const;
     float GetInAirRPM() const;
-};
+    IntVector3 GetCoordinateSystem() const;
 
+    static const IntVector3 RIGHT_UP_FORWARD;
+    static const IntVector3 RIGHT_FORWARD_UP;
+    static const IntVector3 UP_FORWARD_RIGHT;
+    static const IntVector3 UP_RIGHT_FORWARD;
+    static const IntVector3 FORWARD_RIGHT_UP;
+    static const IntVector3 FORWARD_UP_RIGHT;
+};
