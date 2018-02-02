@@ -92,7 +92,7 @@ public:
     /// Set revolution per minute value for when wheel doesn't touch ground. If set to 0 (or not set), calculated from engine force (probably not what you want).
     void SetInAirRPM(float rpm);
     /// Set the coordinate system. The default is (0, 1, 2).
-    void SetCoordinateSystem(const IntVector3& coordinateSystem = DEFAULT_COORDINATE_SYSTEM);
+    void SetCoordinateSystem(const IntVector3& coordinateSystem = RIGHT_FORWARD_UP);
     /// Init the vehicle component after creation.
     void Init();
     /// Perform fixed step pre-update.
@@ -164,8 +164,18 @@ public:
     /// Set wheel data attribute during loading.
     void SetWheelDataAttr(const VariantVector& value);
 
-    /// The default coordinate system (0, 1, 2).
-    static const IntVector3 DEFAULT_COORDINATE_SYSTEM;
+    /// (0, 1, 2) coordinate system (default).
+    static const IntVector3 RIGHT_UP_FORWARD;
+    /// (0, 2, 1) coordinate system.
+    static const IntVector3 RIGHT_FORWARD_UP;
+    /// (1, 2, 0) coordinate system.
+    static const IntVector3 UP_FORWARD_RIGHT;
+    /// (1, 0, 2) coordinate system.
+    static const IntVector3 UP_RIGHT_FORWARD;
+    /// (2, 0, 1) coordinate system.
+    static const IntVector3 FORWARD_RIGHT_UP;
+    /// (2, 1, 0) coordinate system.
+    static const IntVector3 FORWARD_UP_RIGHT;
 
 private:
     /// If the RigidBody should be activated.
