@@ -222,7 +222,7 @@ Urho3D uses the following third-party libraries:
 - FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - kNet (https://github.com/juj/kNet)
-- libcpuid 0.4.0 (https://github.com/anrieff/libcpuid)
+- libcpuid 0.4.0+ (https://github.com/anrieff/libcpuid)
 - Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
 - LZ4 1.7.5 (https://github.com/lz4/lz4)
