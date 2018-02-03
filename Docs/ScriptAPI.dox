@@ -1955,6 +1955,7 @@ namespace Urho3D
 - %Wheel %data : VariantVector
 - %Maximum %side %slip %threshold : float
 - %RPM %for %wheel %motors %in %air (0=calculate) : float
+- %Coordinate %system : IntVector3
 
 ### RibbonTrail
 - %Is %Enabled : bool
@@ -10806,6 +10807,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - String category // readonly
+- IntVector3 coordinateSystem
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -10821,6 +10823,15 @@ Properties:
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
+
+Constants:
+
+- IntVector3 FORWARD_RIGHT_UP
+- IntVector3 FORWARD_UP_RIGHT
+- IntVector3 RIGHT_FORWARD_UP
+- IntVector3 RIGHT_UP_FORWARD
+- IntVector3 UP_FORWARD_RIGHT
+- IntVector3 UP_RIGHT_FORWARD
 
 <a name="Class_Rect"></a>
 

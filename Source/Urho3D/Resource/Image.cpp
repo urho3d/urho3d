@@ -29,7 +29,6 @@
 #include "../IO/Log.h"
 #include "../Resource/Decompress.h"
 
-#include <JO/jo_jpeg.h>
 #include <SDL/SDL_surface.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB/stb_image.h>
@@ -1297,7 +1296,7 @@ bool Image::SaveJPG(const String& fileName, int quality) const
     }
 
     if (data_)
-        return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
+        return stbi_write_jpg(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), quality) != 0;
     else
         return false;
 }

@@ -5084,6 +5084,8 @@ Methods:
 - void SetMaxSideSlipSpeed(float speed)
 - void SetWheelSkidInfoCumulative(int wheel, float skid)
 - void SetInAirRPM(float rpm)
+- void SetCoordinateSystem()
+- void SetCoordinateSystem(const IntVector3& coordinateSystem)
 - void Init()
 - Vector3 GetWheelPosition(int wheel)
 - Quaternion GetWheelRotation(int wheel)
@@ -5111,6 +5113,16 @@ Methods:
 - Vector3 GetContactPosition(int wheel) const
 - Vector3 GetContactNormal(int wheel) const
 - float GetInAirRPM() const
+- IntVector3 GetCoordinateSystem() const
+
+Properties:
+
+- const IntVector3 RIGHT_UP_FORWARD
+- const IntVector3 RIGHT_FORWARD_UP
+- const IntVector3 UP_FORWARD_RIGHT
+- const IntVector3 UP_RIGHT_FORWARD
+- const IntVector3 FORWARD_RIGHT_UP
+- const IntVector3 FORWARD_UP_RIGHT
 
 <a name="Class_Rect"></a>
 ### Rect

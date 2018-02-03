@@ -24,7 +24,7 @@
 set (TARGET_NAME LibCpuId)
 
 # Define preprocessor macros
-add_definitions (-DVERSION="0.4.0")
+add_definitions (-DVERSION="0.4.0+")
 if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()
