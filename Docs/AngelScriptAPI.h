@@ -9280,6 +9280,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 String category;
+IntVector3 coordinateSystem;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -9305,6 +9306,14 @@ StringHash type;
 String typeName;
 /* readonly */
 int weakRefs;
+
+// Constants:
+static const IntVector3 FORWARD_RIGHT_UP;
+static const IntVector3 FORWARD_UP_RIGHT;
+static const IntVector3 RIGHT_FORWARD_UP;
+static const IntVector3 RIGHT_UP_FORWARD;
+static const IntVector3 UP_FORWARD_RIGHT;
+static const IntVector3 UP_RIGHT_FORWARD;
 };
 
 class Rect
