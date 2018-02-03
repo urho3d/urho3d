@@ -73,7 +73,7 @@ public:
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
     ///
-    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(int gid) const;
+    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(unsigned gid) const;
 private:
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;

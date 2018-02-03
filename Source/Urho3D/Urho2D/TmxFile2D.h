@@ -184,13 +184,13 @@ public:
     const TileMapInfo2D& GetInfo() const { return info_; }
 
     /// Return tile sprite by gid, if not exist return 0.
-    Sprite2D* GetTileSprite(int gid) const;
+    Sprite2D* GetTileSprite(unsigned gid) const;
 
     /// Return tile collision shapes for a given gid.
-    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(int gid) const;
+    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(unsigned gid) const;
 
     /// Return tile property set by gid, if not exist return 0.
-    PropertySet2D* GetTilePropertySet(int gid) const;
+    PropertySet2D* GetTilePropertySet(unsigned gid) const;
 
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
@@ -217,11 +217,11 @@ private:
     /// Tile map information.
     TileMapInfo2D info_;
     /// Gid to tile sprite mapping.
-    HashMap<int, SharedPtr<Sprite2D> > gidToSpriteMapping_;
+    HashMap<unsigned, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.
-    HashMap<int, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
+    HashMap<unsigned, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
     /// Gid to tile collision shape mapping.
-    HashMap<int, Vector<SharedPtr<TileMapObject2D> > > gidToCollisionShapeMapping_;
+    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D> > > gidToCollisionShapeMapping_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
     /// Texture edge offset.

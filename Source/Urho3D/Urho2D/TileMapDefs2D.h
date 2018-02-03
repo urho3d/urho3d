@@ -133,7 +133,7 @@ public:
     Tile2D();
 
     /// Return gid.
-    int GetGid() const { return gid_ & ~FLIP_ALL; }
+    unsigned GetGid() const { return gid_ & ~FLIP_ALL; }
     /// Return flip X.
     bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return flip Y.
@@ -186,7 +186,7 @@ public:
     const Vector2& GetPoint(unsigned index) const;
 
     /// Return tile Gid.
-    int GetTileGid() const { return gid_ & ~FLIP_ALL; }
+    unsigned GetTileGid() const { return gid_ & ~FLIP_ALL; }
     /// Return tile flip X.
     bool GetTileFlipX() const { return gid_ & FLIP_HORIZONTAL; }
     /// Return tile flip Y.
