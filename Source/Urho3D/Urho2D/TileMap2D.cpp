@@ -185,7 +185,7 @@ ResourceRef TileMap2D::GetTmxFileAttr() const
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
 }
 
-Vector<SharedPtr<TileMapObject2D> > TileMap2D::GetTileCollisionShapes(int gid) const
+Vector<SharedPtr<TileMapObject2D> > TileMap2D::GetTileCollisionShapes(unsigned gid) const
 {
     Vector<SharedPtr<TileMapObject2D> > shapes;
     return tmxFile_ ? tmxFile_->GetTileCollisionShapes(gid) : shapes;
