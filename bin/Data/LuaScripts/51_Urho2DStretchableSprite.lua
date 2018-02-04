@@ -129,7 +129,7 @@ function TranslateSprites(timeStep)
     local down = input:GetKeyDown(KEY_S)
 
     if left or right or up or down then
-        local quantum = timeStep * speed;
+        local quantum = timeStep * speed
         local translate = Vector2((left and -quantum or 0) + (right and quantum or 0),
                                   (down and -quantum or 0) + (up and quantum or 0))
 
@@ -195,5 +195,5 @@ function GetScreenJoystickPatchString()
         "            <attribute name=\"Text\" value=\"LCTRL\" />" ..
         "        </element>" ..
         "    </add>" ..
-        "</patch>";
+        "</patch>"
 end

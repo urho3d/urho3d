@@ -59,8 +59,8 @@ function CreateScene()
     local staticModel = sphereWithDynamicMatNode:GetComponent("StaticModel")
     dynamicMaterial = staticModel:GetMaterial(0)
 
-    local zoneNode = scene_:GetChild("Zone");
-    zone = zoneNode:GetComponent("Zone");
+    local zoneNode = scene_:GetChild("Zone")
+    zone = zoneNode:GetComponent("Zone")
 
     -- Create the camera (not included in the scene file)
     cameraNode = scene_:CreateChild("Camera")
@@ -145,7 +145,7 @@ function HandleAmbientSliderChanged(eventType, eventData)
 end
 
 function SetupViewport()
-    renderer.hdrRendering = true;
+    renderer.hdrRendering = true
 
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
@@ -158,7 +158,7 @@ function SetupViewport()
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/Tonemap.xml"))
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/AutoExposure.xml"))
 
-    viewport.renderPath = effectRenderPath;
+    viewport.renderPath = effectRenderPath
 end
 
 function SubscribeToEvents()

@@ -53,53 +53,49 @@ function CreateGUI()
     for i=0, 9, 1 do
         local b = Button:new()
         ui.root:AddChild(b)
-        -- Reference a style from the style sheet loaded earlier:
-        b:SetStyle("Button")
-        b:SetMinSize(IntVector2(300, 100))
+        b:SetStyleAuto()
+        b.minWidth = 250
         b:SetPosition(IntVector2(50*i, 50*i))
+
+        -- Enable the bring-to-front flag and set the initial priority
+        b.bringToFront = true
+        b.priority = i
+
+        -- Set the layout mode to make the child text elements aligned vertically
+        b:SetLayout(LM_VERTICAL, 20, IntRect(40, 40, 40, 40))
+        local dragInfos = {"Num Touch", "Text", "Event Touch"}
+        for j=1, table.getn(dragInfos) do
+            b:CreateChild("Text", dragInfos[j]):SetStyleAuto()
+        end
 
         if i % 2 == 0 then
              b:AddTag("SomeTag")
         end
 
+        SubscribeToEvent(b, "Click", "HandleClick")
         SubscribeToEvent(b, "DragMove", "HandleDragMove")
         SubscribeToEvent(b, "DragBegin", "HandleDragBegin")
         SubscribeToEvent(b, "DragCancel", "HandleDragCancel")
-
-        local t = Text:new()
-        b:AddChild(t)
-        t:SetStyle("Text")
-        t:SetHorizontalAlignment(HA_CENTER)
-        t:SetVerticalAlignment(VA_CENTER)
-        t:SetName("Text")
-
-        t = Text:new()
-        b:AddChild(t)
-        t:SetStyle("Text")
-        t:SetName("Event Touch")
-        t:SetHorizontalAlignment(HA_CENTER)
-        t:SetVerticalAlignment(VA_BOTTOM)
-
-        t = Text:new()
-        b:AddChild(t)
-        t:SetStyle("Text")
-        t:SetName("Num Touch")
-        t:SetHorizontalAlignment(HA_CENTER)
-        t:SetVerticalAlignment(VA_TOP)
     end
 
     for i = 0, 9, 1 do
         local t = Text:new()
         ui.root:AddChild(t)
-        t:SetStyle("Text")
+        t:SetStyleAuto()
         t:SetName("Touch " .. i)
-        t:SetVisible(false)
+        t.visible = false
+        t.priority = 100    -- Make sure it has higher priority than the buttons
     end
 end
 
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
+end
+
+function HandleClick(eventType, eventData)
+    local element = eventData["Element"]:GetPtr("UIElement")
+    element:BringToFront()
 end
 
 function HandleDragBegin(eventType, eventData)
@@ -115,11 +111,9 @@ function HandleDragBegin(eventType, eventData)
     local buttons = eventData["Buttons"]:GetInt()
     element:SetVar(VAR_BUTTONS, Variant(buttons))
 
-    local t = tolua.cast(element:GetChild("Text"), 'Text')
-    t:SetText("Drag Begin Buttons: " .. buttons)
+    element:GetChild("Text").text = "Drag Begin Buttons: " .. buttons
 
-    t = tolua.cast(element:GetChild("Num Touch"), 'Text')
-    t:SetText("Number of buttons: " .. eventData["NumButtons"]:GetInt())
+    element:GetChild("Num Touch").text = "Number of buttons: " .. eventData["NumButtons"]:GetInt()
 end
 
 function HandleDragMove(eventType, eventData)
@@ -130,8 +124,7 @@ function HandleDragMove(eventType, eventData)
     local Y = eventData["Y"]:GetInt() + d.y
     local BUTTONS = element:GetVar(VAR_BUTTONS):GetInt()
 
-    local t = tolua.cast(element:GetChild("Event Touch"), 'Text')
-    t:SetText("Drag Move Buttons: " .. buttons)
+    element:GetChild("Event Touch").text = "Drag Move Buttons: " .. buttons
 
     element:SetPosition(IntVector2(X, Y))
 end

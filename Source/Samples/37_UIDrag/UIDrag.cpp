@@ -72,53 +72,37 @@ void UIDrag::CreateGUI()
         auto* b = new Button(context_);
         root->AddChild(b);
         // Reference a style from the style sheet loaded earlier:
-        b->SetStyle("Button");
-        b->SetSize(300, 100);
+        b->SetStyleAuto();
+        b->SetMinWidth(250);
         b->SetPosition(IntVector2(50*i, 50*i));
+
+        // Enable the bring-to-front flag and set the initial priority
+        b->SetBringToFront(true);
+        b->SetPriority(i);
+
+        // Set the layout mode to make the child text elements aligned vertically
+        b->SetLayout(LM_VERTICAL, 20, {40, 40, 40, 40});
+        auto dragInfos = {"Num Touch", "Text", "Event Touch"};
+        for (auto name: dragInfos)
+            b->CreateChild<Text>(name)->SetStyleAuto();
 
         if (i % 2 == 0)
             b->AddTag("SomeTag");
 
+        SubscribeToEvent(b, E_CLICK, URHO3D_HANDLER(UIDrag, HandleClick));
         SubscribeToEvent(b, E_DRAGMOVE, URHO3D_HANDLER(UIDrag, HandleDragMove));
         SubscribeToEvent(b, E_DRAGBEGIN, URHO3D_HANDLER(UIDrag, HandleDragBegin));
         SubscribeToEvent(b, E_DRAGCANCEL, URHO3D_HANDLER(UIDrag, HandleDragCancel));
-        SubscribeToEvent(b, E_DRAGEND, URHO3D_HANDLER(UIDrag, HandleDragEnd));
-
-        {
-            auto* t = new Text(context_);
-            b->AddChild(t);
-            t->SetStyle("Text");
-            t->SetHorizontalAlignment(HA_CENTER);
-            t->SetVerticalAlignment(VA_CENTER);
-            t->SetName("Text");
-        }
-
-        {
-            auto* t = new Text(context_);
-            b->AddChild(t);
-            t->SetStyle("Text");
-            t->SetName("Event Touch");
-            t->SetHorizontalAlignment(HA_CENTER);
-            t->SetVerticalAlignment(VA_BOTTOM);
-        }
-
-        {
-            auto* t = new Text(context_);
-            b->AddChild(t);
-            t->SetStyle("Text");
-            t->SetName("Num Touch");
-            t->SetHorizontalAlignment(HA_CENTER);
-            t->SetVerticalAlignment(VA_TOP);
-        }
     }
 
     for (int i = 0; i < 10; i++)
     {
         auto* t = new Text(context_);
         root->AddChild(t);
-        t->SetStyle("Text");
+        t->SetStyleAuto();
         t->SetName("Touch "+ String(i));
         t->SetVisible(false);
+        t->SetPriority(100);     // Make sure it has higher priority than the buttons
     }
 }
 
@@ -146,6 +130,13 @@ void UIDrag::SubscribeToEvents()
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(UIDrag, HandleUpdate));
 }
 
+void UIDrag::HandleClick(StringHash eventType, VariantMap& eventData)
+{
+    using namespace Click;
+    auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
+    element->BringToFront();
+}
+
 void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
@@ -161,10 +152,10 @@ void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
     int buttons = eventData[P_BUTTONS].GetInt();
     element->SetVar("BUTTONS", buttons);
 
-    Text* t = (Text*)element->GetChild(String("Text"));
+    auto* t = element->GetChildStaticCast<Text>("Text", false);
     t->SetText("Drag Begin Buttons: " + String(buttons));
 
-    t = (Text*)element->GetChild(String("Num Touch"));
+    t = element->GetChildStaticCast<Text>("Num Touch", false);
     t->SetText("Number of buttons: " + String(eventData[P_NUMBUTTONS].GetInt()));
 }
 
@@ -178,7 +169,7 @@ void UIDrag::HandleDragMove(StringHash eventType, VariantMap& eventData)
     int Y = eventData[P_Y].GetInt() + d.y_;
     int BUTTONS = element->GetVar("BUTTONS").GetInt();
 
-    Text* t = (Text*)element->GetChild(String("Event Touch"));
+    auto* t = element->GetChildStaticCast<Text>("Event Touch", false);
     t->SetText("Drag Move Buttons: " + String(buttons));
 
     if (buttons == BUTTONS)
@@ -191,12 +182,6 @@ void UIDrag::HandleDragCancel(StringHash eventType, VariantMap& eventData)
     auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
     IntVector2 P = element->GetVar("START").GetIntVector2();
     element->SetPosition(P);
-}
-
-void UIDrag::HandleDragEnd(StringHash eventType, VariantMap& eventData)
-{
-    using namespace DragBegin;
-    auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
 }
 
 void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)

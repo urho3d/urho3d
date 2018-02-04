@@ -384,7 +384,7 @@ function Character2D:HandleWoundedState(timeStep)
 
     -- Play "hit" animation in loop
     if animatedSprite.animation ~= "hit" then
-        animatedSprite:SetAnimation("hit", LM_FORCE_LOOPED);
+        animatedSprite:SetAnimation("hit", LM_FORCE_LOOPED)
     end
 
     -- Update timer

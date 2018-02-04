@@ -66,10 +66,8 @@ private:
     void SubscribeToEvents();
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleClick(StringHash eventType, VariantMap& eventData);
     void HandleDragBegin(StringHash eventType, VariantMap& eventData);
     void HandleDragMove(StringHash eventType, VariantMap& eventData);
     void HandleDragCancel(StringHash eventType, VariantMap& eventData);
-    void HandleDragEnd(StringHash eventType, VariantMap& eventData);
-    void HandleTextFinished(StringHash eventType, VariantMap& eventData);
-    void HandleLineEditDragBegin(StringHash eventType, VariantMap& eventData);
 };
