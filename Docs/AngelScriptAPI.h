@@ -237,7 +237,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetFlip(bool, bool);
+void SetFlip(bool, bool, bool = false);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -292,6 +292,7 @@ float shadowDistance;
 uint shadowMask;
 float speed;
 Sprite2D sprite;
+bool swapXY;
 bool temporary;
 Rect textureRect;
 /* readonly */
@@ -12321,7 +12322,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetFlip(bool, bool);
+void SetFlip(bool, bool, bool = false);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -12371,6 +12372,7 @@ bool replicated;
 float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
+bool swapXY;
 bool temporary;
 Rect textureRect;
 /* readonly */
@@ -12425,7 +12427,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetFlip(bool, bool);
+void SetFlip(bool, bool, bool = false);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -12476,6 +12478,7 @@ bool replicated;
 float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
+bool swapXY;
 bool temporary;
 Rect textureRect;
 /* readonly */
@@ -13625,11 +13628,17 @@ const String& GetProperty(const String&) const;
 
 // Properties:
 /* readonly */
-int gid;
+bool flipX;
+/* readonly */
+bool flipY;
+/* readonly */
+uint gid;
 /* readonly */
 int refs;
 /* readonly */
 Sprite2D sprite;
+/* readonly */
+bool swapXY;
 /* readonly */
 int weakRefs;
 };
@@ -13648,7 +13657,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 TileMapLayer2D GetLayer(uint) const;
-Array<TileMapObject2D> GetTileCollisionShapes(int) const;
+Array<TileMapObject2D> GetTileCollisionShapes(uint) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
@@ -13839,9 +13848,15 @@ int refs;
 /* readonly */
 Vector2 size;
 /* readonly */
-int tileGid;
+bool tileFlipX;
+/* readonly */
+bool tileFlipY;
+/* readonly */
+uint tileGid;
 /* readonly */
 Sprite2D tileSprite;
+/* readonly */
+bool tileSwapXY;
 /* readonly */
 String type;
 /* readonly */
@@ -16582,6 +16597,11 @@ uint DRAWABLE_LIGHT;
 uint DRAWABLE_ZONE;
 uint FIRST_LOCAL_ID;
 uint FIRST_REPLICATED_ID;
+uint FLIP_ALL;
+uint FLIP_DIAGONAL;
+uint FLIP_HORIZONTAL;
+uint FLIP_RESERVED;
+uint FLIP_VERTICAL;
 Color GRAY;
 Color GREEN;
 int HAT_CENTER;

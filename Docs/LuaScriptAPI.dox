@@ -6393,9 +6393,10 @@ Methods:
 
 - void SetSprite(Sprite2D* sprite)
 - void SetBlendMode(BlendMode mode)
-- void SetFlip(bool flipX, bool flipY)
+- void SetFlip(bool flipX, bool flipY, bool swapXY = false)
 - void SetFlipX(bool flipX)
 - void SetFlipY(bool flipY)
+- void SetSwapXY(bool swapXY)
 - void SetColor(const Color& color)
 - void SetAlpha(float alpha)
 - void SetUseHotSpot(bool useHotSpot)
@@ -6409,6 +6410,7 @@ Methods:
 - BlendMode GetBlendMode() const
 - bool GetFlipX() const
 - bool GetFlipY() const
+- bool GetSwapXY() const
 - const Color& GetColor() const
 - float GetAlpha() const
 - bool GetUseHotSpot() const
@@ -6425,6 +6427,7 @@ Properties:
 - BlendMode blendMode
 - bool flipX
 - bool flipY
+- bool swapXY
 - Color& color
 - float alpha
 - bool useHotSpot
@@ -6924,14 +6927,17 @@ Properties:
 
 Methods:
 
-- int GetGid() const
+- unsigned GetGid() const
+- bool GetFlipX() const
+- bool GetFlipY() const
+- bool GetSwapXY() const
 - Sprite2D* GetSprite() const
 - bool HasProperty(const String name) const
 - const String GetProperty(const String name) const
 
 Properties:
 
-- int gid (readonly)
+- unsigned gid (readonly)
 - Sprite2D* sprite (readonly)
 
 <a name="Class_TileMap2D"></a>
@@ -7016,7 +7022,10 @@ Methods:
 - const Vector2& GetSize() const
 - unsigned GetNumPoints() const
 - const Vector2& GetPoint(unsigned index) const
-- int GetTileGid() const
+- unsigned GetTileGid() const
+- bool GetTileFlipX() const
+- bool GetTileFlipY() const
+- bool GetTileSwapXY() const
 - Sprite2D* GetTileSprite() const
 - bool HasProperty(const String name) const
 - const String GetProperty(const String name) const
@@ -7029,7 +7038,7 @@ Properties:
 - Vector2 position (readonly)
 - Vector2 size (readonly)
 - unsigned numPoints (readonly)
-- int tileGid (readonly)
+- unsigned tileGid (readonly)
 - Sprite2D* tileSprite (readonly)
 
 <a name="Class_Time"></a>
@@ -9013,6 +9022,11 @@ Properties:
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID
+- unsigned FLIP_ALL
+- unsigned FLIP_DIAGONAL
+- unsigned FLIP_HORIZONTAL
+- unsigned FLIP_RESERVED
+- unsigned FLIP_VERTICAL
 - int HAT_CENTER
 - int HAT_DOWN
 - int HAT_LEFT
