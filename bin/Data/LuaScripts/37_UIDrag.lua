@@ -58,14 +58,14 @@ function CreateGUI()
         b:SetPosition(IntVector2(50*i, 50*i))
 
         -- Enable the bring-to-front flag and set the initial priority
-        b.bringToFront = true;
-        b.priority = i;
+        b.bringToFront = true
+        b.priority = i
 
         -- Set the layout mode to make the child text elements aligned vertically
-        b:SetLayout(LM_VERTICAL, 20, IntRect(40, 40, 40, 40));
-        local dragInfos = {"Num Touch", "Text", "Event Touch"};
+        b:SetLayout(LM_VERTICAL, 20, IntRect(40, 40, 40, 40))
+        local dragInfos = {"Num Touch", "Text", "Event Touch"}
         for j=1, table.getn(dragInfos) do
-            b:CreateChild("Text", dragInfos[j]):SetStyleAuto();
+            b:CreateChild("Text", dragInfos[j]):SetStyleAuto()
         end
 
         if i % 2 == 0 then

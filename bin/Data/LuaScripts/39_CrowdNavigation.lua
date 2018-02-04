@@ -399,9 +399,9 @@ function ToggleStreaming(enabled)
         local maxTiles = (2 * streamingDistance + 1) * (2 * streamingDistance + 1)
         local boundingBox = BoundingBox(navMesh.boundingBox)
         SaveNavigationData()
-        navMesh:Allocate(boundingBox, maxTiles);
+        navMesh:Allocate(boundingBox, maxTiles)
     else
-        navMesh:Build();
+        navMesh:Build()
     end
 end
 
