@@ -66,6 +66,7 @@ Urho3D development, contributions and bugfixes by:
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
+- Pavel Matcula
 - Xavier Maupeu
 - Iain Merrick
 - Justin Miller
