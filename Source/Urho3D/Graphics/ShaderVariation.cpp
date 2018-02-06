@@ -31,6 +31,13 @@
 namespace Urho3D
 {
 
+ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) :
+    name_{name},
+    glType_{glType},
+    location_{location}
+{
+}
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
