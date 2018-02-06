@@ -41,6 +41,8 @@ struct ShaderParameter
     ShaderParameter() = default;
     /// Construct with name, glType and location, leaving the remaining attributes zero-initialized (used only in OpenGL).
     ShaderParameter(const String& name, unsigned glType, int location);
+    /// Construct with type, name, offset, size, and buffer, leaving the remaining attributes zero-initialized (used only in Direct3D11).
+    ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer);
 
     /// %Shader type.
     ShaderType type_{};

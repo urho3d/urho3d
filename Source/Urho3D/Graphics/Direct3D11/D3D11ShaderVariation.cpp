@@ -198,13 +198,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned offset = file->ReadUInt();
         unsigned size = file->ReadUInt();
 
-        ShaderParameter parameter;
-        parameter.type_ = type_;
-        parameter.name_ = name;
-        parameter.buffer_ = buffer;
-        parameter.offset_ = offset;
-        parameter.size_ = size;
-        parameters_[StringHash(name)] = parameter;
+        parameters_[StringHash(name)] = ShaderParameter{type_, name, offset, size, buffer};
     }
 
     unsigned numTextureUnits = file->ReadUInt();
@@ -399,13 +393,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (varName[0] == 'c')
             {
                 varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
-                ShaderParameter parameter;
-                parameter.type_ = type_;
-                parameter.name_ = varName;
-                parameter.buffer_ = cbRegister;
-                parameter.offset_ = varDesc.StartOffset;
-                parameter.size_ = varDesc.Size;
-                parameters_[varName] = parameter;
+                parameters_[varName] = ShaderParameter{type_, varName, varDesc.StartOffset, varDesc.Size, cbRegister};
             }
         }
     }

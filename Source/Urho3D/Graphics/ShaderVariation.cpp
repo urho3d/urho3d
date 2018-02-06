@@ -38,6 +38,15 @@ ShaderParameter::ShaderParameter(const String& name, unsigned glType, int locati
 {
 }
 
+ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer) :
+    type_{type},
+    name_{name},
+    offset_{offset},
+    size_{size},
+    buffer_{buffer}
+{
+}
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
