@@ -47,6 +47,14 @@ ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned o
 {
 }
 
+ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) :
+    type_{type},
+    name_{name},
+    register_{reg},
+    regCount_{regCount}
+{
+}
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
