@@ -199,12 +199,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
         unsigned regCount = file->ReadUByte();
 
-        ShaderParameter parameter;
-        parameter.type_ = type_;
-        parameter.name_ = name;
-        parameter.register_ = reg;
-        parameter.regCount_ = regCount;
-        parameters_[StringHash(name)] = parameter;
+        parameters_[StringHash(name)] = ShaderParameter{type_, name, reg, regCount};
     }
 
     unsigned numTextureUnits = file->ReadUInt();
@@ -355,12 +350,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         }
         else
         {
-            ShaderParameter parameter;
-            parameter.type_ = type_;
-            parameter.name_ = name;
-            parameter.register_ = reg;
-            parameter.regCount_ = regCount;
-            parameters_[StringHash(name)] = parameter;
+            parameters_[StringHash(name)] = ShaderParameter{type_, name, reg, regCount};
         }
     }
 
