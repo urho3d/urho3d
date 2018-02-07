@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ struct URHO3D_API DirtyBits
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = (unsigned)(1 << (index & 7));
+            auto bit = (unsigned)(1 << (index & 7));
             if ((data_[byteIndex] & bit) == 0)
             {
                 data_[byteIndex] |= bit;
@@ -83,7 +83,7 @@ struct URHO3D_API DirtyBits
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = (unsigned)(1 << (index & 7));
+            auto bit = (unsigned)(1 << (index & 7));
             if ((data_[byteIndex] & bit) != 0)
             {
                 data_[byteIndex] &= ~bit;
@@ -105,7 +105,7 @@ struct URHO3D_API DirtyBits
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = (unsigned)(1 << (index & 7));
+            auto bit = (unsigned)(1 << (index & 7));
             return (data_[byteIndex] & bit) != 0;
         }
         else

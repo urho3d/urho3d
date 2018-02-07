@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,26 +39,20 @@ namespace Urho3D
 
 extern const char* wrapModeNames[];
 
-AttributeAnimationInfo::AttributeAnimationInfo(Animatable* target, const AttributeInfo& attributeInfo,
+AttributeAnimationInfo::AttributeAnimationInfo(Animatable* animatable, const AttributeInfo& attributeInfo,
     ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
-    ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
+    ValueAnimationInfo(animatable, attributeAnimation, wrapMode, speed),
     attributeInfo_(attributeInfo)
 {
 }
 
-AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& other) :
-    ValueAnimationInfo(other),
-    attributeInfo_(other.attributeInfo_)
-{
-}
+AttributeAnimationInfo::AttributeAnimationInfo(const AttributeAnimationInfo& other) = default;
 
-AttributeAnimationInfo::~AttributeAnimationInfo()
-{
-}
+AttributeAnimationInfo::~AttributeAnimationInfo() = default;
 
 void AttributeAnimationInfo::ApplyValue(const Variant& newValue)
 {
-    Animatable* animatable = static_cast<Animatable*>(target_.Get());
+    auto* animatable = static_cast<Animatable*>(target_.Get());
     if (animatable)
     {
         animatable->OnSetAttribute(attributeInfo_, newValue);
@@ -72,9 +66,7 @@ Animatable::Animatable(Context* context) :
 {
 }
 
-Animatable::~Animatable()
-{
-}
+Animatable::~Animatable() = default;
 
 void Animatable::RegisterObject(Context* context)
 {
@@ -82,9 +74,9 @@ void Animatable::RegisterObject(Context* context)
         ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
 
-bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
+bool Animatable::LoadXML(const XMLElement& source)
 {
-    if (!Serializable::LoadXML(source, setInstanceDefault))
+    if (!Serializable::LoadXML(source))
         return false;
 
     SetObjectAnimation(nullptr);
@@ -128,9 +120,9 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return true;
 }
 
-bool Animatable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+bool Animatable::LoadJSON(const JSONValue& source)
 {
-    if (!Serializable::LoadJSON(source, setInstanceDefault))
+    if (!Serializable::LoadJSON(source))
         return false;
 
     SetObjectAnimation(nullptr);
@@ -179,8 +171,6 @@ bool Animatable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
 
         float speed = value.Get("speed").GetFloat();
         SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
-
-        it++;
     }
 
     return true;
@@ -460,7 +450,7 @@ void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
 {
     if (!value.name_.Empty())
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_));
     }
 }

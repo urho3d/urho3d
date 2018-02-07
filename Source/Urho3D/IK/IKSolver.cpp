@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -231,11 +231,11 @@ ik_node_t* IKSolver::CreateIKNodeFromUrhoNode(const Node* node)
      * holding a reference to any internal effector. Check this for debugging
      * purposes and log if it does.
      */
-    IKEffector* effector = node->GetComponent<IKEffector>();
+    auto* effector = node->GetComponent<IKEffector>();
     if (effector != nullptr)
     {
 #ifdef DEBUG
-        if (effector->ikEffectorNode_ != NULL)
+        if (effector->ikEffectorNode_ != nullptr)
             URHO3D_LOGWARNINGF("[ik] IKEffector (attached to node \"%s\") has a reference to a possibly invalid internal effector. Should be NULL.", effector->GetNode()->GetName().CString());
 #endif
         ik_effector_t* ikEffector = ik_effector_create();
@@ -246,11 +246,11 @@ ik_node_t* IKSolver::CreateIKNodeFromUrhoNode(const Node* node)
     }
 
     // Exact same deal with the constraint
-    IKConstraint* constraint = node->GetComponent<IKConstraint>();
+    auto* constraint = node->GetComponent<IKConstraint>();
     if (constraint != nullptr)
     {
 #ifdef DEBUG
-        if (constraint->ikConstraintNode_ != NULL)
+        if (constraint->ikConstraintNode_ != nullptr)
             URHO3D_LOGWARNINGF("[ik] IKConstraint (attached to node \"%s\") has a reference to a possibly invalid internal constraint. Should be NULL.", constraint->GetNode()->GetName().CString());
 #endif
 
@@ -434,7 +434,7 @@ void IKSolver::Solve()
 // ----------------------------------------------------------------------------
 static void ApplyInitialPoseToSceneCallback(ik_node_t* ikNode)
 {
-    Node* node = (Node*)ikNode->user_data;
+    auto* node = (Node*)ikNode->user_data;
     node->SetWorldRotation(QuatIK2Urho(&ikNode->original_rotation));
     node->SetWorldPosition(Vec3IK2Urho(&ikNode->original_position));
 }
@@ -446,7 +446,7 @@ void IKSolver::ApplyOriginalPoseToScene()
 // ----------------------------------------------------------------------------
 static void ApplySceneToInitialPoseCallback(ik_node_t* ikNode)
 {
-    Node* node = (Node*)ikNode->user_data;
+    auto* node = (Node*)ikNode->user_data;
     ikNode->original_rotation = QuatUrho2IK(node->GetWorldRotation());
     ikNode->original_position = Vec3Urho2IK(node->GetWorldPosition());
 }
@@ -458,7 +458,7 @@ void IKSolver::ApplySceneToOriginalPose()
 // ----------------------------------------------------------------------------
 static void ApplyActivePoseToSceneCallback(ik_node_t* ikNode)
 {
-    Node* node = (Node*)ikNode->user_data;
+    auto* node = (Node*)ikNode->user_data;
     node->SetWorldRotation(QuatIK2Urho(&ikNode->rotation));
     node->SetWorldPosition(Vec3IK2Urho(&ikNode->position));
 }
@@ -470,7 +470,7 @@ void IKSolver::ApplyActivePoseToScene()
 // ----------------------------------------------------------------------------
 static void ApplySceneToActivePoseCallback(ik_node_t* ikNode)
 {
-    Node* node = (Node*)ikNode->user_data;
+    auto* node = (Node*)ikNode->user_data;
     ikNode->rotation = QuatUrho2IK(node->GetWorldRotation());
     ikNode->position = Vec3Urho2IK(node->GetWorldPosition());
 }
@@ -538,8 +538,8 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     using namespace ComponentAdded;
     (void)eventType;
 
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    Component* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
+    auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    auto* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
 
     /*
      * When a solver gets added into the scene, any parent solver's tree will
@@ -550,7 +550,7 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     {
         for (Node* iterNode = node; iterNode != nullptr; iterNode = iterNode->GetParent())
         {
-            IKSolver* parentSolver = iterNode->GetComponent<IKSolver>();
+            auto* parentSolver = iterNode->GetComponent<IKSolver>();
             if (parentSolver != nullptr)
                 parentSolver->MarkTreeNeedsRebuild();
 
@@ -593,8 +593,8 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
     if (solver_->tree == nullptr)
         return;
 
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    Component* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
+    auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    auto* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
 
     /*
      * When a solver gets added into the scene, any parent solver's tree will
@@ -605,7 +605,7 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
     {
         for (Node* iterNode = node; iterNode != nullptr; iterNode = iterNode->GetParent())
         {
-            IKSolver* parentSolver = iterNode->GetComponent<IKSolver>();
+            auto* parentSolver = iterNode->GetComponent<IKSolver>();
             if (parentSolver != nullptr)
                 parentSolver->MarkTreeNeedsRebuild();
 
@@ -654,7 +654,7 @@ void IKSolver::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
     if (solver_->tree == nullptr)
         return;
 
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
 
     PODVector<IKEffector*> effectors;
     node->GetComponents<IKEffector>(effectors, true);
@@ -686,7 +686,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     if (solver_->tree == nullptr)
         return;
 
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
 
     // Remove cached IKEffectors from our list
     PODVector<IKEffector*> effectors;
@@ -728,7 +728,7 @@ void IKSolver::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMa
 // ----------------------------------------------------------------------------
 void IKSolver::DrawDebugGeometry(bool depthTest)
 {
-    DebugRenderer* debug = GetScene()->GetComponent<DebugRenderer>();
+    auto* debug = GetScene()->GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, depthTest);
 }

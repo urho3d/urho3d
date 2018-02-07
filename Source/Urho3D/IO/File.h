@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,26 +63,26 @@ class URHO3D_API File : public Object, public AbstractFile
 
 public:
     /// Construct.
-    File(Context* context);
+    explicit File(Context* context);
     /// Construct and open a filesystem file.
     File(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file.
     File(Context* context, PackageFile* package, const String& fileName);
     /// Destruct. Close the file if open.
-    virtual ~File() override;
+    ~File() override;
 
     /// Read bytes from the file. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size) override;
+    unsigned Read(void* dest, unsigned size) override;
     /// Set position from the beginning of the file.
-    virtual unsigned Seek(unsigned position) override;
+    unsigned Seek(unsigned position) override;
     /// Write bytes to the file. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size) override;
+    unsigned Write(const void* data, unsigned size) override;
 
     /// Return the file name.
-    virtual const String& GetName() const override { return fileName_; }
+    const String& GetName() const override { return fileName_; }
 
     /// Return a checksum of the file contents using the SDBM hash algorithm.
-    virtual unsigned GetChecksum() override;
+    unsigned GetChecksum() override;
 
     /// Open a filesystem file. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);

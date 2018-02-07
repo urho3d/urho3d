@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -394,7 +394,18 @@ void RegisterRaycastVehicleAPI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "Vector3 GetContactNormal(int)", asMETHOD(RaycastVehicle, GetContactNormal), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void set_inAirRPM(float)", asMETHOD(RaycastVehicle, SetInAirRPM), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float get_inAirRPM()", asMETHOD(RaycastVehicle, GetInAirRPM), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "void set_coordinateSystem(const IntVector3&in = RIGHT_UP_FORWARD)", asMETHOD(RaycastVehicle, SetCoordinateSystem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "IntVector3 get_coordinateSystem() const", asMETHOD(RaycastVehicle, GetCoordinateSystem), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "int get_numWheels()", asMETHOD(RaycastVehicle, GetNumWheels), asCALL_THISCALL);
+
+    engine->SetDefaultNamespace("RaycastVehicle");
+    engine->RegisterGlobalProperty("const IntVector3 RIGHT_UP_FORWARD", (void*)&RaycastVehicle::RIGHT_UP_FORWARD);
+    engine->RegisterGlobalProperty("const IntVector3 RIGHT_FORWARD_UP", (void*)&RaycastVehicle::RIGHT_FORWARD_UP);
+    engine->RegisterGlobalProperty("const IntVector3 UP_FORWARD_RIGHT", (void*)&RaycastVehicle::UP_FORWARD_RIGHT);
+    engine->RegisterGlobalProperty("const IntVector3 UP_RIGHT_FORWARD", (void*)&RaycastVehicle::UP_RIGHT_FORWARD);
+    engine->RegisterGlobalProperty("const IntVector3 FORWARD_RIGHT_UP", (void*)&RaycastVehicle::FORWARD_RIGHT_UP);
+    engine->RegisterGlobalProperty("const IntVector3 FORWARD_UP_RIGHT", (void*)&RaycastVehicle::FORWARD_UP_RIGHT);
+    engine->SetDefaultNamespace("");
 }
 
 void RegisterPhysicsAPI(asIScriptEngine* engine)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,9 +58,9 @@ class Sample2D : public Object
 
 public:
     /// Construct.
-    Sample2D(Context* context);
+    explicit Sample2D(Context* context);
     /// Destruct.
-    ~Sample2D();
+    ~Sample2D() override = default;
 
     /// Generate physics collision shapes from the tmx file's objects located in tileMapLayer.
     void CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info);
@@ -95,17 +95,17 @@ public:
     /// Create path from tmx object's points.
     PODVector<Vector2> CreatePathFromPoints(TileMapObject2D* object, Vector2 offset);
     /// Create the UI content.
-    void CreateUIContent(String demoTitle, int remainingLifes, int remainingCoins);
+    void CreateUIContent(const String& demoTitle, int remainingLifes, int remainingCoins);
     /// Handle 'EXIT' button released event.
     void HandleExitButton(StringHash eventType, VariantMap& eventData);
     /// Save the scene.
     void SaveScene(bool initial);
     /// Create a background 2D sprite, optionally rotated by a ValueAnimation object.
-    void CreateBackgroundSprite(TileMapInfo2D info, float scale, String texture, bool animate);
+    void CreateBackgroundSprite(TileMapInfo2D info, float scale, const String& texture, bool animate);
     /// Create a particle emitter attached to the given node.
     void SpawnEffect(Node* node);
     /// Play a non-looping sound effect.
-    void PlaySoundEffect(String soundName);
+    void PlaySoundEffect(const String& soundName);
 
     /// Filename used in load/save functions.
     String demoFilename_;

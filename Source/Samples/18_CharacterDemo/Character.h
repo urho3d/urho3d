@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,23 +47,23 @@ class Character : public LogicComponent
 
 public:
     /// Construct.
-    Character(Context* context);
-    
+    explicit Character(Context* context);
+
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
-    
+
     /// Handle startup. Called by LogicComponent base class.
-    virtual void Start() override;
+    void Start() override;
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep) override;
-    
+    void FixedUpdate(float timeStep) override;
+
     /// Movement controls. Assigned by the main program each frame.
     Controls controls_;
-    
+
 private:
     /// Handle physics collision event.
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
-    
+
     /// Grounded flag for movement.
     bool onGround_;
     /// Jump flag.

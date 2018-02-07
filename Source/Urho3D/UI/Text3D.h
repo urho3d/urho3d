@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,20 +39,20 @@ class URHO3D_API Text3D : public Drawable
 
 public:
     /// Construct.
-    Text3D(Context* context);
+    explicit Text3D(Context* context);
     /// Destruct.
-    virtual ~Text3D() override;
+    ~Text3D() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame) override;
+    void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame) override;
+    void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType() override;
+    UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Set font by looking from resource cache by name and font size. Return true if successful.
     bool SetFont(const String& fontName, float size = DEFAULT_FONT_SIZE);
@@ -170,13 +170,13 @@ public:
     String GetTextAttr() const;
 
     /// Get color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return text_.color_[0]; }
+    const Color& GetColorAttr() const { return text_.colors_[0]; }
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Mark text & geometry dirty.
     void MarkTextDirty();
     /// Update text %UI batches.
@@ -185,7 +185,7 @@ protected:
     void UpdateTextMaterials(bool forceUpdate = false);
     /// Recalculate camera facing and fixed screen size.
     void CalculateFixedScreenSize(const FrameInfo& frame);
-    
+
     /// Internally used text element.
     Text text_;
     /// Geometries.

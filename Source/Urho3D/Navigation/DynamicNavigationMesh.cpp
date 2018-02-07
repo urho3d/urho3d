@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,19 +67,19 @@ struct DynamicNavigationMesh::TileCacheData
 
 struct TileCompressor : public dtTileCacheCompressor
 {
-    virtual int maxCompressedSize(const int bufferSize) override
+    int maxCompressedSize(const int bufferSize) override
     {
         return (int)(bufferSize * 1.05f);
     }
 
-    virtual dtStatus compress(const unsigned char* buffer, const int bufferSize,
+    dtStatus compress(const unsigned char* buffer, const int bufferSize,
         unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize) override
     {
         *compressedSize = LZ4_compress_default((const char*)buffer, (char*)compressed, bufferSize, LZ4_compressBound(bufferSize));
         return DT_SUCCESS;
     }
 
-    virtual dtStatus decompress(const unsigned char* compressed, const int compressedSize,
+    dtStatus decompress(const unsigned char* compressed, const int compressedSize,
         unsigned char* buffer, const int maxBufferSize, int* bufferSize) override
     {
         *bufferSize = LZ4_decompress_safe((const char*)compressed, (char*)buffer, compressedSize, maxBufferSize);
@@ -96,12 +96,12 @@ struct MeshProcess : public dtTileCacheMeshProcess
     PODVector<unsigned char> offMeshAreas_;
     PODVector<unsigned char> offMeshDir_;
 
-    inline MeshProcess(DynamicNavigationMesh* owner) :
+    inline explicit MeshProcess(DynamicNavigationMesh* owner) :
         owner_(owner)
     {
     }
 
-    virtual void process(struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags) override
+    void process(struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags) override
     {
         // Update poly flags from areas.
         // \todo Assignment of flags from areas?
@@ -166,13 +166,13 @@ struct LinearAllocator : public dtTileCacheAlloc
     int top;
     int high;
 
-    LinearAllocator(const int cap) :
+    explicit LinearAllocator(const int cap) :
         buffer(nullptr), capacity(0), top(0), high(0)
     {
         resize(cap);
     }
 
-    virtual ~LinearAllocator() override
+    ~LinearAllocator() override
     {
         dtFree(buffer);
     }
@@ -185,13 +185,13 @@ struct LinearAllocator : public dtTileCacheAlloc
         capacity = cap;
     }
 
-    virtual void reset() override
+    void reset() override
     {
         high = Max(high, top);
         top = 0;
     }
 
-    virtual void* alloc(const int size) override
+    void* alloc(const int size) override
     {
         if (!buffer)
             return nullptr;
@@ -202,7 +202,7 @@ struct LinearAllocator : public dtTileCacheAlloc
         return mem;
     }
 
-    virtual void free(void*) override
+    void free(void*) override
     {
     }
 };
@@ -261,7 +261,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
 
     // Calculate max number of polygons, 22 bits available to identify both tile & polygon within tile
     unsigned tileBits = LogBaseTwo(maxTiles);
-    unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+    auto maxPolys = (unsigned)(1 << (22 - tileBits));
 
     dtNavMeshParams params;
     rcVcopy(params.orig, &boundingBox_.min_.x_);
@@ -321,7 +321,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
     GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
     for (unsigned i = 0; i < obstacles.Size(); ++i)
     {
-        Obstacle* obs = obstacles[i]->GetComponent<Obstacle>();
+        auto* obs = obstacles[i]->GetComponent<Obstacle>();
         if (obs && obs->IsEnabledEffective())
             AddObstacle(obs);
     }
@@ -376,7 +376,7 @@ bool DynamicNavigationMesh::Build()
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
         unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * maxLayers_;
         unsigned tileBits = LogBaseTwo(maxTiles);
-        unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+        auto maxPolys = (unsigned)(1 << (22 - tileBits));
 
         dtNavMeshParams params;
         rcVcopy(params.orig, &boundingBox_.min_.x_);
@@ -473,7 +473,7 @@ bool DynamicNavigationMesh::Build()
         GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
         for (unsigned i = 0; i < obstacles.Size(); ++i)
         {
-            Obstacle* obs = obstacles[i]->GetComponent<Obstacle>();
+            auto* obs = obstacles[i]->GetComponent<Obstacle>();
             if (obs && obs->IsEnabledEffective())
                 AddObstacle(obs);
         }
@@ -630,7 +630,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             scene->GetChildrenWithComponent<Obstacle>(obstacles, true);
             for (unsigned i = 0; i < obstacles.Size(); ++i)
             {
-                Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
+                auto* obstacle = obstacles[i]->GetComponent<Obstacle>();
                 if (obstacle && obstacle->IsEnabledEffective())
                     obstacle->DrawDebugGeometry(debug, depthTest);
             }
@@ -643,7 +643,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
             for (unsigned i = 0; i < connections.Size(); ++i)
             {
-                OffMeshConnection* connection = connections[i]->GetComponent<OffMeshConnection>();
+                auto* connection = connections[i]->GetComponent<OffMeshConnection>();
                 if (connection && connection->IsEnabledEffective())
                     connection->DrawDebugGeometry(debug, depthTest);
             }
@@ -656,7 +656,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             scene->GetChildrenWithComponent<NavArea>(areas, true);
             for (unsigned i = 0; i < areas.Size(); ++i)
             {
-                NavArea* area = areas[i]->GetComponent<NavArea>();
+                auto* area = areas[i]->GetComponent<NavArea>();
                 if (area && area->IsEnabledEffective())
                     area->DrawDebugGeometry(debug, depthTest);
             }
@@ -669,7 +669,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
     Scene* scene = GetScene();
     if (scene)
     {
-        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        auto* debug = scene->GetComponent<DebugRenderer>();
         if (debug)
             DrawDebugGeometry(debug, depthTest);
     }
@@ -779,7 +779,7 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
         source.Read(&header, sizeof(dtTileCacheLayerHeader));
         const int dataSize = source.ReadInt();
 
-        unsigned char* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
+        auto* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
         if (!data)
         {
             URHO3D_LOGERROR("Could not allocate data for navigation mesh tile");

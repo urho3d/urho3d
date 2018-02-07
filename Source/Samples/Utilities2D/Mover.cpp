@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@ void Mover::Update(float timeStep)
     // Handle Orc states (idle/wounded/fighting)
     if (node_->GetName() == "Orc")
     {
-        AnimatedSprite2D* animatedSprite = node_->GetComponent<AnimatedSprite2D>();
+        auto* animatedSprite = node_->GetComponent<AnimatedSprite2D>();
         String anim = "run";
 
         // Handle wounded state

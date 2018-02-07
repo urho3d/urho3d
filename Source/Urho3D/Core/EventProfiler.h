@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,12 @@ public:
     {
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
-            EventProfilerBlock* eventProfilerBlock = static_cast<EventProfilerBlock*>(*i);
+            auto* eventProfilerBlock = static_cast<EventProfilerBlock*>(*i);
             if (eventProfilerBlock->eventID_ == eventID)
                 return eventProfilerBlock;
         }
 
-        EventProfilerBlock* newBlock = new EventProfilerBlock(this, eventID);
+        auto* newBlock = new EventProfilerBlock(this, eventID);
         children_.Push(newBlock);
 
         return newBlock;
@@ -65,7 +65,7 @@ class URHO3D_API EventProfiler : public Profiler
 
 public:
     /// Construct.
-    EventProfiler(Context* context);
+    explicit EventProfiler(Context* context);
 
     /// Activate the event profiler to collect information. This incurs slight performance hit on each SendEvent. By default inactive.
     static void SetActive(bool newActive) { active = newActive; }

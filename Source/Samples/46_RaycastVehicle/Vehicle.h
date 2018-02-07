@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,23 +52,23 @@ class Vehicle : public LogicComponent
 
 public :
     /// Construct.
-    Vehicle(Context* context);
+    explicit Vehicle(Context* context);
     /// Destruct.
-    virtual ~Vehicle() override;
+    ~Vehicle() override;
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
 
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
     void Init();
 
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep) override;
+    void FixedUpdate(float timeStep) override;
     /// Updating wheel effects here.
-    virtual void PostUpdate(float timeStep) override;
+    void PostUpdate(float timeStep) override;
 
     /// Movement controls.
     Controls controls_;

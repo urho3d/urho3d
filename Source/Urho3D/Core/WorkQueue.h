@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,16 +80,16 @@ class URHO3D_API WorkQueue : public Object
 
 public:
     /// Construct.
-    WorkQueue(Context* context);
+    explicit WorkQueue(Context* context);
     /// Destruct.
-    virtual ~WorkQueue() override;
+    ~WorkQueue() override;
 
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
     /// Get pointer to an usable WorkItem from the item pool. Allocate one if no more free items.
     SharedPtr<WorkItem> GetFreeItem();
     /// Add a work item and resume worker threads.
-    void AddWorkItem(SharedPtr<WorkItem> item);
+    void AddWorkItem(const SharedPtr<WorkItem>& item);
     /// Remove a work item before it has started executing. Return true if successfully removed.
     bool RemoveWorkItem(SharedPtr<WorkItem> item);
     /// Remove a number of work items before they have started executing. Return the number of items successfully removed.

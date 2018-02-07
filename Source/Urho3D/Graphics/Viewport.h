@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,13 @@ class URHO3D_API Viewport : public Object
 
 public:
     /// Construct with defaults.
-    Viewport(Context* context);
+    explicit Viewport(Context* context);
     /// Construct with a full rectangle.
     Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = nullptr);
     /// Construct with a specified rectangle.
     Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = nullptr);
     /// Destruct.
-    virtual ~Viewport() override;
+    ~Viewport() override;
 
     /// Set scene.
     void SetScene(Scene* scene);
@@ -59,7 +59,7 @@ public:
     /// Set view rectangle. A zero rectangle (0 0 0 0) means to use the rendertarget's full dimensions.
     void SetRect(const IntRect& rect);
     /// Set rendering path.
-    void SetRenderPath(RenderPath* path);
+    void SetRenderPath(RenderPath* renderPath);
     /// Set rendering path from an XML file.
     void SetRenderPath(XMLFile* file);
     /// Set whether to render debug geometry. Default true.

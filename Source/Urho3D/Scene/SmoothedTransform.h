@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ class URHO3D_API SmoothedTransform : public Component
 
 public:
     /// Construct.
-    SmoothedTransform(Context* context);
+    explicit SmoothedTransform(Context* context);
     /// Destruct.
-    virtual ~SmoothedTransform() override;
+    ~SmoothedTransform() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -74,7 +74,7 @@ public:
 
 protected:
     /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
 
 private:
     /// Handle smoothing update event.

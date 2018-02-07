@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,9 @@ class URHO3D_API DebugHud : public Object
 
 public:
     /// Construct.
-    DebugHud(Context* context);
+    explicit DebugHud(Context* context);
     /// Destruct.
-    virtual ~DebugHud() override;
+    ~DebugHud() override;
 
     /// Update. Called by HandlePostUpdate().
     void Update();

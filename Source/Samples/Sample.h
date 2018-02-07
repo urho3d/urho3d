@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,14 +56,14 @@ class Sample : public Application
 
 public:
     /// Construct.
-    Sample(Context* context);
+    explicit Sample(Context* context);
 
     /// Setup before engine initialization. Modifies the engine parameters.
-    virtual void Setup() override;
+    void Setup() override;
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
-    virtual void Start() override;
+    void Start() override;
     /// Cleanup after the main loop. Called by Application.
-    virtual void Stop() override;
+    void Stop() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.

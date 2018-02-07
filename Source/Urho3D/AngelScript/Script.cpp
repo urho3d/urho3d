@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,13 @@ class ScriptResourceRouter : public ResourceRouter
     URHO3D_OBJECT(ScriptResourceRouter, ResourceRouter);
 
     /// Construct.
-    ScriptResourceRouter(Context* context) :
+    explicit ScriptResourceRouter(Context* context) :
         ResourceRouter(context)
     {
     }
 
     /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available)
-    virtual void Route(String& name, ResourceRequest requestType) override
+    void Route(String& name, ResourceRequest requestType) override
     {
         String extension = GetExtension(name);
         if (extension == ".as")
@@ -58,7 +58,7 @@ class ScriptResourceRouter : public ResourceRouter
             String replaced = ReplaceExtension(name, ".asc");
             // Note: ResourceCache prevents recursive calls to the resource routers so this is OK, the nested Exists()
             // check does not go through the router again
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            auto* cache = GetSubsystem<ResourceCache>();
             if (!cache->Exists(name) && cache->Exists(replaced))
                 name = replaced;
         }
@@ -145,7 +145,7 @@ Script::Script(Context* context) :
     SetExecuteConsoleCommands(true);
 
     // Create and register resource router for checking for compiled AngelScript files
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     if (cache)
     {
         router_ = new ScriptResourceRouter(context_);
@@ -170,7 +170,7 @@ Script::~Script()
         scriptEngine_ = nullptr;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     if (cache)
         cache->RemoveResourceRouter(router_);
 }
@@ -259,7 +259,7 @@ void Script::ExceptionCallback(asIScriptContext* context)
     message.AppendWithFormat("- Exception '%s' in '%s'\n%s", context->GetExceptionString(),
         context->GetExceptionFunction()->GetDeclaration(), GetCallStack(context).CString());
 
-    asSMessageInfo msg;
+    asSMessageInfo msg{};
     msg.row = context->GetExceptionLineNumber(&msg.col, &msg.section);
     msg.type = asMSGTYPE_ERROR;
     msg.message = message.CString();
@@ -309,6 +309,44 @@ asITypeInfo* Script::GetObjectType(const char* declaration)
     asITypeInfo* type = scriptEngine_->GetTypeInfoById(scriptEngine_->GetTypeIdByDecl(declaration));
     objectTypes_[declaration] = type;
     return type;
+}
+
+const char **Script::GetEnumValues(int asTypeID)
+{
+    // If we've already found it, do not try to update the values, as that may invalidate the buffer
+    if (enumValues_.Contains(asTypeID))
+        return enumValues_[asTypeID].Buffer();
+
+    asITypeInfo* type = scriptEngine_->GetTypeInfoById(asTypeID);
+    if (!type)
+        return nullptr;
+
+    if (!(type->GetFlags() & asOBJ_ENUM))
+        return nullptr;
+
+    unsigned count = type->GetEnumValueCount();
+    enumValues_[asTypeID].Resize(count + 1);
+    for (unsigned i = 0; i < count; ++i)
+    {
+        int val = -1;
+        const char* name = type->GetEnumValueByIndex(i,&val);
+        if ((unsigned)val >= count)// use unsigned for val so negative values will be flagged as invalid
+        {
+            URHO3D_LOGDEBUGF("Could not register enum attribute names for type %d."
+                      "%s has value of %d, which is outside of the range [0,%d) for a 0-based enum.",
+                      asTypeID,name,val,count);
+
+            //fill with empty buffer
+            enumValues_[asTypeID] = PODVector<const char*>();
+            return nullptr;
+        }
+        else
+        {
+            enumValues_[asTypeID][i] = name;
+        }
+    }
+    enumValues_[asTypeID][count] = nullptr;
+    return enumValues_[asTypeID].Buffer();
 }
 
 asIScriptContext* Script::GetScriptFileContext()

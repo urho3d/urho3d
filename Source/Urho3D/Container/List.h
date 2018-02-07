@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,10 @@ public:
     struct Node : public ListNodeBase
     {
         /// Construct undefined.
-        Node()
-        {
-        }
+        Node() = default;
 
         /// Construct with value.
-        Node(const T& value) :
+        explicit Node(const T& value) :
             value_(value)
         {
         }
@@ -60,9 +58,7 @@ public:
     struct Iterator : public ListIteratorBase
     {
         /// Construct.
-        Iterator()
-        {
-        }
+        Iterator() = default;
 
         /// Construct with a node pointer.
         explicit Iterator(Node* ptr) :
@@ -111,9 +107,7 @@ public:
     struct ConstIterator : public ListIteratorBase
     {
         /// Construct.
-        ConstIterator()
-        {
-        }
+        ConstIterator() = default;
 
         /// Construct with a node pointer.
         explicit ConstIterator(Node* ptr) :
@@ -122,7 +116,7 @@ public:
         }
 
         /// Construct from a non-const iterator.
-        ConstIterator(const Iterator& rhs) :
+        ConstIterator(const Iterator& rhs) :        // NOLINT(google-explicit-constructor)
             ListIteratorBase(rhs.ptr_)
         {
         }
@@ -278,7 +272,7 @@ public:
     /// Insert a list at position.
     void Insert(const Iterator& dest, const List<T>& list)
     {
-        Node* destNode = static_cast<Node*>(dest.ptr_);
+        auto* destNode = static_cast<Node*>(dest.ptr_);
         ConstIterator it = list.Begin();
         ConstIterator end = list.End();
         while (it != end)
@@ -288,7 +282,7 @@ public:
     /// Insert elements by iterators.
     void Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
-        Node* destNode = static_cast<Node*>(dest.ptr_);
+        auto* destNode = static_cast<Node*>(dest.ptr_);
         ConstIterator it = start;
         while (it != end)
             InsertNode(destNode, *it++);
@@ -297,7 +291,7 @@ public:
     /// Insert elements.
     void Insert(const Iterator& dest, const T* start, const T* end)
     {
-        Node* destNode = static_cast<Node*>(dest.ptr_);
+        auto* destNode = static_cast<Node*>(dest.ptr_);
         const T* ptr = start;
         while (ptr != end)
             InsertNode(destNode, *ptr++);
@@ -464,7 +458,7 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -472,7 +466,7 @@ private:
     /// Reserve a node with initial value.
     Node* ReserveNode(const T& value)
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(value);
         return newNode;
     }

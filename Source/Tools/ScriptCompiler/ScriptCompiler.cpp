@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     #endif
     }
 
-    Log* log = context->GetSubsystem<Log>();
+    auto* log = context->GetSubsystem<Log>();
     // Register Log subsystem manually if compiled without logging support
     if (!log)
     {
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
         String path, file, extension;
         SplitPath(outputFile, path, file, extension);
 
-        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+        auto* cache = context->GetSubsystem<ResourceCache>();
 
         // Add resource path to be able to resolve includes
         if (arguments.Size() > 1)

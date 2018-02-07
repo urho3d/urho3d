@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,14 +79,14 @@ class URHO3D_API ParticleEmitter2D : public Drawable2D
 
 public:
     /// Construct.
-    ParticleEmitter2D(Context* context);
+    explicit ParticleEmitter2D(Context* context);
     /// Destruct.
-    virtual ~ParticleEmitter2D() override;
+    ~ParticleEmitter2D() override;
     /// Register object factory. drawable2d must be registered first.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Set particle effect.
     void SetEffect(ParticleEffect2D* effect);
@@ -123,13 +123,13 @@ public:
 
 private:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Handle draw order changed.
-    virtual void OnDrawOrderChanged() override;
+    void OnDrawOrderChanged() override;
     /// Update source batches.
-    virtual void UpdateSourceBatches() override;
+    void UpdateSourceBatches() override;
     /// Update material.
     void UpdateMaterial();
     /// Handle scene post update.

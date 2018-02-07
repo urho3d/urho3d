@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,11 +56,11 @@ struct MaterialShaderParameter
 struct TechniqueEntry
 {
     /// Construct with defaults.
-    TechniqueEntry();
+    TechniqueEntry() noexcept;
     /// Construct with parameters.
-    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance);
+    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) noexcept;
     /// Destruct.
-    ~TechniqueEntry();
+    ~TechniqueEntry() noexcept = default;
 
     /// Technique.
     SharedPtr<Technique> technique_;
@@ -82,14 +82,14 @@ public:
     /// Copy construct.
     ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other);
     /// Destruct.
-    virtual ~ShaderParameterAnimationInfo() override;
+    ~ShaderParameterAnimationInfo() override;
 
     /// Return shader parameter name.
     const String& GetName() const { return name_; }
 
 protected:
     /// Apply new animation value to the target object. Called by Update().
-    virtual void ApplyValue(const Variant& newValue) override;
+    void ApplyValue(const Variant& newValue) override;
 
 private:
     /// Shader parameter name.
@@ -109,18 +109,18 @@ class URHO3D_API Material : public Resource
 
 public:
     /// Construct.
-    Material(Context* context);
+    explicit Material(Context* context);
     /// Destruct.
-    virtual ~Material() override;
+    ~Material() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Load from an XML element. Return true if successful.
     bool Load(const XMLElement& source);
@@ -239,7 +239,7 @@ public:
 
     /// Return render order.
     unsigned char GetRenderOrder() const { return renderOrder_; }
-    
+
     /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
 

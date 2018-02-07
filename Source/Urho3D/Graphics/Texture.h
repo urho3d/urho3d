@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,13 @@ class XMLFile;
 /// Base class for texture resources.
 class URHO3D_API Texture : public ResourceWithMetadata, public GPUObject
 {
+    URHO3D_OBJECT(Texture, ResourceWithMetadata);
+
 public:
     /// Construct.
-    Texture(Context* context);
+    explicit Texture(Context* context);
     /// Destruct.
-    virtual ~Texture() override;
+    ~Texture() override;
 
     /// Set number of requested mip levels. Needs to be called before setting size.
     /** The default value (0) allocates as many mip levels as necessary to reach 1x1 size. Set value 1 to disable mipmapping.
@@ -51,9 +53,9 @@ public:
      */
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
-    void SetFilterMode(TextureFilterMode filter);
+    void SetFilterMode(TextureFilterMode mode);
     /// Set addressing mode by texture coordinate.
-    void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    void SetAddressMode(TextureCoordinate coord, TextureAddressMode mode);
     /// Set texture max. anisotropy level. No effect if not using anisotropic filtering. Value 0 (default) uses the default setting from Renderer.
     void SetAnisotropy(unsigned level);
     /// Set shadow compare mode. Not used on Direct3D9.
@@ -89,7 +91,7 @@ public:
     TextureFilterMode GetFilterMode() const { return filterMode_; }
 
     /// Return addressing mode by texture coordinate.
-    TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+    TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressModes_[coord]; }
 
     /// Return texture max. anisotropy level. Value 0 means to use the default value from Renderer.
     unsigned GetAnisotropy() const { return anisotropy_; }
@@ -143,7 +145,7 @@ public:
     bool GetParametersDirty() const;
 
     /// Set additional parameters from an XML file.
-    void SetParameters(XMLFile* xml);
+    void SetParameters(XMLFile* file);
     /// Set additional parameters from an XML element.
     void SetParameters(const XMLElement& element);
     /// Mark parameters dirty. Called by Graphics.
@@ -225,7 +227,7 @@ protected:
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.
-    TextureAddressMode addressMode_[MAX_COORDS];
+    TextureAddressMode addressModes_[MAX_COORDS];
     /// Texture anisotropy level.
     unsigned anisotropy_;
     /// Mip levels to skip when loading per texture quality setting.

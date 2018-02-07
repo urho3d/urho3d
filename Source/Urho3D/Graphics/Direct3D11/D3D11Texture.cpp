@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -137,9 +137,9 @@ void Texture::UpdateParameters()
     if (shadowCompare_)
         filterModeIndex += 5;
     samplerDesc.Filter = d3dFilterMode[filterModeIndex];
-    samplerDesc.AddressU = d3dAddressMode[addressMode_[0]];
-    samplerDesc.AddressV = d3dAddressMode[addressMode_[1]];
-    samplerDesc.AddressW = d3dAddressMode[addressMode_[2]];
+    samplerDesc.AddressU = d3dAddressMode[addressModes_[0]];
+    samplerDesc.AddressV = d3dAddressMode[addressModes_[1]];
+    samplerDesc.AddressW = d3dAddressMode[addressModes_[2]];
     samplerDesc.MaxAnisotropy = anisotropy_ ? anisotropy_ : graphics_->GetDefaultTextureAnisotropy();
     samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
     samplerDesc.MinLOD = -M_INFINITY;

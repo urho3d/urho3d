@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,7 @@ IKConstraint::IKConstraint(Context* context) :
 }
 
 // ----------------------------------------------------------------------------
-IKConstraint::~IKConstraint()
-{
-}
+IKConstraint::~IKConstraint() = default;
 
 // ----------------------------------------------------------------------------
 void IKConstraint::RegisterObject(Context* context)
@@ -68,9 +66,9 @@ float IKConstraint::GetStiffness() const
 void IKConstraint::SetStiffness(float stiffness)
 {
     stiffness_ = Clamp(stiffness, 0.0f, 1.0f);
-    if (ikConstraintNode_ != nullptr)
-        /* TODO ikNode_->stiffness = stiffness_; */
-        ;
+    // TODO
+    //if (ikConstraintNode_ != nullptr)
+    //    ikNode_->stiffness = stiffness_;
 }
 
 // ----------------------------------------------------------------------------
@@ -83,9 +81,9 @@ float IKConstraint::GetStretchiness() const
 void IKConstraint::SetStretchiness(float stretchiness)
 {
     stretchiness_ = Clamp(stretchiness, 0.0f, 1.0f);
-    if (ikConstraintNode_)
-        /* TODO ikNode_->stretchiness = stretchiness_;*/
-        ;
+    // TODO
+    //if (ikConstraintNode_)
+    //   ikNode_->stretchiness = stretchiness_;
 }
 
 // ----------------------------------------------------------------------------

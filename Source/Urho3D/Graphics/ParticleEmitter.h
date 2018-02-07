@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,16 +57,16 @@ class URHO3D_API ParticleEmitter : public BillboardSet
 
 public:
     /// Construct.
-    ParticleEmitter(Context* context);
+    explicit ParticleEmitter(Context* context);
     /// Destruct.
-    virtual ~ParticleEmitter() override;
+    ~ParticleEmitter() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Update before octree reinsertion. Is called from a worker thread.
-    virtual void Update(const FrameInfo& frame) override;
+    void Update(const FrameInfo& frame) override;
 
     /// Set particle effect.
     void SetEffect(ParticleEffect* effect);
@@ -115,7 +115,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
 
     /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();

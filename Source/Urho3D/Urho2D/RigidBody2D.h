@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,17 +48,17 @@ class URHO3D_API RigidBody2D : public Component
 
 public:
     /// Construct.
-    RigidBody2D(Context* context);
+    explicit RigidBody2D(Context* context);
     /// Destruct.
-    virtual ~RigidBody2D() override;
+    ~RigidBody2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Set body type.
-    void SetBodyType(BodyType2D bodyType);
+    void SetBodyType(BodyType2D type);
     /// Set mass.
     void SetMass(float mass);
     /// Set inertia.
@@ -159,11 +159,11 @@ public:
 
 private:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
 
     /// Physics world.
     WeakPtr<PhysicsWorld2D> physicsWorld_;

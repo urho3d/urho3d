@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,23 +81,23 @@ void Urho2DTileMap::CreateScene()
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
     camera->SetZoom(1.0f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.0) is set for full visibility at 1280x800 resolution)
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     // Get tmx file
-    TmxFile2D* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx");
+    auto* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx");
     if (!tmxFile)
         return;
 
     SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap"));
     tileMapNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
 
-    TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>();
+    auto* tileMap = tileMapNode->CreateComponent<TileMap2D>();
     // Set animation
     tileMap->SetTmxFile(tmxFile);
 
@@ -110,11 +110,11 @@ void Urho2DTileMap::CreateScene()
 
 void Urho2DTileMap::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys to move, use PageUp PageDown keys to zoom.\n LMB to remove a tile, RMB to swap grass and water.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -126,7 +126,7 @@ void Urho2DTileMap::CreateInstructions()
 
 void Urho2DTileMap::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -139,7 +139,7 @@ void Urho2DTileMap::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 4.0f;
@@ -156,13 +156,13 @@ void Urho2DTileMap::MoveCamera(float timeStep)
 
     if (input->GetKeyDown(KEY_PAGEUP))
     {
-        Camera* camera = cameraNode_->GetComponent<Camera>();
+        auto* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 1.01f);
     }
 
     if (input->GetKeyDown(KEY_PAGEDOWN))
     {
-        Camera* camera = cameraNode_->GetComponent<Camera>();
+        auto* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 0.99f);
     }
 }
@@ -192,10 +192,10 @@ void Urho2DTileMap::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void Urho2DTileMap::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     Node* tileMapNode = scene_->GetChild("TileMap", true);
-    TileMap2D* map = tileMapNode->GetComponent<TileMap2D>();
+    auto* map = tileMapNode->GetComponent<TileMap2D>();
     TileMapLayer2D* layer = map->GetLayer(0);
 
     Vector2 pos = GetMousePositionXY();
@@ -206,7 +206,7 @@ void Urho2DTileMap::HandleMouseButtonDown(StringHash eventType, VariantMap& even
         Node* n = layer->GetTileNode(x, y);
         if (!n)
             return;
-        StaticSprite2D* sprite = n->GetComponent<StaticSprite2D>();
+        auto* sprite = n->GetComponent<StaticSprite2D>();
 
         if (input->GetMouseButtonDown(MOUSEB_RIGHT))
         {
@@ -221,9 +221,9 @@ void Urho2DTileMap::HandleMouseButtonDown(StringHash eventType, VariantMap& even
 
 Vector2 Urho2DTileMap::GetMousePositionXY()
 {
-    Input* input = GetSubsystem<Input>();
-    Graphics* graphics = GetSubsystem<Graphics>();
-    Camera* camera = cameraNode_->GetComponent<Camera>();
+    auto* input = GetSubsystem<Input>();
+    auto* graphics = GetSubsystem<Graphics>();
+    auto* camera = cameraNode_->GetComponent<Camera>();
     Vector3 screenPoint = Vector3((float)input->GetMousePosition().x_ / graphics->GetWidth(), (float)input->GetMousePosition().y_ / graphics->GetHeight(), 10.0f);
     Vector3 worldPoint = camera->ScreenToWorldPoint(screenPoint);
     return Vector2(worldPoint.x_, worldPoint.y_);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ class XMLWriter : public pugi::xml_writer
 {
 public:
     /// Construct.
-    XMLWriter(Serializer& dest) :
+    explicit XMLWriter(Serializer& dest) :
         dest_(dest),
         success_(true)
     {
     }
 
     /// Write bytes to output.
-    virtual void write(const void* data, size_t size) override
+    void write(const void* data, size_t size) override
     {
         if (dest_.Write(data, (unsigned)size) != size)
             success_ = false;
@@ -69,9 +69,7 @@ XMLFile::XMLFile(Context* context) :
 {
 }
 
-XMLFile::~XMLFile()
-{
-}
+XMLFile::~XMLFile() = default;
 
 void XMLFile::RegisterObject(Context* context)
 {
@@ -103,7 +101,7 @@ bool XMLFile::BeginLoad(Deserializer& source)
     if (!inherit.Empty())
     {
         // The existence of this attribute indicates this is an RFC 5261 patch file
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         // If being async loaded, GetResource() is not safe, so use GetTempResource() instead
         XMLFile* inheritedXMLFile = GetAsyncLoadState() == ASYNC_DONE ? cache->GetResource<XMLFile>(inherit) :
             cache->GetTempResource<XMLFile>(inherit);
@@ -195,13 +193,13 @@ void XMLFile::Patch(XMLFile* patchFile)
     Patch(patchFile->GetRoot());
 }
 
-void XMLFile::Patch(XMLElement patchElement)
+void XMLFile::Patch(const XMLElement& patchElement)
 {
     pugi::xml_node root = pugi::xml_node(patchElement.GetNode());
 
-    for (pugi::xml_node::iterator patch = root.begin(); patch != root.end(); patch++)
+    for (auto& patch : root)
     {
-        pugi::xml_attribute sel = patch->attribute("sel");
+        pugi::xml_attribute sel = patch.attribute("sel");
         if (sel.empty())
         {
             URHO3D_LOGERROR("XML Patch failed due to node not having a sel attribute.");
@@ -216,11 +214,11 @@ void XMLFile::Patch(XMLElement patchElement)
             continue;
         }
 
-        if (strcmp(patch->name(), "add") == 0)
-            PatchAdd(*patch, original);
-        else if (strcmp(patch->name(), "replace") == 0)
-            PatchReplace(*patch, original);
-        else if (strcmp(patch->name(), "remove") == 0)
+        if (strcmp(patch.name(), "add") == 0)
+            PatchAdd(patch, original);
+        else if (strcmp(patch.name(), "replace") == 0)
+            PatchReplace(patch, original);
+        else if (strcmp(patch.name(), "remove") == 0)
             PatchRemove(original);
         else
             URHO3D_LOGERROR("XMLFiles used for patching should only use 'add', 'replace' or 'remove' elements.");

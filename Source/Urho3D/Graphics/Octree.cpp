@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,8 +51,8 @@ extern const char* SUBSYSTEM_CATEGORY;
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
-    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
-    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    auto** start = reinterpret_cast<Drawable**>(item->start_);
+    auto** end = reinterpret_cast<Drawable**>(item->end_);
 
     while (start != end)
     {
@@ -77,8 +77,8 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
 {
     Initialize(box);
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-        children_[i] = nullptr;
+    for (auto& child : children_)
+        child = nullptr;
 }
 
 Octant::~Octant()
@@ -201,10 +201,10 @@ void Octant::ResetRoot()
     for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(nullptr);
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto& child : children_)
     {
-        if (children_[i])
-            children_[i]->ResetRoot();
+        if (child)
+            child->ResetRoot();
     }
 }
 
@@ -214,10 +214,10 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
 
-        for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        for (auto& child : children_)
         {
-            if (children_[i])
-                children_[i]->DrawDebugGeometry(debug, depthTest);
+            if (child)
+                child->DrawDebugGeometry(debug, depthTest);
         }
     }
 }
@@ -246,15 +246,15 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
         query.TestDrawables(start, end, inside);
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto child : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query, inside);
+        if (child)
+            child->GetDrawablesInternal(query, inside);
     }
 }
 
@@ -266,7 +266,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
 
         while (start != end)
@@ -278,10 +278,10 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         }
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto child : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query);
+        if (child)
+            child->GetDrawablesInternal(query);
     }
 }
 
@@ -293,7 +293,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
 
         while (start != end)
@@ -305,10 +305,10 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         }
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto child : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesOnlyInternal(query, drawables);
+        if (child)
+            child->GetDrawablesOnlyInternal(query, drawables);
     }
 }
 
@@ -381,7 +381,7 @@ void Octree::Update(const FrameInfo& frame)
         // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
         // (for example physics objects) should not perform non-threadsafe work when marked dirty
         Scene* scene = GetScene();
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
         scene->BeginThreadedUpdate();
 
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
@@ -575,7 +575,7 @@ void Octree::CancelUpdate(Drawable* drawable)
 
 void Octree::DrawDebugGeometry(bool depthTest)
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    auto* debug = GetComponent<DebugRenderer>();
     DrawDebugGeometry(debug, depthTest);
 }
 

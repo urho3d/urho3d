@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ void SceneAndUILoad::Start()
 
 void SceneAndUILoad::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -84,11 +84,11 @@ void SceneAndUILoad::CreateScene()
 
 void SceneAndUILoad::CreateUI()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Set up global UI style into the root UI element
-    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     ui->GetRoot()->SetDefaultStyle(style);
 
     // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
@@ -97,7 +97,7 @@ void SceneAndUILoad::CreateUI()
     cursor->SetStyleAuto();
     ui->SetCursor(cursor);
     // Set starting position of the cursor at the rendering window center
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
     // Load UI content prepared in the editor and add to the UI hierarchy
@@ -105,7 +105,7 @@ void SceneAndUILoad::CreateUI()
     ui->GetRoot()->AddChild(layoutRoot);
 
     // Subscribe to button actions (toggle scene lights when pressed then released)
-    Button* button = layoutRoot->GetChildStaticCast<Button>("ToggleLight1", true);
+    auto* button = layoutRoot->GetChildStaticCast<Button>("ToggleLight1", true);
     if (button)
         SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight1));
     button = layoutRoot->GetChildStaticCast<Button>("ToggleLight2", true);
@@ -115,7 +115,7 @@ void SceneAndUILoad::CreateUI()
 
 void SceneAndUILoad::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -131,8 +131,8 @@ void SceneAndUILoad::SubscribeToEvents()
 void SceneAndUILoad::MoveCamera(float timeStep)
 {
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    UI* ui = GetSubsystem<UI>();
-    Input* input = GetSubsystem<Input>();
+    auto* ui = GetSubsystem<UI>();
+    auto* input = GetSubsystem<Input>();
     ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
 
     // Do not move if the UI has a focused element

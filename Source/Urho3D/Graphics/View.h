@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -116,9 +116,9 @@ class URHO3D_API View : public Object
 
 public:
     /// Construct.
-    View(Context* context);
+    explicit View(Context* context);
     /// Destruct.
-    virtual ~View() override;
+    ~View() override;
 
     /// Define with rendertarget and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, Viewport* viewport);
@@ -146,7 +146,7 @@ public:
 
     /// Return information of the frame being rendered.
     const FrameInfo& GetFrameInfo() const { return frame_; }
-    
+
     /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
 
@@ -155,10 +155,10 @@ public:
 
     /// Return view rectangle.
     const IntRect& GetViewRect() const { return viewRect_; }
-    
+
     /// Return view dimensions.
     const IntVector2& GetViewSize() const { return viewSize_; }
-    
+
     /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
 
@@ -252,7 +252,7 @@ private:
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView,
         const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Return the viewport for a shadow map split.
-    IntRect GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap);
+    IntRect GetShadowMapViewport(Light* light, int splitIndex, Texture2D* shadowMap);
     /// Find and set a new zone for a drawable when it has moved.
     void FindZone(Drawable* drawable);
     /// Return material technique, considering the drawable's LOD distance.

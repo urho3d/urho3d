@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
-#endif 
+#endif
 
 namespace Urho3D
 {
@@ -101,7 +101,7 @@ void AnimatedSprite2D::OnSetEnabled()
 
 void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 {
-    if (animationSet == animationSet_) 
+    if (animationSet == animationSet_)
         return;
 
     Dispose();
@@ -200,7 +200,7 @@ AnimationSet2D* AnimatedSprite2D::GetAnimationSet() const
 
 void AnimatedSprite2D::SetAnimationSetAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetAnimationSet(cache->GetResource<AnimationSet2D>(value.name_));
 }
 
@@ -281,7 +281,7 @@ void AnimatedSprite2D::SetSpineAnimation()
             return;
         }
     }
-    
+
     // Reset slots to setup pose, fix issue #932
     spSkeleton_setSlotsToSetupPose(skeleton_);
     spAnimationState_setAnimationByName(animationState_, 0, animationName_.CString(), loopMode_ != LM_FORCE_CLAMPED ? true : false);
@@ -297,7 +297,7 @@ void AnimatedSprite2D::UpdateSpineAnimation(float timeStep)
     skeleton_->flipX = flipX_;
     skeleton_->flipY = flipY_;
 
-    spSkeleton_update(skeleton_, timeStep); 
+    spSkeleton_update(skeleton_, timeStep);
     spAnimationState_update(animationState_, timeStep);
     spAnimationState_apply(animationState_, skeleton_);
     spSkeleton_updateWorldTransform(skeleton_);
@@ -323,9 +323,9 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
         if (!attachment)
             continue;
 
-        unsigned color = Color(color_.r_ * slot->r, 
-            color_.g_ * slot->g, 
-            color_.b_ * slot->b, 
+        unsigned color = Color(color_.r_ * slot->r,
+            color_.g_ * slot->g,
+            color_.b_ * slot->b,
             color_.a_ * slot->a).ToUInt();
 
         if (attachment->type == SP_ATTACHMENT_REGION)
@@ -456,7 +456,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         if (timelineKeys[i]->GetObjectType() != Spriter::SPRITE)
             continue;
 
-        Spriter::SpriteTimelineKey* timelineKey = (Spriter::SpriteTimelineKey*)timelineKeys[i];
+        auto* timelineKey = (Spriter::SpriteTimelineKey*)timelineKeys[i];
 
         Spriter::SpatialInfo& info = timelineKey->info_;
         Vector3 position(info.x_, info.y_, 0.0f);
@@ -469,8 +469,8 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         if (flipX_ != flipY_)
             angle = -angle;
 
-        Matrix3x4 localTransform(position * PIXEL_SIZE, 
-            Quaternion(angle), 
+        Matrix3x4 localTransform(position * PIXEL_SIZE,
+            Quaternion(angle),
             Vector3(info.scaleX_, info.scaleY_, 1.0f));
 
         Matrix3x4 worldTransform = nodeWorldTransform * localTransform;

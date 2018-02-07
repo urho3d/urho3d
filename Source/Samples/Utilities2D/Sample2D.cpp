@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,14 +66,10 @@ Sample2D::Sample2D(Context* context) :
 {
 }
 
-Sample2D::~Sample2D()
-{
-}
-
 void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info)
 {
     // Create rigid body to the root node
-    RigidBody2D* body = tileMapNode->CreateComponent<RigidBody2D>();
+    auto* body = tileMapNode->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
 
     // Generate physics collision shapes and rigid bodies from the tmx file's objects located in "Physics" layer
@@ -113,7 +109,7 @@ void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLay
 
 CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* object, Vector2 size, TileMapInfo2D info)
 {
-    CollisionBox2D* shape = node->CreateComponent<CollisionBox2D>();
+    auto* shape = node->CreateComponent<CollisionBox2D>();
     shape->SetSize(size);
     if (info.orientation_ == O_ORTHOGONAL)
         shape->SetCenter(object->GetPosition() + size / 2);
@@ -130,7 +126,7 @@ CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* obje
 
 CollisionCircle2D* Sample2D::CreateCircleShape(Node* node, TileMapObject2D* object, float radius, TileMapInfo2D info)
 {
-    CollisionCircle2D* shape = node->CreateComponent<CollisionCircle2D>();
+    auto* shape = node->CreateComponent<CollisionCircle2D>();
     Vector2 size = object->GetSize();
     if (info.orientation_ == O_ORTHOGONAL)
         shape->SetCenter(object->GetPosition() + size / 2);
@@ -148,7 +144,7 @@ CollisionCircle2D* Sample2D::CreateCircleShape(Node* node, TileMapObject2D* obje
 
 CollisionPolygon2D* Sample2D::CreatePolygonShape(Node* node, TileMapObject2D* object)
 {
-    CollisionPolygon2D* shape = node->CreateComponent<CollisionPolygon2D>();
+    auto* shape = node->CreateComponent<CollisionPolygon2D>();
     int numVertices = object->GetNumPoints();
     shape->SetVertexCount(numVertices);
     for (int i = 0; i < numVertices; ++i)
@@ -161,7 +157,7 @@ CollisionPolygon2D* Sample2D::CreatePolygonShape(Node* node, TileMapObject2D* ob
 
 CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* object)
 {
-    CollisionChain2D* shape = node->CreateComponent<CollisionChain2D>();
+    auto* shape = node->CreateComponent<CollisionChain2D>();
     int numVertices = object->GetNumPoints();
     shape->SetVertexCount(numVertices);
     for (int i = 0; i < numVertices; ++i)
@@ -174,20 +170,20 @@ CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* obj
 
 Node* Sample2D::CreateCharacter(TileMapInfo2D info, float friction, Vector3 position, float scale)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* spriteNode = scene_->CreateChild("Imp");
     spriteNode->SetPosition(position);
     spriteNode->SetScale(scale);
-    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
+    auto* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
     // Get scml file and Play "idle" anim
-    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
+    auto* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
     animatedSprite->SetAnimationSet(animationSet);
     animatedSprite->SetAnimation("idle");
     animatedSprite->SetLayer(3); // Put character over tile map (which is on layer 0) and over Orcs (which are on layer 2)
-    RigidBody2D* impBody = spriteNode->CreateComponent<RigidBody2D>();
+    auto* impBody = spriteNode->CreateComponent<RigidBody2D>();
     impBody->SetBodyType(BT_DYNAMIC);
     impBody->SetAllowSleep(false);
-    CollisionCircle2D* shape = spriteNode->CreateComponent<CollisionCircle2D>();
+    auto* shape = spriteNode->CreateComponent<CollisionCircle2D>();
     shape->SetRadius(1.1f); // Set shape size
     shape->SetFriction(friction); // Set friction
     shape->SetRestitution(0.1f); // Bounce
@@ -198,38 +194,38 @@ Node* Sample2D::CreateCharacter(TileMapInfo2D info, float friction, Vector3 posi
 Node* Sample2D::CreateTrigger()
 {
     Node* node = scene_->CreateChild(); // Clones will be renamed according to object type
-    RigidBody2D* body = node->CreateComponent<RigidBody2D>();
+    auto* body = node->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
-    CollisionBox2D* shape = node->CreateComponent<CollisionBox2D>(); // Create box shape
+    auto* shape = node->CreateComponent<CollisionBox2D>(); // Create box shape
     shape->SetTrigger(true);
     return node;
 }
 
 Node* Sample2D::CreateEnemy()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("Enemy");
-    StaticSprite2D* staticSprite = node->CreateComponent<StaticSprite2D>();
+    auto* staticSprite = node->CreateComponent<StaticSprite2D>();
     staticSprite->SetSprite(cache->GetResource<Sprite2D>("Urho2D/Aster.png"));
-    RigidBody2D* body = node->CreateComponent<RigidBody2D>();
+    auto* body = node->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
-    CollisionCircle2D* shape = node->CreateComponent<CollisionCircle2D>(); // Create circle shape
+    auto* shape = node->CreateComponent<CollisionCircle2D>(); // Create circle shape
     shape->SetRadius(0.25f); // Set radius
     return node;
 }
 
 Node* Sample2D::CreateOrc()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("Orc");
     node->SetScale(scene_->GetChild("Imp", true)->GetScale());
-    AnimatedSprite2D* animatedSprite = node->CreateComponent<AnimatedSprite2D>();
-    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/Orc/Orc.scml");
+    auto* animatedSprite = node->CreateComponent<AnimatedSprite2D>();
+    auto* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/Orc/Orc.scml");
     animatedSprite->SetAnimationSet(animationSet);
     animatedSprite->SetAnimation("run"); // Get scml file and Play "run" anim
     animatedSprite->SetLayer(2); // Make orc always visible
-    RigidBody2D* body = node->CreateComponent<RigidBody2D>();
-    CollisionCircle2D* shape = node->CreateComponent<CollisionCircle2D>();
+    auto* body = node->CreateComponent<RigidBody2D>();
+    auto* shape = node->CreateComponent<CollisionCircle2D>();
     shape->SetRadius(1.3f); // Set shape size
     shape->SetTrigger(true);
     return node;
@@ -237,17 +233,17 @@ Node* Sample2D::CreateOrc()
 
 Node* Sample2D::CreateCoin()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("Coin");
     node->SetScale(0.5);
-    AnimatedSprite2D* animatedSprite = node->CreateComponent<AnimatedSprite2D>();
-    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml");
+    auto* animatedSprite = node->CreateComponent<AnimatedSprite2D>();
+    auto* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml");
     animatedSprite->SetAnimationSet(animationSet); // Get scml file and Play "idle" anim
     animatedSprite->SetAnimation("idle");
     animatedSprite->SetLayer(4);
-    RigidBody2D* body = node->CreateComponent<RigidBody2D>();
+    auto* body = node->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
-    CollisionCircle2D* shape = node->CreateComponent<CollisionCircle2D>(); // Create circle shape
+    auto* shape = node->CreateComponent<CollisionCircle2D>(); // Create circle shape
     shape->SetRadius(0.32f); // Set radius
     shape->SetTrigger(true);
     return node;
@@ -255,14 +251,14 @@ Node* Sample2D::CreateCoin()
 
 Node* Sample2D::CreateMovingPlatform()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("MovingPlatform");
     node->SetScale(Vector3(3.0f, 1.0f, 0.0f));
-    StaticSprite2D* staticSprite = node->CreateComponent<StaticSprite2D>();
+    auto* staticSprite = node->CreateComponent<StaticSprite2D>();
     staticSprite->SetSprite(cache->GetResource<Sprite2D>("Urho2D/Box.png"));
-    RigidBody2D* body = node->CreateComponent<RigidBody2D>();
+    auto* body = node->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
-    CollisionBox2D* shape = node->CreateComponent<CollisionBox2D>(); // Create box shape
+    auto* shape = node->CreateComponent<CollisionBox2D>(); // Create box shape
     shape->SetSize(Vector2(0.32f, 0.32f)); // Set box size
     shape->SetFriction(0.8f); // Set friction
     return node;
@@ -299,7 +295,7 @@ void Sample2D::PopulateMovingEntities(TileMapLayer2D* movingEntitiesLayer)
             movingClone->SetPosition2D(movingObject->GetPoint(0) + offset);
 
             // Create script object that handles entity translation along its path
-            Mover* mover = movingClone->CreateComponent<Mover>();
+            auto* mover = movingClone->CreateComponent<Mover>();
 
             // Set path from points
             PODVector<Vector2> path = CreatePathFromPoints(movingObject, offset);
@@ -328,7 +324,7 @@ void Sample2D::PopulateCoins(TileMapLayer2D* coinsLayer)
         TileMapObject2D* coinObject = coinsLayer->GetObject(i); // Get placeholder object
         Node* coinClone = coinNode->Clone();
         coinClone->SetPosition2D(coinObject->GetPosition() + coinObject->GetSize() / 2 + Vector2(0.0f, 0.16f));
-        
+
     }
 
     // Remove node used for cloning purpose
@@ -348,7 +344,7 @@ void Sample2D::PopulateTriggers(TileMapLayer2D* triggersLayer)
         {
             Node* triggerClone = triggerNode->Clone();
             triggerClone->SetName(triggerObject->GetType());
-            CollisionBox2D* shape = triggerClone->GetComponent<CollisionBox2D>();
+            auto* shape = triggerClone->GetComponent<CollisionBox2D>();
             shape->SetSize(triggerObject->GetSize());
             triggerClone->SetPosition2D(triggerObject->GetPosition() + triggerObject->GetSize() / 2);
         }
@@ -357,12 +353,14 @@ void Sample2D::PopulateTriggers(TileMapLayer2D* triggersLayer)
 
 float Sample2D::Zoom(Camera* camera)
 {
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     float zoom_ = camera->GetZoom();
 
     if (input->GetMouseMoveWheel() != 0)
+    {
         zoom_ = Clamp(zoom_ + input->GetMouseMoveWheel() * 0.1f, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
         camera->SetZoom(zoom_);
+    }
 
     if (input->GetKeyDown(KEY_PAGEUP))
     {
@@ -387,94 +385,94 @@ PODVector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, Vecto
     return path;
 }
 
-void Sample2D::CreateUIContent(String demoTitle, int remainingLifes, int remainingCoins)
+void Sample2D::CreateUIContent(const String& demoTitle, int remainingLifes, int remainingCoins)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Set the default UI style and font
     ui->GetRoot()->SetDefaultStyle(cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
 
     // We create in-game UIs (coins and lifes) first so that they are hidden by the fullscreen UI (we could also temporary hide them using SetVisible)
 
     // Create the UI for displaying the remaining coins
-    BorderImage* coinsUI = ui->GetRoot()->CreateChild<BorderImage>("Coins");
+    auto* coinsUI = ui->GetRoot()->CreateChild<BorderImage>("Coins");
     coinsUI->SetTexture(cache->GetResource<Texture2D>("Urho2D/GoldIcon.png"));
     coinsUI->SetSize(50, 50);
     coinsUI->SetImageRect(IntRect(0, 64, 60, 128));
     coinsUI->SetAlignment(HA_LEFT, VA_TOP);
     coinsUI->SetPosition(5, 5);
-    Text* coinsText = coinsUI->CreateChild<Text>("CoinsText");
+    auto* coinsText = coinsUI->CreateChild<Text>("CoinsText");
     coinsText->SetAlignment(HA_CENTER, VA_CENTER);
     coinsText->SetFont(font, 24);
     coinsText->SetTextEffect(TE_SHADOW);
     coinsText->SetText(String(remainingCoins));
 
     // Create the UI for displaying the remaining lifes
-    BorderImage* lifeUI = ui->GetRoot()->CreateChild<BorderImage>("Life");
+    auto* lifeUI = ui->GetRoot()->CreateChild<BorderImage>("Life");
     lifeUI->SetTexture(cache->GetResource<Texture2D>("Urho2D/imp/imp_all.png"));
     lifeUI->SetSize(70, 80);
     lifeUI->SetAlignment(HA_RIGHT, VA_TOP);
     lifeUI->SetPosition(-5, 5);
-    Text* lifeText = lifeUI->CreateChild<Text>("LifeText");
+    auto* lifeText = lifeUI->CreateChild<Text>("LifeText");
     lifeText->SetAlignment(HA_CENTER, VA_CENTER);
     lifeText->SetFont(font, 24);
     lifeText->SetTextEffect(TE_SHADOW);
     lifeText->SetText(String(remainingLifes));
 
     // Create the fullscreen UI for start/end
-    Window* fullUI = ui->GetRoot()->CreateChild<Window>("FullUI");
+    auto* fullUI = ui->GetRoot()->CreateChild<Window>("FullUI");
     fullUI->SetStyleAuto();
     fullUI->SetSize(ui->GetRoot()->GetWidth(), ui->GetRoot()->GetHeight());
     fullUI->SetEnabled(false); // Do not react to input, only the 'Exit' and 'Play' buttons will
 
     // Create the title
-    BorderImage* title = fullUI->CreateChild<BorderImage>("Title");
+    auto* title = fullUI->CreateChild<BorderImage>("Title");
     title->SetMinSize(fullUI->GetWidth(), 50);
     title->SetTexture(cache->GetResource<Texture2D>("Textures/HeightMap.png"));
     title->SetFullImageRect();
     title->SetAlignment(HA_CENTER, VA_TOP);
-    Text* titleText = title->CreateChild<Text>("TitleText");
+    auto* titleText = title->CreateChild<Text>("TitleText");
     titleText->SetAlignment(HA_CENTER, VA_CENTER);
     titleText->SetFont(font, 24);
     titleText->SetText(demoTitle);
 
     // Create the image
-    BorderImage* spriteUI = fullUI->CreateChild<BorderImage>("Sprite");
+    auto* spriteUI = fullUI->CreateChild<BorderImage>("Sprite");
     spriteUI->SetTexture(cache->GetResource<Texture2D>("Urho2D/imp/imp_all.png"));
     spriteUI->SetSize(238, 271);
     spriteUI->SetAlignment(HA_CENTER, VA_CENTER);
     spriteUI->SetPosition(0, - ui->GetRoot()->GetHeight() / 4);
 
     // Create the 'EXIT' button
-    Button* exitButton = ui->GetRoot()->CreateChild<Button>("ExitButton");
+    auto* exitButton = ui->GetRoot()->CreateChild<Button>("ExitButton");
     exitButton->SetStyleAuto();
     exitButton->SetFocusMode(FM_RESETFOCUS);
     exitButton->SetSize(100, 50);
     exitButton->SetAlignment(HA_CENTER, VA_CENTER);
     exitButton->SetPosition(-100, 0);
-    Text* exitText = exitButton->CreateChild<Text>("ExitText");
+    auto* exitText = exitButton->CreateChild<Text>("ExitText");
     exitText->SetAlignment(HA_CENTER, VA_CENTER);
     exitText->SetFont(font, 24);
     exitText->SetText("EXIT");
     SubscribeToEvent(exitButton, E_RELEASED, URHO3D_HANDLER(Sample2D, HandleExitButton));
 
     // Create the 'PLAY' button
-    Button* playButton = ui->GetRoot()->CreateChild<Button>("PlayButton");
+    auto* playButton = ui->GetRoot()->CreateChild<Button>("PlayButton");
     playButton->SetStyleAuto();
     playButton->SetFocusMode(FM_RESETFOCUS);
     playButton->SetSize(100, 50);
     playButton->SetAlignment(HA_CENTER, VA_CENTER);
     playButton->SetPosition(100, 0);
-    Text* playText = playButton->CreateChild<Text>("PlayText");
+    auto* playText = playButton->CreateChild<Text>("PlayText");
     playText->SetAlignment(HA_CENTER, VA_CENTER);
     playText->SetFont(font, 24);
     playText->SetText("PLAY");
 //  SubscribeToEvent(playButton, E_RELEASED, HANDLER(Urho2DPlatformer, HandlePlayButton));
 
     // Create the instructions
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>("Instructions");
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>("Instructions");
     instructionText->SetText("Use WASD keys or Arrows to move\nPageUp/PageDown/MouseWheel to zoom\nF5/F7 to save/reload scene\n'Z' to toggle debug geometry\nSpace to fight");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     instructionText->SetTextAlignment(HA_CENTER); // Center rows in relation to each other
@@ -482,13 +480,13 @@ void Sample2D::CreateUIContent(String demoTitle, int remainingLifes, int remaini
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 
     // Show mouse cursor
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 }
 
 void Sample2D::HandleExitButton(StringHash eventType, VariantMap& eventData)
 {
-    Engine* engine = GetSubsystem<Engine>();
+    auto* engine = GetSubsystem<Engine>();
     engine->Exit();
 }
 
@@ -501,13 +499,13 @@ void Sample2D::SaveScene(bool initial)
     scene_->SaveXML(saveFile);
 }
 
-void Sample2D::CreateBackgroundSprite(TileMapInfo2D info, float scale, String texture, bool animate)
+void Sample2D::CreateBackgroundSprite(TileMapInfo2D info, float scale, const String& texture, bool animate)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("Background");
     node->SetPosition(Vector3(info.GetMapWidth(), info.GetMapHeight(), 0) / 2);
     node->SetScale(scale);
-    StaticSprite2D* sprite = node->CreateComponent<StaticSprite2D>();
+    auto* sprite = node->CreateComponent<StaticSprite2D>();
     sprite->SetSprite(cache->GetResource<Sprite2D>(texture));
     SetRandomSeed(Time::GetSystemTime()); // Randomize from system clock
     sprite->SetColor(Color(Random(0.0f, 1.0f), Random(0.0f, 1.0f), Random(0.0f, 1.0f), 1.0f));
@@ -525,20 +523,20 @@ void Sample2D::CreateBackgroundSprite(TileMapInfo2D info, float scale, String te
 
 void Sample2D::SpawnEffect(Node* node)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* particleNode = node->CreateChild("Emitter");
     particleNode->SetScale(0.5 / node->GetScale().x_);
-    ParticleEmitter2D* particleEmitter = particleNode->CreateComponent<ParticleEmitter2D>();
+    auto* particleEmitter = particleNode->CreateComponent<ParticleEmitter2D>();
     particleEmitter->SetLayer(2);
     particleEmitter->SetEffect(cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex"));
 }
 
-void Sample2D::PlaySoundEffect(String soundName)
+void Sample2D::PlaySoundEffect(const String& soundName)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SoundSource* source = scene_->CreateComponent<SoundSource>();
-    Sound* sound = cache->GetResource<Sound>("Sounds/" + soundName);
-    if (sound != NULL) {
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* source = scene_->CreateComponent<SoundSource>();
+    auto* sound = cache->GetResource<Sound>("Sounds/" + soundName);
+    if (sound != nullptr) {
         source->SetAutoRemoveMode(REMOVE_COMPONENT);
         source->Play(sound);
     }

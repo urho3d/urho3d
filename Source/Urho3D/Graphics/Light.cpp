@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -115,9 +115,7 @@ Light::Light(Context* context) :
 {
 }
 
-Light::~Light()
-{
-}
+Light::~Light() = default;
 
 void Light::RegisterObject(Context* context)
 {
@@ -521,13 +519,13 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 
 void Light::SetRampTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
 void Light::SetShapeTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 

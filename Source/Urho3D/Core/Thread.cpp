@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,10 +49,10 @@ static DWORD WINAPI ThreadFunctionStatic(void* data)
 
 static void* ThreadFunctionStatic(void* data)
 {
-    Thread* thread = static_cast<Thread*>(data);
+    auto* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
-    pthread_exit((void*)0);
-    return 0;
+    pthread_exit((void*)nullptr);
+    return nullptr;
 }
 
 #endif
@@ -106,9 +106,9 @@ void Thread::Stop()
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
 #else
-    pthread_t* thread = (pthread_t*)handle_;
+    auto* thread = (pthread_t*)handle_;
     if (thread)
-        pthread_join(*thread, 0);
+        pthread_join(*thread, nullptr);
     delete thread;
 #endif
     handle_ = nullptr;
@@ -122,7 +122,7 @@ void Thread::SetPriority(int priority)
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
 #elif defined(__linux__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-    pthread_t* thread = (pthread_t*)handle_;
+    auto* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);
 #endif

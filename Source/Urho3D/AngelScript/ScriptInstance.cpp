@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -107,7 +107,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     {
         // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
         // SceneResolver first. Delay searching for the object to ApplyAttributes
-        AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
+        auto* attrPtr = const_cast<AttributeInfo*>(&attr);
         idAttributes_[attrPtr] = src.GetUInt();
     }
     else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
@@ -123,7 +123,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     }
     else if (attr.type_ == VAR_VARIANTVECTOR && attr.ptr_)
     {
-        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        auto* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
         {
             const Vector<Variant>& vector = src.GetVariantVector();
@@ -135,7 +135,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     }
     else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
     {
-        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        auto* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
         {
             const Vector<String>& vector = src.GetStringVector();
@@ -151,7 +151,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 
 void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
 {
-    AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
+    auto* attrPtr = const_cast<AttributeInfo*>(&attr);
 
     // Get ID's for node / component handle attributes
     if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
@@ -182,13 +182,13 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
     }
     else if (attr.type_ == VAR_VARIANTVECTOR && attr.ptr_)
     {
-        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        auto* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
             dest = ArrayToVector<Variant>(arr);
     }
     else if (attr.type_ == VAR_STRINGVECTOR && attr.ptr_)
     {
-        CScriptArray* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
+        auto* arr = reinterpret_cast<CScriptArray*>(attr.ptr_);
         if (arr)
             dest = ArrayToVector<String>(arr);
     } else
@@ -442,7 +442,7 @@ bool ScriptInstance::HasMethod(const String& declaration) const
 
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
@@ -615,8 +615,8 @@ void ScriptInstance::ReleaseObject()
 
 void ScriptInstance::ClearScriptMethods()
 {
-    for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
-        methods_[i] = nullptr;
+    for (auto& method : methods_)
+        method = nullptr;
 
     delayedCalls_.Clear();
 }
@@ -641,9 +641,9 @@ void ScriptInstance::GetScriptAttributes()
     unsigned numProperties = scriptObject_->GetPropertyCount();
     for (unsigned i = 0; i < numProperties; ++i)
     {
-        const char* name;
-        int typeId;
-        bool isPrivate, isProtected, isHandle;
+        const char* name = nullptr;
+        int typeId = 0; // AngelScript void typeid
+        bool isPrivate=false, isProtected=false, isHandle=false, isEnum=false;
 
         scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate, &isProtected);
 
@@ -656,12 +656,20 @@ void ScriptInstance::GetScriptAttributes()
         if (isHandle)
             typeName = typeName.Substring(0, typeName.Length() - 1);
 
+        if (engine->GetTypeInfoById(typeId))
+            isEnum = engine->GetTypeInfoById(typeId)->GetFlags() & asOBJ_ENUM;
+
         AttributeInfo info;
         info.mode_ = AM_FILE;
         info.name_ = name;
         info.ptr_ = scriptObject_->GetAddressOfProperty(i);
 
-        if (!isHandle)
+        if (isEnum)
+        {
+            info.type_ = VAR_INT;
+            info.enumNames_ = GetSubsystem<Script>()->GetEnumValues(typeId);
+        }
+        else if (!isHandle)
         {
             switch (typeId)
             {
@@ -930,7 +938,7 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
     if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)
         return;
 
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
+    auto* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
 
     VariantVector parameters;
     if (method->GetParamCount() > 0)
@@ -1006,7 +1014,7 @@ ScriptEventListener* GetScriptContextEventListener()
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIScriptObject* object = static_cast<asIScriptObject*>(context->GetThisPointer());
+        auto* object = static_cast<asIScriptObject*>(context->GetThisPointer());
         if (object && object->GetUserData())
             return GetScriptContextInstance();
         else

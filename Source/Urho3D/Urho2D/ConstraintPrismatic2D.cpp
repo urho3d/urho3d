@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,7 @@ ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) :
 {
 }
 
-ConstraintPrismatic2D::~ConstraintPrismatic2D()
-{
-}
+ConstraintPrismatic2D::~ConstraintPrismatic2D() = default;
 
 void ConstraintPrismatic2D::RegisterObject(Context* context)
 {

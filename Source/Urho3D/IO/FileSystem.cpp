@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@
 #include <sys/utime.h>
 #else
 #include <dirent.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
 #include <utime.h>
 #include <sys/wait.h>
@@ -182,7 +182,7 @@ int DoSystemRun(const String& fileName, const Vector<String>& arguments)
         argPtrs.Push(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.Size(); ++i)
             argPtrs.Push(arguments[i].CString());
-        argPtrs.Push(0);
+        argPtrs.Push(nullptr);
 
         execvp(argPtrs[0], (char**)&argPtrs[0]);
         return -1; // Return -1 if we could not spawn the process
@@ -204,7 +204,7 @@ class AsyncExecRequest : public Thread
 {
 public:
     /// Construct.
-    AsyncExecRequest(unsigned& requestID) :
+    explicit AsyncExecRequest(unsigned& requestID) :
         requestID_(requestID),
         completed_(false)
     {
@@ -245,7 +245,7 @@ public:
     }
 
     /// The function to run in the thread.
-    virtual void ThreadFunction() override
+    void ThreadFunction() override
     {
         exitCode_ = DoSystemCommand(commandLine_, false, nullptr);
         completed_ = true;
@@ -270,7 +270,7 @@ public:
     }
 
     /// The function to run in the thread.
-    virtual void ThreadFunction() override
+    void ThreadFunction() override
     {
         exitCode_ = DoSystemRun(fileName_, arguments_);
         completed_ = true;
@@ -401,7 +401,7 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
-        AsyncSystemCommand* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
+        auto* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
         asyncExecQueue_.Push(cmd);
         return requestID;
     }
@@ -422,7 +422,7 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
-        AsyncSystemRun* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
+        auto* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
         asyncExecQueue_.Push(cmd);
         return requestID;
     }
@@ -1070,10 +1070,14 @@ bool IsAbsolutePath(const String& pathName)
 String FileSystem::GetTemporaryDir() const
 {
 #if defined(_WIN32)
+#if defined(MINI_URHO)
+    return getenv("TMP");
+#else
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     GetTempPathW(SDL_arraysize(pathName), pathName);
-    return AddTrailingSlash(pathName);
+    return AddTrailingSlash(String(pathName));
+#endif
 #else
     if (char* pathName = getenv("TMPDIR"))
         return AddTrailingSlash(pathName);

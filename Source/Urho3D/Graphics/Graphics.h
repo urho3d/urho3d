@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,9 +84,9 @@ class URHO3D_API Graphics : public Object
 
 public:
     /// Construct.
-    Graphics(Context* context);
+    explicit Graphics(Context* context);
     /// Destruct. Release the Direct3D11 device and close the window.
-    virtual ~Graphics();
+    ~Graphics() override;
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);

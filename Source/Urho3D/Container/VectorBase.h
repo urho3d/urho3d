@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ template <class T> struct RandomAccessIterator
 {
     /// Construct.
     RandomAccessIterator() :
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -145,7 +145,7 @@ template <class T> struct RandomAccessConstIterator
     }
 
     /// Construct from a non-const iterator.
-    RandomAccessConstIterator(const RandomAccessIterator<T>& rhs) :
+    RandomAccessConstIterator(const RandomAccessIterator<T>& rhs) :     // NOLINT(google-explicit-constructor)
         ptr_(rhs.ptr_)
     {
     }
@@ -292,7 +292,7 @@ class URHO3D_API VectorBase
 {
 public:
     /// Construct.
-    VectorBase() :
+    VectorBase() noexcept :
         size_(0),
         capacity_(0),
         buffer_(nullptr)

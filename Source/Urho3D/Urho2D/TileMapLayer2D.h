@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,14 +47,14 @@ class URHO3D_API TileMapLayer2D : public Component
 
 public:
     /// Construct.
-    TileMapLayer2D(Context* context);
+    explicit TileMapLayer2D(Context* context);
     /// Destruct.
-    virtual ~TileMapLayer2D() override;
+    ~TileMapLayer2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Add debug geometry to the debug renderer.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Initialize with tile map and tmx layer.
     void Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer);

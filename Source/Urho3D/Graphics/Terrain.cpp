@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -115,9 +115,7 @@ Terrain::Terrain(Context* context) :
     indexBuffer_->SetShadowed(true);
 }
 
-Terrain::~Terrain()
-{
-}
+Terrain::~Terrain() = default;
 
 void Terrain::RegisterObject(Context* context)
 {
@@ -627,8 +625,8 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
         return IntVector2::ZERO;
 
     Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
-    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_ + 0.5f);
-    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_ + 0.5f);
+    auto xPos = RoundToInt((position.x_ - patchWorldOrigin_.x_) / spacing_.x_);
+    auto zPos = RoundToInt((position.z_ - patchWorldOrigin_.y_) / spacing_.z_);
     xPos = Clamp(xPos, 0, numVertices_.x_ - 1);
     zPos = Clamp(zPos, 0, numVertices_.y_ - 1);
 
@@ -641,8 +639,8 @@ Vector3 Terrain::HeightMapToWorld(const IntVector2& pixelPosition) const
         return Vector3::ZERO;
 
     IntVector2 pos(pixelPosition.x_, numVertices_.y_ - 1 - pixelPosition.y_);
-    float xPos = (float)(pos.x_ * spacing_.x_ + patchWorldOrigin_.x_);
-    float zPos = (float)(pos.y_ * spacing_.z_ + patchWorldOrigin_.y_);
+    auto xPos = pos.x_ * spacing_.x_ + patchWorldOrigin_.x_;
+    auto zPos = pos.y_ * spacing_.z_ + patchWorldOrigin_.y_;
     Vector3 lPos(xPos, 0.0f, zPos);
     Vector3 wPos = node_->GetWorldTransform() * lPos;
     wPos.y_ = GetHeight(wPos);
@@ -654,7 +652,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
     URHO3D_PROFILE(CreatePatchGeometry);
 
-    unsigned row = (unsigned)(patchSize_ + 1);
+    auto row = (unsigned)(patchSize_ + 1);
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
     Geometry* geometry = patch->GetGeometry();
     Geometry* maxLodGeometry = patch->GetMaxLodGeometry();
@@ -666,9 +664,9 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
     SharedArrayPtr<unsigned char> occlusionCpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
 
-    float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
-    float* positionData = (float*)cpuVertexData.Get();
-    float* occlusionData = (float*)occlusionCpuVertexData.Get();
+    auto* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
+    auto* positionData = (float*)cpuVertexData.Get();
+    auto* occlusionData = (float*)occlusionCpuVertexData.Get();
     BoundingBox box;
 
     unsigned occlusionLevel = occlusionLodLevel_;
@@ -792,14 +790,14 @@ void Terrain::UpdatePatchLod(TerrainPatch* patch)
 
 void Terrain::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void Terrain::SetHeightMapAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Image* image = cache->GetResource<Image>(value.name_);
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* image = cache->GetResource<Image>(value.name_);
     SetHeightMapInternal(image, false);
 }
 
@@ -859,7 +857,7 @@ void Terrain::CreateGeometry()
     unsigned prevNumPatches = patches_.Size();
 
     // Determine number of LOD levels
-    unsigned lodSize = (unsigned)patchSize_;
+    auto lodSize = (unsigned)patchSize_;
     numLodLevels_ = 1;
     while (lodSize > MIN_PATCH_SIZE && numLodLevels_ < maxLodLevels_)
     {
@@ -879,7 +877,7 @@ void Terrain::CreateGeometry()
             Vector2(-0.5f * (float)numPatches_.x_ * patchWorldSize_.x_, -0.5f * (float)numPatches_.y_ * patchWorldSize_.y_);
         if (numVertices_ != lastNumVertices_ || lastSpacing_ != spacing_ || patchSize_ != lastPatchSize_)
             updateAll = true;
-        unsigned newDataSize = (unsigned)(numVertices_.x_ * numVertices_.y_);
+        auto newDataSize = (unsigned)(numVertices_.x_ * numVertices_.y_);
 
         // Create new height data if terrain size changed
         if (!heightData_ || updateAll)
@@ -1046,7 +1044,7 @@ void Terrain::CreateGeometry()
                     patchNode->SetPosition(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f,
                         patchWorldOrigin_.y_ + (float)z * patchWorldSize_.y_));
 
-                    TerrainPatch* patch = patchNode->GetComponent<TerrainPatch>();
+                    auto* patch = patchNode->GetComponent<TerrainPatch>();
                     if (!patch)
                     {
                         patch = patchNode->CreateComponent<TerrainPatch>();
@@ -1142,7 +1140,7 @@ void Terrain::CreateIndexData()
 
     PODVector<unsigned short> indices;
     drawRanges_.Clear();
-    unsigned row = (unsigned)(patchSize_ + 1);
+    auto row = (unsigned)(patchSize_ + 1);
 
     /* Build index data for each LOD level. Each LOD level except the lowest can stitch to the next lower LOD from the edges:
        north, south, west, east, or any combination of them, requiring 16 different versions of each LOD level's index data
@@ -1318,8 +1316,8 @@ float Terrain::GetSourceHeight(int x, int z) const
 
 float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
 {
-    unsigned offset = (unsigned)(1 << lodLevel);
-    float divisor = (float)offset;
+    auto offset = (unsigned)(1 << lodLevel);
+    auto divisor = (float)offset;
     float xFrac = (float)(x % offset) / divisor;
     float zFrac = (float)(z % offset) / divisor;
     float h1, h2, h3;
@@ -1440,12 +1438,12 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
     return true;
 }
 
-void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)
+void Terrain::HandleHeightMapReloadFinished(StringHash /*eventType*/, VariantMap& eventData)
 {
     CreateGeometry();
 }
 
-void Terrain::HandleNeighborTerrainCreated(StringHash eventType, VariantMap& eventData)
+void Terrain::HandleNeighborTerrainCreated(StringHash /*eventType*/, VariantMap& eventData)
 {
     UpdateEdgePatchNeighbors();
 }

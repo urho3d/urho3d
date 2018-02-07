@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,9 +42,7 @@ LuaScriptEventInvoker::LuaScriptEventInvoker(LuaScriptInstance* instance) :
 {
 }
 
-LuaScriptEventInvoker::~LuaScriptEventInvoker()
-{
-}
+LuaScriptEventInvoker::~LuaScriptEventInvoker() = default;
 
 void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& eventType, LuaFunction* function)
 {
@@ -59,7 +57,7 @@ void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& ev
 
 void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    LuaFunction* function = static_cast<LuaFunction*>(GetEventHandler()->GetUserData());
+    auto* function = static_cast<LuaFunction*>(GetEventHandler()->GetUserData());
     if (!function)
         return;
 

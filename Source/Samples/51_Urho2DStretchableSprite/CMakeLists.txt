@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,18 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_URHO2D)
+    return ()
+endif ()
+
 # Define target name
-set (TARGET_NAME JO)
+set (TARGET_NAME 51_Urho2DStretchableSprite)
 
 # Define source files
-define_source_files ()
+define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
 
-# Setup target
-setup_library ()
+# Setup target with resource copying
+setup_main_executable ()
 
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/JO FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
+# Setup test cases
+setup_test ()

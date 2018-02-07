@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,8 +56,8 @@ void ConstantBuffer::SetVector3ArrayParameter(unsigned offset, unsigned rows, co
     if (offset + rows * 4 * sizeof(float) > size_)
         return; // Would overflow the buffer
 
-    float* dest = (float*)&shadowData_[offset];
-    const float* src = (const float*)data;
+    auto* dest = (float*)&shadowData_[offset];
+    const auto* src = (const float*)data;
 
     while (rows--)
     {

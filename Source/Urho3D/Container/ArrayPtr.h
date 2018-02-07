@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ template <class T> class SharedArrayPtr
 public:
     /// Construct a null shared array pointer.
     SharedArrayPtr() :
-        ptr_(0),
+        ptr_(nullptr),
         refCount_(nullptr)
     {
     }
@@ -110,7 +110,7 @@ public:
     }
 
     /// Subscript the array.
-    T& operator [](const int index)
+    T& operator [](int index)
     {
         assert(ptr_);
         return ptr_[index];
@@ -126,7 +126,7 @@ public:
     bool operator <(const SharedArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer.
-    operator T*() const { return ptr_; }
+    operator T*() const { return ptr_; }    // NOLINT(google-explicit-constructor)
 
     /// Reset to null and release the array reference.
     void Reset() { ReleaseRef(); }
@@ -201,8 +201,8 @@ private:
                 delete refCount_;
         }
 
-        ptr_ = 0;
-        refCount_ = 0;
+        ptr_ = nullptr;
+        refCount_ = nullptr;
     }
 
     /// Pointer to the array.
@@ -247,7 +247,7 @@ public:
     }
 
     /// Construct from a shared array pointer.
-    WeakArrayPtr(const SharedArrayPtr<T>& rhs) :
+    explicit WeakArrayPtr(const SharedArrayPtr<T>& rhs) :
         ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
     {
@@ -340,7 +340,7 @@ public:
     bool operator <(const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer, null if array is expired.
-    operator T*() const { return Get(); }
+    operator T*() const { return Get(); }       // NOLINT(google-explicit-constructor)
 
     /// Reset to null and release the weak reference.
     void Reset() { ReleaseRef(); }

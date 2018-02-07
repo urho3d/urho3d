@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@
 
 namespace Urho3D
 {
-
 struct RaycastVehicleData;
 
 class URHO3D_API RaycastVehicle : public LogicComponent
@@ -37,18 +36,18 @@ class URHO3D_API RaycastVehicle : public LogicComponent
 
 public:
     /// Construct.
-    RaycastVehicle(Urho3D::Context* context);
+    explicit RaycastVehicle(Urho3D::Context* context);
     /// Destruct.
-    virtual ~RaycastVehicle() override;
+    ~RaycastVehicle() override;
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
-    
+
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Add a wheel. All parameters are relative to RigidBody / node.
     void AddWheel(Node* wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
@@ -92,14 +91,16 @@ public:
     void SetWheelSkidInfoCumulative(int wheel, float skid);
     /// Set revolution per minute value for when wheel doesn't touch ground. If set to 0 (or not set), calculated from engine force (probably not what you want).
     void SetInAirRPM(float rpm);
-    /// Init the vehicle component after creation
+    /// Set the coordinate system. The default is (0, 1, 2).
+    void SetCoordinateSystem(const IntVector3& coordinateSystem = RIGHT_FORWARD_UP);
+    /// Init the vehicle component after creation.
     void Init();
     /// Perform fixed step pre-update.
-    virtual void FixedUpdate(float timeStep) override;
+    void FixedUpdate(float timeStep) override;
     /// Perform fixed step post-update.
-    virtual void FixedPostUpdate(float timeStep) override;
+    void FixedPostUpdate(float timeStep) override;
     /// Perform variable step post-update.
-    virtual void PostUpdate(float timeStep) override;
+    void PostUpdate(float timeStep) override;
 
     /// Get wheel position relative to RigidBody.
     Vector3 GetWheelPosition(int wheel);
@@ -155,11 +156,26 @@ public:
     Vector3 GetContactNormal(int wheel) const;
     /// Get revolution per minute value for when wheel doesn't touch ground.
     float GetInAirRPM() const;
+    /// Get the coordinate system.
+    IntVector3 GetCoordinateSystem() const { return coordinateSystem_; }
 
     /// Get wheel data attribute for serialization.
     VariantVector GetWheelDataAttr() const;
     /// Set wheel data attribute during loading.
     void SetWheelDataAttr(const VariantVector& value);
+
+    /// (0, 1, 2) coordinate system (default).
+    static const IntVector3 RIGHT_UP_FORWARD;
+    /// (0, 2, 1) coordinate system.
+    static const IntVector3 RIGHT_FORWARD_UP;
+    /// (1, 2, 0) coordinate system.
+    static const IntVector3 UP_FORWARD_RIGHT;
+    /// (1, 0, 2) coordinate system.
+    static const IntVector3 UP_RIGHT_FORWARD;
+    /// (2, 0, 1) coordinate system.
+    static const IntVector3 FORWARD_RIGHT_UP;
+    /// (2, 1, 0) coordinate system.
+    static const IntVector3 FORWARD_UP_RIGHT;
 
 private:
     /// If the RigidBody should be activated.
@@ -168,6 +184,8 @@ private:
     WeakPtr<RigidBody> hullBody_;
     /// Opaque Bullet data hidden from public
     RaycastVehicleData* vehicleData_;
+    /// Coordinate system.
+    IntVector3 coordinateSystem_;
     /// Nodes of all wheels
     Vector<Node*> wheelNodes_;
     /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle

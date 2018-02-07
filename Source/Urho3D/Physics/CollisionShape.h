@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ struct TriangleMeshData : public CollisionGeometryData
     /// Construct from a model.
     TriangleMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
-    TriangleMeshData(CustomGeometry* custom);
+    explicit TriangleMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
     UniquePtr<TriangleMeshInterface> meshInterface_;
@@ -92,7 +92,7 @@ struct GImpactMeshData : public CollisionGeometryData
     /// Construct from a model.
     GImpactMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
-    GImpactMeshData(CustomGeometry* custom);
+    explicit GImpactMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
     UniquePtr<TriangleMeshInterface> meshInterface_;
@@ -104,7 +104,7 @@ struct ConvexData : public CollisionGeometryData
     /// Construct from a model.
     ConvexData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
-    ConvexData(CustomGeometry* custom);
+    explicit ConvexData(CustomGeometry* custom);
 
     /// Build the convex hull from vertices.
     void BuildHull(const PODVector<Vector3>& vertices);
@@ -144,18 +144,18 @@ class URHO3D_API CollisionShape : public Component
 
 public:
     /// Construct.
-    CollisionShape(Context* context);
+    explicit CollisionShape(Context* context);
     /// Destruct. Free the geometry data and clean up unused data from the geometry data cache.
-    virtual ~CollisionShape() override;
+    ~CollisionShape() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
@@ -250,11 +250,11 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
     /**
      * Called when instantiating a collision shape that is not one of ShapeType (default no-op).
      *

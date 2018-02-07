@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ public:
     /// Construct.
     Touch(Context* context, float touchSensitivity);
     /// Destruct.
-    ~Touch();
+    ~Touch() override;
 
     /// Update touch controls for the current frame.
     void UpdateTouches(Controls& controls);

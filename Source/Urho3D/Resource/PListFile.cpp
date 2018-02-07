@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include "../Resource/PListFile.h"
 #include "../Resource/XMLFile.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "../DebugNew.h"
 
@@ -215,8 +215,8 @@ IntRect PListValue::GetIntRect() const
         return IntRect::ZERO;
 
     int x, y, w, h;
-    sscanf(string_->CString(), "{{%d,%d},{%d,%d}}", &x, &y, &w, &h);
-    return IntRect(x, y, x + w, y + h);
+    sscanf(string_->CString(), "{{%d,%d},{%d,%d}}", &x, &y, &w, &h);    // NOLINT(cert-err34-c)
+    return {x, y, x + w, y + h};
 }
 
 IntVector2 PListValue::GetIntVector2() const
@@ -225,7 +225,7 @@ IntVector2 PListValue::GetIntVector2() const
         return IntVector2::ZERO;
 
     int x, y;
-    sscanf(string_->CString(), "{%d,%d}", &x, &y);
+    sscanf(string_->CString(), "{%d,%d}", &x, &y);                      // NOLINT(cert-err34-c)
     return IntVector2(x, y);
 }
 
@@ -235,7 +235,7 @@ IntVector3 PListValue::GetIntVector3() const
         return IntVector3::ZERO;
 
     int x, y, z;
-    sscanf(string_->CString(), "{%d,%d,%d}", &x, &y, &z);
+    sscanf(string_->CString(), "{%d,%d,%d}", &x, &y, &z);               // NOLINT(cert-err34-c)
     return IntVector3(x, y, z);
 }
 
@@ -301,9 +301,7 @@ PListFile::PListFile(Context* context) :
 {
 }
 
-PListFile::~PListFile()
-{
-}
+PListFile::~PListFile() = default;
 
 void PListFile::RegisterObject(Context* context)
 {

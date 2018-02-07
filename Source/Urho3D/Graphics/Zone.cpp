@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,9 +64,7 @@ Zone::Zone(Context* context) :
     boundingBox_ = BoundingBox(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX);
 }
 
-Zone::~Zone()
-{
-}
+Zone::~Zone() = default;
 
 void Zone::RegisterObject(Context* context)
 {
@@ -219,7 +217,7 @@ bool Zone::IsInside(const Vector3& point) const
 
 void Zone::SetZoneTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     zoneTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
@@ -340,7 +338,7 @@ void Zone::ClearDrawablesZone()
                 drawable->SetZone(nullptr);
             else if (drawableFlags & DRAWABLE_ZONE)
             {
-                Zone* zone = static_cast<Zone*>(drawable);
+                auto* zone = static_cast<Zone*>(drawable);
                 zone->lastAmbientStartZone_.Reset();
                 zone->lastAmbientEndZone_.Reset();
             }

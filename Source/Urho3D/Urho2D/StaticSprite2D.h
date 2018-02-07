@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,9 +36,9 @@ class URHO3D_API StaticSprite2D : public Drawable2D
 
 public:
     /// Construct.
-    StaticSprite2D(Context* context);
+    explicit StaticSprite2D(Context* context);
     /// Destruct.
-    virtual ~StaticSprite2D() override;
+    ~StaticSprite2D() override;
     /// Register object factory. Drawable2D must be registered first.
     static void RegisterObject(Context* context);
 
@@ -51,11 +51,13 @@ public:
     /// Set blend mode.
     void SetBlendMode(BlendMode blendMode);
     /// Set flip.
-    void SetFlip(bool flipX, bool flipY);
+    void SetFlip(bool flipX, bool flipY, bool swapXY = false);
     /// Set flip X.
     void SetFlipX(bool flipX);
     /// Set flip Y.
     void SetFlipY(bool flipY);
+    /// Set swap X and Y.
+    void SetSwapXY(bool swapXY);
     /// Set color.
     void SetColor(const Color& color);
     /// Set alpha.
@@ -88,6 +90,9 @@ public:
 
     /// Return flip Y.
     bool GetFlipY() const { return flipY_; }
+
+    /// Return swap X and Y.
+    bool GetSwapXY() const { return swapXY_; }
 
     /// Return color.
     const Color& GetColor() const { return color_; }
@@ -123,13 +128,13 @@ public:
 protected:
 
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Handle draw order changed.
-    virtual void OnDrawOrderChanged() override;
+    void OnDrawOrderChanged() override;
     /// Update source batches.
-    virtual void UpdateSourceBatches() override;
+    void UpdateSourceBatches() override;
     /// Update material.
     void UpdateMaterial();
     /// Update drawRect.
@@ -143,6 +148,8 @@ protected:
     bool flipX_;
     /// Flip Y.
     bool flipY_;
+    /// Swap X and Y.
+    bool swapXY_;
     /// Color.
     Color color_;
     /// Use hot spot flag.

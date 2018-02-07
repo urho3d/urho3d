@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -187,9 +187,9 @@ Rect BoundingBox::Projected(const Matrix4& projection) const
     vertices[7] = projMax;
 
     Rect rect;
-    for (unsigned i = 0; i < 8; ++i)
+    for (const auto& vertice : vertices)
     {
-        Vector3 projected = projection * vertices[i];
+        Vector3 projected = projection * vertice;
         rect.Merge(Vector2(projected.x_, projected.y_));
     }
 

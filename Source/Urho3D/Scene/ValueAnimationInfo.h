@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ public:
     /// Copy construct.
     ValueAnimationInfo(const ValueAnimationInfo& other);
     /// Destruct.
-    virtual ~ValueAnimationInfo() override;
+    ~ValueAnimationInfo() override;
 
     /// Advance time position and apply. Return true when the animation is finished. No-op when the target object is not defined.
     bool Update(float timeStep);

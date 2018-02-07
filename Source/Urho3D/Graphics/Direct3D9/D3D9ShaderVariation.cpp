@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -159,7 +159,7 @@ void ShaderVariation::Release()
     compilerOutput_.Clear();
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
+        useTextureUnits_[i] = false;
     parameters_.Clear();
 }
 
@@ -199,12 +199,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
         unsigned regCount = file->ReadUByte();
 
-        ShaderParameter parameter;
-        parameter.type_ = type_;
-        parameter.name_ = name;
-        parameter.register_ = reg;
-        parameter.regCount_ = regCount;
-        parameters_[StringHash(name)] = parameter;
+        parameters_[StringHash(name)] = ShaderParameter{type_, name, reg, regCount};
     }
 
     unsigned numTextureUnits = file->ReadUInt();
@@ -214,7 +209,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
 
         if (reg < MAX_TEXTURE_UNITS)
-            useTextureUnit_[reg] = true;
+            useTextureUnits_[reg] = true;
     }
 
     unsigned byteCodeSize = file->ReadUInt();
@@ -350,17 +345,12 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (reg < MAX_TEXTURE_UNITS)
             {
                 if (name != "AlbedoBuffer" && name != "NormalBuffer" && name != "DepthBuffer" && name != "LightBuffer")
-                    useTextureUnit_[reg] = true;
+                    useTextureUnits_[reg] = true;
             }
         }
         else
         {
-            ShaderParameter parameter;
-            parameter.type_ = type_;
-            parameter.name_ = name;
-            parameter.register_ = reg;
-            parameter.regCount_ = regCount;
-            parameters_[StringHash(name)] = parameter;
+            parameters_[StringHash(name)] = ShaderParameter{type_, name, reg, regCount};
         }
     }
 
@@ -405,13 +395,13 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     unsigned usedTextureUnits = 0;
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
             ++usedTextureUnits;
     }
     file->WriteUInt(usedTextureUnits);
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
         {
             file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
             file->WriteUByte((unsigned char)i);

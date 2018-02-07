@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ Viewport::Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* r
     SetRenderPath(renderPath);
 }
 
-Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath) :
+Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath) :   // NOLINT(modernize-pass-by-value)
     Object(context),
     scene_(scene),
     camera_(camera),
@@ -64,9 +64,7 @@ Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect
     SetRenderPath(renderPath);
 }
 
-Viewport::~Viewport()
-{
-}
+Viewport::~Viewport() = default;
 
 void Viewport::SetScene(Scene* scene)
 {
@@ -99,7 +97,7 @@ void Viewport::SetRenderPath(RenderPath* renderPath)
         renderPath_ = renderPath;
     else
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer)
             renderPath_ = renderer->GetDefaultRenderPath();
     }
@@ -147,7 +145,7 @@ Ray Viewport::GetScreenRay(int x, int y) const
 
     if (rect_ == IntRect::ZERO)
     {
-        Graphics* graphics = GetSubsystem<Graphics>();
+        auto* graphics = GetSubsystem<Graphics>();
         screenX = (float)x / (float)graphics->GetWidth();
         screenY = (float)y / (float)graphics->GetHeight();
     }
@@ -172,7 +170,7 @@ IntVector2 Viewport::WorldToScreenPoint(const Vector3& worldPos) const
     if (rect_ == IntRect::ZERO)
     {
         /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
-        Graphics* graphics = GetSubsystem<Graphics>();
+        auto* graphics = GetSubsystem<Graphics>();
         x = (int)(screenPoint.x_ * graphics->GetWidth());
         y = (int)(screenPoint.y_ * graphics->GetHeight());
     }
@@ -196,7 +194,7 @@ Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
     if (rect_ == IntRect::ZERO)
     {
         /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
-        Graphics* graphics = GetSubsystem<Graphics>();
+        auto* graphics = GetSubsystem<Graphics>();
         screenX = (float)x / (float)graphics->GetWidth();
         screenY = (float)y / (float)graphics->GetHeight();
     }

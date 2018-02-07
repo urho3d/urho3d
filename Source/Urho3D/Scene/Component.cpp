@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,9 +60,7 @@ Component::Component(Context* context) :
 {
 }
 
-Component::~Component()
-{
-}
+Component::~Component() = default;
 
 bool Component::Save(Serializer& dest) const
 {
@@ -100,7 +98,7 @@ bool Component::SaveJSON(JSONValue& dest) const
 
 void Component::MarkNetworkUpdate()
 {
-    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
+    if (!networkUpdate_ && IsReplicated())
     {
         Scene* scene = GetScene();
         if (scene)
@@ -149,6 +147,11 @@ void Component::Remove()
         node_->RemoveComponent(this);
 }
 
+bool Component::IsReplicated() const
+{
+    return Scene::IsReplicatedID(id_);
+}
+
 Scene* Component::GetScene() const
 {
     return node_ ? node_->GetScene() : nullptr;
@@ -191,7 +194,7 @@ void Component::PrepareNetworkUpdate()
             for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
-                ComponentReplicationState* compState = static_cast<ComponentReplicationState*>(*j);
+                auto* compState = static_cast<ComponentReplicationState*>(*j);
                 compState->dirtyAttributes_.Set(i);
 
                 // Add component's parent node to the dirty set if not added yet

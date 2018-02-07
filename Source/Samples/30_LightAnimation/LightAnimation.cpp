@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -73,7 +73,7 @@ void LightAnimation::Start()
 
 void LightAnimation::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -88,13 +88,13 @@ void LightAnimation::CreateScene()
     // (100 x 100 world units)
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
+    auto* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
     // Create a point light to the world so that we can see something.
     Node* lightNode = scene_->CreateChild("PointLight");
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_POINT);
     light->SetRange(10.0f);
 
@@ -161,7 +161,7 @@ void LightAnimation::CreateScene()
         mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
         mushroomNode->SetScale(0.5f + Random(2.0f));
-        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+        auto* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
     }
@@ -177,13 +177,13 @@ void LightAnimation::CreateScene()
 
 void LightAnimation::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move");
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
     instructionText->SetFont(font, 15);
 
     // Position the text relative to the screen center
@@ -192,21 +192,21 @@ void LightAnimation::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 
     // Animating text
-    Text* text = ui->GetRoot()->CreateChild<Text>("animatingText");
+    auto* text = ui->GetRoot()->CreateChild<Text>("animatingText");
     text->SetFont(font, 15);
     text->SetHorizontalAlignment(HA_CENTER);
     text->SetVerticalAlignment(VA_CENTER);
     text->SetPosition(0, ui->GetRoot()->GetHeight() / 4 + 20);
 
     // Animating sprite in the top left corner
-    Sprite* sprite = ui->GetRoot()->CreateChild<Sprite>("animatingSprite");
+    auto* sprite = ui->GetRoot()->CreateChild<Sprite>("animatingSprite");
     sprite->SetPosition(8, 8);
     sprite->SetSize(64, 64);
 }
 
 void LightAnimation::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen. We need to define the scene and the camera
     // at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
@@ -221,7 +221,7 @@ void LightAnimation::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;

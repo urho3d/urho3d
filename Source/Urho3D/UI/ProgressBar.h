@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,16 +36,16 @@ class URHO3D_API ProgressBar : public BorderImage
 
 public:
     /// Construct.
-    ProgressBar(Context *context);
+    explicit ProgressBar(Context *context);
 
     /// Destruct.
-    virtual ~ProgressBar() override;
+    ~ProgressBar() override;
 
     /// Register object factory.
     static void RegisterObject(Context *context);
 
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
@@ -78,14 +78,14 @@ public:
     const String& GetLoadingPercentStyle() const { return loadingPercentStyle_; }
 
     /// Sets the flag to display the percent text.
-    void SetShowPercentText(bool showPercentText);
+    void SetShowPercentText(bool enable);
 
     /// Returns the flag to display the percent text.
     bool GetShowPercentText() const { return showPercentText_; }
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement &dest) const override;
+    bool FilterImplicitAttributes(XMLElement &dest) const override;
 
     /// Update ProgressBar knob position & size.
     void UpdateProgressBar();

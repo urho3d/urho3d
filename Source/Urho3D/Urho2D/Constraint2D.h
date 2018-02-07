@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,16 +39,16 @@ class URHO3D_API Constraint2D : public Component
 
 public:
     /// Construct.
-    Constraint2D(Context* context);
+    explicit Constraint2D(Context* context);
     /// Destruct.
-    virtual ~Constraint2D() override;
+    ~Constraint2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Create joint.
     void CreateJoint();
     /// Release joint.
@@ -78,9 +78,9 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Return joint def.
     virtual b2JointDef* GetJointDef() { return nullptr; };
     /// Recreate joint.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,15 +68,15 @@ void Character2D::Update(float timeStep)
     // Handle wounded/killed states
     if (killed_)
         return;
-    
+
     if (wounded_)
     {
         HandleWoundedState(timeStep);
         return;
     }
 
-    AnimatedSprite2D* animatedSprite = GetComponent<AnimatedSprite2D>();
-    Input* input = GetSubsystem<Input>();
+    auto* animatedSprite = GetComponent<AnimatedSprite2D>();
+    auto* input = GetSubsystem<Input>();
 
     // Set direction
     Vector3 moveDir = Vector3::ZERO; // Reset
@@ -125,45 +125,45 @@ void Character2D::Update(float timeStep)
 
 void Character2D::HandleWoundedState(float timeStep)
 {
-    RigidBody2D* body = GetComponent<RigidBody2D>();
-    AnimatedSprite2D* animatedSprite = GetComponent<AnimatedSprite2D>();
-    
+    auto* body = GetComponent<RigidBody2D>();
+    auto* animatedSprite = GetComponent<AnimatedSprite2D>();
+
     // Play "hit" animation in loop
     if (animatedSprite->GetAnimation() != "hit")
         animatedSprite->SetAnimation("hit", LM_FORCE_LOOPED);
-    
+
     // Update timer
     timer_ += timeStep;
-    
+
     if (timer_ > 2.0f)
     {
         // Reset timer
         timer_ = 0.0f;
-        
+
         // Clear forces (should be performed by setting linear velocity to zero, but currently doesn't work)
         body->SetLinearVelocity(Vector2::ZERO);
         body->SetAwake(false);
         body->SetAwake(true);
-        
+
         // Remove particle emitter
         node_->GetChild("Emitter", true)->Remove();
-        
+
         // Update lifes UI and counter
         remainingLifes_ -= 1;
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         Text* lifeText = static_cast<Text*>(ui->GetRoot()->GetChild("LifeText", true));
         lifeText->SetText(String(remainingLifes_)); // Update lifes UI counter
-        
+
         // Reset wounded state
         wounded_ = false;
-        
+
         // Handle death
         if (remainingLifes_ == 0)
         {
             HandleDeath();
             return;
         }
-        
+
         // Re-position the character to the nearest point
         if (node_->GetPosition().x_ < 15.0f)
             node_->SetPosition(Vector3(-5.0f, 11.0f, 0.0f));
@@ -174,27 +174,27 @@ void Character2D::HandleWoundedState(float timeStep)
 
 void Character2D::HandleDeath()
 {
-    RigidBody2D* body = GetComponent<RigidBody2D>();
-    AnimatedSprite2D* animatedSprite = GetComponent<AnimatedSprite2D>();
-    
+    auto* body = GetComponent<RigidBody2D>();
+    auto* animatedSprite = GetComponent<AnimatedSprite2D>();
+
     // Set state to 'killed'
     killed_ = true;
-    
+
     // Update UI elements
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     Text* instructions = static_cast<Text*>(ui->GetRoot()->GetChild("Instructions", true));
     instructions->SetText("!!! GAME OVER !!!");
     static_cast<Text*>(ui->GetRoot()->GetChild("ExitButton", true))->SetVisible(true);
     static_cast<Text*>(ui->GetRoot()->GetChild("PlayButton", true))->SetVisible(true);
 
     // Show mouse cursor so that we can click
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
-    
+
     // Put character outside of the scene and magnify him
     node_->SetPosition(Vector3(-20.0f, 0.0f, 0.0f));
     node_->SetScale(1.2f);
-    
+
     // Play death animation once
     if (animatedSprite->GetAnimation() != "dead")
         animatedSprite->SetAnimation("dead");

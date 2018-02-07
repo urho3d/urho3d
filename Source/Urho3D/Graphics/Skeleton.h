@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -121,9 +121,9 @@ public:
     /// Return bone by index.
     Bone* GetBone(unsigned index);
     /// Return bone by name.
-    Bone* GetBone(const String& boneName);
+    Bone* GetBone(const String& name);
     /// Return bone by name.
-    Bone* GetBone(const char* boneName);
+    Bone* GetBone(const char* name);
     /// Return bone by name hash.
     Bone* GetBone(const StringHash& boneNameHash);
 

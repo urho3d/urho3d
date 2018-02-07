@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -338,7 +338,7 @@ void PhysicsWorld2D::Update(float timeStep)
 
 void PhysicsWorld2D::DrawDebugGeometry()
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    auto* debug = GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, false);
 }
@@ -470,7 +470,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
+    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -521,7 +521,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
+    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -569,7 +569,7 @@ class PointQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :
+    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :   // NOLINT(modernize-pass-by-value)
         point_(point),
         collisionMask_(collisionMask),
         rigidBody_(nullptr)
@@ -577,7 +577,7 @@ public:
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture) override
+    bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -622,7 +622,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
 
 RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask)
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     for (unsigned i = 0; i < renderer->GetNumViewports(); ++i)
     {
         Viewport* viewport = renderer->GetViewport(i);
@@ -649,7 +649,7 @@ public:
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture) override
+    bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -826,9 +826,7 @@ void PhysicsWorld2D::SendEndContactEvents()
     endContactInfos_.Clear();
 }
 
-PhysicsWorld2D::ContactInfo::ContactInfo()
-{
-}
+PhysicsWorld2D::ContactInfo::ContactInfo() = default;
 
 PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
 {

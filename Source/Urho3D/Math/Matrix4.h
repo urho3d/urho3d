@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ class URHO3D_API Matrix4
 {
 public:
     /// Construct an identity matrix.
-    Matrix4()
+    Matrix4() noexcept
 #ifndef URHO3D_SSE
        :m00_(1.0f),
         m01_(0.0f),
@@ -68,7 +68,7 @@ public:
     }
 
     /// Copy-construct from another matrix.
-    Matrix4(const Matrix4& matrix)
+    Matrix4(const Matrix4& matrix) noexcept
 #ifndef URHO3D_SSE
        :m00_(matrix.m00_),
         m01_(matrix.m01_),
@@ -97,7 +97,7 @@ public:
     }
 
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
-    Matrix4(const Matrix3& matrix) :
+    explicit Matrix4(const Matrix3& matrix) noexcept :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -121,7 +121,7 @@ public:
     Matrix4(float v00, float v01, float v02, float v03,
             float v10, float v11, float v12, float v13,
             float v20, float v21, float v22, float v23,
-            float v30, float v31, float v32, float v33) :
+            float v30, float v31, float v32, float v33) noexcept :
         m00_(v00),
         m01_(v01),
         m02_(v02),
@@ -142,7 +142,7 @@ public:
     }
 
     /// Construct from a float array.
-    explicit Matrix4(const float* data)
+    explicit Matrix4(const float* data) noexcept
 #ifndef URHO3D_SSE
        :m00_(data[0]),
         m01_(data[1]),
@@ -171,7 +171,7 @@ public:
     }
 
     /// Assign from another matrix.
-    Matrix4& operator =(const Matrix4& rhs)
+    Matrix4& operator =(const Matrix4& rhs) noexcept
     {
 #ifdef URHO3D_SSE
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
@@ -200,7 +200,7 @@ public:
     }
 
     /// Assign from a 3x3 matrix. Set the extra elements to identity.
-    Matrix4& operator =(const Matrix3& rhs)
+    Matrix4& operator =(const Matrix3& rhs) noexcept
     {
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
@@ -585,7 +585,7 @@ public:
         __m128 m1 = _mm_loadu_ps(&m10_);
         __m128 m2 = _mm_loadu_ps(&m20_);
         __m128 m3 = _mm_loadu_ps(&m30_);
-        _MM_TRANSPOSE4_PS(m0, m1, m2, m3);
+        _MM_TRANSPOSE4_PS(m0, m1, m2, m3);      // NOLINT(modernize-use-bool-literals)
         Matrix4 out;
         _mm_storeu_ps(&out.m00_, m0);
         _mm_storeu_ps(&out.m10_, m1);
@@ -677,7 +677,7 @@ public:
             __m128 m1 = _mm_loadu_ps(src + 4);
             __m128 m2 = _mm_loadu_ps(src + 8);
             __m128 m3 = _mm_loadu_ps(src + 12);
-            _MM_TRANSPOSE4_PS(m0, m1, m2, m3);
+            _MM_TRANSPOSE4_PS(m0, m1, m2, m3);      // NOLINT(modernize-use-bool-literals)
             _mm_storeu_ps(dest, m0);
             _mm_storeu_ps(dest + 4, m1);
             _mm_storeu_ps(dest + 8, m2);

@@ -293,7 +293,7 @@ function CreateUIContent(demoTitle)
     coinsUI:SetSize(50, 50)
     coinsUI.imageRect = IntRect(0, 64, 60, 128)
     coinsUI:SetAlignment(HA_LEFT, VA_TOP)
-    coinsUI:SetPosition(5, 5);
+    coinsUI:SetPosition(5, 5)
     local coinsText = coinsUI:CreateChild("Text", "CoinsText")
     coinsText:SetAlignment(HA_CENTER, VA_CENTER)
     coinsText:SetFont(font, 24)
@@ -305,7 +305,7 @@ function CreateUIContent(demoTitle)
     lifeUI.texture = cache:GetResource("Texture2D", "Urho2D/imp/imp_all.png")
     lifeUI:SetSize(70, 80)
     lifeUI:SetAlignment(HA_RIGHT, VA_TOP)
-    lifeUI:SetPosition(-5, 5);
+    lifeUI:SetPosition(-5, 5)
     local lifeText = lifeUI:CreateChild("Text", "LifeText")
     lifeText:SetAlignment(HA_CENTER, VA_CENTER)
     lifeText:SetFont(font, 24)
@@ -415,7 +415,7 @@ function ReloadScene(reInit)
     scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/" .. filename .. ".xml")
     -- After loading we have to reacquire the character scene node, as it has been recreated
     -- Simply find by name as there's only one of them
-    character2DNode = scene_:GetChild("Imp", true);
+    character2DNode = scene_:GetChild("Imp", true)
     if character2DNode == nil then
         return
     end

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,16 +64,16 @@ class URHO3D_API CrowdManager : public Component
 
 public:
     /// Construct.
-    CrowdManager(Context* context);
+    explicit CrowdManager(Context* context);
     /// Destruct.
-    virtual ~CrowdManager() override;
+    ~CrowdManager() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Draw the agents' pathing debug data.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
@@ -160,7 +160,7 @@ protected:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Update the crowd simulation.
     void Update(float delta);
     /// Get the detour crowd agent.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/ProcessUtils.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
 
@@ -39,9 +40,7 @@ TypeInfo::TypeInfo(const char* typeName, const TypeInfo* baseTypeInfo) :
 {
 }
 
-TypeInfo::~TypeInfo()
-{
-}
+TypeInfo::~TypeInfo() = default;
 
 bool TypeInfo::IsTypeOf(StringHash type) const
 {
@@ -530,7 +529,6 @@ void Object::RemoveEventSender(Object* sender)
         }
     }
 }
-
 
 Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
 {

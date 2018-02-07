@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,7 @@ AnimationStateTrack::AnimationStateTrack() :
 {
 }
 
-AnimationStateTrack::~AnimationStateTrack()
-{
-}
+AnimationStateTrack::~AnimationStateTrack() = default;
 
 AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     model_(model),
@@ -102,9 +100,7 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
 }
 
 
-AnimationState::~AnimationState()
-{
-}
+AnimationState::~AnimationState() = default;
 
 void AnimationState::SetStartBone(Bone* startBone)
 {
@@ -466,7 +462,7 @@ void AnimationState::ApplyToModel()
         // Do not apply if zero effective weight or the bone has animation disabled
         if (Equals(finalWeight, 0.0f) || !stateTrack.bone_->animated_)
             continue;
-            
+
         ApplyTrack(stateTrack, finalWeight, true);
     }
 }
@@ -534,7 +530,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
         if (channelMask & CHANNEL_SCALE)
             newScale = keyFrame->scale_;
     }
-    
+
     if (blendingMode_ == ABM_ADDITIVE) // not ABM_LERP
     {
         if (channelMask & CHANNEL_POSITION)
@@ -567,7 +563,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
                 newScale = node->GetScale().Lerp(newScale, weight);
         }
     }
-    
+
     if (silent)
     {
         if (channelMask & CHANNEL_POSITION)

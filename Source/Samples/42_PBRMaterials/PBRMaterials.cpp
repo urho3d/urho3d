@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,11 +76,11 @@ void PBRMaterials::Start()
 
 void PBRMaterials::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use sliders to change Roughness and Metallic\n"
         "Hold RMB and use WASD keys and mouse to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
@@ -94,7 +94,7 @@ void PBRMaterials::CreateInstructions()
 
 void PBRMaterials::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
 #ifdef URHO3D_ANGELSCRIPT
     // The scene uses an AngelScript component for animation. Instantiate the subsystem if possible
@@ -109,7 +109,7 @@ void PBRMaterials::CreateScene()
     scene_->LoadXML(*file);
 
     Node* sphereWithDynamicMatNode = scene_->GetChild("SphereWithDynamicMat");
-    StaticModel* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
+    auto* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
     dynamicMaterial_ = staticModel->GetMaterial(0);
 
     Node* zoneNode = scene_->GetChild("Zone");
@@ -127,11 +127,11 @@ void PBRMaterials::CreateScene()
 
 void PBRMaterials::CreateUI()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Set up global UI style into the root UI element
-    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     ui->GetRoot()->SetDefaultStyle(style);
 
     // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
@@ -140,7 +140,7 @@ void PBRMaterials::CreateUI()
     cursor->SetStyleAuto();
     ui->SetCursor(cursor);
     // Set starting position of the cursor at the rendering window center
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
     roughnessLabel_ = ui->GetRoot()->CreateChild<Text>();
@@ -158,7 +158,7 @@ void PBRMaterials::CreateUI()
     ambientLabel_->SetPosition(370, 150);
     ambientLabel_->SetTextEffect(TE_SHADOW);
 
-    Slider* roughnessSlider = ui->GetRoot()->CreateChild<Slider>();
+    auto* roughnessSlider = ui->GetRoot()->CreateChild<Slider>();
     roughnessSlider->SetStyleAuto();
     roughnessSlider->SetPosition(50, 50);
     roughnessSlider->SetSize(300, 20);
@@ -166,7 +166,7 @@ void PBRMaterials::CreateUI()
     SubscribeToEvent(roughnessSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleRoughnessSliderChanged));
     roughnessSlider->SetValue(0.5f);
 
-    Slider* metallicSlider = ui->GetRoot()->CreateChild<Slider>();
+    auto* metallicSlider = ui->GetRoot()->CreateChild<Slider>();
     metallicSlider->SetStyleAuto();
     metallicSlider->SetPosition(50, 100);
     metallicSlider->SetSize(300, 20);
@@ -174,7 +174,7 @@ void PBRMaterials::CreateUI()
     SubscribeToEvent(metallicSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleMetallicSliderChanged));
     metallicSlider->SetValue(0.5f);
 
-    Slider* ambientSlider = ui->GetRoot()->CreateChild<Slider>();
+    auto* ambientSlider = ui->GetRoot()->CreateChild<Slider>();
     ambientSlider->SetStyleAuto();
     ambientSlider->SetPosition(50, 150);
     ambientSlider->SetSize(300, 20);
@@ -207,8 +207,8 @@ void PBRMaterials::HandleAmbientSliderChanged(StringHash eventType, VariantMap& 
 
 void PBRMaterials::SetupViewport()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     renderer->SetHDRRendering(true);
 
@@ -235,8 +235,8 @@ void PBRMaterials::SubscribeToEvents()
 void PBRMaterials::MoveCamera(float timeStep)
 {
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    UI* ui = GetSubsystem<UI>();
-    Input* input = GetSubsystem<Input>();
+    auto* ui = GetSubsystem<UI>();
+    auto* input = GetSubsystem<Input>();
     ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
 
     // Do not move if the UI has a focused element

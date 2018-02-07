@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,9 +52,9 @@ class UIElement3D : public UIElement
     URHO3D_OBJECT(UIElement3D, UIElement);
 public:
     /// Construct.
-    UIElement3D(Context* context) : UIElement(context) { }
+    explicit UIElement3D(Context* context) : UIElement(context) { }
     /// Destruct.
-    virtual ~UIElement3D() override = default;
+    ~UIElement3D() override = default;
     /// Set UIComponent which is using this element as root element.
     void SetNode(Node* node) { node_ = node; }
     /// Set active viewport through which this element is rendered. If viewport is not set, it defaults to first viewport.
@@ -74,16 +74,16 @@ public:
             return result;
 
         Scene* scene = node_->GetScene();
-        StaticModel* model = node_->GetComponent<StaticModel>();
+        auto* model = node_->GetComponent<StaticModel>();
         if (scene == nullptr || model == nullptr)
             return result;
 
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer == nullptr)
             return result;
 
         // \todo Always uses the first viewport, in case there are multiple
-        Octree* octree = scene->GetComponent<Octree>();
+        auto* octree = scene->GetComponent<Octree>();
         if (viewport_ == nullptr)
             viewport_ = renderer->GetViewportForScene(scene, 0);
 
@@ -104,7 +104,7 @@ public:
         IntRect rect = viewport_->GetRect();
         if (rect == IntRect::ZERO)
         {
-            Graphics* graphics = GetSubsystem<Graphics>();
+            auto* graphics = GetSubsystem<Graphics>();
             rect.right_ = graphics->GetWidth();
             rect.bottom_ = graphics->GetHeight();
         }
@@ -145,8 +145,8 @@ protected:
 };
 
 UIComponent::UIComponent(Context* context)
-    : Component(context)
-    , viewportIndex_(0)
+    : Component(context),
+    viewportIndex_(0)
 {
     texture_ = context_->CreateObject<Texture2D>();
     texture_->SetFilterMode(FILTER_BILINEAR);
@@ -169,9 +169,7 @@ UIComponent::UIComponent(Context* context)
     rootElement_->SetSize(UICOMPONENT_DEFAULT_TEXTURE_SIZE, UICOMPONENT_DEFAULT_TEXTURE_SIZE);
 }
 
-UIComponent::~UIComponent()
-{
-}
+UIComponent::~UIComponent() = default;
 
 void UIComponent::RegisterObject(Context* context)
 {
@@ -199,8 +197,8 @@ void UIComponent::OnNodeSet(Node* node)
     rootElement_->SetNode(node);
     if (node)
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        StaticModel* model = node->GetComponent<StaticModel>();
+        auto* renderer = GetSubsystem<Renderer>();
+        auto* model = node->GetComponent<StaticModel>();
         rootElement_->SetViewport(renderer->GetViewportForScene(GetScene(), viewportIndex_));
         if (model == nullptr)
             model_ = model = node->CreateComponent<StaticModel>();
@@ -242,7 +240,7 @@ void UIComponent::SetViewportIndex(unsigned int index)
     viewportIndex_ = index;
     if (Scene* scene = GetScene())
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         Viewport* viewport = renderer->GetViewportForScene(scene, index);
         rootElement_->SetViewport(viewport);
     }

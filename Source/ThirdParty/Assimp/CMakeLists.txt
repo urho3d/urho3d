@@ -778,7 +778,7 @@ SET( zlib_SRCS
 SOURCE_GROUP( zlib FILES ${zlib_SRCS})
 
 SET ( openddl_parser_SRCS
-  contrib/openddlparser/code/OpenDDLExport.cpp 
+  contrib/openddlparser/code/OpenDDLExport.cpp
   contrib/openddlparser/code/OpenDDLCommon.cpp
   contrib/openddlparser/code/OpenDDLParser.cpp
   contrib/openddlparser/code/DDLNode.cpp
@@ -901,6 +901,11 @@ ELSE (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
 set (TARGET_NAME Assimp)
+
+# This target is added as dependency for AssetImporter target which may have clang-tidy setup at that scope
+# So, revert that here in order to exclude Assimp linter warnings/errors from ours
+reset_lint ()
+
 list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)   # Since we only build AssetImporter as a single-arch native tool, there is no point to build Assimp as universal binary library
 setup_library ()
 

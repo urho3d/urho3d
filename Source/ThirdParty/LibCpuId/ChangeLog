@@ -1,0 +1,48 @@
+Version 0.1.0 (2008-10-15):
+	* Initial public release
+
+Version 0.1.1 (2009-07-06):
+	* Added intel_fn11 fields to cpu_raw_data_t to handle
+	  new processor topology enumeration required on Core i7
+	* Support for Intel Nehalem architecture CPUs (Core i7, Xeon i7)
+
+Version 0.1.2 (2009-09-26):
+	* Added support for MSR reading through self-extracting kernel driver
+	  on Win32.
+
+Version 0.1.3 (2010-04-20):
+	* Added support for greater more accurate CPU clock measurements with
+	  cpu_clock_by_ic()
+
+Version 0.2.0 (2011-10-11):
+	* Support for AMD Bulldozer CPUs, 128-bit SSE unit size checking.
+	  A backwards-incompatible change, since the sizeof cpu_id_t is now
+	  different.
+
+Version 0.2.1 (2012-05-26):
+	* Support for Ivy Bridge, and detecting the presence of the RdRand
+	  instruction.
+
+Version 0.2.2 (2015-11-04):
+	* Support for newer processors up to Haswell and Vishera
+	* Fix clock detection in cpu_clock_by_ic() for Bulldozer
+	* Support for detection of AVX/AVX2/BMI1/BMI2
+	* More entries supported in cpu_msrinfo()
+	* Rename of some CPU codenames, made more consistent
+	* *BSD and Solaris support (unofficial)
+
+Version 0.3.0 (2016-07-09):
+	* A backwards-incompatible change, since the sizeof cpu_raw_data_t and
+	  cpu_id_t are now different.
+	* Support for processors up to Skylake.
+	* Fix clock detection in cpu_clock_by_ic() for Skylake.
+	* Support up to 8 subleaf entries for CPUID leaf 04 and detection
+	  of L4 cache.
+	* MSR functions supported on FreeBSD.
+	* INFO_VOLTAGE request supported by cpu_msrinfo().
+
+Version 0.4.0 (2016-09-30):
+	* A backwards-incompatible change, since the sizeof cpu_raw_data_t and
+	  cpu_id_t are now different.
+	* Better detection of AMD clock multiplier with msrinfo.
+	* Support for Intel SGX detection

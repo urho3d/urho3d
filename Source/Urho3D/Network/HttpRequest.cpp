@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -201,7 +201,7 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 #ifdef URHO3D_THREADING
     mutex_.Acquire();
 
-    unsigned char* destPtr = (unsigned char*)dest;
+    auto* destPtr = (unsigned char*)dest;
     unsigned sizeLeft = size;
     unsigned totalRead = 0;
 

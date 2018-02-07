@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,22 +45,22 @@ class URHO3D_API StaticModel : public Drawable
 
 public:
     /// Construct.
-    StaticModel(Context* context);
+    explicit StaticModel(Context* context);
     /// Destruct.
-    virtual ~StaticModel() override;
+    ~StaticModel() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame) override;
+    void UpdateBatches(const FrameInfo& frame) override;
     /// Return the geometry for a specific LOD level.
-    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
+    Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles() override;
+    unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
-    virtual bool DrawOcclusion(OcclusionBuffer* buffer) override;
+    bool DrawOcclusion(OcclusionBuffer* buffer) override;
 
     /// Set model.
     virtual void SetModel(Model* model);
@@ -79,8 +79,10 @@ public:
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
 
+    /// Return material from the first geometry, assuming all the geometries use the same material.
+    virtual Material* GetMaterial() const { return GetMaterial(0); }
     /// Return material by geometry index.
-    virtual Material* GetMaterial(unsigned index = 0) const;
+    virtual Material* GetMaterial(unsigned index) const;
 
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
@@ -101,7 +103,7 @@ public:
 
 protected:
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
     /// Set number of geometries.

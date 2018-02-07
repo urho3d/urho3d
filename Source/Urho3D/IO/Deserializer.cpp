@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,7 @@ Deserializer::Deserializer(unsigned size) :
 {
 }
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 unsigned Deserializer::SeekRelative(int delta)
 {
@@ -303,7 +301,7 @@ ResourceRefList Deserializer::ReadResourceRefList()
 
 Variant Deserializer::ReadVariant()
 {
-    VariantType type = (VariantType)ReadUByte();
+    auto type = (VariantType)ReadUByte();
     return ReadVariant(type);
 }
 

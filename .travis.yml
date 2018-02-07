@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ before_script:
   - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); fi
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   # Travis-CI has a special case handling for release tag where it checks out directly from the tag branch instead of the default 'master' branch
-  - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]]; then export SITE_UPDATE=1; fi; if [[ "$CC" == "gcc" ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
+  - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 2 ]]; then export SITE_UPDATE=1; fi; if [[ "$CC" == "gcc" ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
   - if [[ $LINUX ]]; then
       if [[ "$URHO3D_64BIT" == "0" ]]; then
         export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu;
@@ -70,7 +70,7 @@ before_script:
 script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ $LINUX ]] && [[ ! "$URHO3D_64BIT" == "0" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
 after_script:
   - rake ci_teardown_cache
-  - if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
+  - if [[ ${TRAVIS_JOB_NUMBER##*.} == 2 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 # Below are our custom data to preset build stages for other documents in this YAML stream, we do this because YAML anchor cannot be referenced across document boundary
@@ -137,18 +137,20 @@ matrix:
       stage: debug build configuration
       addons: *pulseaudio
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=Debug
-      script: rake ci && rake ci_timer
+      script: &ci rake ci && rake ci_timer
     - <<: *debug-build-stage
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
-    - &debug-build-stage-clang
-      <<: *debug-build-stage
-      compiler: clang
-    - <<: *debug-build-stage-clang
-      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
 # TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' stages here
-    - stage: lint (to be implemented)
+    - stage: lint
       <<: *base
-      script: true  # Using clang-tidy or something like that or using CMake/clang-tidy integration (see <LANG>_CLANG_TIDY CMake property)
+      env: URHO3D_LINT=1
+      before_script: git clone --depth 1 -b incoming https://github.com/urho3d/fastcomp-clang.git && export PATH=$(pwd)/fastcomp-clang/bin:$PATH
+      script: *ci
+
+stages:
+  - lint
+  - release build configuration
+  - debug build configuration
 
 ---
 
@@ -197,7 +199,7 @@ before_build:
         if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -notmatch "[^-]+-[^-]+-CI" -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE)))
         {
           $env:PACKAGE_UPLOAD = "1";
-          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
+          do { "Installing doxygen and graphviz..."; choco install doxygen.install graphviz >$null } until ($?);
         }
         else
         {
@@ -239,7 +241,7 @@ addons:
       name: urho3d/Urho3D
       description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
     notification_email: urho3d.travis.ci@gmail.com
-    build_command_prepend: rake cmake URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_DATABASE_SQLITE=1 URHO3D_LIB_TYPE=SHARED
+    build_command_prepend: rake cmake URHO3D_LUA=0 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_DATABASE_SQLITE=1 URHO3D_LIB_TYPE=SHARED
     build_command: rake make numjobs=4
     branch_pattern: .*Coverity-Scan$
 env:
@@ -322,13 +324,13 @@ env:
     - &armeabi-v7a-static ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC             # Using default native API Level android-9
     - &armeabi-v7a-shared ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
-    - &x86_64-static ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21    # Using default native API level android-21
-    - &x86_64-shared ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
-    - &x86-static ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21   # At least android-12 is needed when LuaJIT is on
-    - &x86-shared ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21    # Using default native API level android-21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21   # At least android-12 is needed when LuaJIT is on
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
-    - &arm64-v8a-static ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1 # Using default native API level android-21
-    - &arm64-v8a-shared ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
+    - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1 # Using default native API level android-21
+    - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
 stage: release build configuration
 before_script:
   # Temporarily disable the test to build the APK as Travis-CI Trusty beta VM has not yet setup the environment for Android properly
@@ -357,18 +359,6 @@ matrix:
       script: rake ci && rake ci_timer
     - <<: *debug-build-stage
       env: [*armeabi-v7a-shared, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86_64-static, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86_64-shared, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86-static, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*x86-shared, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*arm64-v8a-static, CMAKE_BUILD_TYPE=Debug]
-    - <<: *debug-build-stage
-      env: [*arm64-v8a-shared, CMAKE_BUILD_TYPE=Debug]
     - stage: housekeep
 
 ---
@@ -555,27 +545,17 @@ before_script:
   - if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
   - brew update
   - which cmake >/dev/null 2>&1 || cmake=cmake
-  - travis_retry brew install ccache doxygen graphviz $cmake
+  - if [[ $MAKEFILE ]]; then ccache=ccache; fi
+  - travis_retry brew install doxygen graphviz $cmake $ccache
   - if [[ ! $cmake ]]; then brew outdated cmake || brew upgrade cmake; fi
-  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) >/dev/null && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd >/dev/null && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
+  - if [[ $ccache ]]; then export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH; fi
+  - if [[ $XCODE ]]; then unset USE_CCACHE && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
 script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 matrix:
   fast_finish: true
-  include:
-    - &package-stage
-      stage: package
-      condition: PACKAGE_UPLOAD
-      env: *tvOS
-    - <<: *package-stage
-      env: *iOS
-    - <<: *package-stage
-      env: *macOS-STATIC
-    - <<: *package-stage
-      env: *macOS-SHARED
-    - stage: housekeep
+  include: [stage: housekeep]
 
 ...
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -778,7 +778,7 @@ bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
     if (size < bytes.Size())
         return false;
 
-    unsigned char* destBytes = (unsigned char*)dest;
+    auto* destBytes = (unsigned char*)dest;
     for (unsigned i = 0; i < bytes.Size(); ++i)
         destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
@@ -1058,18 +1058,14 @@ bool XPathResultSet::Empty() const
     return resultSet_ ? resultSet_->empty() : true;
 }
 
-XPathQuery::XPathQuery()
-{
-}
+XPathQuery::XPathQuery() = default;
 
 XPathQuery::XPathQuery(const String& queryString, const String& variableString)
 {
     SetQuery(queryString, variableString);
 }
 
-XPathQuery::~XPathQuery()
-{
-}
+XPathQuery::~XPathQuery() = default;
 
 void XPathQuery::Bind()
 {
@@ -1163,7 +1159,7 @@ void XPathQuery::Clear()
     query_.Reset();
 }
 
-bool XPathQuery::EvaluateToBool(XMLElement element) const
+bool XPathQuery::EvaluateToBool(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return false;
@@ -1172,7 +1168,7 @@ bool XPathQuery::EvaluateToBool(XMLElement element) const
     return query_->evaluate_boolean(node);
 }
 
-float XPathQuery::EvaluateToFloat(XMLElement element) const
+float XPathQuery::EvaluateToFloat(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return 0.0f;
@@ -1181,7 +1177,7 @@ float XPathQuery::EvaluateToFloat(XMLElement element) const
     return (float)query_->evaluate_number(node);
 }
 
-String XPathQuery::EvaluateToString(XMLElement element) const
+String XPathQuery::EvaluateToString(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return String::EMPTY;
@@ -1195,7 +1191,7 @@ String XPathQuery::EvaluateToString(XMLElement element) const
     return result;
 }
 
-XPathResultSet XPathQuery::Evaluate(XMLElement element) const
+XPathResultSet XPathQuery::Evaluate(const XMLElement& element) const
 {
     if (!query_ || ((!element.GetFile() || !element.GetNode()) && !element.GetXPathNode()))
         return XPathResultSet();

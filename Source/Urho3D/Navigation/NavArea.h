@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,14 @@ class URHO3D_API NavArea : public Component
 
 public:
     /// Construct.
-    NavArea(Context*);
+    explicit NavArea(Context*);
     /// Destruct.
-    virtual ~NavArea() override;
+    ~NavArea() override;
     /// Register object factory and attributes.
     static void RegisterObject(Context*);
 
     /// Render debug geometry for the bounds.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Get the area id for this volume.
     unsigned GetAreaID() const { return (unsigned)areaID_; }

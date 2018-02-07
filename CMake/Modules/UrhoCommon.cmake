@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -96,14 +96,18 @@ elseif (TVOS)
     unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
 elseif (XCODE)
     set (CMAKE_OSX_SYSROOT macosx)    # Set Base SDK to "Latest OS X"
-    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    if (CMAKE_OSX_DEPLOYMENT_TARGET)
+        if (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
+            message (FATAL_ERROR "The minimum supported CMAKE_OSX_DEPLOYMENT_TARGET is 10.9.")
+        endif ()
+    else ()
         # If not set, set to current running build system OS version by default
         execute_process (COMMAND sw_vers -productVersion OUTPUT_VARIABLE CURRENT_OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
         string (REGEX REPLACE ^\([^.]+\\.[^.]+\).* \\1 CMAKE_OSX_DEPLOYMENT_TARGET ${CURRENT_OSX_VERSION})
-        set (CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_OSX_DEPLOYMENT_TARGET} CACHE STRING "Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.5 due to constraint from SDL library")
+        set (CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_OSX_DEPLOYMENT_TARGET} CACHE STRING "Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.9")
     endif ()
     if (DEPLOYMENT_TARGET_SAVED AND NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL DEPLOYMENT_TARGET_SAVED)
-        set (CMAKE_OSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET_SAVED} CACHE STRING "Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.5 due to constraint from SDL library" FORCE)
+        set (CMAKE_OSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET_SAVED} CACHE STRING "Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.9" FORCE)
         message (FATAL_ERROR "CMAKE_OSX_DEPLOYMENT_TARGET cannot be changed after the initial configuration/generation. "
             "Auto reverting to its initial value. If you wish to change it then the build tree would have to be regenerated from scratch.")
     endif ()
@@ -606,6 +610,10 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ARM_CFLAGS}")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ARM_CFLAGS}")
         else ()
+            if (NOT XCODE AND NOT WEB)
+                set (CMAKE_C_FLAGS "-mtune=generic ${CMAKE_C_FLAGS}")
+                set (CMAKE_CXX_FLAGS "-mtune=generic ${CMAKE_CXX_FLAGS}")
+            endif ()
             if (URHO3D_SSE AND NOT XCODE AND NOT WEB)
                 # This may influence the effective SSE level when URHO3D_SSE is on as well
                 set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (non-ARM platform only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors")
@@ -1910,6 +1918,26 @@ macro (setup_test)
             add_test (NAME ${ARG_NAME} COMMAND ${TARGET_NAME} ${ARG_OPTIONS})
         endif ()
     endif ()
+endmacro ()
+
+# Macro for setting up linter
+macro (setup_lint)
+    if (URHO3D_LINT)
+        find_program (CLANG_TIDY clang-tidy NO_CMAKE_FIND_ROOT_PATH)
+        if (CLANG_TIDY)
+            set (URHO3D_PCH 0)
+            set (CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY} -config=)
+            set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
+        else ()
+            message (FATAL_ERROR "Ensure clang-tidy host tool is installed and can be found in the PATH environment variable.")
+        endif ()
+    endif ()
+endmacro ()
+
+# Macro for resetting the linter (intended to be called in a child scope where its parent scope has the linter setup)
+macro (reset_lint)
+    unset (CMAKE_CXX_CLANG_TIDY)
+    unset (CMAKE_EXPORT_COMPILE_COMMANDS)
 endmacro ()
 
 # Set common binary output directory if not already set (note that this module can be included in an external project which may already have DEST_RUNTIME_DIR preset)

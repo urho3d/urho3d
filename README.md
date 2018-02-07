@@ -38,6 +38,7 @@ Urho3D development, contributions and bugfixes by:
 - Stanislav Demyanovich
 - Rainer Deyke
 - Josh Engebretson
+- Nicholas Farshidmehr
 - Simon Flores
 - Manuel Freiberger
 - Chris Friesen
@@ -65,6 +66,7 @@ Urho3D development, contributions and bugfixes by:
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
+- Pavel Matcula
 - Xavier Maupeu
 - Iain Merrick
 - Justin Miller
@@ -184,9 +186,8 @@ Urho3D uses the following third-party libraries:
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
 - FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
-- jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
-- libcpuid 0.4.0 (https://github.com/anrieff/libcpuid)
+- libcpuid 0.4.0+ (https://github.com/anrieff/libcpuid)
 - Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
 - LZ4 1.7.5 (https://github.com/lz4/lz4)
@@ -200,10 +201,10 @@ Urho3D uses the following third-party libraries:
 - SDL 2.0.7 (https://www.libsdl.org)
 - SQLite 3.20.1 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
-- stb_image 2.12 (https://nothings.org)
-- stb_image_write 1.02 (https://nothings.org)
-- stb_rect_pack 0.08 (https://nothings.org)
-- stb_vorbis 1.09 (https://nothings.org)
+- stb_image 2.18 (https://nothings.org)
+- stb_image_write 1.08 (https://nothings.org)
+- stb_rect_pack 0.11 (https://nothings.org)
+- stb_vorbis 1.13b (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 - WebP (https://chromium.googlesource.com/webm/libwebp)
 

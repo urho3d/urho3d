@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,7 +83,7 @@ struct Folder
 /// File.
 struct File
 {
-    File(Folder* folder);
+    explicit File(Folder* folder);
     ~File();
 
     bool Load(const pugi::xml_node& node);
@@ -210,7 +210,7 @@ struct Timeline
 };
 
 /// Curve type.
-enum CurveType 
+enum CurveType
 {
     INSTANT = 0,
     LINEAR,
@@ -221,7 +221,7 @@ enum CurveType
 /// Timeline key.
 struct TimelineKey
 {
-    TimelineKey(Timeline* timeline);
+    explicit TimelineKey(Timeline* timeline);
     virtual ~TimelineKey();
 
     virtual ObjectType GetObjectType() const = 0;
@@ -250,7 +250,7 @@ struct SpatialInfo
     float alpha_;
     int spin;
 
-    SpatialInfo(float x = 0.0f, float y = 0.0f, float angle = 0.0f, float scale_x = 1, float scale_y = 1, float a = 1, int spin = 1);
+    SpatialInfo(float x, float y, float angle, float scale_x, float scale_y, float a = 1, int spin = 1);
     SpatialInfo UnmapFromParent(const SpatialInfo& parentInfo) const;
     void Interpolate(const SpatialInfo& other, float t);
 };
@@ -260,11 +260,11 @@ struct SpatialTimelineKey : TimelineKey
 {
     SpatialInfo info_;
 
-    SpatialTimelineKey(Timeline* timeline);
-    virtual ~SpatialTimelineKey() override;
+    explicit SpatialTimelineKey(Timeline* timeline);
+    ~SpatialTimelineKey() override;
 
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
     SpatialTimelineKey& operator=(const SpatialTimelineKey& rhs);
 };
 
@@ -274,13 +274,14 @@ struct BoneTimelineKey : SpatialTimelineKey
     float length_;
     float width_;
 
-    BoneTimelineKey(Timeline* timeline);
-    virtual ~BoneTimelineKey() override;
+    explicit BoneTimelineKey(Timeline* timeline);
+    ~BoneTimelineKey() override;
 
-    virtual ObjectType GetObjectType() const override { return BONE; }
-    virtual TimelineKey* Clone() const override;
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
+    ObjectType GetObjectType() const override { return BONE; }
+
+    TimelineKey* Clone() const override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
     BoneTimelineKey& operator=(const BoneTimelineKey& rhs);
 };
 
@@ -296,13 +297,14 @@ struct SpriteTimelineKey : SpatialTimelineKey
     /// Run time data.
     int zIndex_;
 
-    SpriteTimelineKey(Timeline* timeline);
-    virtual ~SpriteTimelineKey() override;
+    explicit SpriteTimelineKey(Timeline* timeline);
+    ~SpriteTimelineKey() override;
 
-    virtual ObjectType GetObjectType() const override { return SPRITE; }
-    virtual TimelineKey* Clone() const override;
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
+    ObjectType GetObjectType() const override { return SPRITE; }
+
+    TimelineKey* Clone() const override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
     SpriteTimelineKey& operator=(const SpriteTimelineKey& rhs);
 };
 

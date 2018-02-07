@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,15 +39,15 @@ class URHO3D_API Obstacle : public Component
 
 public:
     /// Construct.
-    Obstacle(Context*);
+    explicit Obstacle(Context*);
     /// Destruct.
-    virtual ~Obstacle() override;
+    ~Obstacle() override;
 
     /// Register Obstacle with engine context.
     static void RegisterObject(Context*);
 
     /// Update the owning mesh when enabled status has changed.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Get the height of this obstacle.
     float GetHeight() const { return height_; }
@@ -65,17 +65,17 @@ public:
     unsigned GetObstacleID() const { return obstacleId_; }
 
     /// Render debug information.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Simplified rendering of debug information for script usage.
     void DrawDebugGeometry(bool depthTest);
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned, identify our DynamicNavigationMesh.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
     /// Handle navigation mesh tile added.
     void HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData);
 

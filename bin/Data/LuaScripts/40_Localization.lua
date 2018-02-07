@@ -164,7 +164,7 @@ end
 
 -- You can manually change texts, sprites and other aspects of the game when language is changed
 function HandleChangeLanguage(eventType, eventData)
-    local windowTitle = ui.root:GetChild("WindowTitle", true);
+    local windowTitle = ui.root:GetChild("WindowTitle", true)
     windowTitle.text = localization:Get("title") .. " (" ..
                            localization.languageIndex .. " " ..
                            localization.language .. ")"

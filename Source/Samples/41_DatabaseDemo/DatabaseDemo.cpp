@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,7 @@ void DatabaseDemo::Start()
 
     // Show the console by default, make it large. Console will show the text edit field when there is at least one
     // subscriber for the console command event
-    Console* console = GetSubsystem<Console>();
+    auto* console = GetSubsystem<Console>();
     console->SetNumRows((unsigned)(GetSubsystem<Graphics>()->GetHeight() / 16));
     console->SetNumBufferedRows(2 * console->GetNumRows());
     console->SetCommandInterpreter(GetTypeName());
@@ -182,7 +182,7 @@ void DatabaseDemo::HandleInput(const String& input)
             else if (setting == "connstr")
             {
                 String newConnectionString(input.Substring(input.Find(" ", input.Find("connstr")) + 1));
-                Database* database = GetSubsystem<Database>();
+                auto* database = GetSubsystem<Database>();
                 DbConnection* newConnection = database->Connect(newConnectionString);
                 if (newConnection)
                 {

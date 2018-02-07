@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ void Urho2DIsometricDemo::Start()
 
     // Create the UI content
     sample2D_->CreateUIContent("ISOMETRIC 2.5D DEMO", character2D_->remainingLifes_, character2D_->remainingCoins_);
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     Button* playButton = static_cast<Button*>(ui->GetRoot()->GetChild("PlayButton", true));
     SubscribeToEvent(playButton, E_RELEASED, URHO3D_HANDLER(Urho2DIsometricDemo, HandlePlayButton));
 
@@ -108,29 +108,29 @@ void Urho2DIsometricDemo::CreateScene()
     // Create the Octree, DebugRenderer and PhysicsWorld2D components to the scene
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-    PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
+    auto* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
     physicsWorld->SetGravity(Vector2(0.0f, 0.0f)); // Neutralize gravity as the character will always be grounded
 
     // Create camera
     cameraNode_ = scene_->CreateChild("Camera");
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
     camera->SetZoom(2.0f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (2.0) is set for full visibility at 1280x800 resolution)
 
     // Setup the viewport for displaying the scene
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, camera));
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     renderer->SetViewport(0, viewport);
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Create tile map from tmx file
-    TmxFile2D* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/Tilesets/atrium.tmx");
+    auto* tmxFile = cache->GetResource<TmxFile2D>("Urho2D/Tilesets/atrium.tmx");
     SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap"));
-    TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>();
+    auto* tileMap = tileMapNode->CreateComponent<TileMap2D>();
     tileMap->SetTmxFile(tmxFile);
     const TileMapInfo2D& info = tileMap->GetInfo();
 
@@ -151,11 +151,11 @@ void Urho2DIsometricDemo::CreateScene()
     // Instantiate coins to pick at each placeholder of "Coins" layer (placeholders for coins are Rectangle objects)
     TileMapLayer2D* coinsLayer = tileMap->GetLayer(tileMap->GetNumLayers() - 3);
     sample2D_->PopulateCoins(coinsLayer);
-    
+
     // Init coins counters
     character2D_->remainingCoins_ = coinsLayer->GetNumObjects();
     character2D_->maxCoins_ = coinsLayer->GetNumObjects();
-    
+
     // Check when scene is rendered
     SubscribeToEvent(E_ENDRENDERING, URHO3D_HANDLER(Urho2DIsometricDemo, HandleSceneRendered));
 }
@@ -163,18 +163,18 @@ void Urho2DIsometricDemo::CreateScene()
 void Urho2DIsometricDemo::HandleCollisionBegin(StringHash eventType, VariantMap& eventData)
 {
     // Get colliding node
-    Node* hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEA].GetPtr());
+    auto* hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEA].GetPtr());
     if (hitNode->GetName() == "Imp")
         hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEB].GetPtr());
     String nodeName = hitNode->GetName();
     Node* character2DNode = scene_->GetChild("Imp", true);
-    
+
     // Handle coins picking
     if (nodeName == "Coin")
     {
         hitNode->Remove();
         character2D_->remainingCoins_ -= 1;
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         if (character2D_->remainingCoins_ == 0)
         {
             Text* instructions = static_cast<Text*>(ui->GetRoot()->GetChild("Instructions", true));
@@ -184,13 +184,13 @@ void Urho2DIsometricDemo::HandleCollisionBegin(StringHash eventType, VariantMap&
         coinsText->SetText(String(character2D_->remainingCoins_)); // Update coins UI counter
         sample2D_->PlaySoundEffect("Powerup.wav");
     }
-    
+
     // Handle interactions with enemies
     if (nodeName == "Orc")
     {
-        AnimatedSprite2D* animatedSprite = character2DNode->GetComponent<AnimatedSprite2D>();
+        auto* animatedSprite = character2DNode->GetComponent<AnimatedSprite2D>();
         float deltaX = character2DNode->GetPosition().x_ - hitNode->GetPosition().x_;
-        
+
         // Orc killed if character is fighting in its direction when the contact occurs
         if (animatedSprite->GetAnimation() == "attack" && (deltaX < 0 == animatedSprite->GetFlipX()))
         {
@@ -210,7 +210,7 @@ void Urho2DIsometricDemo::HandleCollisionBegin(StringHash eventType, VariantMap&
                 character2D_->wounded_ = true;
                 if (nodeName == "Orc")
                 {
-                    Mover* orc = static_cast<Mover*>(hitNode->GetComponent<Mover>());
+                    auto* orc = static_cast<Mover*>(hitNode->GetComponent<Mover>());
                     orc->fightTimer_ = 1;
                 }
                 sample2D_->SpawnEffect(character2DNode);
@@ -242,7 +242,7 @@ void Urho2DIsometricDemo::SubscribeToEvents()
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
-    
+
     // Subscribe to Box2D contact listeners
     SubscribeToEvent(E_PHYSICSBEGINCONTACT2D, URHO3D_HANDLER(Urho2DIsometricDemo, HandleCollisionBegin));
 }
@@ -255,7 +255,7 @@ void Urho2DIsometricDemo::HandleUpdate(StringHash eventType, VariantMap& eventDa
     if (cameraNode_)
         sample2D_->Zoom(cameraNode_->GetComponent<Camera>());
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Toggle debug geometry with 'Z' key
     if (input->GetKeyPress(KEY_Z))
@@ -282,11 +282,11 @@ void Urho2DIsometricDemo::HandlePostRenderUpdate(StringHash eventType, VariantMa
 {
     if (drawDebug_)
     {
-        PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
+        auto* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
         physicsWorld->DrawDebugGeometry();
 
         Node* tileMapNode = scene_->GetChild("TileMap", true);
-        TileMap2D* map = tileMapNode->GetComponent<TileMap2D>();
+        auto* map = tileMapNode->GetComponent<TileMap2D>();
         map->DrawDebugGeometry(scene_->GetComponent<DebugRenderer>(), false);
     }
 }
@@ -315,7 +315,7 @@ void Urho2DIsometricDemo::ReloadScene(bool reInit)
     }
 
     // Update lifes UI
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     Text* lifeText = static_cast<Text*>(ui->GetRoot()->GetChild("LifeText", true));
     lifeText->SetText(String(lifes));
 
@@ -327,7 +327,7 @@ void Urho2DIsometricDemo::ReloadScene(bool reInit)
 void Urho2DIsometricDemo::HandlePlayButton(StringHash eventType, VariantMap& eventData)
 {
     // Remove fullscreen UI and unfreeze the scene
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     if (static_cast<Text*>(ui->GetRoot()->GetChild("FullUI", true)))
     {
         ui->GetRoot()->GetChild("FullUI", true)->Remove();
@@ -346,7 +346,7 @@ void Urho2DIsometricDemo::HandlePlayButton(StringHash eventType, VariantMap& eve
     playButton->SetVisible(false);
 
     // Hide mouse cursor
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     input->SetMouseVisible(false);
 }
 

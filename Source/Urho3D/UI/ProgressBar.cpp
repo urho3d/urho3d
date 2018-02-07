@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,9 +53,7 @@ ProgressBar::ProgressBar(Context * context) :
     UpdateProgressBar();
 }
 
-ProgressBar::~ProgressBar()
-{
-}
+ProgressBar::~ProgressBar() = default;
 
 void ProgressBar::RegisterObject(Context * context)
 {
@@ -74,9 +72,9 @@ void ProgressBar::OnResize(const IntVector2& /*newSize*/, const IntVector2& /*de
     UpdateProgressBar();
 }
 
-void ProgressBar::SetOrientation(Orientation type)
+void ProgressBar::SetOrientation(Orientation orientation)
 {
-    orientation_ = type;
+    orientation_ = orientation;
     UpdateProgressBar();
 }
 
@@ -146,14 +144,14 @@ void ProgressBar::UpdateProgressBar()
     {
         if (orientation_ == O_HORIZONTAL)
         {
-            int loadingBarLength = (int) Max((float) GetWidth() * value_ / range_,
+            auto loadingBarLength = (int) Max((float) GetWidth() * value_ / range_,
                                              (float) (border.left_ + border.right_));
             knob_->SetSize(loadingBarLength, GetHeight());
             knob_->SetPosition(Clamp(0, 0, GetWidth() - knob_->GetWidth()), 0);
         }
         else
         {
-            int loadingBarLength = (int) Max((float) GetHeight() * value_ / range_,
+            auto loadingBarLength = (int) Max((float) GetHeight() * value_ / range_,
                                              (float) (border.top_ + border.bottom_));
             knob_->SetSize(GetWidth(), loadingBarLength);
             knob_->SetPosition(0, Clamp(0, 0, GetHeight() - knob_->GetHeight()));
@@ -168,7 +166,7 @@ void ProgressBar::UpdateProgressBar()
     // Update the text.
     loadingText_->SetStyle(loadingPercentStyle_);
     loadingText_->SetAlignment(HA_CENTER, VA_CENTER);
-    loadingText_->SetText(Urho3D::ToString("%d %%", (int)((value_ / range_) * 100.0f + 0.5f)));
+    loadingText_->SetText(Urho3D::ToString("%d %%", RoundToInt((value_ / range_) * 100.0f)));
 }
 
 }

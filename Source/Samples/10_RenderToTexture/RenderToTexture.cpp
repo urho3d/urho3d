@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,7 @@ void RenderToTexture::Start()
 
 void RenderToTexture::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     {
         // Create the scene which will be rendered to a texture
@@ -88,7 +88,7 @@ void RenderToTexture::CreateScene()
 
         // Create a Zone for ambient light & fog control
         Node* zoneNode = rttScene_->CreateChild("Zone");
-        Zone* zone = zoneNode->CreateComponent<Zone>();
+        auto* zone = zoneNode->CreateComponent<Zone>();
         // Set same volume as the Octree, set a close bluish fog and some ambient light
         zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
         zone->SetAmbientColor(Color(0.05f, 0.1f, 0.15f));
@@ -104,23 +104,23 @@ void RenderToTexture::CreateScene()
             boxNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(200.0f) - 100.0f, Random(200.0f) - 100.0f));
             // Orient using random pitch, yaw and roll Euler angles
             boxNode->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
-            StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+            auto* boxObject = boxNode->CreateComponent<StaticModel>();
             boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
             boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
 
             // Add our custom Rotator component which will rotate the scene node each frame, when the scene sends its update event.
             // Simply set same rotation speed for all objects
-            Rotator* rotator = boxNode->CreateComponent<Rotator>();
+            auto* rotator = boxNode->CreateComponent<Rotator>();
             rotator->SetRotationSpeed(Vector3(10.0f, 20.0f, 30.0f));
         }
 
         // Create a camera for the render-to-texture scene. Simply leave it at the world origin and let it observe the scene
         rttCameraNode_ = rttScene_->CreateChild("Camera");
-        Camera* camera = rttCameraNode_->CreateComponent<Camera>();
+        auto* camera = rttCameraNode_->CreateComponent<Camera>();
         camera->SetFarClip(100.0f);
 
         // Create a point light to the camera scene node
-        Light* light = rttCameraNode_->CreateComponent<Light>();
+        auto* light = rttCameraNode_->CreateComponent<Light>();
         light->SetLightType(LIGHT_POINT);
         light->SetRange(30.0f);
     }
@@ -134,7 +134,7 @@ void RenderToTexture::CreateScene()
 
         // Create a Zone component for ambient lighting & fog control
         Node* zoneNode = scene_->CreateChild("Zone");
-        Zone* zone = zoneNode->CreateComponent<Zone>();
+        auto* zone = zoneNode->CreateComponent<Zone>();
         zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
         zone->SetAmbientColor(Color(0.1f, 0.1f, 0.1f));
         zone->SetFogStart(100.0f);
@@ -143,7 +143,7 @@ void RenderToTexture::CreateScene()
         // Create a directional light without shadows
         Node* lightNode = scene_->CreateChild("DirectionalLight");
         lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
-        Light* light = lightNode->CreateComponent<Light>();
+        auto* light = lightNode->CreateComponent<Light>();
         light->SetLightType(LIGHT_DIRECTIONAL);
         light->SetColor(Color(0.2f, 0.2f, 0.2f));
         light->SetSpecularIntensity(1.0f);
@@ -156,7 +156,7 @@ void RenderToTexture::CreateScene()
                 Node* floorNode = scene_->CreateChild("FloorTile");
                 floorNode->SetPosition(Vector3(x * 20.5f, -0.5f, y * 20.5f));
                 floorNode->SetScale(Vector3(20.0f, 1.0f, 20.f));
-                StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
+                auto* floorObject = floorNode->CreateComponent<StaticModel>();
                 floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
                 floorObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
             }
@@ -168,7 +168,7 @@ void RenderToTexture::CreateScene()
             Node* boxNode = scene_->CreateChild("ScreenBox");
             boxNode->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
             boxNode->SetScale(Vector3(21.0f, 16.0f, 0.5f));
-            StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+            auto* boxObject = boxNode->CreateComponent<StaticModel>();
             boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
             boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
 
@@ -176,7 +176,7 @@ void RenderToTexture::CreateScene()
             screenNode->SetPosition(Vector3(0.0f, 10.0f, -0.27f));
             screenNode->SetRotation(Quaternion(-90.0f, 0.0f, 0.0f));
             screenNode->SetScale(Vector3(20.0f, 0.0f, 15.0f));
-            StaticModel* screenObject = screenNode->CreateComponent<StaticModel>();
+            auto* screenObject = screenNode->CreateComponent<StaticModel>();
             screenObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
 
             // Create a renderable texture (1024x768, RGB format), enable bilinear filtering on it
@@ -205,7 +205,7 @@ void RenderToTexture::CreateScene()
 
         // Create the camera which we will move around. Limit far clip distance to match the fog
         cameraNode_ = scene_->CreateChild("Camera");
-        Camera* camera = cameraNode_->CreateComponent<Camera>();
+        auto* camera = cameraNode_->CreateComponent<Camera>();
         camera->SetFarClip(300.0f);
 
         // Set an initial position for the camera scene node above the plane
@@ -215,11 +215,11 @@ void RenderToTexture::CreateScene()
 
 void RenderToTexture::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -231,7 +231,7 @@ void RenderToTexture::CreateInstructions()
 
 void RenderToTexture::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -244,7 +244,7 @@ void RenderToTexture::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;

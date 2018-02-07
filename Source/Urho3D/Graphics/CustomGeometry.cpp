@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,9 +56,7 @@ CustomGeometry::CustomGeometry(Context* context) :
     SetNumGeometries(1);
 }
 
-CustomGeometry::~CustomGeometry()
-{
-}
+CustomGeometry::~CustomGeometry() = default;
 
 void CustomGeometry::RegisterObject(Context* context)
 {
@@ -351,7 +349,7 @@ void CustomGeometry::Commit()
 
     if (totalVertices)
     {
-        unsigned char* dest = (unsigned char*)vertexBuffer_->Lock(0, totalVertices, true);
+        auto* dest = (unsigned char*)vertexBuffer_->Lock(0, totalVertices, true);
         if (dest)
         {
             unsigned vertexStart = 0;
@@ -484,7 +482,7 @@ void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
 
 void CustomGeometry::SetMaterialsAttr(const ResourceRefList& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < value.names_.Size(); ++i)
         SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }

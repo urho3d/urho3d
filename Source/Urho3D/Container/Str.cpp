@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -285,7 +285,7 @@ String::Iterator String::Replace(const String::Iterator& start, const String::It
     unsigned pos = (unsigned)(start - Begin());
     if (pos >= length_)
         return End();
-    unsigned length = (unsigned)(end - start);
+    auto length = (unsigned)(end - start);
     Replace(pos, length, replaceWith);
 
     return Begin() + pos;
@@ -373,7 +373,7 @@ String::Iterator String::Insert(const String::Iterator& dest, const String::Iter
     unsigned pos = (unsigned)(dest - Begin());
     if (pos > length_)
         pos = length_;
-    unsigned length = (unsigned)(end - start);
+    auto length = (unsigned)(end - start);
     Replace(pos, 0, &(*start), length);
 
     return Begin() + pos;
@@ -409,7 +409,7 @@ String::Iterator String::Erase(const String::Iterator& start, const String::Iter
     unsigned pos = (unsigned)(start - Begin());
     if (pos >= length_)
         return End();
-    unsigned length = (unsigned)(end - start);
+    auto length = (unsigned)(end - start);
     Erase(pos, length);
 
     return Begin() + pos;
@@ -438,7 +438,7 @@ void String::Resize(unsigned newLength)
             while (capacity_ < newLength + 1)
                 capacity_ += (capacity_ + 1) >> 1;
 
-            char* newBuffer = new char[capacity_];
+            auto* newBuffer = new char[capacity_];
             // Move the existing data to the new buffer, then delete the old buffer
             if (length_)
                 CopyChars(newBuffer, buffer_, length_);
@@ -459,7 +459,7 @@ void String::Reserve(unsigned newCapacity)
     if (newCapacity == capacity_)
         return;
 
-    char* newBuffer = new char[newCapacity];
+    auto* newBuffer = new char[newCapacity];
     // Move the existing data to the new buffer, then delete the old buffer
     CopyChars(newBuffer, buffer_, length_ + 1);
     if (capacity_)
@@ -938,7 +938,7 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
     }
 }
 
-#define GET_NEXT_CONTINUATION_BYTE(ptr) *ptr; if ((unsigned char)*ptr < 0x80 || (unsigned char)*ptr >= 0xc0) return '?'; else ++ptr;
+#define GET_NEXT_CONTINUATION_BYTE(ptr) *(ptr); if ((unsigned char)*(ptr) < 0x80 || (unsigned char)*(ptr) >= 0xc0) return '?'; else ++(ptr);
 
 unsigned String::DecodeUTF8(const char*& src)
 {
@@ -1013,9 +1013,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 {
     if (src == nullptr)
         return 0;
-    
+
     unsigned short word1 = *src++;
-    
+
     // Check if we are at a low surrogate
     if (word1 >= 0xdc00 && word1 < 0xe000)
     {
@@ -1023,7 +1023,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             ++src;
         return '?';
     }
-    
+
     if (word1 < 0xd800 || word1 >= 0xe000)
         return word1;
     else
@@ -1059,7 +1059,7 @@ Vector<String> String::Split(const char* str, char separator, bool keepEmptyStri
     const ptrdiff_t splitLen = strEnd - str;
     if (splitLen > 0 || keepEmptyStrings)
         ret.Push(String(str, splitLen));
-    
+
     return ret;
 }
 
@@ -1087,7 +1087,7 @@ String& String::AppendWithFormat(const char* formatString, ...)
 String& String::AppendWithFormatArgs(const char* formatString, va_list args)
 {
     int pos = 0, lastPos = 0;
-    int length = (int)strlen(formatString);
+    auto length = (int)strlen(formatString);
 
     while (true)
     {
@@ -1196,8 +1196,8 @@ int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
     {
         for (;;)
         {
-            char l = (char)tolower(*lhs);
-            char r = (char)tolower(*rhs);
+            auto l = (char)tolower(*lhs);
+            auto r = (char)tolower(*rhs);
             if (!l || !r)
                 return l ? 1 : (r ? -1 : 0);
             if (l < r)
@@ -1247,7 +1247,7 @@ WString::WString(const String& str) :
 #ifdef _WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
-    
+
     unsigned byteOffset = 0;
     while (byteOffset < str.Length())
     {
@@ -1255,9 +1255,9 @@ WString::WString(const String& str) :
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
         neededSize += dest - temp;
     }
-    
+
     Resize(neededSize);
-    
+
     byteOffset = 0;
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())
@@ -1287,7 +1287,7 @@ void WString::Resize(unsigned newLength)
     }
     else
     {
-        wchar_t* newBuffer = new wchar_t[newLength + 1];
+        auto* newBuffer = new wchar_t[newLength + 1];
         if (buffer_)
         {
             unsigned copyLength = length_ < newLength ? length_ : newLength;

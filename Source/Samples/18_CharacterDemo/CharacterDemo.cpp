@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,7 @@ CharacterDemo::CharacterDemo(Context* context) :
     Character::RegisterObject(context);
 }
 
-CharacterDemo::~CharacterDemo()
-{
-}
+CharacterDemo::~CharacterDemo() = default;
 
 void CharacterDemo::Start()
 {
@@ -88,7 +86,7 @@ void CharacterDemo::Start()
 
 void CharacterDemo::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -99,13 +97,13 @@ void CharacterDemo::CreateScene()
     // Create camera and define viewport. We will be doing load / save, so it's convenient to create the camera outside the scene,
     // so that it won't be destroyed and recreated, and we don't have to redefine the viewport on load
     cameraNode_ = new Node(context_);
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
     GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, scene_, camera));
 
     // Create static scene content. First create a zone for ambient lighting and fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
     zone->SetFogStart(100.0f);
@@ -115,7 +113,7 @@ void CharacterDemo::CreateScene()
     // Create a directional light with cascaded shadow mapping
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.3f, -0.5f, 0.425f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
@@ -126,15 +124,15 @@ void CharacterDemo::CreateScene()
     Node* floorNode = scene_->CreateChild("Floor");
     floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
     floorNode->SetScale(Vector3(200.0f, 1.0f, 200.0f));
-    StaticModel* object = floorNode->CreateComponent<StaticModel>();
+    auto* object = floorNode->CreateComponent<StaticModel>();
     object->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
     object->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
 
-    RigidBody* body = floorNode->CreateComponent<RigidBody>();
+    auto* body = floorNode->CreateComponent<RigidBody>();
     // Use collision layer bit 2 to mark world scenery. This is what we will raycast against to prevent camera from going
     // inside geometry
     body->SetCollisionLayer(2);
-    CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
+    auto* shape = floorNode->CreateComponent<CollisionShape>();
     shape->SetBox(Vector3::ONE);
 
     // Create mushrooms of varying sizes
@@ -145,14 +143,14 @@ void CharacterDemo::CreateScene()
         objectNode->SetPosition(Vector3(Random(180.0f) - 90.0f, 0.0f, Random(180.0f) - 90.0f));
         objectNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
         objectNode->SetScale(2.0f + Random(5.0f));
-        StaticModel* object = objectNode->CreateComponent<StaticModel>();
+        auto* object = objectNode->CreateComponent<StaticModel>();
         object->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         object->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
         object->SetCastShadows(true);
 
-        RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        auto* body = objectNode->CreateComponent<RigidBody>();
         body->SetCollisionLayer(2);
-        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
+        auto* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetTriangleMesh(object->GetModel(), 0);
     }
 
@@ -166,23 +164,23 @@ void CharacterDemo::CreateScene()
         objectNode->SetPosition(Vector3(Random(180.0f) - 90.0f, Random(10.0f) + 10.0f, Random(180.0f) - 90.0f));
         objectNode->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
         objectNode->SetScale(scale);
-        StaticModel* object = objectNode->CreateComponent<StaticModel>();
+        auto* object = objectNode->CreateComponent<StaticModel>();
         object->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         object->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         object->SetCastShadows(true);
 
-        RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        auto* body = objectNode->CreateComponent<RigidBody>();
         body->SetCollisionLayer(2);
         // Bigger boxes will be heavier and harder to move
         body->SetMass(scale * 2.0f);
-        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
+        auto* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
     }
 }
 
 void CharacterDemo::CreateCharacter()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     Node* objectNode = scene_->CreateChild("Jack");
     objectNode->SetPosition(Vector3(0.0f, 1.0f, 0.0f));
@@ -190,9 +188,9 @@ void CharacterDemo::CreateCharacter()
     // spin node
     Node* adjustNode = objectNode->CreateChild("AdjNode");
     adjustNode->SetRotation( Quaternion(180, Vector3(0,1,0) ) );
-    
+
     // Create the rendering component + animation controller
-    AnimatedModel* object = adjustNode->CreateComponent<AnimatedModel>();
+    auto* object = adjustNode->CreateComponent<AnimatedModel>();
     object->SetModel(cache->GetResource<Model>("Models/Mutant/Mutant.mdl"));
     object->SetMaterial(cache->GetResource<Material>("Models/Mutant/Materials/mutant_M.xml"));
     object->SetCastShadows(true);
@@ -202,7 +200,7 @@ void CharacterDemo::CreateCharacter()
     object->GetSkeleton().GetBone("Mutant:Head")->animated_ = false;
 
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
-    RigidBody* body = objectNode->CreateComponent<RigidBody>();
+    auto* body = objectNode->CreateComponent<RigidBody>();
     body->SetCollisionLayer(1);
     body->SetMass(1.0f);
 
@@ -214,7 +212,7 @@ void CharacterDemo::CreateCharacter()
     body->SetCollisionEventMode(COLLISION_ALWAYS);
 
     // Set a capsule shape for collision
-    CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
+    auto* shape = objectNode->CreateComponent<CollisionShape>();
     shape->SetCapsule(0.7f, 1.8f, Vector3(0.0f, 0.9f, 0.0f));
 
     // Create the character logic component, which takes care of steering the rigidbody
@@ -225,11 +223,11 @@ void CharacterDemo::CreateCharacter()
 
 void CharacterDemo::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "Space to jump, F to toggle 1st/3rd person\n"
@@ -261,7 +259,7 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     if (character_)
     {
@@ -273,7 +271,7 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             touch_->UpdateTouches(character_->controls_);
 
         // Update controls using keys
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         if (!ui->GetFocusElement())
         {
             if (!touch_ || !touch_->useGyroscope_)
@@ -293,11 +291,11 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                     TouchState* state = input->GetTouch(i);
                     if (!state->touchedElement_)    // Touch on empty space
                     {
-                        Camera* camera = cameraNode_->GetComponent<Camera>();
+                        auto* camera = cameraNode_->GetComponent<Camera>();
                         if (!camera)
                             return;
 
-                        Graphics* graphics = GetSubsystem<Graphics>();
+                        auto* graphics = GetSubsystem<Graphics>();
                         character_->controls_.yaw_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.x_;
                         character_->controls_.pitch_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.y_;
                     }
@@ -349,7 +347,7 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     Node* characterNode = character_->GetNode();
 
     // Get camera lookat dir from character yaw + pitch
-    Quaternion rot = characterNode->GetRotation();
+    const Quaternion& rot = characterNode->GetRotation();
     Quaternion dir = rot * Quaternion(character_->controls_.pitch_, Vector3::RIGHT);
 
     // Turn head to camera pitch, but limit to avoid unnatural animation

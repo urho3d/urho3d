@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(Typography)
 namespace
 {
     // Tag used to find all Text elements
-    const String TEXT_TAG("Typography_text_tag");
+    const char* TEXT_TAG = "Typography_text_tag";
 }
 
 Typography::Typography(Context* context) :
@@ -59,11 +59,11 @@ void Typography::Start()
     GetSubsystem<Input>()->SetMouseVisible(true);
 
     // Load XML file containing default UI style sheet
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
 
     // Set the loaded style as default style
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     UIElement* root = ui->GetRoot();
     root->SetDefaultStyle(style);
 
@@ -143,11 +143,12 @@ void Typography::CreateText()
     container->SetLayout(LM_VERTICAL);
     uielement_->AddChild(container);
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Font* font = cache->GetResource<Font>("Fonts/BlueHighway.ttf");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/BlueHighway.ttf");
 
-    for (float size = 1; size <= 18; size += 0.5)
+    for (auto size2x = 2; size2x <= 36; ++size2x)
     {
+        auto size = size2x / 2.f;
         SharedPtr<Text> text(new Text(context_));
         text->SetText(String("The quick brown fox jumps over the lazy dog (") + String(size) + String("pt)"));
         text->SetFont(font, size);
@@ -212,13 +213,13 @@ SharedPtr<DropDownList> Typography::CreateMenu(const String& label, const char**
 
 void Typography::HandleWhiteBackground(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    auto* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
     bool checked = box->IsChecked();
 
     Color fg = checked ? Color::BLACK : Color::WHITE;
     Color bg = checked ? Color::WHITE : Color::BLACK;
 
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     Zone* zone = renderer->GetDefaultZone();
     zone->SetFogColor(bg);
 
@@ -231,17 +232,17 @@ void Typography::HandleWhiteBackground(StringHash eventType, VariantMap& eventDa
 
 void Typography::HandleForceAutoHint(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    auto* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
     bool checked = box->IsChecked();
     GetSubsystem<UI>()->SetForceAutoHint(checked);
 }
 
 void Typography::HandleSRGB(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    auto* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
     bool checked = box->IsChecked();
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (graphics->GetSRGBWriteSupport())
     {
         graphics->SetSRGB(checked);
@@ -257,21 +258,21 @@ void Typography::HandleSRGB(StringHash eventType, VariantMap& eventData)
 
 void Typography::HandleFontHintLevel(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    auto* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
     unsigned i = list->GetSelection();
     GetSubsystem<UI>()->SetFontHintLevel((FontHintLevel)i);
 }
 
 void Typography::HandleFontSubpixel(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    auto* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
     unsigned i = list->GetSelection();
     GetSubsystem<UI>()->SetFontSubpixelThreshold(i * 3);
 }
 
 void Typography::HandleFontOversampling(StringHash eventType, VariantMap& eventData)
 {
-    DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    auto* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
     unsigned i = list->GetSelection();
     GetSubsystem<UI>()->SetFontOversampling(i + 1);
 }

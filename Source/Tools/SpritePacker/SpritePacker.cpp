@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ public:
     int frameX;
     int frameY;
 
-    PackerInfo(String path_, String name_) :
+    PackerInfo(const String& path_, const String& name_) :
         path(path_),
         name(name_),
         x(0),
@@ -79,7 +79,7 @@ public:
     {
     }
 
-    virtual ~PackerInfo() override {}
+    ~PackerInfo() override = default;
 };
 
 void Help()
@@ -121,7 +121,7 @@ void Run(Vector<String>& arguments)
     SharedPtr<Context> context(new Context());
     context->RegisterSubsystem(new FileSystem(context));
     context->RegisterSubsystem(new Log(context));
-    FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
+    auto* fileSystem = context->GetSubsystem<FileSystem>();
 
     Vector<String> inputFiles;
     String outputFile;
@@ -276,7 +276,7 @@ void Run(Vector<String>& arguments)
         }
 
         // load rectangles
-        stbrp_rect* packerRects = new stbrp_rect[packerInfos.Size()];
+        auto* packerRects = new stbrp_rect[packerInfos.Size()];
         for (unsigned i = 0; i < packerInfos.Size(); ++i)
         {
             PackerInfo* packerInfo = packerInfos[i];
@@ -338,7 +338,7 @@ void Run(Vector<String>& arguments)
     spriteSheetImage.SetSize(packedWidth, packedHeight, 4);
 
     // zero out image
-    spriteSheetImage.SetData((unsigned char*)calloc(sizeof(unsigned char), packedWidth * packedHeight * 4));
+    spriteSheetImage.SetData((unsigned char*)calloc(sizeof(unsigned char), (size_t)packedWidth * packedHeight * 4));
 
     XMLFile xml(context);
     XMLElement root = xml.CreateRoot("TextureAtlas");

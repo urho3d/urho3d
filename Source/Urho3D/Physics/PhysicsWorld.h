@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -139,32 +139,32 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 
 public:
     /// Construct.
-    PhysicsWorld(Context* scontext);
+    explicit PhysicsWorld(Context* context);
     /// Destruct.
-    virtual ~PhysicsWorld() override;
+    ~PhysicsWorld() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Check if an AABB is visible for debug drawing.
-    virtual bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override;
+    bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override;
     /// Draw a physics debug line.
-    virtual void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
+    void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
     /// Log warning from the physics engine.
-    virtual void reportErrorWarning(const char* warningString) override;
+    void reportErrorWarning(const char* warningString) override;
     /// Draw a physics debug contact point. Not implemented.
-    virtual void drawContactPoint
+    void drawContactPoint
         (const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) override;
     /// Draw physics debug 3D text. Not implemented.
-    virtual void draw3dText(const btVector3& location, const char* textString) override;
+    void draw3dText(const btVector3& location, const char* textString) override;
 
     /// Set debug draw flags.
-    virtual void setDebugMode(int debugMode) override { debugMode_ = debugMode; }
+    void setDebugMode(int debugMode) override { debugMode_ = debugMode; }
 
     /// Return debug draw flags.
-    virtual int getDebugMode() const override { return debugMode_; }
+    int getDebugMode() const override { return debugMode_; }
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Step the simulation forward.
     void Update(float timeStep);
@@ -251,9 +251,9 @@ public:
     /// Remove a collision shape. Called by CollisionShape.
     void RemoveCollisionShape(CollisionShape* shape);
     /// Add a constraint to keep track of. Called by Constraint.
-    void AddConstraint(Constraint* joint);
+    void AddConstraint(Constraint* constraint);
     /// Remove a constraint. Called by Constraint.
-    void RemoveConstraint(Constraint* joint);
+    void RemoveConstraint(Constraint* constraint);
     /// Add a delayed world transform assignment. Called by RigidBody.
     void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
     /// Add debug geometry to the debug renderer.
@@ -292,7 +292,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
 
 private:
     /// Handle the scene subsystem update event, step simulation here.

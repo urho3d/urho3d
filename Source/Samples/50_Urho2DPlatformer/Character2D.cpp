@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,15 +85,15 @@ void Character2D::Update(float timeStep)
     }
 
     // Set temporary variables
-    Input* input = GetSubsystem<Input>();
-    RigidBody2D* body = GetComponent<RigidBody2D>();
-    AnimatedSprite2D* animatedSprite = GetComponent<AnimatedSprite2D>();
+    auto* input = GetSubsystem<Input>();
+    auto* body = GetComponent<RigidBody2D>();
+    auto* animatedSprite = GetComponent<AnimatedSprite2D>();
     bool onGround = false;
     bool jump = false;
 
     // Collision detection (AABB query)
     Vector2 characterHalfSize = Vector2(0.16f, 0.16f);
-    PhysicsWorld2D* physicsWorld = GetScene()->GetComponent<PhysicsWorld2D>();
+    auto* physicsWorld = GetScene()->GetComponent<PhysicsWorld2D>();
     PODVector<RigidBody2D*> collidingBodies;
     physicsWorld->GetRigidBodies(collidingBodies, Rect(node_->GetWorldPosition2D() - characterHalfSize - Vector2(0.0f, 0.1f), node_->GetWorldPosition2D() + characterHalfSize));
 
@@ -161,8 +161,8 @@ void Character2D::Update(float timeStep)
 
 void Character2D::HandleWoundedState(float timeStep)
 {
-    RigidBody2D* body = GetComponent<RigidBody2D>();
-    AnimatedSprite2D* animatedSprite = GetComponent<AnimatedSprite2D>();
+    auto* body = GetComponent<RigidBody2D>();
+    auto* animatedSprite = GetComponent<AnimatedSprite2D>();
 
     // Play "hit" animation in loop
     if (animatedSprite->GetAnimation() != "hit")
@@ -186,7 +186,7 @@ void Character2D::HandleWoundedState(float timeStep)
 
         // Update lifes UI and counter
         remainingLifes_ -= 1;
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         Text* lifeText = static_cast<Text*>(ui->GetRoot()->GetChild("LifeText", true));
         lifeText->SetText(String(remainingLifes_)); // Update lifes UI counter
 
@@ -210,21 +210,21 @@ void Character2D::HandleWoundedState(float timeStep)
 
 void Character2D::HandleDeath()
 {
-    RigidBody2D* body = GetComponent<RigidBody2D>();
-    AnimatedSprite2D* animatedSprite = GetComponent<AnimatedSprite2D>();
+    auto* body = GetComponent<RigidBody2D>();
+    auto* animatedSprite = GetComponent<AnimatedSprite2D>();
 
     // Set state to 'killed'
     killed_ = true;
 
     // Update UI elements
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     Text* instructions = static_cast<Text*>(ui->GetRoot()->GetChild("Instructions", true));
     instructions->SetText("!!! GAME OVER !!!");
     static_cast<Text*>(ui->GetRoot()->GetChild("ExitButton", true))->SetVisible(true);
     static_cast<Text*>(ui->GetRoot()->GetChild("PlayButton", true))->SetVisible(true);
 
     // Show mouse cursor so that we can click
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
     // Put character outside of the scene and magnify him

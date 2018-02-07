@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,12 +87,10 @@ using VariantMap = HashMap<StringHash, Variant>;
 struct URHO3D_API ResourceRef
 {
     /// Construct.
-    ResourceRef()
-    {
-    }
+    ResourceRef() = default;
 
     /// Construct with type only and empty id.
-    ResourceRef(StringHash type) :
+    explicit ResourceRef(StringHash type) :
         type_(type)
     {
     }
@@ -119,11 +117,7 @@ struct URHO3D_API ResourceRef
     }
 
     /// Construct from another ResourceRef.
-    ResourceRef(const ResourceRef& rhs) :
-        type_(rhs.type_),
-        name_(rhs.name_)
-    {
-    }
+    ResourceRef(const ResourceRef& rhs) = default;
 
     /// Object type.
     StringHash type_;
@@ -141,12 +135,10 @@ struct URHO3D_API ResourceRef
 struct URHO3D_API ResourceRefList
 {
     /// Construct.
-    ResourceRefList()
-    {
-    }
+    ResourceRefList() = default;
 
     /// Construct with type only.
-    ResourceRefList(StringHash type) :
+    explicit ResourceRefList(StringHash type) :
         type_(type)
     {
     }
@@ -178,13 +170,14 @@ class CustomVariantValue
 
 private:
     /// Construct from type info.
-    CustomVariantValue(const std::type_info& typeInfo) : typeInfo_(typeInfo) {}
+    explicit CustomVariantValue(const std::type_info& typeInfo) : typeInfo_(typeInfo) {}
 
 public:
     /// Construct empty.
-    CustomVariantValue() : typeInfo_(typeid(void)) { }
+    CustomVariantValue() : typeInfo_(typeid(void)) { }      // NOLINT(modernize-redundant-void-arg)
     /// Destruct.
-    virtual ~CustomVariantValue() { }
+    virtual ~CustomVariantValue() = default;
+
     /// Get the type info.
     const std::type_info& GetTypeInfo() const { return typeInfo_; }
     /// Return whether the specified type is stored.
@@ -235,7 +228,7 @@ public:
     /// Type traits.
     using Traits = CustomVariantValueTraits<T>;
     /// Construct from value.
-    CustomVariantValueImpl(const T& value) : CustomVariantValue(typeid(T)), value_(value) {}
+    explicit CustomVariantValueImpl(const T& value) : CustomVariantValue(typeid(T)), value_(value) {}
     /// Set value.
     void SetValue(const T& value) { value_ = value; }
     /// Get value.
@@ -244,7 +237,7 @@ public:
     const T& GetValue() const { return value_; }
 
     /// Assign value.
-    virtual bool Assign(const CustomVariantValue& rhs) override
+    bool Assign(const CustomVariantValue& rhs) override
     {
         if (const T* rhsValue = rhs.GetValuePtr<T>())
         {
@@ -254,22 +247,22 @@ public:
         return false;
     }
     /// Clone.
-    virtual CustomVariantValue* Clone() const override { return new ClassName(value_); }
+    CustomVariantValue* Clone() const override { return new ClassName(value_); }
     /// Placement clone.
-    virtual void Clone(void* dest) const override { new (dest) ClassName(value_); }
+    void Clone(void* dest) const override { new (dest) ClassName(value_); }
     /// Get size.
-    virtual unsigned GetSize() const override { return sizeof(ClassName); }
+    unsigned GetSize() const override { return sizeof(ClassName); }
 
     /// Compare to another custom value.
-    virtual bool Compare(const CustomVariantValue& rhs) const override
+    bool Compare(const CustomVariantValue& rhs) const override
     {
         const T* rhsValue = rhs.GetValuePtr<T>();
         return rhsValue && Traits::Compare(value_, *rhsValue);
     }
     /// Compare to zero.
-    virtual bool IsZero() const override { return Traits::IsZero(value_);}
+    bool IsZero() const override { return Traits::IsZero(value_);}
     /// Convert custom value to string.
-    virtual String ToString() const override { return Traits::ToString(value_); }
+    String ToString() const override { return Traits::ToString(value_); }
 
 private:
     /// Value.
@@ -289,38 +282,38 @@ union VariantValue
     int int_;
     bool bool_;
     float float_;
+    double double_;
+    long long int64_;
+    void* voidPtr_;
+    WeakPtr<RefCounted> weakPtr_;
     Vector2 vector2_;
     Vector3 vector3_;
     Vector4 vector4_;
-    Quaternion quaternion_;
-    Color color_;
-    String string_;
-    PODVector<unsigned char> buffer_;
-    void* voidPtr_;
-    ResourceRef resourceRef_;
-    ResourceRefList resourceRefList_;
-    VariantVector variantVector_;
-    VariantMap variantMap_;
-    IntRect intRect_;
+    Rect rect_;
     IntVector2 intVector2_;
-    WeakPtr<RefCounted> weakPtr_;
+    IntVector3 intVector3_;
+    IntRect intRect_;
     Matrix3* matrix3_;
     Matrix3x4* matrix3x4_;
     Matrix4* matrix4_;
-    double double_;
+    Quaternion quaternion_;
+    Color color_;
+    String string_;
     StringVector stringVector_;
-    Rect rect_;
-    IntVector3 intVector3_;
-    long long int64_;
+    VariantVector variantVector_;
+    VariantMap variantMap_;
+    PODVector<unsigned char> buffer_;
+    ResourceRef resourceRef_;
+    ResourceRefList resourceRefList_;
     CustomVariantValue* customValueHeap_;
     CustomVariantValue customValueStack_;
 
     /// Construct uninitialized.
-    VariantValue() { }
+    VariantValue() { }      // NOLINT(modernize-use-equals-default)
     /// Non-copyable.
     VariantValue(const VariantValue& value) = delete;
     /// Destruct.
-    ~VariantValue() { }
+    ~VariantValue() { }     // NOLINT(modernize-use-equals-default)
 };
 
 static_assert(sizeof(VariantValue) == VARIANT_VALUE_SIZE, "Unexpected size of VariantValue");
@@ -330,197 +323,197 @@ class URHO3D_API Variant
 {
 public:
     /// Construct empty.
-    Variant() { }
+    Variant() = default;
 
     /// Construct from integer.
-    Variant(int value)
+    Variant(int value)                  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from 64 bit integer.
-    Variant(long long value)
+    Variant(long long value)            // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned value)
+    Variant(unsigned value)             // NOLINT(google-explicit-constructor)
     {
         *this = (int)value;
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned long long value)
+    Variant(unsigned long long value)   // NOLINT(google-explicit-constructor)
     {
         *this = (long long)value;
     }
 
     /// Construct from a string hash (convert to integer).
-    Variant(const StringHash& value)
+    Variant(const StringHash& value)    // NOLINT(google-explicit-constructor)
     {
         *this = (int)value.Value();
     }
 
     /// Construct from a bool.
-    Variant(bool value)
+    Variant(bool value)                 // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a float.
-    Variant(float value)
+    Variant(float value)                // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a double.
-    Variant(double value)
+    Variant(double value)               // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Vector2.
-    Variant(const Vector2& value)
+    Variant(const Vector2& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Vector3.
-    Variant(const Vector3& value)
+    Variant(const Vector3& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Vector4.
-    Variant(const Vector4& value)
+    Variant(const Vector4& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a quaternion.
-    Variant(const Quaternion& value)
+    Variant(const Quaternion& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a color.
-    Variant(const Color& value)
+    Variant(const Color& value)         // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a string.
-    Variant(const String& value)
+    Variant(const String& value)        // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a C string.
-    Variant(const char* value)
+    Variant(const char* value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a buffer.
-    Variant(const PODVector<unsigned char>& value)
+    Variant(const PODVector<unsigned char>& value)      // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a %VectorBuffer and store as a buffer.
-    Variant(const VectorBuffer& value)
+    Variant(const VectorBuffer& value)  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a pointer.
-    Variant(void* value)
+    Variant(void* value)                // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a resource reference.
-    Variant(const ResourceRef& value)
+    Variant(const ResourceRef& value)   // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a resource reference list.
-    Variant(const ResourceRefList& value)
+    Variant(const ResourceRefList& value)   // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a variant vector.
-    Variant(const VariantVector& value)
+    Variant(const VariantVector& value) // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a variant map.
-    Variant(const VariantMap& value)
+    Variant(const VariantMap& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a string vector.
-    Variant(const StringVector& value)
+    Variant(const StringVector& value)  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a rect.
-    Variant(const Rect& value)
+    Variant(const Rect& value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from an integer rect.
-    Variant(const IntRect& value)
+    Variant(const IntRect& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from an IntVector2.
-    Variant(const IntVector2& value)
+    Variant(const IntVector2& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from an IntVector3.
-    Variant(const IntVector3& value)
+    Variant(const IntVector3& value)    // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
-    Variant(RefCounted* value)
+    Variant(RefCounted* value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Matrix3.
-    Variant(const Matrix3& value)
+    Variant(const Matrix3& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Matrix3x4.
-    Variant(const Matrix3x4& value)
+    Variant(const Matrix3x4& value)     // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a Matrix4.
-    Variant(const Matrix4& value)
+    Variant(const Matrix4& value)       // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from custom value.
     template <class T>
-    Variant(const CustomVariantValueImpl<T>& value)
+    Variant(const CustomVariantValueImpl<T>& value)     // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }

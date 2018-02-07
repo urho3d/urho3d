@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ static const unsigned CLIPMASK_Z_NEG = 0x20;
 
 void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
 {
-    OcclusionBuffer* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
+    auto* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
     OcclusionBatch& batch = *reinterpret_cast<OcclusionBatch*>(item->start_);
     buffer->DrawBatch(batch, threadIndex);
 }
@@ -61,9 +61,7 @@ OcclusionBuffer::OcclusionBuffer(Context* context) :
 {
 }
 
-OcclusionBuffer::~OcclusionBuffer()
-{
-}
+OcclusionBuffer::~OcclusionBuffer() = default;
 
 bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
 {
@@ -217,7 +215,7 @@ void OcclusionBuffer::DrawTriangles()
     else if (buffers_.Size() > 1)
     {
         // Threaded
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
 
         for (Vector<OcclusionBatch>::Iterator i = batches_.Begin(); i != batches_.End(); ++i)
         {
@@ -357,8 +355,8 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     vertices[7] = ModelTransform(viewProj_, worldSpaceBox.max_);
 
     // Apply a far clip relative bias
-    for (unsigned i = 0; i < 8; ++i)
-        vertices[i].z_ -= OCCLUSION_RELATIVE_BIAS;
+    for (auto& vertice : vertices)
+        vertice.z_ -= OCCLUSION_RELATIVE_BIAS;
 
     // Transform to screen space. If any of the corners cross the near plane, assume visible
     float minX, maxX, minY, maxY, minZ;
@@ -387,10 +385,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     }
 
     // Expand the bounding box 1 pixel in each direction to be conservative and correct rasterization offset
-    IntRect rect(
-        (int)(minX - 1.5f), (int)(minY - 1.5f),
-        (int)(maxX + 0.5f), (int)(maxY + 0.5f)
-    );
+    IntRect rect((int)(minX - 1.5f), (int)(minY - 1.5f), RoundToInt(maxX), RoundToInt(maxY));
 
     // If the rect is outside, let frustum culling handle
     if (rect.right_ < 0 || rect.bottom_ < 0)
@@ -409,7 +404,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
         rect.bottom_ = height_ - 1;
 
     // Convert depth to integer and apply final bias
-    int z = (int)(minZ + 0.5f) - OCCLUSION_FIXED_BIAS;
+    int z = RoundToInt(minZ) - OCCLUSION_FIXED_BIAS;
 
     if (!depthHierarchyDirty_)
     {
@@ -506,7 +501,7 @@ void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, unsigned threadInde
     }
     else
     {
-        const unsigned char* srcData = (const unsigned char*)batch.vertexData_;
+        const auto* srcData = (const unsigned char*)batch.vertexData_;
 
         // 16-bit indices
         if (batch.indexSize_ == sizeof(unsigned short))
@@ -769,7 +764,7 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
 struct Gradients
 {
     /// Construct from vertices.
-    Gradients(const Vector3* vertices)
+    explicit Gradients(const Vector3* vertices)
     {
         float invdX = 1.0f / (((vertices[1].x_ - vertices[2].x_) *
                                (vertices[0].y_ - vertices[2].y_)) -
@@ -806,10 +801,10 @@ struct Edge
         float yPreStep = (float)(topY + 1) - top.y_;
         float xPreStep = slope * yPreStep;
 
-        x_ = (int)((xPreStep + top.x_) * OCCLUSION_X_SCALE + 0.5f);
-        xStep_ = (int)(slope * OCCLUSION_X_SCALE + 0.5f);
-        invZ_ = (int)(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_ + 0.5f);
-        invZStep_ = (int)(slope * gradients.dInvZdX_ + gradients.dInvZdY_ + 0.5f);
+        x_ = RoundToInt((xPreStep + top.x_) * OCCLUSION_X_SCALE);
+        xStep_ = RoundToInt(slope * OCCLUSION_X_SCALE);
+        invZ_ = RoundToInt(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_);
+        invZStep_ = RoundToInt(slope * gradients.dInvZdX_ + gradients.dInvZdY_);
     }
 
     /// X coordinate.
@@ -881,9 +876,9 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         }
     }
 
-    int topY = (int)vertices[top].y_;
-    int middleY = (int)vertices[middle].y_;
-    int bottomY = (int)vertices[bottom].y_;
+    auto topY = (int)vertices[top].y_;
+    auto middleY = (int)vertices[middle].y_;
+    auto bottomY = (int)vertices[bottom].y_;
 
     // Check for degenerate triangle
     if (topY == bottomY)
@@ -1025,7 +1020,7 @@ void OcclusionBuffer::ClearBuffer(unsigned threadIndex)
 
     int* dest = buffers_[threadIndex].data_;
     int count = width_ * height_;
-    int fillValue = (int)OCCLUSION_Z_SCALE;
+    auto fillValue = (int)OCCLUSION_Z_SCALE;
 
     while (count--)
         *dest++ = fillValue;
