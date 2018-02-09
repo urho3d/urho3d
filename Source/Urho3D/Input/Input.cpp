@@ -38,6 +38,12 @@
 #include "../UI/Text.h"
 #include "../UI/UI.h"
 
+#ifdef _WIN32
+#include "../Engine/Engine.h"
+#include "../Graphics/Renderer.h"
+#endif
+
+
 #include <SDL/SDL.h>
 
 #ifdef __EMSCRIPTEN__
@@ -293,6 +299,32 @@ int EmscriptenInput::HandleSDLEvents(void* userData, SDL_Event* event)
     return 0;
 }
 
+#endif
+
+#ifdef _WIN32
+// On Windows repaint while the window is actively being resized.
+int Win32_ResizingEventWatcher(void* data, SDL_Event* event)
+{
+    if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) 
+    {
+        SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+        if (win == (SDL_Window*)data)
+        {
+            if (Context* ctx = (Context*)SDL_GetWindowData(win, "URHO3D_CONTEXT"))
+            {
+                if (auto graphics = ctx->GetSubsystem<Graphics>())
+                {
+                    if (graphics->IsInitialized())
+                    {
+                        graphics->OnWindowResized();
+                        ctx->GetSubsystem<Engine>()->RunFrame();
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
 #endif
 
 void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
@@ -1508,6 +1540,15 @@ void Input::Initialize()
     SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(Input, HandleBeginFrame));
 #ifdef __EMSCRIPTEN__
     SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(Input, HandleEndFrame));
+#endif
+
+#ifdef _WIN32
+    // Register callback for resizing in order to repaint.
+    if (SDL_Window* window = graphics_->GetWindow())
+    {
+        SDL_SetWindowData(window, "URHO3D_CONTEXT", GetContext());
+        SDL_AddEventWatch(Win32_ResizingEventWatcher, window);
+    }
 #endif
 
     URHO3D_LOGINFO("Initialized input");
