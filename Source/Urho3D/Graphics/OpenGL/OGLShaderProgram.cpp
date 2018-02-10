@@ -277,10 +277,7 @@ bool ShaderProgram::Link()
         {
             // Store constant uniform
             String paramName = name.Substring(1);
-            ShaderParameter parameter;
-            parameter.name_ = paramName;
-            parameter.glType_ = type;
-            parameter.location_ = location;
+            ShaderParameter parameter{paramName, type, location};
             bool store = location >= 0;
 
 #ifndef GL_ES_VERSION_2_0
