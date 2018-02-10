@@ -47,20 +47,9 @@ namespace Urho3D
 
 const char* GEOMETRY_CATEGORY = "Geometry";
 
-SourceBatch::SourceBatch() :
-    distance_(0.0f),
-    geometry_(nullptr),
-    worldTransform_(&Matrix3x4::IDENTITY),
-    numWorldTransforms_(1),
-    instancingData_(nullptr),
-    geometryType_(GEOM_STATIC)
-{
-}
+SourceBatch::SourceBatch() = default;
 
-SourceBatch::SourceBatch(const SourceBatch& batch)
-{
-    *this = batch;
-}
+SourceBatch::SourceBatch(const SourceBatch& batch) = default;
 
 SourceBatch::~SourceBatch() = default;
 

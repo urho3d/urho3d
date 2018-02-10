@@ -113,5 +113,5 @@ private:
     /// Instructions text.
     SharedPtr<Text> instructionsText_;
     /// ID of own controllable object (client only.)
-    unsigned clientObjectID_;
+    unsigned clientObjectID_{};
 };

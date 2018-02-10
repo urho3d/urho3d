@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Urho2D/AnimatedSprite2D.h>
 #include <Urho3D/Urho2D/AnimationSet2D.h>
 #include <Urho3D/UI/Button.h>
@@ -32,7 +30,6 @@
 #include <Urho3D/Urho2D/CollisionPolygon2D.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
-#include <Urho3D/Urho2D/Drawable2D.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/Graphics/Graphics.h>
@@ -51,7 +48,6 @@
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Urho2D/PhysicsEvents2D.h>
-#include <Urho3D/Urho2D/PhysicsWorld2D.h>
 
 #include <Urho3D/DebugNew.h>
 

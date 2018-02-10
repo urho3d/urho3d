@@ -41,7 +41,7 @@ public:
 
 private:
     /// Starting clock value in milliseconds.
-    unsigned startTime_;
+    unsigned startTime_{};
 };
 
 /// High-resolution operating system timer used in profiling.
@@ -66,7 +66,7 @@ public:
 
 private:
     /// Starting clock value in CPU ticks.
-    long long startTime_;
+    long long startTime_{};
 
     /// High-resolution timer support flag.
     static bool supported;

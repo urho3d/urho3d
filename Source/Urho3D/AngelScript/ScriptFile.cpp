@@ -95,10 +95,7 @@ private:
 
 ScriptFile::ScriptFile(Context* context) :
     Resource(context),
-    script_(GetSubsystem<Script>()),
-    scriptModule_(nullptr),
-    compiled_(false),
-    subscribed_(false)
+    script_(GetSubsystem<Script>())
 {
 }
 

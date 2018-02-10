@@ -122,7 +122,7 @@ protected:
     asITypeInfo      *objType;
     SArrayBuffer     *buffer;
     size_t            elementSize;
-    int               subTypeId;
+    int               subTypeId{};
 
     // Constructors
     CScriptArray(asITypeInfo *ot, void *buf); // Called from script when initialized with list

@@ -235,9 +235,9 @@ private:
     /// Orthographic mode flag.
     bool orthographic_;
     /// Cached actual near clip distance.
-    mutable float projNearClip_;
+    mutable float projNearClip_{};
     /// Cached actual far clip distance.
-    mutable float projFarClip_;
+    mutable float projFarClip_{};
     /// Near clip distance.
     float nearClip_;
     /// Far clip distance.

@@ -88,21 +88,21 @@ private:
     void Clear();
 
     /// Parent component.
-    Component* owner_;
+    Component* owner_{};
     /// Spriter data.
-    SpriterData* spriterData_;
+    SpriterData* spriterData_{};
     /// Current entity.
-    Entity* entity_;
+    Entity* entity_{};
     /// Current animation.
-    Animation* animation_;
+    Animation* animation_{};
     /// Looping.
-    bool looping_;
+    bool looping_{};
     /// Root spatial info.
     SpatialInfo spatialInfo_;
     /// Current time.
-    float currentTime_;
+    float currentTime_{};
     /// Current mainline key.
-    MainlineKey* mainlineKey_;
+    MainlineKey* mainlineKey_{};
     /// Current timeline keys.
     PODVector<SpatialTimelineKey*> timelineKeys_;
 };

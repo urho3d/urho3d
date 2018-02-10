@@ -76,7 +76,7 @@ static unsigned Tick()
 #elif __EMSCRIPTEN__
     return (unsigned)emscripten_get_now();
 #else
-    struct timeval time;
+    struct timeval time{};
     gettimeofday(&time, nullptr);
     return (unsigned)(time.tv_sec * 1000 + time.tv_usec / 1000);
 #endif
@@ -96,7 +96,7 @@ static long long HiresTick()
 #elif __EMSCRIPTEN__
     return (unsigned)(emscripten_get_now()*1000.0);
 #else
-    struct timeval time;
+    struct timeval time{};
     gettimeofday(&time, nullptr);
     return time.tv_sec * 1000000LL + time.tv_usec;
 #endif
@@ -182,9 +182,7 @@ void Time::Sleep(unsigned mSec)
 #ifdef _WIN32
     ::Sleep(mSec);
 #else
-    timespec time;
-    time.tv_sec = mSec / 1000;
-    time.tv_nsec = (mSec % 1000) * 1000000;
+    timespec time{static_cast<time_t>(mSec / 1000), static_cast<long>((mSec % 1000) * 1000000)};
     nanosleep(&time, nullptr);
 #endif
 }

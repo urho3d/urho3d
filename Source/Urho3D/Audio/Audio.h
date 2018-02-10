@@ -128,19 +128,19 @@ private:
     /// Audio thread mutex.
     Mutex audioMutex_;
     /// SDL audio device ID.
-    unsigned deviceID_;
+    unsigned deviceID_{};
     /// Sample size.
-    unsigned sampleSize_;
+    unsigned sampleSize_{};
     /// Clip buffer size in samples.
-    unsigned fragmentSize_;
+    unsigned fragmentSize_{};
     /// Mixing rate.
-    int mixRate_;
+    int mixRate_{};
     /// Mixing interpolation flag.
-    bool interpolation_;
+    bool interpolation_{};
     /// Stereo flag.
-    bool stereo_;
+    bool stereo_{};
     /// Playing flag.
-    bool playing_;
+    bool playing_{};
     /// Master gain by sound source type.
     HashMap<StringHash, Variant> masterGain_;
     /// Paused sound types.

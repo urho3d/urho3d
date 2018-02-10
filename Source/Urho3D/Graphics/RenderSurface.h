@@ -151,11 +151,11 @@ private:
     /// Linked depth buffer.
     WeakPtr<RenderSurface> linkedDepthStencil_;
     /// Update mode for viewports.
-    RenderSurfaceUpdateMode updateMode_;
+    RenderSurfaceUpdateMode updateMode_{SURFACE_UPDATEVISIBLE};
     /// Update queued flag.
-    bool updateQueued_;
+    bool updateQueued_{};
     /// Multisampled resolve dirty flag.
-    bool resolveDirty_;
+    bool resolveDirty_{};
 };
 
 }

@@ -141,7 +141,7 @@ protected:
     /// Stereo panning.
     float panning_;
     /// Effective master gain.
-    float masterGain_;
+    float masterGain_{};
     /// Whether finished event should be sent on playback stop.
     bool sendFinishedEvent_;
     /// Automatic removal mode.

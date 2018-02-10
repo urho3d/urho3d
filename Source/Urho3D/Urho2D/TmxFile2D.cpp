@@ -45,10 +45,7 @@ TmxLayer2D::TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type) :
     tmxFile_(tmxFile),
     type_(type)
 {
-
 }
-
-TmxLayer2D::~TmxLayer2D() = default;
 
 TmxFile2D* TmxLayer2D::GetTmxFile() const
 {

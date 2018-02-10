@@ -205,8 +205,7 @@ class AsyncExecRequest : public Thread
 public:
     /// Construct.
     explicit AsyncExecRequest(unsigned& requestID) :
-        requestID_(requestID),
-        completed_(false)
+        requestID_(requestID)
     {
         // Increment ID for next request
         ++requestID;
@@ -225,11 +224,11 @@ public:
 
 protected:
     /// Request ID.
-    unsigned requestID_;
+    unsigned requestID_{};
     /// Exit code.
-    int exitCode_;
+    int exitCode_{};
     /// Completed flag.
-    volatile bool completed_;
+    volatile bool completed_{};
 };
 
 /// Async system command operation.
@@ -284,9 +283,7 @@ private:
 };
 
 FileSystem::FileSystem(Context* context) :
-    Object(context),
-    nextAsyncExecID_(1),
-    executeConsoleCommands_(false)
+    Object(context)
 {
     SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(FileSystem, HandleBeginFrame));
 
@@ -585,7 +582,7 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
     else
         return 0;
 #else
-    struct stat st;
+    struct stat st{};
     if (!stat(fileName.CString(), &st))
         return (unsigned)st.st_mtime;
     else
@@ -619,7 +616,7 @@ bool FileSystem::FileExists(const String& fileName) const
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
         return false;
 #else
-    struct stat st;
+    struct stat st{};
     if (stat(fixedName.CString(), &st) || st.st_mode & S_IFDIR)
         return false;
 #endif
@@ -673,7 +670,7 @@ bool FileSystem::DirExists(const String& pathName) const
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
 #else
-    struct stat st;
+    struct stat st{};
     if (stat(fixedName.CString(), &st) || !(st.st_mode & S_IFDIR))
         return false;
 #endif
@@ -781,8 +778,8 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
     newTimes.modtime = newTime;
     return _utime(fileName.CString(), &newTimes) == 0;
 #else
-    struct stat oldTime;
-    struct utimbuf newTimes;
+    struct stat oldTime{};
+    struct utimbuf newTimes{};
     if (stat(fileName.CString(), &oldTime) != 0)
         return false;
     newTimes.actime = oldTime.st_atime;
@@ -871,7 +868,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 #else
     DIR* dir;
     struct dirent* de;
-    struct stat st;
+    struct stat st{};
     dir = opendir(GetNativePath(path).CString());
     if (dir)
     {

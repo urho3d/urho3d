@@ -58,17 +58,17 @@ private:
     /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
     /// FreeType face. Non-null after creation only in dynamic mode.
-    void* face_;
+    void* face_{};
     /// Load mode.
-    int loadMode_;
+    int loadMode_{};
     /// Use subpixel glyph positioning?
-    bool subpixel_;
+    bool subpixel_{};
     /// Oversampling level.
-    int oversampling_;
+    int oversampling_{};
     /// Ascender.
-    float ascender_;
+    float ascender_{};
     /// Has mutable glyph.
-    bool hasMutableGlyph_;
+    bool hasMutableGlyph_{};
     /// Glyph area allocator.
     AreaAllocator allocator_;
 };

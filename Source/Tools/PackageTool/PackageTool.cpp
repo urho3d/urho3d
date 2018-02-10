@@ -43,9 +43,9 @@ static const unsigned COMPRESSED_BLOCK_SIZE = 32768;
 struct FileEntry
 {
     String name_;
-    unsigned offset_;
-    unsigned size_;
-    unsigned checksum_;
+    unsigned offset_{};
+    unsigned size_{};
+    unsigned checksum_{};
 };
 
 SharedPtr<Context> context_(new Context());

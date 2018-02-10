@@ -180,21 +180,21 @@ private:
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
 
     /// Internal Detour crowd object.
-    dtCrowd* crowd_;
+    dtCrowd* crowd_{};
     /// NavigationMesh for which the crowd was created.
     WeakPtr<NavigationMesh> navigationMesh_;
     /// The NavigationMesh component Id for pending crowd creation.
-    unsigned navigationMeshId_;
+    unsigned navigationMeshId_{};
     /// The maximum number of agents the crowd can manage.
-    unsigned maxAgents_;
+    unsigned maxAgents_{};
     /// The maximum radius of any agent that will be added to the crowd.
-    float maxAgentRadius_;
+    float maxAgentRadius_{};
     /// Number of query filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
-    unsigned numQueryFilterTypes_;
+    unsigned numQueryFilterTypes_{};
     /// Number of configured area in each filter type. Limit to DT_MAX_AREAS.
     PODVector<unsigned> numAreas_;
     /// Number of obstacle avoidance types configured in the crowd. Limit to DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS.
-    unsigned numObstacleAvoidanceTypes_;
+    unsigned numObstacleAvoidanceTypes_{};
 };
 
 }

@@ -57,7 +57,6 @@ const char* PHYSICS_CATEGORY = "Physics";
 extern const char* SUBSYSTEM_CATEGORY;
 
 static const int MAX_SOLVER_ITERATIONS = 256;
-static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
 
 PhysicsWorldConfig PhysicsWorld::config;
@@ -147,17 +146,7 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
 
 PhysicsWorld::PhysicsWorld(Context* context) :
     Component(context),
-    collisionConfiguration_(nullptr),
     fps_(DEFAULT_FPS),
-    maxSubSteps_(0),
-    timeAcc_(0.0f),
-    maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
-    updateEnabled_(true),
-    interpolation_(true),
-    internalEdge_(true),
-    applyingTransforms_(false),
-    simulating_(false),
-    debugRenderer_(nullptr),
     debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits)
 {
     gContactAddedCallback = CustomMaterialCombinerCallback;

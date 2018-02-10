@@ -191,11 +191,11 @@ private:
     /// Script file.
     WeakPtr<ScriptFile> scriptFile_;
     /// Script object.
-    asIScriptObject* scriptObject_;
+    asIScriptObject* scriptObject_{};
     /// Class name.
     String className_;
     /// Pointers to supported inbuilt methods.
-    asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
+    asIScriptFunction* methods_[MAX_SCRIPT_METHODS]{};
     /// Delayed method calls.
     Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.
@@ -205,9 +205,9 @@ private:
     /// Storage for attributes while script object is being hot-reloaded.
     HashMap<String, Variant> storedAttributes_;
     /// Subscribed to scene update events flag.
-    bool subscribed_;
+    bool subscribed_{};
     /// Subscribed to scene post and fixed update events flag.
-    bool subscribedPostFixed_;
+    bool subscribedPostFixed_{};
 };
 
 /// Return the active AngelScript context. Provided as a wrapper to the AngelScript API function to avoid undefined symbol error in shared library Urho3D builds.

@@ -54,28 +54,18 @@ class PackerInfo : public RefCounted
 public:
     String path;
     String name;
-    int x;
-    int y;
-    int offsetX;
-    int offsetY;
-    int width;
-    int height;
-    int frameWidth;
-    int frameHeight;
-    int frameX;
-    int frameY;
+    int x{};
+    int y{};
+    int offsetX{};
+    int offsetY{};
+    int width{};
+    int height{};
+    int frameWidth{};
+    int frameHeight{};
 
     PackerInfo(const String& path_, const String& name_) :
         path(path_),
-        name(name_),
-        x(0),
-        y(0),
-        offsetX(0),
-        offsetY(0),
-        frameWidth(0),
-        frameHeight(0),
-        frameX(0),
-        frameY(0)
+        name(name_)
     {
     }
 

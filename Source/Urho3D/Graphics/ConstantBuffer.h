@@ -65,9 +65,9 @@ private:
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Buffer byte size.
-    unsigned size_;
+    unsigned size_{};
     /// Dirty flag.
-    bool dirty_;
+    bool dirty_{};
 };
 
 }

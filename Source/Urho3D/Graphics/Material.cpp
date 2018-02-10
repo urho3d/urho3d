@@ -74,7 +74,7 @@ static const char* textureUnitNames[] =
     "lightramp",
     "lightshape",
     "shadowmap",
-    0
+    nullptr
 #endif
 };
 
@@ -196,15 +196,7 @@ void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 }
 
 Material::Material(Context* context) :
-    Resource(context),
-    auxViewFrameNumber_(0),
-    shaderParameterHash_(0),
-    alphaToCoverage_(false),
-    lineAntiAlias_(false),
-    occlusion_(true),
-    specular_(false),
-    subscribed_(false),
-    batchedParameterUpdate_(false)
+    Resource(context)
 {
     ResetToDefaults();
 }

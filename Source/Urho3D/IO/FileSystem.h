@@ -118,9 +118,9 @@ private:
     /// Async execution queue.
     List<AsyncExecRequest*> asyncExecQueue_;
     /// Next async execution ID.
-    unsigned nextAsyncExecID_;
+    unsigned nextAsyncExecID_{1};
     /// Flag for executing engine console commands as OS-specific system command. Default to true.
-    bool executeConsoleCommands_;
+    bool executeConsoleCommands_{};
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.

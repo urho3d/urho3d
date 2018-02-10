@@ -166,9 +166,9 @@ private:
     void ReleaseObject();
 
     /// Lua Script subsystem.
-    LuaScript* luaScript_;
+    LuaScript* luaScript_{};
     /// Lua state.
-    lua_State* luaState_;
+    lua_State* luaState_{};
     /// Event invoker.
     SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Script file.
@@ -178,9 +178,9 @@ private:
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
     /// Lua reference to script object.
-    int scriptObjectRef_;
+    int scriptObjectRef_{};
     /// Script object method.
-    LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
+    LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS]{};
 };
 
 }

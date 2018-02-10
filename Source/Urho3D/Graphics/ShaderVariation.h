@@ -54,7 +54,7 @@ struct ShaderParameter
     union
     {
         /// Offset in constant buffer.
-        unsigned offset_{};
+        unsigned offset_;
         /// OpenGL uniform location.
         int location_;
         /// Direct3D9 register index.
@@ -64,7 +64,7 @@ struct ShaderParameter
     union
     {
         /// Parameter size. Used only on Direct3D11 to calculate constant buffer size.
-        unsigned size_{};
+        unsigned size_;
         /// Parameter OpenGL type.
         unsigned glType_;
         /// Number of registers on Direct3D9.
@@ -157,13 +157,13 @@ private:
     /// Shader type.
     ShaderType type_;
     /// Vertex element hash for vertex shaders. Zero for pixel shaders. Note that hashing is different than vertex buffers.
-    unsigned long long elementHash_;
+    unsigned long long elementHash_{};
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
-    bool useTextureUnits_[MAX_TEXTURE_UNITS];
+    bool useTextureUnits_[MAX_TEXTURE_UNITS]{};
     /// Constant buffer sizes. 0 if a constant buffer slot is not in use.
-    unsigned constantBufferSizes_[MAX_SHADER_PARAMETER_GROUPS];
+    unsigned constantBufferSizes_[MAX_SHADER_PARAMETER_GROUPS]{};
     /// Shader bytecode. Needed for inspecting the input signature and parameters. Not used on OpenGL.
     PODVector<unsigned char> byteCode_;
     /// Shader name.

@@ -70,15 +70,11 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
 
 Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index) :
     level_(level),
-    numDrawables_(0),
     parent_(parent),
     root_(root),
     index_(index)
 {
     Initialize(box);
-
-    for (auto& child : children_)
-        child = nullptr;
 }
 
 Octant::~Octant()

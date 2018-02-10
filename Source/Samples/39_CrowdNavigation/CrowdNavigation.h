@@ -170,15 +170,15 @@ private:
     void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData);
 
     /// Flag for using navigation mesh streaming.
-    bool useStreaming_;
+    bool useStreaming_{};
     /// Streaming distance.
-    int streamingDistance_;
+    int streamingDistance_{2};
     /// Tile data.
     HashMap<IntVector2, PODVector<unsigned char> > tileData_;
     /// Added tiles.
     HashSet<IntVector2> addedTiles_;
     /// Flag for drawing debug geometry.
-    bool drawDebug_;
+    bool drawDebug_{};
     /// Instruction text UI-element.
-    Text* instructionText_;
+    Text* instructionText_{};
 };

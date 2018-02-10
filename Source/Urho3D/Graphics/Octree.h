@@ -139,7 +139,7 @@ protected:
     /// Drawable objects.
     PODVector<Drawable*> drawables_;
     /// Child octants.
-    Octant* children_[NUM_OCTANTS];
+    Octant* children_[NUM_OCTANTS]{};
     /// World bounding box center.
     Vector3 center_;
     /// World bounding box half size.
@@ -147,7 +147,7 @@ protected:
     /// Subdivision level.
     unsigned level_;
     /// Number of drawable objects in this octant and child octants.
-    unsigned numDrawables_;
+    unsigned numDrawables_{};
     /// Parent octant.
     Octant* parent_;
     /// Octree root.
@@ -159,8 +159,6 @@ protected:
 /// %Octree component. Should be added only to the root scene node
 class URHO3D_API Octree : public Component, public Octant
 {
-    friend void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex);
-
     URHO3D_OBJECT(Octree, Component);
 
 public:

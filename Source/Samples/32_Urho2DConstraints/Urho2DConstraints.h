@@ -114,7 +114,7 @@ private:
     /// Get mouse position in 2D world coordinates.
     Vector2 GetMousePositionXY();
     /// Flag for drawing debug geometry.
-    bool drawDebug_;
+    bool drawDebug_{};
     /// Camera object.
-    Camera* camera_;
+    Camera* camera_{};
 };

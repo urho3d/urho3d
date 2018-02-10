@@ -72,11 +72,11 @@ protected:
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Object pointer or name.
-    GPUObjectHandle object_;
+    GPUObjectHandle object_{};
     /// Data lost flag.
-    bool dataLost_;
+    bool dataLost_{};
     /// Data pending flag.
-    bool dataPending_;
+    bool dataPending_{};
 };
 
 }

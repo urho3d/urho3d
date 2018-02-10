@@ -94,7 +94,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
     for (unsigned i = 0; i < numFiles; ++i)
     {
         String entryName = file->ReadString();
-        PackageEntry newEntry;
+        PackageEntry newEntry{};
         newEntry.offset_ = file->ReadUInt() + startOffset;
         totalDataSize_ += (newEntry.size_ = file->ReadUInt());
         newEntry.checksum_ = file->ReadUInt();

@@ -69,9 +69,6 @@ TextureCube::TextureCube(Context* context) :
     addressModes_[COORD_U] = ADDRESS_CLAMP;
     addressModes_[COORD_V] = ADDRESS_CLAMP;
     addressModes_[COORD_W] = ADDRESS_CLAMP;
-
-    for (unsigned& memoryUse : faceMemoryUse_)
-        memoryUse = 0;
 }
 
 TextureCube::~TextureCube()

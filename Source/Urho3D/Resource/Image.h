@@ -50,41 +50,27 @@ enum CompressedFormat
 /// Compressed image mip level.
 struct CompressedLevel
 {
-    /// Construct empty.
-    CompressedLevel() :
-        data_(nullptr),
-        format_(CF_NONE),
-        width_(0),
-        height_(0),
-        depth_(0),
-        blockSize_(0),
-        dataSize_(0),
-        rowSize_(0),
-        rows_(0)
-    {
-    }
-
     /// Decompress to RGBA. The destination buffer required is width * height * 4 bytes. Return true if successful.
     bool Decompress(unsigned char* dest);
 
     /// Compressed image data.
-    unsigned char* data_;
+    unsigned char* data_{};
     /// Compression format.
-    CompressedFormat format_;
+    CompressedFormat format_{CF_NONE};
     /// Width.
-    int width_;
+    int width_{};
     /// Height.
-    int height_;
+    int height_{};
     /// Depth.
-    int depth_;
+    int depth_{};
     /// Block size in bytes.
-    unsigned blockSize_;
+    unsigned blockSize_{};
     /// Total data size in bytes.
-    unsigned dataSize_;
+    unsigned dataSize_{};
     /// Row size in bytes.
-    unsigned rowSize_;
+    unsigned rowSize_{};
     /// Number of rows.
-    unsigned rows_;
+    unsigned rows_{};
 };
 
 /// %Image resource.
@@ -221,23 +207,23 @@ private:
     static void FreeImageData(unsigned char* pixelData);
 
     /// Width.
-    int width_;
+    int width_{};
     /// Height.
-    int height_;
+    int height_{};
     /// Depth.
-    int depth_;
+    int depth_{};
     /// Number of color components.
-    unsigned components_;
+    unsigned components_{};
     /// Number of compressed mip levels.
-    unsigned numCompressedLevels_;
+    unsigned numCompressedLevels_{};
     /// Cubemap status if DDS.
-    bool cubemap_;
+    bool cubemap_{};
     /// Texture array status if DDS.
-    bool array_;
+    bool array_{};
     /// Data is sRGB.
-    bool sRGB_;
+    bool sRGB_{};
     /// Compressed format.
-    CompressedFormat compressedFormat_;
+    CompressedFormat compressedFormat_{CF_NONE};
     /// Pixel data.
     SharedArrayPtr<unsigned char> data_;
     /// Precalculated mip level image.

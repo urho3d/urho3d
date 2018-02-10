@@ -34,12 +34,9 @@
 namespace Urho3D
 {
 
-RenderSurface::RenderSurface(Texture* parentTexture) :
+RenderSurface::RenderSurface(Texture* parentTexture) :      // NOLINT(hicpp-member-init)
     parentTexture_(parentTexture),
-    surface_(nullptr),
-    updateMode_(SURFACE_UPDATEVISIBLE),
-    updateQueued_(false),
-    resolveDirty_(false)
+    surface_(nullptr)
 {
 }
 

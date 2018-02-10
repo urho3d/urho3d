@@ -34,12 +34,6 @@
 namespace Urho3D
 {
 
-FontGlyph::FontGlyph() :
-    page_(M_MAX_UNSIGNED),
-    used_(false)
-{
-}
-
 FontFace::FontFace(Font* font) :
     font_(font)
 {

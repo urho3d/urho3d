@@ -72,15 +72,15 @@ private:
     void Print(const String& output);
 
     /// Game on flag.
-    bool gameOn_;
+    bool gameOn_{};
     /// Food dispensed flag.
-    bool foodAvailable_;
+    bool foodAvailable_{};
     /// Whether ate on the previous turn.
-    bool eatenLastTurn_;
+    bool eatenLastTurn_{};
     /// Number of turns survived.
-    int numTurns_;
+    int numTurns_{};
     /// Player's hunger level.
-    int hunger_;
+    int hunger_{};
     /// Threat of Urho level.
-    int urhoThreat_;
+    int urhoThreat_{};
 };

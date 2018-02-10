@@ -39,10 +39,7 @@ namespace Urho3D
 extern const char* URHO2D_CATEGORY;
 
 Constraint2D::Constraint2D(Context* context) :
-    Component(context),
-    joint_(nullptr),
-    collideConnected_(false),
-    otherBodyNodeIDDirty_(false)
+    Component(context)
 {
 
 }

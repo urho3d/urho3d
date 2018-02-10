@@ -47,9 +47,7 @@ static const StringVector instanceNodesStructureElementNames =
 };
 
 StaticModelGroup::StaticModelGroup(Context* context) :
-    StaticModel(context),
-    nodesDirty_(false),
-    nodeIDsDirty_(false)
+    StaticModel(context)
 {
     // Initialize the default node IDs attribute
     UpdateNodeIDs();
