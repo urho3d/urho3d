@@ -461,7 +461,7 @@ bool TextureCube::Create()
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
     // Disable mip levels from the multisample texture. Rather create them to the resolve texture
-    textureDesc.MipLevels = multiSample_ == 1 ? levels_ : 1;
+    textureDesc.MipLevels = (multiSample_ == 1 && usage_ != TEXTURE_DYNAMIC) ? levels_ : 1;
     textureDesc.ArraySize = MAX_CUBEMAP_FACES;
     textureDesc.SampleDesc.Count = (UINT)multiSample_;
     textureDesc.SampleDesc.Quality = graphics_->GetImpl()->GetMultiSampleQuality(textureDesc.Format, multiSample_);
@@ -507,7 +507,7 @@ bool TextureCube::Create()
     memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
     resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-    resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
+    resourceViewDesc.Texture2D.MipLevels = usage_ != TEXTURE_DYNAMIC ? (UINT)levels_ : 1;
 
     // Sample the resolve texture if created, otherwise the original
     ID3D11Resource* viewObject = resolveTexture_ ? (ID3D11Resource*)resolveTexture_ : (ID3D11Resource*)object_.ptr_;
