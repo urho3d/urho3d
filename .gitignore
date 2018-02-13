@@ -64,6 +64,18 @@ generated/
 /*.project
 /*.workspace
 
+# Visual Studio files
+.vs
+*.vcxproj*
+*.sln
+*.sdf
+*.suo
+/ipch/
+*.tlog
+Debug/
+Release/
+Win32/
+
 # Android project settings
 /Android/local.properties
 
