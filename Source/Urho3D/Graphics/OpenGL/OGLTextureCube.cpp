@@ -481,7 +481,7 @@ bool TextureCube::Create()
         URHO3D_LOGERROR("Failed to create texture");
 
     // Set mipmapping
-    if (usage_ == TEXTURE_DEPTHSTENCIL)
+    if (usage_ == TEXTURE_DEPTHSTENCIL || usage_ == TEXTURE_DYNAMIC)
         requestedLevels_ = 1;
     else if (usage_ == TEXTURE_RENDERTARGET)
     {

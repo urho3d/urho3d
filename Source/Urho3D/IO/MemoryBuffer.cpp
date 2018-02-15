@@ -54,7 +54,7 @@ MemoryBuffer::MemoryBuffer(PODVector<unsigned char>& data) :
 
 MemoryBuffer::MemoryBuffer(const PODVector<unsigned char>& data) :
     AbstractFile(data.Size()),
-    buffer_(data.Begin().ptr_),
+    buffer_(const_cast<unsigned char*>(data.Begin().ptr_)),
     readOnly_(true)
 {
 }
