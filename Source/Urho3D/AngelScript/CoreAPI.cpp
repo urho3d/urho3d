@@ -775,6 +775,10 @@ static void ConstructTimer(Timer* ptr)
 {
     new(ptr) Timer();
 }
+static void ConstructTimerDuration(unsigned timeoutDuration, Timer* ptr)
+{
+    new(ptr) Timer(timeoutDuration);
+}
 
 static Time* GetTime()
 {
@@ -800,8 +804,13 @@ static void RegisterTimer(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Timer", sizeof(Timer), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTimer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Timer", "uint GetMSec(bool)", asMETHOD(Timer, GetMSec), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Timer", "void Reset()", asMETHOD(Timer, Reset), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructTimerDuration), asCALL_CDECL_OBJLAST);
+
+    engine->RegisterObjectMethod("Timer", "uint GetMSec(bool, uint = 0)", asMETHOD(Timer, GetMSec), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Timer", "uint GetStartTime()", asMETHOD(Timer, GetStartTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Timer", "uint GetTimeoutDuration()", asMETHOD(Timer, GetTimeoutDuration), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Timer", "bool IsTimedOut()", asMETHOD(Timer, IsTimedOut), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Timer", "void Reset(uint)", asMETHOD(Timer, Reset), asCALL_THISCALL);
 
     RegisterObject<Time>(engine, "Time");
     engine->RegisterObjectMethod("Time", "uint get_frameNumber() const", asMETHOD(Time, GetFrameNumber), asCALL_THISCALL);
