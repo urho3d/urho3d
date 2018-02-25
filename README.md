@@ -97,6 +97,7 @@ Urho3D development, contributions and bugfixes by:
 - Yusuf Umar
 - Mateus Vendramini
 - Daniel Wiberg
+- Kaikai Zhang
 - Steven Zhang
 - AGreatFish
 - BlueMagnificent
