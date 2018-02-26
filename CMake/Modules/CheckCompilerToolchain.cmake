@@ -171,7 +171,7 @@ if (MSVC)
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     set (NATIVE_64BIT ${CMAKE_CL_64})
     # We only support one target arch when using MSVC for now and make certain assumptions as per documentation instead of querying the compiler
-    foreach (VAR X86 HAVE_MMX HAVE_SSE HAVE_SSE2 HAVE_SSE3 HAVE_SSE4 HAVE_AVX RTTI EXCEPTIONS IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE IS_TRIVIALLY_DESTRUCTIBLE IS_TRIVIALLY_COPY_ASSIGNABLE IS_TRIVIALLY_COPY_CONSTRUCTIBLE)
+    foreach (VAR X86 HAVE_MMX HAVE_SSE HAVE_SSE2 RTTI EXCEPTIONS IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE IS_TRIVIALLY_DESTRUCTIBLE IS_TRIVIALLY_COPY_ASSIGNABLE IS_TRIVIALLY_COPY_CONSTRUCTIBLE)
         set (${VAR} 1)
     endforeach ()
 else ()
