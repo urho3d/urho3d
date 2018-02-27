@@ -117,9 +117,9 @@ bool Model::BeginLoad(Deserializer& source)
             for (unsigned j = 0; j < numElements; ++j)
             {
                 unsigned elementDesc = source.ReadUInt();
-                auto type = (VertexElementType)(elementDesc & 0xff);
-                auto semantic = (VertexElementSemantic)((elementDesc >> 8) & 0xff);
-                auto index = (unsigned char)((elementDesc >> 16) & 0xff);
+                auto type = (VertexElementType)(elementDesc & 0xffu);
+                auto semantic = (VertexElementSemantic)((elementDesc >> 8u) & 0xffu);
+                auto index = (unsigned char)((elementDesc >> 16u) & 0xffu);
                 desc.vertexElements_.Push(VertexElement(type, semantic, index));
             }
         }
@@ -382,8 +382,8 @@ bool Model::Save(Serializer& dest) const
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
             unsigned elementDesc = ((unsigned)elements[j].type_) |
-                (((unsigned)elements[j].semantic_) << 8) |
-                (((unsigned)elements[j].index_) << 16);
+                (((unsigned)elements[j].semantic_) << 8u) |
+                (((unsigned)elements[j].index_) << 16u);
             dest.WriteUInt(elementDesc);
         }
         dest.WriteUInt(morphRangeStarts_[i]);

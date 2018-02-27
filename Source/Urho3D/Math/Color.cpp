@@ -37,7 +37,7 @@ unsigned Color::ToUInt() const
     auto g = (unsigned)Clamp(((int)(g_ * 255.0f)), 0, 255);
     auto b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
     auto a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
-    return (a << 24) | (b << 16) | (g << 8) | r;
+    return (a << 24u) | (b << 16u) | (g << 8u) | r;
 }
 
 Vector3 Color::ToHSL() const
@@ -66,10 +66,10 @@ Vector3 Color::ToHSV() const
 
 void Color::FromUInt(unsigned color)
 {
-    a_ = ((color >> 24) & 0xff) / 255.0f;
-    b_ = ((color >> 16) & 0xff) / 255.0f;
-    g_ = ((color >> 8)  & 0xff) / 255.0f;
-    r_ = ((color >> 0)  & 0xff) / 255.0f;
+    a_ = ((color >> 24u) & 0xffu) / 255.0f;
+    b_ = ((color >> 16u) & 0xffu) / 255.0f;
+    g_ = ((color >> 8u)  & 0xffu) / 255.0f;
+    r_ = ((color >> 0u)  & 0xffu) / 255.0f;
 }
 
 void Color::FromHSL(float h, float s, float l, float a)

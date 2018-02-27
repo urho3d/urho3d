@@ -171,7 +171,7 @@ void ConsoleInput::Advance()
     if (urhoThreat_ > 0)
         Print(String(urhoThreatLevels[urhoThreat_ - 1]) + ".");
 
-    if ((numTurns_ & 3) == 0 && !eatenLastTurn_)
+    if ((numTurns_ & 3u) == 0 && !eatenLastTurn_)
     {
         ++hunger_;
         if (hunger_ > 5)

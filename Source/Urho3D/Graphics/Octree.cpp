@@ -105,17 +105,17 @@ Octant* Octant::GetOrCreateChild(unsigned index)
     Vector3 newMax = worldBoundingBox_.max_;
     Vector3 oldCenter = worldBoundingBox_.Center();
 
-    if (index & 1)
+    if (index & 1u)
         newMin.x_ = oldCenter.x_;
     else
         newMax.x_ = oldCenter.x_;
 
-    if (index & 2)
+    if (index & 2u)
         newMin.y_ = oldCenter.y_;
     else
         newMax.y_ = oldCenter.y_;
 
-    if (index & 4)
+    if (index & 4u)
         newMin.z_ = oldCenter.z_;
     else
         newMax.z_ = oldCenter.z_;

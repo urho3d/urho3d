@@ -118,7 +118,7 @@ void Urho2DPhysicsRope::CreateScene()
         // Set friction
         box->SetFriction(0.2f);
         // Set mask bits.
-        box->SetMaskBits(0xFFFF & ~0x0002);
+        box->SetMaskBits(0xFFFFu & ~0x0002u);
 
         if (i == NUM_OBJECTS - 1)
         {

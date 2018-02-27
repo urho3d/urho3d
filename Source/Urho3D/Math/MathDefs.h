@@ -99,18 +99,7 @@ inline unsigned FloatToRawIntBits(float value)
 }
 
 /// Check whether a floating point value is NaN.
-/// Use a workaround for GCC, see https://github.com/urho3d/Urho3D/issues/655
-#ifndef __GNUC__
-inline bool IsNaN(float value) { return value != value; }
-#else
-
-inline bool IsNaN(float value)
-{
-    unsigned u = FloatToRawIntBits(value);
-    return (u & 0x7fffffff) > 0x7f800000;
-}
-
-#endif
+template <class T> inline bool IsNaN(T value) { return std::isnan(value); }
 
 /// Clamp a number to a range.
 template <class T>
@@ -197,11 +186,11 @@ inline unsigned NextPowerOfTwo(unsigned value)
 {
     // http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
     --value;
-    value |= value >> 1;
-    value |= value >> 2;
-    value |= value >> 4;
-    value |= value >> 8;
-    value |= value >> 16;
+    value |= value >> 1u;
+    value |= value >> 2u;
+    value |= value >> 4u;
+    value |= value >> 8u;
+    value |= value >> 16u;
     return ++value;
 }
 
@@ -226,7 +215,7 @@ inline unsigned CountSetBits(unsigned value)
 }
 
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
-inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }
+inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6u) + (hash << 16u) - hash; }
 
 /// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
 inline float Random() { return Rand() / 32768.0f; }
@@ -250,9 +239,9 @@ inline float RandomNormal(float meanValue, float variance) { return RandStandard
 inline unsigned short FloatToHalf(float value)
 {
     unsigned inu = FloatToRawIntBits(value);
-    unsigned t1 = inu & 0x7fffffff;         // Non-sign bits
-    unsigned t2 = inu & 0x80000000;         // Sign bit
-    unsigned t3 = inu & 0x7f800000;         // Exponent
+    unsigned t1 = inu & 0x7fffffffu;         // Non-sign bits
+    unsigned t2 = inu & 0x80000000u;         // Sign bit
+    unsigned t3 = inu & 0x7f800000u;         // Exponent
 
     t1 >>= 13;                              // Align mantissa on MSB
     t2 >>= 16;                              // Shift sign bit into position
@@ -271,9 +260,9 @@ inline unsigned short FloatToHalf(float value)
 /// Convert half float to float. From https://gist.github.com/martinkallman/5049614
 inline float HalfToFloat(unsigned short value)
 {
-    unsigned t1 = value & 0x7fff;           // Non-sign bits
-    unsigned t2 = value & 0x8000;           // Sign bit
-    unsigned t3 = value & 0x7c00;           // Exponent
+    unsigned t1 = value & 0x7fffu;           // Non-sign bits
+    unsigned t2 = value & 0x8000u;           // Sign bit
+    unsigned t3 = value & 0x7c00u;           // Exponent
 
     t1 <<= 13;                              // Align mantissa on MSB
     t2 <<= 16;                              // Shift sign bit into position

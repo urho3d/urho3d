@@ -117,7 +117,7 @@ private:
     /// Sprite sheet.
     SharedPtr<SpriteSheet2D> spriteSheet_;
     /// Spriter sprites.
-    HashMap<int, SharedPtr<Sprite2D> > spriterFileSprites_;
+    HashMap<unsigned, SharedPtr<Sprite2D> > spriterFileSprites_;
 };
 
 }

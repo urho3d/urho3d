@@ -44,7 +44,7 @@ unsigned GetRandomSeed()
 int Rand()
 {
     randomSeed = randomSeed * 214013 + 2531011;
-    return (randomSeed >> 16) & 32767;
+    return (randomSeed >> 16u) & 32767u;
 }
 
 float RandStandardNormal()

@@ -588,7 +588,7 @@ void Run(const Vector<String>& arguments)
         }
         if (numLodArguments < 4)
             ErrorExit("Must define at least 2 LOD levels");
-        if (!(numLodArguments & 1))
+        if (!(numLodArguments & 1u))
             ErrorExit("No output file defined");
 
         for (unsigned i = 1; i < numLodArguments + 1; ++i)
@@ -597,7 +597,7 @@ void Run(const Vector<String>& arguments)
                 outFile = GetInternalPath(arguments[i]);
             else
             {
-                if (i & 1)
+                if (i & 1u)
                     lodDistances.Push(Max(ToFloat(arguments[i]), 0.0f));
                 else
                     modelNames.Push(GetInternalPath(arguments[i]));

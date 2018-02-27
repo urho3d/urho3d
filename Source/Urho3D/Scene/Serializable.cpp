@@ -759,7 +759,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeS
 
     // First write the change bitfield, then attribute data for non-default attributes
     dest.WriteUByte(timeStamp);
-    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
+    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
@@ -785,7 +785,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     // First write the change bitfield, then attribute data for changed attributes
     // Note: the attribute bits should not contain LATESTDATA attributes
     dest.WriteUByte(timeStamp);
-    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
+    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
@@ -829,7 +829,7 @@ bool Serializable::ReadDeltaUpdate(Deserializer& source)
 
     unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
     unsigned char timeStamp = source.ReadUByte();
-    source.Read(attributeBits.data_, (numAttributes + 7) >> 3);
+    source.Read(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {

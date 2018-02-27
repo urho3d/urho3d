@@ -75,7 +75,7 @@ float FontFace::GetKerning(unsigned c, unsigned d) const
     if (c > 0xffff || d > 0xffff)
         return 0;
 
-    unsigned value = (c << 16) + d;
+    unsigned value = (c << 16u) + d;
 
     HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Find(value);
     if (i != kerningMapping_.End())

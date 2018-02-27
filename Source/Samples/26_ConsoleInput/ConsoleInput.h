@@ -78,7 +78,7 @@ private:
     /// Whether ate on the previous turn.
     bool eatenLastTurn_{};
     /// Number of turns survived.
-    int numTurns_{};
+    unsigned numTurns_{};
     /// Player's hunger level.
     int hunger_{};
     /// Threat of Urho level.

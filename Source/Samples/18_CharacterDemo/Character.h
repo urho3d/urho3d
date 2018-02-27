@@ -27,11 +27,11 @@
 
 using namespace Urho3D;
 
-const int CTRL_FORWARD = 1;
-const int CTRL_BACK = 2;
-const int CTRL_LEFT = 4;
-const int CTRL_RIGHT = 8;
-const int CTRL_JUMP = 16;
+const unsigned CTRL_FORWARD = 1;
+const unsigned CTRL_BACK = 2;
+const unsigned CTRL_LEFT = 4;
+const unsigned CTRL_RIGHT = 8;
+const unsigned CTRL_JUMP = 16;
 
 const float MOVE_FORCE = 0.8f;
 const float INAIR_MOVE_FORCE = 0.02f;

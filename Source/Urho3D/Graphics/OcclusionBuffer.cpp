@@ -57,7 +57,7 @@ OcclusionBuffer::~OcclusionBuffer() = default;
 bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
 {
     // Force the height to an even amount of pixels for better mip generation
-    if (height & 1)
+    if (height & 1u)
         ++height;
 
     if (width == width_ && height == height_)
@@ -894,8 +894,8 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         while (row < endRow)
         {
             int invZ = topToBottom.invZ_;
-            int* dest = row + (topToBottom.x_ >> 16);
-            int* end = row + (topToMiddle.x_ >> 16);
+            int* dest = row + (topToBottom.x_ >> 16u);
+            int* end = row + (topToMiddle.x_ >> 16u);
             while (dest < end)
             {
                 if (invZ < *dest)
@@ -916,8 +916,8 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         while (row < endRow)
         {
             int invZ = topToBottom.invZ_;
-            int* dest = row + (topToBottom.x_ >> 16);
-            int* end = row + (middleToBottom.x_ >> 16);
+            int* dest = row + (topToBottom.x_ >> 16u);
+            int* end = row + (middleToBottom.x_ >> 16u);
             while (dest < end)
             {
                 if (invZ < *dest)
@@ -940,8 +940,8 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         while (row < endRow)
         {
             int invZ = topToMiddle.invZ_;
-            int* dest = row + (topToMiddle.x_ >> 16);
-            int* end = row + (topToBottom.x_ >> 16);
+            int* dest = row + (topToMiddle.x_ >> 16u);
+            int* end = row + (topToBottom.x_ >> 16u);
             while (dest < end)
             {
                 if (invZ < *dest)
@@ -962,8 +962,8 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         while (row < endRow)
         {
             int invZ = middleToBottom.invZ_;
-            int* dest = row + (middleToBottom.x_ >> 16);
-            int* end = row + (topToBottom.x_ >> 16);
+            int* dest = row + (middleToBottom.x_ >> 16u);
+            int* end = row + (topToBottom.x_ >> 16u);
             while (dest < end)
             {
                 if (invZ < *dest)

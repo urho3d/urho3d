@@ -430,7 +430,7 @@ public:
 
         // Check for being power of two
         unsigned check = numBuckets;
-        while (!(check & 1))
+        while (!(check & 1u))
             check >>= 1;
         if (check != 1)
             return false;

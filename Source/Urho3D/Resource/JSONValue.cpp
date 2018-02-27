@@ -67,7 +67,7 @@ JSONValue& JSONValue::operator =(bool rhs)
 JSONValue& JSONValue::operator =(int rhs)
 {
     SetType(JSON_NUMBER, JSONNT_INT);
-    numberValue_ = rhs;    
+    numberValue_ = rhs;
 
     return *this;
 }
@@ -165,12 +165,12 @@ JSONValue& JSONValue::operator =(const JSONValue& rhs)
 
 JSONValueType JSONValue::GetValueType() const
 {
-    return (JSONValueType)(type_ >> 16);
+    return (JSONValueType)(type_ >> 16u);
 }
 
 JSONNumberType JSONValue::GetNumberType() const
 {
-    return (JSONNumberType)(type_ & 0xffff);
+    return (JSONNumberType)(type_ & 0xffffu);
 }
 
 String JSONValue::GetValueTypeName() const
@@ -343,7 +343,7 @@ void JSONValue::Clear()
 
 void JSONValue::SetType(JSONValueType valueType, JSONNumberType numberType)
 {
-    int type = (valueType << 16) | numberType;
+    int type = valueType << 16u | numberType;
     if (type == type_)
         return;
 
@@ -415,7 +415,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
     case VAR_BOOL:
         *this = variant.GetBool();
         return;
-    
+
     case VAR_INT:
         *this = variant.GetInt();
         return;

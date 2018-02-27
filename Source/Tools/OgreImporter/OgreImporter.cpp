@@ -908,9 +908,9 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             dest.Write(offsetMatrix.Data(), sizeof(Matrix3x4));
 
             dest.WriteUByte(bones_[i].collisionMask_);
-            if (bones_[i].collisionMask_ & 1)
+            if (bones_[i].collisionMask_ & 1u)
                 dest.WriteFloat(bones_[i].radius_);
-            if (bones_[i].collisionMask_ & 2)
+            if (bones_[i].collisionMask_ & 2u)
                 dest.WriteBoundingBox(bones_[i].boundingBox_);
         }
 

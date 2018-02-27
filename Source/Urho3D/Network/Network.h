@@ -38,10 +38,7 @@ class MemoryBuffer;
 class Scene;
 
 /// MessageConnection hash function.
-template <class T> unsigned MakeHash(kNet::MessageConnection* value)
-{
-    return ((unsigned)(size_t)value) >> 9;
-}
+template <class T> unsigned MakeHash(kNet::MessageConnection* value) { return (unsigned)((size_t)value >> 9u); }
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener

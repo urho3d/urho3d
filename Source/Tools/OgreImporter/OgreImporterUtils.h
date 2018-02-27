@@ -138,8 +138,8 @@ struct ModelVertexBuffer
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
             unsigned elementDesc = ((unsigned)elements[j].type_) |
-                (((unsigned)elements[j].semantic_) << 8) |
-                (((unsigned)elements[j].index_) << 16);
+                (((unsigned)elements[j].semantic_) << 8u) |
+                (((unsigned)elements[j].index_) << 16u);
             dest.WriteUInt(elementDesc);
         }
 

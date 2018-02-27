@@ -69,7 +69,7 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
         srcPtr += sizeof(unsigned short);
         destPtr += sizeof(unsigned short);
     }
-    if (copySize & 1)
+    if (copySize & 1u)
         *destPtr = *srcPtr;
 
     return size;
@@ -113,7 +113,7 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
         srcPtr += sizeof(unsigned short);
         destPtr += sizeof(unsigned short);
     }
-    if (copySize & 1)
+    if (copySize & 1u)
         *destPtr = *srcPtr;
 
     return size;

@@ -184,7 +184,7 @@ bool ShaderProgram::Link()
 
         int location = glGetAttribLocation(object_.name_, name.CString());
         vertexAttributes_[MakePair((unsigned char)semantic, semanticIndex)] = location;
-        usedVertexAttributes_ |= (1 << location);
+        usedVertexAttributes_ |= (1u << location);
     }
 
     // Check for constant buffers

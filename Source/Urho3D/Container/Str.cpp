@@ -436,7 +436,7 @@ void String::Resize(unsigned newLength)
         {
             // Increase the capacity with half each time it is exceeded
             while (capacity_ < newLength + 1)
-                capacity_ += (capacity_ + 1) >> 1;
+                capacity_ += (capacity_ + 1) >> 1u;
 
             auto* newBuffer = new char[capacity_];
             // Move the existing data to the new buffer, then delete the old buffer
@@ -898,42 +898,42 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
         *dest++ = unicodeChar;
     else if (unicodeChar < 0x800)
     {
-        dest[0] = (char)(0xc0 | ((unicodeChar >> 6) & 0x1f));
-        dest[1] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xc0u | ((unicodeChar >> 6u) & 0x1fu));
+        dest[1] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 2;
     }
     else if (unicodeChar < 0x10000)
     {
-        dest[0] = (char)(0xe0 | ((unicodeChar >> 12) & 0xf));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[2] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xe0u | ((unicodeChar >> 12u) & 0xfu));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[2] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 3;
     }
     else if (unicodeChar < 0x200000)
     {
-        dest[0] = (char)(0xf0 | ((unicodeChar >> 18) & 0x7));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 12) & 0x3f));
-        dest[2] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[3] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xf0u | ((unicodeChar >> 18u) & 0x7u));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[2] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[3] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 4;
     }
     else if (unicodeChar < 0x4000000)
     {
-        dest[0] = (char)(0xf8 | ((unicodeChar >> 24) & 0x3));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 18) & 0x3f));
-        dest[2] = (char)(0x80 | ((unicodeChar >> 12) & 0x3f));
-        dest[3] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[4] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xf8u | ((unicodeChar >> 24u) & 0x3u));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 18u) & 0x3fu));
+        dest[2] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[3] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[4] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 5;
     }
     else
     {
-        dest[0] = (char)(0xfc | ((unicodeChar >> 30) & 0x1));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 24) & 0x3f));
-        dest[2] = (char)(0x80 | ((unicodeChar >> 18) & 0x3f));
-        dest[3] = (char)(0x80 | ((unicodeChar >> 12) & 0x3f));
-        dest[4] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[5] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xfcu | ((unicodeChar >> 30u) & 0x1u));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 24u) & 0x3fu));
+        dest[2] = (char)(0x80u | ((unicodeChar >> 18u) & 0x3fu));
+        dest[3] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[4] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[5] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 6;
     }
 }
@@ -960,20 +960,20 @@ unsigned String::DecodeUTF8(const char*& src)
     else if (char1 < 0xe0)
     {
         unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char2 & 0x3f) | ((char1 & 0x1f) << 6));
+        return (unsigned)((char2 & 0x3fu) | ((char1 & 0x1fu) << 6u));
     }
     else if (char1 < 0xf0)
     {
         unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char3 & 0x3f) | ((char2 & 0x3f) << 6) | ((char1 & 0xf) << 12));
+        return (unsigned)((char3 & 0x3fu) | ((char2 & 0x3fu) << 6u) | ((char1 & 0xfu) << 12u));
     }
     else if (char1 < 0xf8)
     {
         unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char4 & 0x3f) | ((char3 & 0x3f) << 6) | ((char2 & 0x3f) << 12) | ((char1 & 0x7) << 18));
+        return (unsigned)((char4 & 0x3fu) | ((char3 & 0x3fu) << 6u) | ((char2 & 0x3fu) << 12u) | ((char1 & 0x7u) << 18u));
     }
     else if (char1 < 0xfc)
     {
@@ -981,8 +981,8 @@ unsigned String::DecodeUTF8(const char*& src)
         unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char5 & 0x3f) | ((char4 & 0x3f) << 6) | ((char3 & 0x3f) << 12) | ((char2 & 0x3f) << 18) |
-                          ((char1 & 0x3) << 24));
+        return (unsigned)((char5 & 0x3fu) | ((char4 & 0x3fu) << 6u) | ((char3 & 0x3fu) << 12u) | ((char2 & 0x3fu) << 18u) |
+                          ((char1 & 0x3u) << 24u));
     }
     else
     {
@@ -991,8 +991,8 @@ unsigned String::DecodeUTF8(const char*& src)
         unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char6 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char6 & 0x3f) | ((char5 & 0x3f) << 6) | ((char4 & 0x3f) << 12) | ((char3 & 0x3f) << 18) |
-                          ((char2 & 0x3f) << 24) | ((char1 & 0x1) << 30));
+        return (unsigned)((char6 & 0x3fu) | ((char5 & 0x3fu) << 6u) | ((char4 & 0x3fu) << 12u) | ((char3 & 0x3fu) << 18u) |
+                          ((char2 & 0x3fu) << 24u) | ((char1 & 0x1u) << 30u));
     }
 }
 

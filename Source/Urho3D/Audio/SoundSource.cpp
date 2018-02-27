@@ -64,7 +64,7 @@ namespace Urho3D
     } \
 
 #define INC_POS_STEREO_LOOPED() \
-    pos += (intAdd << 1); \
+    pos += ((unsigned)intAdd << 1u); \
     fractPos += fractAdd; \
     if (fractPos > 65535) \
     { \
@@ -75,7 +75,7 @@ namespace Urho3D
         pos -= (end - repeat); \
 
 #define INC_POS_STEREO_ONESHOT() \
-    pos += (intAdd << 1); \
+    pos += ((unsigned)intAdd << 1u); \
     fractPos += fractAdd; \
     if (fractPos > 65535) \
     { \
@@ -593,7 +593,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
     signed char* end = sound_->GetEnd();
     if (pos < start)
         pos = start;
-    if (sound_->IsSixteenBit() && (pos - start) & 1)
+    if (sound_->IsSixteenBit() && (pos - start) & 1u)
         ++pos;
     if (pos > end)
         pos = end;

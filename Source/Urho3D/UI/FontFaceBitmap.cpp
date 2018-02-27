@@ -151,9 +151,9 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         XMLElement kerningElem = kerningsElem.GetChild("kerning");
         while (!kerningElem.IsNull())
         {
-            int first = kerningElem.GetInt("first");
-            int second = kerningElem.GetInt("second");
-            auto value = (unsigned)((first << 16) + second);
+            unsigned first = kerningElem.GetInt("first");
+            unsigned second = kerningElem.GetInt("second");
+            unsigned value = first << 16u | second;
             kerningMapping_[value] = (short)kerningElem.GetInt("amount");
 
             kerningElem = kerningElem.GetNext("kerning");
@@ -253,8 +253,8 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
 
     for (HashMap<unsigned, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
     {
-        unsigned first = (i->first_) >> 16;
-        unsigned second = (i->first_) & 0xffff;
+        unsigned first = (i->first_) >> 16u;
+        unsigned second = (i->first_) & 0xffffu;
         if (glyphMapping_.Find(first) != glyphMapping_.End() && glyphMapping_.Find(second) != glyphMapping_.End())
             kerningMapping_[i->first_] = i->second_;
     }
@@ -332,8 +332,8 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
         for (HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
             XMLElement kerningElem = kerningsElem.CreateChild("kerning");
-            kerningElem.SetInt("first", i->first_ >> 16);
-            kerningElem.SetInt("second", i->first_ & 0xffff);
+            kerningElem.SetInt("first", i->first_ >> 16u);
+            kerningElem.SetInt("second", i->first_ & 0xffffu);
             kerningElem.SetInt("amount", i->second_);
         }
     }

@@ -175,7 +175,7 @@ void Billboards::CreateScene()
         float angle = 0.0f;
 
         Vector3 position((i % 3) * 60.0f - 60.0f, 45.0f, (i / 3) * 60.0f - 60.0f);
-        Color color(((i + 1) & 1) * 0.5f + 0.5f, (((i + 1) >> 1) & 1) * 0.5f + 0.5f, (((i + 1) >> 2) & 1) * 0.5f + 0.5f);
+        Color color(((i + 1) & 1u) * 0.5f + 0.5f, (((i + 1) >> 1u) & 1u) * 0.5f + 0.5f, (((i + 1) >> 2u) & 1u) * 0.5f + 0.5f);
 
         lightNode->SetPosition(position);
         lightNode->SetDirection(Vector3(Sin(angle), -1.5f, Cos(angle)));

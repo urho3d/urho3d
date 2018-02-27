@@ -431,22 +431,22 @@ unsigned Deserializer::ReadVLE()
     unsigned char byte;
 
     byte = ReadUByte();
-    ret = (unsigned)(byte & 0x7f);
+    ret = (unsigned)(byte & 0x7fu);
     if (byte < 0x80)
         return ret;
 
     byte = ReadUByte();
-    ret |= ((unsigned)(byte & 0x7f)) << 7;
+    ret |= ((unsigned)(byte & 0x7fu)) << 7u;
     if (byte < 0x80)
         return ret;
 
     byte = ReadUByte();
-    ret |= ((unsigned)(byte & 0x7f)) << 14;
+    ret |= ((unsigned)(byte & 0x7fu)) << 14u;
     if (byte < 0x80)
         return ret;
 
     byte = ReadUByte();
-    ret |= ((unsigned)byte) << 21;
+    ret |= ((unsigned)byte) << 21u;
     return ret;
 }
 

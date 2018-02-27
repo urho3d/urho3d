@@ -60,13 +60,13 @@ template <> inline unsigned MakeHash(const void* value)
 /// Long long hash function.
 template <> inline unsigned MakeHash(const long long& value)
 {
-    return (unsigned)((value >> 32) | (value & 0xffffffff));
+    return (unsigned)((value >> 32u) | (value & 0xffffffffu));
 }
 
 /// Unsigned long long hash function.
 template <> inline unsigned MakeHash(const unsigned long long& value)
 {
-    return (unsigned)((value >> 32) | (value & 0xffffffff));
+    return (unsigned)((value >> 32u) | (value & 0xffffffffu));
 }
 
 /// Int hash function.

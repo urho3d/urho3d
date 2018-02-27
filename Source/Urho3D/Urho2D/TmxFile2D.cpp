@@ -193,9 +193,9 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
             for (int x = 0; x < width_; ++x)
             {
                 // buffer contains 32-bit integers in little-endian format
-                unsigned gid = ((unsigned)buffer[currentIndex+3] << 24)
-                             | ((unsigned)buffer[currentIndex+2] << 16)
-                             | ((unsigned)buffer[currentIndex+1] << 8)
+                unsigned gid = ((unsigned)buffer[currentIndex+3] << 24u)
+                             | ((unsigned)buffer[currentIndex+2] << 16u)
+                             | ((unsigned)buffer[currentIndex+1] << 8u)
                              | (unsigned)buffer[currentIndex];
                 if (gid > 0)
                 {

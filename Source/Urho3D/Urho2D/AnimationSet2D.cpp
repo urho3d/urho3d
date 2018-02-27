@@ -211,8 +211,8 @@ Sprite2D* AnimationSet2D::GetSprite() const
 
 Sprite2D* AnimationSet2D::GetSpriterFileSprite(int folderId, int fileId) const
 {
-    int key = (folderId << 16) + fileId;
-    HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = spriterFileSprites_.Find(key);
+    unsigned key = folderId << 16u | fileId;
+    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = spriterFileSprites_.Find(key);
     if (i != spriterFileSprites_.End())
         return i->second_;
 
@@ -389,7 +389,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 if (!sprite_)
                     sprite_ = sprite;
 
-                int key = (folder->id_ << 16) + file->id_;
+                unsigned key = folder->id_ << 16u | file->id_;
                 spriterFileSprites_[key] = sprite;
             }
         }
@@ -477,7 +477,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 sprite->SetRectangle(IntRect(info.x, info.y, info.x + image->GetWidth(), info.y + image->GetHeight()));
                 sprite->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
 
-                int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
+                unsigned key = info.file_->folder_->id_ << 16u | info.file_->id_;
                 spriterFileSprites_[key] = sprite;
             }
 
@@ -497,7 +497,7 @@ bool AnimationSet2D::EndLoadSpriter()
             sprite_->SetRectangle(IntRect(info.x, info.y, info.x + info.image_->GetWidth(), info.y + info.image_->GetHeight()));
             sprite_->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
 
-            int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
+            unsigned key = info.file_->folder_->id_ << 16u | info.file_->id_;
             spriterFileSprites_[key] = sprite_;
         }
     }

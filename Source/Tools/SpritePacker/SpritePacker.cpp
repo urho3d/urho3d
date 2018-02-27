@@ -221,7 +221,7 @@ void Run(Vector<String>& arguments)
             {
                 for (int x = 0; x < imageWidth; ++x)
                 {
-                    bool found = (image.GetPixelInt(x, y) & 0x000000ff) != 0;
+                    bool found = (image.GetPixelInt(x, y) & 0x000000ffu) != 0;
                     if (found) {
                         minX = Min(minX, x);
                         minY = Min(minY, y);
@@ -262,7 +262,7 @@ void Run(Vector<String>& arguments)
         for(unsigned x=2; x<11; ++x)
         {
             for(unsigned y=2; y<11; ++y)
-                tries.Push(IntVector2((1<<x), (1<<y)));
+                tries.Push(IntVector2((1u<<x), (1u<<y)));
         }
 
         // load rectangles

@@ -676,12 +676,12 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     if (vertexData)
     {
         const IntVector2& coords = patch->GetCoordinates();
-        int lodExpand = (1 << (occlusionLevel)) - 1;
-        int halfLodExpand = (1 << (occlusionLevel)) / 2;
+        unsigned lodExpand = (1u << (occlusionLevel)) - 1;
+        unsigned halfLodExpand = (1u << (occlusionLevel)) / 2;
 
-        for (int z = 0; z <= patchSize_; ++z)
+        for (unsigned z = 0; z <= patchSize_; ++z)
         {
-            for (int x = 0; x <= patchSize_; ++x)
+            for (unsigned x = 0; x <= patchSize_; ++x)
             {
                 int xPos = coords.x_ * patchSize_ + x;
                 int zPos = coords.y_ * patchSize_ + z;
@@ -744,7 +744,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
     if (drawRanges_.Size())
     {
-        unsigned occlusionDrawRange = occlusionLevel << 4;
+        unsigned occlusionDrawRange = occlusionLevel << 4u;
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
@@ -766,7 +766,7 @@ void Terrain::UpdatePatchLod(TerrainPatch* patch)
 
     // All LOD levels except the coarsest have 16 versions for stitching
     unsigned lodLevel = patch->GetLodLevel();
-    unsigned drawRangeIndex = lodLevel << 4;
+    unsigned drawRangeIndex = lodLevel << 4u;
     if (lodLevel < numLodLevels_ - 1)
     {
         TerrainPatch* north = patch->GetNorthPatch();
@@ -1001,7 +1001,7 @@ void Terrain::CreateGeometry()
         // If updating a region of the heightmap, check which patches change
         if (!updateAll)
         {
-            int lodExpand = 1 << (numLodLevels_ - 1);
+            int lodExpand = 1u << (numLodLevels_ - 1);
             // Expand the right & bottom 1 pixel more, as patches share vertices at the edge
             updateRegion.left_ -= lodExpand;
             updateRegion.right_ += lodExpand + 1;
@@ -1156,7 +1156,7 @@ void Terrain::CreateIndexData()
     for (unsigned i = 0; i < numLodLevels_; ++i)
     {
         unsigned combinations = (i < numLodLevels_ - 1) ? 16 : 1;
-        int skip = 1 << i;
+        int skip = 1u << i;
 
         for (unsigned j = 0; j < combinations; ++j)
         {
@@ -1316,10 +1316,9 @@ float Terrain::GetSourceHeight(int x, int z) const
 
 float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
 {
-    auto offset = (unsigned)(1 << lodLevel);
-    auto divisor = (float)offset;
-    float xFrac = (float)(x % offset) / divisor;
-    float zFrac = (float)(z % offset) / divisor;
+    unsigned offset = 1u << lodLevel;
+    auto xFrac = (float)(x % offset) / offset;
+    auto zFrac = (float)(z % offset) / offset;
     float h1, h2, h3;
 
     if (xFrac + zFrac >= 1.0f)
@@ -1380,7 +1379,7 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
     for (unsigned i = 0; i < numLodLevels_; ++i)
     {
         float maxError = 0.0f;
-        int divisor = 1 << i;
+        int divisor = 1u << i;
 
         if (i > 0)
         {
@@ -1397,7 +1396,7 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
             }
 
             // Set error to be at least same as (half vertex spacing x LOD) to prevent horizontal stretches getting too inaccurate
-            maxError = Max(maxError, 0.25f * (spacing_.x_ + spacing_.z_) * (float)(1 << i));
+            maxError = Max(maxError, 0.25f * (spacing_.x_ + spacing_.z_) * (float)(1u << i));
         }
 
         lodErrors.Push(maxError);

@@ -811,9 +811,9 @@ PODVector<unsigned char> DecodeBase64(String encodedString)
             for (i = 0; i < 4; i++)
                 charArray4[i] = base64_chars.Find(charArray4[i]);
 
-            charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
-            charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
-            charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+            charArray3[0] = (charArray4[0] << 2u) + ((charArray4[1] & 0x30u) >> 4u);
+            charArray3[1] = ((charArray4[1] & 0xfu) << 4u) + ((charArray4[2] & 0x3cu) >> 2u);
+            charArray3[2] = ((charArray4[2] & 0x3u) << 6u) + charArray4[3];
 
             for (i = 0; (i < 3); i++)
                 ret.Push(charArray3[i]);
@@ -830,9 +830,9 @@ PODVector<unsigned char> DecodeBase64(String encodedString)
         for (j = 0; j <4; j++)
             charArray4[j] = base64_chars.Find(charArray4[j]);
 
-        charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
-        charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
-        charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+        charArray3[0] = (charArray4[0] << 2u) + ((charArray4[1] & 0x30u) >> 4u);
+        charArray3[1] = ((charArray4[1] & 0xfu) << 4u) + ((charArray4[2] & 0x3cu) >> 2u);
+        charArray3[2] = ((charArray4[2] & 0x3u) << 6u) + charArray4[3];
 
         for (j = 0; (j < i - 1); j++)
             ret.Push(charArray3[j]);

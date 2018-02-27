@@ -67,7 +67,7 @@
 
 #include "../DebugNew.h"
 
-#define TOUCHID_MASK(id) (1 << (id))
+#define TOUCHID_MASK(id) (1u << (unsigned)(id))
 
 namespace Urho3D
 {
@@ -2067,9 +2067,9 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
         int buttons = dragData->dragButtons;
         dragData->sumPos = IntVector2::ZERO;
         auto* input = GetSubsystem<Input>();
-        for (int i = 0; (1 << i) <= buttons; i++)
+        for (unsigned i = 0; (1u << i) <= buttons; i++)
         {
-            if ((1 << i) & buttons)
+            if ((1u << i) & buttons)
             {
                 TouchState* ts = input->GetTouch((unsigned)i);
                 if (!ts)

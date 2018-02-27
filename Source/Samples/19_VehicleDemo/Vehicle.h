@@ -36,10 +36,10 @@ class RigidBody;
 
 using namespace Urho3D;
 
-const int CTRL_FORWARD = 1;
-const int CTRL_BACK = 2;
-const int CTRL_LEFT = 4;
-const int CTRL_RIGHT = 8;
+const unsigned CTRL_FORWARD = 1;
+const unsigned CTRL_BACK = 2;
+const unsigned CTRL_LEFT = 4;
+const unsigned CTRL_RIGHT = 8;
 
 const float YAW_SENSITIVITY = 0.1f;
 const float ENGINE_POWER = 10.0f;

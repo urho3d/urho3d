@@ -226,22 +226,22 @@ unsigned Texture::GetRowDataSize(int width) const
 #endif
 
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-        return (unsigned)(((width + 3) >> 2) * 8);
+        return ((unsigned)(width + 3) >> 2u) * 8;
 
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-        return (unsigned)(((width + 3) >> 2) * 16);
+        return ((unsigned)(width + 3) >> 2u) * 16;
 
     case GL_ETC1_RGB8_OES:
-        return (unsigned)(((width + 3) >> 2) * 8);
+        return ((unsigned)(width + 3) >> 2u) * 8;
 
     case COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
-        return (unsigned)((width * 4 + 7) >> 3);
+        return (unsigned)(width * 4 + 7) >> 3u;
 
     case COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
-        return (unsigned)((width * 2 + 7) >> 3);
+        return (unsigned)(width * 2 + 7) >> 3u;
 
     default:
         return 0;

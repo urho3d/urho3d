@@ -334,8 +334,8 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
                 skip *= 2;
                 lodSpacing.x_ *= 2.0f;
                 lodSpacing.z_ *= 2.0f;
-                int rX = lodSize.x_ & 1;
-                int rY = lodSize.y_ & 1;
+                int rX = lodSize.x_ & 1u;
+                int rY = lodSize.y_ & 1u;
                 lodSize.x_ >>= 1;
                 lodSize.y_ >>= 1;
                 lodSize.x_ += rX;

@@ -35,11 +35,11 @@ namespace Urho3D
 
 using namespace Urho3D;
 
-const int CTRL_FORWARD = (1 << 0);
-const int CTRL_BACK = (1 << 1);
-const int CTRL_LEFT = (1 << 2);
-const int CTRL_RIGHT = (1 << 3);
-const int CTRL_BRAKE = (1 << 4);
+const unsigned CTRL_FORWARD = (1u << 0u);
+const unsigned CTRL_BACK = (1u << 1u);
+const unsigned CTRL_LEFT = (1u << 2u);
+const unsigned CTRL_RIGHT = (1u << 3u);
+const unsigned CTRL_BRAKE = (1u << 4u);
 const float YAW_SENSITIVITY = 0.1f;
 const float ENGINE_POWER = 10.0f;
 const float MAX_WHEEL_ANGLE = 22.5f;

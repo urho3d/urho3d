@@ -92,7 +92,7 @@ void* AllocatorReserve(AllocatorBlock* allocator)
     if (!allocator->free_)
     {
         // Free nodes have been exhausted. Allocate a new larger block
-        unsigned newCapacity = (allocator->capacity_ + 1) >> 1;
+        unsigned newCapacity = (allocator->capacity_ + 1) >> 1u;
         AllocatorReserveBlock(allocator, allocator->nodeSize_, newCapacity);
         allocator->capacity_ += newCapacity;
     }
