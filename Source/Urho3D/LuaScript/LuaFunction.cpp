@@ -152,9 +152,46 @@ void LuaFunction::PushLuaTable(const char* tableName)
 {
     assert(numArguments_ >= 0);
     ++numArguments_;
-    lua_getglobal(luaState_, tableName);
+
+    // Performance impact wasn't confirmed here. However, I'd like to avoid unneeded allocations.
+    if (!strchr(tableName, '.'))
+    {
+        lua_getglobal(luaState_, tableName);
+    }
+    else
+    {
+        Vector<String> splitNames = String::Split(tableName, '.');
+
+        String currentName = splitNames.Front();
+        lua_getglobal(luaState_, currentName.CString());
+
+        if (splitNames.Size() > 1)
+        {
+            for (unsigned i = 0; i < splitNames.Size() - 1; ++i)
+            {
+                if (i)
+                {
+                    currentName = currentName + "." + splitNames[i];
+                    lua_getfield(luaState_, -1, splitNames[i].CString());
+                    lua_replace(luaState_, -2);
+                }
+                if (!lua_istable(luaState_, -1))
+                {
+                    lua_pop(luaState_, 1);
+                    lua_pushnil(luaState_);
+                    URHO3D_LOGERRORF("Could not find lua table '%s'", currentName.CString());
+                    return;
+                }
+            }
+
+            currentName = currentName + "." + splitNames.Back();
+            lua_getfield(luaState_, -1, splitNames.Back().CString());
+            lua_replace(luaState_, -2);
+        }
+    }
+
     if (!lua_istable(luaState_, -1))
-        URHO3D_LOGERRORF("Could not find lua table %s", tableName);      // nil is pushed instead
+        URHO3D_LOGERRORF("Could not find lua table '%s'", tableName);      // nil is pushed instead
 }
 
 }
