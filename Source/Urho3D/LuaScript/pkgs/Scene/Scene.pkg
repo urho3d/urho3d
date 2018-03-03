@@ -50,6 +50,7 @@ class Scene : public Node
 
     Node* GetNode(unsigned id) const;
     Component* GetComponent(unsigned id) const;
+    Component* GetComponent(const String type, bool recursive = false) const; // Copy-pasted from Node.pkg to avoid shadowing
     static bool IsReplicatedID(unsigned id);
 
     bool IsUpdateEnabled() const;
