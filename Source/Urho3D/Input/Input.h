@@ -257,9 +257,6 @@ public:
     int GetMouseMoveY() const;
     /// Return mouse wheel movement since last frame.
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
-    /// Return input coordinate scaling. Should return non-unity on High DPI display.
-    Vector2 GetInputScale() const { return inputScale_; }
-
     /// Return number of active finger touches.
     unsigned GetNumTouches() const { return touches_.Size(); }
     /// Return active finger touch by index.
@@ -395,8 +392,6 @@ private:
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
     int mouseMoveWheel_;
-    /// Input coordinate scaling. Non-unity when window and backbuffer have different sizes (e.g. Retina display.)
-    Vector2 inputScale_;
     /// SDL window ID.
     unsigned windowID_;
     /// Fullscreen toggle flag.

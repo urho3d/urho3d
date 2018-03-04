@@ -118,16 +118,7 @@ public:
     void SetFontSubpixelThreshold(float threshold);
     /// Set the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
     void SetFontOversampling(int oversampling);
-    /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
-    void SetScale(float scale);
-    /// Scale %UI to the specified width in pixels.
-    void SetWidth(float width);
-    /// Scale %UI to the specified height in pixels.
-    void SetHeight(float height);
-    /// Set custom size of the root element. This disables automatic resizing of the root element according to window size. Set custom size 0,0 to return to automatic resizing.
-    void SetCustomSize(const IntVector2& size);
-    /// Set custom size of the root element.
-    void SetCustomSize(int width, int height);
+
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -211,9 +202,6 @@ public:
     /// Return whether a drag is in progress.
     bool IsDragging() const { return dragConfirmedCount_ > 0; };
 
-    /// Return current UI scale.
-    float GetScale() const { return uiScale_; }
-
     /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
     const IntVector2& GetCustomSize() const { return customSize_; }
 
@@ -284,8 +272,7 @@ private:
     /// Handle button or touch hover.
     void ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
-    void
-        ProcessClickBegin(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    void ProcessClickBegin(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
     void ProcessClickEnd(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle mouse or touch move.
@@ -427,8 +414,6 @@ private:
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
-    /// Current scale of UI.
-    float uiScale_;
     /// Root element custom size. 0,0 for automatic resizing (default.)
     IntVector2 customSize_;
     /// Elements that should be rendered to textures.

@@ -100,7 +100,7 @@ public:
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
     bool SetMode
-        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
+        (int width, int height, bool fullscreen, bool borderless, bool resizable, float virtualp_to_pixel_Ratio, bool vsync, bool tripleBuffer,
             int multiSample, int monitor, int refreshRate);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
@@ -273,17 +273,17 @@ public:
     /// Return window position.
     IntVector2 GetWindowPosition() const;
 
-    /// Return window width in pixels.
-    int GetWidth() const { return width_; }
+    /// Return window width in device pixels or virtual pixels
+    int GetWidth(bool virtualPixels = false) const;
 
-    /// Return window height in pixels.
-    int GetHeight() const { return height_; }
+    /// Return window height in device pixels or virtual pixels
+    int GetHeight(bool virtualPixels = false) const;
 
     /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const { return multiSample_; }
 
     /// Return window size in pixels.
-    IntVector2 GetSize() const { return IntVector2(width_, height_); }
+    IntVector2 GetSize(bool virtualPixels = false) const;
 
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
@@ -294,8 +294,11 @@ public:
     /// Return whether window is resizable.
     bool GetResizable() const { return resizable_; }
 
-    /// Return whether window is high DPI.
-    bool GetHighDPI() const { return highDPI_; }
+	/// Set the ratio of virtual pixels to device pixels. values will be rounded to nearset multiple of 2 (..., 1/4, 1/2, 1, 2, 4, ...)
+	void SetVirtualPixelToPixelRatio(float ratio);
+
+	/// Return the ratio of virtual pixel to device pixels.
+	float GetVirtualPixelToPixelRatio() const { return virtualPixelToPixelRatio_; }
 
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
@@ -495,7 +498,10 @@ public:
 
     /// Window was resized through user interaction. Called by Input subsystem.
     void OnWindowResized();
-    /// Window was moved through user interaction. Called by Input subsystem.
+
+
+
+	/// Window was moved through user interaction. Called by Input subsystem.
     void OnWindowMoved();
     /// Restore GPU objects and reinitialize state. Requires an open window. Used only on OpenGL.
     void Restore();
@@ -626,8 +632,10 @@ private:
     void SetVertexAttribDivisor(unsigned location, unsigned divisor);
     /// Release/clear GPU objects and optionally close the window. Used only on OpenGL.
     void Release(bool clearGPUObjects, bool closeWindow);
-
-    /// Mutex for accessing the GPU objects vector from several threads.
+	
+	void sendScreenModeEvent();
+   
+	/// Mutex for accessing the GPU objects vector from several threads.
     Mutex gpuObjectMutex_;
     /// Implementation.
     GraphicsImpl* impl_;
@@ -652,9 +660,9 @@ private:
     /// Borderless flag.
     bool borderless_{};
     /// Resizable flag.
-    bool resizable_{};
-    /// High DPI flag.
-    bool highDPI_{};
+    bool resizable_;
+    /// ratio of virtual pixels to real pixels (High DPI would be 0.5f)
+    float virtualPixelToPixelRatio_;
     /// Vertical sync flag.
     bool vsync_{};
     /// Refresh rate in Hz. Only used in fullscreen, 0 when windowed
