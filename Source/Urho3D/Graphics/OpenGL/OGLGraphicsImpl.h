@@ -106,62 +106,62 @@ class URHO3D_API GraphicsImpl
 
 public:
     /// Construct.
-    GraphicsImpl();
+    GraphicsImpl() = default;
 
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
 
 private:
     /// SDL OpenGL context.
-    SDL_GLContext context_;
+    SDL_GLContext context_{};
     /// iOS/tvOS system framebuffer handle.
-    unsigned systemFBO_;
+    unsigned systemFBO_{};
     /// Active texture unit.
-    unsigned activeTexture_;
+    unsigned activeTexture_{};
     /// Enabled vertex attributes bitmask.
-    unsigned enabledVertexAttributes_;
+    unsigned enabledVertexAttributes_{};
     /// Vertex attributes bitmask used by the current shader program.
-    unsigned usedVertexAttributes_;
+    unsigned usedVertexAttributes_{};
     /// Vertex attribute instancing bitmask for keeping track of divisors.
-    unsigned instancingVertexAttributes_;
+    unsigned instancingVertexAttributes_{};
     /// Current mapping of vertex attribute locations by semantic. The map is owned by the shader program, so care must be taken to switch a null shader program when it's destroyed.
-    const HashMap<Pair<unsigned char, unsigned char>, unsigned>* vertexAttributes_;
+    const HashMap<Pair<unsigned char, unsigned char>, unsigned>* vertexAttributes_{};
     /// Currently bound frame buffer object.
-    unsigned boundFBO_;
+    unsigned boundFBO_{};
     /// Currently bound vertex buffer object.
-    unsigned boundVBO_;
+    unsigned boundVBO_{};
     /// Currently bound uniform buffer object.
-    unsigned boundUBO_;
+    unsigned boundUBO_{};
     /// Read frame buffer for multisampled texture resolves.
-    unsigned resolveSrcFBO_;
+    unsigned resolveSrcFBO_{};
     /// Write frame buffer for multisampled texture resolves.
-    unsigned resolveDestFBO_;
+    unsigned resolveDestFBO_{};
     /// Current pixel format.
-    int pixelFormat_;
+    int pixelFormat_{};
     /// Map for FBO's per resolution and format.
     HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
     /// OpenGL texture types in use.
-    unsigned textureTypes_[MAX_TEXTURE_UNITS];
+    unsigned textureTypes_[MAX_TEXTURE_UNITS]{};
     /// Constant buffer search map.
     ConstantBufferMap allConstantBuffers_;
     /// Currently bound constant buffers.
-    ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
+    ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2]{};
     /// Dirty constant buffers.
     PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Last used instance data offset.
-    unsigned lastInstanceOffset_;
+    unsigned lastInstanceOffset_{};
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
     HashMap<int, SharedPtr<Texture2D> > depthTextures_;
     /// Shader program in use.
-    ShaderProgram* shaderProgram_;
+    ShaderProgram* shaderProgram_{};
     /// Linked shader programs.
     ShaderProgramMap shaderPrograms_;
     /// Need FBO commit flag.
-    bool fboDirty_;
+    bool fboDirty_{};
     /// Need vertex attribute pointer update flag.
-    bool vertexBuffersDirty_;
+    bool vertexBuffersDirty_{};
     /// sRGB write mode flag.
-    bool sRGBWrite_;
+    bool sRGBWrite_{};
 };
 
 }

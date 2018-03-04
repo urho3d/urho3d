@@ -73,25 +73,25 @@ public:
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
 
     /// Element this batch represents.
-    UIElement* element_;
+    UIElement* element_{};
     /// Blending mode.
-    BlendMode blendMode_;
+    BlendMode blendMode_{BLEND_REPLACE};
     /// Scissor rectangle.
     IntRect scissor_;
     /// Texture.
-    Texture* texture_;
+    Texture* texture_{};
     /// Inverse texture size.
-    Vector2 invTextureSize_;
-    /// Current color. By default calculated from the element.
-    unsigned color_;
+    Vector2 invTextureSize_{Vector2::ONE};
     /// Vertex data.
-    PODVector<float>* vertexData_;
+    PODVector<float>* vertexData_{};
     /// Vertex data start index.
-    unsigned vertexStart_;
+    unsigned vertexStart_{};
     /// Vertex data end index.
-    unsigned vertexEnd_;
+    unsigned vertexEnd_{};
+    /// Current color. By default calculated from the element.
+    unsigned color_{};
     /// Gradient flag.
-    bool useGradient_;
+    bool useGradient_{};
 
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
     static Vector3 posAdjust;

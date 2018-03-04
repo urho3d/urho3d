@@ -52,10 +52,7 @@
 URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
-    Sample(context),
-    streamingDistance_(2),
-    drawDebug_(false),
-    instructionText_(nullptr)
+    Sample(context)
 {
 }
 

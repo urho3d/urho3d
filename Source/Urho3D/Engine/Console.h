@@ -163,7 +163,7 @@ private:
     /// Current row being edited.
     String currentRow_;
     /// Maximum displayed rows.
-    unsigned displayedRows_;
+    unsigned displayedRows_{};
     /// Command history maximum rows.
     unsigned historyRows_;
     /// Command history current position.

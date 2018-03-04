@@ -48,16 +48,7 @@ void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
 }
 
 OcclusionBuffer::OcclusionBuffer(Context* context) :
-    Object(context),
-    width_(0),
-    height_(0),
-    numTriangles_(0),
-    maxTriangles_(OCCLUSION_DEFAULT_MAX_TRIANGLES),
-    cullMode_(CULL_CCW),
-    depthHierarchyDirty_(true),
-    reverseCulling_(false),
-    nearClip_(0.0f),
-    farClip_(0.0f)
+    Object(context)
 {
 }
 

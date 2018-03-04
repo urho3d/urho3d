@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Urho2D/AnimatedSprite2D.h>
 #include <Urho3D/Urho2D/AnimationSet2D.h>
 #include <Urho3D/UI/BorderImage.h>
@@ -40,7 +38,6 @@
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Urho2D/ParticleEffect2D.h>
 #include <Urho3D/Urho2D/ParticleEmitter2D.h>
-#include <Urho3D/Math/Random.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Urho2D/RigidBody2D.h>
 #include <Urho3D/Scene/Scene.h>

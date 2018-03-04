@@ -84,7 +84,7 @@ private:
     /// Render surfaces.
     SharedPtr<RenderSurface> renderSurfaces_[MAX_CUBEMAP_FACES];
     /// Memory use per face.
-    unsigned faceMemoryUse_[MAX_CUBEMAP_FACES];
+    unsigned faceMemoryUse_[MAX_CUBEMAP_FACES]{};
     /// Face image files acquired during BeginLoad.
     Vector<SharedPtr<Image> > loadImages_;
     /// Parameter file acquired during BeginLoad.

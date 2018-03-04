@@ -39,7 +39,7 @@ class TmxLayer2D : public RefCounted
 {
 public:
     TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
-    ~TmxLayer2D() override;
+    ~TmxLayer2D() override = default;
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
@@ -78,11 +78,11 @@ protected:
     /// Name.
     String name_;
     /// Width.
-    int width_;
+    int width_{};
     /// Height.
-    int height_;
+    int height_{};
     /// Visible.
-    bool visible_;
+    bool visible_{};
     /// Property set.
     SharedPtr<PropertySet2D> propertySet_;
 };
@@ -215,7 +215,7 @@ private:
     /// TSX name to XML file mapping.
     HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
     /// Tile map information.
-    TileMapInfo2D info_;
+    TileMapInfo2D info_{};
     /// Gid to tile sprite mapping.
     HashMap<unsigned, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.

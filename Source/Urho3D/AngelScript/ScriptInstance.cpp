@@ -63,12 +63,8 @@ static const char* methodDeclarations[] = {
 };
 
 ScriptInstance::ScriptInstance(Context* context) :
-    Component(context),
-    scriptObject_(nullptr),
-    subscribed_(false),
-    subscribedPostFixed_(false)
+    Component(context)
 {
-    ClearScriptMethods();
     ClearScriptAttributes();
 }
 

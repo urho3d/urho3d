@@ -294,31 +294,31 @@ private:
     /// Pixel shader defines.
     String pixelShaderDefines_;
     /// Normal culling mode.
-    CullMode cullMode_;
+    CullMode cullMode_{};
     /// Culling mode for shadow rendering.
-    CullMode shadowCullMode_;
+    CullMode shadowCullMode_{};
     /// Polygon fill mode.
-    FillMode fillMode_;
+    FillMode fillMode_{};
     /// Depth bias parameters.
-    BiasParameters depthBias_;
+    BiasParameters depthBias_{};
     /// Render order value.
-    unsigned char renderOrder_;
+    unsigned char renderOrder_{};
     /// Last auxiliary view rendered frame number.
-    unsigned auxViewFrameNumber_;
+    unsigned auxViewFrameNumber_{};
     /// Shader parameter hash value.
-    unsigned shaderParameterHash_;
+    unsigned shaderParameterHash_{};
     /// Alpha-to-coverage flag.
-    bool alphaToCoverage_;
+    bool alphaToCoverage_{};
     /// Line antialiasing flag.
-    bool lineAntiAlias_;
+    bool lineAntiAlias_{};
     /// Render occlusion flag.
-    bool occlusion_;
+    bool occlusion_{true};
     /// Specular lighting flag.
-    bool specular_;
+    bool specular_{};
     /// Flag for whether is subscribed to animation updates.
-    bool subscribed_;
+    bool subscribed_{};
     /// Flag to suppress parameter hash and memory use recalculation when setting multiple shader parameters (loading or resetting the material.)
-    bool batchedParameterUpdate_;
+    bool batchedParameterUpdate_{};
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// JSON file used while loading.

@@ -2043,13 +2043,13 @@ void ScriptDictionaryListFactory_Generic(asIScriptGeneric *gen)
     *(CScriptDictionary**)gen->GetAddressOfReturnLocation() = CScriptDictionary::Create(buffer);
 }
 
-CScriptDictValue::CScriptDictValue()
+CScriptDictValue::CScriptDictValue()    // NOLINT(hicpp-member-init)
 {
     m_valueObj = nullptr;
     m_typeId   = 0;
 }
 
-CScriptDictValue::CScriptDictValue(asIScriptEngine *engine, void *value, int typeId)
+CScriptDictValue::CScriptDictValue(asIScriptEngine *engine, void *value, int typeId)    // NOLINT(hicpp-member-init)
 {
     m_valueObj = nullptr;
     m_typeId   = 0;

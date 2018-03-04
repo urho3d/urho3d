@@ -243,16 +243,7 @@ bool CompressedLevel::Decompress(unsigned char* dest)
 }
 
 Image::Image(Context* context) :
-    Resource(context),
-    width_(0),
-    height_(0),
-    depth_(0),
-    components_(0),
-    numCompressedLevels_(0),
-    cubemap_(false),
-    array_(false),
-    sRGB_(false),
-    compressedFormat_(CF_NONE)
+    Resource(context)
 {
 }
 
@@ -271,12 +262,12 @@ bool Image::BeginLoad(Deserializer& source)
     if (fileID == "DDS ")
     {
         // DDS compressed format
-        DDSurfaceDesc2 ddsd;
+        DDSurfaceDesc2 ddsd;        // NOLINT(hicpp-member-init)
         source.Read(&ddsd, sizeof(ddsd));
 
         // DDS DX10+
         const bool hasDXGI = ddsd.ddpfPixelFormat_.dwFourCC_ == FOURCC_DX10;
-        DDSHeader10 dxgiHeader;
+        DDSHeader10 dxgiHeader;     // NOLINT(hicpp-member-init)
         if (hasDXGI)
             source.Read(&dxgiHeader, sizeof(dxgiHeader));
 
@@ -1330,7 +1321,7 @@ bool Image::SaveDDS(const String& fileName) const
 
     outFile.WriteFileID("DDS ");
 
-    DDSurfaceDesc2 ddsd;
+    DDSurfaceDesc2 ddsd;        // NOLINT(hicpp-member-init)
     memset(&ddsd, 0, sizeof(ddsd));
     ddsd.dwSize_ = sizeof(ddsd);
     ddsd.dwFlags_ = 0x00000001l /*DDSD_CAPS*/

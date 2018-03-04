@@ -31,9 +31,7 @@ namespace Urho3D
 {
 
 GPUObject::GPUObject(Graphics* graphics) :
-    graphics_(graphics),
-    dataLost_(false),
-    dataPending_(false)
+    graphics_(graphics)
 {
 #ifdef URHO3D_OPENGL
     object_.name_ = 0;

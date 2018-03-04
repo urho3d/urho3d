@@ -78,7 +78,7 @@ private:
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
     /// Tile map information.
-    TileMapInfo2D info_;
+    TileMapInfo2D info_{};
     /// Root node for tile map layer.
     SharedPtr<Node> rootNode_;
     /// Tile map layers.

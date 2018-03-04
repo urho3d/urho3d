@@ -37,8 +37,6 @@ namespace Urho3D
 namespace Spriter
 {
 
-SpriterData::SpriterData() = default;
-
 SpriterData::~SpriterData()
 {
     Reset();
@@ -74,14 +72,14 @@ bool SpriterData::Load(const pugi::xml_node& node)
 
     for (xml_node folderNode = node.child("folder"); !folderNode.empty(); folderNode = folderNode.next_sibling("folder"))
     {
-        folders_.Push(new  Folder());
+        folders_.Push(new Folder());
         if (!folders_.Back()->Load(folderNode))
             return false;
     }
 
     for (xml_node entityNode = node.child("entity"); !entityNode.empty(); entityNode = entityNode.next_sibling("entity"))
     {
-        entities_.Push(new  Entity());
+        entities_.Push(new Entity());
         if (!entities_.Back()->Load(entityNode))
             return false;
     }
@@ -97,8 +95,6 @@ bool SpriterData::Load(const void* data, size_t size)
 
     return Load(document.child("spriter_data"));
 }
-
-Folder::Folder() = default;
 
 Folder::~Folder()
 {
@@ -137,8 +133,6 @@ File::File(Folder* folder) :
 {
 }
 
-File::~File() = default;
-
 bool File::Load(const pugi::xml_node& node)
 {
     if (strcmp(node.name(), "file") != 0)
@@ -153,8 +147,6 @@ bool File::Load(const pugi::xml_node& node)
 
     return true;
 }
-
-Entity::Entity() = default;
 
 Entity::~Entity()
 {
@@ -199,9 +191,10 @@ bool Entity::Load(const pugi::xml_node& node)
     return true;
 }
 
-CharacterMap::CharacterMap() = default;
-
-CharacterMap::~CharacterMap() = default;
+CharacterMap::~CharacterMap()
+{
+    Reset();
+}
 
 void CharacterMap::Reset()
 {
@@ -230,10 +223,6 @@ bool CharacterMap::Load(const pugi::xml_node& node)
     return false;
 }
 
-MapInstruction::MapInstruction() = default;
-
-MapInstruction::~MapInstruction() = default;
-
 bool MapInstruction::Load(const pugi::xml_node& node)
 {
     if (strcmp(node.name(), "map") != 0)
@@ -246,8 +235,6 @@ bool MapInstruction::Load(const pugi::xml_node& node)
 
     return true;
 }
-
-Animation::Animation() = default;
 
 Animation::~Animation()
 {
@@ -298,8 +285,6 @@ bool Animation::Load(const pugi::xml_node& node)
     return true;
 }
 
-MainlineKey::MainlineKey() = default;
-
 MainlineKey::~MainlineKey()
 {
     Reset();
@@ -338,10 +323,6 @@ bool MainlineKey::Load(const pugi::xml_node& node)
     return true;
 }
 
-Ref::Ref() = default;
-
-Ref::~Ref() = default;
-
 bool Ref::Load(const pugi::xml_node& node)
 {
     if (strcmp(node.name(), "bone_ref") != 0 && strcmp(node.name(), "object_ref") != 0)
@@ -355,8 +336,6 @@ bool Ref::Load(const pugi::xml_node& node)
 
     return true;
 }
-
-Timeline::Timeline() = default;
 
 Timeline::~Timeline()
 {
@@ -420,8 +399,6 @@ TimelineKey::TimelineKey(Timeline* timeline)
 {
     this->timeline_ = timeline;
 }
-
-TimelineKey::~TimelineKey() = default;
 
 bool TimelineKey::Load(const pugi::xml_node& node)
 {
@@ -498,15 +475,15 @@ float TimelineKey::GetTByCurveType(float currentTime, float nextTimelineTime) co
     }
 }
 
-SpatialInfo::SpatialInfo(float x, float y, float angle, float scale_x, float scale_y, float a, int spin)
+SpatialInfo::SpatialInfo(float x, float y, float angle, float scale_x, float scale_y, float alpha, int spin) :
+    x_(x),
+    y_(y),
+    angle_(angle),
+    scaleX_(scale_x),
+    scaleY_(scale_y),
+    alpha_(alpha),
+    spin_(spin)
 {
-    this->x_ = x;
-    this->y_ = y;
-    this->angle_ = angle;
-    this->scaleX_ = scale_x;
-    this->scaleY_ = scale_y;
-    this->alpha_ = a;
-    this->spin = spin;
 }
 
 SpatialInfo SpatialInfo::UnmapFromParent(const SpatialInfo& parentInfo) const
@@ -535,7 +512,7 @@ SpatialInfo SpatialInfo::UnmapFromParent(const SpatialInfo& parentInfo) const
         unmappedY = parentInfo.y_;
     }
 
-    return {unmappedX, unmappedY, unmappedAngle, unmappedScaleX, unmappedScaleY, unmappedAlpha, spin};
+    return {unmappedX, unmappedY, unmappedAngle, unmappedScaleX, unmappedScaleY, unmappedAlpha, spin_};
 }
 
 void SpatialInfo::Interpolate(const SpatialInfo& other, float t)
@@ -543,11 +520,11 @@ void SpatialInfo::Interpolate(const SpatialInfo& other, float t)
     x_ = Linear(x_, other.x_, t);
     y_ = Linear(y_, other.y_, t);
 
-    if (spin > 0.0f && (other.angle_ - angle_ < 0.0f))
+    if (spin_ > 0.0f && (other.angle_ - angle_ < 0.0f))
     {
         angle_ = Linear(angle_, other.angle_ + 360.0f, t);
     }
-    else if (spin < 0.0f && (other.angle_ - angle_ > 0.0f))
+    else if (spin_ < 0.0f && (other.angle_ - angle_ > 0.0f))
     {
         angle_ = Linear(angle_, other.angle_ - 360.0f, t);
     }
@@ -567,8 +544,6 @@ SpatialTimelineKey::SpatialTimelineKey(Timeline* timeline) :
 {
 }
 
-SpatialTimelineKey::~SpatialTimelineKey() = default;
-
 bool SpatialTimelineKey::Load(const xml_node& node)
 {
     if (!TimelineKey::Load(node))
@@ -585,12 +560,10 @@ bool SpatialTimelineKey::Load(const xml_node& node)
     info_.scaleY_ = childNode.attribute("scale_y").as_float(1.0f);
     info_.alpha_ = childNode.attribute("a").as_float(1.0f);
 
-    info_.spin = node.attribute("spin").as_int(1);
+    info_.spin_ = node.attribute("spin").as_int(1);
 
     return true;
 }
-
-SpatialTimelineKey& SpatialTimelineKey::operator=(const SpatialTimelineKey& rhs)= default;
 
 void SpatialTimelineKey::Interpolate(const TimelineKey& other, float t)
 {
@@ -601,10 +574,7 @@ void SpatialTimelineKey::Interpolate(const TimelineKey& other, float t)
 BoneTimelineKey::BoneTimelineKey(Timeline* timeline) :
     SpatialTimelineKey(timeline)
 {
-
 }
-
-BoneTimelineKey::~BoneTimelineKey() = default;
 
 TimelineKey* BoneTimelineKey::Clone() const
 {
@@ -624,8 +594,6 @@ bool BoneTimelineKey::Load(const xml_node& node)
 
     return true;
 }
-
-BoneTimelineKey& BoneTimelineKey::operator=(const BoneTimelineKey& rhs)= default;
 
 void BoneTimelineKey::Interpolate(const TimelineKey& other, float t)
 {
@@ -647,8 +615,6 @@ SpriteTimelineKey::SpriteTimelineKey(Timeline* timeline) :
     SpatialTimelineKey(timeline)
 {
 }
-
-SpriteTimelineKey::~SpriteTimelineKey() = default;
 
 bool SpriteTimelineKey::Load(const pugi::xml_node& node)
 {

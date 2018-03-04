@@ -195,57 +195,54 @@ protected:
     /// Create the GPU texture. Implemented in subclasses.
     virtual bool Create() { return true; }
 
-    union
-    {
-        /// Direct3D11 shader resource view.
-        void* shaderResourceView_;
-        /// OpenGL target.
-        unsigned target_;
-    };
+    /// OpenGL target.
+    unsigned target_{};
 
+    /// Direct3D11 shader resource view.
+    void* shaderResourceView_{};
     /// Direct3D11 sampler state object.
-    void* sampler_;
+    void* sampler_{};
     /// Direct3D11 resolve texture object when multisample with autoresolve is used.
-    void* resolveTexture_;
+    void* resolveTexture_{};
 
     /// Texture format.
-    unsigned format_;
+    unsigned format_{};
     /// Texture usage type.
-    TextureUsage usage_;
+    TextureUsage usage_{TEXTURE_STATIC};
     /// Current mip levels.
-    unsigned levels_;
+    unsigned levels_{};
     /// Requested mip levels.
-    unsigned requestedLevels_;
+    unsigned requestedLevels_{};
     /// Texture width.
-    int width_;
+    int width_{};
     /// Texture height.
-    int height_;
+    int height_{};
     /// Texture depth.
-    int depth_;
+    int depth_{};
     /// Shadow compare mode.
-    bool shadowCompare_;
+    bool shadowCompare_{};
     /// Filtering mode.
-    TextureFilterMode filterMode_;
+    TextureFilterMode filterMode_{FILTER_DEFAULT};
     /// Addressing mode.
-    TextureAddressMode addressModes_[MAX_COORDS];
+    TextureAddressMode addressModes_[MAX_COORDS]{ADDRESS_WRAP, ADDRESS_WRAP, ADDRESS_WRAP};
     /// Texture anisotropy level.
-    unsigned anisotropy_;
+    unsigned anisotropy_{};
     /// Mip levels to skip when loading per texture quality setting.
-    unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
+    unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS]{2, 1, 0};
     /// Border color.
     Color borderColor_;
     /// Multisampling level.
-    int multiSample_;
+    int multiSample_{1};
     /// sRGB sampling and writing mode flag.
-    bool sRGB_;
+    bool sRGB_{};
     /// Parameters dirty flag.
-    bool parametersDirty_;
+    bool parametersDirty_{true};
     /// Multisampling autoresolve flag.
-    bool autoResolve_;
+    bool autoResolve_{};
     /// Multisampling resolve needed -flag.
-    bool resolveDirty_;
+    bool resolveDirty_{};
     /// Mipmap levels regeneration needed -flag.
-    bool levelsDirty_;
+    bool levelsDirty_{};
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

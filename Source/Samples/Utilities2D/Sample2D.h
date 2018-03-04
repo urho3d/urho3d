@@ -40,8 +40,6 @@ using namespace Urho3D;
 const float CAMERA_MIN_DIST = 0.1f;
 const float CAMERA_MAX_DIST = 6.0f;
 
-const float MOVE_SPEED_SCALE = 1.0f; // Scaling factor based on tiles' aspect ratio
-
 /// Convenient functions for Urho2D samples:
 ///    - Generate collision shapes from a tmx file objects
 ///    - Create Spriter Imp character
@@ -110,7 +108,7 @@ public:
     /// Filename used in load/save functions.
     String demoFilename_;
     /// The scene.
-    Scene* scene_;
+    Scene* scene_{};
 
 protected:
     /// Return XML patch instructions for screen joystick layout.

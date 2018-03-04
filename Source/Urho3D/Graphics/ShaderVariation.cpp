@@ -31,14 +31,14 @@
 namespace Urho3D
 {
 
-ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) :
+ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) :   // NOLINT(hicpp-member-init)
     name_{name},
     glType_{glType},
     location_{location}
 {
 }
 
-ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer) :
+ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer) :    // NOLINT(hicpp-member-init)
     type_{type},
     name_{name},
     offset_{offset},
@@ -47,7 +47,7 @@ ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned o
 {
 }
 
-ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) :
+ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) :    // NOLINT(hicpp-member-init)
     type_{type},
     name_{name},
     register_{reg},
@@ -58,13 +58,8 @@ ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned r
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    type_(type),
-    elementHash_(0)
+    type_(type)
 {
-    for (bool& useTextureUnit : useTextureUnits_)
-        useTextureUnit = false;
-    for (unsigned& constantBufferSize : constantBufferSizes_)
-        constantBufferSize = 0;
 }
 
 ShaderVariation::~ShaderVariation()

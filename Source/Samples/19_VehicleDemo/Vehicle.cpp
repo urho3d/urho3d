@@ -35,8 +35,7 @@
 #include "Vehicle.h"
 
 Vehicle::Vehicle(Context* context) :
-    LogicComponent(context),
-    steering_(0.0f)
+    LogicComponent(context)
 {
     // Only the physics update event is needed: unsubscribe from the rest for optimization
     SetUpdateEventMask(USE_FIXEDUPDATE);

@@ -83,7 +83,7 @@ private:
     void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Texture array layers number.
-    unsigned layers_;
+    unsigned layers_{};
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
     /// Memory use per layer.

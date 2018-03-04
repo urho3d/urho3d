@@ -75,30 +75,40 @@ private:
     /// Acquire wheel components from wheel scene nodes.
     void GetWheelComponents();
 
-
-    // Wheel scene nodes.
+    /// Wheel scene front-left node.
     WeakPtr<Node> frontLeft_;
+    /// Wheel scene front-right node.
     WeakPtr<Node> frontRight_;
+    /// Wheel scene rear-left node.
     WeakPtr<Node> rearLeft_;
+    /// Wheel scene rear-right node.
     WeakPtr<Node> rearRight_;
 
-    // Steering axle constraints.
+    /// Steering front-left axle constraint.
     WeakPtr<Constraint> frontLeftAxis_;
+    /// Steering front-right axle constraint.
     WeakPtr<Constraint> frontRightAxis_;
 
-    // Hull and wheel rigid bodies.
+    /// Hull and wheel hull rigid bodies.
     WeakPtr<RigidBody> hullBody_;
+    /// Hull and wheel front-left rigid bodies.
     WeakPtr<RigidBody> frontLeftBody_;
+    /// Hull and wheel front-right rigid bodies.
     WeakPtr<RigidBody> frontRightBody_;
+    /// Hull and wheel rear-left rigid bodies.
     WeakPtr<RigidBody> rearLeftBody_;
+    /// Hull and wheel rear-right rigid bodies.
     WeakPtr<RigidBody> rearRightBody_;
 
-    // IDs of the wheel scene nodes for serialization.
-    unsigned frontLeftID_;
-    unsigned frontRightID_;
-    unsigned rearLeftID_;
-    unsigned rearRightID_;
+    /// ID of the front-left wheel scene node for serialization.
+    unsigned frontLeftID_{};
+    /// ID of the front-right wheel scene node for serialization.
+    unsigned frontRightID_{};
+    /// ID of the rear-left wheel scene node for serialization.
+    unsigned rearLeftID_{};
+    /// ID of the rear-right wheel scene node for serialization.
+    unsigned rearRightID_{};
 
-    /// Current left/right steering amount (-1 to 1.)
-    float steering_;
+    /// Current left/right steering amount (-1 to 1).
+    float steering_{};
 };

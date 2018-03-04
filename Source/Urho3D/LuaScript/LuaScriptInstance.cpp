@@ -65,16 +65,12 @@ static const char* scriptObjectMethodNames[] = {
 
 LuaScriptInstance::LuaScriptInstance(Context* context) :
     Component(context),
+    luaScript_(GetSubsystem<LuaScript>()),
+    eventInvoker_(new LuaScriptEventInvoker(this)),
     scriptObjectRef_(LUA_REFNIL)
 {
-    luaScript_ = GetSubsystem<LuaScript>();
     luaState_ = luaScript_->GetState();
     attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
-
-    eventInvoker_ = new LuaScriptEventInvoker(this);
-
-    for (auto& scriptObjectMethod : scriptObjectMethods_)
-        scriptObjectMethod = nullptr;
 }
 
 LuaScriptInstance::~LuaScriptInstance()

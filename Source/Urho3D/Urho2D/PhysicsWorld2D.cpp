@@ -50,11 +50,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     Component(context),
     gravity_(DEFAULT_GRAVITY),
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
-    positionIterations_(DEFAULT_POSITION_ITERATIONS),
-    debugRenderer_(nullptr),
-    physicsStepping_(false),
-    applyingTransforms_(false),
-    updateEnabled_(true)
+    positionIterations_(DEFAULT_POSITION_ITERATIONS)
 {
     // Set default debug draw flags
     m_drawFlags = e_shapeBit;

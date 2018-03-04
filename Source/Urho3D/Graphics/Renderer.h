@@ -505,9 +505,9 @@ private:
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
     /// Instance of shadow map filter
-    Object* shadowMapFilterInstance_;
+    Object* shadowMapFilterInstance_{};
     /// Function pointer of shadow map filter
-    ShadowMapFilter shadowMapFilter_;
+    ShadowMapFilter shadowMapFilter_{};
     /// Screen buffers by resolution and format.
     HashMap<long long, Vector<SharedPtr<Texture> > > screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
@@ -535,73 +535,73 @@ private:
     /// Frame info for rendering.
     FrameInfo frame_;
     /// Texture anisotropy level.
-    int textureAnisotropy_;
+    int textureAnisotropy_{4};
     /// Texture filtering mode.
-    TextureFilterMode textureFilterMode_;
+    TextureFilterMode textureFilterMode_{FILTER_TRILINEAR};
     /// Texture quality level.
-    int textureQuality_;
+    int textureQuality_{QUALITY_HIGH};
     /// Material quality level.
-    int materialQuality_;
+    int materialQuality_{QUALITY_HIGH};
     /// Shadow map resolution.
-    int shadowMapSize_;
+    int shadowMapSize_{1024};
     /// Shadow quality.
-    ShadowQuality shadowQuality_;
+    ShadowQuality shadowQuality_{SHADOWQUALITY_PCF_16BIT};
     /// Shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
-    float shadowSoftness_;
+    float shadowSoftness_{1.0f};
     /// Shadow parameters when VSM is used, they help to reduce light bleeding.
-    Vector2 vsmShadowParams_;
+    Vector2 vsmShadowParams_{0.0000001f, 0.9f};
     /// Multisample level for VSM shadows.
-    int vsmMultiSample_;
+    int vsmMultiSample_{1};
     /// Maximum number of shadow maps per resolution.
-    int maxShadowMaps_;
+    int maxShadowMaps_{1};
     /// Minimum number of instances required in a batch group to render as instanced.
-    int minInstances_;
+    int minInstances_{2};
     /// Maximum sorted instances per batch group.
-    int maxSortedInstances_;
+    int maxSortedInstances_{1000};
     /// Maximum occluder triangles.
-    int maxOccluderTriangles_;
+    int maxOccluderTriangles_{5000};
     /// Occlusion buffer width.
-    int occlusionBufferSize_;
+    int occlusionBufferSize_{256};
     /// Occluder screen size threshold.
-    float occluderSizeThreshold_;
+    float occluderSizeThreshold_{0.025f};
     /// Mobile platform shadow depth bias multiplier.
-    float mobileShadowBiasMul_;
+    float mobileShadowBiasMul_{1.0f};
     /// Mobile platform shadow depth bias addition.
-    float mobileShadowBiasAdd_;
+    float mobileShadowBiasAdd_{};
     /// Mobile platform shadow normal offset multiplier.
-    float mobileNormalOffsetMul_;
+    float mobileNormalOffsetMul_{1.0f};
     /// Number of occlusion buffers in use.
-    unsigned numOcclusionBuffers_;
+    unsigned numOcclusionBuffers_{};
     /// Number of temporary shadow cameras in use.
-    unsigned numShadowCameras_;
+    unsigned numShadowCameras_{};
     /// Number of primitives (3D geometry only.)
-    unsigned numPrimitives_;
+    unsigned numPrimitives_{};
     /// Number of batches (3D geometry only.)
-    unsigned numBatches_;
+    unsigned numBatches_{};
     /// Frame number on which shaders last changed.
-    unsigned shadersChangedFrameNumber_;
+    unsigned shadersChangedFrameNumber_{M_MAX_UNSIGNED};
     /// Current stencil value for light optimization.
-    unsigned char lightStencilValue_;
+    unsigned char lightStencilValue_{};
     /// HDR rendering flag.
-    bool hdrRendering_;
+    bool hdrRendering_{};
     /// Specular lighting flag.
-    bool specularLighting_;
+    bool specularLighting_{true};
     /// Draw shadows flag.
-    bool drawShadows_;
+    bool drawShadows_{true};
     /// Shadow map reuse flag.
-    bool reuseShadowMaps_;
+    bool reuseShadowMaps_{true};
     /// Dynamic instancing flag.
-    bool dynamicInstancing_;
+    bool dynamicInstancing_{true};
     /// Number of extra instancing data elements.
-    int numExtraInstancingBufferElements_;
+    int numExtraInstancingBufferElements_{};
     /// Threaded occlusion rendering flag.
-    bool threadedOcclusion_;
+    bool threadedOcclusion_{};
     /// Shaders need reloading flag.
-    bool shadersDirty_;
+    bool shadersDirty_{true};
     /// Initialized flag.
-    bool initialized_;
+    bool initialized_{};
     /// Flag for views needing reset.
-    bool resetViews_;
+    bool resetViews_{};
 };
 
 }

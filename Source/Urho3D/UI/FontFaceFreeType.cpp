@@ -73,14 +73,12 @@ public:
 
 private:
     /// FreeType library.
-    FT_Library library_;
+    FT_Library library_{};
 };
 
 FontFaceFreeType::FontFaceFreeType(Font* font) :
     FontFace(font),
-    face_(nullptr),
-    loadMode_(FT_LOAD_DEFAULT),
-    hasMutableGlyph_(false)
+    loadMode_(FT_LOAD_DEFAULT)
 {
 }
 

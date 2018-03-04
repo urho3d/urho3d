@@ -61,12 +61,8 @@ const void* ShaderProgram::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
-    pixelShader_(pixelShader),
-    usedVertexAttributes_(0),
-    frameNumber_(0)
+    pixelShader_(pixelShader)
 {
-    for (bool& useTextureUnit : useTextureUnits_)
-        useTextureUnit = false;
     for (auto& parameterSource : parameterSources_)
         parameterSource = (const void*)M_MAX_UNSIGNED;
 }

@@ -128,11 +128,11 @@ private:
     /// Script subsystem.
     SharedPtr<Script> script_;
     /// Script module.
-    asIScriptModule* scriptModule_;
+    asIScriptModule* scriptModule_{};
     /// Compiled flag.
-    bool compiled_;
+    bool compiled_{};
     /// Subscribed to application update event flag.
-    bool subscribed_;
+    bool subscribed_{};
     /// Encountered include files during script file loading.
     HashSet<String> includeFiles_;
     /// Search cache for checking whether script classes implement "ScriptObject" interface.
@@ -148,7 +148,7 @@ private:
     /// Byte code for asynchronous loading.
     SharedArrayPtr<unsigned char> loadByteCode_;
     /// Byte code size for asynchronous loading.
-    unsigned loadByteCodeSize_;
+    unsigned loadByteCodeSize_{};
 };
 
 /// Helper class for forwarding events to script objects that are not part of a scene.

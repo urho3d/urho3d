@@ -94,19 +94,19 @@ private:
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Texture unit use.
-    bool useTextureUnits_[MAX_TEXTURE_UNITS];
+    bool useTextureUnits_[MAX_TEXTURE_UNITS]{};
     /// Vertex attributes.
     HashMap<Pair<unsigned char, unsigned char>, unsigned> vertexAttributes_;
     /// Used vertex attribute location bitmask.
-    unsigned usedVertexAttributes_;
+    unsigned usedVertexAttributes_{};
     /// Constant buffers by binding index.
     SharedPtr<ConstantBuffer> constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
     /// Remembered shader parameter sources for individual uniform mode.
-    const void* parameterSources_[MAX_SHADER_PARAMETER_GROUPS];
+    const void* parameterSources_[MAX_SHADER_PARAMETER_GROUPS]{};
     /// Shader link error string.
     String linkerOutput_;
     /// Shader parameter source framenumber.
-    unsigned frameNumber_;
+    unsigned frameNumber_{};
 
     /// Global shader parameter source framenumber.
     static unsigned globalFrameNumber;

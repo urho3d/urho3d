@@ -54,8 +54,6 @@ public:
 private:
     /// Construct the scene content.
     void CreateScene();
-    /// Construct an instruction text to the UI.
-    void CreateInstructions();
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
     /// Handle the logic update event.
@@ -78,9 +76,9 @@ private:
     /// The controllable character component.
     WeakPtr<Character2D> character2D_;
     /// Flag for drawing debug geometry.
-    bool drawDebug_;
+    bool drawDebug_{};
     /// Scaling factor based on tiles' aspect ratio.
-    float moveSpeedScale_;
+    float moveSpeedScale_{};
 
     /// Sample2D utility object.
     SharedPtr<Sample2D> sample2D_;

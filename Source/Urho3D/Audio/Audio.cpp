@@ -53,10 +53,7 @@ static const StringHash SOUND_MASTER_HASH("Master");
 static void SDLAudioCallback(void* userdata, Uint8* stream, int len);
 
 Audio::Audio(Context* context) :
-    Object(context),
-    deviceID_(0),
-    sampleSize_(0),
-    playing_(false)
+    Object(context)
 {
     context_->RequireSDL(SDL_INIT_AUDIO);
 

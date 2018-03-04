@@ -207,7 +207,7 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 
     for (;;)
     {
-        Pair<unsigned, bool> status;
+        Pair<unsigned, bool> status{};
 
         for (;;)
         {
@@ -288,10 +288,8 @@ unsigned HttpRequest::GetAvailableSize() const
 
 Pair<unsigned, bool> HttpRequest::CheckAvailableSizeAndEof() const
 {
-    Pair<unsigned, bool> ret;
-    ret.first_ = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
-    ret.second_ = (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !ret.first_));
-    return ret;
+    unsigned size = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    return {size, (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !size))};
 }
 
 }

@@ -65,9 +65,9 @@ private:
     /// Maximum size it allows to grow. It is zero when it is not allowed to grow.
     IntVector2 maxSize_;
     /// The dimension use for next growth. Used internally.
-    bool doubleWidth_;
+    bool doubleWidth_{true};
     /// Fast mode flag.
-    bool fastMode_;
+    bool fastMode_{true};
 };
 
 }

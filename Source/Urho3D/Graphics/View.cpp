@@ -282,26 +282,13 @@ StringHash ParseTextureTypeXml(ResourceCache* cache, const String& filename);
 View::View(Context* context) :
     Object(context),
     graphics_(GetSubsystem<Graphics>()),
-    renderer_(GetSubsystem<Renderer>()),
-    scene_(nullptr),
-    octree_(nullptr),
-    cullCamera_(nullptr),
-    camera_(nullptr),
-    cameraZone_(nullptr),
-    farClipZone_(nullptr),
-    occlusionBuffer_(nullptr),
-    renderTarget_(nullptr),
-    substituteRenderTarget_(nullptr),
-    passCommand_(nullptr)
+    renderer_(GetSubsystem<Renderer>())
 {
     // Create octree query and scene results vector for each thread
     unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
     tempDrawables_.Resize(numThreads);
     sceneResults_.Resize(numThreads);
-    frame_.camera_ = nullptr;
 }
-
-View::~View() = default;
 
 bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 {

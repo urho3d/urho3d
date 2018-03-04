@@ -446,7 +446,7 @@ unsigned GetNumPhysicalCPUs()
     return SDL_TVOS_GetActiveProcessorCount();
 #endif
 #elif defined(__linux__)
-    struct CpuCoreCount data;
+    struct CpuCoreCount data{};
     GetCPUData(&data);
     return data.numPhysicalCores_;
 #elif defined(__EMSCRIPTEN__)
@@ -479,7 +479,7 @@ unsigned GetNumLogicalCPUs()
     return SDL_TVOS_GetActiveProcessorCount();
 #endif
 #elif defined(__linux__)
-    struct CpuCoreCount data;
+    struct CpuCoreCount data{};
     GetCPUData(&data);
     return data.numLogicalCores_;
 #elif defined(__EMSCRIPTEN__)
@@ -521,7 +521,7 @@ String GetMiniDumpDir()
 unsigned long long GetTotalMemory()
 {
 #if defined(__linux__) && !defined(__ANDROID__)
-    struct sysinfo s;
+    struct sysinfo s{};
     if (sysinfo(&s) != -1)
         return s.totalram;
 #elif defined(_WIN32)
@@ -607,7 +607,7 @@ static void GetOS(RTL_OSVERSIONINFOW *r)
 String GetOSVersion()
 {
 #if defined(__linux__) && !defined(__ANDROID__)
-    struct utsname u;
+    struct utsname u{};
     if (uname(&u) == 0)
         return String(u.sysname) + " " + u.release;
 #elif defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)

@@ -57,31 +57,8 @@ static const char* filterModeNames[] =
 
 Texture::Texture(Context* context) :
     ResourceWithMetadata(context),
-    GPUObject(GetSubsystem<Graphics>()),
-    shaderResourceView_(nullptr),
-    sampler_(nullptr),
-    resolveTexture_(nullptr),
-    format_(0),
-    usage_(TEXTURE_STATIC),
-    levels_(0),
-    requestedLevels_(0),
-    width_(0),
-    height_(0),
-    depth_(0),
-    shadowCompare_(false),
-    filterMode_(FILTER_DEFAULT),
-    anisotropy_(0),
-    multiSample_(1),
-    sRGB_(false),
-    parametersDirty_(true),
-    autoResolve_(false),
-    resolveDirty_(false),
-    levelsDirty_(false)
+    GPUObject(GetSubsystem<Graphics>())
 {
-    for (auto& addressMode : addressModes_)
-        addressMode = ADDRESS_WRAP;
-    for (int i = 0; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
-        mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
 }
 
 Texture::~Texture() = default;

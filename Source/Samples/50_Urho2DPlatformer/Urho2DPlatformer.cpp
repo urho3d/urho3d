@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Audio/Audio.h>
 #include <Urho3D/Urho2D/AnimatedSprite2D.h>
 #include <Urho3D/Urho2D/AnimationSet2D.h>
@@ -33,7 +31,6 @@
 #include <Urho3D/Urho2D/CollisionPolygon2D.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
-#include <Urho3D/Urho2D/Drawable2D.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/Graphics/Graphics.h>
@@ -67,8 +64,7 @@
 URHO3D_DEFINE_APPLICATION_MAIN(Urho2DPlatformer)
 
 Urho2DPlatformer::Urho2DPlatformer(Context* context) :
-    Sample(context),
-    drawDebug_(false)
+    Sample(context)
 {
     // Register factory for the Character2D component so it can be created via CreateComponent
     Character2D::RegisterObject(context);

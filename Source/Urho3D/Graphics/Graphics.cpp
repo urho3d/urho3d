@@ -44,7 +44,9 @@
 #include "../Graphics/Technique.h"
 #include "../Graphics/Terrain.h"
 #include "../Graphics/TerrainPatch.h"
+#ifdef _WIN32
 #include "../Graphics/Texture2D.h"
+#endif
 #include "../Graphics/Texture2DArray.h"
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
@@ -53,7 +55,6 @@
 #include "../IO/Log.h"
 
 #include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
 
 #include "../DebugNew.h"
 
@@ -229,18 +230,12 @@ int Graphics::GetMonitorCount() const
 
 int Graphics::GetCurrentMonitor() const
 {
-    if (!window_)
-        return 0;
-
-    return SDL_GetWindowDisplayIndex(window_);
+    return window_ ? SDL_GetWindowDisplayIndex(window_) : 0;
 }
 
 bool Graphics::GetMaximized() const
 {
-    if (!window_)
-        return false;
-
-    return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
+    return window_? static_cast<bool>(SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED) : false;
 }
 
 Vector3 Graphics::GetDisplayDPI(int monitor) const
@@ -379,7 +374,7 @@ void Graphics::CleanupScratchBuffers()
     {
         if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
         {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : nullptr;
+            i->data_ = maxScratchBufferRequest_ > 0 ? (new unsigned char[maxScratchBufferRequest_]) : nullptr;
             i->size_ = maxScratchBufferRequest_;
 
             URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
