@@ -62,6 +62,20 @@ public:
         AddRef();
     }
 
+    /// Move-construct from another shared pointer.
+    SharedPtr(SharedPtr<T>&& rhs) noexcept :
+        ptr_(rhs.ptr_)
+    {
+        rhs.ptr_ = nullptr;
+    }
+
+    /// Move-construct from another shared pointer allowing implicit upcasting.
+    template <class U> SharedPtr(SharedPtr<U>&& rhs) noexcept :    // NOLINT(google-explicit-constructor)
+        ptr_(rhs.ptr_)
+    {
+        rhs.ptr_ = nullptr;
+    }
+
     /// Construct from a raw pointer.
     explicit SharedPtr(T* ptr) noexcept :
         ptr_(ptr)
@@ -94,6 +108,30 @@ public:
             return *this;
 
         SharedPtr<T> copy(rhs);
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Move-assign from another shared pointer.
+    SharedPtr<T>& operator =(SharedPtr<T>&& rhs)
+    {
+        if (ptr_ == rhs.ptr_)
+            return *this;
+
+        SharedPtr<T> copy(std::move(rhs));
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Move-assign from another shared pointer allowing implicit upcasting.
+    template <class U> SharedPtr<T>& operator =(SharedPtr<U>&& rhs)
+    {
+        if (ptr_ == rhs.ptr_)
+            return *this;
+
+        SharedPtr<T> copy(std::move(rhs));
         Swap(copy);
 
         return *this;

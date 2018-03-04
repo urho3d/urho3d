@@ -60,6 +60,17 @@ public:
         *this = str;
     }
 
+    /// Move-construct from another string.
+    String(String&& str) :
+        length_(str.length_),
+        capacity_(str.capacity_),
+        buffer_(str.buffer_)
+    {
+        str.length_ = 0;
+        str.capacity_ = 0;
+        str.buffer_ = &endZero;
+    }
+
     /// Construct from a C string.
     String(const char* str) :   // NOLINT(google-explicit-constructor)
         length_(0),
@@ -157,6 +168,15 @@ public:
     {
         Resize(rhs.length_);
         CopyChars(buffer_, rhs.buffer_, rhs.length_);
+
+        return *this;
+    }
+
+    /// Move-assign a string.
+    String& operator =(String&& rhs)
+    {
+        String copy(std::move(rhs));
+        Swap(copy);
 
         return *this;
     }
