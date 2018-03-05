@@ -254,6 +254,7 @@ Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
+    pixelToDevicePixelRatio_(1.0f),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -299,12 +300,10 @@ Graphics::~Graphics()
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, float pixelRatio, bool vsync,
     bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
-
-    highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
     bool maximize = false;
 
@@ -346,7 +345,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     // If nothing changes, do not reset the device
     if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+        vsync == vsync_ && tripleBuffer == tripleBuffer_  && pixelRatio == pixelToDevicePixelRatio_ && multiSample == multiSample_)
         return true;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
@@ -441,7 +440,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     fullscreen_ = fullscreen;
     borderless_ = borderless;
     resizable_ = resizable;
-    highDPI_ = highDPI;
+    pixelToDevicePixelRatio_ = pixelRatio;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     monitor_ = monitor;
@@ -498,7 +497,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_BORDERLESS] = borderless_;
     eventData[P_RESIZABLE] = resizable_;
-    eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_PIXELRATIO] = pixelToDevicePixelRatio_;
     eventData[P_MONITOR] = monitor_;
     eventData[P_REFRESHRATE] = refreshRate_;
     SendEvent(E_SCREENMODE, eventData);
@@ -508,7 +507,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, pixelToDevicePixelRatio_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -2092,7 +2091,7 @@ void Graphics::OnWindowResized()
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
-    eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_PIXELRATIO] = pixelToDevicePixelRatio_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
