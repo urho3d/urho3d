@@ -965,11 +965,11 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         scale.y_ = -scale.y_;
 #endif
     }
-	float virtualPixelToPixelRatio = GetSubsystem<Graphics>()->GetVirtualPixelToPixelRatio();
+	float pixelToDevicePixelRatio = GetSubsystem<Graphics>()->GetPixelToDevicePixelRatio();
     Matrix4 projection(Matrix4::IDENTITY);
-    projection.m00_ = scale.x_ / virtualPixelToPixelRatio;
+    projection.m00_ = scale.x_ / pixelToDevicePixelRatio;
     projection.m03_ = offset.x_;
-    projection.m11_ = scale.y_ / virtualPixelToPixelRatio;
+    projection.m11_ = scale.y_ / pixelToDevicePixelRatio;
     projection.m13_ = offset.y_;
     projection.m22_ = 1.0f;
     projection.m23_ = 0.0f;
@@ -1038,10 +1038,10 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
 
         IntRect scissor = batch.scissor_;
-        scissor.left_ = (int)(scissor.left_ / virtualPixelToPixelRatio);
-        scissor.top_ = (int)(scissor.top_ / virtualPixelToPixelRatio);
-        scissor.right_ = (int)(scissor.right_ / virtualPixelToPixelRatio);
-        scissor.bottom_ = (int)(scissor.bottom_ / virtualPixelToPixelRatio);
+        scissor.left_ = (int)(scissor.left_ / pixelToDevicePixelRatio);
+        scissor.top_ = (int)(scissor.top_ / pixelToDevicePixelRatio);
+        scissor.right_ = (int)(scissor.right_ / pixelToDevicePixelRatio);
+        scissor.bottom_ = (int)(scissor.bottom_ / pixelToDevicePixelRatio);
 
         // Flip scissor vertically if using OpenGL texture rendering
 #ifdef URHO3D_OPENGL
@@ -2074,9 +2074,9 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
 
     if (applyScale)
     {
-		float virtualPixelToPixelRatio = graphics_->GetPixelToDevicePixelRatio();
-        size.x_ = RoundToInt((float)size.x_ * virtualPixelToPixelRatio);
-        size.y_ = RoundToInt((float)size.y_ * virtualPixelToPixelRatio);
+		float pixelToDeviePixelRatio = graphics_->GetPixelToDevicePixelRatio();
+        size.x_ = RoundToInt((float)size.x_ * pixelToDeviePixelRatio);
+        size.y_ = RoundToInt((float)size.y_ * pixelToDeviePixelRatio);
     }
 
     return size;

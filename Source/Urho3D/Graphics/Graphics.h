@@ -283,7 +283,7 @@ public:
     int GetMultiSample() const { return multiSample_; }
 
     /// Return window size in device pixels or pixels
-    IntVector2 GetSize(bool devicePixels = true) const;
+    IntVector2 GetSize(bool devicePixels = false) const;
 
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
