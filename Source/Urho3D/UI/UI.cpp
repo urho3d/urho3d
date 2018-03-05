@@ -2074,7 +2074,7 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
 
     if (applyScale)
     {
-		float virtualPixelToPixelRatio = graphics_->GetVirtualPixelToPixelRatio();
+		float virtualPixelToPixelRatio = graphics_->GetPixelToDevicePixelRatio();
         size.x_ = RoundToInt((float)size.x_ * virtualPixelToPixelRatio);
         size.y_ = RoundToInt((float)size.y_ * virtualPixelToPixelRatio);
     }

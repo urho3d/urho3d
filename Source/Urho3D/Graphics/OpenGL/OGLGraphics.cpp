@@ -224,7 +224,7 @@ Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
-	virtualPixelToPixelRatio_(1.0f),
+	pixelToDevicePixelRatio_(1.0f),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     shaderPath_("Shaders/GLSL/"),
@@ -283,12 +283,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     multiSample = Clamp(multiSample, 1, 16);
 
     if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && vsync == vsync_ && virtualp_to_pixel_Ratio == virtualPixelToPixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+        resizable == resizable_ && vsync == vsync_ && virtualp_to_pixel_Ratio == pixelToDevicePixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
 
     // If only vsync changes, do not destroy/recreate the context
     if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && virtualp_to_pixel_Ratio == virtualPixelToPixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
+        resizable == resizable_ && virtualp_to_pixel_Ratio == pixelToDevicePixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
@@ -482,7 +482,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     multiSample_ = multiSample;
     monitor_ = monitor;
     refreshRate_ = refreshRate;
-	virtualPixelToPixelRatio_ = virtualp_to_pixel_Ratio;
+	pixelToDevicePixelRatio_ = virtualp_to_pixel_Ratio;
 
     SDL_GL_GetDrawableSize(window_, &width_, &height_);
     if (!fullscreen)
@@ -521,7 +521,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, virtualPixelToPixelRatio_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, pixelToDevicePixelRatio_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -2250,7 +2250,7 @@ void Graphics::sendScreenModeEvent()
 	eventData[P_FULLSCREEN] = fullscreen_;
 	eventData[P_BORDERLESS] = borderless_;
 	eventData[P_RESIZABLE] = resizable_;
-	eventData[P_PIXELRATIO] = virtualPixelToPixelRatio_;
+	eventData[P_PIXELRATIO] = pixelToDevicePixelRatio_;
 	eventData[P_MONITOR] = monitor_;
 	eventData[P_REFRESHRATE] = refreshRate_;
 	SendEvent(E_SCREENMODE, eventData);

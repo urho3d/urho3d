@@ -104,7 +104,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, virtualPixelToPixelRatio_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, pixelToDevicePixelRatio_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Variant& value)
@@ -177,31 +177,31 @@ IntVector2 Graphics::GetWindowPosition() const
     return position_;
 }
 
-int Graphics::GetWidth(bool virtualPixels) const
+int Graphics::GetWidth(bool devicePixels) const
 {
-	if (virtualPixels)
-		return width_ * virtualPixelToPixelRatio_;
+	if (!devicePixels)
+		return width_ * pixelToDevicePixelRatio_;
 	else
 		return width_;
 }
 
-int Graphics::GetHeight(bool virtualPixels) const
+int Graphics::GetHeight(bool devicePixels) const
 {
-	if (virtualPixels)
-		return height_ * virtualPixelToPixelRatio_;
+	if (!devicePixels)
+		return height_ * pixelToDevicePixelRatio_;
 	else
 		return height_;
 }
 
-IntVector2 Graphics::GetSize(bool virtualPixels) const
+IntVector2 Graphics::GetSize(bool devicePixels) const
 {
-	if(virtualPixels)
-		return IntVector2(width_ * virtualPixelToPixelRatio_, height_ * virtualPixelToPixelRatio_);
+	if(!devicePixels)
+		return IntVector2(width_ * pixelToDevicePixelRatio_, height_ * pixelToDevicePixelRatio_);
 	else
 		return IntVector2(width_, height_);
 }
 
-void Graphics::SetVirtualPixelToPixelRatio(float ratio)
+void Graphics::SetPixelToDevicePixelRatio(float ratio)
 {
 	SetMode(width_, height_, fullscreen_, borderless_, resizable_, ratio, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }

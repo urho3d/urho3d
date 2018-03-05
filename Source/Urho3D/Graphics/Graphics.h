@@ -273,17 +273,17 @@ public:
     /// Return window position.
     IntVector2 GetWindowPosition() const;
 
-    /// Return window width in device pixels or virtual pixels
-    int GetWidth(bool virtualPixels = false) const;
+    /// Return window width in device pixels or pixels
+    int GetWidth(bool devicePixels = false) const;
 
-    /// Return window height in device pixels or virtual pixels
-    int GetHeight(bool virtualPixels = false) const;
+    /// Return window height in device pixels or pixels
+    int GetHeight(bool devicePixels = false) const;
 
     /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const { return multiSample_; }
 
-    /// Return window size in pixels.
-    IntVector2 GetSize(bool virtualPixels = false) const;
+    /// Return window size in device pixels or pixels
+    IntVector2 GetSize(bool devicePixels = true) const;
 
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
@@ -295,10 +295,10 @@ public:
     bool GetResizable() const { return resizable_; }
 
 	/// Set the ratio of virtual pixels to device pixels. values will be rounded to nearset multiple of 2 (..., 1/4, 1/2, 1, 2, 4, ...)
-	void SetVirtualPixelToPixelRatio(float ratio);
+	void SetPixelToDevicePixelRatio(float ratio);
 
 	/// Return the ratio of virtual pixel to device pixels.
-	float GetVirtualPixelToPixelRatio() const { return virtualPixelToPixelRatio_; }
+	float GetPixelToDevicePixelRatio() const { return pixelToDevicePixelRatio_; }
 
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
@@ -662,7 +662,7 @@ private:
     /// Resizable flag.
     bool resizable_;
     /// ratio of virtual pixels to real pixels (High DPI would be 0.5f)
-    float virtualPixelToPixelRatio_;
+    float pixelToDevicePixelRatio_;
     /// Vertical sync flag.
     bool vsync_{};
     /// Refresh rate in Hz. Only used in fullscreen, 0 when windowed
