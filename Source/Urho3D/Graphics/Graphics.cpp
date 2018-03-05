@@ -203,11 +203,7 @@ IntVector2 Graphics::GetSize(bool virtualPixels) const
 
 void Graphics::SetVirtualPixelToPixelRatio(float ratio)
 {
-	//round ratio to nearest multiple of 2.
-	float power = float(Ln(ratio)) / Ln(float(2.0f));
-	int powerInt = RoundToInt(power);
-	float roundedRatio = pow(float(2), float(powerInt));
-	SetMode(width_, height_, fullscreen_, borderless_, resizable_, roundedRatio, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
+	SetMode(width_, height_, fullscreen_, borderless_, resizable_, ratio, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
