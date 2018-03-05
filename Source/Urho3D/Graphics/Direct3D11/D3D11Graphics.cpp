@@ -269,7 +269,7 @@ Graphics::~Graphics()
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, float virtualPixelToPixelRatio, bool vsync, bool tripleBuffer,
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, float pixelRatio, bool vsync, bool tripleBuffer,
     int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
@@ -312,7 +312,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     // If nothing changes, do not reset the device
     if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        vsync == vsync_ && tripleBuffer == tripleBuffer_ && virtualPixelToPixelRatio == pixelToDevicePixelRatio_ && multiSample == multiSample_)
+        vsync == vsync_ && tripleBuffer == tripleBuffer_ && pixelRatio == pixelToDevicePixelRatio_ && multiSample == multiSample_)
         return true;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
@@ -365,7 +365,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     fullscreen_ = fullscreen;
     borderless_ = borderless;
     resizable_ = resizable;
-    pixelToDevicePixelRatio_ = virtualPixelToPixelRatio;
+    pixelToDevicePixelRatio_ = pixelRatio;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
 
