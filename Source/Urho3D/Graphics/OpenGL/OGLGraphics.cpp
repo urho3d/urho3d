@@ -255,7 +255,7 @@ Graphics::~Graphics()
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, float virtualp_to_pixel_Ratio, bool vsync,
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, float pixelRatio, bool vsync,
     bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
@@ -283,12 +283,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     multiSample = Clamp(multiSample, 1, 16);
 
     if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && vsync == vsync_ && virtualp_to_pixel_Ratio == pixelToDevicePixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+        resizable == resizable_ && vsync == vsync_ && pixelRatio == pixelToDevicePixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
 
     // If only vsync changes, do not destroy/recreate the context
     if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && virtualp_to_pixel_Ratio == pixelToDevicePixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
+        resizable == resizable_ && pixelRatio == pixelToDevicePixelRatio_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
@@ -409,7 +409,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             flags |= SDL_WINDOW_BORDERLESS;
         if (resizable)
             flags |= SDL_WINDOW_RESIZABLE;
-        if (virtualp_to_pixel_Ratio < 1.0f)
+        if (pixelRatio < 1.0f)
             flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
         SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
@@ -482,7 +482,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     multiSample_ = multiSample;
     monitor_ = monitor;
     refreshRate_ = refreshRate;
-	pixelToDevicePixelRatio_ = virtualp_to_pixel_Ratio;
+	pixelToDevicePixelRatio_ = pixelRatio;
 
     SDL_GL_GetDrawableSize(window_, &width_, &height_);
     if (!fullscreen)
@@ -490,7 +490,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     int logicalWidth, logicalHeight;
     SDL_GetWindowSize(window_, &logicalWidth, &logicalHeight);
-    //virtualPixelToPixelRatio_ = float(logicalWidth) / float(width_);
+    //pixelRatio = float(logicalWidth) / float(width_);
 
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
