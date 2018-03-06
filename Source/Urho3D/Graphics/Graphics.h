@@ -274,16 +274,16 @@ public:
     IntVector2 GetWindowPosition() const;
 
     /// Return window width in device pixels or pixels
-    int GetWidth(bool devicePixels = false) const;
+    int GetWidth(bool devicePixels = true) const;
 
     /// Return window height in device pixels or pixels
-    int GetHeight(bool devicePixels = false) const;
+    int GetHeight(bool devicePixels = true) const;
 
     /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const { return multiSample_; }
 
     /// Return window size in device pixels or pixels
-    IntVector2 GetSize(bool devicePixels = false) const;
+    IntVector2 GetSize(bool devicePixels = true) const;
 
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
