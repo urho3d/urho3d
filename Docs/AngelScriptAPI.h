@@ -9740,6 +9740,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+Vector3 baseVelocity;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;

@@ -5567,6 +5567,7 @@ Methods:
 - void SetStartScale(float startScale)
 - void SetEndScale(float endScale)
 - void SetTrailType(TrailType type)
+- void SetBaseVelocity(const Vector3& baseVelocity)
 - void SetSorted(bool enable)
 - void SetLifetime(float time)
 - void SetEmitting(bool emitting)
@@ -5582,6 +5583,7 @@ Methods:
 - float GetStartScale() const
 - float GetEndScale() const
 - TrailType GetTrailType() const
+- const Vector3& GetBaseVelocity() const
 - bool IsSorted() const
 - float GetLifetime() const
 - unsigned GetTailColumn() const
@@ -5599,6 +5601,7 @@ Properties:
 - float startScale
 - float endScale
 - TrailType trailType
+- Vector3 baseVelocity
 - bool sorted
 - float lifetime
 - unsigned tailColumn
@@ -5806,6 +5809,7 @@ Methods:
 - void SetAsyncLoadingMs(int ms)
 - Node* GetNode(unsigned id) const
 - Component* GetComponent(unsigned id) const
+- Component* GetComponent(const String type, bool recursive = false) const
 - bool IsReplicatedID(unsigned id)
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
