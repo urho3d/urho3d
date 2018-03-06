@@ -102,13 +102,15 @@ public:
     void SetEndScale(float endScale);
     /// Set how the trail behave.
     void SetTrailType(TrailType type);
+    /// Set base velocity applied to the trail.
+    void SetBaseVelocity(const Vector3& baseVelocity);
     /// Set whether tails are sorted by distance. Default false.
     void SetSorted(bool enable);
     /// Set tail time to live.
     void SetLifetime(float time);
     /// Set whether trail should be emitting.
     void SetEmitting(bool emitting);
-    /// Set whether to update when trail emiiter are not visible.
+    /// Set whether to update when trail emitter are not visible.
     void SetUpdateInvisible(bool enable);
     /// Set number of column for every tails. Can be useful for fixing distortion at high angle.
     void SetTailColumn(unsigned tailColumn);
@@ -153,7 +155,10 @@ public:
     /// Return how the trail behave.
     TrailType GetTrailType() const { return trailType_; }
 
-    /// Get number of column for tails.
+    /// Return base trail velocity.
+    const Vector3& GetBaseVelocity() const { return baseVelocity_; }
+
+    /// Return number of column for tails.
     unsigned GetTailColumn() const { return tailColumn_; }
 
     /// Return whether is currently emitting.
@@ -179,6 +184,8 @@ protected:
     float animationLodTimer_;
     /// Trail type.
     TrailType trailType_;
+    /// Base velocity applied to the trail.
+    Vector3 baseVelocity_;
 
 private:
     /// Handle scene post-update event.
@@ -189,7 +196,7 @@ private:
     /// Rewrite RibbonTrail vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
     /// Update/Rebuild tail mesh only if position changed (called by UpdateBatches())
-    void UpdateTail();
+    void UpdateTail(float timeStep);
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
@@ -220,7 +227,7 @@ private:
     float endScale_;
     /// Last scene timestep.
     float lastTimeStep_;
-    // Lifetime
+    /// Lifetime
     float lifetime_;
     /// Number of columns for every tails.
     unsigned tailColumn_;

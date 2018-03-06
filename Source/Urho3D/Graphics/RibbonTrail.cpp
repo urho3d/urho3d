@@ -112,6 +112,7 @@ void RibbonTrail::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Base Velocity", GetBaseVelocity, SetBaseVelocity, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, unsigned, 0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Vertex Distance", GetVertexDistance, SetVertexDistance, float, 0.1f, AM_DEFAULT);
@@ -204,15 +205,23 @@ void RibbonTrail::Update(const FrameInfo &frame)
     if (!needUpdate_)
         return;
 
-    UpdateTail();
+    UpdateTail(frame.timeStep_);
     OnMarkedDirty(node_);
     needUpdate_ = false;
 }
 
-void RibbonTrail::UpdateTail()
+void RibbonTrail::UpdateTail(float timeStep)
 {
-    Vector3 worldPosition = node_->GetWorldPosition();
-    float path = (previousPosition_ - worldPosition).Length();
+    // Apply base velocity to all cached positions
+    if (baseVelocity_ != Vector3::ZERO)
+    {
+        for (TrailPoint& point : points_)
+            point.position_ += baseVelocity_ * timeStep;
+        previousPosition_ += baseVelocity_ * timeStep;
+    }
+
+    const Vector3 worldPosition = node_->GetWorldPosition();
+    const float path = (previousPosition_ - worldPosition).Length();
 
     // Update tails lifetime
     int expiredIndex = -1;
@@ -256,7 +265,7 @@ void RibbonTrail::UpdateTail()
     // Update end of trail position using endTail linear interpolation
     else if (points_.Size() > 1 && points_[0].lifetime_ < lifetime_)
     {
-        float step = SmoothStep(startEndTailTime_, lifetime_, points_[0].lifetime_);
+        const float step = SmoothStep(startEndTailTime_, lifetime_, points_[0].lifetime_);
         points_[0].position_ = Lerp(endTail_.position_, points_[1].position_, step);
         bufferDirty_ = true;
     }
@@ -264,7 +273,7 @@ void RibbonTrail::UpdateTail()
     // Add starting points
     if (points_.Size() == 0 && path > M_LARGE_EPSILON && emitting_)
     {
-        Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
+        const Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
 
         TrailPoint startPoint{previousPosition_, forwardMotion};
         TrailPoint nextPoint{worldPosition, forwardMotion};
@@ -286,7 +295,7 @@ void RibbonTrail::UpdateTail()
     // Add more points
     if (points_.Size() > 1 && emitting_)
     {
-        Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
+        const Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
 
         // Add more points if path exceeded tail length
         if (path > vertexDistance_)
@@ -845,6 +854,11 @@ void RibbonTrail::SetTrailType(TrailType type)
     Drawable::OnMarkedDirty(node_);
     bufferSizeDirty_ = true;
     MarkNetworkUpdate();
+}
+
+void RibbonTrail::SetBaseVelocity(const Vector3& baseVelocity)
+{
+    baseVelocity_ = baseVelocity;
 }
 
 void RibbonTrail::SetMaterialAttr(const ResourceRef& value)
