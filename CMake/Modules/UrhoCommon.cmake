@@ -1096,7 +1096,7 @@ macro (define_resource_dirs)
     list (APPEND SOURCE_FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
 endmacro()
 
-# Macro fo adding a HTML shell-file when targeting Web platform
+# Macro for adding a HTML shell-file when targeting Web platform
 macro (add_html_shell)
     check_source_files ("Could not call add_html_shell() macro before define_source_files() macro.")
     if (EMSCRIPTEN)
@@ -1126,7 +1126,7 @@ macro (enable_pch HEADER_PATHNAME)
     # No op when PCH support is not enabled
     if (URHO3D_PCH)
         # Get the optional LANG parameter to indicate whether the header should be treated as C or C++ header, default to C++
-        if ("${ARGN}" STREQUAL C)   # Stringify as the LANG paramater could be empty
+        if ("${ARGN}" STREQUAL C) # Stringify as the LANG paramater could be empty
             set (EXT c)
             set (LANG C)
             set (LANG_H c-header)
