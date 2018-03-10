@@ -49,7 +49,7 @@ before_script:
   - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); fi
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   # Travis-CI has a special case handling for release tag where it checks out directly from the tag branch instead of the default 'master' branch
-  - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 2 ]]; then export SITE_UPDATE=1; fi; if [[ "$CC" == "gcc" ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
+  - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]]; then export SITE_UPDATE=1; fi; if [[ "$CC" == "gcc" ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
   - if [[ $LINUX ]]; then
       if [[ "$URHO3D_64BIT" == "0" ]]; then
         export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu;
@@ -70,7 +70,7 @@ before_script:
 script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ $LINUX ]] && [[ ! "$URHO3D_64BIT" == "0" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
 after_script:
   - rake ci_teardown_cache
-  - if [[ ${TRAVIS_JOB_NUMBER##*.} == 2 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
+  - if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 # Below are our custom data to preset build stages for other documents in this YAML stream, we do this because YAML anchor cannot be referenced across document boundary
@@ -147,11 +147,6 @@ matrix:
       before_script: git clone --depth 1 -b incoming https://github.com/urho3d/fastcomp-clang.git && export PATH=$(pwd)/fastcomp-clang/bin:$PATH
       script: *ci
 
-stages:
-  - lint
-  - release build configuration
-  - debug build configuration
-
 ---
 
 branch: {name: MinGW-CI, active: yes, appveyor: yes}
@@ -223,7 +218,8 @@ deploy: off
 
 ---
 
-branch: {name: Coverity-Scan, active: no}
+# Temporary disable the Coverity-Scan CI because its new owner has dropped the ball
+branch: {name: Coverity-Synopsys, active: no}
 language: cpp
 compiler: gcc
 cache:
