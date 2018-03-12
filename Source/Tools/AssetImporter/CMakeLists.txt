@@ -29,7 +29,7 @@ define_source_files ()
 # Define dependency libs
 add_subdirectory (../../ThirdParty/Assimp ../../ThirdParty/Assimp)
 set (LIBS Assimp)
-set (INCLUDE_DIRS ../../ThirdParty/Assimp/include)
+set (INCLUDE_DIRS ../../ThirdParty/Assimp/include ${CMAKE_CURRENT_BINARY_DIR}/../../ThirdParty/Assimp/include)
 
 # Setup target
 setup_executable (TOOL)
