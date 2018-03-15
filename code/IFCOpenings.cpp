@@ -1492,14 +1492,14 @@ bool TryAddOpenings_Poly2Tri(const std::vector<TempOpening>& openings,const std:
     vmax -= vmin;
 
     // If this happens then the projection must have been wrong.
-    assert(vmax.Length());
+    ai_assert(vmax.Length());
 
     ClipperLib::ExPolygons clipped;
     ClipperLib::Polygons holes_union;
 
 
     IfcVector3 wall_extrusion;
-    bool do_connections = false, first = true;
+    bool first = true;
 
     try {
 
@@ -1527,7 +1527,6 @@ bool TryAddOpenings_Poly2Tri(const std::vector<TempOpening>& openings,const std:
                 if (first) {
                     first = false;
                     if (dot > 0.f) {
-                        do_connections = true;
                         wall_extrusion = t.extrusionDir;
                         if (is_extruded_side) {
                             wall_extrusion = - wall_extrusion;
@@ -1607,44 +1606,6 @@ bool TryAddOpenings_Poly2Tri(const std::vector<TempOpening>& openings,const std:
     old_verts.swap(curmesh.verts);
     old_vertcnt.swap(curmesh.vertcnt);
 
-
-    // add connection geometry to close the adjacent 'holes' for the openings
-    // this should only be done from one side of the wall or the polygons
-    // would be emitted twice.
-    if (false && do_connections) {
-
-        std::vector<IfcVector3> tmpvec;
-        for(ClipperLib::Polygon& opening : holes_union) {
-
-            assert(ClipperLib::Orientation(opening));
-
-            tmpvec.clear();
-
-            for(ClipperLib::IntPoint& point : opening) {
-
-                tmpvec.push_back( minv * IfcVector3(
-                    vmin.x + from_int64(point.X) * vmax.x,
-                    vmin.y + from_int64(point.Y) * vmax.y,
-                    coord));
-            }
-
-            for(size_t i = 0, size = tmpvec.size(); i < size; ++i) {
-                const size_t next = (i+1)%size;
-
-                curmesh.vertcnt.push_back(4);
-
-                const IfcVector3& in_world = tmpvec[i];
-                const IfcVector3& next_world = tmpvec[next];
-
-                // Assumptions: no 'partial' openings, wall thickness roughly the same across the wall
-                curmesh.verts.push_back(in_world);
-                curmesh.verts.push_back(in_world+wall_extrusion);
-                curmesh.verts.push_back(next_world+wall_extrusion);
-                curmesh.verts.push_back(next_world);
-            }
-        }
-    }
-
     std::vector< std::vector<p2t::Point*> > contours;
     for(ClipperLib::ExPolygon& clip : clipped) {
 
@@ -1705,7 +1666,7 @@ bool TryAddOpenings_Poly2Tri(const std::vector<TempOpening>& openings,const std:
                     static_cast<IfcFloat>( tri->GetPoint(i)->y )
                 );
 
-                assert(v.x <= 1.0 && v.x >= 0.0 && v.y <= 1.0 && v.y >= 0.0);
+                ai_assert(v.x <= 1.0 && v.x >= 0.0 && v.y <= 1.0 && v.y >= 0.0);
                 const IfcVector3 v3 = minv * IfcVector3(vmin.x + v.x * vmax.x, vmin.y + v.y * vmax.y,coord) ;
 
                 curmesh.verts.push_back(v3);

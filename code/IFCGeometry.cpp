@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file  IFCGeometry.cpp
  *  @brief Geometry conversion and synthesis for IFC
  */
@@ -561,8 +559,7 @@ void ProcessExtrudedArea(const IfcExtrudedAreaSolid& solid, const TempMesh& curv
     IfcVector3 dir = IfcMatrix3(trafo) * extrusionDir;
 
     // reverse profile polygon if it's winded in the wrong direction in relation to the extrusion direction
-    // Urho3D: modified to not use C++11
-    IfcVector3 profileNormal = TempMesh::ComputePolygonNormal(&in[0], in.size());
+    IfcVector3 profileNormal = TempMesh::ComputePolygonNormal(in.data(), in.size());
     if( profileNormal * dir < 0.0 )
         std::reverse(in.begin(), in.end());
 

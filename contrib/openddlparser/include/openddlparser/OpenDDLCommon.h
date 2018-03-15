@@ -53,9 +53,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 BEGIN_ODDLPARSER_NS
 
-// Urho3D: modified to not use C++11
-#define OPENDDL_NO_USE_CPP11
-
 // We will use C++11 optional
 #ifndef OPENDDL_NO_USE_CPP11
     // All C++11 constructs
