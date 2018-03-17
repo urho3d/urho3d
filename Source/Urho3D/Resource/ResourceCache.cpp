@@ -311,16 +311,15 @@ void ResourceCache::ReleaseResources(StringHash type, const String& partialName,
 
 void ResourceCache::ReleaseResources(const String& partialName, bool force)
 {
-    // Some resources refer to others, like materials to textures. Release twice to ensure these get released.
-    // This is not necessary if forcing release
-    unsigned repeat = force ? 1 : 2;
-
-    while (repeat--)
+    // Some resources refer to others, like materials to textures. Repeat the release logic as many times as necessary to ensure
+    // these get released. This is not necessary if forcing release
+    bool released;
+    do
     {
+        released = false;
+
         for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         {
-            bool released = false;
-
             for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
                  j != i->second_.resources_.End();)
             {
@@ -338,20 +337,20 @@ void ResourceCache::ReleaseResources(const String& partialName, bool force)
             if (released)
                 UpdateResourceGroup(i->first_);
         }
-    }
+
+    } while (released && !force);
 }
 
 void ResourceCache::ReleaseAllResources(bool force)
 {
-    unsigned repeat = force ? 1 : 2;
-
-    while (repeat--)
+    bool released;
+    do
     {
+        released = false;
+
         for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
              i != resourceGroups_.End(); ++i)
         {
-            bool released = false;
-
             for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
                  j != i->second_.resources_.End();)
             {
@@ -366,7 +365,8 @@ void ResourceCache::ReleaseAllResources(bool force)
             if (released)
                 UpdateResourceGroup(i->first_);
         }
-    }
+
+    } while (released && !force);
 }
 
 bool ResourceCache::ReloadResource(Resource* resource)
