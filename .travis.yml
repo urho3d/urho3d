@@ -218,8 +218,7 @@ deploy: off
 
 ---
 
-# Temporary disable the Coverity-Scan CI because its new owner has dropped the ball
-branch: {name: Coverity-Synopsys, active: no}
+branch: {name: Coverity-Scan, active: no}
 language: cpp
 compiler: gcc
 cache:
