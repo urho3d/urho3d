@@ -106,7 +106,7 @@ protected:
     virtual void UpdateSourceBatches() = 0;
 
     /// Return draw order by layer and order in layer.
-    int GetDrawOrder() const { return (layer_ << 20) + (orderInLayer_ << 10); }
+    int GetDrawOrder() const { return layer_ << 16u | orderInLayer_; }
 
     /// Layer.
     int layer_;
