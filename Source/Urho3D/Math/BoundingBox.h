@@ -319,10 +319,10 @@ public:
 
     /// Minimum vector.
     Vector3 min_;
-    float dummyMin_; // This is never used, but exists to pad the min_ value to four floats.
+    float dummyMin_{}; // This is never used, but exists to pad the min_ value to four floats.
     /// Maximum vector.
     Vector3 max_;
-    float dummyMax_; // This is never used, but exists to pad the max_ value to four floats.
+    float dummyMax_{}; // This is never used, but exists to pad the max_ value to four floats.
 };
 
 }

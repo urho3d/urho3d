@@ -208,13 +208,13 @@ struct URHO3D_API RayQueryResult
     /// Hit texture position
     Vector2 textureUV_;
     /// Distance from ray origin.
-    float distance_;
+    float distance_{};
     /// Drawable.
     Drawable* drawable_;
     /// Scene node.
     Node* node_;
     /// Drawable specific subobject if applicable.
-    unsigned subObject_;
+    unsigned subObject_{};
 };
 
 /// Raycast octree query.

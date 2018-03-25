@@ -59,12 +59,6 @@ struct CollisionGeometryData;
 /// Physics raycast hit.
 struct URHO3D_API PhysicsRaycastResult
 {
-    /// Construct with defaults.
-    PhysicsRaycastResult() :
-        body_(nullptr)
-    {
-    }
-
     /// Test for inequality, added to prevent GCC from complaining.
     bool operator !=(const PhysicsRaycastResult& rhs) const
     {
@@ -76,11 +70,11 @@ struct URHO3D_API PhysicsRaycastResult
     /// Hit worldspace normal.
     Vector3 normal_;
     /// Hit distance from ray origin.
-    float distance_;
+    float distance_{};
     /// Hit fraction.
-    float hitFraction_;
+    float hitFraction_{};
     /// Rigid body that was hit.
-    RigidBody* body_;
+    RigidBody* body_{};
 };
 
 /// Delayed world transform assignment for parented rigidbodies.

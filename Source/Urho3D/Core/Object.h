@@ -224,7 +224,7 @@ protected:
     /// Execution context.
     Context* context_;
     /// Type info.
-    const TypeInfo* typeInfo_;
+    const TypeInfo* typeInfo_{};
 };
 
 /// Template implementation of the object factory.

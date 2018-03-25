@@ -43,32 +43,23 @@ struct WorkItem : public RefCounted
     friend class WorkQueue;
 
 public:
-    // Construct
-    WorkItem() :
-        priority_(0),
-        sendEvent_(false),
-        completed_(false),
-        pooled_(false)
-    {
-    }
-
     /// Work function. Called with the work item and thread index (0 = main thread) as parameters.
-    void (* workFunction_)(const WorkItem*, unsigned);
+    void (* workFunction_)(const WorkItem*, unsigned){};
     /// Data start pointer.
-    void* start_;
+    void* start_{};
     /// Data end pointer.
-    void* end_;
+    void* end_{};
     /// Auxiliary data pointer.
-    void* aux_;
+    void* aux_{};
     /// Priority. Higher value = will be completed first.
-    unsigned priority_;
+    unsigned priority_{};
     /// Whether to send event on completion.
-    bool sendEvent_;
+    bool sendEvent_{};
     /// Completed flag.
-    volatile bool completed_;
+    volatile bool completed_{};
 
 private:
-    bool pooled_;
+    bool pooled_{};
 };
 
 /// Work queue subsystem for multithreading.

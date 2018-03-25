@@ -119,7 +119,7 @@ public:
     /// Plane absolute normal.
     Vector3 absNormal_;
     /// Plane constant.
-    float d_;
+    float d_{};
 
     /// Plane at origin with normal pointing up.
     static const Plane UP;

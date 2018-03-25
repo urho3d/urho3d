@@ -205,7 +205,7 @@ private:
     friend class TmxObjectGroup2D;
 
     /// Object type.
-    TileMapObjectType2D objectType_;
+    TileMapObjectType2D objectType_{};
     /// Name.
     String name_;
     /// Type.

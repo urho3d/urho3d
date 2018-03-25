@@ -49,11 +49,7 @@ struct SceneReplicationState;
 struct URHO3D_API DirtyBits
 {
     /// Construct empty.
-    DirtyBits() :
-        count_(0)
-    {
-        memset(data_, 0, MAX_NETWORK_ATTRIBUTES / 8);
-    }
+    DirtyBits() = default;
 
     /// Copy-construct.
     DirtyBits(const DirtyBits& bits) :
@@ -116,22 +112,16 @@ struct URHO3D_API DirtyBits
     unsigned Count() const { return count_; }
 
     /// Bit data.
-    unsigned char data_[MAX_NETWORK_ATTRIBUTES / 8];
+    unsigned char data_[MAX_NETWORK_ATTRIBUTES / 8]{};
     /// Number of set bits.
-    unsigned char count_;
+    unsigned char count_{};
 };
 
 /// Per-object attribute state for network replication, allocated on demand.
 struct URHO3D_API NetworkState
 {
-    /// Construct with defaults.
-    NetworkState() :
-        interceptMask_(0)
-    {
-    }
-
     /// Cached network attribute infos.
-    const Vector<AttributeInfo>* attributes_;
+    const Vector<AttributeInfo>* attributes_{};
     /// Current network attribute values.
     Vector<Variant> currentValues_;
     /// Previous network attribute values.
@@ -141,7 +131,7 @@ struct URHO3D_API NetworkState
     /// Previous user variables.
     VariantMap previousVars_;
     /// Bitmask for intercepting network messages. Used on the client only.
-    unsigned long long interceptMask_;
+    unsigned long long interceptMask_{};
 };
 
 /// Base class for per-user network replication states.
@@ -155,7 +145,7 @@ struct URHO3D_API ReplicationState
 struct URHO3D_API ComponentReplicationState : public ReplicationState
 {
     /// Parent node replication state.
-    NodeReplicationState* nodeState_;
+    NodeReplicationState* nodeState_{};
     /// Link to the actual component.
     WeakPtr<Component> component_;
     /// Dirty attribute bits.
@@ -165,14 +155,6 @@ struct URHO3D_API ComponentReplicationState : public ReplicationState
 /// Per-user node network replication state.
 struct URHO3D_API NodeReplicationState : public ReplicationState
 {
-    /// Construct.
-    NodeReplicationState() :
-        ReplicationState(),
-        priorityAcc_(0.0f),
-        markedDirty_(false)
-    {
-    }
-
     /// Parent scene replication state.
     SceneReplicationState* sceneState_;
     /// Link to the actual node.
@@ -184,9 +166,9 @@ struct URHO3D_API NodeReplicationState : public ReplicationState
     /// Components by ID.
     HashMap<unsigned, ComponentReplicationState> componentStates_;
     /// Interest management priority accumulator.
-    float priorityAcc_;
+    float priorityAcc_{};
     /// Whether exists in the SceneState's dirty set.
-    bool markedDirty_;
+    bool markedDirty_{};
 };
 
 /// Per-user scene network replication state.

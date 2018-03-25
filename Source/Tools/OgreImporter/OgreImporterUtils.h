@@ -93,11 +93,6 @@ bool CompareKeyFrames(const AnimationKeyFrame& lhs, const AnimationKeyFrame& rhs
 
 struct ModelVertex
 {
-    ModelVertex() :
-        hasBlendWeights_(false)
-    {
-    }
-
     Vector3 position_;
     Vector3 normal_;
     Color color_;
@@ -106,13 +101,12 @@ struct ModelVertex
     Vector3 cubeTexCoord1_;
     Vector3 cubeTexCoord2_;
     Vector4 tangent_;
-    float blendWeights_[4];
-    unsigned char blendIndices_[4];
-    bool hasBlendWeights_;
-
-    unsigned useCount_;
-    int cachePosition_;
-    float score_;
+    float blendWeights_[4]{};
+    unsigned char blendIndices_[4]{};
+    bool hasBlendWeights_{};
+    unsigned useCount_{};
+    int cachePosition_{};
+    float score_{};
 };
 
 struct ModelVertexBuffer
@@ -237,21 +231,12 @@ struct ModelIndexBuffer
 
 struct ModelSubGeometryLodLevel
 {
-    float distance_;
-    PrimitiveType primitiveType_;
-    unsigned vertexBuffer_;
-    unsigned indexBuffer_;
-    unsigned indexStart_;
-    unsigned indexCount_;
+    float distance_{};
+    PrimitiveType primitiveType_{TRIANGLE_LIST};
+    unsigned vertexBuffer_{};
+    unsigned indexBuffer_{};
+    unsigned indexStart_{};
+    unsigned indexCount_{};
     HashMap<unsigned, PODVector<BoneWeightAssignment> > boneWeights_;
     PODVector<unsigned> boneMapping_;
-
-    ModelSubGeometryLodLevel() :
-        distance_(0.0f),
-        primitiveType_(TRIANGLE_LIST),
-        indexBuffer_(0),
-        indexStart_(0),
-        indexCount_(0)
-    {
-    }
 };

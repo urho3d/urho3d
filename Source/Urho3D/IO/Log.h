@@ -64,9 +64,9 @@ struct StoredLogMessage
     /// Message text.
     String message_;
     /// Message level. -1 for raw messages.
-    int level_;
+    int level_{};
     /// Error flag for raw messages.
-    bool error_;
+    bool error_{};
 };
 
 /// Logging subsystem.

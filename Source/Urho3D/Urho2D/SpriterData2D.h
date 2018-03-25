@@ -234,7 +234,7 @@ struct TimelineKey
     Timeline* timeline_{};
     int id_{};
     float time_{};
-    CurveType curveType_;
+    CurveType curveType_{};
     float c1_{};
     float c2_{};
 };

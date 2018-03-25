@@ -201,7 +201,7 @@ public:
     /// Sphere center.
     Vector3 center_;
     /// Sphere radius.
-    float radius_;
+    float radius_{};
 };
 
 }

@@ -77,26 +77,16 @@ using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, Share
 /// Cached state of a frame buffer object
 struct FrameBufferObject
 {
-    FrameBufferObject() :
-        fbo_(0),
-        depthAttachment_(nullptr),
-        readBuffers_(M_MAX_UNSIGNED),
-        drawBuffers_(M_MAX_UNSIGNED)
-    {
-        for (auto& colorAttachment : colorAttachments_)
-            colorAttachment = nullptr;
-    }
-
     /// Frame buffer handle.
-    unsigned fbo_;
+    unsigned fbo_{};
     /// Bound color attachment textures.
-    RenderSurface* colorAttachments_[MAX_RENDERTARGETS];
+    RenderSurface* colorAttachments_[MAX_RENDERTARGETS]{};
     /// Bound depth/stencil attachment.
-    RenderSurface* depthAttachment_;
+    RenderSurface* depthAttachment_{};
     /// Read buffer bits.
-    unsigned readBuffers_;
+    unsigned readBuffers_{M_MAX_UNSIGNED};
     /// Draw buffer bits.
-    unsigned drawBuffers_;
+    unsigned drawBuffers_{M_MAX_UNSIGNED};
 };
 
 /// %Graphics subsystem implementation. Holds API-specific objects.

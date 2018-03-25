@@ -59,7 +59,7 @@ struct DebugLine
     /// End position.
     Vector3 end_;
     /// Color.
-    unsigned color_;
+    unsigned color_{};
 };
 
 /// Debug render triangle.
@@ -84,7 +84,7 @@ struct DebugTriangle
     /// Vertex c.
     Vector3 v3_;
     /// Color.
-    unsigned color_;
+    unsigned color_{};
 };
 
 /// Debug geometry rendering component. Should be added only to the root scene node.

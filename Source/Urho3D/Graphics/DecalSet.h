@@ -67,9 +67,9 @@ struct DecalVertex
     /// Tangent.
     Vector4 tangent_;
     /// Blend weights.
-    float blendWeights_[4];
+    float blendWeights_[4]{};
     /// Blend indices.
-    unsigned char blendIndices_[4];
+    unsigned char blendIndices_[4]{};
 };
 
 /// One decal in a decal set.

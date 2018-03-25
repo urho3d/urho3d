@@ -50,11 +50,7 @@ struct LightBatchQueue;
 struct Batch
 {
     /// Construct with defaults.
-    Batch() :
-        isBase_(false),
-        lightQueue_(nullptr)
-    {
-    }
+    Batch() = default;
 
     /// Construct from a drawable's source batch.
     explicit Batch(const SourceBatch& rhs) :
@@ -79,37 +75,37 @@ struct Batch
     void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// State sorting key.
-    unsigned long long sortKey_;
+    unsigned long long sortKey_{};
     /// Distance from camera.
-    float distance_;
+    float distance_{};
     /// 8-bit render order modifier from material.
-    unsigned char renderOrder_;
+    unsigned char renderOrder_{};
     /// 8-bit light mask for stencil marking in deferred rendering.
-    unsigned char lightMask_;
+    unsigned char lightMask_{};
     /// Base batch flag. This tells to draw the object fully without light optimizations.
-    bool isBase_;
+    bool isBase_{};
     /// Geometry.
-    Geometry* geometry_;
+    Geometry* geometry_{};
     /// Material.
-    Material* material_;
+    Material* material_{};
     /// World transform(s). For a skinned model, these are the bone transforms.
-    const Matrix3x4* worldTransform_;
+    const Matrix3x4* worldTransform_{};
     /// Number of world transforms.
-    unsigned numWorldTransforms_;
+    unsigned numWorldTransforms_{};
     /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
-    void* instancingData_;
+    void* instancingData_{};
     /// Zone.
-    Zone* zone_;
+    Zone* zone_{};
     /// Light properties.
-    LightBatchQueue* lightQueue_;
+    LightBatchQueue* lightQueue_{};
     /// Material pass.
-    Pass* pass_;
+    Pass* pass_{};
     /// Vertex shader.
-    ShaderVariation* vertexShader_;
+    ShaderVariation* vertexShader_{};
     /// Pixel shader.
-    ShaderVariation* pixelShader_;
+    ShaderVariation* pixelShader_{};
     /// %Geometry type.
-    GeometryType geometryType_;
+    GeometryType geometryType_{};
 };
 
 /// Data for one geometry instance.
@@ -127,11 +123,11 @@ struct InstanceData
     }
 
     /// World transform.
-    const Matrix3x4* worldTransform_;
+    const Matrix3x4* worldTransform_{};
     /// Instancing data buffer.
-    const void* instancingData_;
+    const void* instancingData_{};
     /// Distance from camera.
-    float distance_;
+    float distance_{};
 };
 
 /// Instanced 3D geometry draw call.
@@ -281,15 +277,15 @@ public:
 struct ShadowBatchQueue
 {
     /// Shadow map camera.
-    Camera* shadowCamera_;
+    Camera* shadowCamera_{};
     /// Shadow map viewport.
     IntRect shadowViewport_;
     /// Shadow caster draw calls.
     BatchQueue shadowBatches_;
     /// Directional light cascade near split distance.
-    float nearSplit_;
+    float nearSplit_{};
     /// Directional light cascade far split distance.
-    float farSplit_;
+    float farSplit_{};
 };
 
 /// Queue for light related draw calls.

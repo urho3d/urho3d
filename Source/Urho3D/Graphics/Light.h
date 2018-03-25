@@ -108,9 +108,9 @@ struct URHO3D_API CascadeParameters
     /// Far clip values of the splits.
     Vector4 splits_;
     /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
-    float fadeStart_;
+    float fadeStart_{};
     /// Automatic depth bias adjustment strength.
-    float biasAutoAdjust_;
+    float biasAutoAdjust_{};
 };
 
 /// Shadow map focusing parameters.
