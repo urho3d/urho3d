@@ -229,7 +229,7 @@ void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
         return;
     }
 
-    if (texture_->SetSize(width, height, GetSubsystem<Graphics>()->GetRGBAFormat(), TEXTURE_RENDERTARGET))
+    if (texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET))
         texture_->GetRenderSurface()->SetUpdateMode(SURFACE_MANUALUPDATE);
     else
         URHO3D_LOGERROR("UIComponent: resizing texture failed.");
