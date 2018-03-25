@@ -322,13 +322,12 @@ void Run(Vector<String>& arguments)
             ErrorExit("Could not allocate for all images.  The max sprite sheet texture size is " + String(MAX_TEXTURE_SIZE) + "x" + String(MAX_TEXTURE_SIZE) + ".");
     }
 
-
     // create image for spritesheet
     Image spriteSheetImage(context);
     spriteSheetImage.SetSize(packedWidth, packedHeight, 4);
 
     // zero out image
-    spriteSheetImage.SetData((unsigned char*)calloc(sizeof(unsigned char), (size_t)packedWidth * packedHeight * 4));
+    spriteSheetImage.SetData(nullptr);
 
     XMLFile xml(context);
     XMLElement root = xml.CreateRoot("TextureAtlas");

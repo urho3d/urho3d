@@ -834,7 +834,7 @@ bool Image::Save(Serializer& dest) const
     int len;
     unsigned char* png = stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
     bool success = dest.Write(png, (unsigned)len) == (unsigned)len;
-    free(png);
+    free(png);      // NOLINT(hicpp-no-malloc)
     return success;
 }
 
@@ -939,7 +939,11 @@ void Image::SetData(const unsigned char* pixelData)
         return;
     }
 
-    memcpy(data_.Get(), pixelData, (size_t)width_ * height_ * depth_ * components_);
+    auto size = (size_t)width_ * height_ * depth_ * components_;
+    if (pixelData)
+        memcpy(data_.Get(), pixelData, size);
+    else
+        memset(data_.Get(), 0, size);
     nextLevel_.Reset();
 }
 
