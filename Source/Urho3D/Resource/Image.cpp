@@ -965,6 +965,7 @@ bool Image::LoadColorLUT(Deserializer& source)
     if (components != 3)
     {
         URHO3D_LOGERROR("Invalid image format, can not load image");
+        FreeImageData(pixelDataIn);
         return false;
     }
 
