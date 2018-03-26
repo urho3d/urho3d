@@ -328,8 +328,7 @@ void Run(Vector<String>& arguments)
     spriteSheetImage.SetSize(packedWidth, packedHeight, 4);
 
     // zero out image
-    // Ugly: depends on implementation details - is this really needed?
-    memset(spriteSheetImage.GetData(), 0, packedWidth * packedHeight * 4);
+    spriteSheetImage.SetData((unsigned char*)calloc(sizeof(unsigned char), (size_t)packedWidth * packedHeight * 4));
 
     XMLFile xml(context);
     XMLElement root = xml.CreateRoot("TextureAtlas");
