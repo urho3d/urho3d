@@ -24,6 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
+#include "../Core/ScopeGuard.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
@@ -957,11 +958,13 @@ bool Image::LoadColorLUT(Deserializer& source)
     int width, height;
     unsigned components;
     unsigned char* pixelDataIn = GetImageData(source, width, height, components);
+    const auto imageLiberator = MakeScopeGuard(std::bind(FreeImageData, pixelDataIn)); // free image data whichever way we exit
     if (!pixelDataIn)
     {
         URHO3D_LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
         return false;
     }
+
     if (components != 3)
     {
         URHO3D_LOGERROR("Invalid image format, can not load image");
@@ -988,8 +991,6 @@ bool Image::LoadColorLUT(Deserializer& source)
             }
         }
     }
-
-    FreeImageData(pixelDataIn);
 
     return true;
 }
