@@ -133,7 +133,7 @@ Variant& Variant::operator =(const Variant& rhs)
         break;
 
     default:
-        memcpy(&value_, &rhs.value_, sizeof(VariantValue));
+        memcpy(&value_, &rhs.value_, sizeof(VariantValue));     // NOLINT(bugprone-undefined-memory-manipulation)
         break;
     }
 
