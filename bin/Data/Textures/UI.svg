@@ -30,8 +30,8 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="4"
-     inkscape:cx="114.07172"
-     inkscape:cy="75.047882"
+     inkscape:cx="120.32172"
+     inkscape:cy="91.297882"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -1295,24 +1295,6 @@
       </cc:License>
     </rdf:RDF>
   </metadata>
-  <g
-     style="display:none"
-     inkscape:label="Background"
-     id="layer2"
-     inkscape:groupmode="layer"
-     sodipodi:insensitive="true">
-    <image
-       sodipodi:absref="/home/frode/Git/Branch/Urho3D/bin/Data/Textures/UI_old.png"
-       xlink:href="UI_old.png"
-       transform="translate(-809.14288,-862.64795)"
-       y="862.64795"
-       x="809.14288"
-       id="image4198"
-       style="opacity:0.42000002;image-rendering:optimizeSpeed"
-       preserveAspectRatio="none"
-       height="128"
-       width="256" />
-  </g>
   <g
      style="display:inline"
      transform="translate(-809.14288,-862.64795)"
