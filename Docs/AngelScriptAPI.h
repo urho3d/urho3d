@@ -16417,6 +16417,7 @@ float InverseLerp(float, float, float);
 bool IsAbsolutePath(const String&);
 bool IsAlpha(uint);
 bool IsDigit(uint);
+bool IsNaN(double);
 bool IsNaN(float);
 bool IsPowerOfTwo(uint);
 bool IsReplicatedID(uint);
