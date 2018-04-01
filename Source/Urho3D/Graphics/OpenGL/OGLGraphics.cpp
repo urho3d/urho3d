@@ -3159,6 +3159,8 @@ void Graphics::CleanupFramebuffers()
             DeleteFramebuffer(impl_->resolveSrcFBO_);
         if (impl_->resolveDestFBO_)
             DeleteFramebuffer(impl_->resolveDestFBO_);
+        impl_->resolveSrcFBO_ = 0;
+        impl_->resolveDestFBO_ = 0;
     }
     else
         impl_->boundFBO_ = 0;
