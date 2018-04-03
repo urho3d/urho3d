@@ -39,7 +39,7 @@ Sprite2D::Sprite2D(Context* context) :
     Resource(context),
     hotSpot_(0.5f, 0.5f),
     offset_(0, 0),
-    edgeOffset_(0.0f)
+    edgeOffset_(M_LARGE_EPSILON)
 {
 
 }
