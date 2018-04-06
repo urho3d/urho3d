@@ -439,12 +439,12 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
     btVector3 start = ToBtVector3(ray.origin_);
     btVector3 end;
     btVector3 direction = ToBtVector3(ray.direction_);
-    float remainingDistance = maxDistance;
-    auto count = RoundToInt(maxDistance / segmentDistance);
+    float distance;
 
-    for (auto i = 0; i < count; ++i)
+    for (float remainingDistance = maxDistance; remainingDistance > 0; remainingDistance -= segmentDistance)
     {
-        float distance = Min(remainingDistance, segmentDistance);     // The last segment may be shorter
+        distance = Min(remainingDistance, segmentDistance);
+
         end = start + distance * direction;
 
         btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
@@ -466,7 +466,6 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
 
         // Use the end position as the new start position
         start = end;
-        remainingDistance -= segmentDistance;
     }
 
     // Didn't hit anything
