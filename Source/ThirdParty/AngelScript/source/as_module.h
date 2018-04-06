@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -65,7 +65,7 @@ struct asSNameSpace;
 struct sBindInfo
 {
 	asCScriptFunction *importedFunctionSignature;
-	asCString		   importFromModule;
+	asCString          importFromModule;
 	int                boundFunctionId;
 };
 
@@ -76,7 +76,7 @@ struct sObjectTypePair
 };
 
 
-// TODO: import: Remove function imports. When I have implemented function 
+// TODO: import: Remove function imports. When I have implemented function
 //               pointers the function imports should be deprecated.
 
 // TODO: Need a separate interface for compiling scripts. The asIScriptCompiler
@@ -207,6 +207,7 @@ public:
 	asCTypeInfo       *GetType(const char *type, asSNameSpace *ns);
 	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);
 	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt, asSNameSpace *ns);
+	void               UninitializeGlobalProp(asCGlobalProperty *prop);
 
 	asCString name;
 
@@ -239,6 +240,13 @@ public:
 	asCArray<asCTypedefType*>      typeDefs; // increases ref count
 	// This array holds the funcdefs declared in the module
 	asCArray<asCFuncdefType*>      funcDefs; // increases ref count
+
+#ifndef AS_NO_COMPILER
+	// This array holds types that have been explicitly declared with 'external'
+	asCArray<asCTypeInfo*>       externalTypes; // doesn't increase ref count
+	// This array holds functions that have been explicitly declared with 'external'
+	asCArray<asCScriptFunction*> externalFunctions; // doesn't increase ref count
+#endif
 };
 
 END_AS_NAMESPACE

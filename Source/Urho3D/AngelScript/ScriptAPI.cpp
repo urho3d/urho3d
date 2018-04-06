@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ static void ScriptFileDelayedExecute(float delay, bool repeat, const String& dec
 static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const String& className, CreateMode mode, Node* ptr)
 {
     if (!file)
-        return 0;
+        return nullptr;
 
     // Try first to reuse an existing, empty ScriptInstance
     const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
@@ -69,7 +69,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Get());
+            auto* instance = static_cast<ScriptInstance*>(i->Get());
             asIScriptObject* object = instance->GetScriptObject();
             if (!object)
             {
@@ -79,7 +79,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
         }
     }
     // Then create a new component if not found
-    ScriptInstance* instance = ptr->CreateComponent<ScriptInstance>(mode);
+    auto* instance = ptr->CreateComponent<ScriptInstance>(mode);
     instance->CreateObject(file, className);
     return instance->GetScriptObject();
 }
@@ -96,7 +96,7 @@ static void RegisterScriptFile(asIScriptEngine* engine)
 
 static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, CreateMode mode, Node* ptr)
 {
-    ResourceCache* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
+    auto* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
     return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName), className, mode, ptr);
 }
 
@@ -108,14 +108,14 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Get());
+            auto* instance = static_cast<ScriptInstance*>(i->Get());
             asIScriptObject* object = instance->GetScriptObject();
             if (object)
                 return object;
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
@@ -125,7 +125,7 @@ asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Get());
+            auto* instance = static_cast<ScriptInstance*>(i->Get());
             if (instance->IsA(className))
             {
                 asIScriptObject* object = instance->GetScriptObject();
@@ -135,7 +135,7 @@ asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 static bool ScriptInstanceExecute(const String& declaration, CScriptArray* srcParams, ScriptInstance* ptr)

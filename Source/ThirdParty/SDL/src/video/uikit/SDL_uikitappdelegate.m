@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
 // Urho3D: added function
 void SDL_IOS_LogMessage(const char *message)
-{   
+{
     #ifdef _DEBUG
     NSLog(@"%@", [NSString stringWithUTF8String: message]);
     #endif
@@ -93,7 +93,7 @@ const char* SDL_IOS_GetResourceDir()
         resource_dir = malloc(strlen(temp) + 1);
         strcpy(resource_dir, temp);
     }
-    
+
     return resource_dir;
 }
 
@@ -104,12 +104,12 @@ const char* SDL_IOS_GetDocumentsDir()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-        
+
         const char *temp = [basePath UTF8String];
         documents_dir = malloc(strlen(temp) + 1);
         strcpy(documents_dir, temp);
     }
-    
+
     return documents_dir;
 }
 
@@ -121,7 +121,7 @@ unsigned SDL_TVOS_GetActiveProcessorCount()
 }
 #endif
 
-static void
+static void SDLCALL
 SDL_IdleTimerDisabledChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
     BOOL disable = (hint && *hint != '0');
@@ -474,14 +474,24 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
     return YES;
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application
+- (UIWindow *)window
 {
-    SDL_SendAppEvent(SDL_APP_TERMINATING);
+    SDL_VideoDevice *_this = SDL_GetVideoDevice();
+    if (_this) {
+        SDL_Window *window = NULL;
+        for (window = _this->windows; window != NULL; window = window->next) {
+            SDL_WindowData *data = (__bridge SDL_WindowData *) window->driverdata;
+            if (data != nil) {
+                return data.uiwindow;
+            }
+        }
+    }
+    return nil;
 }
 
-- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
+- (void)setWindow:(UIWindow *)window
 {
-    SDL_SendAppEvent(SDL_APP_LOWMEMORY);
+    /* Do nothing. */
 }
 
 #if !TARGET_OS_TV
@@ -514,41 +524,34 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 }
 #endif
 
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    SDL_OnApplicationWillTerminate();
+}
+
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
+{
+    SDL_OnApplicationDidReceiveMemoryWarning();
+}
+
 - (void)applicationWillResignActive:(UIApplication*)application
 {
-    SDL_VideoDevice *_this = SDL_GetVideoDevice();
-    if (_this) {
-        SDL_Window *window;
-        for (window = _this->windows; window != nil; window = window->next) {
-            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_LOST, 0, 0);
-            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
-        }
-    }
-    SDL_SendAppEvent(SDL_APP_WILLENTERBACKGROUND);
+    SDL_OnApplicationWillResignActive();
 }
 
 - (void)applicationDidEnterBackground:(UIApplication*)application
 {
-    SDL_SendAppEvent(SDL_APP_DIDENTERBACKGROUND);
+    SDL_OnApplicationDidEnterBackground();
 }
 
 - (void)applicationWillEnterForeground:(UIApplication*)application
 {
-    SDL_SendAppEvent(SDL_APP_WILLENTERFOREGROUND);
+    SDL_OnApplicationWillEnterForeground();
 }
 
 - (void)applicationDidBecomeActive:(UIApplication*)application
 {
-    SDL_SendAppEvent(SDL_APP_DIDENTERFOREGROUND);
-
-    SDL_VideoDevice *_this = SDL_GetVideoDevice();
-    if (_this) {
-        SDL_Window *window;
-        for (window = _this->windows; window != nil; window = window->next) {
-            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
-            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESTORED, 0, 0);
-        }
-    }
+    SDL_OnApplicationDidBecomeActive();
 }
 
 - (void)sendDropFileForURL:(NSURL *)url
@@ -562,23 +565,24 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
     SDL_SendDropComplete(NULL);
 }
 
-#if TARGET_OS_TV
-/* TODO: Use this on iOS 9+ as well? */
+#if TARGET_OS_TV || (defined(__IPHONE_9_0) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_9_0)
+
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
     /* TODO: Handle options */
     [self sendDropFileForURL:url];
     return YES;
 }
-#endif /* TARGET_OS_TV */
 
-#if !TARGET_OS_TV
+#else
+
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
     [self sendDropFileForURL:url];
     return YES;
 }
-#endif /* !TARGET_OS_TV */
+
+#endif
 
 @end
 

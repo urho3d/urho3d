@@ -1,6 +1,6 @@
 //
 
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,37 +47,13 @@ namespace Urho3D
 
 const char* GEOMETRY_CATEGORY = "Geometry";
 
-SourceBatch::SourceBatch() :
-    distance_(0.0f),
-    geometry_(0),
-    worldTransform_(&Matrix3x4::IDENTITY),
-    numWorldTransforms_(1),
-    instancingData_((void*)0),
-    geometryType_(GEOM_STATIC)
-{
-}
+SourceBatch::SourceBatch() = default;
 
-SourceBatch::SourceBatch(const SourceBatch& batch)
-{
-    *this = batch;
-}
+SourceBatch::SourceBatch(const SourceBatch& batch) = default;
 
-SourceBatch::~SourceBatch()
-{
-}
+SourceBatch::~SourceBatch() = default;
 
-SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
-{
-    distance_ = rhs.distance_;
-    geometry_ = rhs.geometry_;
-    material_ = rhs.material_;
-    worldTransform_ = rhs.worldTransform_;
-    numWorldTransforms_ = rhs.numWorldTransforms_;
-    instancingData_ = rhs.instancingData_;
-    geometryType_ = rhs.geometryType_;
-
-    return *this;
-}
+SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)= default;
 
 
 Drawable::Drawable(Context* context, unsigned char drawableFlags) :
@@ -90,8 +66,8 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     occludee_(true),
     updateQueued_(false),
     zoneDirty_(false),
-    octant_(0),
-    zone_(0),
+    octant_(nullptr),
+    zone_(nullptr),
     viewMask_(DEFAULT_VIEWMASK),
     lightMask_(DEFAULT_LIGHTMASK),
     shadowMask_(DEFAULT_SHADOWMASK),
@@ -107,8 +83,12 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     lodBias_(1.0f),
     basePassFlags_(0),
     maxLights_(0),
-    firstLight_(0)
+    firstLight_(nullptr)
 {
+    if (drawableFlags == DRAWABLE_UNDEFINED || drawableFlags > DRAWABLE_ANY)
+    {
+        URHO3D_LOGERROR("Drawable with undefined drawableFlags");
+    }
 }
 
 Drawable::~Drawable()
@@ -176,7 +156,7 @@ Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
     if (batchIndex < batches_.Size())
         return batches_[batchIndex].geometry_;
     else
-        return 0;
+        return nullptr;
 }
 
 bool Drawable::DrawOcclusion(OcclusionBuffer* buffer)
@@ -285,13 +265,13 @@ bool Drawable::IsInView() const
 {
     // Note: in headless mode there is no renderer subsystem and no view frustum tests are performed, so return
     // always false in that case
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     return renderer && viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && !viewCameras_.Empty();
 }
 
 bool Drawable::IsInView(Camera* camera) const
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     return renderer && viewFrameNumber_ == renderer->GetFrameInfo().frameNumber_ && (!camera || viewCameras_.Contains(camera));
 }
 
@@ -325,7 +305,7 @@ void Drawable::MarkInView(const FrameInfo& frame)
         viewCameras_.Push(frame.camera_);
 
     basePassFlags_ = 0;
-    firstLight_ = 0;
+    firstLight_ = nullptr;
     lights_.Clear();
     vertexLights_.Clear();
 }
@@ -411,7 +391,7 @@ void Drawable::AddToOctree()
     Scene* scene = GetScene();
     if (scene)
     {
-        Octree* octree = scene->GetComponent<Octree>();
+        auto* octree = scene->GetComponent<Octree>();
         if (octree)
             octree->InsertDrawable(this);
         else
@@ -468,7 +448,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
         for (unsigned geoIndex = 0; geoIndex < batches.Size(); ++geoIndex)
         {
             Geometry* geo = drawable->GetLodGeometry(geoIndex, 0);
-            if (geo == 0)
+            if (geo == nullptr)
                 continue;
             if (geo->GetPrimitiveType() != TRIANGLE_LIST)
             {
@@ -585,7 +565,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     {
                         //16 bit indices
                         unsigned short indices[3];
-                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        memcpy(indices, indexData + (indexIdx * indexSize), (size_t)indexSize * 3);
                         longIndices[0] = indices[0] - indexOffset;
                         longIndices[1] = indices[1] - indexOffset;
                         longIndices[2] = indices[2] - indexOffset;
@@ -594,7 +574,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     {
                         //32 bit indices
                         unsigned indices[3];
-                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        memcpy(indices, indexData + (indexIdx * indexSize), (size_t)indexSize * 3);
                         longIndices[0] = indices[0] - indexOffset;
                         longIndices[1] = indices[1] - indexOffset;
                         longIndices[2] = indices[2] - indexOffset;

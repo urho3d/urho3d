@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,20 +34,18 @@ namespace Urho3D
 
 const StringHash StringHash::ZERO;
 
-StringHash::StringHash(const char* str) :
+StringHash::StringHash(const char* str) noexcept :
     value_(Calculate(str))
 {
 }
 
-StringHash::StringHash(const String& str) :
+StringHash::StringHash(const String& str) noexcept :
     value_(Calculate(str.CString()))
 {
 }
 
-unsigned StringHash::Calculate(const char* str)
+unsigned StringHash::Calculate(const char* str, unsigned hash)
 {
-    unsigned hash = 0;
-
     if (!str)
         return hash;
 

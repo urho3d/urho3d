@@ -699,6 +699,8 @@ namespace Urho3D
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
+- %XBegin : int
+- %YBegin : int
 - %Button : int
 - %Buttons : int
 - %Qualifiers : int
@@ -724,6 +726,8 @@ namespace Urho3D
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
+- %XBegin : int
+- %YBegin : int
 - %Button : int
 - %Buttons : int
 - %Qualifiers : int
@@ -1104,6 +1108,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1521,6 +1526,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1775,6 +1781,7 @@ namespace Urho3D
 - %Tiled : bool
 - %Blend %Mode : int
 - %Pressed %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1948,6 +1955,7 @@ namespace Urho3D
 - %Wheel %data : VariantVector
 - %Maximum %side %slip %threshold : float
 - %RPM %for %wheel %motors %in %air (0=calculate) : float
+- %Coordinate %system : IntVector3
 
 ### RibbonTrail
 - %Is %Enabled : bool
@@ -1960,6 +1968,7 @@ namespace Urho3D
 - %Emitting : bool
 - %Update %Invisible : bool
 - %Trail %Type : int
+- %Base %Velocity : Vector3
 - %Tail %Lifetime : float
 - %Tail %Column : int
 - %Vertex %Distance : float
@@ -2313,6 +2322,25 @@ namespace Urho3D
 - %Use %Draw %Rectangle : bool
 - %Texture %Rectangle : Rect
 - %Use %Texture %Rectangle : bool
+
+### StretchableSprite2D
+- %Is %Enabled : bool
+- %Layer : int
+- %Order %in %Layer : int
+- %View %Mask : int
+- %Sprite : ResourceRef
+- %Blend %Mode : int
+- %Flip X : bool
+- %Flip Y : bool
+- %Color : Color
+- %Custom %material : ResourceRef
+- %Hot %Spot : Vector2
+- %Use %Hot %Spot : bool
+- %Draw %Rectangle : Rect
+- %Use %Draw %Rectangle : bool
+- %Texture %Rectangle : Rect
+- %Use %Texture %Rectangle : bool
+- %Border : IntRect
 
 ### Terrain
 - %Is %Enabled : bool
@@ -2829,6 +2857,7 @@ namespace Urho3D
 <a href="#Class_StaticModel"><b>StaticModel</b></a>
 <a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
 <a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_StretchableSprite2D"><b>StretchableSprite2D</b></a>
 <a href="#Class_String"><b>String</b></a>
 <a href="#Class_StringHash"><b>StringHash</b></a>
 <a href="#Class_Technique"><b>Technique</b></a>
@@ -2854,6 +2883,7 @@ namespace Urho3D
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
 <a href="#Class_TouchState"><b>TouchState</b></a>
 <a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -2891,10 +2921,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
@@ -2951,10 +2981,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllAnimationStates()
@@ -3000,7 +3030,7 @@ Properties:
 - bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -3015,6 +3045,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Skeleton@ skeleton // readonly
@@ -3046,10 +3077,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -3068,7 +3099,7 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetFlip(bool, bool)
+- void SetFlip(bool, bool, bool = false)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
 Properties:
@@ -3108,10 +3139,12 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - float speed
 - Sprite2D@ sprite
+- bool swapXY
 - bool temporary
 - Rect textureRect
 - StringHash type // readonly
@@ -3222,10 +3255,10 @@ Methods:
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
 - bool IsPlaying(uint8) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - bool Play(const String&, uint8, bool, float = 0.0f)
 - bool PlayExclusive(const String&, uint8, bool, float = 0.0f)
@@ -3276,6 +3309,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -3405,6 +3439,7 @@ Methods:
 - void Sort(uint, uint)
 - void SortReverse()
 - void SortReverse(uint, uint)
+- bool Swap(T[]&)
 
 Properties:
 
@@ -3419,10 +3454,10 @@ Properties:
 
 - Variant defaultValue
 - String[]@ enumNames // readonly
+- VariantMap metadata
 - uint mode
 - String name
 - VariantType type
-- String[]@ variantStructureElementNames // readonly
 
 <a name="Class_Audio"></a>
 
@@ -3501,10 +3536,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -3555,6 +3590,7 @@ Properties:
 - bool occluder
 - int refs // readonly
 - bool relative
+- bool replicated // readonly
 - bool scaled
 - float shadowDistance
 - uint shadowMask
@@ -3581,6 +3617,7 @@ Properties:
 - Vector3 initialScale
 - String name
 - Node@ node
+- uint parentIndex
 - float radius
 
 <a name="Class_BorderImage"></a>
@@ -3616,18 +3653,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -3843,18 +3881,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -3883,6 +3922,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -3929,6 +3969,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -4024,10 +4065,10 @@ Methods:
 - Frustum GetSplitFrustum(float, float) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4081,6 +4122,7 @@ Properties:
 - Vector2 projectionOffset
 - Plane reflectionPlane
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -4139,18 +4181,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -4311,10 +4354,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4360,6 +4403,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - Vector2 size
 - bool temporary
@@ -4386,10 +4430,10 @@ Methods:
 - Vector2[]@ GetVertices() const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4435,6 +4479,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4460,10 +4505,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4508,6 +4553,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4532,10 +4578,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4578,6 +4624,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4605,10 +4652,10 @@ Methods:
 - Vector2[]@ GetVertices() const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4653,6 +4700,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4678,10 +4726,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4731,6 +4779,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
+- bool replicated // readonly
 - Quaternion rotation
 - ShapeType shapeType
 - Vector3 size
@@ -4757,10 +4806,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4802,6 +4851,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - bool temporary
 - bool trigger
@@ -4822,6 +4872,7 @@ Methods:
 - bool Equals() const
 - void FromHSL(float, float, float, float)
 - void FromHSV(float, float, float, float)
+- void FromUInt(uint)
 - float Hue() const
 - void Invert(bool)
 - Color Lerp(const Color&, float) const
@@ -4875,10 +4926,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -4912,6 +4963,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5016,10 +5068,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5066,6 +5118,7 @@ Properties:
 - RigidBody@ ownBody // readonly
 - Vector3 position
 - int refs // readonly
+- bool replicated // readonly
 - Quaternion rotation
 - bool temporary
 - StringHash type // readonly
@@ -5090,10 +5143,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5130,6 +5183,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5152,10 +5206,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5197,6 +5251,7 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - Vector2 ownerBodyAnchor
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5219,10 +5274,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5262,6 +5317,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5284,10 +5340,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5327,6 +5383,7 @@ Properties:
 - Constraint2D@ ownerConstraint
 - float ratio
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5349,10 +5406,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5394,6 +5451,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5416,10 +5474,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5459,6 +5517,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - Vector2 target
 - bool temporary
 - StringHash type // readonly
@@ -5482,10 +5541,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5529,6 +5588,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5552,10 +5612,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5597,6 +5657,7 @@ Properties:
 - Vector2 ownerBodyGroundAnchor
 - float ratio
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5619,10 +5680,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5665,6 +5726,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5688,10 +5750,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5731,6 +5793,7 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - Vector2 ownerBodyAnchor
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5753,10 +5816,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5796,6 +5859,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5818,10 +5882,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5865,6 +5929,7 @@ Properties:
 - RigidBody2D@ otherBody
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -5906,10 +5971,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -5958,6 +6023,7 @@ Properties:
 - uint queryFilterType
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - bool requestedTarget // readonly
 - CrowdAgentRequestedTarget requestedTargetType // readonly
 - Vector3 targetPosition
@@ -5996,10 +6062,10 @@ Methods:
 - Vector3 GetRandomPointInCircle(const Vector3&, float, int)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, int)
@@ -6048,6 +6114,7 @@ Properties:
 - uint numQueryFilterTypes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -6105,18 +6172,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -6289,10 +6357,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6340,6 +6408,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6482,10 +6551,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6520,6 +6589,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -6544,10 +6614,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllDecals()
@@ -6599,6 +6669,7 @@ Properties:
 - bool occluder
 - bool optimizeBufferSize
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6706,10 +6777,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6752,6 +6823,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6780,10 +6852,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -6828,6 +6900,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -6874,18 +6947,19 @@ Methods:
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -6918,6 +6992,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -6967,6 +7042,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -7083,10 +7159,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool HasTile(const IntVector2&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -7147,6 +7223,7 @@ Properties:
 - int refs // readonly
 - float regionMergeSize
 - float regionMinSize
+- bool replicated // readonly
 - bool temporary
 - int tileSize
 - StringHash type // readonly
@@ -7355,6 +7432,7 @@ Properties:
 - bool executeConsoleCommands
 - String programDir // readonly
 - int refs // readonly
+- String temporaryDir // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - String userDocumentsDir // readonly
@@ -7480,6 +7558,7 @@ Methods:
 - void Minimize()
 - void PrecacheShaders(File@)
 - void PrecacheShaders(VectorBuffer&)
+- void Raise()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
 - bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int)
@@ -7492,9 +7571,11 @@ Properties:
 - String apiName // readonly
 - bool borderless // readonly
 - String category // readonly
+- int currentMonitor // readonly
 - bool deferredSupport // readonly
 - IntVector2[] desktopResolution // readonly
 - bool deviceLost // readonly
+- Vector3[] displayDPI // readonly
 - bool dither
 - bool flushGPU
 - bool fullscreen // readonly
@@ -7503,6 +7584,7 @@ Properties:
 - bool initialized // readonly
 - bool instancingSupport // readonly
 - bool lightPrepassSupport // readonly
+- bool maximized // readonly
 - int monitorCount // readonly
 - int multiSample // readonly
 - int[]@ multiSampleLevels // readonly
@@ -7606,10 +7688,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -7644,6 +7726,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float rotationDecay
 - float rotationWeight
 - String targetName
@@ -7680,10 +7763,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void RebuildChainTrees()
 - void RecalculateSegmentLengths()
@@ -7729,6 +7812,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - float tolerance
 - StringHash type // readonly
@@ -7776,6 +7860,7 @@ Methods:
 - void SetPixelInt(int, int, uint)
 - bool SetSize(int, int, int, uint)
 - bool SetSize(int, int, uint)
+- bool SetSubimage(const Image@, const IntRect&) const
 
 Properties:
 
@@ -7786,6 +7871,7 @@ Properties:
 - CompressedFormat compressedFormat // readonly
 - bool cubemap // readonly
 - int depth // readonly
+- bool hasAlphaChannel // readonly
 - int height // readonly
 - uint memoryUse // readonly
 - String name
@@ -8081,10 +8167,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -8144,6 +8230,7 @@ Properties:
 - Texture@ rampTexture
 - float range
 - int refs // readonly
+- bool replicated // readonly
 - BiasParameters shadowBias
 - CascadeParameters shadowCascade
 - float shadowDistance
@@ -8199,18 +8286,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -8378,8 +8466,10 @@ Methods:
 - void ClearSelection()
 - void CopySelectedItemsToClipboard()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
+- void DisableInternalLayoutUpdate()
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
+- void EnableInternalLayoutUpdate()
 - void EnableLayoutUpdate()
 - void Expand(uint, bool, bool = false)
 - uint FindChild(UIElement@) const
@@ -8403,20 +8493,21 @@ Methods:
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@, UIElement@ = null)
+- bool IsChildOf(UIElement@) const
 - bool IsExpanded(uint) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 - bool IsSelected(uint) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -8471,6 +8562,7 @@ Methods:
 - void SetViewPosition(int, int)
 - void ToggleExpand(uint, bool = false)
 - void ToggleSelection(uint)
+- void UpdateInternalLayout()
 - void UpdateLayout()
 - const Variant& GetVar(const StringHash&)
 
@@ -8624,6 +8716,7 @@ Methods:
 - void Info(const String&)
 - void Open(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void Trace(const String&)
 - void Warning(const String&)
 - void Write(const String&, bool = false)
 
@@ -8858,18 +8951,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -8899,6 +8993,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -8948,6 +9043,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -9204,10 +9300,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9243,6 +9339,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9266,10 +9363,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9304,6 +9401,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - bool recursive
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9342,10 +9440,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool HasTile(const IntVector2&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -9403,6 +9501,7 @@ Properties:
 - int refs // readonly
 - float regionMergeSize
 - float regionMinSize
+- bool replicated // readonly
 - bool temporary
 - int tileSize
 - StringHash type // readonly
@@ -9466,10 +9565,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9507,6 +9606,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9555,10 +9655,10 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&)
 - bool IsChildOf(Node@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector2 LocalToWorld2D(const Vector2&) const
@@ -9658,6 +9758,7 @@ Properties:
 - Vector3 position
 - Vector2 position2D
 - int refs // readonly
+- bool replicated // readonly
 - Vector3 right // readonly
 - Quaternion rotation
 - float rotation2D
@@ -9757,10 +9858,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9797,6 +9898,7 @@ Properties:
 - uint obstacleId // readonly
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9826,10 +9928,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
 - RayQueryResult RaycastSingle(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
@@ -9868,6 +9970,7 @@ Properties:
 - uint numLevels // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9891,10 +9994,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -9933,6 +10036,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - float radius
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9972,9 +10076,9 @@ Properties:
 Methods:
 
 - void AddColorFrame(ColorFrame@)
-- void AddColorTime(Color&, float)
+- void AddColorTime(const Color&, float)
 - void AddTextureFrame(TextureFrame@)
-- void AddTextureTime(Rect&, float)
+- void AddTextureTime(const Rect&, float)
 - ParticleEffect@ Clone(const String& = String ( )) const
 - ColorFrame@ GetColorFrame(uint) const
 - TextureFrame@ GetTextureFrame(uint) const
@@ -10088,10 +10192,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllParticles()
@@ -10148,6 +10252,7 @@ Properties:
 - bool occluder
 - int refs // readonly
 - bool relative
+- bool replicated // readonly
 - bool scaled
 - bool serializeParticles
 - float shadowDistance
@@ -10180,10 +10285,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -10231,6 +10336,7 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Sprite2D@ sprite
@@ -10310,10 +10416,10 @@ Methods:
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float, uint = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float, uint = 0xffff)
@@ -10360,6 +10466,7 @@ Properties:
 - int numIterations
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool splitImpulse
 - bool temporary
 - StringHash type // readonly
@@ -10388,10 +10495,10 @@ Methods:
 - RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult2D[]@ Raycast(const Vector2&, const Vector2&, uint = 0xffff)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff)
@@ -10437,6 +10544,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - uint positionIterations
 - int refs // readonly
+- bool replicated // readonly
 - bool subStepping
 - bool temporary
 - StringHash type // readonly
@@ -10652,10 +10760,10 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - void Init()
 - bool IsFrontWheel(int)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -10701,6 +10809,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - String category // readonly
+- IntVector3 coordinateSystem
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -10711,10 +10820,20 @@ Properties:
 - int numWheels // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
+
+Constants:
+
+- IntVector3 FORWARD_RIGHT_UP
+- IntVector3 FORWARD_UP_RIGHT
+- IntVector3 RIGHT_FORWARD_UP
+- IntVector3 RIGHT_UP_FORWARD
+- IntVector3 UP_FORWARD_RIGHT
+- IntVector3 UP_RIGHT_FORWARD
 
 <a name="Class_Rect"></a>
 
@@ -10777,7 +10896,9 @@ Methods:
 
 Properties:
 
+- bool[] added // readonly
 - RenderPathCommand[] commands
+- bool[] enabled // readonly
 - uint numCommands // readonly
 - uint numRenderTargets // readonly
 - int refs // readonly
@@ -10870,6 +10991,7 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry(bool) const
+- Viewport@ GetViewportForScene(Scene@, uint)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - void ReloadShaders() const
@@ -11051,10 +11173,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11081,6 +11203,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- Vector3 baseVelocity
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11103,6 +11226,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool sorted
@@ -11149,10 +11273,10 @@ Methods:
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void ReAddBodyToWorld()
 - void Remove()
@@ -11213,6 +11337,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - Vector3 position
 - int refs // readonly
+- bool replicated // readonly
 - float restitution
 - float rollingFriction
 - Quaternion rotation
@@ -11246,10 +11371,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11295,6 +11420,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -11359,16 +11485,16 @@ Methods:
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - bool IsChildOf(Node@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
 - bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadAsyncXML(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadJSON(File@)
 - bool LoadJSON(VectorBuffer&)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector2 LocalToWorld2D(const Vector2&) const
@@ -11478,6 +11604,7 @@ Properties:
 - Vector3 position
 - Vector2 position2D
 - int refs // readonly
+- bool replicated // readonly
 - PackageFile@[]@ requiredPackageFiles // readonly
 - Vector3 right // readonly
 - Quaternion rotation
@@ -11586,10 +11713,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsA(const String&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -11624,6 +11751,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - ScriptFile@ scriptFile
 - ScriptObject@ scriptObject // readonly
 - bool temporary
@@ -11669,18 +11797,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -11856,18 +11985,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -11956,6 +12086,7 @@ Properties:
 - int height
 - HorizontalAlignment horizontalAlignment
 - ScrollBar@ horizontalScrollBar // readonly
+- bool horizontalScrollBarVisible
 - bool hovering // readonly
 - int indent
 - int indentSpacing
@@ -12007,6 +12138,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - ScrollBar@ verticalScrollBar // readonly
+- bool verticalScrollBarVisible
 - IntVector2 viewPosition
 - bool visible
 - bool visibleEffective // readonly
@@ -12025,10 +12157,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
@@ -12101,6 +12233,8 @@ Methods:
 Methods:
 
 - Bone@ GetBone(const String&) const
+- uint GetBoneIndex(const String&) const
+- Bone@ GetBoneParent(Bone@) const
 - void Reset()
 
 Properties:
@@ -12128,10 +12262,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -12167,7 +12301,7 @@ Properties:
 - bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -12178,6 +12312,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -12223,18 +12358,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -12397,10 +12533,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -12436,6 +12572,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - Vector3 targetPosition
 - Quaternion targetRotation
 - Vector3 targetWorldPosition
@@ -12501,10 +12638,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -12538,6 +12675,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -12560,10 +12698,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
 - void Play(Sound@, float)
@@ -12609,6 +12747,7 @@ Properties:
 - float panning
 - bool playing // readonly
 - int refs // readonly
+- bool replicated // readonly
 - Sound@ sound // readonly
 - String soundType
 - bool temporary
@@ -12634,10 +12773,10 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
 - void Play(Sound@, float)
@@ -12689,6 +12828,7 @@ Properties:
 - float panning
 - bool playing // readonly
 - int refs // readonly
+- bool replicated // readonly
 - float rolloffFactor
 - Sound@ sound // readonly
 - String soundType
@@ -12769,10 +12909,10 @@ Methods:
 - Vector3 GetPosition() const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Move(float)
 - void Remove()
@@ -12814,6 +12954,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - float speed
 - bool temporary
 - StringHash type // readonly
@@ -12853,18 +12994,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -13089,10 +13231,10 @@ Methods:
 - bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13128,7 +13270,7 @@ Properties:
 - bool inView // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -13140,6 +13282,7 @@ Properties:
 - bool occluder
 - uint occlusionLodLevel
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13170,10 +13313,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllInstanceNodes()
@@ -13212,7 +13355,7 @@ Properties:
 - Node@[] instanceNodes // readonly
 - uint lightMask
 - float lodBias
-- Material@ material // writeonly
+- Material@ material
 - Material@[] materials
 - uint maxLights
 - Model@ model
@@ -13225,6 +13368,7 @@ Properties:
 - bool occluder
 - uint occlusionLodLevel
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13254,10 +13398,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13275,7 +13419,7 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetFlip(bool, bool)
+- void SetFlip(bool, bool, bool = false)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
 Properties:
@@ -13311,9 +13455,104 @@ Properties:
 - bool occluder
 - int orderInLayer
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - Sprite2D@ sprite
+- bool swapXY
+- bool temporary
+- Rect textureRect
+- StringHash type // readonly
+- String typeName // readonly
+- bool useDrawRect
+- bool useHotSpot
+- bool useTextureRect
+- uint viewMask
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
+- uint zoneMask
+
+<a name="Class_StretchableSprite2D"></a>
+
+### StretchableSprite2D
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool IsInView(Camera@) const
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetFlip(bool, bool, bool = false)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- float alpha
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- BlendMode blendMode
+- IntRect border
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- Color color
+- Material@ customMaterial
+- float drawDistance
+- Rect drawRect
+- bool enabled
+- bool enabledEffective // readonly
+- bool flipX
+- bool flipY
+- Vector2 hotSpot
+- uint id // readonly
+- bool inView // readonly
+- int layer
+- uint lightMask
+- float lodBias
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- bool occludee
+- bool occluder
+- int orderInLayer
+- int refs // readonly
+- bool replicated // readonly
+- float shadowDistance
+- uint shadowMask
+- Sprite2D@ sprite
+- bool swapXY
 - bool temporary
 - Rect textureRect
 - StringHash type // readonly
@@ -13471,10 +13710,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - Vector3 HeightMapToWorld(const IntVector2&) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13527,6 +13766,7 @@ Properties:
 - int patchSize
 - TerrainPatch@[] patches // readonly
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool smoothing
@@ -13558,10 +13798,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13604,6 +13844,7 @@ Properties:
 - bool occludee
 - bool occluder
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13648,18 +13889,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -13693,7 +13935,7 @@ Methods:
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - bool SetFont(Font@, float)
-- bool SetFont(const String&, int)
+- bool SetFont(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxAnchor(float, float)
@@ -13834,10 +14076,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -13902,6 +14144,7 @@ Properties:
 - bool occluder
 - float opacity
 - int refs // readonly
+- bool replicated // readonly
 - float rowHeight // readonly
 - float rowSpacing
 - float[] rowWidths // readonly
@@ -14230,9 +14473,12 @@ Methods:
 
 Properties:
 
-- int gid // readonly
+- bool flipX // readonly
+- bool flipY // readonly
+- uint gid // readonly
 - int refs // readonly
 - Sprite2D@ sprite // readonly
+- bool swapXY // readonly
 - int weakRefs // readonly
 
 <a name="Class_TileMap2D"></a>
@@ -14251,13 +14497,13 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
-- TileMapObject2D@[]@ GetTileCollisionShapes(int) const
+- TileMapObject2D@[]@ GetTileCollisionShapes(uint) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - bool PositionToTileIndex(int&, int&, const Vector2&) const
 - void Remove()
@@ -14295,6 +14541,7 @@ Properties:
 - uint numLayers // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - TmxFile2D@ tmxFile
 - StringHash type // readonly
@@ -14337,10 +14584,10 @@ Methods:
 - bool HasProperty(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -14380,6 +14627,7 @@ Properties:
 - uint numObjects // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
+- bool replicated // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -14405,8 +14653,11 @@ Properties:
 - Vector2 position // readonly
 - int refs // readonly
 - Vector2 size // readonly
-- int tileGid // readonly
+- bool tileFlipX // readonly
+- bool tileFlipY // readonly
+- uint tileGid // readonly
 - Sprite2D@ tileSprite // readonly
+- bool tileSwapXY // readonly
 - String type // readonly
 - int weakRefs // readonly
 
@@ -14425,6 +14676,7 @@ Properties:
 - String category // readonly
 - float elapsedTime // readonly
 - uint frameNumber // readonly
+- float framesPerSecond // readonly
 - int refs // readonly
 - uint systemTime // readonly
 - uint timeSinceEpoch // readonly
@@ -14462,6 +14714,7 @@ Methods:
 Properties:
 
 - String category // readonly
+- float edgeOffset
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
@@ -14503,18 +14756,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -14706,6 +14960,7 @@ Properties:
 - float fontSubpixelThreshold
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
+- float maxDoubleClickDistance
 - int maxFontTextureSize
 - UIElement@ modalRoot // readonly
 - bool nonFocusedMouseWheel
@@ -14717,6 +14972,68 @@ Properties:
 - bool useMutableGlyphs
 - bool useScreenKeyboard
 - bool useSystemClipboard
+- int weakRefs // readonly
+
+<a name="Class_UIComponent"></a>
+
+### UIComponent
+
+Methods:
+
+- void ApplyAttributes()
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Material@ material // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool replicated // readonly
+- UIElement@ root // readonly
+- bool temporary
+- Texture2D@ texture // readonly
+- StringHash type // readonly
+- String typeName // readonly
 - int weakRefs // readonly
 
 <a name="Class_UIElement"></a>
@@ -14752,18 +15069,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -15037,6 +15355,8 @@ Methods:
 - float AbsDotProduct(const Vector3&) const
 - float Angle(const Vector3&) const
 - Vector3 CrossProduct(const Vector3&) const
+- float DistanceToPlane(const Vector3&, const Vector3&) const
+- float DistanceToPoint(const Vector3&) const
 - float DotProduct(const Vector3&) const
 - bool Equals(const Vector3&) const
 - bool IsNaN() const
@@ -15045,6 +15365,8 @@ Methods:
 - Vector3 Normalized() const
 - Vector3 Orthogonalize(const Vector3&) const
 - float ProjectOntoAxis(const Vector3&) const
+- Vector3 ProjectOntoLine(const Vector3&, const Vector3&, bool = false) const
+- Vector3 ProjectOntoPlane(const Vector3&, const Vector3&) const
 - String ToString() const
 
 Properties:
@@ -15257,18 +15579,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void QueueUpdate()
 - void Remove()
@@ -15503,18 +15826,19 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- UIElement@ LoadChildXML(XMLFile@, XMLFile@ = null)
-- UIElement@ LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
@@ -15671,6 +15995,7 @@ Properties:
 
 Methods:
 
+- bool AppendChild(XMLElement, bool)
 - XMLElement CreateChild(const String&)
 - String GetAttribute(const String& = String ( )) const
 - String GetAttributeLower(const String&) const
@@ -15707,6 +16032,7 @@ Methods:
 - Variant GetVectorVariant(const String&) const
 - bool HasAttribute(const String&) const
 - bool HasChild(const String&) const
+- bool Remove()
 - bool RemoveAttribute(const String& = String ( ))
 - bool RemoveChild(const String&)
 - bool RemoveChild(const XMLElement&)
@@ -15770,8 +16096,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
-- void Patch(XMLElement)
 - void Patch(XMLFile@)
+- void Patch(const XMLElement&)
 - bool Save(File@) const
 - bool Save(File@, const String&) const
 - bool Save(VectorBuffer&) const
@@ -15799,10 +16125,10 @@ Methods:
 
 - void Bind()
 - void Clear()
-- XPathResultSet Evaluate(XMLElement)
-- bool EvaluateToBool(XMLElement)
-- float EvaluateToFloat(XMLElement)
-- String EvaluateToString(XMLElement)
+- XPathResultSet Evaluate(const XMLElement&)
+- bool EvaluateToBool(const XMLElement&)
+- float EvaluateToFloat(const XMLElement&)
+- String EvaluateToString(const XMLElement&)
 - bool SetQuery(const String&, const String& = String ( ), bool = true)
 - bool SetVariable(const String&, bool)
 - bool SetVariable(const String&, const String&)
@@ -15841,10 +16167,10 @@ Methods:
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(const XMLElement&)
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -15900,6 +16226,7 @@ Properties:
 - bool override
 - int priority
 - int refs // readonly
+- bool replicated // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -16594,8 +16921,10 @@ Properties:
 - bool IsAbsolutePath(const String&)
 - bool IsAlpha(uint)
 - bool IsDigit(uint)
+- bool IsNaN(double)
 - bool IsNaN(float)
 - bool IsPowerOfTwo(uint)
+- bool IsReplicatedID(uint)
 - String Join(String[]&, const String&)
 - float Lerp(float, float, float)
 - float Ln(float)
@@ -16772,6 +17101,11 @@ Properties:
 - uint DRAWABLE_ZONE
 - uint FIRST_LOCAL_ID
 - uint FIRST_REPLICATED_ID
+- uint FLIP_ALL
+- uint FLIP_DIAGONAL
+- uint FLIP_HORIZONTAL
+- uint FLIP_RESERVED
+- uint FLIP_VERTICAL
 - Color GRAY
 - Color GREEN
 - int HAT_CENTER
@@ -16790,19 +17124,60 @@ Properties:
 - int KEY_8
 - int KEY_9
 - int KEY_A
+- int KEY_AC_BACK
+- int KEY_AC_BOOKMARKS
+- int KEY_AC_FORWARD
+- int KEY_AC_HOME
+- int KEY_AC_REFRESH
+- int KEY_AC_SEARCH
+- int KEY_AC_STOP
+- int KEY_AGAIN
 - int KEY_ALT
+- int KEY_ALTERASE
+- int KEY_AMPERSAND
 - int KEY_APPLICATION
+- int KEY_ASTERISK
+- int KEY_AT
+- int KEY_AUDIOMUTE
+- int KEY_AUDIONEXT
+- int KEY_AUDIOPLAY
+- int KEY_AUDIOPREV
+- int KEY_AUDIOSTOP
 - int KEY_B
+- int KEY_BACKQUOTE
+- int KEY_BACKSLASH
 - int KEY_BACKSPACE
+- int KEY_BRIGHTNESSDOWN
+- int KEY_BRIGHTNESSUP
 - int KEY_C
+- int KEY_CALCULATOR
+- int KEY_CANCEL
 - int KEY_CAPSLOCK
+- int KEY_CARET
+- int KEY_CLEAR
+- int KEY_CLEARAGAIN
+- int KEY_COLON
+- int KEY_COMMA
+- int KEY_COMPUTER
+- int KEY_COPY
+- int KEY_CRSEL
 - int KEY_CTRL
+- int KEY_CURRENCYSUBUNIT
+- int KEY_CURRENCYUNIT
+- int KEY_CUT
 - int KEY_D
+- int KEY_DECIMALSEPARATOR
 - int KEY_DELETE
+- int KEY_DISPLAYSWITCH
+- int KEY_DOLLAR
 - int KEY_DOWN
 - int KEY_E
+- int KEY_EJECT
 - int KEY_END
+- int KEY_EQUALS
 - int KEY_ESCAPE
+- int KEY_EXCLAIM
+- int KEY_EXSEL
 - int KEY_F
 - int KEY_F1
 - int KEY_F10
@@ -16828,15 +17203,24 @@ Properties:
 - int KEY_F7
 - int KEY_F8
 - int KEY_F9
+- int KEY_FIND
 - int KEY_G
+- int KEY_GREATER
 - int KEY_GUI
 - int KEY_H
+- int KEY_HASH
+- int KEY_HELP
 - int KEY_HOME
 - int KEY_I
 - int KEY_INSERT
 - int KEY_J
 - int KEY_K
+- int KEY_KBDILLUMDOWN
+- int KEY_KBDILLUMTOGGLE
+- int KEY_KBDILLUMUP
 - int KEY_KP_0
+- int KEY_KP_00
+- int KEY_KP_000
 - int KEY_KP_1
 - int KEY_KP_2
 - int KEY_KP_3
@@ -16846,28 +17230,91 @@ Properties:
 - int KEY_KP_7
 - int KEY_KP_8
 - int KEY_KP_9
+- int KEY_KP_A
+- int KEY_KP_AMPERSAND
+- int KEY_KP_AT
+- int KEY_KP_B
+- int KEY_KP_BACKSPACE
+- int KEY_KP_BINARY
+- int KEY_KP_C
+- int KEY_KP_CLEAR
+- int KEY_KP_CLEARENTRY
+- int KEY_KP_COLON
+- int KEY_KP_COMMA
+- int KEY_KP_D
+- int KEY_KP_DBLAMPERSAND
+- int KEY_KP_DBLVERTICALBAR
+- int KEY_KP_DECIMAL
 - int KEY_KP_DIVIDE
+- int KEY_KP_E
 - int KEY_KP_ENTER
+- int KEY_KP_EQUALS
+- int KEY_KP_EQUALSAS400
+- int KEY_KP_EXCLAM
+- int KEY_KP_F
+- int KEY_KP_GREATER
+- int KEY_KP_HASH
+- int KEY_KP_HEXADECIMAL
+- int KEY_KP_LEFTBRACE
+- int KEY_KP_LEFTPAREN
+- int KEY_KP_LESS
+- int KEY_KP_MEMADD
+- int KEY_KP_MEMCLEAR
+- int KEY_KP_MEMDIVIDE
+- int KEY_KP_MEMMULTIPLY
+- int KEY_KP_MEMRECALL
+- int KEY_KP_MEMSTORE
+- int KEY_KP_MEMSUBTRACT
 - int KEY_KP_MINUS
 - int KEY_KP_MULTIPLY
+- int KEY_KP_OCTAL
+- int KEY_KP_PERCENT
 - int KEY_KP_PERIOD
 - int KEY_KP_PLUS
+- int KEY_KP_PLUSMINUS
+- int KEY_KP_POWER
+- int KEY_KP_RIGHTBRACE
+- int KEY_KP_RIGHTPAREN
+- int KEY_KP_SPACE
+- int KEY_KP_TAB
+- int KEY_KP_VERTICALBAR
+- int KEY_KP_XOR
 - int KEY_L
 - int KEY_LALT
 - int KEY_LCTRL
 - int KEY_LEFT
+- int KEY_LEFTBRACKET
+- int KEY_LEFTPAREN
+- int KEY_LESS
 - int KEY_LGUI
 - int KEY_LSHIFT
 - int KEY_M
+- int KEY_MAIL
+- int KEY_MEDIASELECT
+- int KEY_MENU
+- int KEY_MINUS
+- int KEY_MODE
+- int KEY_MUTE
 - int KEY_N
 - int KEY_NUMLOCKCLEAR
 - int KEY_O
+- int KEY_OPER
+- int KEY_OUT
 - int KEY_P
 - int KEY_PAGEDOWN
 - int KEY_PAGEUP
+- int KEY_PASTE
 - int KEY_PAUSE
+- int KEY_PERCENT
+- int KEY_PERIOD
+- int KEY_PLUS
+- int KEY_POWER
 - int KEY_PRINTSCREEN
+- int KEY_PRIOR
 - int KEY_Q
+- int KEY_QUESTION
+- int KEY_QUOTE
+- int KEY_QUOTEDBL
 - int KEY_R
 - int KEY_RALT
 - int KEY_RCTRL
@@ -16875,19 +17322,33 @@ Properties:
 - int KEY_RETURN2
 - int KEY_RGUI
 - int KEY_RIGHT
+- int KEY_RIGHTBRACKET
+- int KEY_RIGHTPAREN
 - int KEY_RSHIFT
 - int KEY_S
 - int KEY_SCROLLLOCK
 - int KEY_SELECT
+- int KEY_SEMICOLON
+- int KEY_SEPARATOR
 - int KEY_SHIFT
+- int KEY_SLASH
+- int KEY_SLEEP
 - int KEY_SPACE
+- int KEY_STOP
+- int KEY_SYSREQ
 - int KEY_T
 - int KEY_TAB
+- int KEY_THOUSANDSSEPARATOR
 - int KEY_U
+- int KEY_UNDERSCORE
+- int KEY_UNDO
 - int KEY_UNKNOWN
 - int KEY_UP
 - int KEY_V
+- int KEY_VOLUMEDOWN
+- int KEY_VOLUMEUP
 - int KEY_W
+- int KEY_WWW
 - int KEY_X
 - int KEY_Y
 - int KEY_Z
@@ -16897,6 +17358,7 @@ Properties:
 - int LOG_ERROR
 - int LOG_INFO
 - int LOG_NONE
+- int LOG_TRACE
 - int LOG_WARNING
 - Color MAGENTA
 - uint MASK_BLENDINDICES

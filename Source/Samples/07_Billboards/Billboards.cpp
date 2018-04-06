@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ void Billboards::Start()
 
 void Billboards::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -86,7 +86,7 @@ void Billboards::CreateScene()
 
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.1f, 0.1f, 0.1f));
     zone->SetFogStart(100.0f);
@@ -95,7 +95,7 @@ void Billboards::CreateScene()
     // Create a directional light without shadows
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetColor(Color(0.2f, 0.2f, 0.2f));
     light->SetSpecularIntensity(1.0f);
@@ -108,7 +108,7 @@ void Billboards::CreateScene()
             Node* floorNode = scene_->CreateChild("FloorTile");
             floorNode->SetPosition(Vector3(x * 20.5f, -0.5f, y * 20.5f));
             floorNode->SetScale(Vector3(20.0f, 1.0f, 20.f));
-            StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
+            auto* floorObject = floorNode->CreateComponent<StaticModel>();
             floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
             floorObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         }
@@ -130,7 +130,7 @@ void Billboards::CreateScene()
             mushroomNode->SetPosition(Vector3(Random(25.0f) - 12.5f, 0.0f, Random(25.0f) - 12.5f));
             mushroomNode->SetRotation(Quaternion(0.0f, Random() * 360.0f, 0.0f));
             mushroomNode->SetScale(1.0f + Random() * 4.0f);
-            StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+            auto* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
             mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
             mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
             mushroomObject->SetCastShadows(true);
@@ -146,7 +146,7 @@ void Billboards::CreateScene()
         Node* smokeNode = scene_->CreateChild("Smoke");
         smokeNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(20.0f) + 10.0f, Random(200.0f) - 100.0f));
 
-        BillboardSet* billboardObject = smokeNode->CreateComponent<BillboardSet>();
+        auto* billboardObject = smokeNode->CreateComponent<BillboardSet>();
         billboardObject->SetNumBillboards(NUM_BILLBOARDS);
         billboardObject->SetMaterial(cache->GetResource<Material>("Materials/LitSmoke.xml"));
         billboardObject->SetSorted(true);
@@ -170,12 +170,12 @@ void Billboards::CreateScene()
     for (unsigned i = 0; i < NUM_LIGHTS; ++i)
     {
         Node* lightNode = scene_->CreateChild("SpotLight");
-        Light* light = lightNode->CreateComponent<Light>();
+        auto* light = lightNode->CreateComponent<Light>();
 
         float angle = 0.0f;
 
-        Vector3 position((i % 3) * 60.0f - 60.0f, 45.0f, (i / 3) * 60.0f - 60.0f);
-        Color color(((i + 1) & 1) * 0.5f + 0.5f, (((i + 1) >> 1) & 1) * 0.5f + 0.5f, (((i + 1) >> 2) & 1) * 0.5f + 0.5f);
+        Vector3 position((i % 3) * 60.0f - 60.0f, 45.0f, (i / 3.f) * 60.0f - 60.0f);
+        Color color(((i + 1) & 1u) * 0.5f + 0.5f, (((i + 1) >> 1u) & 1u) * 0.5f + 0.5f, (((i + 1) >> 2u) & 1u) * 0.5f + 0.5f);
 
         lightNode->SetPosition(position);
         lightNode->SetDirection(Vector3(Sin(angle), -1.5f, Cos(angle)));
@@ -202,7 +202,7 @@ void Billboards::CreateScene()
 
     // Create the camera. Limit far clip distance to match the fog
     cameraNode_ = scene_->CreateChild("Camera");
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 
     // Set an initial position for the camera scene node above the plane
@@ -211,11 +211,11 @@ void Billboards::CreateScene()
 
 void Billboards::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "Space to toggle debug geometry"
@@ -232,7 +232,7 @@ void Billboards::CreateInstructions()
 
 void Billboards::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -255,7 +255,7 @@ void Billboards::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -304,7 +304,7 @@ void Billboards::AnimateScene(float timeStep)
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
     for (unsigned i = 0; i < billboardNodes.Size(); ++i)
     {
-        BillboardSet* billboardObject = billboardNodes[i]->GetComponent<BillboardSet>();
+        auto* billboardObject = billboardNodes[i]->GetComponent<BillboardSet>();
 
         for (unsigned j = 0; j < billboardObject->GetNumBillboards(); ++j)
         {

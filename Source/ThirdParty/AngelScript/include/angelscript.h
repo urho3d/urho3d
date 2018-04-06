@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni and Nathanial Lydick for Urho3D
+// Modified by Lasse Oorni, Nathanial Lydick, and Yao Wei Tjong for Urho3D
 
 //
 // angelscript.h
@@ -64,8 +64,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        23102
-#define ANGELSCRIPT_VERSION_STRING "2.31.2"
+#define ANGELSCRIPT_VERSION        23200
+#define ANGELSCRIPT_VERSION_STRING "2.32.0 WIP"
 
 // Data types
 
@@ -150,6 +150,7 @@ enum asEEngineProp
 	asEP_PRIVATE_PROP_AS_PROTECTED          = 24,
 	asEP_ALLOW_UNICODE_IDENTIFIERS          = 25,
 	asEP_HEREDOC_TRIM_MODE                  = 26,
+	asEP_MAX_NESTED_CALLS                   = 27,
 
 	asEP_LAST_PROPERTY
 };
@@ -419,15 +420,14 @@ typedef asIScriptContext *(*asREQUESTCONTEXTFUNC_t)(asIScriptEngine *, void *);
 typedef void (*asRETURNCONTEXTFUNC_t)(asIScriptEngine *, asIScriptContext *, void *);
 
 // Check if the compiler can use C++11 features
-// Urho3D: restored earlier ifdef
 #if !defined(_MSC_VER) || _MSC_VER >= 1700   // MSVC 2012
-#if !defined(__GNUC__) || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)  // gnuc 4.7
-#if !(defined(__GNUC__) && defined(__cplusplus) && __cplusplus < 201103L) // g++ -std=c++11
-#if !defined(__SUNPRO_CC)
-#define AS_CAN_USE_CPP11 1
-#endif
-#endif
-#endif
+ #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)  // gnuc 4.7 or clang
+  #if !(defined(__GNUC__) && defined(__cplusplus) && __cplusplus < 201103L) // gnuc and clang require compiler flag -std=c++11
+   #if !defined(__SUNPRO_CC) // Oracle Solaris Studio
+    #define AS_CAN_USE_CPP11 1
+   #endif
+  #endif
+ #endif
 #endif
 
 // This macro does basically the same thing as offsetof defined in stddef.h, but
@@ -441,11 +441,8 @@ typedef void (*asRETURNCONTEXTFUNC_t)(asIScriptEngine *, asIScriptContext *, voi
 // check that the cast is really valid.
 // BCC v5.8 (C++Builder 2006) and earlier have a similar bug which forces us to fall back to a C-style cast.
 #define asFUNCTIONPR(f,p,r) asFunctionPtr((void (*)())((r (*)p)(f)))
-#elif (defined(_MSC_VER) && _MSC_VER >= 1900)
-// Urho3D: VS2015 does not compile the C-style cast of the function pointer
-#define asFUNCTIONPR(f,p,r) asFunctionPtr(reinterpret_cast<void (*)()>(static_cast<r (*)p>(f)))
 #else
-#define asFUNCTIONPR(f,p,r) asFunctionPtr((void (*)())(static_cast<r (*)p>(f)))
+#define asFUNCTIONPR(f,p,r) asFunctionPtr(reinterpret_cast<void (*)()>(static_cast<r (*)p>(f)))
 #endif
 
 #ifndef AS_NO_CLASS_METHODS
@@ -604,15 +601,15 @@ BEGIN_AS_NAMESPACE
 template<typename T>
 asUINT asGetTypeTraits()
 {
-// Urho3D: restore earlier ifdefs due to some Android CI builds breaking
-#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5)
+// Urho3D - Clang compiler built with old GCC's libstdc++ suffers the same pre-standard templates problem as old GCC compiler
+#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5) || (defined(__clang__) && !defined(CLANG_PRE_STANDARD))
 	// MSVC, XCode/Clang, and gnuc 5+
 	// C++11 compliant code
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::is_trivially_default_constructible<T>::value;
 	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
 	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::is_trivially_copy_assignable<T>::value;
 	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::is_trivially_copy_constructible<T>::value;
-#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+#elif (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))) || defined(__clang__)
 	// gnuc 4.8 is using a mix of C++11 standard and pre-standard templates
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
 	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;

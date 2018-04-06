@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ void EventReceiverGroup::Remove(Object* object)
         PODVector<Object*>::Iterator i = receivers_.Find(object);
         if (i != receivers_.End())
         {
-            (*i) = 0;
+            (*i) = nullptr;
             dirty_ = true;
         }
     }
@@ -121,7 +121,7 @@ void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attribute
 }
 
 Context::Context() :
-    eventHandler_(0)
+    eventHandler_(nullptr)
 {
 #ifdef __ANDROID__
     // Always reset the random seed on Android, as the Urho3D library might not be unloaded between runs
@@ -193,26 +193,42 @@ void Context::RemoveSubsystem(StringHash objectType)
         subsystems_.Erase(i);
 }
 
-void Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr)
+AttributeHandle Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr)
 {
     // None or pointer types can not be supported
-    if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
+    if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR
+        || attr.type_ == VAR_CUSTOM_HEAP || attr.type_ == VAR_CUSTOM_STACK)
     {
         URHO3D_LOGWARNING("Attempt to register unsupported attribute type " + Variant::GetTypeName(attr.type_) + " to class " +
             GetTypeName(objectType));
-        return;
+        return AttributeHandle();
     }
 
-    attributes_[objectType].Push(attr);
+    AttributeHandle handle;
+
+    Vector<AttributeInfo>& objectAttributes = attributes_[objectType];
+    objectAttributes.Push(attr);
+    handle.attributeInfo_ = &objectAttributes.Back();
 
     if (attr.mode_ & AM_NET)
-        networkAttributes_[objectType].Push(attr);
+    {
+        Vector<AttributeInfo>& objectNetworkAttributes = networkAttributes_[objectType];
+        objectNetworkAttributes.Push(attr);
+        handle.networkAttributeInfo_ = &objectNetworkAttributes.Back();
+    }
+    return handle;
 }
 
 void Context::RemoveAttribute(StringHash objectType, const char* name)
 {
     RemoveNamedAttribute(attributes_, objectType, name);
     RemoveNamedAttribute(networkAttributes_, objectType, name);
+}
+
+void Context::RemoveAllAttributes(StringHash objectType)
+{
+    attributes_.Erase(objectType);
+    networkAttributes_.Erase(objectType);
 }
 
 void Context::UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue)
@@ -341,7 +357,7 @@ Object* Context::GetSubsystem(StringHash type) const
     if (i != subsystems_.End())
         return i->second_;
     else
-        return 0;
+        return nullptr;
 }
 
 const Variant& Context::GetGlobalVar(StringHash key) const
@@ -360,7 +376,7 @@ Object* Context::GetEventSender() const
     if (!eventSenders_.Empty())
         return eventSenders_.Back();
     else
-        return 0;
+        return nullptr;
 }
 
 const String& Context::GetTypeName(StringHash objectType) const
@@ -374,7 +390,7 @@ AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
 {
     HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
     if (i == attributes_.End())
-        return 0;
+        return nullptr;
 
     Vector<AttributeInfo>& infos = i->second_;
 
@@ -384,7 +400,7 @@ AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
             return &(*j);
     }
 
-    return 0;
+    return nullptr;
 }
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
@@ -440,7 +456,7 @@ void Context::BeginSendEvent(Object* sender, StringHash eventType)
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginBlock(eventType);
     }
@@ -456,7 +472,7 @@ void Context::EndSendEvent()
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->EndBlock();
     }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,11 @@ namespace Urho3D
 {
 
 Texture2DArray::Texture2DArray(Context* context) :
-    Texture(context),
-    layers_(0)
+    Texture(context)
 {
 #ifdef URHO3D_OPENGL
 #ifndef GL_ES_VERSION_2_0
     target_ = GL_TEXTURE_2D_ARRAY;
-#else
-    target_ = 0;
 #endif
 #endif
 }
@@ -68,7 +65,7 @@ void Texture2DArray::RegisterObject(Context* context)
 
 bool Texture2DArray::BeginLoad(Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
@@ -202,7 +199,7 @@ void Texture2DArray::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap&
 {
     if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer)
             renderer->QueueRenderSurface(renderSurface_);
         renderSurface_->ResetUpdateQueued();

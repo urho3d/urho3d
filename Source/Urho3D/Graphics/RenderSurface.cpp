@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -106,7 +106,7 @@ bool RenderSurface::GetAutoResolve() const
 
 Viewport* RenderSurface::GetViewport(unsigned index) const
 {
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+    return index < viewports_.Size() ? viewports_[index] : nullptr;
 }
 
 }

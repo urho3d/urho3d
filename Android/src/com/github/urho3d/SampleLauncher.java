@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,8 @@ import android.widget.ListView;
 
 public class SampleLauncher extends ListActivity {
 
-    public static final String LIBRARY_NAMES = "libraryNames";
-    public static final String PICKED_LIBRARY = "pickedLibrary";
+    static final String LIBRARY_NAMES = "libraryNames";
+    static final String PICKED_LIBRARY = "pickedLibrary";
     private static final int OBTAINING_LIBNAMES = 1;
 
     @Override
@@ -48,7 +48,7 @@ public class SampleLauncher extends ListActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // Prepare a list view for picking the sample library names
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.samples_list_text_view);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.samples_list_text_view);
         setContentView(R.layout.samples_list);
         setListAdapter(adapter);
     }

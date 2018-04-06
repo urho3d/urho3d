@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -148,13 +148,13 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
     }
 }
 
-bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
+bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& up)
 {
     Quaternion ret;
     Vector3 forward = direction.Normalized();
 
-    Vector3 v = forward.CrossProduct(upDirection);
-    // If direction & upDirection are parallel and crossproduct becomes zero, use FromRotationTo() fallback
+    Vector3 v = forward.CrossProduct(up);
+    // If direction & up are parallel and crossproduct becomes zero, use FromRotationTo() fallback
     if (v.LengthSquared() >= M_EPSILON)
     {
         v.Normalize();
@@ -223,7 +223,7 @@ float Quaternion::RollAngle() const
 
 Urho3D::Vector3 Quaternion::Axis() const
 {
-    return Vector3(x_, y_, z_) / sqrt(1 - w_ * w_);
+    return Vector3(x_, y_, z_) / sqrt(1. - w_ * w_);
 }
 
 float Quaternion::Angle() const

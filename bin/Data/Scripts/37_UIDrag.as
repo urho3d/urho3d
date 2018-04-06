@@ -41,53 +41,37 @@ void CreateGUI()
     {
         Button@ b = Button();
         root.AddChild(b);
-        // Reference a style from the style sheet loaded earlier:
-        b.style = "Button";
-        b.size = IntVector2(300, 100);
+        b.SetStyleAuto();
+        b.minWidth = 250;
         b.position = IntVector2(50*i, 50*i);
+
+        // Enable the bring-to-front flag and set the initial priority
+        b.bringToFront = true;
+        b.priority = i;
+
+        // Set the layout mode to make the child text elements aligned vertically
+        b.SetLayout(LM_VERTICAL, 20, IntRect(40, 40, 40, 40));
+        Array<String> dragInfos = {"Num Touch", "Text", "Event Touch"};
+        for (uint j = 0; j < dragInfos.length; ++j)
+            b.CreateChild("Text", dragInfos[j]).SetStyleAuto();
 
         if (i % 2 == 0)
             b.AddTag("SomeTag");
 
+        SubscribeToEvent(b, "Click", "HandleClick");
         SubscribeToEvent(b, "DragMove", "HandleDragMove");
         SubscribeToEvent(b, "DragBegin", "HandleDragBegin");
         SubscribeToEvent(b, "DragCancel", "HandleDragCancel");
-
-        {
-            Text@ t = Text();
-            b.AddChild(t);
-            t.style = "Text";
-            t.horizontalAlignment = HA_CENTER;
-            t.verticalAlignment = VA_CENTER;
-            t.name = "Text";
-        }
-
-        {
-            Text@ t = Text();
-            b.AddChild(t);
-            t.style = "Text";
-            t.name = "Event Touch";
-            t.horizontalAlignment = HA_CENTER;
-            t.verticalAlignment = VA_BOTTOM;
-        }
-
-        {
-            Text@ t = Text();
-            b.AddChild(t);
-            t.style ="Text";
-            t.name = "Num Touch";
-            t.horizontalAlignment = HA_CENTER;
-            t.verticalAlignment = VA_TOP;
-        }
     }
 
     for (int i = 0; i < 10; i++)
     {
         Text@ t = Text();
         root.AddChild(t);
-        t.style = "Text";
+        t.SetStyleAuto();
         t.name = "Touch "+ String(i);
         t.visible = false;
+        t.priority = 100;   // Make sure it has higher priority than the buttons
     }
 }
 
@@ -111,6 +95,12 @@ void SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate");
+}
+
+void HandleClick(StringHash eventType, VariantMap& eventData)
+{
+    Button@ element = eventData["Element"].GetPtr();
+    element.BringToFront();
 }
 
 void HandleDragBegin(StringHash eventType, VariantMap& eventData)

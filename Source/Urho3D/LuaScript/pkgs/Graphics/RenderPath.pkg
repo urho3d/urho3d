@@ -97,6 +97,8 @@ class RenderPath
     bool Append(XMLFile* file);
 
     void SetEnabled(const String tag, bool active);
+    bool IsEnabled(const String tag) const;
+    bool IsAdded(const String tag) const;
     void ToggleEnabled(const String tag);
     void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
     void AddRenderTarget(const RenderTargetInfo& info);

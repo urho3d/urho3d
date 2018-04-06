@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Core/Object.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../UI/Cursor.h"
 #include "../UI/UIBatch.h"
 
@@ -48,9 +49,10 @@ class ResourceCache;
 class Timer;
 class UIBatch;
 class UIElement;
-class VertexBuffer;
 class XMLElement;
 class XMLFile;
+class RenderSurface;
+class UIComponent;
 
 /// %UI subsystem. Manages the graphical user interface.
 class URHO3D_API UI : public Object
@@ -59,9 +61,9 @@ class URHO3D_API UI : public Object
 
 public:
     /// Construct.
-    UI(Context* context);
+    explicit UI(Context* context);
     /// Destruct.
-    virtual ~UI();
+    ~UI() override;
 
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
@@ -76,20 +78,22 @@ public:
     void Update(float timeStep);
     /// Update the UI for rendering. Called by HandleRenderUpdate().
     void RenderUpdate();
-    /// Render the UI. If resetRenderTargets is true, is assumed to be the default UI render to backbuffer called by Engine, and will be performed only once. Additional UI renders to a different rendertarget may be triggered from the renderpath.
-    void Render(bool resetRenderTargets = true);
+    /// Render the UI. If renderUICommand is false (default), is assumed to be the default UI render to backbuffer called by Engine, and will be performed only once. Additional UI renders to a different rendertarget may be triggered from the renderpath.
+    void Render(bool renderUICommand = false);
     /// Debug draw a UI element.
     void DebugDraw(UIElement* element);
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
-    SharedPtr<UIElement> LoadLayout(Deserializer& source, XMLFile* styleFile = 0);
+    SharedPtr<UIElement> LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr);
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
-    SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
+    SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = nullptr);
     /// Save a UI layout to an XML file. Return true if successful.
     bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.
     void SetClipboardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
+    /// Set max screen distance in pixels between double click clicks.
+    void SetMaxDoubleClickDistance(float distPixels);
     /// Set UI drag event start interval in seconds.
     void SetDragBeginInterval(float interval);
     /// Set UI drag event start distance threshold in pixels.
@@ -136,10 +140,12 @@ public:
 
     /// Return cursor position.
     IntVector2 GetCursorPosition() const;
-    /// Return UI element at screen coordinates. By default returns only input-enabled elements.
+    /// Return UI element at global screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
-    /// Return UI element at screen coordinates. By default returns only input-enabled elements.
+    /// Return UI element at global screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
+    /// Get a child element at element's screen position relative to specified root element.
+    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly=true);
 
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
@@ -159,7 +165,10 @@ public:
 
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
-
+    
+    /// Get max screen distance in pixels for double clicks to register. 
+    float GetMaxDoubleClickDistance() const { return maxDoubleClickDist_;}
+    
     /// Return UI drag start event interval in seconds.
     float GetDragBeginInterval() const { return dragBeginInterval_; }
 
@@ -208,6 +217,9 @@ public:
     /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
     const IntVector2& GetCustomSize() const { return customSize_; }
 
+    /// Set texture to which element will be rendered.
+    void SetElementRenderTexture(UIElement* element, Texture2D* texture);
+
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData
     {
@@ -226,17 +238,39 @@ public:
     };
 
 private:
+    /// Data structured used to hold data of UI elements that are rendered to texture.
+    struct RenderToTextureData
+    {
+        /// UIElement to be rendered into texture.
+        WeakPtr<UIElement> rootElement_;
+        /// Texture that UIElement will be rendered into.
+        SharedPtr<Texture2D> texture_;
+        /// UI rendering batches.
+        PODVector<UIBatch> batches_;
+        /// UI rendering vertex data.
+        PODVector<float> vertexData_;
+        /// UI vertex buffer.
+        SharedPtr<VertexBuffer> vertexBuffer_;
+        /// UI rendering batches for debug draw.
+        PODVector<UIBatch> debugDrawBatches_;
+        /// UI rendering vertex data for debug draw.
+        PODVector<float> debugVertexData_;
+        /// UI debug geometry vertex buffer.
+        SharedPtr<VertexBuffer> debugVertexBuffer_;
+    };
+
     /// Initialize when screen mode initially set.
     void Initialize();
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
     /// Upload UI geometry into a vertex buffer.
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
-    /// Render UI batches. Geometry must have been uploaded first.
-    void Render
-        (bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
+    /// Render UI batches to the current rendertarget. Geometry must have been uploaded first.
+    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     /// Generate batches from an UI element recursively. Skip the cursor element.
-    void GetBatches(UIElement* element, IntRect currentScissor);
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor);
+    /// Return UI element at global screen coordinates. Return position converted to element's screen coordinates.
+    UIElement* GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition);
     /// Return UI element at screen position recursively.
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly);
     /// Return the first element in hierarchy that can alter focus.
@@ -248,22 +282,26 @@ private:
     /// Force release of font faces when global font properties change.
     void ReleaseFontFaces();
     /// Handle button or touch hover.
-    void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
+    void ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
     void
-        ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+        ProcessClickBegin(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
-    void ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    void ProcessClickEnd(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle mouse or touch move.
-    void ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor,
+    void ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor,
         bool cursorVisible);
     /// Send a UI element drag or hover begin event.
     void SendDragOrHoverEvent
         (StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, UI::DragData* dragData);
-    /// Send a UI click or double click event.
+    /// Send a UI click event.
     void SendClickEvent
         (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button, int buttons,
             int qualifiers);
+
+    /// Send a UI double click event
+    void SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, int button, int buttons, int qualifiers);
+    
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
@@ -293,7 +331,7 @@ private:
     /// Handle a file being drag-dropped into the application window.
     void HandleDropFile(StringHash eventType, VariantMap& eventData);
     /// Remove drag data and return next iterator.
-    HashMap<WeakPtr<UIElement>, DragData*>::Iterator DragElementErase(HashMap<WeakPtr<UIElement>, DragData*>::Iterator dragElement);
+    HashMap<WeakPtr<UIElement>, DragData*>::Iterator DragElementErase(HashMap<WeakPtr<UIElement>, DragData*>::Iterator i);
     /// Handle clean up on a drag cancel.
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.
@@ -373,6 +411,10 @@ private:
     Timer clickTimer_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
+    /// Screen position of first mouse click for double click distance checking.
+    IntVector2 doubleClickFirstPos_;
+    /// Max screen distance the first click in a double click can be from the second click in a double click.
+    float maxDoubleClickDist_;
     /// Currently hovered elements.
     HashMap<WeakPtr<UIElement>, bool> hoveredElements_;
     /// Currently dragged elements.
@@ -389,6 +431,8 @@ private:
     float uiScale_;
     /// Root element custom size. 0,0 for automatic resizing (default.)
     IntVector2 customSize_;
+    /// Elements that should be rendered to textures.
+    HashMap<UIElement*, RenderToTextureData> renderToTexture_;
 };
 
 /// Register UI library objects.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,7 @@ void HttpRequest::ThreadFunction()
 
     // Initiate the connection. This may block due to DNS query
     /// \todo SSL mode will not actually work unless Civetweb's SSL mode is initialized with an external SSL DLL
-    mg_connection* connection = 0;
+    mg_connection* connection = nullptr;
     if (postData_.Empty())
     {
         connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
@@ -201,13 +201,13 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 #ifdef URHO3D_THREADING
     mutex_.Acquire();
 
-    unsigned char* destPtr = (unsigned char*)dest;
+    auto* destPtr = (unsigned char*)dest;
     unsigned sizeLeft = size;
     unsigned totalRead = 0;
 
     for (;;)
     {
-        Pair<unsigned, bool> status;
+        Pair<unsigned, bool> status{};
 
         for (;;)
         {
@@ -288,10 +288,8 @@ unsigned HttpRequest::GetAvailableSize() const
 
 Pair<unsigned, bool> HttpRequest::CheckAvailableSizeAndEof() const
 {
-    Pair<unsigned, bool> ret;
-    ret.first_ = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
-    ret.second_ = (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !ret.first_));
-    return ret;
+    unsigned size = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    return {size, (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !size))};
 }
 
 }

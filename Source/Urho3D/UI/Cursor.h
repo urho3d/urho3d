@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,17 +56,17 @@ struct URHO3D_API CursorShapeInfo
     CursorShapeInfo() :
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
-        osCursor_(0),
+        osCursor_(nullptr),
         systemDefined_(false),
         systemCursor_(-1)
     {
     }
 
     /// Construct with system cursor.
-    CursorShapeInfo(int systemCursor) :
+    explicit CursorShapeInfo(int systemCursor) :
         imageRect_(IntRect::ZERO),
         hotSpot_(IntVector2::ZERO),
-        osCursor_(0),
+        osCursor_(nullptr),
         systemDefined_(false),
         systemCursor_(systemCursor)
     {
@@ -95,14 +95,14 @@ class URHO3D_API Cursor : public BorderImage
 
 public:
     /// Construct.
-    Cursor(Context* context);
+    explicit Cursor(Context* context);
     /// Destruct.
-    virtual ~Cursor();
+    ~Cursor() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// Define a shape.
     void DefineShape(const String& shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);

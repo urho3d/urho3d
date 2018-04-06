@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -45,12 +46,7 @@ namespace Assimp    {
 namespace HMP   {
 
 #include "./../include/assimp/Compiler/pushpack1.h"
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
 
 // to make it easier for us, we test the magic word against both "endianesses"
 #define AI_HMP_MAGIC_NUMBER_BE_4    AI_MAKE_MAGIC("HMP4")

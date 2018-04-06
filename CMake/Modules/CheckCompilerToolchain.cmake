@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,10 @@
 #  HAVE_3DNOW
 #  HAVE_SSE
 #  HAVE_SSE2
+#  HAVE_SSE3
+#  HAVE_SSE4
+#  HAVE_AVX
+#  HAVE_AVX2
 #  HAVE_ALTIVEC
 #
 # CPU SIMD instruction extension support for arm/arm64 archs:
@@ -47,6 +51,12 @@
 #  RTTI
 #  EXCEPTIONS
 #
+# C++11 type traits standard:
+#  IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE
+#  IS_TRIVIALLY_DESTRUCTIBLE
+#  IS_TRIVIALLY_COPY_ASSIGNABLE
+#  IS_TRIVIALLY_COPY_CONSTRUCTIBLE
+#  CLANG_PRE_STANDARD (Clang with pre-standard type trait templates)
 
 if (EMSCRIPTEN AND CMAKE_HOST_WIN32)
     set (EMCC_FIX EMCC_FIX)
@@ -120,6 +130,24 @@ macro (check_feature_enabled FEATURE)
     endif ()
 endmacro ()
 
+include (CheckCXXSourceCompiles)
+
+# Macro for checking if the type trait template is matching the C++11 standard
+macro (check_type_trait TYPE_TRAIT)
+    string (TOUPPER ${TYPE_TRAIT} UPPERCASE_${TYPE_TRAIT})
+    if (INVALIDATE_CCT)
+        unset (${UPPERCASE_${TYPE_TRAIT}} CACHE)
+    endif ()
+    if (CMAKE_CXX_COMPILER_ID MATCHES GNU|Clang)
+        set (ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+        set (CMAKE_REQUIRED_FLAGS "-std=c++11 ${CMAKE_REQUIRED_FLAGS}")
+    endif ()
+    check_cxx_source_compiles ("#include <type_traits>\nint main() { return std::${TYPE_TRAIT}<bool>::value; }" ${UPPERCASE_${TYPE_TRAIT}})
+    if (CMAKE_CXX_COMPILER_ID MATCHES GNU|Clang)
+        set (CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+    endif ()
+endmacro ()
+
 # Macro for checking if a native compiler toolchain exists for building the host tool targets
 # This macro is designed to be used in cross-compiling build
 macro (check_native_compiler_exist)
@@ -143,7 +171,7 @@ if (MSVC)
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     set (NATIVE_64BIT ${CMAKE_CL_64})
     # We only support one target arch when using MSVC for now and make certain assumptions as per documentation instead of querying the compiler
-    foreach (VAR X86 HAVE_MMX HAVE_SSE HAVE_SSE2 RTTI EXCEPTIONS)
+    foreach (VAR X86 HAVE_MMX HAVE_SSE HAVE_SSE2 RTTI EXCEPTIONS IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE IS_TRIVIALLY_DESTRUCTIBLE IS_TRIVIALLY_COPY_ASSIGNABLE IS_TRIVIALLY_COPY_CONSTRUCTIBLE)
         set (${VAR} 1)
     endforeach ()
 else ()
@@ -189,14 +217,23 @@ else ()
     elseif (POWERPC)
         check_extension (altivec)
     elseif (X86)
-        check_extension (sse)
-        check_extension (sse2)
+        foreach (ext sse sse2 sse3 sse4 avx avx2)
+            check_extension (${ext})
+        endforeach ()
         if (CMAKE_SYSTEM_NAME STREQUAL Linux)
-            check_extension (mmx)
-            check_extension (3dnow __3dNOW__)
+            check_native_define (__MMX__ HAVE_MMX)
+            check_native_define (__3dNOW__ HAVE_3DNOW)
         endif ()
     endif ()
     # Check if C++ feature is being turned on/off in the configured compiler flags
     check_feature_enabled (RTTI __GXX_RTTI)
     check_feature_enabled (EXCEPTIONS)
+    # Check if C++11 type trait standard is being followed
+    check_type_trait (is_trivially_default_constructible)
+    check_type_trait (is_trivially_destructible)
+    check_type_trait (is_trivially_copy_assignable)
+    check_type_trait (is_trivially_copy_constructible)
+    if (CMAKE_CXX_COMPILER_ID MATCHES Clang AND NOT IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE AND IS_TRIVIALLY_DESTRUCTIBLE)
+        set (CLANG_PRE_STANDARD 1)
+    endif ()
 endif ()

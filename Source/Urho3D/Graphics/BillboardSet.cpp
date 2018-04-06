@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,10 @@ const char* faceCameraModeNames[] =
     "LookAt Y",
     "LookAt Mixed",
     "Direction",
-    0
+    nullptr
 };
 
-const char* billboardsStructureElementNames[] =
+static const StringVector billboardsStructureElementNames =
 {
     "Billboard Count",
     "   Position",
@@ -66,8 +66,7 @@ const char* billboardsStructureElementNames[] =
     "   Color",
     "   Rotation",
     "   Direction",
-    "   Is Enabled",
-    0
+    "   Is Enabled"
 };
 
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
@@ -106,9 +105,7 @@ BillboardSet::BillboardSet(Context* context) :
     batches_[0].worldTransform_ = &transforms_[0];
 }
 
-BillboardSet::~BillboardSet()
-{
-}
+BillboardSet::~BillboardSet() = default;
 
 void BillboardSet::RegisterObject(Context* context)
 {
@@ -129,9 +126,8 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr,
-                                                            VariantVector, Variant::emptyVariantVector,
-                                                            billboardsStructureElementNames, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE)
+        .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, billboardsStructureElementNames);
     URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
@@ -360,12 +356,12 @@ Material* BillboardSet::GetMaterial() const
 
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
-    return index < billboards_.Size() ? &billboards_[index] : (Billboard*)0;
+    return index < billboards_.Size() ? &billboards_[index] : nullptr;
 }
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
@@ -521,7 +517,7 @@ void BillboardSet::UpdateBufferSize()
         }
         geometryTypeUpdate_ = false;
     }
-    
+
     bool largeIndices = (numBillboards * 4) >= 65536;
 
     if (indexBuffer_->GetIndexCount() != numBillboards * 6)
@@ -541,7 +537,7 @@ void BillboardSet::UpdateBufferSize()
 
     if (!largeIndices)
     {
-        unsigned short* dest = (unsigned short*)destPtr;
+        auto* dest = (unsigned short*)destPtr;
         unsigned short vertexIndex = 0;
         while (numBillboards--)
         {
@@ -551,14 +547,14 @@ void BillboardSet::UpdateBufferSize()
             dest[3] = vertexIndex + 2;
             dest[4] = vertexIndex + 3;
             dest[5] = vertexIndex;
-            
+
             dest += 6;
             vertexIndex += 4;
         }
     }
     else
     {
-        unsigned* dest = (unsigned*)destPtr;
+        auto* dest = (unsigned*)destPtr;
         unsigned vertexIndex = 0;
         while (numBillboards--)
         {
@@ -637,7 +633,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         previousOffset_ = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     }
 
-    float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
+    auto* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
     if (!dest)
         return;
 

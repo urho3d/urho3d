@@ -21,6 +21,7 @@ class UI : public Object
 
     void SetClipboardText(const String text);
     void SetDoubleClickInterval(float interval);
+    void SetMaxDoubleClickDistance(float pixels);
     void SetDragBeginInterval(float interval);
     void SetDragBeginDistance(int pixels);
     void SetDefaultToolTipDelay(float delay);
@@ -51,6 +52,7 @@ class UI : public Object
     UIElement* GetDragElement(unsigned index);
     const String GetClipboardText() const;
     float GetDoubleClickInterval() const;
+    float GetMaxDoubleClickDistance() const;
     float GetDragBeginInterval() const;
     int GetDragBeginDistance() const;
     float GetDefaultToolTipDelay() const;

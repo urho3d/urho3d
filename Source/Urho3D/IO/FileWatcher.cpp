@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,10 +93,10 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         WString(nativePath).CString(),
         FILE_LIST_DIRECTORY,
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
-        0,
+        nullptr,
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS,
-        0);
+        nullptr);
 
     if (dirHandle_ != INVALID_HANDLE_VALUE)
     {
@@ -250,8 +250,8 @@ void FileWatcher::ThreadFunction()
             FILE_NOTIFY_CHANGE_FILE_NAME |
             FILE_NOTIFY_CHANGE_LAST_WRITE,
             &bytesFilled,
-            0,
-            0))
+            nullptr,
+            nullptr))
         {
             unsigned offset = 0;
 
@@ -284,14 +284,14 @@ void FileWatcher::ThreadFunction()
     while (shouldRun_)
     {
         int i = 0;
-        int length = (int)read(watchHandle_, buffer, sizeof(buffer));
+        auto length = (int)read(watchHandle_, buffer, sizeof(buffer));
 
         if (length < 0)
             return;
 
         while (i < length)
         {
-            inotify_event* event = (inotify_event*)&buffer[i];
+            auto* event = (inotify_event*)&buffer[i];
 
             if (event->len > 0)
             {
@@ -335,7 +335,7 @@ bool FileWatcher::GetNextChange(String& dest)
 {
     MutexLock lock(changesMutex_);
 
-    unsigned delayMsec = (unsigned)(delay_ * 1000.0f);
+    auto delayMsec = (unsigned)(delay_ * 1000.0f);
 
     if (changes_.Empty())
         return false;

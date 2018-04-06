@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ void Ragdolls::Start()
 
 void Ragdolls::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -95,7 +95,7 @@ void Ragdolls::CreateScene()
 
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
@@ -105,7 +105,7 @@ void Ragdolls::CreateScene()
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
@@ -117,16 +117,16 @@ void Ragdolls::CreateScene()
         Node* floorNode = scene_->CreateChild("Floor");
         floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
         floorNode->SetScale(Vector3(500.0f, 1.0f, 500.0f));
-        StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
+        auto* floorObject = floorNode->CreateComponent<StaticModel>();
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
         // Make the floor physical by adding RigidBody and CollisionShape components
-        RigidBody* body = floorNode->CreateComponent<RigidBody>();
+        auto* body = floorNode->CreateComponent<RigidBody>();
         // We will be spawning spherical objects in this sample. The ground also needs non-zero rolling friction so that
         // the spheres will eventually come to rest
         body->SetRollingFriction(0.15f);
-        CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
+        auto* shape = floorNode->CreateComponent<CollisionShape>();
         // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
         shape->SetBox(Vector3::ONE);
@@ -140,7 +140,7 @@ void Ragdolls::CreateScene()
             Node* modelNode = scene_->CreateChild("Jack");
             modelNode->SetPosition(Vector3(x * 5.0f, 0.0f, z * 5.0f));
             modelNode->SetRotation(Quaternion(0.0f, 180.0f, 0.0f));
-            AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
+            auto* modelObject = modelNode->CreateComponent<AnimatedModel>();
             modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
             modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
             modelObject->SetCastShadows(true);
@@ -150,11 +150,11 @@ void Ragdolls::CreateScene()
 
             // Create a rigid body and a collision shape. These will act as a trigger for transforming the
             // model into a ragdoll when hit by a moving object
-            RigidBody* body = modelNode->CreateComponent<RigidBody>();
+            auto* body = modelNode->CreateComponent<RigidBody>();
             // The Trigger mode makes the rigid body only detect collisions, but impart no forces on the
             // colliding objects
             body->SetTrigger(true);
-            CollisionShape* shape = modelNode->CreateComponent<CollisionShape>();
+            auto* shape = modelNode->CreateComponent<CollisionShape>();
             // Create the capsule shape with an offset so that it is correctly aligned with the model, which
             // has its origin at the feet
             shape->SetCapsule(0.7f, 2.0f, Vector3(0.0f, 1.0f, 0.0f));
@@ -167,7 +167,7 @@ void Ragdolls::CreateScene()
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load / save
     cameraNode_ = new Node(context_);
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 
     // Set an initial position for the camera scene node above the floor
@@ -176,11 +176,11 @@ void Ragdolls::CreateScene()
 
 void Ragdolls::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "LMB to spawn physics objects\n"
@@ -199,7 +199,7 @@ void Ragdolls::CreateInstructions()
 
 void Ragdolls::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -212,7 +212,7 @@ void Ragdolls::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -261,21 +261,21 @@ void Ragdolls::MoveCamera(float timeStep)
 
 void Ragdolls::SpawnObject()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     Node* boxNode = scene_->CreateChild("Sphere");
     boxNode->SetPosition(cameraNode_->GetPosition());
     boxNode->SetRotation(cameraNode_->GetRotation());
     boxNode->SetScale(0.25f);
-    StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+    auto* boxObject = boxNode->CreateComponent<StaticModel>();
     boxObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
     boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
     boxObject->SetCastShadows(true);
 
-    RigidBody* body = boxNode->CreateComponent<RigidBody>();
+    auto* body = boxNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetRollingFriction(0.15f);
-    CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
+    auto* shape = boxNode->CreateComponent<CollisionShape>();
     shape->SetSphere(1.0f);
 
     const float OBJECT_VELOCITY = 10.0f;

@@ -15,6 +15,8 @@
 /** @file Socket.cpp
 	@brief */
 
+// Modified by Lasse Oorni and Henrik Heino for Urho3D
+
 #include <string>
 #include <cassert>
 #include <utility>
@@ -135,6 +137,14 @@ writeOpen(true), readOpen(true)
 	SetSendBufferSize(512 * 1024);
 	SetReceiveBufferSize(512 * 1024);
 	udpPeerAddress = remoteEndPoint.ToSockAddrIn();
+
+	// Urho3D: Prevent SIGPIPE signal when other end closes connection
+#ifdef __APPLE__
+	if (connection != INVALID_SOCKET) {
+		int set = 1;
+		setsockopt(connection, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+	}
+#endif
 }
 
 Socket::Socket(const Socket &rhs)
@@ -726,7 +736,14 @@ bool Socket::Send(const char *data, size_t numBytes)
 	if (transport == SocketOverUDP && type != ClientSocket)
 		bytesSent = sendto(connectSocket, data, numBytes, 0, (sockaddr*)&udpPeerAddress, sizeof(udpPeerAddress));
 	else
+	{
+		// Urho3D: Prevent SIGPIPE signal when other end closes connection
+		#if defined(_WIN32) || defined(__APPLE__)
 		bytesSent = send(connectSocket, data, numBytes, 0);
+		#else
+		bytesSent = send(connectSocket, data, numBytes, MSG_NOSIGNAL);
+		#endif
+	}
 
 	if (bytesSent == (int)numBytes)
 	{

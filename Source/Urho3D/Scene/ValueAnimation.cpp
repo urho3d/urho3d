@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,12 @@ const char* interpMethodNames[] =
     "None",
     "Linear",
     "Spline",
-    0
+    nullptr
 };
 
 ValueAnimation::ValueAnimation(Context* context) :
     Resource(context),
-    owner_(0),
+    owner_(nullptr),
     interpolationMethod_(IM_LINEAR),
     splineTension_(0.5f),
     valueType_(VAR_NONE),
@@ -59,9 +59,7 @@ ValueAnimation::ValueAnimation(Context* context) :
 {
 }
 
-ValueAnimation::~ValueAnimation()
-{
-}
+ValueAnimation::~ValueAnimation() = default;
 
 void ValueAnimation::RegisterObject(Context* context)
 {
@@ -94,7 +92,7 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     eventFrames_.Clear();
 
     String interpMethodString = source.GetAttribute("interpolationmethod");
-    InterpMethod method = (InterpMethod)GetStringListIndex(interpMethodString.CString(), interpMethodNames, IM_LINEAR);
+    auto method = (InterpMethod)GetStringListIndex(interpMethodString.CString(), interpMethodNames, IM_LINEAR);
 
     SetInterpolationMethod(method);
     if (interpolationMethod_ == IM_SPLINE)
@@ -156,7 +154,7 @@ bool ValueAnimation::LoadJSON(const JSONValue& source)
     eventFrames_.Clear();
 
     String interpMethodString = source.Get("interpolationmethod").GetString();
-    InterpMethod method = (InterpMethod)GetStringListIndex(interpMethodString.CString(), interpMethodNames, IM_LINEAR);
+    auto method = (InterpMethod)GetStringListIndex(interpMethodString.CString(), interpMethodNames, IM_LINEAR);
 
     SetInterpolationMethod(method);
     if (interpolationMethod_ == IM_SPLINE)
@@ -340,7 +338,7 @@ bool ValueAnimation::IsValid() const
            (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
 }
 
-Variant ValueAnimation::GetAnimationValue(float scaledTime)
+Variant ValueAnimation::GetAnimationValue(float scaledTime) const
 {
     unsigned index = 1;
     for (; index < keyFrames_.Size(); ++index)
@@ -436,7 +434,7 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     }
 }
 
-Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime)
+Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime) const
 {
     if (splineTangentsDirty_)
         UpdateSplineTangents();
@@ -488,7 +486,7 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
     }
 }
 
-void ValueAnimation::UpdateSplineTangents()
+void ValueAnimation::UpdateSplineTangents() const
 {
     splineTangents_.Clear();
 

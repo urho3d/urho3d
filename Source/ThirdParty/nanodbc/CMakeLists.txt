@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,12 @@
 set (TARGET_NAME nanodbc)
 
 # Define source files
-define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h)
+define_source_files (GLOB_CPP_PATTERNS nanodbc/*.cpp GLOB_H_PATTERNS nanodbc/*.h)
 
 # Define dependency libs
+set (INCLUDE_DIRS .)
 if (ODBC_INCLUDE_DIRS)
-    set (INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
+    LIST (APPEND INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
 endif ()
 if (ODBC_DEFINES)
     add_definitions (${ODBC_DEFINES})
@@ -38,4 +39,4 @@ endif ()
 setup_library ()
 
 # Install headers for building and using the Urho3D library
-install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/nanodbc FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
+install_header_files (DIRECTORY nanodbc/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/nanodbc FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant

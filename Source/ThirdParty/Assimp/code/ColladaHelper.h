@@ -4,7 +4,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -40,23 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #ifndef AI_COLLADAHELPER_H_INC
 #define AI_COLLADAHELPER_H_INC
 
-#include <string>
 #include <map>
 #include <vector>
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
-#include "../include/assimp/light.h"
-#include "../include/assimp/mesh.h"
-#include "../include/assimp/material.h"
+#include <assimp/light.h>
+#include <assimp/mesh.h>
+#include <assimp/material.h>
 
 struct aiMaterial;
 
@@ -96,12 +89,27 @@ enum InputType
     IT_Bitangent
 };
 
+/** Supported controller types */
+enum ControllerType
+{
+    Skin,
+    Morph
+};
+
+/** Supported morph methods */
+enum MorphMethod
+{
+    Normalized,
+    Relative
+};
+
+
 /** Contains all data for one of the different transformation types */
 struct Transform
 {
     std::string mID;  ///< SID of the transform step, by which anim channels address their target node
     TransformType mType;
-    float f[16]; ///< Interpretation of data depends on the type of the transformation
+    ai_real f[16]; ///< Interpretation of data depends on the type of the transformation
 };
 
 /** A collada camera. */
@@ -123,16 +131,16 @@ struct Camera
     bool mOrtho;
 
     //! Horizontal field of view in degrees
-    float mHorFov;
+    ai_real mHorFov;
 
     //! Vertical field of view in degrees
-    float mVerFov;
+    ai_real mVerFov;
 
     //! Screen aspect
-    float mAspect;
+    ai_real mAspect;
 
     //! Near& far z
-    float mZNear, mZFar;
+    ai_real mZNear, mZFar;
 };
 
 #define ASSIMP_COLLADA_LIGHT_ANGLE_NOT_SET 1e9f
@@ -159,21 +167,21 @@ struct Light
     aiColor3D mColor;
 
     //! Light attenuation
-    float mAttConstant,mAttLinear,mAttQuadratic;
+    ai_real mAttConstant,mAttLinear,mAttQuadratic;
 
     //! Spot light falloff
-    float mFalloffAngle;
-    float mFalloffExponent;
+    ai_real mFalloffAngle;
+    ai_real mFalloffExponent;
 
     // -----------------------------------------------------
     // FCOLLADA extension from here
 
     //! ... related stuff from maja and max extensions
-    float mPenumbraAngle;
-    float mOuterAngle;
+    ai_real mPenumbraAngle;
+    ai_real mOuterAngle;
 
     //! Common light intensity
-    float mIntensity;
+    ai_real mIntensity;
 };
 
 /** Short vertex index description */
@@ -282,7 +290,7 @@ struct Node
 struct Data
 {
     bool mIsStringArray;
-    std::vector<float> mValues;
+    std::vector<ai_real> mValues;
     std::vector<std::string> mStrings;
 };
 
@@ -294,7 +302,7 @@ struct Accessor
     size_t mOffset;  // in number of values
     size_t mStride;  // Stride in number of values
     std::vector<std::string> mParams; // names of the data streams in the accessors. Empty string tells to ignore.
-    size_t mSubOffset[4]; // Suboffset inside the object for the common 4 elements. For a vector, thats XYZ, for a color RGBA and so on.
+    size_t mSubOffset[4]; // Suboffset inside the object for the common 4 elements. For a vector, that's XYZ, for a color RGBA and so on.
                           // For example, SubOffset[0] denotes which of the values inside the object is the vector X component.
     std::string mSource;   // URL of the source array
     mutable const Data* mData; // Pointer to the source array, if resolved. NULL else
@@ -387,6 +395,12 @@ enum PrimitiveType
 /** A skeleton controller to deform a mesh with the use of joints */
 struct Controller
 {
+    // controller type
+    ControllerType mType;
+
+    // Morphing method if type is Morph
+    MorphMethod mMethod;
+
     // the URL of the mesh deformed by the controller.
     std::string mMeshId;
 
@@ -394,7 +408,7 @@ struct Controller
     std::string mJointNameSource;
 
     ///< The bind shape matrix, as array of floats. I'm not sure what this matrix actually describes, but it can't be ignored in all cases
-    float mBindShapeMatrix[16];
+    ai_real mBindShapeMatrix[16];
 
     // accessor URL of the joint inverse bind matrices
     std::string mJointOffsetMatrixSource;
@@ -409,6 +423,9 @@ struct Controller
 
     // JointIndex-WeightIndex pairs for all vertices
     std::vector< std::pair<size_t, size_t> > mWeights;
+
+    std::string mMorphTarget;
+    std::string mMorphWeight;
 };
 
 /** A collada material. Pretty much the only member is a reference to an effect. */
@@ -497,11 +514,11 @@ struct Sampler
 
     /** Weighting factor
      */
-    float mWeighting;
+    ai_real mWeighting;
 
     /** Mixing factor from OKINO
      */
-    float mMixWithPrevious;
+    ai_real mMixWithPrevious;
 };
 
 /** A collada effect. Can contain about anything according to the Collada spec,
@@ -520,10 +537,11 @@ struct Effect
         mTexTransparent, mTexBump, mTexReflective;
 
     // Scalar factory
-    float mShininess, mRefractIndex, mReflectivity;
-    float mTransparency;
+    ai_real mShininess, mRefractIndex, mReflectivity;
+    ai_real mTransparency;
     bool mHasTransparency;
     bool mRGBTransparency;
+    bool mInvertTransparency;
 
     // local params referring to each other by their SID
     typedef std::map<std::string, Collada::EffectParam> ParamLibrary;
@@ -543,10 +561,11 @@ struct Effect
         , mTransparent  ( 0, 0, 0, 1)
         , mShininess    (10.0f)
         , mRefractIndex (1.f)
-        , mReflectivity (1.f)
+        , mReflectivity (0.f)
         , mTransparency (1.f)
         , mHasTransparency (false)
         , mRGBTransparency(false)
+        , mInvertTransparency(false)
         , mDoubleSided  (false)
         , mWireframe    (false)
         , mFaceted      (false)
@@ -582,6 +601,12 @@ struct AnimationChannel
     std::string mSourceTimes;
     /** Source URL of the value values. Collada calls them "output". */
     std::string mSourceValues;
+    /** Source URL of the IN_TANGENT semantic values. */
+    std::string mInTanValues;
+    /** Source URL of the OUT_TANGENT semantic values. */
+    std::string mOutTanValues;
+    /** Source URL of the INTERPOLATION semantic values. */
+    std::string mInterpolationValues;
 };
 
 /** An animation. Container for 0-x animation channels or 0-x animations */
@@ -602,12 +627,55 @@ struct Animation
         for( std::vector<Animation*>::iterator it = mSubAnims.begin(); it != mSubAnims.end(); ++it)
             delete *it;
     }
+
+	/** Collect all channels in the animation hierarchy into a single channel list. */
+	void CollectChannelsRecursively(std::vector<AnimationChannel> &channels)
+	{
+		channels.insert(channels.end(), mChannels.begin(), mChannels.end());
+
+		for (std::vector<Animation*>::iterator it = mSubAnims.begin(); it != mSubAnims.end(); ++it)
+		{
+			Animation *pAnim = (*it);
+
+			pAnim->CollectChannelsRecursively(channels);
+		}
+	}
+
+	/** Combine all single-channel animations' channel into the same (parent) animation channel list. */
+	void CombineSingleChannelAnimations()
+	{
+		CombineSingleChannelAnimationsRecursively(this);
+	}
+
+	void CombineSingleChannelAnimationsRecursively(Animation *pParent)
+	{
+		for (std::vector<Animation*>::iterator it = pParent->mSubAnims.begin(); it != pParent->mSubAnims.end();)
+		{
+			Animation *anim = *it;
+
+			CombineSingleChannelAnimationsRecursively(anim);
+
+			if (anim->mChannels.size() == 1)
+			{
+				pParent->mChannels.push_back(anim->mChannels[0]);
+
+				it = pParent->mSubAnims.erase(it);
+
+				delete anim;
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
 };
 
 /** Description of a collada animation channel which has been determined to affect the current node */
 struct ChannelEntry
 {
     const Collada::AnimationChannel* mChannel; ///> the source channel
+    std::string mTargetId;
     std::string mTransformId;   // the ID of the transformation step of the node which is influenced
     size_t mTransformIndex; // Index into the node's transform chain to apply the channel to
     size_t mSubElement; // starting index inside the transform data

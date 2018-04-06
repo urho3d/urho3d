@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ bool ShaderVariation::Create()
     {
         if (device && byteCode_.Size())
         {
-            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_.ptr_);
+            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), nullptr, (ID3D11VertexShader**)&object_.ptr_);
             if (FAILED(hr))
             {
                 URHO3D_SAFE_RELEASE(object_.ptr_);
@@ -106,7 +106,7 @@ bool ShaderVariation::Create()
     {
         if (device && byteCode_.Size())
         {
-            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_.ptr_);
+            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), nullptr, (ID3D11PixelShader**)&object_.ptr_);
             if (FAILED(hr))
             {
                 URHO3D_SAFE_RELEASE(object_.ptr_);
@@ -117,7 +117,7 @@ bool ShaderVariation::Create()
             compilerOutput_ = "Could not create pixel shader, empty bytecode";
     }
 
-    return object_.ptr_ != 0;
+    return object_.ptr_ != nullptr;
 }
 
 void ShaderVariation::Release()
@@ -132,12 +132,12 @@ void ShaderVariation::Release()
         if (type_ == VS)
         {
             if (graphics_->GetVertexShader() == this)
-                graphics_->SetShaders(0, 0);
+                graphics_->SetShaders(nullptr, nullptr);
         }
         else
         {
             if (graphics_->GetPixelShader() == this)
-                graphics_->SetShaders(0, 0);
+                graphics_->SetShaders(nullptr, nullptr);
         }
 
         URHO3D_SAFE_RELEASE(object_.ptr_);
@@ -146,7 +146,7 @@ void ShaderVariation::Release()
     compilerOutput_.Clear();
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
+        useTextureUnits_[i] = false;
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         constantBufferSizes_[i] = 0;
     parameters_.Clear();
@@ -198,13 +198,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned offset = file->ReadUInt();
         unsigned size = file->ReadUInt();
 
-        ShaderParameter parameter;
-        parameter.type_ = type_;
-        parameter.name_ = name;
-        parameter.buffer_ = buffer;
-        parameter.offset_ = offset;
-        parameter.size_ = size;
-        parameters_[StringHash(name)] = parameter;
+        parameters_[StringHash(name)] = ShaderParameter{type_, name, offset, size, buffer};
     }
 
     unsigned numTextureUnits = file->ReadUInt();
@@ -214,7 +208,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
 
         if (reg < MAX_TEXTURE_UNITS)
-            useTextureUnit_[reg] = true;
+            useTextureUnits_[reg] = true;
     }
 
     unsigned byteCodeSize = file->ReadUInt();
@@ -244,8 +238,8 @@ bool ShaderVariation::Compile()
     Vector<String> defines = defines_.Split(' ');
 
     // Set the entrypoint, profile and flags according to the shader being compiled
-    const char* entryPoint = 0;
-    const char* profile = 0;
+    const char* entryPoint = nullptr;
+    const char* profile = nullptr;
     unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
     defines.Push("D3D11");
@@ -296,15 +290,15 @@ bool ShaderVariation::Compile()
     }
 
     D3D_SHADER_MACRO endMacro;
-    endMacro.Name = 0;
-    endMacro.Definition = 0;
+    endMacro.Name = nullptr;
+    endMacro.Definition = nullptr;
     macros.Push(endMacro);
 
     // Compile using D3DCompile
-    ID3DBlob* shaderCode = 0;
-    ID3DBlob* errorMsgs = 0;
+    ID3DBlob* shaderCode = nullptr;
+    ID3DBlob* errorMsgs = nullptr;
 
-    HRESULT hr = D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
+    HRESULT hr = D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), nullptr,
         entryPoint, profile, flags, 0, &shaderCode, &errorMsgs);
     if (FAILED(hr))
     {
@@ -325,7 +319,7 @@ bool ShaderVariation::Compile()
         CalculateConstantBufferSizes();
 
         // Then strip everything not necessary to use the shader
-        ID3DBlob* strippedCode = 0;
+        ID3DBlob* strippedCode = nullptr;
         D3DStripShader(bufData, bufSize,
             D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_DEBUG_INFO | D3DCOMPILER_STRIP_TEST_BLOBS, &strippedCode);
         byteCode_.Resize((unsigned)strippedCode->GetBufferSize());
@@ -335,13 +329,13 @@ bool ShaderVariation::Compile()
 
     URHO3D_SAFE_RELEASE(shaderCode);
     URHO3D_SAFE_RELEASE(errorMsgs);
-    
+
     return !byteCode_.Empty();
 }
 
 void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 {
-    ID3D11ShaderReflection* reflection = 0;
+    ID3D11ShaderReflection* reflection = nullptr;
     D3D11_SHADER_DESC shaderDesc;
 
     HRESULT hr = D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
@@ -380,7 +374,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         if (resourceDesc.Type == D3D_SIT_CBUFFER)
             cbRegisterMap[resourceName] = resourceDesc.BindPoint;
         else if (resourceDesc.Type == D3D_SIT_SAMPLER && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
-            useTextureUnit_[resourceDesc.BindPoint] = true;
+            useTextureUnits_[resourceDesc.BindPoint] = true;
     }
 
     for (unsigned i = 0; i < shaderDesc.ConstantBuffers; ++i)
@@ -399,13 +393,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (varName[0] == 'c')
             {
                 varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
-                ShaderParameter parameter;
-                parameter.type_ = type_;
-                parameter.name_ = varName;
-                parameter.buffer_ = cbRegister;
-                parameter.offset_ = varDesc.StartOffset;
-                parameter.size_ = varDesc.Size;
-                parameters_[varName] = parameter;
+                parameters_[varName] = ShaderParameter{type_, varName, varDesc.StartOffset, varDesc.Size, cbRegister};
             }
         }
     }
@@ -453,13 +441,13 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     unsigned usedTextureUnits = 0;
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
             ++usedTextureUnits;
     }
     file->WriteUInt(usedTextureUnits);
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
         {
             file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
             file->WriteUByte((unsigned char)i);

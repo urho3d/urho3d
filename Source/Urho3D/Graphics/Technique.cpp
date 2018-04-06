@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ const char* blendModeNames[] =
     "invdestalpha",
     "subtract",
     "subtractalpha",
-    0
+    nullptr
 };
 
 static const char* compareModeNames[] =
@@ -62,7 +62,7 @@ static const char* compareModeNames[] =
     "lessequal",
     "greater",
     "greaterequal",
-    0
+    nullptr
 };
 
 static const char* lightingModeNames[] =
@@ -70,7 +70,7 @@ static const char* lightingModeNames[] =
     "unlit",
     "pervertex",
     "perpixel",
-    0
+    nullptr
 };
 
 Pass::Pass(const String& name) :
@@ -94,9 +94,7 @@ Pass::Pass(const String& name) :
         lightingMode_ = LIGHTING_PERPIXEL;
 }
 
-Pass::~Pass()
-{
-}
+Pass::~Pass() = default;
 
 void Pass::SetBlendMode(BlendMode mode)
 {
@@ -250,9 +248,7 @@ Technique::Technique(Context* context) :
 #endif
 }
 
-Technique::~Technique()
-{
-}
+Technique::~Technique() = default;
 
 void Technique::RegisterObject(Context* context)
 {
@@ -447,13 +443,13 @@ bool Technique::HasPass(const String& name) const
 Pass* Technique::GetPass(const String& name) const
 {
     HashMap<String, unsigned>::ConstIterator i = passIndices.Find(name.ToLower());
-    return i != passIndices.End() ? GetPass(i->second_) : 0;
+    return i != passIndices.End() ? GetPass(i->second_) : nullptr;
 }
 
 Pass* Technique::GetSupportedPass(const String& name) const
 {
     HashMap<String, unsigned>::ConstIterator i = passIndices.Find(name.ToLower());
-    return i != passIndices.End() ? GetSupportedPass(i->second_) : 0;
+    return i != passIndices.End() ? GetSupportedPass(i->second_) : nullptr;
 }
 
 unsigned Technique::GetNumPasses() const

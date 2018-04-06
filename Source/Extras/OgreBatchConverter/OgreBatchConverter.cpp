@@ -5,7 +5,7 @@
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/IO/FileSystem.h>
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace Urho3D;
 

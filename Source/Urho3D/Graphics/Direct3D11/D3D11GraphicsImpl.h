@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,9 +38,9 @@ namespace Urho3D
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
 
-typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
-typedef HashMap<unsigned long long, SharedPtr<VertexDeclaration> > VertexDeclarationMap;
-typedef HashMap<unsigned, SharedPtr<ConstantBuffer> > ConstantBufferMap;
+using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
+using VertexDeclarationMap = HashMap<unsigned long long, SharedPtr<VertexDeclaration> >;
+using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
 
 /// %Graphics implementation. Holds API-specific objects.
 class URHO3D_API GraphicsImpl

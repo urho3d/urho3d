@@ -476,25 +476,25 @@ String GetNodeTitle(Node@ node)
 
     if (showID)
     {
-        if (node.id >= FIRST_LOCAL_ID)
-            ret += " (Local " + String(node.id) + ")";
-        else
+        if (node.replicated)
             ret += " (" + String(node.id) + ")";
+        else
+            ret += " (Local " + String(node.id) + ")";
 
         if (node.temporary)
             ret += " (Temp)";
     }
-    
+
     return ret;
 }
 
 String GetComponentTitle(Component@ component)
 {
     String ret = component.typeName;
-    
+
     if (showID)
     {
-        if (component.id >= FIRST_LOCAL_ID)
+        if (!component.replicated)
             ret += " (Local)";
 
         if (component.temporary)
@@ -650,7 +650,7 @@ Model@ FindFirstSelectedModel()
                 return sm.model;
         }
     }
-    
+
     return null;
 }
 
@@ -661,16 +661,16 @@ void UpdateModelInfo(Model@ model)
         modelInfoText.text = "";
         return;
     }
-    
+
     String infoStr = "Model: " + model.name;
 
     infoStr += "\n  Morphs: " + model.numMorphs;
-    
+
     for (uint g = 0; g < model.numGeometries; ++g)
     {
         infoStr += "\n  Geometry " + g + "\n    Lods: " + model.numGeometryLodLevels[g];
     }
-    
+
     modelInfoText.text = infoStr;
 }
 
@@ -701,7 +701,7 @@ void HandleHierarchyListSelectionChange()
         else if (type == ITEM_NODE)
         {
             Node@ node = GetListNode(index);
-            if (node !is null) 
+            if (node !is null)
                 selectedNodes.Push(node);
         }
         else if (type == ITEM_UI_ELEMENT)
@@ -711,7 +711,7 @@ void HandleHierarchyListSelectionChange()
                 selectedUIElements.Push(element);
         }
     }
-    
+
     // If only one node/UIElement selected, use it for editing
     if (selectedNodes.length == 1)
         editNode = selectedNodes[0];
@@ -734,7 +734,7 @@ void HandleHierarchyListSelectionChange()
         }
         editNode = commonNode;
     }
-    
+
     UpdateModelInfo(FindFirstSelectedModel());
 
     // Now check if the component(s) can be edited. If many selected, must have same type or have same edit node
@@ -820,15 +820,24 @@ void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
     if (type == ITEM_NODE)
     {
         Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
-        LocateNode(node);
+        Array<Node@> nodes;
+        nodes.Push(node);
+        LocateNodes(nodes);
+    }
+    else if (type == ITEM_COMPONENT)
+    {
+        Component@ component = editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetUInt());
+        Array<Component@> components;
+        components.Push(component);
+        LocateComponents(components);
     }
 
     bool isExpanded = hierarchyList.IsExpanded(hierarchyList.selection);
 
-    if (!isExpanded && eventData["Button"].GetInt() == MOUSEB_LEFT) 
+    if (!isExpanded && eventData["Button"].GetInt() == MOUSEB_LEFT)
     {
-        isExpanded = !isExpanded;  
-        hierarchyList.Expand(hierarchyList.selection, isExpanded, false); 
+        isExpanded = !isExpanded;
+        hierarchyList.Expand(hierarchyList.selection, isExpanded, false);
     }
 }
 
@@ -864,7 +873,7 @@ void HandleHierarchyItemClick(StringHash eventType, VariantMap& eventData)
         actions.Push(CreateContextMenuItem("Copy", "HandleHierarchyContextCopy"));
         actions.Push(CreateContextMenuItem("Cut", "HandleHierarchyContextCut"));
         actions.Push(CreateContextMenuItem("Delete", "HandleHierarchyContextDelete"));
-        actions.Push(CreateContextMenuItem("Paste", "HandleHierarchyContextPaste")); 
+        actions.Push(CreateContextMenuItem("Paste", "HandleHierarchyContextPaste"));
         actions.Push(CreateContextMenuItem("Enable/disable", "HandleHierarchyContextEnableDisable"));
 
         /* actions.Push(CreateBrowserFileActionMenu("Edit", "HandleBrowserEditResource", file)); */
@@ -877,7 +886,7 @@ void HandleHierarchyItemClick(StringHash eventType, VariantMap& eventData)
         actions.Push(CreateContextMenuItem("Copy", "HandleHierarchyContextCopy"));
         actions.Push(CreateContextMenuItem("Cut", "HandleHierarchyContextCut"));
         actions.Push(CreateContextMenuItem("Delete", "HandleHierarchyContextDelete"));
-        actions.Push(CreateContextMenuItem("Paste", "HandleHierarchyContextPaste")); 
+        actions.Push(CreateContextMenuItem("Paste", "HandleHierarchyContextPaste"));
         actions.Push(CreateContextMenuItem("Reset to default", "HandleHierarchyContextResetToDefault"));
         actions.Push(CreateContextMenuItem("Reset position", "HandleHierarchyContextResetPosition"));
         actions.Push(CreateContextMenuItem("Reset rotation", "HandleHierarchyContextResetRotation"));
@@ -1021,7 +1030,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     {
         Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
-        
+
         if (sourceNodes.length > 0)
         {
             if (input.qualifierDown[QUAL_CTRL] && sourceNodes.length == 1)
@@ -1698,7 +1707,7 @@ bool BlenderModeDelete()
         actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
         actions.Push(CreateContextMenuItem("Cancel", "HandleEmpty"));
 
-        if (actions.length > 0) 
+        if (actions.length > 0)
         {
             ActivateContextMenu(actions);
             return true;
@@ -1844,12 +1853,12 @@ void HandleHierarchyContextDelete()
     Delete();
 }
 
-void HandleBlenderModeDelete() 
+void HandleBlenderModeDelete()
 {
     Delete();
 }
 
-void HandleEmpty() 
+void HandleEmpty()
 {
     //just doing nothing
 }
@@ -1911,7 +1920,7 @@ void CollapseHierarchy()
 
     // only scene's scope expand by default
     hierarchyList.Expand(0, true, false);
-    
+
     hierarchyList.SetSelections(oldSelections);
 }
 
@@ -1920,7 +1929,7 @@ void CollapseHierarchy(StringHash eventType, VariantMap& eventData)
     CollapseHierarchy();
 }
 
-void HandleShowID(StringHash eventType, VariantMap& eventData) 
+void HandleShowID(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ checkBox = eventData["Element"].GetPtr();
     showID = checkBox.checked;

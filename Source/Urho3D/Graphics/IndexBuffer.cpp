@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,13 @@ namespace Urho3D
 
 IndexBuffer::IndexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
+    GPUObject(forceHeadless ? nullptr : GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
     lockState_(LOCK_NONE),
     lockStart_(0),
     lockCount_(0),
-    lockScratchData_(0),
+    lockScratchData_(nullptr),
     shadowed_(false),
     dynamic_(false),
     discardLock_(false)

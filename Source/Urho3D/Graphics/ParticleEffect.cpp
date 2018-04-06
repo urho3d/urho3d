@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ static const char* emitterTypeNames[] =
 {
     "Sphere",
     "Box",
-    0
+    nullptr
 };
 
 static const Vector2 DEFAULT_PARTICLE_SIZE(0.1f, 0.1f);
@@ -88,9 +88,7 @@ ParticleEffect::ParticleEffect(Context* context) :
 {
 }
 
-ParticleEffect::~ParticleEffect()
-{
-}
+ParticleEffect::~ParticleEffect() = default;
 
 void ParticleEffect::RegisterObject(Context* context)
 {
@@ -778,12 +776,12 @@ SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const
 
 const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 {
-    return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0;
+    return index < colorFrames_.Size() ? &colorFrames_[index] : nullptr;
 }
 
 const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
 {
-    return index < textureFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
+    return index < textureFrames_.Size() ? &textureFrames_[index] : nullptr;
 }
 
 Vector3 ParticleEffect::GetRandomDirection() const

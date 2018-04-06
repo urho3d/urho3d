@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,9 +42,7 @@ ConstraintDistance2D::ConstraintDistance2D(Context* context) :
 
 }
 
-ConstraintDistance2D::~ConstraintDistance2D()
-{
-}
+ConstraintDistance2D::~ConstraintDistance2D() = default;
 
 void ConstraintDistance2D::RegisterObject(Context* context)
 {
@@ -129,12 +127,12 @@ void ConstraintDistance2D::SetLength(float length)
 b2JointDef* ConstraintDistance2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
-        return 0;
+        return nullptr;
 
     b2Body* bodyA = ownerBody_->GetBody();
     b2Body* bodyB = otherBody_->GetBody();
     if (!bodyA || !bodyB)
-        return 0;
+        return nullptr;
 
     jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_));
 

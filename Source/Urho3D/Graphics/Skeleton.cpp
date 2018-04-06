@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,7 @@ Skeleton::Skeleton() :
 {
 }
 
-Skeleton::~Skeleton()
-{
-}
+Skeleton::~Skeleton() = default;
 
 bool Skeleton::Load(Deserializer& source)
 {
@@ -152,9 +150,42 @@ Bone* Skeleton::GetRootBone()
     return GetBone(rootBoneIndex_);
 }
 
+unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
+{
+    const unsigned numBones = bones_.Size();
+    for (unsigned i = 0; i < numBones; ++i)
+    {
+        if (bones_[i].nameHash_ == boneNameHash)
+            return i;
+    }
+
+    return M_MAX_UNSIGNED;
+}
+
+unsigned Skeleton::GetBoneIndex(const Bone* bone) const
+{
+    if (bones_.Empty() || bone < &bones_.Front() || bone > &bones_.Back())
+        return M_MAX_UNSIGNED;
+
+    return static_cast<unsigned>(bone - &bones_.Front());
+}
+
+unsigned Skeleton::GetBoneIndex(const String& boneName) const
+{
+    return GetBoneIndex(StringHash(boneName));
+}
+
+Bone* Skeleton::GetBoneParent(const Bone* bone)
+{
+    if (GetBoneIndex(bone) == bone->parentIndex_)
+        return nullptr;
+    else
+        return GetBone(bone->parentIndex_);
+}
+
 Bone* Skeleton::GetBone(unsigned index)
 {
-    return index < bones_.Size() ? &bones_[index] : (Bone*)0;
+    return index < bones_.Size() ? &bones_[index] : nullptr;
 }
 
 Bone* Skeleton::GetBone(const String& name)
@@ -167,15 +198,10 @@ Bone* Skeleton::GetBone(const char* name)
     return GetBone(StringHash(name));
 }
 
-Bone* Skeleton::GetBone(StringHash nameHash)
+Bone* Skeleton::GetBone(const StringHash& boneNameHash)
 {
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
-    {
-        if (i->nameHash_ == nameHash)
-            return &(*i);
-    }
-
-    return 0;
+    const unsigned index = GetBoneIndex(boneNameHash);
+    return index < bones_.Size() ? &bones_[index] : nullptr;
 }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
         loadImage_->PrecalculateLevels();
 
     // Load the optional parameters file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
 
@@ -134,14 +134,14 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     renderSurface_.Reset();
 
     usage_ = usage;
-    
+
     if (usage >= TEXTURE_RENDERTARGET)
     {
         renderSurface_ = new RenderSurface(this);
 
         // Clamp mode addressing by default and nearest filtering
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
+        addressModes_[COORD_U] = ADDRESS_CLAMP;
+        addressModes_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
     }
 
@@ -160,31 +160,32 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     return Create();
 }
 
-SharedPtr<Image> Texture2D::GetImage() const
+bool Texture2D::GetImage(Image& image) const
 {
     if (format_ != Graphics::GetRGBAFormat() && format_ != Graphics::GetRGBFormat())
     {
         URHO3D_LOGERROR("Unsupported texture format, can not convert to Image");
-        return SharedPtr<Image>();
+        return false;
     }
 
-    Image* rawImage = new Image(context_);
-    if (format_ == Graphics::GetRGBAFormat())
-        rawImage->SetSize(width_, height_, 4);
-    else if (format_ == Graphics::GetRGBFormat())
-        rawImage->SetSize(width_, height_, 3);
-    else
-        assert(0);
+    image.SetSize(width_, height_, GetComponents());
+    GetData(0, image.GetData());
+    return true;
+}
 
-    GetData(0, rawImage->GetData());
-    return SharedPtr<Image>(rawImage);
+SharedPtr<Image> Texture2D::GetImage() const
+{
+    auto rawImage = MakeShared<Image>(context_);
+    if (!GetImage(*rawImage))
+        return nullptr;
+    return rawImage;
 }
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer)
             renderer->QueueRenderSurface(renderSurface_);
         renderSurface_->ResetUpdateQueued();

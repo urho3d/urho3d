@@ -4,7 +4,7 @@ struct Bone
 {
     Bone();
     ~Bone();
-    
+
     String name_ @ name;
     StringHash nameHash_ @ nameHash;
     unsigned parentIndex_ @ parentIndex;
@@ -25,7 +25,10 @@ class Skeleton
     Bone* GetRootBone();
     Bone* GetBone(const String name);
     Bone* GetBone(unsigned index);
-    
+    unsigned GetBoneIndex(const String boneName) const;
+    unsigned GetBoneIndex(const Bone* bone) const;
+    Bone* GetBoneParent(const Bone* bone);
+
     tolua_readonly tolua_property__get_set unsigned numBones;
     tolua_readonly tolua_property__get_set Bone* rootBone;
 };

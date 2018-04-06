@@ -16,6 +16,7 @@ class RibbonTrail : public Drawable
     void SetStartScale(float startScale);
     void SetEndScale(float endScale);
     void SetTrailType(TrailType type);
+    void SetBaseVelocity(const Vector3& baseVelocity);
     void SetSorted(bool enable);
     void SetLifetime(float time);
     void SetEmitting(bool emitting);
@@ -33,6 +34,7 @@ class RibbonTrail : public Drawable
     float GetStartScale() const;
     float GetEndScale() const;
     TrailType GetTrailType() const;
+    const Vector3& GetBaseVelocity() const;
     bool IsSorted() const;
     float GetLifetime() const;
     unsigned GetTailColumn() const;
@@ -48,6 +50,7 @@ class RibbonTrail : public Drawable
     tolua_property__get_set float startScale;
     tolua_property__get_set float endScale;
     tolua_property__get_set TrailType trailType;
+    tolua_property__get_set Vector3 baseVelocity;
     tolua_property__is_set bool sorted;
     tolua_property__get_set float lifetime;
     tolua_property__get_set unsigned tailColumn;

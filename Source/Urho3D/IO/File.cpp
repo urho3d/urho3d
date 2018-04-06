@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ static const unsigned SKIP_BUFFER_SIZE = 1024;
 File::File(Context* context) :
     Object(context),
     mode_(FILE_READ),
-    handle_(0),
+    handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
 #endif
@@ -85,7 +85,7 @@ File::File(Context* context) :
 File::File(Context* context, const String& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ),
-    handle_(0),
+    handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
 #endif
@@ -103,7 +103,7 @@ File::File(Context* context, const String& fileName, FileMode mode) :
 File::File(Context* context, PackageFile* package, const String& fileName) :
     Object(context),
     mode_(FILE_READ),
-    handle_(0),
+    handle_(nullptr),
 #ifdef __ANDROID__
     assetHandle_(0),
 #endif
@@ -212,7 +212,7 @@ unsigned File::Read(void* dest, unsigned size)
     if (compressed_)
     {
         unsigned sizeLeft = size;
-        unsigned char* destPtr = (unsigned char*)dest;
+        auto* destPtr = (unsigned char*)dest;
 
         while (sizeLeft)
         {
@@ -332,14 +332,14 @@ unsigned File::Write(const void* data, unsigned size)
     // Need to reassign the position due to internal buffering when transitioning from reading to writing
     if (writeSyncNeeded_)
     {
-        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
         writeSyncNeeded_ = false;
     }
 
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began
-        fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
+        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
         URHO3D_LOGERROR("Error while writing to file " + GetName());
         return 0;
     }
@@ -397,7 +397,7 @@ void File::Close()
     if (handle_)
     {
         fclose((FILE*)handle_);
-        handle_ = 0;
+        handle_ = nullptr;
         position_ = 0;
         size_ = 0;
         offset_ = 0;
@@ -421,7 +421,7 @@ bool File::IsOpen() const
 #ifdef __ANDROID__
     return handle_ != 0 || assetHandle_ != 0;
 #else
-    return handle_ != 0;
+    return handle_ != nullptr;
 #endif
 }
 
@@ -432,8 +432,8 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     compressed_ = false;
     readSyncNeeded_ = false;
     writeSyncNeeded_ = false;
-    
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         URHO3D_LOGERRORF("Access denied to %s", fileName.CString());

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ class URHO3D_API ProfilerBlock
 public:
     /// Construct with the specified parent block and name.
     ProfilerBlock(ProfilerBlock* parent, const char* name) :
-        name_(0),
+        name_(nullptr),
         time_(0),
         maxTime_(0),
         count_(0),
@@ -64,7 +64,7 @@ public:
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             delete *i;
-            *i = 0;
+            *i = nullptr;
         }
 
         delete [] name_;
@@ -128,7 +128,7 @@ public:
                 return *i;
         }
 
-        ProfilerBlock* newBlock = new ProfilerBlock(this, name);
+        auto* newBlock = new ProfilerBlock(this, name);
         children_.Push(newBlock);
 
         return newBlock;
@@ -175,9 +175,9 @@ class URHO3D_API Profiler : public Object
 
 public:
     /// Construct.
-    Profiler(Context* context);
+    explicit Profiler(Context* context);
     /// Destruct.
-    virtual ~Profiler();
+    ~Profiler() override;
 
     /// Begin timing a profiling block.
     void BeginBlock(const char* name)

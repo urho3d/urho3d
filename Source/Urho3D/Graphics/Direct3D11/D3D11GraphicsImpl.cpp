@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,36 +31,36 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    device_(0),
-    deviceContext_(0),
-    swapChain_(0),
-    defaultRenderTargetView_(0),
-    defaultDepthTexture_(0),
-    defaultDepthStencilView_(0),
-    depthStencilView_(0),
-    resolveTexture_(0),
-    shaderProgram_(0)
+    device_(nullptr),
+    deviceContext_(nullptr),
+    swapChain_(nullptr),
+    defaultRenderTargetView_(nullptr),
+    defaultDepthTexture_(nullptr),
+    defaultDepthStencilView_(nullptr),
+    depthStencilView_(nullptr),
+    resolveTexture_(nullptr),
+    shaderProgram_(nullptr)
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        renderTargetViews_[i] = 0;
+        renderTargetViews_[i] = nullptr;
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        shaderResourceViews_[i] = 0;
-        samplers_[i] = 0;
+        shaderResourceViews_[i] = nullptr;
+        samplers_[i] = nullptr;
     }
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        vertexBuffers_[i] = 0;
+        vertexBuffers_[i] = nullptr;
         vertexSizes_[i] = 0;
         vertexOffsets_[i] = 0;
     }
 
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
     {
-        constantBuffers_[VS][i] = 0;
-        constantBuffers_[PS][i] = 0;
+        constantBuffers_[VS][i] = nullptr;
+        constantBuffers_[PS][i] = nullptr;
     }
 }
 

@@ -226,7 +226,7 @@ function HandlePostUpdate(eventType, eventData)
     -- Raycast camera against static objects (physics collision mask 2)
     -- and move it closer to the vehicle if something in between
     local cameraRay = Ray(cameraStartPos, (cameraTargetPos - cameraStartPos):Normalized())
-    local cameraRayLength = (cameraTargetPos - cameraStartPos):Length();
+    local cameraRayLength = (cameraTargetPos - cameraStartPos):Length()
     local physicsWorld = scene_:GetComponent("PhysicsWorld")
     local result = physicsWorld:RaycastSingle(cameraRay, cameraRayLength, 2)
     if result.body ~= nil then
@@ -361,8 +361,8 @@ function Vehicle:PostInit()
     local node = self.node
     local raycastVehicle = node:GetComponent("RaycastVehicle")
     self.hullBody = node:GetComponent("RigidBody")
-    self:CreateEmitters();
-    raycastVehicle:ResetWheels();
+    self:CreateEmitters()
+    raycastVehicle:ResetWheels()
 end
 
 function Vehicle:FixedUpdate(timeStep)

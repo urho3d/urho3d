@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ EventProfiler::EventProfiler(Context* context) :
 {
     // FIXME: Is there a cleaner way?
     delete root_;
-    current_ = root_ = new EventProfilerBlock(0, "RunFrame");
+    current_ = root_ = new EventProfilerBlock(nullptr, "RunFrame");
     delete [] root_->name_;
     root_->name_ = new char[sizeof("RunFrame")];
     memcpy(root_->name_, "RunFrame", sizeof("RunFrame"));

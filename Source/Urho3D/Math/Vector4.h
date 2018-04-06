@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ class URHO3D_API Vector4
 {
 public:
     /// Construct a zero vector.
-    Vector4() :
+    Vector4() noexcept :
         x_(0.0f),
         y_(0.0f),
         z_(0.0f),
@@ -41,16 +41,10 @@ public:
     }
 
     /// Copy-construct from another vector.
-    Vector4(const Vector4& vector) :
-        x_(vector.x_),
-        y_(vector.y_),
-        z_(vector.z_),
-        w_(vector.w_)
-    {
-    }
+    Vector4(const Vector4& vector) noexcept = default;
 
     /// Construct from a 3-dimensional vector and the W coordinate.
-    Vector4(const Vector3& vector, float w) :
+    Vector4(const Vector3& vector, float w) noexcept :
         x_(vector.x_),
         y_(vector.y_),
         z_(vector.z_),
@@ -59,7 +53,7 @@ public:
     }
 
     /// Construct from coordinates.
-    Vector4(float x, float y, float z, float w) :
+    Vector4(float x, float y, float z, float w) noexcept :
         x_(x),
         y_(y),
         z_(z),
@@ -68,7 +62,7 @@ public:
     }
 
     /// Construct from a float array.
-    explicit Vector4(const float* data) :
+    explicit Vector4(const float* data) noexcept :
         x_(data[0]),
         y_(data[1]),
         z_(data[2]),
@@ -77,14 +71,7 @@ public:
     }
 
     /// Assign from another vector.
-    Vector4& operator =(const Vector4& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        w_ = rhs.w_;
-        return *this;
-    }
+    Vector4& operator =(const Vector4& rhs) noexcept = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector4& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ && w_ == rhs.w_; }
@@ -174,6 +161,12 @@ public:
         return *this;
     }
 
+    /// Return const value by index.
+    float operator[](unsigned index) const { return (&x_)[index]; }
+
+    /// Return mutable value by index.
+    float& operator[](unsigned index) { return (&x_)[index]; }
+
     /// Calculate dot product.
     float DotProduct(const Vector4& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ + w_ * rhs.w_; }
 
@@ -206,6 +199,18 @@ public:
 
     /// Return as string.
     String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const
+    {
+        unsigned hash = 37;
+        hash = 37 * hash + FloatToRawIntBits(x_);
+        hash = 37 * hash + FloatToRawIntBits(y_);
+        hash = 37 * hash + FloatToRawIntBits(z_);
+        hash = 37 * hash + FloatToRawIntBits(w_);
+
+        return hash;
+    }
 
     /// X coordinate.
     float x_;

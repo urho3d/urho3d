@@ -220,6 +220,7 @@ class UIElement : public Animatable
 
     UIElement* GetChild(const String name, bool recursive = false) const;
     UIElement* GetChild(unsigned index) const;
+    bool IsChildOf(UIElement* element) const;
 
     UIElement* GetParent() const;
     UIElement* GetRoot() const;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ extern const char* UI_CATEGORY;
 Button::Button(Context* context) :
     BorderImage(context),
     pressedOffset_(IntVector2::ZERO),
+    disabledOffset_(IntVector2::ZERO),
     pressedChildOffset_(IntVector2::ZERO),
     repeatDelay_(1.0f),
     repeatRate_(0.0f),
@@ -48,9 +49,7 @@ Button::Button(Context* context) :
     focusMode_ = FM_FOCUSABLE;
 }
 
-Button::~Button()
-{
-}
+Button::~Button() = default;
 
 void Button::RegisterObject(Context* context)
 {
@@ -60,6 +59,7 @@ void Button::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pressed Child Offset", GetPressedChildOffset, SetPressedChildOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
@@ -90,11 +90,18 @@ void Button::Update(float timeStep)
 void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (hovering_ || HasFocus())
-        offset += hoverOffset_;
-    if (pressed_ || selected_)
-        offset += pressedOffset_;
-
+    if (enabled_)
+    {
+        if (hovering_ || HasFocus())
+            offset += hoverOffset_;
+        if (pressed_ || selected_)
+            offset += pressedOffset_;
+    }
+    else
+    {
+        offset += disabledOffset_;
+    }
+    
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
@@ -144,8 +151,8 @@ void Button::OnKey(int key, int buttons, int qualifiers)
     if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {
         // Simulate LMB click
-        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
-        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0, 0);
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr);
+        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr, nullptr);
     }
 }
 
@@ -157,6 +164,16 @@ void Button::SetPressedOffset(const IntVector2& offset)
 void Button::SetPressedOffset(int x, int y)
 {
     pressedOffset_ = IntVector2(x, y);
+}
+
+void Button::SetDisabledOffset(const IntVector2& offset)
+{
+    disabledOffset_ = offset;
+}
+
+void Button::SetDisabledOffset(int x, int y)
+{
+    disabledOffset_ = IntVector2(x, y);
 }
 
 void Button::SetPressedChildOffset(const IntVector2& offset)

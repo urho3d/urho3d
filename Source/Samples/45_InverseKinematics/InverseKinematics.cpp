@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,9 +50,7 @@
 URHO3D_DEFINE_APPLICATION_MAIN(InverseKinematics)
 
 InverseKinematics::InverseKinematics(Context* context) :
-    Sample(context),
-    floorPitch_(0.0f),
-    floorRoll_(0.0f)
+    Sample(context)
 {
 }
 
@@ -81,7 +79,7 @@ void InverseKinematics::Start()
 
 void InverseKinematics::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -93,19 +91,19 @@ void InverseKinematics::CreateScene()
     // Create scene node & StaticModel component for showing a static plane
     floorNode_ = scene_->CreateChild("Plane");
     floorNode_->SetScale(Vector3(50.0f, 1.0f, 50.0f));
-    StaticModel* planeObject = floorNode_->CreateComponent<StaticModel>();
+    auto* planeObject = floorNode_->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
     // Set up collision, we need to raycast to determine foot height
     floorNode_->CreateComponent<RigidBody>();
-    CollisionShape* col = floorNode_->CreateComponent<CollisionShape>();
+    auto* col = floorNode_->CreateComponent<CollisionShape>();
     col->SetBox(Vector3(1, 0, 1));
 
     // Create a directional light to the world.
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00005f, 0.5f));
@@ -115,7 +113,7 @@ void InverseKinematics::CreateScene()
     // Load Jack model
     jackNode_ = scene_->CreateChild("Jack");
     jackNode_->SetRotation(Quaternion(0.0f, 270.0f, 0.0f));
-    AnimatedModel* jack = jackNode_->CreateComponent<AnimatedModel>();
+    auto* jack = jackNode_->CreateComponent<AnimatedModel>();
     jack->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
     jack->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
     jack->SetCastShadows(true);
@@ -167,11 +165,11 @@ void InverseKinematics::CreateScene()
 
 void InverseKinematics::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Left-Click and drag to look around\nRight-Click and drag to change incline\nPress space to reset floor\nPress D to draw debug geometry");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -183,7 +181,7 @@ void InverseKinematics::CreateInstructions()
 
 void InverseKinematics::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen. We need to define the scene and the camera
     // at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
@@ -198,7 +196,7 @@ void InverseKinematics::UpdateCameraAndFloor(float /*timeStep*/)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
@@ -267,7 +265,7 @@ void InverseKinematics::HandlePostRenderUpdate(StringHash /*eventType*/, Variant
 
 void InverseKinematics::HandleSceneDrawableUpdateFinished(StringHash /*eventType*/, VariantMap& eventData)
 {
-    PhysicsWorld* phyWorld = scene_->GetComponent<PhysicsWorld>();
+    auto* phyWorld = scene_->GetComponent<PhysicsWorld>();
     Vector3 leftFootPosition = leftFoot_->GetWorldPosition();
     Vector3 rightFootPosition = rightFoot_->GetWorldPosition();
 

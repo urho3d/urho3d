@@ -15,6 +15,9 @@ generated/
 
 # Output files
 /Source/**/*.a
+/Source/ThirdParty/Assimp/revision.h
+/Source/ThirdParty/Assimp/contrib/zlib/zconf.h
+/Source/ThirdParty/Assimp/include/assimp/config.h
 /Source/ThirdParty/LuaJIT/src/host/buildvm
 /Source/ThirdParty/LuaJIT/src/host/buildvm_arch.h
 /Source/ThirdParty/LuaJIT/src/host/minilua
@@ -38,6 +41,10 @@ generated/
 # Generated documentation
 /Docs/html/
 /Docs/qch/
+
+# Saved sample scenes
+/bin/Data/Scenes/Isometric2D.xml
+/bin/Data/Scenes/Platformer2D.xml
 
 # Eclipse project settings
 /.*project
@@ -81,6 +88,7 @@ CTestTestfile.cmake
 /Source/**/*.cmake
 !/Source/ThirdParty/SDL/cmake/*.cmake
 !/Source/ThirdParty/SDL/include/*cmake
+!/Source/ThirdParty/Assimp/cmake-modules/*cmake
 /Docs/**/*.cmake
 
 # Precompiled header files

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,6 @@
 
 namespace Urho3D
 {
-
-Polyhedron::~Polyhedron()
-{
-}
 
 void Polyhedron::Define(const BoundingBox& box)
 {
@@ -209,8 +205,8 @@ void Polyhedron::Clip(const Plane& plane)
 
 void Polyhedron::Clip(const Frustum& frustum)
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
-        Clip(frustum.planes_[i]);
+    for (const auto& plane : frustum.planes_)
+        Clip(plane);
 }
 
 void Polyhedron::Clip(const BoundingBox& box)

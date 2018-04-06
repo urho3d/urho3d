@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,23 +78,23 @@ class URHO3D_API Text : public Selectable
 
 public:
     /// Construct.
-    Text(Context* context);
+    explicit Text(Context* context);
     /// Destruct.
-    virtual ~Text();
+    ~Text() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
     /// React to indent change.
-    virtual void OnIndentSet();
+    void OnIndentSet() override;
 
     /// Set font by looking from resource cache by name and font size. Return true if successful.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, float size = DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.
     bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
@@ -209,7 +209,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Update text when text, font or spacing changed.
     void UpdateText(bool onResize = false);
     /// Update cached character locations after text update, or when text alignment or indent has changed.
@@ -218,9 +218,9 @@ protected:
     void ValidateSelection();
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
-    /// Contruct batch.
+    /// Construct batch.
     void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = 0,
+        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
             float depthBias = 0.0f);
 
     /// Font.

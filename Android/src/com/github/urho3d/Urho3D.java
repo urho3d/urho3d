@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ import java.util.*;
 
 public class Urho3D extends SDLActivity {
 
-    public static final String SCRIPTS = "scripts";
-    public static final String PICKED_SCRIPT = "pickedScript";
+    static final String SCRIPTS = "scripts";
+    static final String PICKED_SCRIPT = "pickedScript";
     private static final String TAG = "Urho3D";
     private static final int OBTAINING_SCRIPT = 1;
     private static String[] mArguments = new String[0];
@@ -88,10 +88,10 @@ public class Urho3D extends SDLActivity {
             if ("Urho3DPlayer".equals(mArguments[0]) && mArguments.length == 1) {
                 // Urho3DPlayer needs a script name to play
                 try {
-                    final AssetManager assetManager = getContext().getAssets();
+                    final AssetManager assetManager = getAssets();
                     HashMap<String, ArrayList<String>> scripts = new HashMap<String, ArrayList<String>>(2) {{
-                        put("AngelScript", new ArrayList<String>(Arrays.asList(assetManager.list("Data/Scripts"))));
-                        put("Lua", new ArrayList<String>(Arrays.asList(assetManager.list("Data/LuaScripts"))));
+                        put("AngelScript", new ArrayList<>(Arrays.asList(assetManager.list("Data/Scripts"))));
+                        put("Lua", new ArrayList<>(Arrays.asList(assetManager.list("Data/LuaScripts"))));
                     }};
                     startActivityForResult(new Intent(this, ScriptPicker.class).putExtra(SCRIPTS, scripts), OBTAINING_SCRIPT);
                 } catch (IOException e) {

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ const BYTE d3dElementUsage[] =
 };
 
 VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexElement>& srcElements) :
-    declaration_(0)
+    declaration_(nullptr)
 {
     PODVector<VertexDeclarationElement> elements;
 
@@ -85,7 +85,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexE
 }
 
 VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers) :
-    declaration_(0)
+    declaration_(nullptr)
 {
     PODVector<VertexDeclarationElement> elements;
     unsigned prevBufferElements = 0;
@@ -139,7 +139,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
 }
 
 VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers) :
-    declaration_(0)
+    declaration_(nullptr)
 {
     PODVector<VertexDeclarationElement> elements;
     unsigned prevBufferElements = 0;

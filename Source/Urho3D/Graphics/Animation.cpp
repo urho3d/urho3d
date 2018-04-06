@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -86,7 +86,7 @@ void AnimationTrack::RemoveAllKeyFrames()
 
 AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index)
 {
-    return index < keyFrames_.Size() ? &keyFrames_[index] : (AnimationKeyFrame*)0;
+    return index < keyFrames_.Size() ? &keyFrames_[index] : nullptr;
 }
 
 void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
@@ -112,9 +112,7 @@ Animation::Animation(Context* context) :
 {
 }
 
-Animation::~Animation()
-{
-}
+Animation::~Animation() = default;
 
 void Animation::RegisterObject(Context* context)
 {
@@ -166,7 +164,7 @@ bool Animation::BeginLoad(Deserializer& source)
     }
 
     // Optionally read triggers from an XML file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
@@ -256,7 +254,7 @@ bool Animation::Save(Serializer& dest) const
     // If triggers have been defined, write an XML file for them
     if (!triggers_.Empty() || HasMetadata())
     {
-        File* destFile = dynamic_cast<File*>(&dest);
+        auto* destFile = dynamic_cast<File*>(&dest);
         if (destFile)
         {
             String xmlName = ReplaceExtension(destFile->GetName(), ".xml");
@@ -386,7 +384,7 @@ SharedPtr<Animation> Animation::Clone(const String& cloneName) const
 AnimationTrack* Animation::GetTrack(unsigned index)
 {
     if (index >= GetNumTracks())
-        return (AnimationTrack*) 0;
+        return nullptr;
 
     int j = 0;
     for(HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Begin(); i != tracks_.End(); ++i)
@@ -397,24 +395,24 @@ AnimationTrack* Animation::GetTrack(unsigned index)
         ++j;
     }
 
-    return (AnimationTrack*) 0;
+    return nullptr;
 }
 
 AnimationTrack* Animation::GetTrack(const String& name)
 {
     HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Find(StringHash(name));
-    return i != tracks_.End() ? &i->second_ : (AnimationTrack*)0;
+    return i != tracks_.End() ? &i->second_ : nullptr;
 }
 
 AnimationTrack* Animation::GetTrack(StringHash nameHash)
 {
     HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Find(nameHash);
-    return i != tracks_.End() ? &i->second_ : (AnimationTrack*)0;
+    return i != tracks_.End() ? &i->second_ : nullptr;
 }
 
 AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
 {
-    return index < triggers_.Size() ? &triggers_[index] : (AnimationTriggerPoint*)0;
+    return index < triggers_.Size() ? &triggers_[index] : nullptr;
 }
 
 }

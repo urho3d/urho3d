@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
     set (DEFAULT_MEMORY_DEBUGGING 1)
 endif ()
 option (IK_MEMORY_DEBUGGING "Global switch for memory options. Keep track of the number of allocations and de-allocations and prints a report when the program shuts down" ${DEFAULT_MEMORY_DEBUGGING})
-cmake_dependent_option (IK_MEMORY_BACKTRACE "Generate backtraces for every malloc(), making it easy to track down memory leaks" "${DEFAULT_MEMORY_DEBUGGING}" "IK_MEMORY_DEBUGGING AND UNIX AND NOT WEB" FALSE)
+cmake_dependent_option (IK_MEMORY_BACKTRACE "Generate backtraces for every malloc(), making it easy to track down memory leaks" "${DEFAULT_MEMORY_DEBUGGING}" "IK_MEMORY_DEBUGGING AND UNIX AND NOT WEB AND NOT ANDROID" FALSE)
 
 # Need to set IK_PLATFORM for dllimport/dllexport
 if (WIN32)

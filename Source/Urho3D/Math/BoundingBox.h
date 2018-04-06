@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,42 +44,42 @@ class URHO3D_API BoundingBox
 {
 public:
     /// Construct with zero size.
-    BoundingBox() :
+    BoundingBox() noexcept :
         min_(M_INFINITY, M_INFINITY, M_INFINITY),
         max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
     }
 
     /// Copy-construct from another bounding box.
-    BoundingBox(const BoundingBox& box) :
+    BoundingBox(const BoundingBox& box) noexcept :
         min_(box.min_),
         max_(box.max_)
     {
     }
 
     /// Construct from a rect, with the Z dimension left zero.
-    BoundingBox(const Rect& rect) :
+    explicit BoundingBox(const Rect& rect) noexcept :
         min_(Vector3(rect.min_, 0.0f)),
         max_(Vector3(rect.max_, 0.0f))
     {
     }
 
     /// Construct from minimum and maximum vectors.
-    BoundingBox(const Vector3& min, const Vector3& max) :
+    BoundingBox(const Vector3& min, const Vector3& max) noexcept :
         min_(min),
         max_(max)
     {
     }
 
     /// Construct from minimum and maximum floats (all dimensions same.)
-    BoundingBox(float min, float max) :
+    BoundingBox(float min, float max) noexcept :
         min_(Vector3(min, min, min)),
         max_(Vector3(max, max, max))
     {
     }
 
 #ifdef URHO3D_SSE
-    BoundingBox(__m128 min, __m128 max)
+    BoundingBox(__m128 min, __m128 max) noexcept
     {
         _mm_storeu_ps(&min_.x_, min);
         _mm_storeu_ps(&max_.x_, max);
@@ -95,7 +95,7 @@ public:
     }
 
     /// Construct from a frustum.
-    BoundingBox(const Frustum& frustum) :
+    explicit BoundingBox(const Frustum& frustum) :
         min_(M_INFINITY, M_INFINITY, M_INFINITY),
         max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
@@ -103,7 +103,7 @@ public:
     }
 
     /// Construct from a polyhedron.
-    BoundingBox(const Polyhedron& poly) :
+    explicit BoundingBox(const Polyhedron& poly) :
         min_(M_INFINITY, M_INFINITY, M_INFINITY),
         max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
@@ -111,7 +111,7 @@ public:
     }
 
     /// Construct from a sphere.
-    BoundingBox(const Sphere& sphere) :
+    explicit BoundingBox(const Sphere& sphere) :
         min_(M_INFINITY, M_INFINITY, M_INFINITY),
         max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
@@ -119,7 +119,7 @@ public:
     }
 
     /// Assign from another bounding box.
-    BoundingBox& operator =(const BoundingBox& rhs)
+    BoundingBox& operator =(const BoundingBox& rhs) noexcept
     {
         min_ = rhs.min_;
         max_ = rhs.max_;
@@ -127,7 +127,7 @@ public:
     }
 
     /// Assign from a Rect, with the Z dimension left zero.
-    BoundingBox& operator =(const Rect& rhs)
+    BoundingBox& operator =(const Rect& rhs) noexcept
     {
         min_ = Vector3(rhs.min_, 0.0f);
         max_ = Vector3(rhs.max_, 0.0f);
@@ -319,10 +319,10 @@ public:
 
     /// Minimum vector.
     Vector3 min_;
-    float dummyMin_; // This is never used, but exists to pad the min_ value to four floats.
+    float dummyMin_{}; // This is never used, but exists to pad the min_ value to four floats.
     /// Maximum vector.
     Vector3 max_;
-    float dummyMax_; // This is never used, but exists to pad the max_ value to four floats.
+    float dummyMax_{}; // This is never used, but exists to pad the max_ value to four floats.
 };
 
 }

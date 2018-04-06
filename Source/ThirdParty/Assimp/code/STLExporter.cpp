@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -43,11 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if !defined(ASSIMP_BUILD_NO_EXPORT) && !defined(ASSIMP_BUILD_NO_STL_EXPORTER)
 
 #include "STLExporter.h"
-#include "../include/assimp/version.h"
-#include "../include/assimp/IOSystem.hpp"
-#include "../include/assimp/scene.h"
-#include "../include/assimp/Exporter.hpp"
-#include <boost/scoped_ptr.hpp>
+#include <assimp/version.h>
+#include <assimp/IOSystem.hpp>
+#include <assimp/scene.h>
+#include <assimp/Exporter.hpp>
+#include <memory>
 #include "Exceptional.h"
 #include "ByteSwapper.h"
 
@@ -56,26 +57,34 @@ namespace Assimp    {
 
 // ------------------------------------------------------------------------------------------------
 // Worker function for exporting a scene to Stereolithograpy. Prototyped and registered in Exporter.cpp
-void ExportSceneSTL(const char* pFile,IOSystem* pIOSystem, const aiScene* pScene, const ExportProperties* pProperties)
+void ExportSceneSTL(const char* pFile,IOSystem* pIOSystem, const aiScene* pScene, const ExportProperties* /*pProperties*/)
 {
     // invoke the exporter
     STLExporter exporter(pFile, pScene);
 
+    if (exporter.mOutput.fail()) {
+        throw DeadlyExportError("output data creation failed. Most likely the file became too large: " + std::string(pFile));
+    }
+    
     // we're still here - export successfully completed. Write the file.
-    boost::scoped_ptr<IOStream> outfile (pIOSystem->Open(pFile,"wt"));
+    std::unique_ptr<IOStream> outfile (pIOSystem->Open(pFile,"wt"));
     if(outfile == NULL) {
         throw DeadlyExportError("could not open output .stl file: " + std::string(pFile));
     }
 
     outfile->Write( exporter.mOutput.str().c_str(), static_cast<size_t>(exporter.mOutput.tellp()),1);
 }
-void ExportSceneSTLBinary(const char* pFile,IOSystem* pIOSystem, const aiScene* pScene, const ExportProperties* pProperties)
+void ExportSceneSTLBinary(const char* pFile,IOSystem* pIOSystem, const aiScene* pScene, const ExportProperties* /*pProperties*/)
 {
     // invoke the exporter
     STLExporter exporter(pFile, pScene, true);
 
+    if (exporter.mOutput.fail()) {
+        throw DeadlyExportError("output data creation failed. Most likely the file became too large: " + std::string(pFile));
+    }
+    
     // we're still here - export successfully completed. Write the file.
-    boost::scoped_ptr<IOStream> outfile (pIOSystem->Open(pFile,"wb"));
+    std::unique_ptr<IOStream> outfile (pIOSystem->Open(pFile,"wb"));
     if(outfile == NULL) {
         throw DeadlyExportError("could not open output .stl file: " + std::string(pFile));
     }
@@ -94,6 +103,7 @@ STLExporter :: STLExporter(const char* _filename, const aiScene* pScene, bool bi
     // make sure that all formatting happens using the standard, C locale and not the user's current locale
     const std::locale& l = std::locale("C");
     mOutput.imbue(l);
+    mOutput.precision(16);
     if (binary) {
         char buf[80] = {0} ;
         buf[0] = 'A'; buf[1] = 's'; buf[2] = 's'; buf[3] = 'i'; buf[4] = 'm'; buf[5] = 'p';
@@ -161,12 +171,12 @@ void STLExporter :: WriteMeshBinary(const aiMesh* m)
             }
             nor.Normalize();
         }
-        float nx = nor.x, ny = nor.y, nz = nor.z;
+        ai_real nx = nor.x, ny = nor.y, nz = nor.z;
         AI_SWAP4(nx); AI_SWAP4(ny); AI_SWAP4(nz);
         mOutput.write((char *)&nx, 4); mOutput.write((char *)&ny, 4); mOutput.write((char *)&nz, 4);
         for(unsigned int a = 0; a < f.mNumIndices; ++a) {
             const aiVector3D& v  = m->mVertices[f.mIndices[a]];
-            float vx = v.x, vy = v.y, vz = v.z;
+            ai_real vx = v.x, vy = v.y, vz = v.z;
             AI_SWAP4(vx); AI_SWAP4(vy); AI_SWAP4(vz);
             mOutput.write((char *)&vx, 4); mOutput.write((char *)&vy, 4); mOutput.write((char *)&vz, 4);
         }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,9 +51,7 @@ StaticModel::StaticModel(Context* context) :
 {
 }
 
-StaticModel::~StaticModel()
-{
-}
+StaticModel::~StaticModel() = default;
 
 void StaticModel::RegisterObject(Context* context)
 {
@@ -158,7 +156,7 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
 Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
 {
     if (batchIndex >= geometries_.Size())
-        return 0;
+        return nullptr;
 
     // If level is out of range, use visible geometry
     if (level < geometries_[batchIndex].Size())
@@ -254,7 +252,7 @@ void StaticModel::SetModel(Model* model)
         SetNumGeometries(model->GetNumGeometries());
         const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
         const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
-        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : (const Matrix3x4*)0;
+        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : nullptr;
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
             batches_[i].worldTransform_ = worldTransform;
@@ -307,7 +305,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
     if (useFileName.Trimmed().Empty() && model_)
         useFileName = ReplaceExtension(model_->GetName(), ".txt");
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(useFileName, false);
     if (!file)
         return;
@@ -315,7 +313,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
     unsigned index = 0;
     while (!file->IsEof() && index < batches_.Size())
     {
-        Material* material = cache->GetResource<Material>(file->ReadLine());
+        auto* material = cache->GetResource<Material>(file->ReadLine());
         if (material)
             SetMaterial(index, material);
 
@@ -325,7 +323,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
 
 Material* StaticModel::GetMaterial(unsigned index) const
 {
-    return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
+    return index < batches_.Size() ? batches_[index].material_ : nullptr;
 }
 
 bool StaticModel::IsInside(const Vector3& point) const
@@ -374,13 +372,13 @@ void StaticModel::SetNumGeometries(unsigned num)
 
 void StaticModel::SetModelAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetModel(cache->GetResource<Model>(value.name_));
 }
 
 void StaticModel::SetMaterialsAttr(const ResourceRefList& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < value.names_.Size(); ++i)
         SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }

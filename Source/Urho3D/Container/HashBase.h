@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,9 +40,9 @@ struct HashNodeBase
 {
     /// Construct.
     HashNodeBase() :
-        down_(0),
-        prev_(0),
-        next_(0)
+        down_(nullptr),
+        prev_(nullptr),
+        next_(nullptr)
     {
     }
 
@@ -59,7 +59,7 @@ struct HashIteratorBase
 {
     /// Construct.
     HashIteratorBase() :
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -107,10 +107,10 @@ public:
 
     /// Construct.
     HashBase() :
-        head_(0),
-        tail_(0),
-        ptrs_(0),
-        allocator_(0)
+        head_(nullptr),
+        tail_(nullptr),
+        ptrs_(nullptr),
+        allocator_(nullptr)
     {
     }
 
@@ -143,7 +143,7 @@ protected:
     void SetSize(unsigned size) { if (ptrs_) (reinterpret_cast<unsigned*>(ptrs_))[0] = size; }
 
     /// Return bucket head pointers.
-    HashNodeBase** Ptrs() const { return ptrs_ ? ptrs_ + 2 : 0; }
+    HashNodeBase** Ptrs() const { return ptrs_ ? ptrs_ + 2 : nullptr; }
 
     /// List head node pointer.
     HashNodeBase* head_;

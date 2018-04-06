@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,7 +99,7 @@ void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
     ResetScene();
 
     scene_ = scene;
-    cameraNode_ = camera ? camera->GetNode() : 0;
+    cameraNode_ = camera ? camera->GetNode() : nullptr;
     ownScene_ = ownScene;
 
     viewport_->SetScene(scene_);
@@ -162,11 +162,11 @@ void View3D::ResetScene()
     {
         RefCount* refCount = scene_->RefCountPtr();
         ++refCount->refs_;
-        scene_ = 0;
+        scene_ = nullptr;
         --refCount->refs_;
     }
     else
-        scene_ = 0;
+        scene_ = nullptr;
 }
 
 void View3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

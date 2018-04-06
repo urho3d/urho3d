@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -434,7 +434,6 @@ CreateCaptureBuffer(_THIS, const DWORD bufsize, WAVEFORMATEX *wfmt)
     LPDIRECTSOUNDCAPTURE capture = this->hidden->capture;
     LPDIRECTSOUNDCAPTUREBUFFER *capturebuf = &this->hidden->capturebuf;
     DSCBUFFERDESC format;
-//    DWORD junk, cursor;
     HRESULT result;
 
     SDL_zero(format);
@@ -523,8 +522,8 @@ DSOUND_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
             bufsize = numchunks * this->spec.size;
             if ((bufsize < DSBSIZE_MIN) || (bufsize > DSBSIZE_MAX)) {
                 SDL_SetError("Sound buffer size must be between %d and %d",
-                             (DSBSIZE_MIN < numchunks) ? 1 : DSBSIZE_MIN / numchunks,
-                             DSBSIZE_MAX / numchunks);
+                             (int) ((DSBSIZE_MIN < numchunks) ? 1 : DSBSIZE_MIN / numchunks),
+                             (int) (DSBSIZE_MAX / numchunks));
             } else {
                 int rc;
 				WAVEFORMATEX wfmt;

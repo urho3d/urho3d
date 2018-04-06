@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ define_source_files ()
 # Define dependency libs
 add_subdirectory (../../ThirdParty/Assimp ../../ThirdParty/Assimp)
 set (LIBS Assimp)
-set (INCLUDE_DIRS ../../ThirdParty/Assimp/include)
+set (INCLUDE_DIRS ../../ThirdParty/Assimp/include ${CMAKE_CURRENT_BINARY_DIR}/../../ThirdParty/Assimp/include)
 
 # Setup target
 setup_executable (TOOL)

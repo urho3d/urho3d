@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ public:
     /// Construct.
     DbConnection(Context* context, const String& connectionString);
     /// Destruct.
-    ~DbConnection();
+    ~DbConnection() override;
     /// Finalize all prepared statements, close all BLOB handles, and finish all sqlite3_backup objects
     void Finalize();
 
@@ -53,7 +53,7 @@ public:
     const sqlite3* GetConnectionImpl() const { return connectionImpl_; }
 
     /// Return true when the connection object is connected to the associated database.
-    bool IsConnected() const { return connectionImpl_ != 0; }
+    bool IsConnected() const { return connectionImpl_ != nullptr; }
 
 private:
     /// The connection string for SQLite3 is using the URI format described in https://www.sqlite.org/uri.html, while the connection string for ODBC is using DSN format as per ODBC standard.

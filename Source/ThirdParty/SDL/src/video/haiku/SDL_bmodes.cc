@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -43,7 +43,7 @@ extern "C" {
 #if WRAP_BMODE
 /* This wrapper is here so that the driverdata can be freed without freeing
    the display_mode structure */
-typedef struct SDL_DisplayModeData {
+struct SDL_DisplayModeData {
 	display_mode *bmode;
 };
 #endif
@@ -310,7 +310,7 @@ int BE_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode){
 	}
 
 	if(bscreen.SetMode(bmode) != B_OK) {
-		return SDL_SetError("Bad video mode\n");
+		return SDL_SetError("Bad video mode");
 	}
 	
 	free(bmode_list);
@@ -329,3 +329,5 @@ int BE_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode){
 #endif
 
 #endif /* SDL_VIDEO_DRIVER_HAIKU */
+
+/* vi: set ts=4 sw=4 expandtab: */

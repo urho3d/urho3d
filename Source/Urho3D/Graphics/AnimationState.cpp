@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,21 +34,19 @@ namespace Urho3D
 {
 
 AnimationStateTrack::AnimationStateTrack() :
-    track_(0),
-    bone_(0),
+    track_(nullptr),
+    bone_(nullptr),
     weight_(1.0f),
     keyFrame_(0)
 {
 }
 
-AnimationStateTrack::~AnimationStateTrack()
-{
-}
+AnimationStateTrack::~AnimationStateTrack() = default;
 
 AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     model_(model),
     animation_(animation),
-    startBone_(0),
+    startBone_(nullptr),
     looped_(false),
     weight_(0.0f),
     time_(0.0f),
@@ -56,13 +54,13 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     blendingMode_(ABM_LERP)
 {
     // Set default start bone (use all tracks.)
-    SetStartBone(0);
+    SetStartBone(nullptr);
 }
 
 AnimationState::AnimationState(Node* node, Animation* animation) :
     node_(node),
     animation_(animation),
-    startBone_(0),
+    startBone_(nullptr),
     looped_(false),
     weight_(1.0f),
     time_(0.0f),
@@ -102,9 +100,7 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
 }
 
 
-AnimationState::~AnimationState()
-{
-}
+AnimationState::~AnimationState() = default;
 
 void AnimationState::SetStartBone(Bone* startBone)
 {
@@ -138,7 +134,7 @@ void AnimationState::SetStartBone(Bone* startBone)
         stateTrack.track_ = &i->second_;
 
         // Include those tracks that are either the start bone itself, or its children
-        Bone* trackBone = 0;
+        Bone* trackBone = nullptr;
         const StringHash& nameHash = i->second_.nameHash_;
 
         if (nameHash == startBone->nameHash_)
@@ -387,7 +383,7 @@ Node* AnimationState::GetNode() const
 
 Bone* AnimationState::GetStartBone() const
 {
-    return model_ ? startBone_ : 0;
+    return model_ ? startBone_ : nullptr;
 }
 
 float AnimationState::GetBoneWeight(unsigned index) const
@@ -466,7 +462,7 @@ void AnimationState::ApplyToModel()
         // Do not apply if zero effective weight or the bone has animation disabled
         if (Equals(finalWeight, 0.0f) || !stateTrack.bone_->animated_)
             continue;
-            
+
         ApplyTrack(stateTrack, finalWeight, true);
     }
 }
@@ -534,7 +530,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
         if (channelMask & CHANNEL_SCALE)
             newScale = keyFrame->scale_;
     }
-    
+
     if (blendingMode_ == ABM_ADDITIVE) // not ABM_LERP
     {
         if (channelMask & CHANNEL_POSITION)
@@ -567,7 +563,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
                 newScale = node->GetScale().Lerp(newScale, weight);
         }
     }
-    
+
     if (silent)
     {
         if (channelMask & CHANNEL_POSITION)

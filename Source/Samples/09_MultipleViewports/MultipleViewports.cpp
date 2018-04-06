@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ void MultipleViewports::Start()
 
 void MultipleViewports::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -87,13 +87,13 @@ void MultipleViewports::CreateScene()
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
+    auto* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
@@ -103,7 +103,7 @@ void MultipleViewports::CreateScene()
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
@@ -118,7 +118,7 @@ void MultipleViewports::CreateScene()
         mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
         mushroomNode->SetScale(0.5f + Random(2.0f));
-        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+        auto* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
         mushroomObject->SetCastShadows(true);
@@ -132,7 +132,7 @@ void MultipleViewports::CreateScene()
         float size = 1.0f + Random(10.0f);
         boxNode->SetPosition(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f));
         boxNode->SetScale(size);
-        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+        auto* boxObject = boxNode->CreateComponent<StaticModel>();
         boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         boxObject->SetCastShadows(true);
@@ -142,14 +142,14 @@ void MultipleViewports::CreateScene()
 
     // Create the cameras. Limit far clip distance to match the fog
     cameraNode_ = scene_->CreateChild("Camera");
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 
     // Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
     // Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
     rearCameraNode_ = cameraNode_->CreateChild("RearCamera");
     rearCameraNode_->Rotate(Quaternion(180.0f, Vector3::UP));
-    Camera* rearCamera = rearCameraNode_->CreateComponent<Camera>();
+    auto* rearCamera = rearCameraNode_->CreateComponent<Camera>();
     rearCamera->SetFarClip(300.0f);
     // Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
     // "view override flags" for this. We could also disable eg. shadows or force low material quality
@@ -162,11 +162,11 @@ void MultipleViewports::CreateScene()
 
 void MultipleViewports::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "B to toggle bloom, F to toggle FXAA\n"
@@ -184,8 +184,8 @@ void MultipleViewports::CreateInstructions()
 
 void MultipleViewports::SetupViewports()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* graphics = GetSubsystem<Graphics>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     renderer->SetNumViewports(2);
 
@@ -197,7 +197,7 @@ void MultipleViewports::SetupViewports()
     // bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
     // for example with the effect name to allow easy toggling on and off. We start with the effects
     // disabled.
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/Bloom.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
@@ -230,7 +230,7 @@ void MultipleViewports::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;

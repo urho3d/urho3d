@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@
 #include "../joystick/SDL_joystick_c.h" /* For SDL_PrivateJoystickValid */
 #include "SDL_assert.h"
 
+/* Global for SDL_windowshaptic.c */
 SDL_Haptic *SDL_haptics = NULL;
-
 
 /*
  * Initializes the Haptic devices.
@@ -313,6 +313,7 @@ SDL_HapticOpenFromJoystick(SDL_Joystick * joystick)
     SDL_memset(haptic, 0, sizeof(SDL_Haptic));
     haptic->rumble_id = -1;
     if (SDL_SYS_HapticOpenFromJoystick(haptic, joystick) < 0) {
+        SDL_SetError("Haptic: SDL_SYS_HapticOpenFromJoystick failed.");
         SDL_free(haptic);
         return NULL;
     }

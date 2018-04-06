@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ bool CompareHeaderFiles(const HeaderFile& lhs, const HeaderFile& rhs)
 void ExtractPropertyInfo(const String& functionName, const String& declaration, Vector<PropertyInfo>& propertyInfos)
 {
     String propertyName = functionName.Substring(4);
-    PropertyInfo* info = 0;
+    PropertyInfo* info = nullptr;
     for (unsigned k = 0; k < propertyInfos.Size(); ++k)
     {
         if (propertyInfos[k].name_ == propertyName)
@@ -173,7 +173,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
 
         // s/(\w+)\[\]/Array<\1>/g
         unsigned posBegin = String::NPOS;
-        while (1)   // Loop to cater for array of array of T
+        while (true)   // Loop to cater for array of array of T
         {
             unsigned posEnd = out.Find("[]");
             if (posEnd == String::NPOS)
@@ -203,7 +203,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     {
         Log::WriteRaw("namespace Urho3D\n{\n\n/**\n");
 
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        auto* fileSystem = GetSubsystem<FileSystem>();
         Vector<String> headerFileNames;
         String path = AddTrailingSlash(sourceTree);
         if (!path.Empty())

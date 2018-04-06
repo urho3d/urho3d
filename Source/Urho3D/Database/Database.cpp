@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ DbConnection* Database::Connect(const String& connectionString)
             connectionsPool.Pop();
             if (connection->IsConnected())
                 break;
-            connection = 0;
+            connection = nullptr;
         }
     }
     if (!connection)
@@ -72,7 +72,7 @@ DbConnection* Database::Connect(const String& connectionString)
         return connection;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 void Database::Disconnect(DbConnection* connection)

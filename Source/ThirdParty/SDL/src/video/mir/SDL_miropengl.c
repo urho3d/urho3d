@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,12 +31,12 @@
 
 #include "SDL_mirdyn.h"
 
-void
+int
 MIR_GL_SwapWindow(_THIS, SDL_Window* window)
 {
     MIR_Window* mir_wind = window->driverdata;
 
-    SDL_EGL_SwapBuffers(_this, mir_wind->egl_surface);
+    return SDL_EGL_SwapBuffers(_this, mir_wind->egl_surface);
 }
 
 int
@@ -66,29 +66,11 @@ MIR_GL_LoadLibrary(_THIS, const char* path)
 {
     MIR_Data* mir_data = _this->driverdata;
 
-    SDL_EGL_LoadLibrary(_this, path, MIR_mir_connection_get_egl_native_display(mir_data->connection));
+    SDL_EGL_LoadLibrary(_this, path, MIR_mir_connection_get_egl_native_display(mir_data->connection), 0);
 
     SDL_EGL_ChooseConfig(_this);
 
     return 0;
-}
-
-void
-MIR_GL_UnloadLibrary(_THIS)
-{
-    SDL_EGL_UnloadLibrary(_this);
-}
-
-void*
-MIR_GL_GetProcAddress(_THIS, const char* proc)
-{
-    void* proc_addr = SDL_EGL_GetProcAddress(_this, proc);
-
-    if (!proc_addr) {
-        SDL_SetError("Failed to find proc address!");
-    }
-
-    return proc_addr;
 }
 
 #endif /* SDL_VIDEO_DRIVER_MIR */

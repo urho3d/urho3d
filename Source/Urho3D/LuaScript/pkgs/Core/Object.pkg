@@ -5,6 +5,8 @@ class Object : public RefCounted
     StringHash GetType() const;
     const String GetTypeName() const;
     const String GetCategory() const;
+    void SetBlockEvents(bool block);
+    bool GetBlockEvents() const;
 
     tolua_outside void ObjectSendEvent @ SendEvent(const String eventName, VariantMap* eventData = 0);
     tolua_outside bool ObjectHasSubscribedToEvent @ HasSubscribedToEvent(const String eventName) const;

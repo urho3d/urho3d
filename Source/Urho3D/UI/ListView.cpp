@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ static const char* highlightModes[] =
     "Never",
     "Focus",
     "Always",
-    0
+    nullptr
 };
 
 static const StringHash expandedHash("Expanded");
@@ -99,7 +99,7 @@ public:
         for (unsigned i = 0; i < children_.Size(); ++i)
         {
             const IntVector2& position = children_[i]->GetPosition();
-            CheckBox* overlay = overlayContainer_->GetChildStaticCast<CheckBox>(i);
+            auto* overlay = overlayContainer_->GetChildStaticCast<CheckBox>(i);
             bool visible = children_[i]->IsVisible() && GetItemHierarchyParent(children_[i]);
             overlay->SetVisible(visible);
             if (visible)
@@ -127,7 +127,7 @@ public:
     {
         using namespace UIMouseClick;
 
-        UIElement* overlay = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+        auto* overlay = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
         if (overlay)
         {
             const Vector<SharedPtr<UIElement> >& children = overlayContainer_->GetChildren();
@@ -186,9 +186,7 @@ ListView::ListView(Context* context) :
     UpdateUIClickSubscription();
 }
 
-ListView::~ListView()
-{
-}
+ListView::~ListView() = default;
 
 void ListView::RegisterObject(Context* context)
 {
@@ -323,6 +321,27 @@ void ListView::OnResize(const IntVector2& newSize, const IntVector2& delta)
         overlayContainer_->SetSize(scrollPanel_->GetSize());
 }
 
+void ListView::UpdateInternalLayout()
+{
+    if (overlayContainer_)
+        overlayContainer_->UpdateLayout();
+    contentElement_->UpdateLayout();
+}
+
+void ListView::DisableInternalLayoutUpdate()
+{
+    if (overlayContainer_)
+        overlayContainer_->DisableLayoutUpdate();
+    contentElement_->DisableLayoutUpdate();
+}
+
+void ListView::EnableInternalLayoutUpdate()
+{
+    if (overlayContainer_)
+        overlayContainer_->EnableLayoutUpdate();
+    contentElement_->EnableLayoutUpdate();
+}
+
 void ListView::AddItem(UIElement* item)
 {
     InsertItem(M_MAX_UNSIGNED, item);
@@ -337,7 +356,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     item->SetEnabled(true);
     item->SetSelected(false);
 
-    unsigned numItems = contentElement_->GetNumChildren();
+    const unsigned numItems = contentElement_->GetNumChildren();
     if (hierarchyMode_)
     {
         int baseIndent = baseIndent_;
@@ -346,8 +365,13 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
             baseIndent = parentItem->GetIndent();
             SetItemHierarchyParent(parentItem, true);
 
+            // Hide item if parent is collapsed
+            const unsigned parentIndex = FindItem(parentItem);
+            if (!IsExpanded(parentIndex))
+                item->SetVisible(false);
+
             // Adjust the index to ensure it is within the children index limit of the parent item
-            unsigned indexLimit = FindItem(parentItem);
+            unsigned indexLimit = parentIndex;
             if (index <= indexLimit)
                 index = indexLimit + 1;
             else
@@ -891,7 +915,7 @@ void ListView::CopySelectedItemsToClipboard() const
     for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         // Only handle Text UI element
-        Text* text = dynamic_cast<Text*>(GetItem(*i));
+        auto* text = dynamic_cast<Text*>(GetItem(*i));
         if (text)
             selectedText.Append(text->GetText()).Append("\n");
     }
@@ -1001,7 +1025,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
 
-    UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+    auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
     // Check if the clicked element belongs to the list
     unsigned i = FindItem(element);
@@ -1086,7 +1110,7 @@ void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventD
     int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
 
-    UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+    auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
     // Check if the clicked element belongs to the list
     unsigned i = FindItem(element);
     if (i >= GetNumItems())
@@ -1107,7 +1131,7 @@ void ListView::HandleItemFocusChanged(StringHash eventType, VariantMap& eventDat
 {
     using namespace FocusChanged;
 
-    UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
+    auto* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
     while (element)
     {
         // If the focused element or its parent is in the list, scroll the list to make the item visible

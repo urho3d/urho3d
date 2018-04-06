@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,32 +78,32 @@ class URHO3D_API Node : public Animatable
 
 public:
     /// Construct.
-    Node(Context* context);
+    explicit Node(Context* context);
     /// Destruct. Any child nodes are detached.
-    virtual ~Node();
+    ~Node() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
+    bool Load(Deserializer& source) override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    bool LoadXML(const XMLElement& source) override;
     /// Load from JSON data. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
+    bool LoadJSON(const JSONValue& source) override;
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    bool Save(Serializer& dest) const override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const;
+    bool SaveXML(XMLElement& dest) const override;
     /// Save as JSON data. Return true if successful.
-    virtual bool SaveJSON(JSONValue& dest) const;
+    bool SaveJSON(JSONValue& dest) const override;
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
 
     /// Return whether should save default-valued attributes into XML. Always save node transforms for readability, even if identity.
-    virtual bool SaveDefaultAttributes() const { return true; }
+    bool SaveDefaultAttributes() const override { return true; }
 
     /// Mark for attribute check on the next network update.
-    virtual void MarkNetworkUpdate();
+    void MarkNetworkUpdate() override;
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
 
@@ -336,6 +336,8 @@ public:
 
     /// Return ID.
     unsigned GetID() const { return id_; }
+    /// Return whether the node is replicated or local to a scene.
+    bool IsReplicated() const;
 
     /// Return name.
     const String& GetName() const { return impl_->name_; }
@@ -629,11 +631,11 @@ public:
 
 protected:
     /// Handle attribute animation added.
-    virtual void OnAttributeAnimationAdded();
+    void OnAttributeAnimationAdded() override;
     /// Handle attribute animation removed.
-    virtual void OnAttributeAnimationRemoved();
+    void OnAttributeAnimationRemoved() override;
     /// Find target of an attribute animation from object hierarchy by name.
-    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
+    Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
 
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
@@ -735,7 +737,7 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        T* component = dynamic_cast<T*>(i->Get());
+        auto* component = dynamic_cast<T*>(i->Get());
         if (component)
             return component;
     }
@@ -750,7 +752,7 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 template <class T> T* Node::GetParentDerivedComponent(bool fullTraversal) const
@@ -777,7 +779,7 @@ template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool rec
 
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        T* component = dynamic_cast<T*>(i->Get());
+        auto* component = dynamic_cast<T*>(i->Get());
         if (component)
             dest.Push(component);
     }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ class URHO3D_API Application : public Object
 
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.
-    Application(Context* context);
+    explicit Application(Context* context);
 
     /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Call ErrorExit() to terminate without initializing the engine. Called by Application.
     virtual void Setup() { }

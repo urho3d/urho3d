@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,9 +104,7 @@ ParticleEffect2D::ParticleEffect2D(Context* context) :
 {
 }
 
-ParticleEffect2D::~ParticleEffect2D()
-{
-}
+ParticleEffect2D::~ParticleEffect2D() = default;
 
 void ParticleEffect2D::RegisterObject(Context* context)
 {
@@ -215,7 +213,7 @@ bool ParticleEffect2D::EndLoad()
     // Apply the sprite now
     if (!loadSpriteName_.Empty())
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
         if (!sprite_)
             URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
@@ -515,7 +513,7 @@ SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName) con
     ret->rotationEndVariance_ = rotationEndVariance_;
     /// \todo Zero if source was created programmatically
     ret->SetMemoryUse(GetMemoryUse());
-    
+
     return ret;
 }
 

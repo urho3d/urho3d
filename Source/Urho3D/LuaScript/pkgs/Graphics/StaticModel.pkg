@@ -9,11 +9,12 @@ class StaticModel : public Drawable
     void ApplyMaterialList(const String fileName = String::EMPTY);
     Model* GetModel() const;
     unsigned GetNumGeometries() const;
-    Material* GetMaterial(unsigned index = 0) const;
+    Material* GetMaterial() const;
+    Material* GetMaterial(unsigned index) const;
     unsigned GetOcclusionLodLevel() const;
     bool IsInside(const Vector3& point) const;
     bool IsInsideLocal(const Vector3& point) const;
-    
+
     tolua_property__get_set Model* model;
     tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set BoundingBox& boundingBox;

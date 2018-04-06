@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ Mutex::~Mutex()
     CRITICAL_SECTION* cs = (CRITICAL_SECTION*)handle_;
     DeleteCriticalSection(cs);
     delete cs;
-    handle_ = 0;
+    handle_ = nullptr;
 }
 
 void Mutex::Acquire()
@@ -71,7 +71,7 @@ void Mutex::Release()
 Mutex::Mutex() :
     handle_(new pthread_mutex_t)
 {
-    pthread_mutex_t* mutex = (pthread_mutex_t*)handle_;
+    auto* mutex = (pthread_mutex_t*)handle_;
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -80,10 +80,10 @@ Mutex::Mutex() :
 
 Mutex::~Mutex()
 {
-    pthread_mutex_t* mutex = (pthread_mutex_t*)handle_;
+    auto* mutex = (pthread_mutex_t*)handle_;
     pthread_mutex_destroy(mutex);
     delete mutex;
-    handle_ = 0;
+    handle_ = nullptr;
 }
 
 void Mutex::Acquire()

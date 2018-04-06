@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,7 +41,7 @@ static SDL_INLINE SDL_BApp *_GetBeApp() {
 
 static int _InitWindow(_THIS, SDL_Window *window) {
 	uint32 flags = 0;
-	window_look look = B_BORDERED_WINDOW_LOOK;
+	window_look look = B_TITLED_WINDOW_LOOK;
 
 	BRect bounds(
         window->x,
@@ -66,7 +66,7 @@ static int _InitWindow(_THIS, SDL_Window *window) {
 
     SDL_BWin *bwin = new(std::nothrow) SDL_BWin(bounds, look, flags);
     if(bwin == NULL)
-    	return ENOMEM;
+        return -1;
 
     window->driverdata = bwin;
     int32 winID = _GetBeApp()->GetID(window);
@@ -76,8 +76,9 @@ static int _InitWindow(_THIS, SDL_Window *window) {
 }
 
 int BE_CreateWindow(_THIS, SDL_Window *window) {
-	if(_InitWindow(_this, window) == ENOMEM)
-		return ENOMEM;
+    if (_InitWindow(_this, window) < 0) {
+        return -1;
+    }
 	
 	/* Start window loop */
     _ToBeWin(window)->Show();
@@ -102,8 +103,9 @@ int BE_CreateWindowFrom(_THIS, SDL_Window * window, const void *data) {
 	}
 	
 	/* If we are out of memory, return the error code */
-	if(_InitWindow(_this, window) == ENOMEM)
-		return ENOMEM;
+    if (_InitWindow(_this, window) < 0) {
+        return -1;
+    }
 	
 	/* TODO: Add any other SDL-supported window attributes here */
     _ToBeWin(window)->SetTitle(otherBWin->Title());
@@ -227,3 +229,5 @@ SDL_bool BE_GetWindowWMInfo(_THIS, SDL_Window * window,
 #endif
 
 #endif /* SDL_VIDEO_DRIVER_HAIKU */
+
+/* vi: set ts=4 sw=4 expandtab: */

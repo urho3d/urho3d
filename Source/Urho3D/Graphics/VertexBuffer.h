@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,16 +37,16 @@ class URHO3D_API VertexBuffer : public Object, public GPUObject
 
 public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.
-    VertexBuffer(Context* context, bool forceHeadless = false);
+    explicit VertexBuffer(Context* context, bool forceHeadless = false);
     /// Destruct.
-    virtual ~VertexBuffer();
+    ~VertexBuffer() override;
 
     /// Mark the buffer destroyed on graphics context destruction. May be a no-op depending on the API.
-    virtual void OnDeviceLost();
+    void OnDeviceLost() override;
     /// Recreate the buffer and restore data if applicable. May be a no-op depending on the API.
-    virtual void OnDeviceReset();
+    void OnDeviceReset() override;
     /// Release buffer.
-    virtual void Release();
+    void Release() override;
 
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
@@ -88,10 +88,10 @@ public:
     const VertexElement* GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const;
 
     /// Return whether has a specified element semantic.
-    bool HasElement(VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(semantic, index) != 0; }
+    bool HasElement(VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(semantic, index) != nullptr; }
 
     /// Return whether has an element semantic with specific type.
-    bool HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(type, semantic, index) != 0; }
+    bool HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(type, semantic, index) != nullptr; }
 
     /// Return offset of a element within vertex, or M_MAX_UNSIGNED if does not exist.
     unsigned GetElementOffset(VertexElementSemantic semantic, unsigned char index = 0) const { const VertexElement* element = GetElement(semantic, index); return element ? element->offset_ : M_MAX_UNSIGNED; }
@@ -147,29 +147,29 @@ private:
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Number of vertices.
-    unsigned vertexCount_;
+    unsigned vertexCount_{};
     /// Vertex size.
-    unsigned vertexSize_;
+    unsigned vertexSize_{};
     /// Vertex elements.
     PODVector<VertexElement> elements_;
     /// Vertex element hash.
-    unsigned long long elementHash_;
+    unsigned long long elementHash_{};
     /// Vertex element legacy bitmask.
-    unsigned elementMask_;
+    unsigned elementMask_{};
     /// Buffer locking state.
-    LockState lockState_;
+    LockState lockState_{LOCK_NONE};
     /// Lock start vertex.
-    unsigned lockStart_;
+    unsigned lockStart_{};
     /// Lock number of vertices.
-    unsigned lockCount_;
+    unsigned lockCount_{};
     /// Scratch buffer for fallback locking.
-    void* lockScratchData_;
+    void* lockScratchData_{};
     /// Dynamic flag.
-    bool dynamic_;
+    bool dynamic_{};
     /// Shadowed flag.
-    bool shadowed_;
+    bool shadowed_{};
     /// Discard lock flag. Used by OpenGL only.
-    bool discardLock_;
+    bool discardLock_{};
 };
 
 }

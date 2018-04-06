@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ void Mover::Update(float timeStep)
 
     // Get the model's first (only) animation state and advance its time. Note the convenience accessor to other components
     // in the same scene node
-    AnimatedModel* model = node_->GetComponent<AnimatedModel>(true);
+    auto* model = node_->GetComponent<AnimatedModel>(true);
     if (model->GetNumAnimationStates())
     {
         AnimationState* state = model->GetAnimationStates()[0];

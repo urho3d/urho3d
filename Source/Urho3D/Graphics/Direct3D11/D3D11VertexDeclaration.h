@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ public:
     /// Construct with vertex buffers and element masks to base declaration on.
     VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers);
     /// Destruct.
-    ~VertexDeclaration();
+    virtual ~VertexDeclaration() override;
 
     /// Return input layout object corresponding to the declaration.
     void* GetInputLayout() const { return inputLayout_; }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ static CScriptArray* DbResultGetRow(unsigned index, DbResult* ptr)
     if (index >= rows.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return VectorToArray<Variant>(rows[index], "Array<Variant>");

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,11 +50,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     Component(context),
     gravity_(DEFAULT_GRAVITY),
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
-    positionIterations_(DEFAULT_POSITION_ITERATIONS),
-    debugRenderer_(0),
-    physicsStepping_(false),
-    applyingTransforms_(false),
-    updateEnabled_(true)
+    positionIterations_(DEFAULT_POSITION_ITERATIONS)
 {
     // Set default debug draw flags
     m_drawFlags = e_shapeBit;
@@ -104,7 +100,7 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
         world_->DrawDebugData();
-        debugRenderer_ = 0;
+        debugRenderer_ = nullptr;
     }
 }
 
@@ -338,7 +334,7 @@ void PhysicsWorld2D::Update(float timeStep)
 
 void PhysicsWorld2D::DrawDebugGeometry()
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    auto* debug = GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, false);
 }
@@ -470,7 +466,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -521,7 +517,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -558,7 +554,7 @@ private:
 void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
     unsigned collisionMask)
 {
-    result.body_ = 0;
+    result.body_ = nullptr;
 
     SingleRayCastCallback callback(result, startPoint, collisionMask);
     world_->RayCast(&callback, ToB2Vec2(startPoint), ToB2Vec2(endPoint));
@@ -569,15 +565,15 @@ class PointQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :
+    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :   // NOLINT(modernize-pass-by-value)
         point_(point),
         collisionMask_(collisionMask),
-        rigidBody_(0)
+        rigidBody_(nullptr)
     {
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture)
+    bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -622,7 +618,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
 
 RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask)
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     for (unsigned i = 0; i < renderer->GetNumViewports(); ++i)
     {
         Viewport* viewport = renderer->GetViewport(i);
@@ -634,7 +630,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned col
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 // Aabb query callback class.
@@ -649,7 +645,7 @@ public:
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture)
+    bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -826,9 +822,7 @@ void PhysicsWorld2D::SendEndContactEvents()
     endContactInfos_.Clear();
 }
 
-PhysicsWorld2D::ContactInfo::ContactInfo()
-{
-}
+PhysicsWorld2D::ContactInfo::ContactInfo() = default;
 
 PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
 {

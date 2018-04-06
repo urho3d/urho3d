@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,16 +65,12 @@ static const char* scriptObjectMethodNames[] = {
 
 LuaScriptInstance::LuaScriptInstance(Context* context) :
     Component(context),
+    luaScript_(GetSubsystem<LuaScript>()),
+    eventInvoker_(new LuaScriptEventInvoker(this)),
     scriptObjectRef_(LUA_REFNIL)
 {
-    luaScript_ = GetSubsystem<LuaScript>();
     luaState_ = luaScript_->GetState();
     attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
-
-    eventInvoker_ = new LuaScriptEventInvoker(this);
-
-    for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethods_[i] = 0;
 }
 
 LuaScriptInstance::~LuaScriptInstance()
@@ -143,56 +139,56 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
             break;
         case VAR_VECTOR2:
             {
-                Vector2* value = new Vector2(src.GetVector2());
+                auto* value = new Vector2(src.GetVector2());
                 tolua_pushusertype(luaState_, value, "Vector2");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_VECTOR3:
             {
-                Vector3* value = new Vector3(src.GetVector3());
+                auto* value = new Vector3(src.GetVector3());
                 tolua_pushusertype(luaState_, value, "Vector3");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_VECTOR4:
             {
-                Vector4* value = new Vector4(src.GetVector4());
+                auto* value = new Vector4(src.GetVector4());
                 tolua_pushusertype(luaState_, value, "Vector4");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_QUATERNION:
             {
-                Quaternion* value = new Quaternion(src.GetQuaternion());
+                auto* value = new Quaternion(src.GetQuaternion());
                 tolua_pushusertype(luaState_, value, "Quaternion");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_COLOR:
             {
-                Color* value = new Color(src.GetColor());
+                auto* value = new Color(src.GetColor());
                 tolua_pushusertype(luaState_, value, "Color");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_INTRECT:
             {
-                IntRect* value = new IntRect(src.GetIntRect());
+                auto* value = new IntRect(src.GetIntRect());
                 tolua_pushusertype(luaState_, value, "IntRect");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_INTVECTOR2:
             {
-                IntVector2* value = new IntVector2(src.GetIntVector2());
+                auto* value = new IntVector2(src.GetIntVector2());
                 tolua_pushusertype(luaState_, value, "IntVector2");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
             break;
         case VAR_INTVECTOR3:
             {
-                IntVector3* value = new IntVector3(src.GetIntVector3());
+                auto* value = new IntVector3(src.GetIntVector3());
                 tolua_pushusertype(luaState_, value, "IntVector3");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
@@ -254,28 +250,28 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         dest = tolua_tourho3dstring(luaState_, -1, "");
         break;
     case VAR_VECTOR2:
-        dest = *((Vector2*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Vector2*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_VECTOR3:
-        dest = *((Vector3*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Vector3*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_VECTOR4:
-        dest = *((Vector4*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Vector4*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_QUATERNION:
-        dest = *((Quaternion*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Quaternion*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_COLOR:
-        dest = *((Color*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((Color*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_INTRECT:
-        dest = *((IntRect*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((IntRect*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_INTVECTOR2:
-        dest = *((IntVector2*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((IntVector2*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     case VAR_INTVECTOR3:
-        dest = *((IntVector3*)tolua_tousertype(luaState_, -1, 0));
+        dest = *((IntVector3*)tolua_tousertype(luaState_, -1, nullptr));
         break;
     default:
         URHO3D_LOGERROR("Unsupported data type");
@@ -304,7 +300,7 @@ void LuaScriptInstance::AddEventHandler(const String& eventName, int functionInd
 {
     LuaFunction* function = luaScript_->GetFunction(functionIndex);
     if (function)
-        eventInvoker_->AddEventHandler(0, eventName, function);
+        eventInvoker_->AddEventHandler(nullptr, eventName, function);
 }
 
 void LuaScriptInstance::AddEventHandler(const String& eventName, const String& functionName)
@@ -312,7 +308,7 @@ void LuaScriptInstance::AddEventHandler(const String& eventName, const String& f
     String realFunctionName = functionName.Replaced(":", ".");
     LuaFunction* function = luaScript_->GetFunction(realFunctionName);
     if (function)
-        eventInvoker_->AddEventHandler(0, eventName, function);
+        eventInvoker_->AddEventHandler(nullptr, eventName, function);
 }
 
 void LuaScriptInstance::AddEventHandler(Object* sender, const String& eventName, int functionIndex)
@@ -383,7 +379,7 @@ bool LuaScriptInstance::HasEventHandler(Object* sender, const String& eventName)
 
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
-    SetScriptFile(0);
+    SetScriptFile(nullptr);
     SetScriptObjectType(scriptObjectType);
     return scriptObjectRef_ != LUA_REFNIL;
 }
@@ -667,7 +663,7 @@ void LuaScriptInstance::HandleUpdate(StringHash eventType, VariantMap& eventData
     {
         if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
             scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
-        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     LuaFunction* function = scriptObjectMethods_[LSOM_UPDATE];
@@ -700,7 +696,7 @@ void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& even
     {
         if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
             scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
-        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     using namespace PhysicsPreStep;
@@ -750,8 +746,8 @@ void LuaScriptInstance::ReleaseObject()
         function->EndCall();
     }
 
-    for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethods_[i] = 0;
+    for (auto& scriptObjectMethod : scriptObjectMethods_)
+        scriptObjectMethod = nullptr;
 }
 
 LuaFunction* LuaScriptInstance::GetScriptObjectFunction(const String& functionName) const
@@ -761,7 +757,7 @@ LuaFunction* LuaScriptInstance::GetScriptObjectFunction(const String& functionNa
 
 void LuaScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetScriptFile(cache->GetResource<LuaFile>(value.name_));
 }
 

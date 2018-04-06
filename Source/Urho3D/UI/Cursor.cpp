@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ Cursor::~Cursor()
         if (i->second_.osCursor_)
         {
             SDL_FreeCursor(i->second_.osCursor_);
-            i->second_.osCursor_ = 0;
+            i->second_.osCursor_ = nullptr;
         }
     }
 }
@@ -139,7 +139,7 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     if (!image)
         return;
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     if (!shapeInfos_.Contains(shape))
         shapeInfos_[shape] = CursorShapeInfo();
@@ -150,7 +150,7 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     info.texture_ = cache->GetResource<Texture2D>(image->GetName(), false);
     if (!info.texture_)
     {
-        Texture2D* texture = new Texture2D(context_);
+        auto* texture = new Texture2D(context_);
         texture->SetData(SharedPtr<Image>(image));
         info.texture_ = texture;
     }
@@ -163,7 +163,7 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     if (info.osCursor_)
     {
         SDL_FreeCursor(info.osCursor_);
-        info.osCursor_ = 0;
+        info.osCursor_ = nullptr;
     }
 
     // Reset current shape if it was edited
@@ -266,7 +266,7 @@ void Cursor::ApplyOSCursorShape()
     if (info.osCursor_ && info.systemDefined_ != useSystemShapes_)
     {
         SDL_FreeCursor(info.osCursor_);
-        info.osCursor_ = 0;
+        info.osCursor_ = nullptr;
     }
 
     // Create SDL cursor now if necessary

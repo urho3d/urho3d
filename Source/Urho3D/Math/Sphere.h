@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,57 +36,48 @@ class URHO3D_API Sphere
 {
 public:
     /// Construct undefined.
-    Sphere() :
+    Sphere() noexcept :
         center_(Vector3::ZERO),
         radius_(-M_INFINITY)
     {
     }
 
     /// Copy-construct from another sphere.
-    Sphere(const Sphere& sphere) :
-        center_(sphere.center_),
-        radius_(sphere.radius_)
-    {
-    }
+    Sphere(const Sphere& sphere) noexcept = default;
 
     /// Construct from center and radius.
-    Sphere(const Vector3& center, float radius) :
+    Sphere(const Vector3& center, float radius) noexcept :
         center_(center),
         radius_(radius)
     {
     }
 
     /// Construct from an array of vertices.
-    Sphere(const Vector3* vertices, unsigned count)
+    Sphere(const Vector3* vertices, unsigned count) noexcept
     {
         Define(vertices, count);
     }
 
     /// Construct from a bounding box.
-    Sphere(const BoundingBox& box)
+    explicit Sphere(const BoundingBox& box) noexcept
     {
         Define(box);
     }
 
     /// Construct from a frustum.
-    Sphere(const Frustum& frustum)
+    explicit Sphere(const Frustum& frustum) noexcept
     {
         Define(frustum);
     }
 
     /// Construct from a polyhedron.
-    Sphere(const Polyhedron& poly)
+    explicit Sphere(const Polyhedron& poly) noexcept
     {
         Define(poly);
     }
 
     /// Assign from another sphere.
-    Sphere& operator =(const Sphere& rhs)
-    {
-        center_ = rhs.center_;
-        radius_ = rhs.radius_;
-        return *this;
-    }
+    Sphere& operator =(const Sphere& rhs) noexcept = default;
 
     /// Test for equality with another sphere.
     bool operator ==(const Sphere& rhs) const { return center_ == rhs.center_ && radius_ == rhs.radius_; }
@@ -210,7 +201,7 @@ public:
     /// Sphere center.
     Vector3 center_;
     /// Sphere radius.
-    float radius_;
+    float radius_{};
 };
 
 }

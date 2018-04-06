@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,8 +39,8 @@ struct ListNodeBase
 {
     /// Construct.
     ListNodeBase() :
-        prev_(0),
-        next_(0)
+        prev_(nullptr),
+        next_(nullptr)
     {
     }
 
@@ -55,7 +55,7 @@ struct ListIteratorBase
 {
     /// Construct.
     ListIteratorBase() :
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -95,9 +95,9 @@ class URHO3D_API ListBase
 public:
     /// Construct.
     ListBase() :
-        head_(0),
-        tail_(0),
-        allocator_(0),
+        head_(nullptr),
+        tail_(nullptr),
+        allocator_(nullptr),
         size_(0)
     {
     }

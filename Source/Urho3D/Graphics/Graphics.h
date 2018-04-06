@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,9 +84,9 @@ class URHO3D_API Graphics : public Object
 
 public:
     /// Construct.
-    Graphics(Context* context);
+    explicit Graphics(Context* context);
     /// Destruct. Release the Direct3D11 device and close the window.
-    virtual ~Graphics();
+    ~Graphics() override;
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);
@@ -311,7 +311,7 @@ public:
 
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
-    
+
     /// Return whether rendering output is dithered.
     bool GetDither() const;
 
@@ -374,6 +374,13 @@ public:
     IntVector2 GetDesktopResolution(int monitor) const;
     /// Return the number of currently connected monitors.
     int GetMonitorCount() const;
+    /// Returns the index of the display containing the center of the window on success or a negative error code on failure.
+    int GetCurrentMonitor() const;
+    /// Returns true if window is maximized or runs in full screen mode.
+    bool GetMaximized() const;
+    /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
+    Vector3 GetDisplayDPI(int monitor=0) const;
+
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
     /// Return a shader variation by name and defines.
@@ -496,6 +503,8 @@ public:
     void Maximize();
     /// Minimize the window.
     void Minimize();
+    /// Raises window if it was minimized.
+    void Raise() const;
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -623,151 +632,151 @@ private:
     /// Implementation.
     GraphicsImpl* impl_;
     /// SDL window.
-    SDL_Window* window_;
+    SDL_Window* window_{};
     /// Window title.
     String windowTitle_;
     /// Window icon image.
     WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
-    void* externalWindow_;
+    void* externalWindow_{};
     /// Window width in pixels.
-    int width_;
+    int width_{};
     /// Window height in pixels.
-    int height_;
+    int height_{};
     /// Window position.
     IntVector2 position_;
     /// Multisampling mode.
-    int multiSample_;
+    int multiSample_{1};
     /// Fullscreen flag.
-    bool fullscreen_;
+    bool fullscreen_{};
     /// Borderless flag.
-    bool borderless_;
+    bool borderless_{};
     /// Resizable flag.
-    bool resizable_;
+    bool resizable_{};
     /// High DPI flag.
-    bool highDPI_;
+    bool highDPI_{};
     /// Vertical sync flag.
-    bool vsync_;
+    bool vsync_{};
     /// Refresh rate in Hz. Only used in fullscreen, 0 when windowed
-    int refreshRate_;
+    int refreshRate_{};
     /// Monitor index. Only used in fullscreen, 0 when windowed
-    int monitor_;
+    int monitor_{};
     /// Triple buffering flag.
-    bool tripleBuffer_;
+    bool tripleBuffer_{};
     /// Flush GPU command buffer flag.
-    bool flushGPU_;
+    bool flushGPU_{};
     /// Force OpenGL 2 flag. Only used on OpenGL.
-    bool forceGL2_;
+    bool forceGL2_{};
     /// sRGB conversion on write flag for the main window.
-    bool sRGB_;
+    bool sRGB_{};
     /// Light pre-pass rendering support flag.
-    bool lightPrepassSupport_;
+    bool lightPrepassSupport_{};
     /// Deferred rendering support flag.
-    bool deferredSupport_;
+    bool deferredSupport_{};
     /// Anisotropic filtering support flag.
-    bool anisotropySupport_;
+    bool anisotropySupport_{};
     /// DXT format support flag.
-    bool dxtTextureSupport_;
+    bool dxtTextureSupport_{};
     /// ETC1 format support flag.
-    bool etcTextureSupport_;
+    bool etcTextureSupport_{};
     /// PVRTC formats support flag.
-    bool pvrtcTextureSupport_;
+    bool pvrtcTextureSupport_{};
     /// Hardware shadow map depth compare support flag.
-    bool hardwareShadowSupport_;
+    bool hardwareShadowSupport_{};
     /// Instancing support flag.
-    bool instancingSupport_;
+    bool instancingSupport_{};
     /// sRGB conversion on read support flag.
-    bool sRGBSupport_;
+    bool sRGBSupport_{};
     /// sRGB conversion on write support flag.
-    bool sRGBWriteSupport_;
+    bool sRGBWriteSupport_{};
     /// Number of primitives this frame.
-    unsigned numPrimitives_;
+    unsigned numPrimitives_{};
     /// Number of batches this frame.
-    unsigned numBatches_;
+    unsigned numBatches_{};
     /// Largest scratch buffer request this frame.
-    unsigned maxScratchBufferRequest_;
+    unsigned maxScratchBufferRequest_{};
     /// GPU objects.
     PODVector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
     /// Shadow map dummy color texture format.
-    unsigned dummyColorFormat_;
+    unsigned dummyColorFormat_{};
     /// Shadow map depth texture format.
-    unsigned shadowMapFormat_;
+    unsigned shadowMapFormat_{};
     /// Shadow map 24-bit depth texture format.
-    unsigned hiresShadowMapFormat_;
+    unsigned hiresShadowMapFormat_{};
     /// Vertex buffers in use.
-    VertexBuffer* vertexBuffers_[MAX_VERTEX_STREAMS];
+    VertexBuffer* vertexBuffers_[MAX_VERTEX_STREAMS]{};
     /// Index buffer in use.
-    IndexBuffer* indexBuffer_;
+    IndexBuffer* indexBuffer_{};
     /// Current vertex declaration hash.
-    unsigned long long vertexDeclarationHash_;
+    unsigned long long vertexDeclarationHash_{};
     /// Current primitive type.
-    unsigned primitiveType_;
+    unsigned primitiveType_{};
     /// Vertex shader in use.
-    ShaderVariation* vertexShader_;
+    ShaderVariation* vertexShader_{};
     /// Pixel shader in use.
-    ShaderVariation* pixelShader_;
+    ShaderVariation* pixelShader_{};
     /// Textures in use.
-    Texture* textures_[MAX_TEXTURE_UNITS];
+    Texture* textures_[MAX_TEXTURE_UNITS]{};
     /// Texture unit mappings.
     HashMap<String, TextureUnit> textureUnits_;
     /// Rendertargets in use.
-    RenderSurface* renderTargets_[MAX_RENDERTARGETS];
+    RenderSurface* renderTargets_[MAX_RENDERTARGETS]{};
     /// Depth-stencil surface in use.
-    RenderSurface* depthStencil_;
+    RenderSurface* depthStencil_{};
     /// Viewport coordinates.
     IntRect viewport_;
     /// Default texture filtering mode.
-    TextureFilterMode defaultTextureFilterMode_;
+    TextureFilterMode defaultTextureFilterMode_{FILTER_TRILINEAR};
     /// Default texture max. anisotropy level.
-    unsigned defaultTextureAnisotropy_;
+    unsigned defaultTextureAnisotropy_{4};
     /// Blending mode.
-    BlendMode blendMode_;
+    BlendMode blendMode_{};
     /// Alpha-to-coverage enable.
-    bool alphaToCoverage_;
+    bool alphaToCoverage_{};
     /// Color write enable.
-    bool colorWrite_;
+    bool colorWrite_{};
     /// Hardware culling mode.
-    CullMode cullMode_;
+    CullMode cullMode_{};
     /// Depth constant bias.
-    float constantDepthBias_;
+    float constantDepthBias_{};
     /// Depth slope scaled bias.
-    float slopeScaledDepthBias_;
+    float slopeScaledDepthBias_{};
     /// Depth compare mode.
-    CompareMode depthTestMode_;
+    CompareMode depthTestMode_{};
     /// Depth write enable flag.
-    bool depthWrite_;
+    bool depthWrite_{};
     /// Line antialiasing enable flag.
-    bool lineAntiAlias_;
+    bool lineAntiAlias_{};
     /// Polygon fill mode.
-    FillMode fillMode_;
+    FillMode fillMode_{};
     /// Scissor test enable flag.
-    bool scissorTest_;
+    bool scissorTest_{};
     /// Scissor test rectangle.
     IntRect scissorRect_;
     /// Stencil test compare mode.
-    CompareMode stencilTestMode_;
+    CompareMode stencilTestMode_{};
     /// Stencil operation on pass.
-    StencilOp stencilPass_;
+    StencilOp stencilPass_{};
     /// Stencil operation on fail.
-    StencilOp stencilFail_;
+    StencilOp stencilFail_{};
     /// Stencil operation on depth fail.
-    StencilOp stencilZFail_;
+    StencilOp stencilZFail_{};
     /// Stencil test reference value.
-    unsigned stencilRef_;
+    unsigned stencilRef_{};
     /// Stencil compare bitmask.
-    unsigned stencilCompareMask_;
+    unsigned stencilCompareMask_{};
     /// Stencil write bitmask.
-    unsigned stencilWriteMask_;
+    unsigned stencilWriteMask_{};
     /// Current custom clip plane in post-projection space.
     Vector4 clipPlane_;
     /// Stencil test enable flag.
-    bool stencilTest_;
+    bool stencilTest_{};
     /// Custom clip plane enable flag.
-    bool useClipPlane_;
+    bool useClipPlane_{};
     /// Remembered shader parameter sources.
-    const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
+    const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS]{};
     /// Base directory for shaders.
     String shaderPath_;
     /// Cache directory for Direct3D binary shaders.

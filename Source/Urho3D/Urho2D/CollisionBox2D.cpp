@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,7 @@ CollisionBox2D::CollisionBox2D(Context* context) :
     fixtureDef_.shape = &boxShape_;
 }
 
-CollisionBox2D::~CollisionBox2D()
-{
-}
+CollisionBox2D::~CollisionBox2D() = default;
 
 void CollisionBox2D::RegisterObject(Context* context)
 {

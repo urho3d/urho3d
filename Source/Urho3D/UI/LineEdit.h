@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,37 +37,37 @@ class URHO3D_API LineEdit : public BorderImage
 
 public:
     /// Construct.
-    LineEdit(Context* context);
+    explicit LineEdit(Context* context);
     /// Destruct.
-    virtual ~LineEdit();
+    ~LineEdit() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
     /// Perform UI element update.
-    virtual void Update(float timeStep);
+    void Update(float timeStep) override;
     /// React to mouse click begin.
-    virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    void OnClickBegin
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse doubleclick.
-    virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    void OnDoubleClick
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse drag begin.
-    virtual void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    void
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse drag motion.
-    virtual void OnDragMove
+    void OnDragMove
         (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
-            Cursor* cursor);
+            Cursor* cursor) override;
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
-    virtual bool OnDragDropTest(UIElement* source);
+    bool OnDragDropTest(UIElement* source) override;
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
-    virtual bool OnDragDropFinish(UIElement* source);
+    bool OnDragDropFinish(UIElement* source) override;
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    void OnKey(int key, int buttons, int qualifiers) override;
     /// React to text input event.
-    virtual void OnTextInput(const String& text);
+    void OnTextInput(const String& text) override;
 
     /// Set text.
     void SetText(const String& text);
@@ -118,7 +118,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Update displayed text.
     void UpdateText();
     /// Update cursor position and restart cursor blinking.

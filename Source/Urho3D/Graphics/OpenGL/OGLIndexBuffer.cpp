@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ void IndexBuffer::Release()
         if (!graphics_->IsDeviceLost())
         {
             if (graphics_->GetIndexBuffer() == this)
-                graphics_->SetIndexBuffer(0);
+                graphics_->SetIndexBuffer(nullptr);
 
             glDeleteBuffers(1, &object_.name_);
         }
@@ -87,14 +87,14 @@ bool IndexBuffer::SetData(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
+        memcpy(shadowData_.Get(), data, indexCount_ * (size_t)indexSize_);
 
     if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
             graphics_->SetIndexBuffer(this);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * (size_t)indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -134,7 +134,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         return true;
 
     if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
-        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+        memcpy(shadowData_.Get() + start * indexSize_, data, count * (size_t)indexSize_);
 
     if (object_.name_)
     {
@@ -142,9 +142,9 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         {
             graphics_->SetIndexBuffer(this);
             if (!discard || start != 0)
-                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, count * indexSize_, data);
+                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * (size_t)indexSize_, count * indexSize_, data);
             else
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * (size_t)indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -161,23 +161,23 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Index buffer already locked");
-        return 0;
+        return nullptr;
     }
 
     if (!indexSize_)
     {
         URHO3D_LOGERROR("Index size not defined, can not lock index buffer");
-        return 0;
+        return nullptr;
     }
 
     if (start + count > indexCount_)
     {
         URHO3D_LOGERROR("Illegal range for locking index buffer");
-        return 0;
+        return nullptr;
     }
 
     if (!count)
-        return 0;
+        return nullptr;
 
     lockStart_ = start;
     lockCount_ = count;
@@ -195,7 +195,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return lockScratchData_;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 void IndexBuffer::Unlock()
@@ -211,7 +211,7 @@ void IndexBuffer::Unlock()
         SetDataRange(lockScratchData_, lockStart_, lockCount_, discardLock_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
-        lockScratchData_ = 0;
+        lockScratchData_ = nullptr;
         lockState_ = LOCK_NONE;
         break;
 
@@ -245,7 +245,7 @@ bool IndexBuffer::Create()
         }
 
         graphics_->SetIndexBuffer(this);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * (size_t)indexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;
@@ -262,7 +262,7 @@ bool IndexBuffer::UpdateToGPU()
 void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     // Never called on OpenGL
-    return 0;
+    return nullptr;
 }
 
 void IndexBuffer::UnmapBuffer()

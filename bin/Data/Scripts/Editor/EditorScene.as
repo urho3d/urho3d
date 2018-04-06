@@ -325,7 +325,7 @@ void CreateComponent(const String&in componentType)
     /// \todo Allow to specify the createmode
     for (uint i = 0; i < editNodes.length; ++i)
     {
-        Component@ newComponent = editNodes[i].CreateComponent(componentType, editNodes[i].id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Component@ newComponent = editNodes[i].CreateComponent(componentType, editNodes[i].replicated ? REPLICATED : LOCAL);
         if (newComponent !is null)
         {
             // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
@@ -409,11 +409,11 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
 
     if (parent !is null)
         newNode.parent = parent;
-        
+
     if (newNode !is null)
     {
         newNode.scale = newNode.scale * scaleMod;
-        
+
         AdjustNodePositionByAABB(newNode);
 
         // Create an undo action for the load
@@ -641,7 +641,7 @@ bool SceneCopy()
             XMLFile@ xml = XMLFile();
             XMLElement rootElem = xml.CreateRoot("component");
             selectedComponents[i].SaveXML(rootElem);
-            rootElem.SetBool("local", selectedComponents[i].id >= FIRST_LOCAL_ID);
+            rootElem.SetBool("local", !selectedComponents[i].replicated);
             sceneCopyBuffer.Push(xml);
         }
     }
@@ -657,7 +657,7 @@ bool SceneCopy()
             XMLFile@ xml = XMLFile();
             XMLElement rootElem = xml.CreateRoot("node");
             selectedNodes[i].SaveXML(rootElem);
-            rootElem.SetBool("local", selectedNodes[i].id >= FIRST_LOCAL_ID);
+            rootElem.SetBool("local", !selectedNodes[i].replicated);
             sceneCopyBuffer.Push(xml);
         }
     }
@@ -794,7 +794,7 @@ bool NodesParentToLastSelected()
 {
     if (lastSelectedNode.Get() is null)
         return false;
-        
+
     if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
         return false;
 
@@ -805,17 +805,17 @@ bool NodesParentToLastSelected()
 
     // Parent selected nodes to root
     Array<Node@> changedNodes;
-    
+
     // Find new parent node it selected last
     Node@ lastNode = lastSelectedNode.Get(); //GetListNode(hierarchyList.selection);
-    
+
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
-        
+
         Node@ sourceNode = selectedNodes[i];
         if ( sourceNode.id == lastNode.id)
             continue; // Skip last node it is parent
-        
+
         if (sourceNode.parent.id == lastNode.id)
             continue; // Root or already parented to root
 
@@ -838,20 +838,20 @@ bool NodesParentToLastSelected()
     return true;
 }
 
-bool SceneSmartDuplicateNode() 
-{       
+bool SceneSmartDuplicateNode()
+{
     const float minOffset = 0.1;
-    
-    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty 
+
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty
         || selectedNodes.empty || lastSelectedNode.Get() is null)
         return false;
-    
-    
+
+
     Node@ node = lastSelectedNode.Get();
     Node@ parent = node.parent;
     Vector3 offset = Vector3(1,0,0); // default offset
-    
-    if (parent is editorScene) // if parent of selected node is Scene make empty parent for it and place in same position; 
+
+    if (parent is editorScene) // if parent of selected node is Scene make empty parent for it and place in same position;
     {
         parent = CreateNode(LOCAL);
         SceneChangeParent(parent, editorScene, false);
@@ -861,20 +861,20 @@ bool SceneSmartDuplicateNode()
         SceneChangeParent(node, parent, false);
         parent = node.parent;
         SelectNode(node, false);
-    } 
-    
+    }
+
     Vector3 size;
     BoundingBox bb;
-    
-    // get bb for offset  
+
+    // get bb for offset
     Drawable@ drawable = GetFirstDrawable(node);
     if (drawable !is null)
     {
         bb = drawable.boundingBox;
         size =  bb.size * drawable.node.worldScale;
-        offset = Vector3(size.x, 0, 0); 
-    } 
-    
+        offset = Vector3(size.x, 0, 0);
+    }
+
     // make offset on axis that select user by mouse
     if (gizmoAxisX.selected)
     {
@@ -892,10 +892,10 @@ bool SceneSmartDuplicateNode()
         offset = node.worldRotation * Vector3(0,0,size.z);
     }
     else
-        offset = lastOffsetForSmartDuplicate;    
-    
+        offset = lastOffsetForSmartDuplicate;
+
     Vector3 lastInstancePosition = node.worldPosition;
-    
+
     SelectNode(node, false);
     SceneDuplicate();
     Node@ newInstance = parent.children[parent.numChildren-1];
@@ -903,7 +903,7 @@ bool SceneSmartDuplicateNode()
     newInstance.worldPosition = lastInstancePosition;
     newInstance.Translate(offset, TS_WORLD);
     newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
-    
+
     lastOffsetForSmartDuplicate = offset;
     UpdateNodeAttributes();
     return true;
@@ -911,7 +911,10 @@ bool SceneSmartDuplicateNode()
 
 bool ViewCloser()
 {
-    return (viewCloser = true);
+    if (selectedNodes.length > 0 || selectedNodes.length > 0)
+        LocateNodesAndComponents(selectedNodes, selectedComponents);
+
+    return true;
 }
 
 
@@ -973,7 +976,7 @@ bool SceneEnableAllNodes()
     // Toggle enabled state of nodes recursively
     Array<Node@> allNodes;
     allNodes = editorScene.GetChildren(true);
-    
+
     for (uint i = 0; i < allNodes.length; ++i)
     {
         // Do not attempt to disable the Scene
@@ -989,10 +992,10 @@ bool SceneEnableAllNodes()
             group.actions.Push(action);
         }
     }
-    
+
     Array<Component@> allComponents;
     allComponents = editorScene.GetComponents();
-    
+
     for (uint i = 0; i < allComponents.length; ++i)
     {
         // Some components purposefully do not expose the Enabled attribute, and it does not affect them in any way
@@ -1132,7 +1135,7 @@ uint SceneFindChildIndex(Node@ parent, Node@ child)
         if (parent.children[i] is child)
             return i;
     }
-    
+
     return -1;
 }
 
@@ -1143,7 +1146,7 @@ uint SceneFindComponentIndex(Node@ node, Component@ component)
         if (node.components[i] is component)
             return i;
     }
-    
+
     return -1;
 }
 
@@ -1330,7 +1333,7 @@ bool SceneRenderZoneCubemaps()
     bool success = false;
     Array<Zone@> capturedThisCall;
     bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
-    
+
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
@@ -1344,7 +1347,7 @@ bool SceneRenderZoneCubemaps()
             }
         }
     }
-    
+
     for (uint i = 0; i < selectedComponents.length; ++i)
     {
         Zone@ zone = cast<Zone>(selectedComponents[i]);
@@ -1357,7 +1360,7 @@ bool SceneRenderZoneCubemaps()
             }
         }
     }
-    
+
     // Start rendering cubemaps if there are any to render and the queue isn't already running
     if (activeCubeCapture.length > 0 && !alreadyCapturing)
         activeCubeCapture[0].Start();
@@ -1393,7 +1396,7 @@ bool SceneAddChildrenStaticModelGroup()
     SaveEditAction(action);
     SetSceneModified();
     FocusComponent(smg);
-    
+
     return true;
 }
 
@@ -1433,7 +1436,7 @@ bool SceneSetChildrenSplinePath(bool makeCycle)
     SaveEditAction(action);
     SetSceneModified();
     FocusComponent(sp);
-    
+
     return true;
 }
 
@@ -1485,7 +1488,7 @@ Drawable@ GetFirstDrawable(Node@ node)
                 return drawable;
         }
     }
-    
+
     return null;
 }
 
@@ -1502,7 +1505,7 @@ void AssignModel(StaticModel@ assignee, String modelPath)
     action.Define(assignee, oldModel, model);
     SaveEditAction(action);
     SetSceneModified();
-    FocusComponent(assignee); 
+    FocusComponent(assignee);
 }
 
 void CreateModelWithStaticModel(String filepath, Node@ parent)
@@ -1544,20 +1547,20 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
 }
 
 bool ColorWheelSetupBehaviorForColoring()
-{    
+{
     Menu@ menu = GetEventSender();
     if (menu is null)
         return false;
-    
+
     coloringPropertyName = menu.name;
-    
+
     if (coloringPropertyName == "menuCancel") return false;
-    
-    if (coloringComponent.typeName == "Light") 
+
+    if (coloringComponent.typeName == "Light")
     {
         Light@ light = cast<Light>(coloringComponent);
-        if (light !is null) 
-        {          
+        if (light !is null)
+        {
             if (coloringPropertyName == "menuLightColor")
             {
                 coloringOldColor = light.color;
@@ -1565,28 +1568,28 @@ bool ColorWheelSetupBehaviorForColoring()
             }
             else if (coloringPropertyName == "menuSpecularIntensity")
             {
-               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we divide in and multiply out 
-               float scaledSpecular = light.specularIntensity * 0.1f; 
+               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we divide in and multiply out
+               float scaledSpecular = light.specularIntensity * 0.1f;
                coloringOldScalar = scaledSpecular;
                ShowColorWheelWithColor(Color(scaledSpecular,scaledSpecular,scaledSpecular));
 
             }
             else if (coloringPropertyName == "menuBrightnessMultiplier")
-            { 
+            {
                float scaledBrightness = light.brightness * 0.1f;
                coloringOldScalar = scaledBrightness;
                ShowColorWheelWithColor(Color(scaledBrightness,scaledBrightness,scaledBrightness));
-            }   
-        }      
+            }
+        }
     }
-    else if (coloringComponent.typeName == "StaticModel") 
+    else if (coloringComponent.typeName == "StaticModel")
     {
         StaticModel@ model  = cast<StaticModel>(coloringComponent);
-        if (model !is null) 
-        {            
+        if (model !is null)
+        {
             Material@ mat = model.materials[0];
-            if (mat !is null) 
-            { 
+            if (mat !is null)
+            {
                 if (coloringPropertyName == "menuDiffuseColor")
                 {
                     Variant oldValue = mat.shaderParameters["MatDiffColor"];
@@ -1607,55 +1610,55 @@ bool ColorWheelSetupBehaviorForColoring()
                     Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
                     Array<String> values = oldValue.ToString().Split(' ');
                     coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); // RGB
-                    
-                    
+
+
                     ShowColorWheelWithColor(coloringOldColor);
                 }
                 else if (coloringPropertyName == "menuEnvironmentMapColor")
-                {   
+                {
                     Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
                     Array<String> values = oldValue.ToString().Split(' ');
                     coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); //RGB
-                    
+
                     ShowColorWheelWithColor(coloringOldColor);
-                }      
+                }
             }
         }
     }
-    else if (coloringComponent.typeName == "Zone") 
+    else if (coloringComponent.typeName == "Zone")
     {
         Zone@ zone  = cast<Zone>(coloringComponent);
-        if (zone !is null) 
+        if (zone !is null)
         {
             if (coloringPropertyName == "menuAmbientColor")
             {
                 coloringOldColor = zone.ambientColor;
             }
-            else if (coloringPropertyName == "menuFogColor") 
+            else if (coloringPropertyName == "menuFogColor")
             {
                 coloringOldColor = zone.fogColor;
             }
-            
+
             ShowColorWheelWithColor(coloringOldColor);
         }
     }
-    else if (coloringComponent.typeName == "Text3D") 
+    else if (coloringComponent.typeName == "Text3D")
     {
         Text3D@ txt = cast<Text3D>(coloringComponent);
-        if (txt !is null) 
+        if (txt !is null)
         {
             if (coloringPropertyName == "c" || coloringPropertyName == "tl")
                 coloringOldColor = txt.colors[C_TOPLEFT];
-            else if (coloringPropertyName == "tr") 
+            else if (coloringPropertyName == "tr")
                 coloringOldColor = txt.colors[C_TOPRIGHT];
-            else if (coloringPropertyName == "bl") 
+            else if (coloringPropertyName == "bl")
                 coloringOldColor = txt.colors[C_BOTTOMLEFT];
-            else if (coloringPropertyName == "br") 
+            else if (coloringPropertyName == "br")
                 coloringOldColor = txt.colors[C_BOTTOMRIGHT];
-            
+
             ShowColorWheelWithColor(coloringOldColor);
         }
-    }          
+    }
     return true;
 }
 

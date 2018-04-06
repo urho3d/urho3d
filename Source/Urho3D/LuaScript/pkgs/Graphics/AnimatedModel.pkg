@@ -21,7 +21,7 @@ class AnimatedModel : public StaticModel
     unsigned GetNumAnimationStates() const;
     AnimationState* GetAnimationState(Animation* animation) const;
     AnimationState* GetAnimationState(const String animationName) const;
-    AnimationState* GetAnimationState(const StringHash animationNameHash) const;
+    AnimationState* GetAnimationState(StringHash animationNameHash) const;
     AnimationState* GetAnimationState(unsigned index) const;
     float GetAnimationLodBias() const;
     bool GetUpdateInvisible() const;
@@ -30,7 +30,7 @@ class AnimatedModel : public StaticModel
     float GetMorphWeight(StringHash nameHash) const;
     float GetMorphWeight(unsigned index) const;
     bool IsMaster() const;
-    
+
     void UpdateBoneBoundingBox();
 
     tolua_property__get_set Model* model;

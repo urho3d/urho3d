@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,22 +37,25 @@ class URHO3D_API ScrollView : public UIElement
 
 public:
     /// Construct.
-    ScrollView(Context* context);
+    explicit ScrollView(Context* context);
     /// Destruct.
-    virtual ~ScrollView();
+    ~ScrollView() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Perform UI element update.
-    virtual void Update(float timeStep);
+    void Update(float timeStep) override;
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers);
+    void OnWheel(int delta, int buttons, int qualifiers) override;
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    void OnKey(int key, int buttons, int qualifiers) override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+
+    /// Return whether the element could handle wheel input.
+    bool IsWheelHandler() const override { return true; }
 
     /// Set content element.
     void SetContentElement(UIElement* element);
@@ -62,6 +65,10 @@ public:
     void SetViewPosition(int x, int y);
     /// Set scrollbars' visibility manually. Disables scrollbar autoshow/hide.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
+    /// Set horizontal scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    void SetHorizontalScrollBarVisible(bool visible);
+    /// Set vertical scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    void SetVerticalScrollBarVisible(bool visible);
     /// Set whether to automatically show/hide scrollbars. Default true.
     void SetScrollBarsAutoVisible(bool enable);
     /// Set arrow key scroll step. Also sets it on the scrollbars.
@@ -99,6 +106,12 @@ public:
     /// Return whether scrollbars are automatically shown/hidden.
     bool GetScrollBarsAutoVisible() const { return scrollBarsAutoVisible_; }
 
+    /// Return whether the horizontal scrollbar is visible.
+    bool GetHorizontalScrollBarVisible() const;
+
+    /// Return whether the vertical scrollbar is visible.
+    bool GetVerticalScrollBarVisible() const;
+
     /// Return arrow key scroll step.
     float GetScrollStep() const;
 
@@ -122,7 +135,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Filter implicit attributes in serialization process for internal scroll bar.
     bool FilterScrollBarImplicitAttributes(XMLElement& dest, const String& name) const;
     /// Resize panel based on scrollbar visibility.

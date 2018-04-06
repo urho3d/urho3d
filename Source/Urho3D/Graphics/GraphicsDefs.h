@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -180,7 +180,7 @@ enum VertexElementSemantic
 struct URHO3D_API VertexElement
 {
     /// Default-construct.
-    VertexElement() :
+    VertexElement() noexcept :
         type_(TYPE_VECTOR3),
         semantic_(SEM_POSITION),
         index_(0),
@@ -190,7 +190,7 @@ struct URHO3D_API VertexElement
     }
 
     /// Construct with type, semantic, index and whether is per-instance data.
-    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) :
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) noexcept :
         type_(type),
         semantic_(semantic),
         index_(index),

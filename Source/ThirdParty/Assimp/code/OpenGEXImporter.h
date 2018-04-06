@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2014, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -47,13 +48,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <list>
+#include <map>
+#include <memory>
 
 namespace ODDLParser {
     class DDLNode;
     struct Context;
 }
+
 struct aiNode;
 struct aiMaterial;
+struct aiCamera;
+struct aiLight;
 
 namespace Assimp {
 namespace OpenGEX {
@@ -110,7 +116,11 @@ protected:
     void handleObjectRefNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleMaterialRefNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleGeometryNode( ODDLParser::DDLNode *node, aiScene *pScene );
+    void handleCameraNode( ODDLParser::DDLNode *node, aiScene *pScene );
+    void handleLightNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleGeometryObject( ODDLParser::DDLNode *node, aiScene *pScene );
+    void handleCameraObject( ODDLParser::DDLNode *node, aiScene *pScene );
+    void handleLightObject( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleTransformNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleMeshNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleVertexArrayNode( ODDLParser::DDLNode *node, aiScene *pScene );
@@ -118,7 +128,12 @@ protected:
     void handleMaterialNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleColorNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void handleTextureNode( ODDLParser::DDLNode *node, aiScene *pScene );
+    void handleParamNode( ODDLParser::DDLNode *node, aiScene *pScene );
+    void handleAttenNode( ODDLParser::DDLNode *node, aiScene *pScene );
     void copyMeshes( aiScene *pScene );
+    void copyCameras( aiScene *pScene );
+    void copyLights( aiScene *pScene );
+    void copyMaterials( aiScene *pScene );
     void resolveReferences();
     void pushNode( aiNode *node, aiScene *pScene );
     aiNode *popNode();
@@ -130,6 +145,8 @@ private:
     struct VertexContainer {
         size_t m_numVerts;
         aiVector3D *m_vertices;
+        size_t m_numColors;
+        aiColor4D *m_colors;
         size_t m_numNormals;
         aiVector3D *m_normals;
         size_t m_numUVComps[ AI_MAX_NUMBER_OF_TEXTURECOORDS ];
@@ -138,9 +155,8 @@ private:
         VertexContainer();
         ~VertexContainer();
 
-    private:
-        VertexContainer( const VertexContainer & );
-        VertexContainer &operator = ( const VertexContainer & );
+        VertexContainer( const VertexContainer & ) = delete;
+        VertexContainer &operator = ( const VertexContainer & ) = delete;
     };
 
     struct RefInfo {
@@ -156,9 +172,8 @@ private:
         RefInfo( aiNode *node, Type type, std::vector<std::string> &names );
         ~RefInfo();
 
-    private:
-        RefInfo( const RefInfo & );
-        RefInfo &operator = ( const RefInfo & );
+        RefInfo( const RefInfo & ) = delete;
+        RefInfo &operator = ( const RefInfo & ) = delete;
     };
 
     struct ChildInfo {
@@ -166,12 +181,13 @@ private:
         std::list<aiNode*> m_children;
     };
     ChildInfo *m_root;
-    typedef std::map<aiNode*, ChildInfo*> NodeChildMap;
+    typedef std::map<aiNode*, std::unique_ptr<ChildInfo> > NodeChildMap;
     NodeChildMap m_nodeChildMap;
 
     std::vector<aiMesh*> m_meshCache;
     typedef std::map<std::string, size_t> ReferenceMap;
     std::map<std::string, size_t> m_mesh2refMap;
+    std::map<std::string, size_t> m_material2refMap;
 
     ODDLParser::Context *m_ctx;
     MetricInfo m_metrics[ MetricInfo::Max ];
@@ -179,10 +195,14 @@ private:
     VertexContainer m_currentVertices;
     aiMesh *m_currentMesh;
     aiMaterial *m_currentMaterial;
+    aiLight *m_currentLight;
+    aiCamera *m_currentCamera;
     int m_tokenType;
     std::vector<aiMaterial*> m_materialCache;
+    std::vector<aiCamera*> m_cameraCache;
+    std::vector<aiLight*> m_lightCache;
     std::vector<aiNode*> m_nodeStack;
-    std::vector<RefInfo*> m_unresolvedRefStack;
+    std::vector<std::unique_ptr<RefInfo> > m_unresolvedRefStack;
 };
 
 } // Namespace OpenGEX

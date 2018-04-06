@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_cocoaopengl_h
-#define _SDL_cocoaopengl_h
+#ifndef SDL_cocoaopengl_h_
+#define SDL_cocoaopengl_h_
 
 #if SDL_VIDEO_OPENGL_CGL
 
@@ -58,11 +58,11 @@ extern void Cocoa_GL_GetDrawableSize(_THIS, SDL_Window * window,
                                      int * w, int * h);
 extern int Cocoa_GL_SetSwapInterval(_THIS, int interval);
 extern int Cocoa_GL_GetSwapInterval(_THIS);
-extern void Cocoa_GL_SwapWindow(_THIS, SDL_Window * window);
+extern int Cocoa_GL_SwapWindow(_THIS, SDL_Window * window);
 extern void Cocoa_GL_DeleteContext(_THIS, SDL_GLContext context);
 
 #endif /* SDL_VIDEO_OPENGL_CGL */
 
-#endif /* _SDL_cocoaopengl_h */
+#endif /* SDL_cocoaopengl_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

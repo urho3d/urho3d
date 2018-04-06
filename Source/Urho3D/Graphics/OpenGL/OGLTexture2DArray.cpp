@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ void Texture2DArray::OnDeviceReset()
     if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
@@ -82,7 +82,7 @@ void Texture2DArray::Release()
             for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             {
                 if (graphics_->GetTexture(i) == this)
-                    graphics_->SetTexture(i, 0);
+                    graphics_->SetTexture(i, nullptr);
             }
 
             glDeleteTextures(1, &object_.name_);
@@ -134,8 +134,8 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
 
     if (IsCompressed())
     {
-        x &= ~3;
-        y &= ~3;
+        x &= ~3u;
+        y &= ~3u;
     }
 
     int levelWidth = GetLevelWidth(level);
@@ -156,7 +156,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     {
         if (wholeLevel)
             glTexImage3D(target_, level, format, width, height, layers_, 0, GetExternalFormat(format_),
-                GetDataType(format_), 0);
+                GetDataType(format_), nullptr);
         glTexSubImage3D(target_, level, x, y, layer, width, height, 1, GetExternalFormat(format_),
             GetDataType(format_), data);
     }
@@ -164,13 +164,13 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     {
         if (wholeLevel)
             glCompressedTexImage3D(target_, level, format, width, height, layers_, 0,
-                GetDataSize(width, height, layers_), 0);
+                GetDataSize(width, height, layers_), nullptr);
         glCompressedTexSubImage3D(target_, level, x, y, layer, width, height, 1, format,
             GetDataSize(width, height), data);
     }
 #endif
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 }
 
@@ -205,7 +205,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
     SharedPtr<Image> mipImage;
     unsigned memoryUse = 0;
     int quality = QUALITY_HIGH;
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();
 
@@ -312,10 +312,10 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
-        while (mipsToSkip && (width / (1 << mipsToSkip) < 4 || height / (1 << mipsToSkip) < 4))
+        while (mipsToSkip && (width / (1u << mipsToSkip) < 4 || height / (1u << mipsToSkip) < 4))
             --mipsToSkip;
-        width /= (1 << mipsToSkip);
-        height /= (1 << mipsToSkip);
+        width /= (1u << mipsToSkip);
+        height /= (1u << mipsToSkip);
 
         // Create the texture array when layer 0 is being loaded, assume rest of the layers are same size & format
         if (!layer)
@@ -347,7 +347,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
             }
             else
             {
-                unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
+                auto* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
                 SetData(layer, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
@@ -405,7 +405,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     else
         glGetCompressedTexImage(target_, level, dest);
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 #else
     URHO3D_LOGERROR("Getting texture data not supported");
@@ -445,7 +445,7 @@ bool Texture2DArray::Create()
     if (!IsCompressed())
     {
         glGetError();
-        glTexImage3D(target_, 0, format, width_, height_, layers_, 0, externalFormat, dataType, 0);
+        glTexImage3D(target_, 0, format, width_, height_, layers_, 0, externalFormat, dataType, nullptr);
         if (glGetError())
             success = false;
     }
@@ -453,7 +453,7 @@ bool Texture2DArray::Create()
         URHO3D_LOGERROR("Failed to create texture array");
 
     // Set mipmapping
-    if (usage_ == TEXTURE_DEPTHSTENCIL)
+    if (usage_ == TEXTURE_DEPTHSTENCIL || usage_ == TEXTURE_DYNAMIC)
         requestedLevels_ = 1;
     else if (usage_ == TEXTURE_RENDERTARGET)
     {
@@ -477,7 +477,7 @@ bool Texture2DArray::Create()
 
     // Set initial parameters, then unbind the texture
     UpdateParameters();
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
 
     return success;
 #endif

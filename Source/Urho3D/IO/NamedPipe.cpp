@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 #else
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <signal.h>
+#include <csignal>
 #include <unistd.h>
 #endif
 
@@ -79,7 +79,7 @@ unsigned NamedPipe::Seek(unsigned position)
 
 #ifdef _WIN32
 
-static const String pipePath("\\\\.\\pipe\\");
+static const char* pipePath = "\\\\.\\pipe\\";
 
 bool NamedPipe::Open(const String& pipeName, bool isServer)
 {
@@ -98,7 +98,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
             PIPE_BUFFER_SIZE,
             PIPE_BUFFER_SIZE,
             0,
-            0
+            nullptr
         );
 
         if (handle_ == INVALID_HANDLE_VALUE)
@@ -120,10 +120,10 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
             WString(pipePath + pipeName).CString(),
             GENERIC_READ | GENERIC_WRITE,
             0,
-            0,
+            nullptr,
             OPEN_EXISTING,
             0,
-            0
+            nullptr
         );
 
         if (handle_ == INVALID_HANDLE_VALUE)
@@ -145,7 +145,7 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD read = 0;
-        ReadFile(handle_, dest, size, &read, 0);
+        ReadFile(handle_, dest, size, &read, nullptr);
         return read;
     }
 
@@ -157,7 +157,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD written = 0;
-        WriteFile(handle_, data, size, &written, 0);
+        WriteFile(handle_, data, size, &written, nullptr);
         return written;
     }
 
@@ -194,7 +194,7 @@ bool NamedPipe::IsEof() const
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD bytesAvailable = 0;
-        PeekNamedPipe(handle_, 0, 0, 0, &bytesAvailable, 0);
+        PeekNamedPipe(handle_, nullptr, 0, nullptr, &bytesAvailable, nullptr);
         return bytesAvailable == 0;
     }
     else
@@ -203,9 +203,9 @@ bool NamedPipe::IsEof() const
 
 #else
 
-static const String pipePath("/tmp/");
+static const char* pipePath = "/tmp/";
 
-#define SAFE_CLOSE(handle) if (handle != -1) { close(handle); handle = -1; }
+#define SAFE_CLOSE(handle) if ((handle) != -1) { close(handle); (handle) = -1; }
 
 bool NamedPipe::Open(const String& pipeName, bool isServer)
 {
@@ -363,14 +363,12 @@ bool NamedPipe::IsEof() const
     if (readHandle_ != -1)
     {
         fd_set set;
-        FD_ZERO(&set);
+        FD_ZERO(&set);      // NOLINT(modernize-use-bool-literals)
         FD_SET(readHandle_, &set);
 
-        struct timeval timeout;
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 1000; // 1ms timeout for select
+        struct timeval timeout{0, 1000};    // 1ms timeout for select
 
-        return select(readHandle_ + 1, &set, 0, 0, &timeout) <= 0;
+        return select(readHandle_ + 1, &set, nullptr, nullptr, &timeout) <= 0;
     }
     else
         return true;

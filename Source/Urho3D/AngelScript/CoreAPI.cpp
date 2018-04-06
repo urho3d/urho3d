@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ static int StringHashCmp(const StringHash& lhs, const StringHash& rhs)
 
 static void RegisterStringHash(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<StringHash>() | asOBJ_APP_CLASS_ALLINTS);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructStringHashCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringHashInit), asCALL_CDECL_OBJLAST);
@@ -383,13 +383,13 @@ static CScriptArray* VariantGetStringVector(Variant* ptr)
 
 static asIScriptObject* VariantGetScriptObject(Variant* ptr)
 {
-    asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
+    auto* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
     if (!object)
-        return 0;
+        return nullptr;
 
     asITypeInfo* scriptObjectInterface = object->GetEngine()->GetTypeInfoByName("ScriptObject");
     if (!object->GetObjectType()->Implements(scriptObjectInterface))
-        return 0;
+        return nullptr;
 
     return object;
 }
@@ -807,6 +807,7 @@ static void RegisterTimer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Time", "uint get_frameNumber() const", asMETHOD(Time, GetFrameNumber), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_timeStep() const", asMETHOD(Time, GetTimeStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_elapsedTime()", asMETHOD(Time, GetElapsedTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Time", "float get_framesPerSecond() const", asMETHOD(Time, GetFramesPerSecond), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "uint get_systemTime() const", asFUNCTION(TimeGetSystemTime), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Time", "uint get_timeSinceEpoch() const", asFUNCTION(TimeGetTimeSinceEpoch), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Time", "String get_timeStamp() const", asFUNCTION(TimeGetTimeStamp), asCALL_CDECL_OBJLAST);
@@ -859,15 +860,6 @@ static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
     return VectorToArray<String>(enumNames, "Array<String>");
 }
 
-static CScriptArray* AttributeInfoGetVariantStructureElementNames(AttributeInfo* ptr)
-{
-    Vector<String> variantStructureElementNames;
-    const char** variantStructureElementNamesPtrs = ptr->variantStructureElementNames_;
-    while (variantStructureElementNamesPtrs && *variantStructureElementNamesPtrs)
-        variantStructureElementNames.Push(*variantStructureElementNamesPtrs++);
-    return VectorToArray<String>(variantStructureElementNames, "Array<String>");
-}
-
 static Object* CreateObject(const String& objectType)
 {
     if (Context* context = GetScriptContext())
@@ -878,7 +870,7 @@ static Object* CreateObject(const String& objectType)
             return object;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 static void SendEvent(const String& eventType, VariantMap& eventData)
@@ -991,7 +983,7 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
     ptr->~WeakPtr<RefCounted>();
 }
 
-static void SetGlobalVar(const String& key, Variant value)
+static void SetGlobalVar(const String& key, const Variant& value)
 {
     GetScriptContext()->SetGlobalVar(key, value);
 }
@@ -1014,11 +1006,11 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames() const", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_variantStructureElementNames() const", asFUNCTION(AttributeInfoGetVariantStructureElementNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
     engine->RegisterObjectProperty("AttributeInfo", "String name", offsetof(AttributeInfo, name_));
     engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
     engine->RegisterObjectProperty("AttributeInfo", "uint mode", offsetof(AttributeInfo, mode_));
+    engine->RegisterObjectProperty("AttributeInfo", "VariantMap metadata", offsetof(AttributeInfo, metadata_));
 
     RegisterObject<Object>(engine, "Object");
 

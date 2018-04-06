@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@
 #include "../Scene/Component.h"
 
 #ifdef DT_POLYREF64
-typedef uint64_t dtPolyRef;
+using dtPolyRef = uint64_t;
 #else
-typedef unsigned int dtPolyRef;
+using dtPolyRef = unsigned int;
 #endif
 
 class dtCrowd;
@@ -64,25 +64,25 @@ class URHO3D_API CrowdManager : public Component
 
 public:
     /// Construct.
-    CrowdManager(Context* context);
+    explicit CrowdManager(Context* context);
     /// Destruct.
-    virtual ~CrowdManager();
+    ~CrowdManager() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
 
     /// Draw the agents' pathing debug data.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
     /// Set the crowd target position. The target position is set to all crowd agents found in the specified node. Defaulted to scene node.
-    void SetCrowdTarget(const Vector3& position, Node* node = 0);
+    void SetCrowdTarget(const Vector3& position, Node* node = nullptr);
     /// Set the crowd move velocity. The move velocity is applied to all crowd agents found in the specified node. Defaulted to scene node.
-    void SetCrowdVelocity(const Vector3& velocity, Node* node = 0);
+    void SetCrowdVelocity(const Vector3& velocity, Node* node = nullptr);
     /// Reset any crowd target for all crowd agents found in the specified node. Defaulted to scene node.
-    void ResetCrowdTarget(Node* node = 0);
+    void ResetCrowdTarget(Node* node = nullptr);
     /// Set the maximum number of agents.
     void SetMaxAgents(unsigned maxAgents);
     /// Set the maximum radius of any agent.
@@ -103,21 +103,21 @@ public:
     void SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params);
 
     /// Get all the crowd agent components in the specified node hierarchy. If the node is not specified then use scene node. When inCrowdFilter is set to true then only get agents that are in the crowd.
-    PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
+    PODVector<CrowdAgent*> GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const;
     /// Find the nearest point on the navigation mesh to a given point using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
-    Vector3 FindNearestPoint(const Vector3& point, int queryFilterType, dtPolyRef* nearestRef = 0);
+    Vector3 FindNearestPoint(const Vector3& point, int queryFilterType, dtPolyRef* nearestRef = nullptr);
     /// Try to move along the surface from one point to another using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
     Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited = 3);
     /// Find a path between world space points using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Return non-empty list of points if successful.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType);
     /// Return a random point on the navigation mesh using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
-    Vector3 GetRandomPoint(int queryFilterType, dtPolyRef* randomRef = 0);
+    Vector3 GetRandomPoint(int queryFilterType, dtPolyRef* randomRef = nullptr);
     /// Return a random point on the navigation mesh within a circle using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. The circle radius is only a guideline and in practice the returned point may be further away.
-    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType, dtPolyRef* randomRef = 0);
+    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType, dtPolyRef* randomRef = nullptr);
     /// Return distance to wall from a point using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Maximum search radius must be specified.
-    float GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
+    float GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr);
     /// Perform a walkability raycast on the navigation mesh between start and end using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Return the point where a wall was hit, or the end point if no walls.
-    Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = 0);
+    Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = nullptr);
 
     /// Get the maximum number of agents.
     unsigned GetMaxAgents() const { return maxAgents_; }
@@ -160,7 +160,7 @@ protected:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    void OnSceneSet(Scene* scene) override;
     /// Update the crowd simulation.
     void Update(float delta);
     /// Get the detour crowd agent.
@@ -180,21 +180,21 @@ private:
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
 
     /// Internal Detour crowd object.
-    dtCrowd* crowd_;
+    dtCrowd* crowd_{};
     /// NavigationMesh for which the crowd was created.
     WeakPtr<NavigationMesh> navigationMesh_;
     /// The NavigationMesh component Id for pending crowd creation.
-    unsigned navigationMeshId_;
+    unsigned navigationMeshId_{};
     /// The maximum number of agents the crowd can manage.
-    unsigned maxAgents_;
+    unsigned maxAgents_{};
     /// The maximum radius of any agent that will be added to the crowd.
-    float maxAgentRadius_;
+    float maxAgentRadius_{};
     /// Number of query filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
-    unsigned numQueryFilterTypes_;
+    unsigned numQueryFilterTypes_{};
     /// Number of configured area in each filter type. Limit to DT_MAX_AREAS.
     PODVector<unsigned> numAreas_;
     /// Number of obstacle avoidance types configured in the crowd. Limit to DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS.
-    unsigned numObstacleAvoidanceTypes_;
+    unsigned numObstacleAvoidanceTypes_{};
 };
 
 }

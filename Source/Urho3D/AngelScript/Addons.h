@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,8 +51,8 @@ public:
     // Factory functions
     static CScriptArray *Create(asITypeInfo *ot);
     static CScriptArray *Create(asITypeInfo *ot, asUINT length);
-    static CScriptArray *Create(asITypeInfo *ot, asUINT length, void *defaultValue);
-    static CScriptArray *Create(asITypeInfo *ot, void *listBuffer);
+    static CScriptArray *Create(asITypeInfo *ot, asUINT length, void *defVal);
+    static CScriptArray *Create(asITypeInfo *ot, void *initList);
 
     // Memory management
     void AddRef() const;
@@ -79,9 +79,9 @@ public:
     void       *At(asUINT index);
     const void *At(asUINT index) const;
 
-    // Set value of an element. 
+    // Set value of an element.
     // The value arg should be a pointer to the value that will be copied to the element.
-    // Remember, if the array holds handles the value parameter should be the 
+    // Remember, if the array holds handles the value parameter should be the
     // address of the handle. The refCount of the object will also be incremented
     void  SetValue(asUINT index, void *value);
 
@@ -106,6 +106,8 @@ public:
     int  Find(asUINT startAt, void *value) const;
     int  FindByRef(void *ref) const;
     int  FindByRef(asUINT startAt, void *ref) const;
+    // Swap content of two arrays for avoid copy
+    bool Swap(CScriptArray& other);
 
     // GC methods
     int  GetRefCount();
@@ -119,11 +121,11 @@ protected:
     mutable bool      gcFlag;
     asITypeInfo      *objType;
     SArrayBuffer     *buffer;
-    int               elementSize;
-    int               subTypeId;
+    size_t            elementSize;
+    int               subTypeId{};
 
     // Constructors
-    CScriptArray(asITypeInfo *ot, void *initBuf); // Called from script when initialized with list
+    CScriptArray(asITypeInfo *ot, void *buf); // Called from script when initialized with list
     CScriptArray(asUINT length, asITypeInfo *ot);
     CScriptArray(asUINT length, void *defVal, asITypeInfo *ot);
     CScriptArray(const CScriptArray &other);
@@ -150,7 +152,7 @@ class CScriptDictionary;
 class URHO3D_API CScriptDictValue
 {
 public:
-    // This class must not be declared as local variable in C++, because it needs 
+    // This class must not be declared as local variable in C++, because it needs
     // to receive the script engine pointer in all operations. The engine pointer
     // is not kept as member in order to keep the size down
     CScriptDictValue();
@@ -286,14 +288,14 @@ public:
 
 protected:
     // Since the dictionary uses the asAllocMem and asFreeMem functions to allocate memory
-    // the constructors are made protected so that the application cannot allocate it 
+    // the constructors are made protected so that the application cannot allocate it
     // manually in a different way
-    CScriptDictionary(asIScriptEngine *engine);
-    CScriptDictionary(asBYTE *buffer);
+    explicit CScriptDictionary(asIScriptEngine *engine);
+    explicit CScriptDictionary(asBYTE *buffer);
 
     // We don't want anyone to call the destructor directly, it should be called through the Release method
     virtual ~CScriptDictionary();
-    
+
     // Our properties
     asIScriptEngine *engine;
     mutable int refCount;

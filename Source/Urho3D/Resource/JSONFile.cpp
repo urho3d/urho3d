@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,9 +47,7 @@ JSONFile::JSONFile(Context* context) :
 {
 }
 
-JSONFile::~JSONFile()
-{
-}
+JSONFile::~JSONFile() = default;
 
 void JSONFile::RegisterObject(Context* context)
 {
@@ -227,7 +225,7 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     writer.SetIndent(!indendation.Empty() ? indendation.Front() : '\0', indendation.Length());
 
     document.Accept(writer);
-    unsigned size = (unsigned)buffer.GetSize();
+    auto size = (unsigned)buffer.GetSize();
     return dest.Write(buffer.GetString(), size) == size;
 }
 

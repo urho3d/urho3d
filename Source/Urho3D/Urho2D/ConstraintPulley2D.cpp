@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,7 @@ ConstraintPulley2D::ConstraintPulley2D(Context* context) :
 
 }
 
-ConstraintPulley2D::~ConstraintPulley2D()
-{
-}
+ConstraintPulley2D::~ConstraintPulley2D() = default;
 
 void ConstraintPulley2D::RegisterObject(Context* context)
 {
@@ -121,12 +119,12 @@ void ConstraintPulley2D::SetRatio(float ratio)
 b2JointDef* ConstraintPulley2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
-        return 0;
+        return nullptr;
 
     b2Body* bodyA = ownerBody_->GetBody();
     b2Body* bodyB = otherBody_->GetBody();
     if (!bodyA || !bodyB)
-        return 0;
+        return nullptr;
 
     jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyGroundAnchor_), ToB2Vec2(otherBodyGroundAnchor_),
         ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_), jointDef_.ratio);

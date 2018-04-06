@@ -1,5 +1,11 @@
 $#include "Urho2D/TmxFile2D.h"
 
+// FIXME: complete the bindings for the rest of the class methods
 class TmxFile2D : Resource
 {
+    void SetSpriteTextureEdgeOffset(float offset);
+
+    float GetSpriteTextureEdgeOffset() const;
+
+    tolua_property__get_set float spriteTextureEdgeOffset @ edgeOffset;
 };

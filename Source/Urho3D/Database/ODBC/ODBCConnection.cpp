@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,7 +113,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 
                         default:
                             // All other types are stored using their string representation in the Variant
-                            colValues[i] = result.resultImpl_.get<nanodbc::string_type>((short)i).c_str();
+                            colValues[i] = result.resultImpl_.get<nanodbc::string>((short)i).c_str();
                             break;
                         }
                     }

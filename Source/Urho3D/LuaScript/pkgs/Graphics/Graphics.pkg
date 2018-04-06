@@ -18,6 +18,7 @@ class Graphics : public Object
     bool ToggleFullscreen();
     void Maximize();
     void Minimize();
+    void Raise();
     void Close();
     bool TakeScreenShot(Image& destImage);
     void BeginDumpShaders(const String fileName);
@@ -62,6 +63,10 @@ class Graphics : public Object
     IntVector2 GetDesktopResolution(int monitor) const;
     int GetMonitorCount() const;
     const String GetShaderCacheDir() const;
+    int GetCurrentMonitor() const;
+    bool GetMaximized() const;
+    void Raise() const;
+    Vector3 GetDisplayDPI(int monitor=0) const;
 
     static unsigned GetAlphaFormat();
     static unsigned GetLuminanceFormat();

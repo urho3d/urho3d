@@ -2010,7 +2010,7 @@ Both a RigidBody and at least one CollisionShape component must exist in a scene
 
 CollisionShape provides two APIs for defining the collision geometry. Either setting individual properties such as the \ref CollisionShape::SetShapeType "shape type" or \ref CollisionShape::SetSize "size", or specifying both the shape type and all its properties at once: see for example \ref CollisionShape::SetBox "SetBox()", \ref CollisionShape::SetCapsule "SetCapsule()" or \ref CollisionShape::SetTriangleMesh "SetTriangleMesh()".
 
-RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0. Note that the triangle mesh collision shape is not supported for moving objects; it will not collide properly due to limitations in the Bullet library. In this case the convex hull shape can be used instead.
+RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0. Note that the triangle mesh collision shape is not supported for moving objects; it will not collide properly due to limitations in the Bullet library. In this case the convex hull or GImpact triangle mesh shape can be used instead.
 
 The collision behaviour of a rigid body is controlled by several variables. First, the collision layer and mask define which other objects to collide with: see \ref RigidBody::SetCollisionLayer "SetCollisionLayer()" and \ref RigidBody::SetCollisionMask "SetCollisionMask()". By default a rigid body is on layer 1; the layer will be ANDed with the other body's collision mask to see if the collision should be reported. A rigid body can also be set to \ref RigidBody::SetTrigger "trigger mode" to only report collisions without actually applying collision forces. This can be used to implement trigger areas. Finally, the \ref RigidBody::SetFriction "friction", \ref RigidBody::SetRollingFriction "rolling friction" and \ref RigidBody::SetRestitution "restitution" coefficients (between 0 - 1) control how kinetic energy is transferred in the collisions. Note that rolling friction is by default zero, and if you want for example a sphere rolling on the floor to eventually stop, you need to set a non-zero rolling friction on both the sphere and floor rigid bodies.
 
@@ -2953,20 +2953,35 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers and custom values.
 
-To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
+Attributes can either refer to a member of the object or define setter & getter functions. Member attributes can also have post-set action: member function without arguments that is called every time when value is assigned to the attribute.
+
+Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
+
+The folowing macros can be used to define an attribute:
+
+- `URHO3D_ATTRIBUTE`: Member of the object. Shall be convertible from and to specified type.
+- `URHO3D_ATTRIBUTE_EX`: Member of the object. Post-set member function callback is called when attribute is set.
+- `URHO3D_ACCESSOR_ATTRIBUTE`: Getter and setter member functions. Attribute value of specified type is passed into setter and expected to be returned from getter.
+- `URHO3D_CUSTOM_ATTRIBUTE`: Getter and setter functional objects that are directly working with Variant value. See \ref MakeVariantAttributeAccessor "MakeVariantAttributeAccessor()"
+- `URHO3D_ENUM_ATTRIBUTE`: 32-bit integer zero-based enumeration with human-readable names.
+- `URHO3D_ENUM_ATTRIBUTE_EX`: The same as `URHO3D_ATTRIBUTE_EX`, used for enumerations.
+- `URHO3D_ENUM_ACCESSOR_ATTRIBUTE`: The same as `URHO3D_ACCESSOR_ATTRIBUTE`, used for enumerations.
+- `URHO3D_CUSTOM_ENUM_ATTRIBUTE`: The same as `URHO3D_CUSTOM_ATTRIBUTE`, used for enumerations.
+
+To implement side effects to attributes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
 Each attribute can have a combination of the following flags:
 
-- AM_FILE: Is used for file serialization (load/save.)
-- AM_NET: Is used for network replication.
-- AM_LATESTDATA: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
-- AM_NOEDIT: Is an internal attribute and is not to be shown for editing.
-- AM_NODEID: Is a node ID and may need rewriting when instantiating scene content.
-- AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
+- `AM_FILE`: Is used for file serialization (load/save.)
+- `AM_NET`: Is used for network replication.
+- `AM_LATESTDATA`: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
+- `AM_NOEDIT`: Is an internal attribute and is not to be shown for editing.
+- `AM_NODEID`: Is a node ID and may need rewriting when instantiating scene content.
+- `AM_COMPONENTID`: Is a component ID and may need rewriting when instantiating scene content.
 
-The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+The default flags are `AM_FILE` and `AM_NET`. Note that it is legal to define neither `AM_FILE` or `AM_NET`, meaning the attribute has only run-time significance (perhaps for editing.)
 
 See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
@@ -2982,7 +2997,7 @@ Note that if a particular networked application does not need scene replication,
 
 \section Network_Connecting Connecting to a server
 
-Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 1234.
+Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 2345.
 
 Note the scene (to be used for replication) and identity VariantMap supplied as parameters when connecting. The identity data can contain for example the user name or credentials, it is completely application-specified. The identity data is sent right after connecting and causes the E_CLIENTIDENTITY event to be sent on the server when received. By subscribing to this event, server code can examine incoming connections and accept or deny them. The default is to accept all connections.
 
@@ -2990,7 +3005,7 @@ After connecting successfully, client code can get the Connection object represe
 
 \section Network_Replication Scene replication
 
-%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have been not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
+%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
 
 The CreateMode translates into two different node and component ID ranges - replicated ID's range from 0x1 to 0xffffff, while local ID's range from 0x1000000 to 0xffffffff. This means there is a maximum of 16777215 replicated nodes or components in a scene.
 
@@ -3072,7 +3087,7 @@ For high performance, consider using unordered messages, because for in-order me
 
 \section Network_RemoteEvents Remote events
 
-A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally set to be originate from a specific Node in the receiver's scene ("remote node event.")
+A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally be set to originate from a specific Node in the receiver's scene ("remote node event.")
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
@@ -3785,7 +3800,13 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Pointers and references append the * or & symbol to the type without a space in between. For example \c Drawable* drawable, \c %Serializer& dest.
 
-- The macro \c NULL and 0 should not be used for null poitners, \c nullptr is used instead.
+- The macro \c NULL and 0 should not be used for null pointers, \c nullptr is used instead.
+
+- \c override is used wherever possible.
+
+- \c using is used instead of \c typedef in type declarations.
+
+- `enum class` is not used because of legacy reasons.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3800,30 +3821,24 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
-Keep contributions consistent with existing code unless wide scale refactoring is performed.
-Follow this guideline to keep code style consistent among contributions and contributors:
+It's recommended to follow <a href="https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md">C++ Core Guidelines</a> (except items that contradict Urho legacy, e.g. ES.107, Enum.3, Enum.5)
 
-- Use \c override wherever possible.
+Use this brief checklist to keep code style consistent among contributions and contributors:
 
 - Prefer inplace member initialization to initializer lists.
 
-- Prefer \c using to \c typedef type declarations.
-
 - Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
 
-- Avoid \c enum \c class to keep Urho API consistent. TODO: Perform API-breaking migration to \c enum \c class?
+- Avoid \c auto unless it increases code readability. More details <a href="https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html">here</a> and <a href="https://google.github.io/styleguide/cppguide.html#auto">here</a>.
 
-- Avoid \c auto unless it increases code readability.
+  - Use \c auto for verbose, unknown or redundant types. Example:
+    \code
+    auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
+    for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
+    auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
+    \endcode
 
-- Use \c auto for verbose, unknown or redundant types. Example:
-  \code
-  auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
-  for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
-  auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
-  \endcode
-  See https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html and https://google.github.io/styleguide/cppguide.html#auto
-
-- Use \c auto instead of manual type deduction via \c decltype and \c typename.
+  - Use \c auto instead of manual type deduction via \c decltype and \c typename.
 
 \page ContributionChecklist Contribution checklist
 
@@ -3831,7 +3846,7 @@ When contributing code to the Urho3D project, there are a few things to check so
 
 First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
-Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2017 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2018 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
 Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
 
