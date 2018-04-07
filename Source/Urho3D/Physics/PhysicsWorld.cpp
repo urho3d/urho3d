@@ -429,23 +429,26 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
     }
 }
 
-void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask)
+void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask, float overlap_distance)
 {
     URHO3D_PROFILE(PhysicsRaycastSingleSegmented);
+
+    assert(overlap_distance < segmentDistance);
 
     if (maxDistance >= M_INFINITY)
         URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
-    btVector3 start = ToBtVector3(ray.origin_);
+    auto start = ToBtVector3(ray.origin_);
     btVector3 end;
-    btVector3 direction = ToBtVector3(ray.direction_);
-    float distance;
+    const auto direction = ToBtVector3(ray.direction_);
+    const auto overlap = direction * overlap_distance; // overlap a bit with the previous segment for better precision, to avoid missing hits
 
-    for (float remainingDistance = maxDistance; remainingDistance > 0; remainingDistance -= segmentDistance)
+    // calculate distances using segment_index directly to avoid precision errors with floating point
+    float rayDistance = 0;
+    for(unsigned segment_index = 0; rayDistance < maxDistance; rayDistance = ++segment_index * segmentDistance) // NOLINT
     {
-        distance = Min(remainingDistance, segmentDistance);
-
-        end = start + distance * direction;
+        const auto remainingDistance = maxDistance - rayDistance;
+        end = start + direction * (remainingDistance < segmentDistance ? remainingDistance : segmentDistance);
 
         btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
         rayCallback.m_collisionFilterGroup = (short)0xffff;
@@ -465,7 +468,7 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
         }
 
         // Use the end position as the new start position
-        start = end;
+        start = end - overlap;
     }
 
     // Didn't hit anything
