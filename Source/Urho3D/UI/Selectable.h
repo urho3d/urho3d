@@ -27,13 +27,13 @@
 namespace Urho3D
 {
 
-class URHO3D_API Selectable : public UIElement
+class URHO3D_API UISelectable : public UIElement
 {
 public:
-    URHO3D_OBJECT(Selectable, UIElement);
+    URHO3D_OBJECT(UISelectable, UIElement);
 
     using UIElement::UIElement;
-    ~Selectable() override = default;
+    ~UISelectable() override = default;
 
     /// Register object factory.
     static void RegisterObject(Context* context);

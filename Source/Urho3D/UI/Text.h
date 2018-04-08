@@ -70,9 +70,9 @@ struct GlyphLocation
 };
 
 /// %Text %UI element.
-class URHO3D_API Text : public Selectable
+class URHO3D_API Text : public UISelectable
 {
-    URHO3D_OBJECT(Text, Selectable);
+    URHO3D_OBJECT(Text, UISelectable);
 
     friend class Text3D;
 
