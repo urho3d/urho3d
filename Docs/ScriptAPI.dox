@@ -2407,6 +2407,8 @@ namespace Urho3D
 - %Indent %Spacing : int
 - %Variables : VariantMap
 - %Tags : StringVector
+- %Selection %Color : Color
+- %Hover %Color : Color
 - %Font : ResourceRef
 - %Font %Size : float
 - %Text : String
@@ -2414,8 +2416,6 @@ namespace Urho3D
 - %Row %Spacing : float
 - %Word %Wrap : bool
 - %Auto %Localizable : bool
-- %Selection %Color : Color
-- %Hover %Color : Color
 - %Text %Effect : int
 - %Shadow %Offset : IntVector2
 - %Stroke %Thickness : int
@@ -2538,6 +2538,49 @@ namespace Urho3D
 - %Indent %Spacing : int
 - %Variables : VariantMap
 - %Tags : StringVector
+
+### UISelectable
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Min %Anchor : Vector2
+- %Max %Anchor : Vector2
+- %Min %Offset : IntVector2
+- %Max %Offset : IntVector2
+- %Pivot : Vector2
+- %Enable %Anchor : bool
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Tags : StringVector
+- %Selection %Color : Color
+- %Hover %Color : Color
 
 ### View3D
 - %Name : String
@@ -2885,6 +2928,7 @@ namespace Urho3D
 <a href="#Class_UI"><b>UI</b></a>
 <a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_UISelectable"><b>UISelectable</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
 <a href="#Class_VariantMap"><b>VariantMap</b></a>
@@ -15197,6 +15241,185 @@ Properties:
 - UIElement@ root // readonly
 - IntVector2 screenPosition // readonly
 - bool selected
+- IntVector2 size
+- bool sortChildren
+- String style
+- String[]@ tags // readonly
+- bool temporary
+- TraversalMode traversalMode
+- StringHash type // readonly
+- String typeName // readonly
+- bool useDerivedOpacity
+- VariantMap vars // readonly
+- VerticalAlignment verticalAlignment
+- bool visible
+- bool visibleEffective // readonly
+- int weakRefs // readonly
+- int width
+
+<a name="Class_UISelectable"></a>
+
+### UISelectable
+
+Methods:
+
+- void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
+- void ApplyAttributes()
+- void BringToFront()
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
+- void DisableLayoutUpdate()
+- IntVector2 ElementToScreen(const IntVector2&)
+- void EnableLayoutUpdate()
+- uint FindChild(UIElement@) const
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
+- UIElement@ GetElementEventSender() const
+- bool GetInterceptNetworkUpdate(const String&) const
+- uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
+- void InsertChild(uint, UIElement@)
+- bool IsChildOf(UIElement@) const
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- UIElement@ LoadChildXML(XMLFile@, XMLFile@)
+- UIElement@ LoadChildXML(const XMLElement&, XMLFile@)
+- bool LoadJSON(const JSONValue&)
+- bool LoadXML(File@)
+- bool LoadXML(VectorBuffer&)
+- bool LoadXML(XMLFile@, XMLFile@)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(const XMLElement&)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAllChildren()
+- void RemoveAllTags()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(uint)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
+- void ResetDeepEnabled()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(File@, const String& = "\t")
+- bool SaveXML(VectorBuffer&, const String& = "\t")
+- bool SaveXML(XMLElement&) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
+- void SetFixedHeight(int)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetInterceptNetworkUpdate(const String&, bool)
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetMaxAnchor(float, float)
+- void SetMaxSize(int, int)
+- void SetMinAnchor(float, float)
+- void SetMinSize(int, int)
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetPivot(float, float)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyle(const XMLElement&)
+- bool SetStyleAuto(XMLFile@ = null)
+- void UpdateLayout()
+- const Variant& GetVar(const StringHash&)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- bool bringToBack
+- bool bringToFront
+- String category // readonly
+- IntVector2 childOffset // readonly
+- UIElement@[] children // readonly
+- IntRect clipBorder
+- bool clipChildren
+- Color color // writeonly
+- bool colorGradient // readonly
+- Color[] colors
+- IntRect combinedScreenRect // readonly
+- XMLFile@ defaultStyle
+- float derivedOpacity // readonly
+- uint dragButtonCombo // readonly
+- int dragButtonCount // readonly
+- uint dragDropMode
+- bool editable
+- bool elementEventSender
+- bool enableAnchor
+- bool enabled
+- bool enabledSelf // readonly
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
+- bool focus
+- FocusMode focusMode
+- int height
+- HorizontalAlignment horizontalAlignment
+- Color hoverColor
+- bool hovering // readonly
+- int indent
+- int indentSpacing
+- int indentWidth // readonly
+- bool internal
+- IntRect layoutBorder
+- Vector2 layoutFlexScale
+- LayoutMode layoutMode
+- int layoutSpacing
+- Vector2 maxAnchor
+- int maxHeight
+- IntVector2 maxOffset
+- IntVector2 maxSize
+- int maxWidth
+- Vector2 minAnchor
+- int minHeight
+- IntVector2 minOffset
+- IntVector2 minSize
+- int minWidth
+- String name
+- uint numAllChildren // readonly
+- uint numAttributes // readonly
+- uint numChildren // readonly
+- ObjectAnimation@ objectAnimation
+- float opacity
+- UIElement@ parent
+- Vector2 pivot
+- IntVector2 position
+- int priority
+- int refs // readonly
+- UIElement@ root // readonly
+- IntVector2 screenPosition // readonly
+- bool selected
+- Color selectionColor
 - IntVector2 size
 - bool sortChildren
 - String style

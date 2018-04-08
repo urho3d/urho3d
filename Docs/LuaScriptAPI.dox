@@ -212,6 +212,7 @@ namespace Urho3D
 <a href="#Class_UI"><b>UI</b></a>
 <a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_UISelectable"><b>UISelectable</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
 <a href="#Class_VariantMap"><b>VariantMap</b></a>
@@ -6638,7 +6639,7 @@ Properties:
 - unsigned lodLevel (readonly)
 
 <a name="Class_Text"></a>
-### Text : UIElement
+### Text : UISelectable
 
 Methods:
 
@@ -6654,8 +6655,6 @@ Methods:
 - void SetWordwrap(bool enable)
 - void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED)
 - void ClearSelection()
-- void SetSelectionColor(const Color& color)
-- void SetHoverColor(const Color& color)
 - void SetTextEffect(TextEffect textEffect)
 - void SetEffectShadowOffset(const IntVector2& offset)
 - void SetEffectStrokeThickness(int thickness)
@@ -6671,8 +6670,6 @@ Methods:
 - bool GetWordwrap() const
 - unsigned GetSelectionStart() const
 - unsigned GetSelectionLength() const
-- const Color& GetSelectionColor() const
-- const Color& GetHoverColor() const
 - TextEffect GetTextEffect() const
 - const IntVector2& GetEffectShadowOffset() const
 - int GetEffectStrokeThickness() const
@@ -6698,8 +6695,6 @@ Properties:
 - bool autoLocalizable
 - unsigned selectionStart (readonly)
 - unsigned selectionLength (readonly)
-- Color& selectionColor
-- Color& hoverColor
 - TextEffect textEffect
 - IntVector2& effectShadowOffset
 - int effectStrokeThickness
@@ -7460,6 +7455,24 @@ Properties:
 - int indentWidth (readonly)
 - TraversalMode traversalMode
 - bool elementEventSender
+
+<a name="Class_UISelectable"></a>
+### UISelectable : UIElement
+
+Methods:
+
+- UISelectable() (GC)
+- UISelectable* new()
+- void delete()
+- void SetSelectionColor(const Color& color)
+- void SetHoverColor(const Color& color)
+- const Color& GetSelectionColor() const
+- const Color& GetHoverColor() const
+
+Properties:
+
+- Color& selectionColor
+- Color& hoverColor
 
 <a name="Class_ValueAnimation"></a>
 ### ValueAnimation : Resource
