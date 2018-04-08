@@ -8,16 +8,16 @@ namespace Urho3D
 
 extern const char* UI_CATEGORY;
 
-void Selectable::RegisterObject(Context* context)
+void UISelectable::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Selectable>(UI_CATEGORY);
+    context->RegisterFactory<UISelectable>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
     URHO3D_ATTRIBUTE("Selection Color", Color, selectionColor_, Color::TRANSPARENT, AM_FILE);
     URHO3D_ATTRIBUTE("Hover Color", Color, hoverColor_, Color::TRANSPARENT, AM_FILE);
 }
 
-void Selectable::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect & currentScissor)
+void UISelectable::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect & currentScissor)
 {
     // Hovering and/or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
@@ -34,12 +34,12 @@ void Selectable::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& verte
     hovering_ = false;
 }
 
-void Selectable::SetSelectionColor(const Color& color)
+void UISelectable::SetSelectionColor(const Color& color)
 {
     selectionColor_ = color;
 }
 
-void Selectable::SetHoverColor(const Color& color)
+void UISelectable::SetHoverColor(const Color& color)
 {
     hoverColor_ = color;
 }

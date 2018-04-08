@@ -2140,7 +2140,7 @@ void RegisterUILibrary(Context* context)
     Font::RegisterObject(context);
 
     UIElement::RegisterObject(context);
-    Selectable::RegisterObject(context);
+    UISelectable::RegisterObject(context);
     BorderImage::RegisterObject(context);
     Sprite::RegisterObject(context);
     Button::RegisterObject(context);
