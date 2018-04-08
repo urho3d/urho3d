@@ -27,21 +27,34 @@
 namespace Urho3D
 {
 
-struct URHO3D_API Selectable : UIElement
+class URHO3D_API Selectable : public UIElement
 {
+public:
     URHO3D_OBJECT(Selectable, UIElement);
 
     using UIElement::UIElement;
-    virtual ~Selectable() = default;
-
-    Color selectionColor_ = Color(0.f, 0.f, 0.f, 0.f);
-    Color hoverColor_ = Color(0.f, 0.f, 0.f, 0.f);
+    ~Selectable() override = default;
 
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+
+    /// Set selection background color. Color with 0 alpha (default) disables.
+    void SetSelectionColor(const Color& color);
+    /// Set hover background color. Color with 0 alpha (default) disables.
+    void SetHoverColor(const Color& color);
+
+    /// Return selection background color.
+    const Color& GetSelectionColor() const { return selectionColor_; }
+
+    /// Return hover background color.
+    const Color& GetHoverColor() const { return hoverColor_; }
+
+protected:
+    Color selectionColor_{ Color::TRANSPARENT };
+    Color hoverColor_{ Color::TRANSPARENT };
 };
 
 }

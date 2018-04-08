@@ -61,8 +61,6 @@ Text::Text(Context* context) :
     charLocationsDirty_(true),
     selectionStart_(0),
     selectionLength_(0),
-    selectionColor_(Color::TRANSPARENT),
-    hoverColor_(Color::TRANSPARENT),
     textEffect_(TE_NONE),
     shadowOffset_(IntVector2(1, 1)),
     strokeThickness_(1),
@@ -381,16 +379,6 @@ void Text::ClearSelection()
 {
     selectionStart_ = 0;
     selectionLength_ = 0;
-}
-
-void Text::SetSelectionColor(const Color& color)
-{
-    selectionColor_ = color;
-}
-
-void Text::SetHoverColor(const Color& color)
-{
-    hoverColor_ = color;
 }
 
 void Text::SetTextEffect(TextEffect textEffect)
