@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../UI/Selectable.h"
+#include "../UI/UISelectable.h"
 
 namespace Urho3D
 {

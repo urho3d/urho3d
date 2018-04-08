@@ -1292,6 +1292,16 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "Array<String>@ get_tags() const", asFUNCTION(UIElementGetTags), asCALL_CDECL_OBJLAST);
 }
 
+/// Template function for registering a class derived from UISelectable.
+template <class T> void RegisterUISelectable(asIScriptEngine* engine, const char* className)
+{
+    RegisterUIElement<T>(engine, className);
+    engine->RegisterObjectMethod(className, "void set_selectionColor(const Color&in)", asMETHOD(T, SetSelectionColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Color& get_selectionColor() const", asMETHOD(T, GetSelectionColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_hoverColor(const Color&in)", asMETHOD(T, SetHoverColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Color& get_hoverColor() const", asMETHOD(T, GetHoverColor), asCALL_THISCALL);
+}
+
 /// Template function for registering a class derived from BorderImage.
 template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char* className)
 {

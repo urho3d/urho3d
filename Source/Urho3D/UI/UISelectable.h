@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Math/Color.h"
 #include "../UI/UIElement.h"
 
 namespace Urho3D
@@ -32,7 +33,9 @@ class URHO3D_API UISelectable : public UIElement
 public:
     URHO3D_OBJECT(UISelectable, UIElement);
 
+    /// Construct.
     using UIElement::UIElement;
+    /// Destruct.
     ~UISelectable() override = default;
 
     /// Register object factory.
@@ -48,13 +51,14 @@ public:
 
     /// Return selection background color.
     const Color& GetSelectionColor() const { return selectionColor_; }
-
     /// Return hover background color.
     const Color& GetHoverColor() const { return hoverColor_; }
 
 protected:
-    Color selectionColor_{ Color::TRANSPARENT };
-    Color hoverColor_{ Color::TRANSPARENT };
+    /// Selection background color.
+    Color selectionColor_{Color::TRANSPARENT};
+    /// Hover background color.
+    Color hoverColor_{Color::TRANSPARENT};
 };
 
 }
