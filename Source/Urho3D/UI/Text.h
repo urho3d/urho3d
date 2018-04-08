@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../UI/UIElement.h"
+#include "../UI/Selectable.h"
 
 namespace Urho3D
 {
@@ -70,9 +70,9 @@ struct GlyphLocation
 };
 
 /// %Text %UI element.
-class URHO3D_API Text : public UIElement
+class URHO3D_API Text : public UISelectable
 {
-    URHO3D_OBJECT(Text, UIElement);
+    URHO3D_OBJECT(Text, UISelectable);
 
     friend class Text3D;
 
@@ -113,10 +113,6 @@ public:
     void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
     /// Clear selection.
     void ClearSelection();
-    /// Set selection background color. Color with 0 alpha (default) disables.
-    void SetSelectionColor(const Color& color);
-    /// Set hover background color. Color with 0 alpha (default) disables.
-    void SetHoverColor(const Color& color);
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
     /// Set shadow offset.
@@ -154,12 +150,6 @@ public:
 
     /// Return selection length.
     unsigned GetSelectionLength() const { return selectionLength_; }
-
-    /// Return selection background color.
-    const Color& GetSelectionColor() const { return selectionColor_; }
-
-    /// Return hover background color.
-    const Color& GetHoverColor() const { return hoverColor_; }
 
     /// Return text effect.
     TextEffect GetTextEffect() const { return textEffect_; }
@@ -243,10 +233,6 @@ protected:
     unsigned selectionStart_;
     /// Selection length.
     unsigned selectionLength_;
-    /// Selection background color.
-    Color selectionColor_;
-    /// Hover background color.
-    Color hoverColor_;
     /// Text effect.
     TextEffect textEffect_;
     /// Text effect shadow offset.

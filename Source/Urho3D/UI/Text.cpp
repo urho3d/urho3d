@@ -52,7 +52,7 @@ extern const char* horizontalAlignments[];
 extern const char* UI_CATEGORY;
 
 Text::Text(Context* context) :
-    UIElement(context),
+    UISelectable(context),
     fontSize_(DEFAULT_FONT_SIZE),
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
@@ -61,8 +61,6 @@ Text::Text(Context* context) :
     charLocationsDirty_(true),
     selectionStart_(0),
     selectionLength_(0),
-    selectionColor_(Color::TRANSPARENT),
-    hoverColor_(Color::TRANSPARENT),
     textEffect_(TE_NONE),
     shadowOffset_(IntVector2(1, 1)),
     strokeThickness_(1),
@@ -81,7 +79,7 @@ void Text::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text>(UI_CATEGORY);
 
-    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_COPY_BASE_ATTRIBUTES(UISelectable);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     URHO3D_ATTRIBUTE("Font Size", float, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
@@ -90,8 +88,6 @@ void Text::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
     URHO3D_ATTRIBUTE("Word Wrap", bool, wordWrap_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Auto Localizable", GetAutoLocalizable, SetAutoLocalizable, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
     URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, shadowOffset_, IntVector2(1, 1), AM_FILE);
     URHO3D_ATTRIBUTE("Stroke Thickness", int, strokeThickness_, 1, AM_FILE);
@@ -104,7 +100,7 @@ void Text::RegisterObject(Context* context)
 
 void Text::ApplyAttributes()
 {
-    UIElement::ApplyAttributes();
+    UISelectable::ApplyAttributes();
 
     // Localize now if attributes were loaded out-of-order
     if (autoLocalizable_ && stringId_.Length())
@@ -141,15 +137,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     }
 
     // Hovering and/or whole selection batch
-    if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
-    {
-        bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
-        batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
-            (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
-        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
-        UIBatch::AddOrMerge(batch, batches);
-    }
+    UISelectable::GetBatches(batches, vertexData, currentScissor);
 
     // Partial selection batch
     if (!selected_ && selectionLength_ && charLocations_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
@@ -247,9 +235,6 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
         UIBatch::AddOrMerge(pageBatch, batches);
     }
-
-    // Reset hovering for next frame
-    hovering_ = false;
 }
 
 void Text::OnResize(const IntVector2& newSize, const IntVector2& delta)
@@ -396,16 +381,6 @@ void Text::ClearSelection()
     selectionLength_ = 0;
 }
 
-void Text::SetSelectionColor(const Color& color)
-{
-    selectionColor_ = color;
-}
-
-void Text::SetHoverColor(const Color& color)
-{
-    hoverColor_ = color;
-}
-
 void Text::SetTextEffect(TextEffect textEffect)
 {
     textEffect_ = textEffect;
@@ -493,7 +468,7 @@ String Text::GetTextAttr() const
 
 bool Text::FilterImplicitAttributes(XMLElement& dest) const
 {
-    if (!UIElement::FilterImplicitAttributes(dest))
+    if (!UISelectable::FilterImplicitAttributes(dest))
         return false;
 
     if (!IsFixedWidth())
