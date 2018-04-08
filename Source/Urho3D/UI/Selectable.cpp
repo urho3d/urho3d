@@ -34,4 +34,14 @@ void Selectable::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& verte
     hovering_ = false;
 }
 
+void Selectable::SetSelectionColor(const Color& color)
+{
+    selectionColor_ = color;
+}
+
+void Selectable::SetHoverColor(const Color& color)
+{
+    hoverColor_ = color;
+}
+
 }
