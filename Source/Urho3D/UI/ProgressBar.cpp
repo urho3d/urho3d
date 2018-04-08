@@ -20,12 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "ProgressBar.h"
+#include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"
 #include "../IO/Log.h"
-#include "UIEvents.h"
+#include "../UI/ProgressBar.h"
+#include "../UI/UIEvents.h"
 
 namespace Urho3D
 {
