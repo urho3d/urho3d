@@ -331,7 +331,7 @@ task :ci do
     data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"].each { |name| ENV["EXCLUDED_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample'] && data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"]
   end
   # Unshallow the clone's history when necessary
-  if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
+  if ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
     puts; $stdout.flush
   end
@@ -662,12 +662,12 @@ task :ci_package_upload do
       # Download source packages from GitHub
       system "export SNAPSHOT_VER=$(git describe $TRAVIS_COMMIT |ruby -pe 'gsub(/-(?!g)/, %q{.})'); wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.zip" or abort 'Failed to get source packages'
       # Only keep the snapshots from the last 10 revisions
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +11
+      retry_block { system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +11
 cd #{upload_dir}
 ls -1t
 bye
 EOF
-); do echo rm #{upload_dir}/${v}-*; done |sftp -b - urho-travis-ci@frs.sourceforge.net >/dev/null 2>&1" or warn 'Failed to housekeep snapshots'
+); do echo rm #{upload_dir}/${v}-*; done |sftp -b - urho-travis-ci@frs.sourceforge.net >/dev/null 2>&1" } or warn 'Failed to housekeep snapshots'
     end
   else
     upload_dir = "/home/frs/project/#{repo}/#{ENV['RELEASE_TAG']}"
@@ -676,29 +676,29 @@ EOF
       system 'wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.tar.gz -O Urho3D-$RELEASE_TAG-Source.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.zip -O Urho3D-$RELEASE_TAG-Source.zip' or abort 'Failed to get source packages'
     end
     # Make sure the release directory exists remotely, do this in all the build jobs as we don't know which one would start uploading first
-    system "bash -c 'sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
+    retry_block { system "bash -c 'sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
 mkdir #{upload_dir}
 bye
-EOF'" or abort 'Failed to create release directory remotely'
+EOF'" } or abort 'Failed to create release directory remotely'
   end
   if ENV['SITE_UPDATE']
     # Upload the source package
-    system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload source package'
+    retry_block { system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" } or abort 'Failed to upload source package'
     if ENV['RELEASE_TAG']
       # Mark the source tarball as default download for host systems other than Windows/Mac/Linux
-      system "curl -H 'Accept: application/json' -X PUT -d 'default=bsd&default=solaris&default=others' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-Source.tar.gz" % ENV['TRAVIS_REPO_SLUG'].split('/') or abort 'Failed to set source tarball as default download'
+      retry_block { system "curl -H 'Accept: application/json' -X PUT -d 'default=bsd&default=solaris&default=others' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-Source.tar.gz" % ENV['TRAVIS_REPO_SLUG'].split('/') } or abort 'Failed to set source tarball as default download'
     end
     # Sync readme and license files, just in case they are updated in the repo
-    system 'for f in README.md LICENSE; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
-    system 'rsync -e ssh -az README.md LICENSE urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
+    retry_block { system 'for f in README.md LICENSE; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' } or abort 'Failed to acquire file modified time'
+    retry_block { system 'rsync -e ssh -az README.md LICENSE urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' } or abort 'Failed to sync readme and license files'
     # Mark that the site has been updated
     File.open('.site_updated', 'w') {}
   end
   # Upload the binary package
-  system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" or abort 'Failed to upload binary package'
+  retry_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } or abort 'Failed to upload binary package'
   if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
-    system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten or abort 'Failed to set binary tarball/zip as default download'
+    retry_block { system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten } or abort 'Failed to set binary tarball/zip as default download'
   end
 end
 
@@ -709,7 +709,7 @@ task :ci_timer do
 end
 
 # Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
-def timeup quiet = false, cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 40.0
+def timeup quiet = false, cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 45.0
   unless File.exists?('start_time.log')
     system 'touch start_time.log split_time.log'
     return nil
@@ -906,6 +906,16 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   puts "\n" if str == '.'; $stdout.flush
   thread.join
   return thread.value
+end
+
+# Usage: retry_block { code-block } or abort
+def retry_block retries = 10, retry_interval = 1
+    until yield
+        retries -= 1
+        return nil if retries == 0
+        sleep retry_interval
+    end
+    0
 end
 
 def append_new_release release, filename = '../urho3d.github.io/_data/urho3d.json'
