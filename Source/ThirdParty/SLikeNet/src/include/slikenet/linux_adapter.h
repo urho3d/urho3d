@@ -17,6 +17,8 @@
 #include "winsock2.h"
 #include "ws2tcpip.h"
 
+// Fix for MinGW
+#define vsprintf_s vsnprintf
 
 #define NS_INADDRSZ  4
 #define NS_IN6ADDRSZ 16
