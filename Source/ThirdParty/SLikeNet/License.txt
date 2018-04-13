@@ -1,0 +1,66 @@
+MIT License
+Copyright © 2016-2017 SLikeSoft™ UG (haftungsbeschränkt)
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-----------------------------------------------------
+END OF LICENSE
+
+Since we provide this library completely free of charge, we'd appreciate any
+donation you'd like to grant us (check out our web page for details at
+https://www.slikesoft.com/?page_id=1437&lang=en).
+With your donation you directly support the future development of the library.
+
+For further information regarding licensing please refer to chapter 7 in the
+readme.txt file alongside this license.txt file.
+
+In case a future version of SLikeNet is distributed under different license
+terms, you may alternatively choose to use this version of SLikeNet under those
+later license terms.
+
+If you are distributing the SLikeNet source, we also explicitly permit you to
+rename (and move) the license.txt file to a different location within the
+package without having to update all the references to the location of the
+license.txt file, as long as you make it clear in any accompanying
+documentation where to locate the license terms and clarify that the source
+code references outdated locations.
+
+Also we'd like to state that you are not allowed (without prior written
+permission from SLikeSoft) to suggest that you, your company, and/or your
+product is affiliated with SLikeSoft.
+
+Please see chapter 7.2 and chapter 2.4 in the readme.txt file for information
+about licensed 3rd-party software/code SLikeNet is based on. We'd especially
+like to point out the RakNet License (see chapter 7.2.1 in readme.txt,
+licenses/RakNet License.txt, and licenses/RakNet Patents.txt) since SLikeNet is
+derived from RakNet.
+
+In addition to the licensing requirements, we'd appreciate if you are
+considering the following legally NON binding requests:
+- send us a short mail (info@slikesoft.com) to let us know that you are using
+our library in your product
+- mention in your product / on your webpage that you are using SLikeNet
+(provide a link to https://www.slikenet.com/ on your webpage)
+- allow us to put your product/company name on our webpage as a reference that
+you are using SLikeNet
+
+As mentioned: None of these optional requests are binding. If you don't feel
+like following any of these requests, we are still glad you decided to use our
+network library, nevertheless.
