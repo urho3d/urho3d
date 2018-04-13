@@ -390,7 +390,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
 
 void Network::Disconnect(int waitMSec)
 {
-    if (serverConnection)
+    if (serverConnection_)
         return;
 
     URHO3D_PROFILE(Disconnect);
