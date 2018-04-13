@@ -40,17 +40,17 @@ typedef int errno_t;
 
 
 // MS specific security enhanced functions
-errno_t fopen_s(FILE **pfile, const char *filename, const char *mode);
-errno_t localtime_s(struct tm* _tm, const time_t *time);
-errno_t mbstowcs_s(size_t *pReturnValue, wchar_t *wcstr, size_t sizeInWords, const char *mbstr, size_t count);
-int sprintf_s(char *buffer, size_t sizeOfBuffer, const char *format, ...);
-errno_t strcat_s(char *strDestination, size_t numberOfElements, const char *strSource);
-errno_t strcpy_s(char* strDestination, size_t numberOfElements, const char *strSource);
-errno_t strncat_s(char *strDest, size_t numberOfElements, const char *strSource, size_t count);
-errno_t strncpy_s(char *strDest, size_t numberOfElements, const char *strSource, size_t count);
-int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
-errno_t wcscat_s(wchar_t *strDestination, size_t numberOfElements, const wchar_t *strSource);
-errno_t wcscpy_s(wchar_t* strDestination, size_t numberOfElements, const wchar_t *strSource);
+// errno_t fopen_s(FILE **pfile, const char *filename, const char *mode);
+// errno_t localtime_s(struct tm* _tm, const time_t *time);
+// errno_t mbstowcs_s(size_t *pReturnValue, wchar_t *wcstr, size_t sizeInWords, const char *mbstr, size_t count);
+// int sprintf_s(char *buffer, size_t sizeOfBuffer, const char *format, ...);
+// errno_t strcat_s(char *strDestination, size_t numberOfElements, const char *strSource);
+// errno_t strcpy_s(char* strDestination, size_t numberOfElements, const char *strSource);
+// errno_t strncat_s(char *strDest, size_t numberOfElements, const char *strSource, size_t count);
+// errno_t strncpy_s(char *strDest, size_t numberOfElements, const char *strSource, size_t count);
+// int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
+// errno_t wcscat_s(wchar_t *strDestination, size_t numberOfElements, const wchar_t *strSource);
+// errno_t wcscpy_s(wchar_t* strDestination, size_t numberOfElements, const wchar_t *strSource);
 
 // corresponding template overloads
 template<size_t BufferSize> errno_t mbstowcs_s(size_t *pReturnValue, wchar_t(&wcstr)[BufferSize], const char *mbstr, size_t count)
