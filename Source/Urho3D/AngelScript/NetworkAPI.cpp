@@ -171,7 +171,14 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "bool Connect(const String&in, uint16, Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, Connect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void Disconnect(int waitMSec = 0)", asMETHOD(Network, Disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool DiscoverHosts(uint16)", asMETHOD(Network, DiscoverHosts), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Network", "bool SetDiscoveryBeacon(const VariantMap&in data = VariantMap())", asMETHOD(Network, SetDiscoveryBeacon), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool SetPassword(const String&password)", asMETHOD(Network, SetPassword), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void SetNATServerInfo(const String&in, uint16)", asMETHOD(Network, SetNATServerInfo), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void StartNATClient() const", asMETHOD(Network, StartNATClient), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "const String& get_startNATClient() const", asMETHOD(Network, StartNATClient), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool AttemptNATPunchtrough(const String&guid, Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, AttemptNATPunchtrough), asCALL_THISCALL);    
     engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, bool, bool, const VectorBuffer&in, uint contentID = 0)", asMETHODPR(Network, BroadcastMessage, (int, bool, bool, const VectorBuffer&, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Scene@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteSceneEvent), asCALL_CDECL_OBJLAST);
@@ -190,6 +197,7 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "float get_simulatedPacketLoss() const", asMETHOD(Network, GetSimulatedPacketLoss), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void set_packageCacheDir(const String&in)", asMETHOD(Network, SetPackageCacheDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "const String& get_packageCacheDir() const", asMETHOD(Network, GetPackageCacheDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "const String& get_guid() const", asMETHOD(Network, GetGUID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_serverRunning() const", asMETHOD(Network, IsServerRunning), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Connection@+ get_serverConnection() const", asMETHOD(Network, GetServerConnection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Array<Connection@>@ get_clientConnections() const", asFUNCTION(NetworkGetClientConnections), asCALL_CDECL_OBJLAST);

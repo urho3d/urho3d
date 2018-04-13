@@ -51,7 +51,7 @@
 #endif
 
 // Identifier for the chat network messages
-const int MSG_CHAT = 32;
+const int MSG_CHAT = 153;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 
@@ -114,7 +114,7 @@ void Chat::CreateUI()
     // Row height would be zero if the font failed to load
     if (rowHeight)
     {
-        float numberOfRows = (graphics->GetHeight() - 20) / rowHeight;
+        float numberOfRows = (graphics->GetHeight() - 100) / rowHeight;
         chatHistory_.Resize(static_cast<unsigned int>(numberOfRows));
     }
 
