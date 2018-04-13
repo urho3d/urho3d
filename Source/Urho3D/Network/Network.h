@@ -54,9 +54,9 @@ public:
 
 
     /// Handle an inbound message.
-    virtual void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
-    virtual void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
-    virtual void ClientDisconnected(const SLNet::AddressOrGUID& connection);
+    void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
+    void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+    void ClientDisconnected(const SLNet::AddressOrGUID& connection);
 
     /// Set the data that will be used for a reply to attempts at host discovery on LAN/subnet.
     void SetDiscoveryBeacon(const VariantMap& data);
@@ -78,7 +78,7 @@ public:
     void StartNATClient();
     /// Get local server GUID
     const String& GetGUID();
-    // Attempt to connect to NAT server
+    /// Attempt to connect to NAT server
     void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Broadcast a message with content ID to all client connections.
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
@@ -148,7 +148,7 @@ private:
     void OnServerDisconnected();
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
-    //All incoming packages are handled here
+    /// All incoming packages are handled here
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
 
     /// SLikeNet peer instance for server connection 

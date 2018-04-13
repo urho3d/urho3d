@@ -22,16 +22,16 @@
 
 #pragma once
 
+#include <SLikeNet/MessageIdentifiers.h>
+#include <SLikeNet/RakPeerInterface.h>
+#include <SLikeNet/RakNetTypes.h>
+
 #include "../Container/HashSet.h"
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 #include "../Input/Controls.h"
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
-
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/RakPeerInterface.h>
-#include <SLikeNet/RakNetTypes.h>
 
 #ifdef SendMessage
 #undef SendMessage

@@ -80,7 +80,7 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
 Connection::~Connection()
 {
     // Reset scene (remove possible owner references), as this connection is about to be destroyed
-    SetScene(0);
+    SetScene(nullptr);
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -91,8 +91,9 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const Vecto
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
     unsigned contentID)
 {
-    // Make sure not to use kNet internal message ID's
-    if (msgID <= 0x4 || msgID >= 0x3ffffffe)
+    /* Make sure not to use SLikeNet(RakNet) internal message ID's
+     and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
+    if (msgID <= 0x4 || msgID >= 255)
     {
         URHO3D_LOGERROR("Can not send message with reserved ID");
         return;
@@ -134,7 +135,7 @@ void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder,
         URHO3D_LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
-    if (node->IsReplicated())
+    if (!node->IsReplicated())
     {
         URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
@@ -1185,7 +1186,7 @@ void Connection::ProcessNewNode(Node* node)
     {
         Component* component = components[i];
         // Check if component is not to be replicated
-        if (component->IsReplicated())
+        if (!component->IsReplicated())
             continue;
 
         ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
@@ -1353,7 +1354,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             Component* component = components[i];
             // Check if component is not to be replicated
-            if (component->IsReplicated())
+            if (!component->IsReplicated())
                 continue;
 
             HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());

@@ -341,6 +341,7 @@ void Network::DiscoverHosts(unsigned port)
     if (rakPeer_ && !rakPeer_->IsActive())
     {
         SLNet::SocketDescriptor socket;
+        // Startup local connection with max 1 incoming connection(first param) and 1 socket description (third param)
         rakPeer_->Startup(1, &socket, 1);
     }
     rakPeer_->Ping("255.255.255.255", port, false);
@@ -360,9 +361,10 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     {
         URHO3D_LOGINFO("Initializing client connection...");
         SLNet::SocketDescriptor socket;
+        // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
         rakPeerClient_->Startup(2, &socket, 1);
-        /// Allow 300 ms to notify
-        //rakPeerClient_->Shutdown(300);
+    } else {
+        OnServerDisconnected();
     }
 
     //isServer_ = false;
@@ -388,7 +390,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
 
 void Network::Disconnect(int waitMSec)
 {
-    if (serverConnection_.Refs() == 0)
+    if (serverConnection)
         return;
 
     URHO3D_PROFILE(Disconnect);
@@ -405,6 +407,7 @@ bool Network::StartServer(unsigned short port)
     SLNet::SocketDescriptor socket;//(port, AF_INET);
     socket.port = port;
     socket.socketFamily = AF_INET;
+    // Startup local connection with max 128 incoming connection(first param) and 1 socket description (third param)
     SLNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
     if (startResult == SLNet::RAKNET_STARTED)
     {
@@ -469,6 +472,7 @@ void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const Vari
     identity_ = identity;
     rakPeerClient_->AttachPlugin(&(natPunchthroughClient_));
     SLNet::SocketDescriptor socket;
+    // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
     rakPeerClient_->Startup(2, &socket, 1);
 
     remoteGUID_.FromString(guid.CString());
@@ -485,7 +489,8 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 {
     if (!rakPeer_) 
         return;
-    // Make sure not to use kNet internal message ID's
+    /* Make sure not to use SLikeNet(RakNet) internal message ID's
+     and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
     if (msgID < ID_USER_PACKET_ENUM || msgID >= 255)
     {
         URHO3D_LOGERROR("Can not send message with reserved ID");
@@ -525,7 +530,7 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
         URHO3D_LOGERROR("Null sender node for remote node event");
         return;
     }
-    if (node->IsReplicated())
+    if (!node->IsReplicated())
     {
         URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
@@ -671,7 +676,6 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         dataStart += sizeof(char);
     }
 
-	URHO3D_LOGINFO("Incoming packet " + String((int)packetID));
     if (packetID == ID_NEW_INCOMING_CONNECTION)
     {
         if (isServer)
@@ -682,12 +686,10 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_CONNECTION_REQUEST_ACCEPTED) // We're a client, our connection as been accepted
     {
-        URHO3D_LOGINFO("ID_CONNECTION_REQUEST_ACCEPTED " + String(packet->systemAddress.ToString(false)));
         if(packet->systemAddress == natPunchServerAddress_) {
             URHO3D_LOGINFO("Succesfully connected to NAT punchtrough server! ");
             if (!isServer)
             {
-                URHO3D_LOGINFO("Pinging remote NAT server...");
                 natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
             }
         } else {
@@ -738,10 +740,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     else if (packetID == ID_CONNECTION_ATTEMPT_FAILED) // We've failed to connect to the server/peer
     {
         if (packet->systemAddress == natPunchServerAddress_) {
-			URHO3D_LOGINFO("Connection to NAT punchtrough server failed!");
+			URHO3D_LOGERROR("Connection to NAT punchtrough server failed!");
 
         } else {
-			URHO3D_LOGINFO("ID_CONNECTION_ATTEMPT_FAILED");
 
             if (!isServer)
             {
@@ -752,18 +753,16 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_NAT_PUNCHTHROUGH_SUCCEEDED)
     {
-        URHO3D_LOGINFO("NAT punchtrough succeeded!");
         SLNet::SystemAddress remotePeer = packet->systemAddress;
-        URHO3D_LOGINFO("Remote peer: " + String(remotePeer.ToString()));
+        URHO3D_LOGINFO("NAT punchtrough succeeded! Remote peer: " + String(remotePeer.ToString()));
         if (!isServer)
         {
-			URHO3D_LOGINFO("Client connecting to remote server!");
 			using namespace NetworkNatPunchtroughSucceeded;
 			VariantMap eventMap;
 			eventMap[P_ADDRESS] = remotePeer.ToString(false);
 			eventMap[P_PORT] = remotePeer.GetPort();
 			SendEvent(E_NETWORKNATPUNCHTROUGHSUCCEEDED, eventMap);
-			URHO3D_LOGINFO("Connecting... " + String(remotePeer.ToString()));
+			URHO3D_LOGINFO("Connecting to server behind NAT: " + String(remotePeer.ToString()));
             Connect(String(remotePeer.ToString(false)), remotePeer.GetPort(), scene_, identity_);
         }
         packetHandled = true;
@@ -941,7 +940,7 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
 {
     serverConnection_->SetConnectPending(false);
     serverConnection_->SetAddressOrGUID(address);
-    URHO3D_LOGINFO("Connected to server");
+    URHO3D_LOGINFO("Connected to server!");
 
     // Send the identity map now
     VectorBuffer msg;
