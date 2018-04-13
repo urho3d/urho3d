@@ -38,9 +38,11 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
-#include <kNet/kNet.h>
-
 #include "../DebugNew.h"
+
+#include <SLikeNet/RakNetStatistics.h>
+
+#include <cstdio>
 
 namespace Urho3D
 {
@@ -60,10 +62,11 @@ PackageUpload::PackageUpload() :
 {
 }
 
-Connection::Connection(Context* context, bool isClient, const kNet::SharedPtr<kNet::MessageConnection>& connection) :
+Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer) :
     Object(context),
     timeStamp_(0),
-    connection_(connection),
+    peer_(peer),
+    address_(address),
     sendMode_(OPSM_NONE),
     isClient_(isClient),
     connectPending_(false),
@@ -71,19 +74,13 @@ Connection::Connection(Context* context, bool isClient, const kNet::SharedPtr<kN
     logStatistics_(false)
 {
     sceneState_.connection_ = this;
-
-    // Store address and port now for accurate logging (kNet may already have destroyed the socket on disconnection,
-    // in which case we would log a zero address:port on disconnect)
-    kNet::EndPoint endPoint = connection_->RemoteEndPoint();
-    ///\todo Not IPv6-capable.
-    address_ = Urho3D::ToString("%d.%d.%d.%d", endPoint.ip[0], endPoint.ip[1], endPoint.ip[2], endPoint.ip[3]);
-    port_ = endPoint.port;
+    port_ = address.systemAddress.GetPort();
 }
 
 Connection::~Connection()
 {
     // Reset scene (remove possible owner references), as this connection is about to be destroyed
-    SetScene(nullptr);
+    SetScene(0);
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -106,22 +103,13 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
         URHO3D_LOGERROR("Null pointer supplied for network message data");
         return;
     }
-
-    kNet::NetworkMessage* msg = connection_->StartNewMessage((unsigned long)msgID, numBytes);
-    if (!msg)
-    {
-        URHO3D_LOGERROR("Can not start new network message");
-        return;
-    }
-
-    msg->reliable = reliable;
-    msg->inOrder = inOrder;
-    msg->priority = 0;
-    msg->contentID = contentID;
-    if (numBytes)
-        memcpy(msg->data, data, numBytes);
-
-    connection_->EndAndQueueMessage(msg);
+    
+    VectorBuffer buffer;
+    buffer.WriteUByte((unsigned char)msgID);
+    buffer.Write(data, numBytes);
+    PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
+    if (peer_)
+        peer_->Send((const char*)buffer.GetData(), (int)buffer.GetSize(), HIGH_PRIORITY, reliability, (char)0, address_, false);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -146,7 +134,7 @@ void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder,
         URHO3D_LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
-    if (!node->IsReplicated())
+    if (node->GetID() >= FIRST_LOCAL_ID)
     {
         URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
@@ -238,7 +226,11 @@ void Connection::SetLogStatistics(bool enable)
 
 void Connection::Disconnect(int waitMSec)
 {
-    connection_->Disconnect(waitMSec);
+    // if (!isClient_) {
+    //     peer_->Shutdown(waitMSec);
+    // } else {
+        peer_->CloseConnection(address_, true);
+    // }
 }
 
 void Connection::SendServerUpdate()
@@ -290,9 +282,11 @@ void Connection::SendRemoteEvents()
     {
         statsTimer_.Reset();
         char statsBuffer[256];
-        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", connection_->RoundTripTime(),
-            (int)connection_->PacketsInPerSec(),
-            (int)connection_->PacketsOutPerSec(), connection_->BytesInPerSec() / 1000.0f, connection_->BytesOutPerSec() / 1000.0f);
+        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", peer_->GetAveragePing(address_),
+            (int)0, //TODO: Packets in per second
+            (int)0, //TODO: Packets out per second
+            0.0f, //TODO: Bytes in per second
+            0.0f); // TODO: Bytes out per second
         URHO3D_LOGINFO(statsBuffer);
     }
 #endif
@@ -325,7 +319,7 @@ void Connection::SendRemoteEvents()
 
 void Connection::SendPackages()
 {
-    while (!uploads_.Empty() && connection_->NumOutboundMessagesPending() < 1000)
+    while (!uploads_.Empty())
     {
         unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
 
@@ -334,7 +328,7 @@ void Connection::SendPackages()
             HashMap<StringHash, PackageUpload>::Iterator current = i++;
             PackageUpload& upload = current->second_;
             unsigned fragmentSize =
-                Min((upload.file_->GetSize() - upload.file_->GetPosition()), PACKAGE_FRAGMENT_SIZE);
+                (unsigned)Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
             upload.file_->Read(buffer, fragmentSize);
 
             msg_.Clear();
@@ -470,7 +464,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 
     // In case we have joined other scenes in this session, remove first all downloaded package files from the resource system
     // to prevent resource conflicts
-    auto* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
@@ -536,7 +530,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg);
-            auto* transform = node->GetComponent<SmoothedTransform>();
+            SmoothedTransform* transform = node->GetComponent<SmoothedTransform>();
             if (transform)
                 transform->Update(1.0f, 0.0f);
 
@@ -739,7 +733,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             for (unsigned i = 0; i < packages.Size(); ++i)
             {
                 PackageFile* package = packages[i];
-                const String& packageFullName = package->GetName();
+                String packageFullName = package->GetName();
                 if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
                 {
                     StringHash nameHash(name);
@@ -981,11 +975,6 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
     }
 }
 
-kNet::MessageConnection* Connection::GetMessageConnection() const
-{
-    return const_cast<kNet::MessageConnection*>(connection_.ptr());
-}
-
 Scene* Connection::GetScene() const
 {
     return scene_;
@@ -993,37 +982,58 @@ Scene* Connection::GetScene() const
 
 bool Connection::IsConnected() const
 {
-    return connection_->GetConnectionState() == kNet::ConnectionOK;
+    return peer_ && peer_->IsActive();
 }
 
 float Connection::GetRoundTripTime() const
 {
-    return connection_->RoundTripTime();
+    if (peer_)
+    {
+        SLNet::RakNetStatistics stats;
+        if (peer_->GetStatistics(address_.systemAddress, &stats))
+            return (float)peer_->GetAveragePing(address_);
+    }
+    return 0.0f;
 }
 
 float Connection::GetLastHeardTime() const
 {
-    return connection_->LastHeardTime();
+    //TODO
+    return 0.0f;
 }
 
 float Connection::GetBytesInPerSec() const
 {
-    return connection_->BytesInPerSec();
+    if (peer_)
+    {
+        SLNet::RakNetStatistics stats;
+        if (peer_->GetStatistics(address_.systemAddress, &stats))
+            return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_RECEIVED];
+    }
+    return 0.0f;
 }
 
 float Connection::GetBytesOutPerSec() const
 {
-    return connection_->BytesOutPerSec();
+    if (peer_)
+    {
+        SLNet::RakNetStatistics stats;
+        if (peer_->GetStatistics(address_.systemAddress, &stats))
+            return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_SENT];
+    }
+    return 0.0f;
 }
 
 float Connection::GetPacketsInPerSec() const
 {
-    return connection_->PacketsInPerSec();
+    //TODO
+    return 0.0f;
 }
 
 float Connection::GetPacketsOutPerSec() const
 {
-    return connection_->PacketsOutPerSec();
+    //TODO
+    return 0.0f;
 }
 
 String Connection::ToString() const
@@ -1083,13 +1093,8 @@ void Connection::SendPackageToClient(PackageFile* package)
 
 void Connection::ConfigureNetworkSimulator(int latencyMs, float packetLoss)
 {
-    if (connection_)
-    {
-        kNet::NetworkSimulator& simulator = connection_->NetworkSendSimulator();
-        simulator.enabled = latencyMs > 0 || packetLoss > 0.0f;
-        simulator.constantPacketSendDelay = (float)latencyMs;
-        simulator.packetLossRate = packetLoss;
-    }
+    if (peer_)
+        peer_->ApplyNetworkSimulator(packetLoss, latencyMs, 0);
 }
 
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
@@ -1180,7 +1185,7 @@ void Connection::ProcessNewNode(Node* node)
     {
         Component* component = components[i];
         // Check if component is not to be replicated
-        if (!component->IsReplicated())
+        if (component->GetID() >= FIRST_LOCAL_ID)
             continue;
 
         ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
@@ -1213,7 +1218,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 
     // Check from the interest management component, if exists, whether should update
     /// \todo Searching for the component is a potential CPU hotspot. It should be cached
-    auto* priority = node->GetComponent<NetworkPriority>();
+    NetworkPriority* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
     {
         float distance = (node->GetWorldPosition() - position_).Length();
@@ -1348,7 +1353,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             Component* component = components[i];
             // Check if component is not to be replicated
-            if (!component->IsReplicated())
+            if (component->GetID() >= FIRST_LOCAL_ID)
                 continue;
 
             HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());
@@ -1378,7 +1383,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 
 bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
 {
-    auto* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,22 +26,28 @@
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
+#include "SLikeNet/NatPunchthroughClient.h"
 
-#include <kNet/IMessageHandler.h>
-#include <kNet/INetworkServerListener.h>
+namespace SLNet
+{
+    struct AddressOrGUID;
+    struct Packet;
+}
 
 namespace Urho3D
 {
+
+enum RakNetInstanceType {
+    SERVER,
+    CLIENT
+};
 
 class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
-/// MessageConnection hash function.
-template <class T> unsigned MakeHash(kNet::MessageConnection* value) { return (unsigned)((size_t)value >> 9u); }
-
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
-class URHO3D_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
+class URHO3D_API Network : public Object
 {
     URHO3D_OBJECT(Network, Object);
 
@@ -49,18 +55,22 @@ public:
     /// Construct.
     explicit Network(Context* context);
     /// Destruct.
-    ~Network() override;
+    ~Network();
 
-    /// Handle a kNet message from either a client or the server.
-    void HandleMessage
-        (kNet::MessageConnection* source, kNet::packet_id_t packetId, kNet::message_id_t msgId, const char* data, size_t numBytes) override;
-    /// Compute the content ID for a message.
-    u32 ComputeContentID(kNet::message_id_t msgId, const char* data, size_t numBytes) override;
-    /// Handle a new client connection.
-    void NewConnectionEstablished(kNet::MessageConnection* connection) override;
-    /// Handle a client disconnection.
-    void ClientDisconnected(kNet::MessageConnection* connection) override;
 
+    /// Handle an inbound message.
+    virtual void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
+    virtual void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+    virtual void ClientDisconnected(const SLNet::AddressOrGUID& connection);
+
+    /// Set the data that will be used for a reply to attempts at host discovery on LAN/subnet.
+    void SetDiscoveryBeacon(const VariantMap& data);
+    /// Scan the LAN/subnet for available hosts.
+    void DiscoverHosts(unsigned port);
+    /// Set password for the client/server communcation
+    void SetPassword(const String& password);
+    /// Set NAT server information
+    void SetNATServerInfo(const String& address, unsigned short port);
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
@@ -69,19 +79,22 @@ public:
     bool StartServer(unsigned short port);
     /// Stop the server.
     void StopServer();
+    /// Start NAT punchtrough client to allow remote connections
+    void StartNATClient();
+    /// Get local server GUID
+    const String& GetGUID();
+    // Attempt to connect to NAT server
+    void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Broadcast a message with content ID to all client connections.
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Broadcast a message with content ID to all client connections.
-    void BroadcastMessage
-        (int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     /// Broadcast a remote event to all client connections.
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Broadcast a remote event to all client connections in a specific scene.
-    void BroadcastRemoteEvent
-        (Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Broadcast a remote event with the specified node as a sender. Is sent to all client connections in the node's scene.
-    void BroadcastRemoteEvent
-        (Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
     void SetUpdateFps(int fps);
     /// Set simulated latency in milliseconds. This adds a fixed delay before sending each packet.
@@ -99,9 +112,7 @@ public:
     /// Trigger all client connections in the specified scene to download a package file from the server. Can be used to download additional resource packages when clients are already joined in the scene. The package must have been added as a requirement to the scene, or else the eventual download will fail.
     void SendPackageToClients(Scene* scene, PackageFile* package);
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
-    SharedPtr<HttpRequest> MakeHttpRequest
-        (const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(),
-            const String& postData = String::EMPTY);
+    SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
 
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
@@ -113,7 +124,7 @@ public:
     float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
 
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
-    Connection* GetConnection(kNet::MessageConnection* connection) const;
+    Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
@@ -137,18 +148,22 @@ private:
     /// Handle render update frame event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle server connection.
-    void OnServerConnected();
+    void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
     void OnServerDisconnected();
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
+    //All incoming packages are handled here
+    void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
 
-    /// kNet instance.
-    UniquePtr<kNet::Network> network_;
+    /// SLikeNet peer instance for server connection 
+    SLNet::RakPeerInterface* rakPeer_;
+    /// SLikeNet peer instance for client connection
+    SLNet::RakPeerInterface* rakPeerClient_;
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> > clientConnections_;
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
     /// Remote event fixed blacklist.
@@ -167,6 +182,22 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
+    /// Whether we started as server or not.
+    bool isServer_;
+    /// Server/Client password used for connecting
+    String password_;
+    /// Scene which will be used for NAT punchtrough connections
+    Scene* scene_;
+    /// Client identify for NAT punchtrough connections
+    VariantMap identity_;
+    /// NAT punchtrough server information
+    SLNet::SystemAddress natPunchServerAddress_;
+    /// NAT punchtrough client
+    SLNet::NatPunchthroughClient natPunchthroughClient_;
+    /// Remote GUID information
+    SLNet::RakNetGUID remoteGUID_;
+    /// Local server GUID
+    String guid_;
 };
 
 /// Register Network library objects.

@@ -97,4 +97,31 @@ URHO3D_EVENT(E_REMOTEEVENTDATA, RemoteEventData)
     URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
+URHO3D_EVENT(E_NETWORKBANNED, NetworkBanned)
+{
+}
+
+URHO3D_EVENT(E_NETWORKINVALIDPASSWORD, NetworkInvalidPassword)
+{
+}
+
+URHO3D_EVENT(E_NETWORKHOSTDISCOVERED, NetworkHostDiscovered)
+{
+    URHO3D_PARAM(P_ADDRESS, Address);   // String
+    URHO3D_PARAM(P_PORT, Port);         // int
+    URHO3D_PARAM(P_BEACON, Beacon);     // VariantMap
+}
+
+URHO3D_EVENT(E_NETWORKNATPUNCHTROUGHSUCCEEDED, NetworkNatPunchtroughSucceeded)
+{
+	URHO3D_PARAM(P_ADDRESS, Address);   // String
+	URHO3D_PARAM(P_PORT, Port);         // int
+}
+
+URHO3D_EVENT(E_NETWORKNATPUNCHTROUGHFAILED, NetworkNatPunchtroughFailed)
+{
+	URHO3D_PARAM(P_ADDRESS, Address);   // String
+	URHO3D_PARAM(P_PORT, Port);         // int
+}
+
 }
