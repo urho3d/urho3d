@@ -22,11 +22,17 @@
 
 #pragma once
 
+#include "SLikeNet/NatPunchthroughClient.h"
+
+/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif
+
 #include "../Container/HashSet.h"
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
-#include "SLikeNet/NatPunchthroughClient.h"
 
 namespace SLNet
 {

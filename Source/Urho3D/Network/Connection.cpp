@@ -40,8 +40,6 @@
 
 #include "../DebugNew.h"
 
-#include <SLikeNet/RakNetStatistics.h>
-
 #include <cstdio>
 
 namespace Urho3D
