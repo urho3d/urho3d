@@ -40,6 +40,10 @@
 #define _copysign copysign
 #endif
 
+#ifdef __MINGW32__
+#define _copysign copysign
+#endif
+
 namespace SLNet
 {
 	/// This class allows you to write and read native types as a string of bits.  BitStream is used extensively throughout RakNet and is designed to be used by users as well.

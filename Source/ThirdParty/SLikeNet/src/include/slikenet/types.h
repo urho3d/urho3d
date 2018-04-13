@@ -23,7 +23,10 @@
 
 
 
-
+#ifdef __MINGW32__
+#include "winsock2.h"
+#include "ws2tcpip.h"
+#endif
 
 #include "defines.h"
 #include "NativeTypes.h"

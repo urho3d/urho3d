@@ -17,7 +17,11 @@ cmake_minimum_required(VERSION 2.6)
 # Define target name
 set (TARGET_NAME SLikeNet)
 
-add_definitions (-DRAKNET_ENABLE_STATIC)
+add_definitions (-DRAKNET_ENABLE_STATIC -D_RAKNET_SUPPORT_NatTypeDetectionServer=0 -D_RAKNET_SUPPORT_UDPForwarder=0 -D_RAKNET_SUPPORT_TwoWayAuthentication=0)
+add_definitions (-D_RAKNET_SUPPORT_CloudClient=0 -D_RAKNET_SUPPORT_CloudServer=0 -D_RAKNET_SUPPORT_ConnectionGraph2=0 -D_RAKNET_SUPPORT_NatPunchthroughServer=0)
+add_definitions (-D_RAKNET_SUPPORT_RelayPlugin=0 -D_RAKNET_SUPPORT_LibVoice=0 -D_RAKNET_SUPPORT_DynDNS=0 -D_RAKNET_SUPPORT_HTTPConnection2=0 -D_RAKNET_SUPPORT_HTTPConnection=0)
+add_definitions (-D_RAKNET_SUPPORT_EmailSender=0 -D_RAKNET_SUPPORT_UDPProxyClient=0 -D_RAKNET_SUPPORT_UDPProxyCoordinator=0 -D_RAKNET_SUPPORT_TeamManager=0 -D_RAKNET_SUPPORT_TeamBalancer=0)
+add_definitions (-D_RAKNET_SUPPORT_NatTypeDetectionClient=0 -D_RAKNET_SUPPORT_FullyConnectedMesh2=0 -D_RAKNET_SUPPORT_ConnectionGraph2=0 -D_RAKNET_SUPPORT_FullyConnectedMesh=0)
 
 # CMake policy settings
 if( POLICY CMP0037 )
@@ -56,6 +60,10 @@ IF (WIN32 AND NOT UNIX)
 ELSE(WIN32 AND NOT UNIX)
     set(RAKNET_LIBRARY_LIBS pthread)
 ENDIF(WIN32 AND NOT UNIX)
+
+IF (MINGW)
+    set(RAKNET_LIBRARY_LIBS ws2_32)
+ENDIF(MINGW)
 
 # enable C++11 language support for GCC
 include(CheckCXXCompilerFlag)

@@ -28,6 +28,11 @@
 #include "slikenet/VitaIncludes.h"
 #include "errno.h"
 
+#ifdef __MINGW32__
+#include "winsock2.h"
+#include "ws2tcpip.h"
+#endif
+
 #ifdef _WIN32
 #include <tchar.h>
 #else
