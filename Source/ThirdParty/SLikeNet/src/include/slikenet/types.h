@@ -422,13 +422,13 @@ struct RAK_DLL_EXPORT AddressOrGUID
 		return *this;
 	}
 
+	inline bool operator==( const AddressOrGUID& right ) const {return (rakNetGuid!=UNASSIGNED_RAKNET_GUID && rakNetGuid==right.rakNetGuid) || (systemAddress!=UNASSIGNED_SYSTEM_ADDRESS && systemAddress==right.systemAddress);}
+
 	// Urho3D: addition of ToHash to deal with template specialization conflicting in the case of Reference types
     unsigned ToHash() const
     {
         return ((unsigned)(size_t)(ToInteger(*this) >> 9));
     }
-
-	inline bool operator==( const AddressOrGUID& right ) const {return (rakNetGuid!=UNASSIGNED_RAKNET_GUID && rakNetGuid==right.rakNetGuid) || (systemAddress!=UNASSIGNED_SYSTEM_ADDRESS && systemAddress==right.systemAddress);}
 };
 
 typedef uint64_t NetworkID;
