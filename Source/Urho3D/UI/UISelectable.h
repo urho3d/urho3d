@@ -22,6 +22,11 @@
 
 #pragma once
 
+/// RakNet libraries include windows headers which may conflict with Color::TRANSPARENT
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif
+
 #include "../Math/Color.h"
 #include "../UI/UIElement.h"
 
