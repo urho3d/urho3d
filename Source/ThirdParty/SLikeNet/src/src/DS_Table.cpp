@@ -1026,7 +1026,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false && inputRow->cells[i]->c)
 			{
-				strncpy_s(buff, inputRow->cells[i]->c, 512-2);
+				strncpy(buff, inputRow->cells[i]->c, 512-2);
 				buff[512-2]=0;
 				len=(int)strlen(buff);
 			}

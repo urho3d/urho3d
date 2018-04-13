@@ -37,11 +37,6 @@ namespace SLNet
 namespace Urho3D
 {
 
-enum RakNetInstanceType {
-    SERVER,
-    CLIENT
-};
-
 class HttpRequest;
 class MemoryBuffer;
 class Scene;
@@ -55,7 +50,7 @@ public:
     /// Construct.
     explicit Network(Context* context);
     /// Destruct.
-    ~Network();
+    ~Network() override;
 
 
     /// Handle an inbound message.

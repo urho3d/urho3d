@@ -111,7 +111,7 @@ public:
     /// Construct with context and kNet message connection pointers.
     Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer);
     /// Destruct.
-    ~Connection();
+    ~Connection() override;
 
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
