@@ -23,6 +23,7 @@
 
 #include "slikenet/SocketIncludes.h"
 #include "slikenet/defines.h"
+#include "slikenet/linux_adapter.h"
 
 
 
@@ -924,7 +925,7 @@ void BitStream::PrintHex( char *out, size_t outLength ) const
 	BitSize_t i;
 	for ( i=0; i < GetNumberOfBytesUsed(); i++)
 	{
-		sprintf_s(out+i*3, outLength-i*3, "%02x ", data[i]);
+		sprintf(out+i*3, "%02x ", data[i]);
 	}
 }
 
