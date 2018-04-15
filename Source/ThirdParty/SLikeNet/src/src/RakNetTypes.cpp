@@ -852,7 +852,7 @@ void RakNetGUID::ToString(char *dest, size_t destLength) const
 		strcpy_s(dest, destLength, "UNASSIGNED_RAKNET_GUID");
 	else
 		//sprintf(dest, destLength, "%u.%u.%u.%u.%u.%u", g[0], g[1], g[2], g[3], g[4], g[5]);
-		sprintf(dest, destLength, "%" PRINTF_64_BIT_MODIFIER "u", (long long unsigned int) g);
+		sprintf(dest, "%" PRINTF_64_BIT_MODIFIER "u", (long long unsigned int) g);
 		// sprintf(dest, destLength, "%u.%u.%u.%u.%u.%u", g[0], g[1], g[2], g[3], g[4], g[5]);
 }
 bool RakNetGUID::FromString(const char *source)

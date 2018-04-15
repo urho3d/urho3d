@@ -189,13 +189,13 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString( RakNetStatistics *s, char *buffer
 {
 	if ( s == 0 )
 	{
-		sprintf( buffer, bufferLength, "stats is a NULL pointer in statsToString\n" );
+		sprintf( buffer, "stats is a NULL pointer in statsToString\n" );
 		return ;
 	}
 
 	if (verbosityLevel==0)
 	{
-		sprintf(buffer, bufferLength,
+		sprintf(buffer,
 			"Bytes per second sent     %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Bytes per second received %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Current packetloss        %.1f%%\n",
@@ -206,7 +206,7 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString( RakNetStatistics *s, char *buffer
 	}
 	else if (verbosityLevel==1)
 	{
-		sprintf(buffer, bufferLength,
+		sprintf(buffer,
 			"Actual bytes per second sent       %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Actual bytes per second received   %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Message bytes per second pushed    %" PRINTF_64_BIT_MODIFIER "u\n"
@@ -250,7 +250,7 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString( RakNetStatistics *s, char *buffer
 	}	
 	else
 	{
-		sprintf(buffer, bufferLength,
+		sprintf(buffer,
 			"Actual bytes per second sent         %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Actual bytes per second received     %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Message bytes per second sent        %" PRINTF_64_BIT_MODIFIER "u\n"

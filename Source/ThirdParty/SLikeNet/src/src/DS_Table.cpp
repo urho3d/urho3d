@@ -974,14 +974,14 @@ void Table::PrintColumnHeaders(char *out, int outLength, char columnDelineator) 
 		{
 			len = (int) strlen(out);
 			if (len < outLength-1)
-				sprintf(out+len, outLength-len, "%c", columnDelineator);
+				sprintf(out+len, "%c", columnDelineator);
 			else
 				return;
 		}
 
 		len = (int) strlen(out);
 		if (len < outLength-(int) strlen(columns[i].columnName))
-			sprintf(out+len, outLength-len, "%s", columns[i].columnName);
+			sprintf(out+len, "%s", columns[i].columnName);
 		else
 			return;
 	}
