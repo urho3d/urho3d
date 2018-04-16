@@ -83,7 +83,7 @@ public:
     /// Start NAT punchtrough client to allow remote connections
     void StartNATClient();
     /// Get local server GUID
-    const String& GetGUID();
+    const String& GetGUID() const { return guid_; };
     /// Attempt to connect to NAT server
     void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Broadcast a message with content ID to all client connections.
@@ -193,7 +193,9 @@ private:
     VariantMap identity_;
     /// NAT punchtrough server information
     SLNet::SystemAddress natPunchServerAddress_;
-    /// NAT punchtrough client
+    /// NAT punchtrough client for the server
+    SLNet::NatPunchthroughClient natPunchthroughServerClient_;
+    /// NAT punchtrough client for the client
     SLNet::NatPunchthroughClient natPunchthroughClient_;
     /// Remote GUID information
     SLNet::RakNetGUID remoteGUID_;

@@ -64,7 +64,7 @@ void CreateUI()
 
     UpdateButtons();
 
-    chatHistory.Resize((graphics.height - 20) / chatHistoryText.rowHeight);
+    chatHistory.Resize((graphics.height - 100) / chatHistoryText.rowHeight);
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     renderer.defaultZone.fogColor = Color(0.0f, 0.0f, 0.1f);
