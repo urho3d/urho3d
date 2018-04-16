@@ -69,19 +69,6 @@ function CreateUI()
     CreateLabel("3. Input local or remote server GUID", IntVector2(20, marginTop-20));
     serverGuid = CreateLineEdit("Remote server GUID", 200, IntVector2(20, marginTop));
     connectButton = CreateButton("Connect", 160, IntVector2(240, marginTop));
-    -- buttonContainer = ui.root:CreateChild("UIElement")
-    -- buttonContainer:SetFixedSize(graphics.width, 20)
-    -- buttonContainer:SetPosition(0, graphics.height - 20)
-    -- buttonContainer.layoutMode = LM_HORIZONTAL
-
-    -- textEdit = buttonContainer:CreateChild("LineEdit")
-    -- textEdit:SetStyleAuto()
-
-    -- sendButton = CreateButton("Send", 70)
-    -- connectButton = CreateButton("Connect", 90)
-    -- disconnectButton = CreateButton("Disconnect", 100)
-    -- startServerButton = CreateButton("Start Server", 110)
-
 
     local size = 20
     for i = 1, size do
@@ -169,9 +156,11 @@ end
 
 function HandleSaveNatSettings(eventType, eventData)
 
+    local address = natServerAddress.text
+    local port = natServerPort.text
     -- Save NAT server configuration
-    network:SetNATServerInfo(natServerAddress.text, natServerPort.text:ToInt());
-    ShowLogMessage("Saving NAT settings: " + natServerAddress.text + ":" + natServerPort.text);
+    network:SetNATServerInfo(address, port);
+    ShowLogMessage("Saving NAT settings: " .. address .. ":" .. port);
 end
 
 function HandleServerConnected(eventType, eventData)
@@ -208,18 +197,18 @@ end
 
 function HandleStartServer(eventType, eventData)
     network:StartServer(SERVER_PORT);
-    ShowLogMessage("Server: Server started on port: " + String(SERVER_PORT));
+    ShowLogMessage("Server: Server started on port: " .. SERVER_PORT);
 
     -- Connect to the NAT server
     network:StartNATClient();
     ShowLogMessage("Server: Starting NAT client for server...");
 
     -- Output our assigned GUID which others will use to connect to our server
-    guid.text = network.guid;
+    guid.text = network:GetGUID();
 end
 
 function HandleConnect(eventType, eventData)
-    VariantMap userData;
+    local userData = VariantMap()
     userData["Name"] = "Urho3D";
 
     -- Attempt connecting to server using custom GUID, Scene = null as a second parameter and user identity is passed as third parameter
