@@ -225,11 +225,7 @@ void Connection::SetLogStatistics(bool enable)
 
 void Connection::Disconnect(int waitMSec)
 {
-    // if (!isClient_) {
-    //     peer_->Shutdown(waitMSec);
-    // } else {
-        peer_->CloseConnection(address_, true);
-    // }
+	peer_->CloseConnection(address_, true);
 }
 
 void Connection::SendServerUpdate()

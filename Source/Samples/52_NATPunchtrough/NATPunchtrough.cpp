@@ -181,7 +181,7 @@ Button* NATPunchtrough::CreateButton(const String& text, int width, IntVector2 p
 
 LineEdit* NATPunchtrough::CreateLineEdit(const String& placeholder, int width, IntVector2 pos)
 {
-    LineEdit* textEdit = GetSubsystem<UI>()->GetRoot()->CreateChild<LineEdit>("");
+    auto* textEdit = GetSubsystem<UI>()->GetRoot()->CreateChild<LineEdit>("");
     textEdit->SetStyleAuto();
     textEdit->SetFixedWidth(width);
     textEdit->SetFixedHeight(30);
@@ -195,7 +195,7 @@ void NATPunchtrough::CreateLabel(const String& text, IntVector2 pos)
     auto* cache = GetSubsystem<ResourceCache>();
     // Create log element to view latest logs from the system
     auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
-    Text* label = GetSubsystem<UI>()->GetRoot()->CreateChild<Text>();
+    auto* label = GetSubsystem<UI>()->GetRoot()->CreateChild<Text>();
     label->SetFont(font, 12);
     label->SetColor(Color(0.0f, 1.0f, 0.0f));
     label->SetPosition(pos);
