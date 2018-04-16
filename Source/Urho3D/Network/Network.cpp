@@ -200,6 +200,7 @@ Network::Network(Context* context) :
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     SetPassword("");
+	SetDiscoveryBeacon(VariantMap());
 
     SetNATServerInfo("127.0.0.1", 61111);
 
@@ -338,13 +339,13 @@ void Network::SetDiscoveryBeacon(const VariantMap& data)
 void Network::DiscoverHosts(unsigned port)
 {
     // JSandusky: Contrary to the manual, we actually do have to perform Startup first before we can Ping
-    if (rakPeer_ && !rakPeer_->IsActive())
+    if (!rakPeerClient_->IsActive())
     {
         SLNet::SocketDescriptor socket;
         // Startup local connection with max 1 incoming connection(first param) and 1 socket description (third param)
-        rakPeer_->Startup(1, &socket, 1);
+		rakPeerClient_->Startup(1, &socket, 1);
     }
-    rakPeer_->Ping("255.255.255.255", port, false);
+	rakPeerClient_->Ping("255.255.255.255", port, false);
 }
 
 void Network::SetPassword(const String& password)
@@ -793,25 +794,30 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_UNCONNECTED_PING)
     {
-
+		packetHandled = true;
     }
     else if (packetID == ID_UNCONNECTED_PONG) // Host discovery response
     {
-        if (isServer)
+        if (!isServer)
         {
-            dataStart += sizeof(SLNet::TimeMS);
+			using namespace NetworkHostDiscovered;
+			
+			dataStart += sizeof(SLNet::TimeMS);
+			VariantMap& eventMap = context_->GetEventDataMap();
+			if (packet->length > packet->length - dataStart) {
+				VectorBuffer buffer(packet->data + dataStart, packet->length - dataStart);
+				VariantMap srcData = buffer.ReadVariantMap();
+				eventMap[P_BEACON] = srcData;
+			}
+			else {
+				eventMap[P_BEACON] = VariantMap();
+			}
 
-            VectorBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            VariantMap srcData = buffer.ReadVariantMap();
-
-            VariantMap& eventMap = context_->GetEventDataMap();
-            using namespace NetworkHostDiscovered;
-            eventMap[P_BEACON] = srcData;
             eventMap[P_ADDRESS] = String(packet->systemAddress.ToString(false));
             eventMap[P_PORT] = (int)packet->systemAddress.GetPort();
             SendEvent(E_NETWORKHOSTDISCOVERED, eventMap);
-            packetHandled = true;
         }
+		packetHandled = true;
     }
 
     // Urho3D messages
