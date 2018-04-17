@@ -279,7 +279,7 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
     if (connection)
     {
         MemoryBuffer msg(data, (unsigned)numBytes);
-        if (connection->ProcessMessage((int)msgId, msg))
+        if (connection->ProcessMessage((int)msgID, msg))
             return;
 
         // If message was not handled internally, forward as an event
@@ -287,7 +287,7 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
 
         VariantMap& eventData = GetEventDataMap();
         eventData[P_CONNECTION] = connection;
-        eventData[P_MESSAGEID] = (int)msgId;
+        eventData[P_MESSAGEID] = (int)msgID;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
