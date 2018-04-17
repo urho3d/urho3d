@@ -322,7 +322,7 @@ void Connection::SendPackages()
         {
             HashMap<StringHash, PackageUpload>::Iterator current = i++;
             PackageUpload& upload = current->second_;
-            unsigned fragmentSize =
+            auto fragmentSize =
                 (unsigned)Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
             upload.file_->Read(buffer, fragmentSize);
 
@@ -459,7 +459,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 
     // In case we have joined other scenes in this session, remove first all downloaded package files from the resource system
     // to prevent resource conflicts
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
@@ -525,7 +525,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg);
-            SmoothedTransform* transform = node->GetComponent<SmoothedTransform>();
+            auto* transform = node->GetComponent<SmoothedTransform>();
             if (transform)
                 transform->Update(1.0f, 0.0f);
 
@@ -728,7 +728,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             for (unsigned i = 0; i < packages.Size(); ++i)
             {
                 PackageFile* package = packages[i];
-                String packageFullName = package->GetName();
+                const String& packageFullName = package->GetName();
                 if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
                 {
                     StringHash nameHash(name);
@@ -1213,7 +1213,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 
     // Check from the interest management component, if exists, whether should update
     /// \todo Searching for the component is a potential CPU hotspot. It should be cached
-    NetworkPriority* priority = node->GetComponent<NetworkPriority>();
+    auto* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
     {
         float distance = (node->GetWorldPosition() - position_).Length();
@@ -1378,7 +1378,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 
 bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();

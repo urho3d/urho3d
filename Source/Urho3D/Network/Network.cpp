@@ -194,13 +194,15 @@ Network::Network(Context* context) :
     simulatedLatency_(0),
     simulatedPacketLoss_(0.0f),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
-    updateAcc_(0.0f)
+    updateAcc_(0.0f),
+    isServer_(false),
+    scene_(nullptr)
 {
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     SetPassword("");
-	SetDiscoveryBeacon(VariantMap());
+    SetDiscoveryBeacon(VariantMap());
 
     SetNATServerInfo("127.0.0.1", 61111);
 
@@ -257,7 +259,7 @@ Network::Network(Context* context) :
 
 Network::~Network()
 {
-	rakPeer_->DetachPlugin(&(natPunchthroughServerClient_));
+    rakPeer_->DetachPlugin(&(natPunchthroughServerClient_));
     // If server connection exists, disconnect, but do not send an event because we are shutting down
     Disconnect(100);
     serverConnection_.Reset();
@@ -266,18 +268,18 @@ Network::~Network()
 
     SLNet::RakPeerInterface::DestroyInstance(rakPeer_);
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
-    rakPeer_ = 0;
-    rakPeerClient_ = 0;
+    rakPeer_ = nullptr;
+    rakPeerClient_ = nullptr;
 }
 
-void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetId, int msgId, const char* data, size_t numBytes)
+void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes)
 {
     // Only process messages from known sources
     Connection* connection = GetConnection(source);
     if (connection)
     {
         MemoryBuffer msg(data, (unsigned)numBytes);
-        if (connection->ProcessMessage((int)msgId, msg))
+        if (connection->ProcessMessage((int)msgID, msg))
             return;
 
         // If message was not handled internally, forward as an event
@@ -285,7 +287,7 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetId, in
 
         VariantMap& eventData = GetEventDataMap();
         eventData[P_CONNECTION] = connection;
-        eventData[P_MESSAGEID] = (int)msgId;
+        eventData[P_MESSAGEID] = (int)msgID;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
@@ -343,9 +345,9 @@ void Network::DiscoverHosts(unsigned port)
     {
         SLNet::SocketDescriptor socket;
         // Startup local connection with max 1 incoming connection(first param) and 1 socket description (third param)
-		rakPeerClient_->Startup(1, &socket, 1);
+        rakPeerClient_->Startup(1, &socket, 1);
     }
-	rakPeerClient_->Ping("255.255.255.255", port, false);
+    rakPeerClient_->Ping("255.255.255.255", port, false);
 }
 
 void Network::SetPassword(const String& password)
@@ -452,14 +454,14 @@ void Network::SetNATServerInfo(const String& address, unsigned short port)
 
 void Network::StartNATClient()
 {
-	if (!rakPeer_) {
-		URHO3D_LOGERROR("Unable to start NAT client, client not initialized!");
-		return;
-	}
+    if (!rakPeer_) {
+        URHO3D_LOGERROR("Unable to start NAT client, client not initialized!");
+        return;
+    }
     rakPeer_->AttachPlugin(&(natPunchthroughServerClient_));
     guid_ = String(rakPeer_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
     URHO3D_LOGINFO("GUID: " + guid_);
-    rakPeer_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), 0, 0);
+    rakPeer_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), nullptr, 0);
 }
 
 void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity)
@@ -472,7 +474,7 @@ void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const Vari
     rakPeerClient_->Startup(2, &socket, 1);
 
     remoteGUID_.FromString(guid.CString());
-    rakPeerClient_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), 0, 0);
+    rakPeerClient_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), nullptr, 0);
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -627,7 +629,7 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
         if (i != clientConnections_.End())
             return i->second_;
         else
-            return 0;
+            return nullptr;
     }
 }
 
@@ -737,7 +739,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     else if (packetID == ID_CONNECTION_ATTEMPT_FAILED) // We've failed to connect to the server/peer
     {
         if (packet->systemAddress == natPunchServerAddress_) {
-			URHO3D_LOGERROR("Connection to NAT punchtrough server failed!");
+            URHO3D_LOGERROR("Connection to NAT punchtrough server failed!");
             SendEvent(E_NATMASTERCONNECTIONFAILED);
 
         } else {
@@ -755,27 +757,27 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         URHO3D_LOGINFO("NAT punchtrough succeeded! Remote peer: " + String(remotePeer.ToString()));
         if (!isServer)
         {
-			using namespace NetworkNatPunchtroughSucceeded;
-			VariantMap eventMap;
-			eventMap[P_ADDRESS] = remotePeer.ToString(false);
-			eventMap[P_PORT] = remotePeer.GetPort();
-			SendEvent(E_NETWORKNATPUNCHTROUGHSUCCEEDED, eventMap);
-			URHO3D_LOGINFO("Connecting to server behind NAT: " + String(remotePeer.ToString()));
+            using namespace NetworkNatPunchtroughSucceeded;
+            VariantMap eventMap;
+            eventMap[P_ADDRESS] = remotePeer.ToString(false);
+            eventMap[P_PORT] = remotePeer.GetPort();
+            SendEvent(E_NETWORKNATPUNCHTROUGHSUCCEEDED, eventMap);
+            URHO3D_LOGINFO("Connecting to server behind NAT: " + String(remotePeer.ToString()));
             Connect(String(remotePeer.ToString(false)), remotePeer.GetPort(), scene_, identity_);
         }
         packetHandled = true;
     }
-	else if (packetID == ID_NAT_PUNCHTHROUGH_FAILED)
-	{
-		URHO3D_LOGERROR("NAT punchtrough failed!");
-		SLNet::SystemAddress remotePeer = packet->systemAddress;
-		using namespace NetworkNatPunchtroughFailed;
-		VariantMap eventMap;
-		eventMap[P_ADDRESS] = remotePeer.ToString(false);
-		eventMap[P_PORT] = remotePeer.GetPort();
-		SendEvent(E_NETWORKNATPUNCHTROUGHFAILED, eventMap);
-		packetHandled = true;
-	}
+    else if (packetID == ID_NAT_PUNCHTHROUGH_FAILED)
+    {
+        URHO3D_LOGERROR("NAT punchtrough failed!");
+        SLNet::SystemAddress remotePeer = packet->systemAddress;
+        using namespace NetworkNatPunchtroughFailed;
+        VariantMap eventMap;
+        eventMap[P_ADDRESS] = remotePeer.ToString(false);
+        eventMap[P_PORT] = remotePeer.GetPort();
+        SendEvent(E_NETWORKNATPUNCHTROUGHFAILED, eventMap);
+        packetHandled = true;
+    }
     else if (packetID == ID_CONNECTION_BANNED) // We're a client and we're on the ban list
     {
         URHO3D_LOGERROR("Connection failed, you're banned!");
@@ -794,30 +796,30 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_UNCONNECTED_PING)
     {
-		packetHandled = true;
+        packetHandled = true;
     }
     else if (packetID == ID_UNCONNECTED_PONG) // Host discovery response
     {
         if (!isServer)
         {
-			using namespace NetworkHostDiscovered;
-			
-			dataStart += sizeof(SLNet::TimeMS);
-			VariantMap& eventMap = context_->GetEventDataMap();
-			if (packet->length > packet->length - dataStart) {
-				VectorBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-				VariantMap srcData = buffer.ReadVariantMap();
-				eventMap[P_BEACON] = srcData;
-			}
-			else {
-				eventMap[P_BEACON] = VariantMap();
-			}
+            using namespace NetworkHostDiscovered;
+            
+            dataStart += sizeof(SLNet::TimeMS);
+            VariantMap& eventMap = context_->GetEventDataMap();
+            if (packet->length > packet->length - dataStart) {
+                VectorBuffer buffer(packet->data + dataStart, packet->length - dataStart);
+                VariantMap srcData = buffer.ReadVariantMap();
+                eventMap[P_BEACON] = srcData;
+            }
+            else {
+                eventMap[P_BEACON] = VariantMap();
+            }
 
             eventMap[P_ADDRESS] = String(packet->systemAddress.ToString(false));
             eventMap[P_PORT] = (int)packet->systemAddress.GetPort();
             SendEvent(E_NETWORKHOSTDISCOVERED, eventMap);
         }
-		packetHandled = true;
+        packetHandled = true;
     }
 
     // Urho3D messages
