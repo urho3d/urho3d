@@ -728,7 +728,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             for (unsigned i = 0; i < packages.Size(); ++i)
             {
                 PackageFile* package = packages[i];
-                const String packageFullName = package->GetName();
+                const String& packageFullName = package->GetName();
                 if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
                 {
                     StringHash nameHash(name);
