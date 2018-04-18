@@ -31,7 +31,7 @@ using namespace SLNet;
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <errno.h>  // error numbers
-#if !defined(ANDROID)
+#if !defined(ANDROID) || !defined(__ANDROID__)
 #include <ifaddrs.h>
 #endif
 #include <netinet/in.h>
