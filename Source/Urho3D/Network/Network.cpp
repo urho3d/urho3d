@@ -468,16 +468,16 @@ void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const Vari
 {
     scene_ = scene;
     identity_ = identity;
-	remoteGUID_.FromString(guid.CString());
+    remoteGUID_.FromString(guid.CString());
     rakPeerClient_->AttachPlugin(&(natPunchthroughClient_));
-	if (rakPeerClient_->IsActive()) {
-		natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
-	}
-	else {
-		SLNet::SocketDescriptor socket;
-		// Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
-		rakPeerClient_->Startup(2, &socket, 1);
-	}
+    if (rakPeerClient_->IsActive()) {
+        natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
+    }
+    else {
+        SLNet::SocketDescriptor socket;
+        // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
+        rakPeerClient_->Startup(2, &socket, 1);
+    }
 
     rakPeerClient_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), nullptr, 0);
 }
@@ -687,17 +687,17 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             packetHandled = true;
         }
     }
-	else if (packetID == ID_ALREADY_CONNECTED)
-	{
-		if (packet->systemAddress == natPunchServerAddress_) {
-			URHO3D_LOGINFO("Already connected to NAT server! ");
-			if (!isServer)
-			{
-				natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
-			}
-		}
-		packetHandled = true;
-	}
+    else if (packetID == ID_ALREADY_CONNECTED)
+    {
+        if (packet->systemAddress == natPunchServerAddress_) {
+            URHO3D_LOGINFO("Already connected to NAT server! ");
+            if (!isServer)
+            {
+                natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
+            }
+        }
+        packetHandled = true;
+    }
     else if (packetID == ID_CONNECTION_REQUEST_ACCEPTED) // We're a client, our connection as been accepted
     {
         if(packet->systemAddress == natPunchServerAddress_) {
