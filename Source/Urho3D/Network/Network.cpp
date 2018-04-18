@@ -206,7 +206,6 @@ Network::Network(Context* context) :
 
     SetNATServerInfo("127.0.0.1", 61111);
 
-
     // Register Network library object factories
     RegisterNetworkLibrary(context_);
 
@@ -622,6 +621,11 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
     // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
     return request;
+}
+
+void Network::BanAddress(const String& address)
+{
+    rakPeer_->AddToBanList(address.CString(), 0);
 }
 
 Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const

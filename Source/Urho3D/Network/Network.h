@@ -114,7 +114,8 @@ public:
     void SendPackageToClients(Scene* scene, PackageFile* package);
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
     SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
-
+    /// Ban specific IP addresses
+    void BanAddress(const String& address);
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
 
