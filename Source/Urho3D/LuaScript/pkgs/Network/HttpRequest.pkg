@@ -34,7 +34,8 @@ class HttpRequest
     IntRect ReadIntRect();
     IntVector2 ReadIntVector2();
     IntVector3 ReadIntVector3();
-    Rect ReadRect();
+    // Rect conflicts with OSX includes from the RakNet library
+    Urho3D::Rect ReadRect();
     Vector2 ReadVector2();
     Vector3 ReadVector3();
     Vector3 ReadPackedVector3(float maxAbsCoord);

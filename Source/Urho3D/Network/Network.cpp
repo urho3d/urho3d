@@ -37,11 +37,6 @@
 #include "../Network/NetworkPriority.h"
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
-
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/RakPeerInterface.h>
-#include <SLikeNet/RakNetTypes.h>
-
 #include "../DebugNew.h"
 
 namespace Urho3D
