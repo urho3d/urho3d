@@ -20,6 +20,17 @@
 // THE SOFTWARE.
 //
 
+#include "SLikeNet/NatPunchthroughClient.h"
+#include <SLikeNet/MessageIdentifiers.h>
+#include <SLikeNet/RakPeerInterface.h>
+#include <SLikeNet/RakNetTypes.h>
+#include <SLikeNet/RakNetStatistics.h>
+
+/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif
+
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
@@ -191,13 +202,18 @@ Network::Network(Context* context) :
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
     updateAcc_(0.0f),
     isServer_(false),
-    scene_(nullptr)
+    scene_(nullptr),
+	natPunchServerAddress_(nullptr),
+	remoteGUID_(nullptr)
 {
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     SetPassword("");
     SetDiscoveryBeacon(VariantMap());
+
+	natPunchthroughClient_ = new SLNet::NatPunchthroughClient;
+	natPunchthroughServerClient_ = new SLNet::NatPunchthroughClient;
 
     SetNATServerInfo("127.0.0.1", 61111);
 
@@ -253,17 +269,31 @@ Network::Network(Context* context) :
 
 Network::~Network()
 {
-    rakPeer_->DetachPlugin(&(natPunchthroughServerClient_));
+    rakPeer_->DetachPlugin(natPunchthroughServerClient_);
+	rakPeerClient_->DetachPlugin(natPunchthroughClient_);
     // If server connection exists, disconnect, but do not send an event because we are shutting down
     Disconnect(100);
     serverConnection_.Reset();
 
     clientConnections_.Clear();
 
+	if (natPunchthroughServerClient_)
+		delete natPunchthroughServerClient_;
+
+	if (natPunchthroughClient_)
+		delete natPunchthroughClient_;
+
+	if (remoteGUID_)
+		delete remoteGUID_;
+
+	if (natPunchServerAddress_)
+		delete natPunchServerAddress_;
+
     SLNet::RakPeerInterface::DestroyInstance(rakPeer_);
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
+
 }
 
 void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes)
@@ -443,7 +473,10 @@ void Network::StopServer()
 void Network::SetNATServerInfo(const String& address, unsigned short port)
 {
     String combined = address + "|" + String((int)port);
-    natPunchServerAddress_.FromString(combined.CString());
+	if (!natPunchServerAddress_)
+		natPunchServerAddress_ = new SLNet::SystemAddress;
+
+    natPunchServerAddress_->FromString(combined.CString());
 }
 
 void Network::StartNATClient()
@@ -452,20 +485,28 @@ void Network::StartNATClient()
         URHO3D_LOGERROR("Unable to start NAT client, client not initialized!");
         return;
     }
-    rakPeer_->AttachPlugin(&(natPunchthroughServerClient_));
+	if (natPunchServerAddress_->GetPort() == 0) {
+		URHO3D_LOGERROR("NAT master server address incorrect!");
+		return;
+	}
+
+    rakPeer_->AttachPlugin(natPunchthroughServerClient_);
     guid_ = String(rakPeer_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
     URHO3D_LOGINFO("GUID: " + guid_);
-    rakPeer_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), nullptr, 0);
+    rakPeer_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
 }
 
 void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity)
 {
     scene_ = scene;
     identity_ = identity;
-    remoteGUID_.FromString(guid.CString());
-    rakPeerClient_->AttachPlugin(&(natPunchthroughClient_));
+	if (!remoteGUID_)
+		remoteGUID_ = new SLNet::RakNetGUID;
+
+    remoteGUID_->FromString(guid.CString());
+    rakPeerClient_->AttachPlugin(natPunchthroughClient_);
     if (rakPeerClient_->IsActive()) {
-        natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
+        natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
     }
     else {
         SLNet::SocketDescriptor socket;
@@ -473,7 +514,7 @@ void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const Vari
         rakPeerClient_->Startup(2, &socket, 1);
     }
 
-    rakPeerClient_->Connect(natPunchServerAddress_.ToString(false), natPunchServerAddress_.GetPort(), nullptr, 0);
+    rakPeerClient_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -688,23 +729,23 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_ALREADY_CONNECTED)
     {
-        if (packet->systemAddress == natPunchServerAddress_) {
+        if (natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
             URHO3D_LOGINFO("Already connected to NAT server! ");
             if (!isServer)
             {
-                natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
+                natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
             }
         }
         packetHandled = true;
     }
     else if (packetID == ID_CONNECTION_REQUEST_ACCEPTED) // We're a client, our connection as been accepted
     {
-        if(packet->systemAddress == natPunchServerAddress_) {
+        if(natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
             URHO3D_LOGINFO("Succesfully connected to NAT punchtrough server! ");
             SendEvent(E_NATMASTERCONNECTIONSUCCEEDED);
             if (!isServer)
             {
-                natPunchthroughClient_.OpenNAT(remoteGUID_, natPunchServerAddress_);
+                natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
             }
         } else {
             if (!isServer)
@@ -753,7 +794,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_CONNECTION_ATTEMPT_FAILED) // We've failed to connect to the server/peer
     {
-        if (packet->systemAddress == natPunchServerAddress_) {
+        if (natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
             URHO3D_LOGERROR("Connection to NAT punchtrough server failed!");
             SendEvent(E_NATMASTERCONNECTIONFAILED);
 

@@ -22,23 +22,10 @@
 
 #pragma once
 
-#include "SLikeNet/NatPunchthroughClient.h"
-
-/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
-#ifdef TRANSPARENT
-#undef TRANSPARENT
-#endif
-
 #include "../Container/HashSet.h"
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
-
-namespace SLNet
-{
-    struct AddressOrGUID;
-    struct Packet;
-}
 
 namespace Urho3D
 {
@@ -193,13 +180,13 @@ private:
     /// Client identify for NAT punchtrough connections
     VariantMap identity_;
     /// NAT punchtrough server information
-    SLNet::SystemAddress natPunchServerAddress_;
+    SLNet::SystemAddress* natPunchServerAddress_;
     /// NAT punchtrough client for the server
-    SLNet::NatPunchthroughClient natPunchthroughServerClient_;
+    SLNet::NatPunchthroughClient* natPunchthroughServerClient_;
     /// NAT punchtrough client for the client
-    SLNet::NatPunchthroughClient natPunchthroughClient_;
+    SLNet::NatPunchthroughClient* natPunchthroughClient_;
     /// Remote GUID information
-    SLNet::RakNetGUID remoteGUID_;
+    SLNet::RakNetGUID* remoteGUID_;
     /// Local server GUID
     String guid_;
 };

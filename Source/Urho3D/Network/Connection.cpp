@@ -20,6 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include <SLikeNet/MessageIdentifiers.h>
+#include <SLikeNet/RakPeerInterface.h>
+#include <SLikeNet/RakNetTypes.h>
+#include <SLikeNet/RakNetStatistics.h>
+
+/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif
+
 #include "../Precompiled.h"
 
 #include "../Core/Profiler.h"
@@ -64,21 +74,25 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     Object(context),
     timeStamp_(0),
     peer_(peer),
-    address_(address),
     sendMode_(OPSM_NONE),
     isClient_(isClient),
     connectPending_(false),
     sceneLoaded_(false),
-    logStatistics_(false)
+    logStatistics_(false),
+	address_(nullptr)
 {
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
+	SetAddressOrGUID(address);
 }
 
 Connection::~Connection()
 {
     // Reset scene (remove possible owner references), as this connection is about to be destroyed
     SetScene(nullptr);
+
+	if (address_)
+		delete address_;
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -108,7 +122,7 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     buffer.Write(data, numBytes);
     PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
     if (peer_)
-        peer_->Send((const char*)buffer.GetData(), (int)buffer.GetSize(), HIGH_PRIORITY, reliability, (char)0, address_, false);
+        peer_->Send((const char*)buffer.GetData(), (int)buffer.GetSize(), HIGH_PRIORITY, reliability, (char)0, *address_, false);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -225,7 +239,7 @@ void Connection::SetLogStatistics(bool enable)
 
 void Connection::Disconnect(int waitMSec)
 {
-	peer_->CloseConnection(address_, true);
+	peer_->CloseConnection(*address_, true);
 }
 
 void Connection::SendServerUpdate()
@@ -277,7 +291,7 @@ void Connection::SendRemoteEvents()
     {
         statsTimer_.Reset();
         char statsBuffer[256];
-        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", peer_->GetAveragePing(address_),
+        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", peer_->GetAveragePing(*address_),
             (int)0, //TODO: Packets in per second
             (int)0, //TODO: Packets out per second
             0.0f, //TODO: Bytes in per second
@@ -439,7 +453,7 @@ void Connection::Ban()
 {
     if (peer_)
     {
-        peer_->AddToBanList(address_.ToString(false), 0);
+        peer_->AddToBanList(address_->ToString(false), 0);
     }
 }
 
@@ -993,8 +1007,8 @@ float Connection::GetRoundTripTime() const
     if (peer_)
     {
         SLNet::RakNetStatistics stats;
-        if (peer_->GetStatistics(address_.systemAddress, &stats))
-            return (float)peer_->GetAveragePing(address_);
+        if (peer_->GetStatistics(address_->systemAddress, &stats))
+            return (float)peer_->GetAveragePing(*address_);
     }
     return 0.0f;
 }
@@ -1010,7 +1024,7 @@ float Connection::GetBytesInPerSec() const
     if (peer_)
     {
         SLNet::RakNetStatistics stats;
-        if (peer_->GetStatistics(address_.systemAddress, &stats))
+        if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_RECEIVED];
     }
     return 0.0f;
@@ -1021,7 +1035,7 @@ float Connection::GetBytesOutPerSec() const
     if (peer_)
     {
         SLNet::RakNetStatistics stats;
-        if (peer_->GetStatistics(address_.systemAddress, &stats))
+        if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_SENT];
     }
     return 0.0f;
@@ -1552,6 +1566,17 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
     }
 
     RequestNeededPackages(1, msg);
+}
+
+String Connection::GetAddress() const {
+	return String(address_->ToString(false /*write port*/)); 
+}
+
+void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
+{ 
+	if (address_)
+		delete address_;
+	address_ = new SLNet::AddressOrGUID(addr);
 }
 
 }

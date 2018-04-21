@@ -22,16 +22,6 @@
 
 #pragma once
 
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/RakPeerInterface.h>
-#include <SLikeNet/RakNetTypes.h>
-#include <SLikeNet/RakNetStatistics.h>
-
-/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
-#ifdef TRANSPARENT
-#undef TRANSPARENT
-#endif
-
 #include "../Container/HashSet.h"
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
@@ -42,6 +32,16 @@
 #ifdef SendMessage
 #undef SendMessage
 #endif
+
+namespace SLNet
+{
+	class SystemAddress;
+	struct AddressOrGUID;
+	struct RakNetGUID;
+	struct Packet;
+	class NatPunchthroughClient;
+	class RakPeerInterface;
+}
 
 namespace Urho3D
 {
@@ -158,9 +158,9 @@ public:
     /// Ban this connections IP address
     void Ban();
     /// Return the RakNet address/guid.
-    const SLNet::AddressOrGUID& GetAddressOrGUID() const { return address_; }
+    const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
     /// Set the the RakNet address/guid.
-    void SetAddressOrGUID(const SLNet::AddressOrGUID& addr) { address_ = addr; }
+	void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
 
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
@@ -196,7 +196,7 @@ public:
     bool GetLogStatistics() const { return logStatistics_; }
 
     /// Return remote address.
-    String GetAddress() const { return String(address_.ToString(false /*write port*/)); }
+	String GetAddress() const;
 
     /// Return remote port.
     unsigned short GetPort() const { return port_; }
@@ -319,7 +319,7 @@ private:
     /// Show statistics flag.
     bool logStatistics_;
     /// Address of this connection.
-    SLNet::AddressOrGUID address_;
+    SLNet::AddressOrGUID* address_;
     /// Raknet peer object.
     SLNet::RakPeerInterface* peer_;
 };
