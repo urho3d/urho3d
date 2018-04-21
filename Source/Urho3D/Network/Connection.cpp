@@ -91,8 +91,7 @@ Connection::~Connection()
     // Reset scene (remove possible owner references), as this connection is about to be destroyed
     SetScene(nullptr);
 
-	if (address_)
-		delete address_;
+	delete address_;
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -1574,8 +1573,7 @@ String Connection::GetAddress() const {
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
 { 
-	if (address_)
-		delete address_;
+	delete address_;
 	address_ = new SLNet::AddressOrGUID(addr);
 }
 

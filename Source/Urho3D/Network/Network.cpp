@@ -277,17 +277,10 @@ Network::~Network()
 
     clientConnections_.Clear();
 
-	if (natPunchthroughServerClient_)
-		delete natPunchthroughServerClient_;
-
-	if (natPunchthroughClient_)
-		delete natPunchthroughClient_;
-
-	if (remoteGUID_)
-		delete remoteGUID_;
-
-	if (natPunchServerAddress_)
-		delete natPunchServerAddress_;
+	delete natPunchthroughServerClient_;
+	delete natPunchthroughClient_;
+	delete remoteGUID_;
+	delete natPunchServerAddress_;
 
     SLNet::RakPeerInterface::DestroyInstance(rakPeer_);
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
