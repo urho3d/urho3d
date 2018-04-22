@@ -79,11 +79,11 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     connectPending_(false),
     sceneLoaded_(false),
     logStatistics_(false),
-	address_(nullptr)
+    address_(nullptr)
 {
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
-	SetAddressOrGUID(address);
+    SetAddressOrGUID(address);
 }
 
 Connection::~Connection()
@@ -91,7 +91,8 @@ Connection::~Connection()
     // Reset scene (remove possible owner references), as this connection is about to be destroyed
     SetScene(nullptr);
 
-	delete address_;
+    delete address_;
+    address_ = nullptr;
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -238,7 +239,7 @@ void Connection::SetLogStatistics(bool enable)
 
 void Connection::Disconnect(int waitMSec)
 {
-	peer_->CloseConnection(*address_, true);
+    peer_->CloseConnection(*address_, true);
 }
 
 void Connection::SendServerUpdate()
@@ -1568,13 +1569,14 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
 }
 
 String Connection::GetAddress() const {
-	return String(address_->ToString(false /*write port*/)); 
+    return String(address_->ToString(false /*write port*/)); 
 }
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
 { 
-	delete address_;
-	address_ = new SLNet::AddressOrGUID(addr);
+    delete address_;
+    address_ = nullptr;
+    address_ = new SLNet::AddressOrGUID(addr);
 }
 
 }

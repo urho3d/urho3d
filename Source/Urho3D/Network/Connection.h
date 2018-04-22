@@ -35,12 +35,12 @@
 
 namespace SLNet
 {
-	class SystemAddress;
-	struct AddressOrGUID;
-	struct RakNetGUID;
-	struct Packet;
-	class NatPunchthroughClient;
-	class RakPeerInterface;
+    class SystemAddress;
+    struct AddressOrGUID;
+    struct RakNetGUID;
+    struct Packet;
+    class NatPunchthroughClient;
+    class RakPeerInterface;
 }
 
 namespace Urho3D
@@ -160,7 +160,7 @@ public:
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
     /// Set the the RakNet address/guid.
-	void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
+    void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
 
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
@@ -196,7 +196,7 @@ public:
     bool GetLogStatistics() const { return logStatistics_; }
 
     /// Return remote address.
-	String GetAddress() const;
+    String GetAddress() const;
 
     /// Return remote port.
     unsigned short GetPort() const { return port_; }
