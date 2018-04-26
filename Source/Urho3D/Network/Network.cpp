@@ -192,7 +192,7 @@ static const char* RAKNET_MESSAGEID_STRINGS[] = {
 };
 
 static const int DEFAULT_UPDATE_FPS = 30;
-static const int SERVER_TIMEOUT_TIME = 1000;
+static const int SERVER_TIMEOUT_TIME = 10000;
 
 Network::Network(Context* context) :
     Object(context),
@@ -799,7 +799,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 
             if (!isServer)
             {
-                SendEvent(E_CONNECTFAILED);
+                OnServerDisconnected();
             }
         }
         packetHandled = true;
