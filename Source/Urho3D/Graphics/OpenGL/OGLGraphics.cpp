@@ -66,6 +66,7 @@ extern "C"
 
 #ifdef _WIN32
 // Prefer the high-performance GPU on switchable GPU systems
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 extern "C"
 {

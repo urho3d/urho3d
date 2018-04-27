@@ -27,6 +27,7 @@
 
 #ifdef _WIN32
 // Needs to be included above sql.h for windows
+#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #endif
