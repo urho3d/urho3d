@@ -885,7 +885,11 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         else
         {
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            serverConnection_->ProcessMessage(packetID, buffer);            
+            bool processed = serverConnection_->ProcessMessage(packetID, buffer);
+            if (!processed)
+            {
+                HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+            }
         }
         packetHandled = true;
     }
