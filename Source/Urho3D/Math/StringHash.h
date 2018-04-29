@@ -90,11 +90,17 @@ public:
     /// Return as string.
     String ToString() const;
 
+    /// Return string which has specific hash value. Return first string if many (in order of calculation). Use for debug purposes only. Return empty string if URHO3D_HASH_DEBUG is off.
+    String Reverse() const;
+
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return value_; }
 
     /// Calculate hash value case-insensitively from a C string.
     static unsigned Calculate(const char* str, unsigned hash = 0);
+
+    /// Get map of strings for each unique StringHash. Unsafe to use if new unique StringHash-es are created in other threads. Use for debug purposes only. Return nullptr if URHO3D_HASH_DEBUG is off.
+    static const StringMap* GetHashReverseMap();
 
     /// Zero hash.
     static const StringHash ZERO;
