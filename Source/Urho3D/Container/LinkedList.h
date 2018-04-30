@@ -54,6 +54,10 @@ public:
         head_(nullptr)
     {
     }
+
+    /// Non-copyable.
+    LinkedList(const LinkedList<T>& list) = delete;
+
     /// Aggregate initialization constructor.
     LinkedList(const std::initializer_list<T>& list) : LinkedList()
     {
@@ -62,6 +66,10 @@ public:
             Insert(*it);
         }
     }
+
+    /// Non-assignable.
+    LinkedList<T>& operator =(const LinkedList<T>& list) = delete;
+
     /// Destruct.
     ~LinkedList()
     {
