@@ -37,6 +37,11 @@ URHO3D_DEFINE_APPLICATION_MAIN(HelloWorld)
 HelloWorld::HelloWorld(Context* context) :
     Sample(context)
 {
+    Vector<UniquePtr<int>> vec;
+    vec.Push(MakeUnique<int>(10));
+    vec.Push(MakeUnique<int>(11));
+    vec.Push(MakeUnique<int>(12));
+    vec.Insert(vec.Begin(), MakeUnique<int>(13));
 }
 
 void HelloWorld::Start()
