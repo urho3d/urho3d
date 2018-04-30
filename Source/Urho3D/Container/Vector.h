@@ -217,13 +217,27 @@ public:
 #ifndef COVERITY_SCAN_MODEL
     void Push(const T& value)
     {
-        DoInsertElements(size_, &value, &value + 1, CopyTag{});
+        if (size_ + 1 > capacity_)
+            DoInsertElements(size_, &value, &value + 1, CopyTag{});
+        else
+        {
+            // Optimize common case
+            ++size_;
+            new (&Back()) T(value);
+        }
     }
 
     /// Move-add an element at the end.
     void Push(T && value)
     {
-        DoInsertElements(size_, &value, &value + 1, MoveTag{});
+        if (size_ + 1 > capacity_)
+            DoInsertElements(size_, &value, &value + 1, MoveTag{});
+        else
+        {
+            // Optimize common case
+            ++size_;
+            new (&Back()) T(std::move(value));
+        }
     }
 #else
     // FIXME: Attempt had been made to use this model in the Coverity-Scan model file without any success
