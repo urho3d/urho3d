@@ -340,7 +340,8 @@ public:
         else
         {
             // Swap elements from the end of the array into the empty space
-            std::move(Buffer() + newSize, End(), Buffer() + pos);
+            T* buffer = Buffer();
+            std::move(buffer + newSize, buffer + size_, buffer + pos);
             Resize(newSize);
         }
     }
