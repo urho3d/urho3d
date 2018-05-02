@@ -359,7 +359,7 @@ public:
         return *this;
     };
     /// Populate the map using variadic template.
-    template <typename... Args> HashMap& Populate(const T& key, const U& value, Args... args)
+    template <typename... Args> HashMap& Populate(const T& key, const U& value, const Args&... args)
     {
         this->operator [](key) = value;
         return Populate(args...);

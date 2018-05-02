@@ -213,6 +213,14 @@ public:
         return Buffer()[index];
     }
 
+    /// Create an element at the end.
+    template <class... Args> T& Emplace(Args&&... args)
+    {
+        T value(std::forward(args)...);
+        Push(std::move(value));
+        return Back();
+    }
+
     /// Add an element at the end.
 #ifndef COVERITY_SCAN_MODEL
     void Push(const T& value)
