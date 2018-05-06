@@ -27,6 +27,8 @@
 namespace Urho3D
 {
 
+class StringHashRegister;
+
 /// 32-bit hash value for a string.
 class URHO3D_API StringHash
 {
@@ -99,8 +101,8 @@ public:
     /// Calculate hash value case-insensitively from a C string.
     static unsigned Calculate(const char* str, unsigned hash = 0);
 
-    /// Get map of strings for each unique StringHash. Unsafe to use if new unique StringHash-es are created in other threads. Use for debug purposes only. Return nullptr if URHO3D_HASH_DEBUG is off.
-    static const StringMap* GetHashReverseMap();
+    /// Get global StringHashRegister. Use for debug purposes only. Return nullptr if URHO3D_HASH_DEBUG is off.
+    static StringHashRegister* GetGlobalStringHashRegister();
 
     /// Zero hash.
     static const StringHash ZERO;
