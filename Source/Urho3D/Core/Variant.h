@@ -1360,7 +1360,7 @@ public:
     /// Return a pointer to a modifiable custom variant value or null on type mismatch.
     template <class T> T* GetCustomPtr()
     {
-        if (const CustomVariantValue* value = GetCustomVariantValuePtr())
+        if (CustomVariantValue* value = GetCustomVariantValuePtr())
         {
             if (value->IsType<T>())
                 return value->GetValuePtr<T>();
