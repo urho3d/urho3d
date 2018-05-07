@@ -37,6 +37,8 @@ class URHO3D_API StringHashRegister
 public:
     /// Construct. threadSafe controls whether the RegisterString and GetStringCopy are thread-safe.
     StringHashRegister(bool threadSafe);
+    /// Destruct.
+    ~StringHashRegister();
 
     /// Register string for hash reverse mapping. Could be used from StringHash ctor.
     StringHash RegisterString(const StringHash& hash, const char* string);

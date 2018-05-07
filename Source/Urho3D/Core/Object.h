@@ -356,7 +356,7 @@ private:
 };
 
 /// Get register of event names.
-StringHashRegister& GetEventNameRegister();
+URHO3D_API StringHashRegister& GetEventNameRegister();
 
 /// Describe an event's hash ID and begin a namespace in which to define its parameters.
 #define URHO3D_EVENT(eventID, eventName) static const Urho3D::StringHash eventID(Urho3D::GetEventNameRegister().RegisterString(#eventName)); namespace eventName

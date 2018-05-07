@@ -40,6 +40,10 @@ StringHashRegister::StringHashRegister(bool threadSafe)
 }
 
 
+StringHashRegister::~StringHashRegister()
+{
+}
+
 StringHash StringHashRegister::RegisterString(const StringHash& hash, const char* string)
 {
     if (mutex_)
