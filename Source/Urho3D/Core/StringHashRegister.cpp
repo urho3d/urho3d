@@ -40,8 +40,9 @@ StringHashRegister::StringHashRegister(bool threadSafe)
 }
 
 
-StringHashRegister::~StringHashRegister()
+StringHashRegister::~StringHashRegister()       // NOLINT(hicpp-use-equals-default, modernize-use-equals-default)
 {
+    // Keep destructor here to let mutex_ destruct
 }
 
 StringHash StringHashRegister::RegisterString(const StringHash& hash, const char* string)
