@@ -469,11 +469,10 @@ void Network::StopServer()
 
 void Network::SetNATServerInfo(const String& address, unsigned short port)
 {
-    String combined = address + "|" + String((int)port);
     if (!natPunchServerAddress_)
         natPunchServerAddress_ = new SLNet::SystemAddress;
 
-    natPunchServerAddress_->FromString(combined.CString());
+    natPunchServerAddress_->FromStringExplicitPort(address.CString(), port);
 }
 
 void Network::StartNATClient()
