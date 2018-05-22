@@ -216,8 +216,17 @@ public:
     /// Create an element at the end.
     template <class... Args> T& Emplace(Args&&... args)
     {
-        T value(std::forward(args)...);
-        Push(std::move(value));
+        if (size_ < capacity_)
+        {
+            // Optimize common case
+            ++size_;
+            new (&Back()) T(std::forward<Args>(args)...);
+        }
+        else
+        {
+            T value(std::forward<Args>(args)...);
+            Push(std::move(value));
+        }
         return Back();
     }
 
@@ -225,27 +234,27 @@ public:
 #ifndef COVERITY_SCAN_MODEL
     void Push(const T& value)
     {
-        if (size_ + 1 > capacity_)
-            DoInsertElements(size_, &value, &value + 1, CopyTag{});
-        else
+        if (size_ < capacity_)
         {
             // Optimize common case
             ++size_;
             new (&Back()) T(value);
         }
+        else
+            DoInsertElements(size_, &value, &value + 1, CopyTag{});
     }
 
     /// Move-add an element at the end.
     void Push(T && value)
     {
-        if (size_ + 1 > capacity_)
-            DoInsertElements(size_, &value, &value + 1, MoveTag{});
-        else
+        if (size_ < capacity_)
         {
             // Optimize common case
             ++size_;
             new (&Back()) T(std::move(value));
         }
+        else
+            DoInsertElements(size_, &value, &value + 1, MoveTag{});
     }
 #else
     // FIXME: Attempt had been made to use this model in the Coverity-Scan model file without any success
