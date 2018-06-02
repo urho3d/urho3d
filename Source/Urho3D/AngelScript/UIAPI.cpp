@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -134,6 +134,11 @@ static void RegisterUIElement(asIScriptEngine* engine)
 
     // Register TouchState touchedElement property now
     engine->RegisterObjectMethod("TouchState", "UIElement@+ get_touchedElement()", asMETHOD(TouchState, GetTouchedElement), asCALL_THISCALL);
+}
+
+static void RegisterUISelectable(asIScriptEngine* engine)
+{
+    RegisterUISelectable<UISelectable>(engine, "UISelectable");
 }
 
 static void RegisterBorderImage(asIScriptEngine* engine)
@@ -384,7 +389,7 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextEffect", "TE_SHADOW", TE_SHADOW);
     engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
 
-    RegisterUIElement<Text>(engine, "Text");
+    RegisterUISelectable<Text>(engine, "Text");
     engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, float)", asMETHODPR(Text, SetFont, (const String&, float), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, float)", asMETHODPR(Text, SetFont, (Font*, float), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
@@ -404,10 +409,6 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "bool get_autoLocalizable() const", asMETHOD(Text, GetAutoLocalizable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_selectionStart() const", asMETHOD(Text, GetSelectionStart), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_selectionLength() const", asMETHOD(Text, GetSelectionLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void set_selectionColor(const Color&in)", asMETHOD(Text, SetSelectionColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "const Color& get_selectionColor() const", asMETHOD(Text, GetSelectionColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void set_hoverColor(const Color&in)", asMETHOD(Text, SetHoverColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "const Color& get_hoverColor() const", asMETHOD(Text, GetHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_textEffect(TextEffect)", asMETHOD(Text, SetTextEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "TextEffect get_textEffect() const", asMETHOD(Text, GetTextEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_effectShadowOffset(const IntVector2&in)", asMETHOD(Text, SetEffectShadowOffset), asCALL_THISCALL);
@@ -823,6 +824,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
 {
     RegisterFont(engine);
     RegisterUIElement(engine);
+    RegisterUISelectable(engine);
     RegisterBorderImage(engine);
     RegisterSprite(engine);
     RegisterButton(engine);

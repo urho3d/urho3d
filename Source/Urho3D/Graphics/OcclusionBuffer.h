@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,9 +92,9 @@ class URHO3D_API OcclusionBuffer : public Object
 
 public:
     /// Construct.
-    OcclusionBuffer(Context* context);
+    explicit OcclusionBuffer(Context* context);
     /// Destruct.
-    virtual ~OcclusionBuffer() override;
+    ~OcclusionBuffer() override;
 
     /// Set occlusion buffer size and whether to reserve multiple buffers for threading optimization.
     bool SetSize(int width, int height, bool threaded);
@@ -184,19 +184,19 @@ private:
     /// Submitted render jobs.
     PODVector<OcclusionBatch> batches_;
     /// Buffer width.
-    int width_;
+    int width_{};
     /// Buffer height.
-    int height_;
+    int height_{};
     /// Number of rendered triangles.
-    unsigned numTriangles_;
+    unsigned numTriangles_{};
     /// Maximum number of triangles.
-    unsigned maxTriangles_;
+    unsigned maxTriangles_{OCCLUSION_DEFAULT_MAX_TRIANGLES};
     /// Culling mode.
-    CullMode cullMode_;
+    CullMode cullMode_{CULL_CCW};
     /// Depth hierarchy needs update flag.
-    bool depthHierarchyDirty_;
+    bool depthHierarchyDirty_{true};
     /// Culling reverse flag.
-    bool reverseCulling_;
+    bool reverseCulling_{};
     /// View transform matrix.
     Matrix3x4 view_;
     /// Projection matrix.
@@ -206,21 +206,21 @@ private:
     /// Last used timer.
     Timer useTimer_;
     /// Near clip distance.
-    float nearClip_;
+    float nearClip_{};
     /// Far clip distance.
-    float farClip_;
+    float farClip_{};
     /// X scaling for viewport transform.
-    float scaleX_;
+    float scaleX_{};
     /// Y scaling for viewport transform.
-    float scaleY_;
+    float scaleY_{};
     /// X offset for viewport transform.
-    float offsetX_;
+    float offsetX_{};
     /// Y offset for viewport transform.
-    float offsetY_;
+    float offsetY_{};
     /// Combined X projection and viewport transform.
-    float projOffsetScaleX_;
+    float projOffsetScaleX_{};
     /// Combined Y projection and viewport transform.
-    float projOffsetScaleY_;
+    float projOffsetScaleY_{};
 };
 
 }

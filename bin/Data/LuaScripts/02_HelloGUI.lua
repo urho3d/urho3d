@@ -71,7 +71,7 @@ function InitWindow()
     ui.root:AddChild(window)
 
     -- Set Window size and layout settings
-    window.minWidth = 384;
+    window.minWidth = 384
     window:SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6))
     window:SetAlignment(HA_CENTER, VA_CENTER)
     window:SetName("Window")

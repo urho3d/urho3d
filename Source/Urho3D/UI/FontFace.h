@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,31 +36,28 @@ class Texture2D;
 /// %Font glyph description.
 struct URHO3D_API FontGlyph
 {
-    /// Construct.
-    FontGlyph();
-
     /// X position in texture.
-    short x_;
+    short x_{};
     /// Y position in texture.
-    short y_;
+    short y_{};
     /// Width in texture.
-    short texWidth_;
+    short texWidth_{};
     /// Height in texture.
-    short texHeight_;
+    short texHeight_{};
     /// Width on screen.
-    float width_;
+    float width_{};
     /// Height on screen.
-    float height_;
+    float height_{};
     /// Glyph X offset from origin.
-    float offsetX_;
+    float offsetX_{};
     /// Glyph Y offset from origin.
-    float offsetY_;
+    float offsetY_{};
     /// Horizontal advance.
-    float advanceX_;
+    float advanceX_{};
     /// Texture page. M_MAX_UNSIGNED if not yet resident on any texture.
-    unsigned page_;
+    unsigned page_{M_MAX_UNSIGNED};
     /// Used flag.
-    bool used_;
+    bool used_{};
 };
 
 /// %Font face description.
@@ -70,9 +67,9 @@ class URHO3D_API FontFace : public RefCounted
 
 public:
     /// Construct.
-    FontFace(Font* font);
+    explicit FontFace(Font* font);
     /// Destruct.
-    virtual ~FontFace() override;
+    ~FontFace() override;
 
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;
@@ -101,10 +98,10 @@ protected:
     /// Create a texture for font rendering.
     SharedPtr<Texture2D> CreateFaceTexture();
     /// Load font face texture from image resource.
-    SharedPtr<Texture2D> LoadFaceTexture(SharedPtr<Image> image);
+    SharedPtr<Texture2D> LoadFaceTexture(const SharedPtr<Image>& image);
 
     /// Parent font.
-    Font* font_;
+    Font* font_{};
     /// Glyph mapping.
     HashMap<unsigned, FontGlyph> glyphMapping_;
     /// Kerning mapping.
@@ -112,9 +109,9 @@ protected:
     /// Glyph texture pages.
     Vector<SharedPtr<Texture2D> > textures_;
     /// Point size.
-    float pointSize_;
+    float pointSize_{};
     /// Row height.
-    float rowHeight_;
+    float rowHeight_{};
 };
 
 }

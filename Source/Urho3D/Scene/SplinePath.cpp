@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,16 +113,16 @@ void SplinePath::ApplyAttributes()
     dirty_ = false;
 }
 
-void SplinePath::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+void SplinePath::DrawDebugGeometry(DebugRenderer* debug, bool /*depthTest*/)
 {
     if (debug && node_ && IsEnabledEffective())
     {
         if (spline_.GetKnots().Size() > 1)
         {
             Vector3 a = spline_.GetPoint(0.f).GetVector3();
-            for (float f = 0.01f; f <= 1.0f; f = f + 0.01f)
+            for (auto i = 1; i <= 100; ++i)
             {
-                Vector3 b = spline_.GetPoint(f).GetVector3();
+                Vector3 b = spline_.GetPoint(i / 100.f).GetVector3();
                 debug->AddLine(a, b, Color::GREEN);
                 a = b;
             }
@@ -346,9 +346,9 @@ void SplinePath::CalculateLength()
     length_ = 0.f;
 
     Vector3 a = spline_.GetKnot(0).GetVector3();
-    for (float f = 0.000f; f <= 1.000f; f += 0.001f)
+    for (auto i = 0; i <= 1000; ++i)
     {
-        Vector3 b = spline_.GetPoint(f).GetVector3();
+        Vector3 b = spline_.GetPoint(i / 1000.f).GetVector3();
         length_ += Abs((a - b).Length());
         a = b;
     }

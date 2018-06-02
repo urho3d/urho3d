@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,15 +38,18 @@ class Shader;
 struct ShaderParameter
 {
     /// Construct with defaults.
-    ShaderParameter() :
-        bufferPtr_(nullptr)
-    {
-    }
+    ShaderParameter() = default;
+    /// Construct with name, glType and location, leaving the remaining attributes zero-initialized (used only in OpenGL).
+    ShaderParameter(const String& name, unsigned glType, int location);
+    /// Construct with type, name, offset, size, and buffer, leaving the remaining attributes zero-initialized (used only in Direct3D11).
+    ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer);
+    /// Construct with type, name, register, and register count, leaving the remaining attributes zero-initialized (used only in Direct3D9).
+    ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount);
 
     /// %Shader type.
-    ShaderType type_;
+    ShaderType type_{};
     /// Name of the parameter.
-    String name_;
+    String name_{};
 
     union
     {
@@ -69,9 +72,9 @@ struct ShaderParameter
     };
 
     /// Constant buffer index. Only used on Direct3D11.
-    unsigned buffer_;
+    unsigned buffer_{};
     /// Constant buffer pointer. Defined only in shader programs.
-    ConstantBuffer* bufferPtr_;
+    ConstantBuffer* bufferPtr_{};
 };
 
 /// Vertex or pixel shader on the GPU.
@@ -81,12 +84,12 @@ public:
     /// Construct.
     ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
-    virtual ~ShaderVariation() override;
+    ~ShaderVariation() override;
 
     /// Mark the GPU resource destroyed on graphics context destruction.
-    virtual void OnDeviceLost() override;
+    void OnDeviceLost() override;
     /// Release the shader.
-    virtual void Release() override;
+    void Release() override;
 
     /// Compile the shader. Return true if successful.
     bool Create();
@@ -111,7 +114,7 @@ public:
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
 
     /// Return whether uses a texture unit (only for pixel shaders.) Not applicable on OpenGL, where this information is contained in ShaderProgram instead.
-    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnits_[unit]; }
 
     /// Return all parameter definitions. Not applicable on OpenGL, where this information is contained in ShaderProgram instead.
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
@@ -154,13 +157,13 @@ private:
     /// Shader type.
     ShaderType type_;
     /// Vertex element hash for vertex shaders. Zero for pixel shaders. Note that hashing is different than vertex buffers.
-    unsigned long long elementHash_;
+    unsigned long long elementHash_{};
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
-    bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    bool useTextureUnits_[MAX_TEXTURE_UNITS]{};
     /// Constant buffer sizes. 0 if a constant buffer slot is not in use.
-    unsigned constantBufferSizes_[MAX_SHADER_PARAMETER_GROUPS];
+    unsigned constantBufferSizes_[MAX_SHADER_PARAMETER_GROUPS]{};
     /// Shader bytecode. Needed for inspecting the input signature and parameters. Not used on OpenGL.
     PODVector<unsigned char> byteCode_;
     /// Shader name.

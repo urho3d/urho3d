@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,13 +37,13 @@ class Mover : public LogicComponent
 
 public:
     /// Construct.
-    Mover(Context* context);
+    explicit Mover(Context* context);
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
 
     /// Handle scene update. Called by LogicComponent base class.
-    virtual void Update(float timeStep);
+    void Update(float timeStep) override;
     /// Return path attribute.
     PODVector<unsigned char> GetPathAttr() const;
     /// Set path attribute.

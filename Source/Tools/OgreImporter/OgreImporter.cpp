@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -468,9 +468,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     unsigned bone = boneAssignment.GetInt("boneindex");
                     float weight = boneAssignment.GetFloat("weight");
 
-                    BoneWeightAssignment assign;
-                    assign.boneIndex_ = bone;
-                    assign.weight_ = weight;
+                    BoneWeightAssignment assign{static_cast<unsigned char>(bone), weight};
                     // Source data might have 0 weights. Disregard these
                     if (assign.weight_ > 0.0f)
                     {
@@ -910,9 +908,9 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             dest.Write(offsetMatrix.Data(), sizeof(Matrix3x4));
 
             dest.WriteUByte(bones_[i].collisionMask_);
-            if (bones_[i].collisionMask_ & 1)
+            if (bones_[i].collisionMask_ & 1u)
                 dest.WriteFloat(bones_[i].radius_);
-            if (bones_[i].collisionMask_ & 2)
+            if (bones_[i].collisionMask_ & 2u)
                 dest.WriteBoundingBox(bones_[i].boundingBox_);
         }
 
@@ -1079,10 +1077,7 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
 
     for (unsigned i = subGeom->indexStart_; i < subGeom->indexStart_ + subGeom->indexCount_; i += 3)
     {
-        Triangle triangle;
-        triangle.v0_ = ib->indices_[i];
-        triangle.v1_ = ib->indices_[i + 1];
-        triangle.v2_ = ib->indices_[i + 2];
+        Triangle triangle{ib->indices_[i], ib->indices_[i + 1], ib->indices_[i + 2]};
         vb->vertices_[triangle.v0_].useCount_++;
         vb->vertices_[triangle.v1_].useCount_++;
         vb->vertices_[triangle.v2_].useCount_++;

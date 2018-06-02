@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,14 +61,10 @@ const void* ShaderProgram::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
-    pixelShader_(pixelShader),
-    usedVertexAttributes_(0),
-    frameNumber_(0)
+    pixelShader_(pixelShader)
 {
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        parameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+    for (auto& parameterSource : parameterSources_)
+        parameterSource = (const void*)M_MAX_UNSIGNED;
 }
 
 ShaderProgram::~ShaderProgram()
@@ -107,8 +103,8 @@ void ShaderProgram::Release()
         vertexAttributes_.Clear();
         usedVertexAttributes_ = 0;
 
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-            useTextureUnit_[i] = false;
+        for (bool& useTextureUnit : useTextureUnits_)
+            useTextureUnit = false;
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
             constantBuffers_[i].Reset();
     }
@@ -181,14 +177,14 @@ bool ShaderProgram::Link()
 
         if (semantic == MAX_VERTEX_ELEMENT_SEMANTICS)
         {
-            URHO3D_LOGWARNING("Found vertex attribute " + name + " with no known semantic in shader program " + 
+            URHO3D_LOGWARNING("Found vertex attribute " + name + " with no known semantic in shader program " +
                 vertexShader_->GetFullName() + " " + pixelShader_->GetFullName());
             continue;
         }
 
         int location = glGetAttribLocation(object_.name_, name.CString());
         vertexAttributes_[MakePair((unsigned char)semantic, semanticIndex)] = location;
-        usedVertexAttributes_ |= (1 << location);
+        usedVertexAttributes_ |= (1u << location);
     }
 
     // Check for constant buffers
@@ -277,10 +273,7 @@ bool ShaderProgram::Link()
         {
             // Store constant uniform
             String paramName = name.Substring(1);
-            ShaderParameter parameter;
-            parameter.name_ = paramName;
-            parameter.glType_ = type;
-            parameter.location_ = location;
+            ShaderParameter parameter{paramName, type, location};
             bool store = location >= 0;
 
 #ifndef GL_ES_VERSION_2_0
@@ -311,7 +304,7 @@ bool ShaderProgram::Link()
 
             if (unit < MAX_TEXTURE_UNITS)
             {
-                useTextureUnit_[unit] = true;
+                useTextureUnits_[unit] = true;
                 glUniform1iv(location, 1, reinterpret_cast<int*>(&unit));
             }
         }
@@ -353,8 +346,8 @@ bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* 
     // If global framenumber has changed, invalidate all per-program parameter sources now
     if (globalFrameNumber != frameNumber_)
     {
-        for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-            parameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+        for (auto& parameterSource : parameterSources_)
+            parameterSource = (const void*)M_MAX_UNSIGNED;
         frameNumber_ = globalFrameNumber;
     }
 
@@ -411,8 +404,8 @@ void ShaderProgram::ClearParameterSources()
         ++globalFrameNumber;
 
 #ifndef GL_ES_VERSION_2_0
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        globalParameterSources[i] = (const void*)M_MAX_UNSIGNED;
+    for (auto& globalParameterSource : globalParameterSources)
+        globalParameterSource = (const void*)M_MAX_UNSIGNED;
 #endif
 }
 

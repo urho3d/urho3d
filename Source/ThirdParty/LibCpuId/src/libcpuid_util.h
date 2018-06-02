@@ -38,13 +38,16 @@ void match_features(const struct feature_map_t* matchtable, int count,
 
 struct match_entry_t {
 	int family, model, stepping, ext_family, ext_model;
-	int ncores, l2cache, l3cache, brand_code, model_code;
+	int ncores, l2cache, l3cache, brand_code;
+	uint64_t model_bits;
+	int model_code;
 	char name[32];
 };
 
 // returns the match score:
 int match_cpu_codename(const struct match_entry_t* matchtable, int count,
-                        struct cpu_id_t* data, int brand_code, int model_code);
+                       struct cpu_id_t* data, int brand_code, uint64_t bits,
+                       int model_code);
 
 void warnf(const char* format, ...)
 #ifdef __GNUC__
@@ -76,6 +79,13 @@ int match_pattern(const char* haystack, const char* pattern);
  * machinery doesn't need to issue cpu_identify more than once.
  */
 struct cpu_id_t* get_cached_cpuid(void);
+
+
+/* returns true if all bits of mask are present in `bits'. */
+int match_all(uint64_t bits, uint64_t mask);
+
+/* print what bits a mask consists of */
+void debug_print_lbits(int debuglevel, uint64_t mask);
 
 /*
  * Sets the current errno

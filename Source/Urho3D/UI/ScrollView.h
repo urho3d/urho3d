@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,25 +37,25 @@ class URHO3D_API ScrollView : public UIElement
 
 public:
     /// Construct.
-    ScrollView(Context* context);
+    explicit ScrollView(Context* context);
     /// Destruct.
-    virtual ~ScrollView() override;
+    ~ScrollView() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Perform UI element update.
-    virtual void Update(float timeStep) override;
+    void Update(float timeStep) override;
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers) override;
+    void OnWheel(int delta, int buttons, int qualifiers) override;
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers) override;
+    void OnKey(int key, int buttons, int qualifiers) override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Return whether the element could handle wheel input.
-    virtual bool IsWheelHandler() const { return true; }
+    bool IsWheelHandler() const override { return true; }
 
     /// Set content element.
     void SetContentElement(UIElement* element);
@@ -135,7 +135,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const override;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Filter implicit attributes in serialization process for internal scroll bar.
     bool FilterScrollBarImplicitAttributes(XMLElement& dest, const String& name) const;
     /// Resize panel based on scrollbar visibility.

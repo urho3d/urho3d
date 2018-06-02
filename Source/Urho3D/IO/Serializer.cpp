@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,7 @@ namespace Urho3D
 
 static const float q = 32767.0f;
 
-Serializer::~Serializer()
-{
-}
+Serializer::~Serializer() = default;
 
 bool Serializer::WriteInt64(long long value)
 {
@@ -125,9 +123,9 @@ bool Serializer::WritePackedVector3(const Vector3& value, float maxAbsCoord)
     short coords[3];
     float v = 32767.0f / maxAbsCoord;
 
-    coords[0] = (short)(Clamp(value.x_, -maxAbsCoord, maxAbsCoord) * v + 0.5f);
-    coords[1] = (short)(Clamp(value.y_, -maxAbsCoord, maxAbsCoord) * v + 0.5f);
-    coords[2] = (short)(Clamp(value.z_, -maxAbsCoord, maxAbsCoord) * v + 0.5f);
+    coords[0] = (short)Round(Clamp(value.x_, -maxAbsCoord, maxAbsCoord) * v);
+    coords[1] = (short)Round(Clamp(value.y_, -maxAbsCoord, maxAbsCoord) * v);
+    coords[2] = (short)Round(Clamp(value.z_, -maxAbsCoord, maxAbsCoord) * v);
     return Write(&coords[0], sizeof coords) == sizeof coords;
 }
 
@@ -146,10 +144,10 @@ bool Serializer::WritePackedQuaternion(const Quaternion& value)
     short coords[4];
     Quaternion norm = value.Normalized();
 
-    coords[0] = (short)(Clamp(norm.w_, -1.0f, 1.0f) * q + 0.5f);
-    coords[1] = (short)(Clamp(norm.x_, -1.0f, 1.0f) * q + 0.5f);
-    coords[2] = (short)(Clamp(norm.y_, -1.0f, 1.0f) * q + 0.5f);
-    coords[3] = (short)(Clamp(norm.z_, -1.0f, 1.0f) * q + 0.5f);
+    coords[0] = (short)Round(Clamp(norm.w_, -1.0f, 1.0f) * q);
+    coords[1] = (short)Round(Clamp(norm.x_, -1.0f, 1.0f) * q);
+    coords[2] = (short)Round(Clamp(norm.y_, -1.0f, 1.0f) * q);
+    coords[3] = (short)Round(Clamp(norm.z_, -1.0f, 1.0f) * q);
     return Write(&coords[0], sizeof coords) == sizeof coords;
 }
 
@@ -372,23 +370,23 @@ bool Serializer::WriteVLE(unsigned value)
         return WriteUByte((unsigned char)value);
     else if (value < 0x4000)
     {
-        data[0] = (unsigned char)(value | 0x80);
-        data[1] = (unsigned char)(value >> 7);
+        data[0] = (unsigned char)(value | 0x80u);
+        data[1] = (unsigned char)(value >> 7u);
         return Write(data, 2) == 2;
     }
     else if (value < 0x200000)
     {
-        data[0] = (unsigned char)(value | 0x80);
-        data[1] = (unsigned char)((value >> 7) | 0x80);
-        data[2] = (unsigned char)(value >> 14);
+        data[0] = (unsigned char)(value | 0x80u);
+        data[1] = (unsigned char)(value >> 7u | 0x80u);
+        data[2] = (unsigned char)(value >> 14u);
         return Write(data, 3) == 3;
     }
     else
     {
-        data[0] = (unsigned char)(value | 0x80);
-        data[1] = (unsigned char)((value >> 7) | 0x80);
-        data[2] = (unsigned char)((value >> 14) | 0x80);
-        data[3] = (unsigned char)(value >> 21);
+        data[0] = (unsigned char)(value | 0x80u);
+        data[1] = (unsigned char)(value >> 7u | 0x80u);
+        data[2] = (unsigned char)(value >> 14u | 0x80u);
+        data[3] = (unsigned char)(value >> 21u);
         return Write(data, 4) == 4;
     }
 }

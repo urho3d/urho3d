@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,7 @@ class VertexBuffer;
 struct DebugLine
 {
     /// Construct undefined.
-    DebugLine()
-    {
-    }
+    DebugLine() = default;
 
     /// Construct with start and end positions and color.
     DebugLine(const Vector3& start, const Vector3& end, unsigned color) :
@@ -61,16 +59,14 @@ struct DebugLine
     /// End position.
     Vector3 end_;
     /// Color.
-    unsigned color_;
+    unsigned color_{};
 };
 
 /// Debug render triangle.
 struct DebugTriangle
 {
     /// Construct undefined.
-    DebugTriangle()
-    {
-    }
+    DebugTriangle() = default;
 
     /// Construct with start and end positions and color.
     DebugTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color) :
@@ -88,7 +84,7 @@ struct DebugTriangle
     /// Vertex c.
     Vector3 v3_;
     /// Color.
-    unsigned color_;
+    unsigned color_{};
 };
 
 /// Debug geometry rendering component. Should be added only to the root scene node.
@@ -98,9 +94,9 @@ class URHO3D_API DebugRenderer : public Component
 
 public:
     /// Construct.
-    DebugRenderer(Context* context);
+    explicit DebugRenderer(Context* context);
     /// Destruct.
-    virtual ~DebugRenderer() override;
+    ~DebugRenderer() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

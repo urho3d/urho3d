@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,11 +35,11 @@ namespace Urho3D
 
 using namespace Urho3D;
 
-const int CTRL_FORWARD = (1 << 0);
-const int CTRL_BACK = (1 << 1);
-const int CTRL_LEFT = (1 << 2);
-const int CTRL_RIGHT = (1 << 3);
-const int CTRL_BRAKE = (1 << 4);
+const unsigned CTRL_FORWARD = (1u << 0u);
+const unsigned CTRL_BACK = (1u << 1u);
+const unsigned CTRL_LEFT = (1u << 2u);
+const unsigned CTRL_RIGHT = (1u << 3u);
+const unsigned CTRL_BRAKE = (1u << 4u);
 const float YAW_SENSITIVITY = 0.1f;
 const float ENGINE_POWER = 10.0f;
 const float MAX_WHEEL_ANGLE = 22.5f;
@@ -52,23 +52,23 @@ class Vehicle : public LogicComponent
 
 public :
     /// Construct.
-    Vehicle(Context* context);
+    explicit Vehicle(Context* context);
     /// Destruct.
-    virtual ~Vehicle() override;
+    ~Vehicle() override;
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
 
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
     void Init();
 
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep) override;
+    void FixedUpdate(float timeStep) override;
     /// Updating wheel effects here.
-    virtual void PostUpdate(float timeStep) override;
+    void PostUpdate(float timeStep) override;
 
     /// Movement controls.
     Controls controls_;

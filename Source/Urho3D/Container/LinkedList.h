@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ template <class T> class LinkedList
 public:
     /// Construct empty.
     LinkedList() :
-        head_(0)
+        head_(nullptr)
     {
     }
     /// Aggregate initialization constructor.
@@ -78,6 +78,7 @@ public:
             delete element;
             element = next;
         }
+        head_ = nullptr;
     }
 
     /// Insert an element at the beginning.
@@ -172,10 +173,10 @@ public:
     }
 
     /// Return next element, or null if no more elements.
-    T* Next(T* element) const { return element ? static_cast<T*>(element->next_) : 0; }
+    T* Next(T* element) const { return element ? static_cast<T*>(element->next_) : nullptr; }
 
     /// Return whether is empty.
-    bool Empty() const { return head_ == 0; }
+    bool Empty() const { return head_ == nullptr; }
 
 private:
     /// First element.

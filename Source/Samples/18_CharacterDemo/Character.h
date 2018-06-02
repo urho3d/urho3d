@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,11 @@
 
 using namespace Urho3D;
 
-const int CTRL_FORWARD = 1;
-const int CTRL_BACK = 2;
-const int CTRL_LEFT = 4;
-const int CTRL_RIGHT = 8;
-const int CTRL_JUMP = 16;
+const unsigned CTRL_FORWARD = 1;
+const unsigned CTRL_BACK = 2;
+const unsigned CTRL_LEFT = 4;
+const unsigned CTRL_RIGHT = 8;
+const unsigned CTRL_JUMP = 16;
 
 const float MOVE_FORCE = 0.8f;
 const float INAIR_MOVE_FORCE = 0.02f;
@@ -47,23 +47,23 @@ class Character : public LogicComponent
 
 public:
     /// Construct.
-    Character(Context* context);
-    
+    explicit Character(Context* context);
+
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
-    
+
     /// Handle startup. Called by LogicComponent base class.
-    virtual void Start() override;
+    void Start() override;
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep) override;
-    
+    void FixedUpdate(float timeStep) override;
+
     /// Movement controls. Assigned by the main program each frame.
     Controls controls_;
-    
+
 private:
     /// Handle physics collision event.
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
-    
+
     /// Grounded flag for movement.
     bool onGround_;
     /// Jump flag.

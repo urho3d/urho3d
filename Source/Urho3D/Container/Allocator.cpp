@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSi
     if (!capacity)
         capacity = 1;
 
-    unsigned char* blockPtr = new unsigned char[sizeof(AllocatorBlock) + capacity * (sizeof(AllocatorNode) + nodeSize)];
-    AllocatorBlock* newBlock = reinterpret_cast<AllocatorBlock*>(blockPtr);
+    auto* blockPtr = new unsigned char[sizeof(AllocatorBlock) + capacity * (sizeof(AllocatorNode) + nodeSize)];
+    auto* newBlock = reinterpret_cast<AllocatorBlock*>(blockPtr);
     newBlock->nodeSize_ = nodeSize;
     newBlock->capacity_ = capacity;
     newBlock->free_ = nullptr;
@@ -49,17 +49,17 @@ AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSi
 
     // Initialize the nodes. Free nodes are always chained to the first (parent) allocator
     unsigned char* nodePtr = blockPtr + sizeof(AllocatorBlock);
-    AllocatorNode* firstNewNode = reinterpret_cast<AllocatorNode*>(nodePtr);
+    auto* firstNewNode = reinterpret_cast<AllocatorNode*>(nodePtr);
 
     for (unsigned i = 0; i < capacity - 1; ++i)
     {
-        AllocatorNode* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
+        auto* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
         newNode->next_ = reinterpret_cast<AllocatorNode*>(nodePtr + sizeof(AllocatorNode) + nodeSize);
         nodePtr += sizeof(AllocatorNode) + nodeSize;
     }
     // i == capacity - 1
     {
-        AllocatorNode* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
+        auto* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
         newNode->next_ = nullptr;
     }
 
@@ -92,7 +92,7 @@ void* AllocatorReserve(AllocatorBlock* allocator)
     if (!allocator->free_)
     {
         // Free nodes have been exhausted. Allocate a new larger block
-        unsigned newCapacity = (allocator->capacity_ + 1) >> 1;
+        unsigned newCapacity = (allocator->capacity_ + 1) >> 1u;
         AllocatorReserveBlock(allocator, allocator->nodeSize_, newCapacity);
         allocator->capacity_ += newCapacity;
     }
@@ -111,8 +111,8 @@ void AllocatorFree(AllocatorBlock* allocator, void* ptr)
     if (!allocator || !ptr)
         return;
 
-    unsigned char* dataPtr = static_cast<unsigned char*>(ptr);
-    AllocatorNode* node = reinterpret_cast<AllocatorNode*>(dataPtr - sizeof(AllocatorNode));
+    auto* dataPtr = static_cast<unsigned char*>(ptr);
+    auto* node = reinterpret_cast<AllocatorNode*>(dataPtr - sizeof(AllocatorNode));
 
     // Chain the node back to free nodes
     node->next_ = allocator->free_;

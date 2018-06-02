@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,14 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
+setup_lint ()
+
+# Prevent ICE from old MinGW versions, workaround from the GCC bugzilla https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61189
+if (MINGW AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.1 AND NOT URHO3D_64BIT)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpreferred-stack-boundary=2")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpreferred-stack-boundary=2")
+endif ()
+
 # Generate JSON compilation database format specification
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
@@ -34,10 +42,6 @@ if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     execute_process (COMMAND ${LLVM_CONFIG} --libdir OUTPUT_VARIABLE LLVM_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
     execute_process (COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION})
     create_symlink (${LLVM_LIBDIR}/clang/${LLVM_VERSION}/include ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION}/include FALLBACK_TO_COPY)
-    # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (ancient glibc header has incorrect defines)
-    if (DEFINED ENV{TRAVIS})
-        add_definitions (-D__extern_always_inline=inline)
-    endif ()
 endif ()
 
 # Save keep the preprocessor macros (for using the Urho3D library) for later use in generating Urho3D.pc file

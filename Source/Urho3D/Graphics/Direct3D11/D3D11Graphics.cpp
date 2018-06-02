@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -199,38 +199,7 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
-    window_(nullptr),
-    externalWindow_(nullptr),
-    width_(0),
-    height_(0),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
-    multiSample_(1),
-    fullscreen_(false),
-    borderless_(false),
-    resizable_(false),
-    highDPI_(false),
-    vsync_(false),
-    monitor_(0),
-    refreshRate_(0),
-    tripleBuffer_(false),
-    flushGPU_(false),
-    forceGL2_(false),
-    sRGB_(false),
-    anisotropySupport_(false),
-    dxtTextureSupport_(false),
-    etcTextureSupport_(false),
-    pvrtcTextureSupport_(false),
-    hardwareShadowSupport_(false),
-    lightPrepassSupport_(false),
-    deferredSupport_(false),
-    instancingSupport_(false),
-    sRGBSupport_(false),
-    sRGBWriteSupport_(false),
-    numPrimitives_(0),
-    numBatches_(0),
-    maxScratchBufferRequest_(0),
-    defaultTextureFilterMode_(FILTER_TRILINEAR),
-    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -1307,7 +1276,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             }
         }
 
-        if (texture->GetLevelsDirty())
+        if (texture && texture->GetLevelsDirty())
             texture->RegenerateLevels();
     }
 

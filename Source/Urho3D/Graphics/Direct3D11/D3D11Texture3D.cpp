@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -388,7 +388,7 @@ bool Texture3D::Create()
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
     textureDesc.Depth = (UINT)depth_;
-    textureDesc.MipLevels = levels_;
+    textureDesc.MipLevels = usage_ != TEXTURE_DYNAMIC ? levels_ : 1;
     textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -406,7 +406,7 @@ bool Texture3D::Create()
     memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
     resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
-    resourceViewDesc.Texture3D.MipLevels = (UINT)levels_;
+    resourceViewDesc.Texture3D.MipLevels = usage_ != TEXTURE_DYNAMIC ? (UINT)levels_ : 1;
 
     hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);

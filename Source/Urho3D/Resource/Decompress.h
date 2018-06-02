@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,14 @@ namespace Urho3D
 
 /// Decompress a DXT compressed image to RGBA.
 URHO3D_API void
-    DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, int depth, CompressedFormat format);
+    DecompressImageDXT(unsigned char* rgba, const void* blocks, int width, int height, int depth, CompressedFormat format);
 /// Decompress an ETC1 compressed image to RGBA.
-URHO3D_API void DecompressImageETC(unsigned char* dest, const void* blocks, int width, int height);
+URHO3D_API void DecompressImageETC(unsigned char* rgba, const void* blocks, int width, int height);
 /// Decompress a PVRTC compressed image to RGBA.
-URHO3D_API void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, int height, CompressedFormat format);
+URHO3D_API void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format);
 /// Flip a compressed block vertically.
-URHO3D_API void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat format);
+URHO3D_API void FlipBlockVertical(unsigned char* dest, const unsigned char* src, CompressedFormat format);
 /// Flip a compressed block horizontally.
-URHO3D_API void FlipBlockHorizontal(unsigned char* dest, unsigned char* src, CompressedFormat format);
+URHO3D_API void FlipBlockHorizontal(unsigned char* dest, const unsigned char* src, CompressedFormat format);
 
 }

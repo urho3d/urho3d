@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,9 +58,7 @@ AnimationController::AnimationController(Context* context) :
 {
 }
 
-AnimationController::~AnimationController()
-{
-}
+AnimationController::~AnimationController() = default;
 
 void AnimationController::RegisterObject(Context* context)
 {
@@ -162,7 +160,7 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
 {
     // Get the animation resource first to be able to get the canonical resource name
     // (avoids potential adding of duplicate animations)
-    Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
+    auto* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
     if (!newAnimation)
         return false;
 
@@ -199,11 +197,11 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
 bool AnimationController::PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime)
 {
     bool success = Play(name, layer, looped, fadeTime);
-    
+
     // Fade other animations only if successfully started the new one
     if (success)
         FadeOthers(name, 0.0f, fadeTime);
-    
+
     return success;
 }
 
@@ -313,7 +311,7 @@ bool AnimationController::SetLayer(const String& name, unsigned char layer)
 bool AnimationController::SetStartBone(const String& name, const String& startBoneName)
 {
     // Start bone can only be set in model mode
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    auto* model = GetComponent<AnimatedModel>();
     if (!model)
         return false;
 
@@ -578,7 +576,7 @@ AnimationState* AnimationController::GetAnimationState(const String& name) const
 AnimationState* AnimationController::GetAnimationState(StringHash nameHash) const
 {
     // Model mode
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    auto* model = GetComponent<AnimatedModel>();
     if (model)
         return model->GetAnimationState(nameHash);
 
@@ -615,7 +613,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
 {
     MemoryBuffer buf(value);
 
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    auto* model = GetComponent<AnimatedModel>();
 
     // Check which animations we need to remove
     HashSet<StringHash> processedAnimations;
@@ -631,7 +629,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         AnimationState* state = GetAnimationState(animHash);
         if (!state)
         {
-            Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animName);
+            auto* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animName);
             state = AddAnimationState(newAnimation);
             if (!state)
             {
@@ -673,9 +671,9 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
             animations_[index].autoFadeTime_ = 0.0f;
-        
+
         animations_[index].removeOnCompletion_ = (ctrl & CTRL_REMOVEONCOMPLETION) != 0;
-        
+
         if (ctrl & CTRL_SETTIME)
         {
             unsigned char setTimeRev = buf.ReadUByte();
@@ -713,7 +711,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
 
 void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     nodeAnimationStates_.Clear();
     unsigned index = 0;
     unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
@@ -764,7 +762,7 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
 {
     attrBuffer_.Clear();
 
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    auto* model = GetComponent<AnimatedModel>();
 
     unsigned validAnimations = 0;
     for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
@@ -852,7 +850,7 @@ AnimationState* AnimationController::AddAnimationState(Animation* animation)
         return nullptr;
 
     // Model mode
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    auto* model = GetComponent<AnimatedModel>();
     if (model)
         return model->AddAnimationState(animation);
 
@@ -868,7 +866,7 @@ void AnimationController::RemoveAnimationState(AnimationState* state)
         return;
 
     // Model mode
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    auto* model = GetComponent<AnimatedModel>();
     if (model)
     {
         model->RemoveAnimationState(state);

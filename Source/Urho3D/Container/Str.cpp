@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -285,7 +285,7 @@ String::Iterator String::Replace(const String::Iterator& start, const String::It
     unsigned pos = (unsigned)(start - Begin());
     if (pos >= length_)
         return End();
-    unsigned length = (unsigned)(end - start);
+    auto length = (unsigned)(end - start);
     Replace(pos, length, replaceWith);
 
     return Begin() + pos;
@@ -373,7 +373,7 @@ String::Iterator String::Insert(const String::Iterator& dest, const String::Iter
     unsigned pos = (unsigned)(dest - Begin());
     if (pos > length_)
         pos = length_;
-    unsigned length = (unsigned)(end - start);
+    auto length = (unsigned)(end - start);
     Replace(pos, 0, &(*start), length);
 
     return Begin() + pos;
@@ -409,7 +409,7 @@ String::Iterator String::Erase(const String::Iterator& start, const String::Iter
     unsigned pos = (unsigned)(start - Begin());
     if (pos >= length_)
         return End();
-    unsigned length = (unsigned)(end - start);
+    auto length = (unsigned)(end - start);
     Erase(pos, length);
 
     return Begin() + pos;
@@ -436,9 +436,9 @@ void String::Resize(unsigned newLength)
         {
             // Increase the capacity with half each time it is exceeded
             while (capacity_ < newLength + 1)
-                capacity_ += (capacity_ + 1) >> 1;
+                capacity_ += (capacity_ + 1) >> 1u;
 
-            char* newBuffer = new char[capacity_];
+            auto* newBuffer = new char[capacity_];
             // Move the existing data to the new buffer, then delete the old buffer
             if (length_)
                 CopyChars(newBuffer, buffer_, length_);
@@ -459,7 +459,7 @@ void String::Reserve(unsigned newCapacity)
     if (newCapacity == capacity_)
         return;
 
-    char* newBuffer = new char[newCapacity];
+    auto* newBuffer = new char[newCapacity];
     // Move the existing data to the new buffer, then delete the old buffer
     CopyChars(newBuffer, buffer_, length_ + 1);
     if (capacity_)
@@ -898,47 +898,47 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
         *dest++ = unicodeChar;
     else if (unicodeChar < 0x800)
     {
-        dest[0] = (char)(0xc0 | ((unicodeChar >> 6) & 0x1f));
-        dest[1] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xc0u | ((unicodeChar >> 6u) & 0x1fu));
+        dest[1] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 2;
     }
     else if (unicodeChar < 0x10000)
     {
-        dest[0] = (char)(0xe0 | ((unicodeChar >> 12) & 0xf));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[2] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xe0u | ((unicodeChar >> 12u) & 0xfu));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[2] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 3;
     }
     else if (unicodeChar < 0x200000)
     {
-        dest[0] = (char)(0xf0 | ((unicodeChar >> 18) & 0x7));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 12) & 0x3f));
-        dest[2] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[3] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xf0u | ((unicodeChar >> 18u) & 0x7u));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[2] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[3] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 4;
     }
     else if (unicodeChar < 0x4000000)
     {
-        dest[0] = (char)(0xf8 | ((unicodeChar >> 24) & 0x3));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 18) & 0x3f));
-        dest[2] = (char)(0x80 | ((unicodeChar >> 12) & 0x3f));
-        dest[3] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[4] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xf8u | ((unicodeChar >> 24u) & 0x3u));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 18u) & 0x3fu));
+        dest[2] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[3] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[4] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 5;
     }
     else
     {
-        dest[0] = (char)(0xfc | ((unicodeChar >> 30) & 0x1));
-        dest[1] = (char)(0x80 | ((unicodeChar >> 24) & 0x3f));
-        dest[2] = (char)(0x80 | ((unicodeChar >> 18) & 0x3f));
-        dest[3] = (char)(0x80 | ((unicodeChar >> 12) & 0x3f));
-        dest[4] = (char)(0x80 | ((unicodeChar >> 6) & 0x3f));
-        dest[5] = (char)(0x80 | (unicodeChar & 0x3f));
+        dest[0] = (char)(0xfcu | ((unicodeChar >> 30u) & 0x1u));
+        dest[1] = (char)(0x80u | ((unicodeChar >> 24u) & 0x3fu));
+        dest[2] = (char)(0x80u | ((unicodeChar >> 18u) & 0x3fu));
+        dest[3] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[4] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[5] = (char)(0x80u | (unicodeChar & 0x3fu));
         dest += 6;
     }
 }
 
-#define GET_NEXT_CONTINUATION_BYTE(ptr) *ptr; if ((unsigned char)*ptr < 0x80 || (unsigned char)*ptr >= 0xc0) return '?'; else ++ptr;
+#define GET_NEXT_CONTINUATION_BYTE(ptr) *(ptr); if ((unsigned char)*(ptr) < 0x80 || (unsigned char)*(ptr) >= 0xc0) return '?'; else ++(ptr);
 
 unsigned String::DecodeUTF8(const char*& src)
 {
@@ -960,20 +960,20 @@ unsigned String::DecodeUTF8(const char*& src)
     else if (char1 < 0xe0)
     {
         unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char2 & 0x3f) | ((char1 & 0x1f) << 6));
+        return (unsigned)((char2 & 0x3fu) | ((char1 & 0x1fu) << 6u));
     }
     else if (char1 < 0xf0)
     {
         unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char3 & 0x3f) | ((char2 & 0x3f) << 6) | ((char1 & 0xf) << 12));
+        return (unsigned)((char3 & 0x3fu) | ((char2 & 0x3fu) << 6u) | ((char1 & 0xfu) << 12u));
     }
     else if (char1 < 0xf8)
     {
         unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char4 & 0x3f) | ((char3 & 0x3f) << 6) | ((char2 & 0x3f) << 12) | ((char1 & 0x7) << 18));
+        return (unsigned)((char4 & 0x3fu) | ((char3 & 0x3fu) << 6u) | ((char2 & 0x3fu) << 12u) | ((char1 & 0x7u) << 18u));
     }
     else if (char1 < 0xfc)
     {
@@ -981,8 +981,8 @@ unsigned String::DecodeUTF8(const char*& src)
         unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char5 & 0x3f) | ((char4 & 0x3f) << 6) | ((char3 & 0x3f) << 12) | ((char2 & 0x3f) << 18) |
-                          ((char1 & 0x3) << 24));
+        return (unsigned)((char5 & 0x3fu) | ((char4 & 0x3fu) << 6u) | ((char3 & 0x3fu) << 12u) | ((char2 & 0x3fu) << 18u) |
+                          ((char1 & 0x3u) << 24u));
     }
     else
     {
@@ -991,8 +991,8 @@ unsigned String::DecodeUTF8(const char*& src)
         unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
         unsigned char char6 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char6 & 0x3f) | ((char5 & 0x3f) << 6) | ((char4 & 0x3f) << 12) | ((char3 & 0x3f) << 18) |
-                          ((char2 & 0x3f) << 24) | ((char1 & 0x1) << 30));
+        return (unsigned)((char6 & 0x3fu) | ((char5 & 0x3fu) << 6u) | ((char4 & 0x3fu) << 12u) | ((char3 & 0x3fu) << 18u) |
+                          ((char2 & 0x3fu) << 24u) | ((char1 & 0x1u) << 30u));
     }
 }
 
@@ -1013,9 +1013,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 {
     if (src == nullptr)
         return 0;
-    
+
     unsigned short word1 = *src++;
-    
+
     // Check if we are at a low surrogate
     if (word1 >= 0xdc00 && word1 < 0xe000)
     {
@@ -1023,7 +1023,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             ++src;
         return '?';
     }
-    
+
     if (word1 < 0xd800 || word1 >= 0xe000)
         return word1;
     else
@@ -1059,7 +1059,7 @@ Vector<String> String::Split(const char* str, char separator, bool keepEmptyStri
     const ptrdiff_t splitLen = strEnd - str;
     if (splitLen > 0 || keepEmptyStrings)
         ret.Push(String(str, splitLen));
-    
+
     return ret;
 }
 
@@ -1087,7 +1087,7 @@ String& String::AppendWithFormat(const char* formatString, ...)
 String& String::AppendWithFormatArgs(const char* formatString, va_list args)
 {
     int pos = 0, lastPos = 0;
-    int length = (int)strlen(formatString);
+    auto length = (int)strlen(formatString);
 
     while (true)
     {
@@ -1196,8 +1196,8 @@ int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
     {
         for (;;)
         {
-            char l = (char)tolower(*lhs);
-            char r = (char)tolower(*rhs);
+            auto l = (char)tolower(*lhs);
+            auto r = (char)tolower(*rhs);
             if (!l || !r)
                 return l ? 1 : (r ? -1 : 0);
             if (l < r)
@@ -1247,7 +1247,7 @@ WString::WString(const String& str) :
 #ifdef _WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
-    
+
     unsigned byteOffset = 0;
     while (byteOffset < str.Length())
     {
@@ -1255,9 +1255,9 @@ WString::WString(const String& str) :
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
         neededSize += dest - temp;
     }
-    
+
     Resize(neededSize);
-    
+
     byteOffset = 0;
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())
@@ -1287,7 +1287,7 @@ void WString::Resize(unsigned newLength)
     }
     else
     {
-        wchar_t* newBuffer = new wchar_t[newLength + 1];
+        auto* newBuffer = new wchar_t[newLength + 1];
         if (buffer_)
         {
             unsigned copyLength = length_ < newLength ? length_ : newLength;

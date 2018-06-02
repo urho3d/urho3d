@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ void Physics::Start()
 
 void Physics::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -93,7 +93,7 @@ void Physics::CreateScene()
 
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
     zone->SetFogColor(Color(1.0f, 1.0f, 1.0f));
@@ -103,7 +103,7 @@ void Physics::CreateScene()
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
@@ -115,7 +115,7 @@ void Physics::CreateScene()
     // generate the necessary 3D texture coordinates for cube mapping
     Node* skyNode = scene_->CreateChild("Sky");
     skyNode->SetScale(500.0f); // The scale actually does not matter
-    Skybox* skybox = skyNode->CreateComponent<Skybox>();
+    auto* skybox = skyNode->CreateComponent<Skybox>();
     skybox->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
     skybox->SetMaterial(cache->GetResource<Material>("Materials/Skybox.xml"));
 
@@ -124,7 +124,7 @@ void Physics::CreateScene()
         Node* floorNode = scene_->CreateChild("Floor");
         floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
         floorNode->SetScale(Vector3(1000.0f, 1.0f, 1000.0f));
-        StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
+        auto* floorObject = floorNode->CreateComponent<StaticModel>();
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
@@ -132,7 +132,7 @@ void Physics::CreateScene()
         // parameters make the object static (zero mass.) Note that a CollisionShape by itself will not participate
         // in the physics simulation
         /*RigidBody* body = */floorNode->CreateComponent<RigidBody>();
-        CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
+        auto* shape = floorNode->CreateComponent<CollisionShape>();
         // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
         shape->SetBox(Vector3::ONE);
@@ -146,7 +146,7 @@ void Physics::CreateScene()
             {
                 Node* boxNode = scene_->CreateChild("Box");
                 boxNode->SetPosition(Vector3((float)x, -(float)y + 8.0f, 0.0f));
-                StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+                auto* boxObject = boxNode->CreateComponent<StaticModel>();
                 boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
                 boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
                 boxObject->SetCastShadows(true);
@@ -154,10 +154,10 @@ void Physics::CreateScene()
                 // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
                 // and also adjust friction. The actual mass is not important; only the mass ratios between colliding
                 // objects are significant
-                RigidBody* body = boxNode->CreateComponent<RigidBody>();
+                auto* body = boxNode->CreateComponent<RigidBody>();
                 body->SetMass(1.0f);
                 body->SetFriction(0.75f);
-                CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
+                auto* shape = boxNode->CreateComponent<CollisionShape>();
                 shape->SetBox(Vector3::ONE);
             }
         }
@@ -166,7 +166,7 @@ void Physics::CreateScene()
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside the scene, because
     // we want it to be unaffected by scene load / save
     cameraNode_ = new Node(context_);
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(500.0f);
 
     // Set an initial position for the camera scene node above the floor
@@ -175,11 +175,11 @@ void Physics::CreateScene()
 
 void Physics::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "LMB to spawn physics objects\n"
@@ -198,7 +198,7 @@ void Physics::CreateInstructions()
 
 void Physics::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -221,7 +221,7 @@ void Physics::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -271,23 +271,23 @@ void Physics::MoveCamera(float timeStep)
 
 void Physics::SpawnObject()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Create a smaller box at camera position
     Node* boxNode = scene_->CreateChild("SmallBox");
     boxNode->SetPosition(cameraNode_->GetPosition());
     boxNode->SetRotation(cameraNode_->GetRotation());
     boxNode->SetScale(0.25f);
-    StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+    auto* boxObject = boxNode->CreateComponent<StaticModel>();
     boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
     boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
     boxObject->SetCastShadows(true);
 
     // Create physics components, use a smaller mass also
-    RigidBody* body = boxNode->CreateComponent<RigidBody>();
+    auto* body = boxNode->CreateComponent<RigidBody>();
     body->SetMass(0.25f);
     body->SetFriction(0.75f);
-    CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
+    auto* shape = boxNode->CreateComponent<CollisionShape>();
     shape->SetBox(Vector3::ONE);
 
     const float OBJECT_VELOCITY = 10.0f;

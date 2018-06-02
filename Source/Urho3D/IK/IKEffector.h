@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../Scene/Component.h"
 #include "../Scene/Scene.h"
 
-typedef struct ik_node_t ik_node_t;
+using ik_node_t = struct ik_node_t;
 
 namespace Urho3D
 {
@@ -62,10 +62,10 @@ public:
     };
 
     /// Constructs a new IK effector.
-    IKEffector(Context* context);
+    explicit IKEffector(Context* context);
 
     /// Destructs he IK effector.
-    virtual ~IKEffector() override;
+    ~IKEffector() override;
 
     /// Registers this class as an object factory.
     static void RegisterObject(Context* context);
@@ -166,7 +166,7 @@ public:
     void SetRotationDecay(float decay);
 
     void DrawDebugGeometry(bool depthTest);
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
 private:
     friend class IKSolver;
@@ -174,7 +174,7 @@ private:
     /// Intended to be used only by IKSolver
     void SetIKSolver(IKSolver* solver);
     /// Intended to be used only by IKSolver
-    void SetIKEffectorNode(ik_node_t* effector);
+    void SetIKEffectorNode(ik_node_t* effectorNode);
     /// Intended to be used by IKSolver. Copies the positions/rotations of the target node into the effector
     void UpdateTargetNodePosition();
 

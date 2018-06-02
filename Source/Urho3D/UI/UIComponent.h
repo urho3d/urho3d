@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,9 +42,9 @@ class URHO3D_API UIComponent : public Component
 
 public:
     /// Construct.
-    UIComponent(Context* context);
+    explicit UIComponent(Context* context);
     /// Destruct.
-    virtual ~UIComponent() override;
+    ~UIComponent() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -59,7 +59,7 @@ public:
 
 protected:
     /// Handle component being added to Node or removed from it.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle resizing of element. Setting size of element will automatically resize texture. UIElement size matches size of texture.
     void OnElementResized(StringHash eventType, VariantMap& args);
 

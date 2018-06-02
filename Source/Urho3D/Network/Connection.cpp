@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ PackageUpload::PackageUpload() :
 {
 }
 
-Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
+Connection::Connection(Context* context, bool isClient, const kNet::SharedPtr<kNet::MessageConnection>& connection) :
     Object(context),
     timeStamp_(0),
     connection_(connection),
@@ -146,7 +146,7 @@ void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder,
         URHO3D_LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
-    if (node->GetID() >= FIRST_LOCAL_ID)
+    if (!node->IsReplicated())
     {
         URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
@@ -470,7 +470,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 
     // In case we have joined other scenes in this session, remove first all downloaded package files from the resource system
     // to prevent resource conflicts
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
@@ -536,7 +536,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg);
-            SmoothedTransform* transform = node->GetComponent<SmoothedTransform>();
+            auto* transform = node->GetComponent<SmoothedTransform>();
             if (transform)
                 transform->Update(1.0f, 0.0f);
 
@@ -739,7 +739,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             for (unsigned i = 0; i < packages.Size(); ++i)
             {
                 PackageFile* package = packages[i];
-                String packageFullName = package->GetName();
+                const String& packageFullName = package->GetName();
                 if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
                 {
                     StringHash nameHash(name);
@@ -1180,7 +1180,7 @@ void Connection::ProcessNewNode(Node* node)
     {
         Component* component = components[i];
         // Check if component is not to be replicated
-        if (component->GetID() >= FIRST_LOCAL_ID)
+        if (!component->IsReplicated())
             continue;
 
         ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
@@ -1213,7 +1213,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 
     // Check from the interest management component, if exists, whether should update
     /// \todo Searching for the component is a potential CPU hotspot. It should be cached
-    NetworkPriority* priority = node->GetComponent<NetworkPriority>();
+    auto* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
     {
         float distance = (node->GetWorldPosition() - position_).Length();
@@ -1348,7 +1348,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             Component* component = components[i];
             // Check if component is not to be replicated
-            if (component->GetID() >= FIRST_LOCAL_ID)
+            if (!component->IsReplicated())
                 continue;
 
             HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());
@@ -1378,7 +1378,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 
 bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();

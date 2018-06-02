@@ -1,0 +1,178 @@
+#
+# Copyright (c) 2008-2018 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+---
+
+Checks: '*,-cert-env33-c,-cert-dcl50-cpp,-cert-dcl59-cpp,-cert-err58-cpp,-cppcoreguidelines-no-malloc,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-cstyle-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-special-member-functions,-cppcoreguidelines-pro-type-member-init,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-owning-memory,-google-*,google-default-arguments,google-explicit-constructor,google-runtime-member-string-references,google-runtime-operator,-hicpp-named-parameter,-hicpp-no-assembler,-hicpp-function-size,-hicpp-special-member-functions,-hicpp-braces-around-statements,-hicpp-no-array-decay,-hicpp-vararg,-hicpp-signed-bitwise,-llvm-*,-readability-else-after-return,-readability-implicit-bool-cast,-readability-named-parameter,-readability-simplify-boolean-expr,-readability-braces-around-statements,-readability-identifier-naming,-readability-function-size,-readability-redundant-member-init,-readability-redundant-declaration,-readability-implicit-bool-conversion,-misc-bool-pointer-implicit-conversion,-misc-definitions-in-headers,-misc-unused-alias-decls,-misc-unused-parameters,-misc-unused-using-decls,-modernize-use-default-member-init,-modernize-use-using,-modernize-raw-string-literal,-clang-diagnostic-*,-clang-analyzer-*,-android-*,-fuchsia-*,-objc-*'
+WarningsAsErrors: ''
+HeaderFilterRegex: '/(?!ThirdParty)/'
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
+CheckOptions:
+  - key:             bugprone-argument-comment.StrictMode
+    value:           '0'
+  - key:             bugprone-assert-side-effect.AssertMacros
+    value:           assert
+  - key:             bugprone-assert-side-effect.CheckFunctionCalls
+    value:           '0'
+  - key:             bugprone-dangling-handle.HandleClasses
+    value:           'std::basic_string_view;std::experimental::basic_string_view'
+  - key:             bugprone-string-constructor.LargeLengthThreshold
+    value:           '8388608'
+  - key:             bugprone-string-constructor.WarnOnLargeLength
+    value:           '1'
+  - key:             cert-err09-cpp.CheckThrowTemporaries
+    value:           '1'
+  - key:             cert-err61-cpp.CheckThrowTemporaries
+    value:           '1'
+  - key:             cert-oop11-cpp.IncludeStyle
+    value:           llvm
+  - key:             google-readability-braces-around-statements.ShortStatementLines
+    value:           '1'
+  - key:             google-readability-function-size.StatementThreshold
+    value:           '800'
+  - key:             google-readability-namespace-comments.ShortNamespaceLines
+    value:           '10'
+  - key:             google-readability-namespace-comments.SpacesBeforeComments
+    value:           '2'
+  - key:             hicpp-member-init.IgnoreArrays
+    value:           '0'
+  - key:             hicpp-move-const-arg.CheckTriviallyCopyableMove
+    value:           '1'
+  - key:             hicpp-no-malloc.Allocations
+    value:           '::malloc;::calloc'
+  - key:             hicpp-no-malloc.Deallocations
+    value:           '::free'
+  - key:             hicpp-no-malloc.Reallocations
+    value:           '::realloc'
+  - key:             hicpp-use-auto.RemoveStars
+    value:           '0'
+  - key:             hicpp-use-emplace.ContainersWithPushBack
+    value:           '::std::vector;::std::list;::std::deque'
+  - key:             hicpp-use-emplace.SmartPointers
+    value:           '::std::shared_ptr;::std::unique_ptr;::std::auto_ptr;::std::weak_ptr'
+  - key:             hicpp-use-emplace.TupleMakeFunctions
+    value:           '::std::make_pair;::std::make_tuple'
+  - key:             hicpp-use-emplace.TupleTypes
+    value:           '::std::pair;::std::tuple'
+  - key:             hicpp-use-equals-default.IgnoreMacros
+    value:           '1'
+  - key:             hicpp-use-noexcept.ReplacementString
+    value:           ''
+  - key:             hicpp-use-noexcept.UseNoexceptFalse
+    value:           '1'
+  - key:             hicpp-use-nullptr.NullMacros
+    value:           ''
+  - key:             misc-misplaced-widening-cast.CheckImplicitCasts
+    value:           '0'
+  - key:             misc-sizeof-expression.WarnOnSizeOfCompareToConstant
+    value:           '1'
+  - key:             misc-sizeof-expression.WarnOnSizeOfConstant
+    value:           '1'
+  - key:             misc-sizeof-expression.WarnOnSizeOfThis
+    value:           '1'
+  - key:             misc-suspicious-enum-usage.StrictMode
+    value:           '0'
+  - key:             misc-suspicious-missing-comma.MaxConcatenatedTokens
+    value:           '5'
+  - key:             misc-suspicious-missing-comma.RatioThreshold
+    value:           '0.200000'
+  - key:             misc-suspicious-missing-comma.SizeThreshold
+    value:           '5'
+  - key:             misc-suspicious-string-compare.StringCompareLikeFunctions
+    value:           ''
+  - key:             misc-suspicious-string-compare.WarnOnImplicitComparison
+    value:           '1'
+  - key:             misc-suspicious-string-compare.WarnOnLogicalNotComparison
+    value:           '0'
+  - key:             misc-throw-by-value-catch-by-reference.CheckThrowTemporaries
+    value:           '1'
+  - key:             modernize-loop-convert.MaxCopySize
+    value:           '16'
+  - key:             modernize-loop-convert.MinConfidence
+    value:           reasonable
+  - key:             modernize-loop-convert.NamingStyle
+    value:           CamelCase
+  - key:             modernize-make-shared.IgnoreMacros
+    value:           '1'
+  - key:             modernize-make-shared.IncludeStyle
+    value:           '0'
+  - key:             modernize-make-shared.MakeSmartPtrFunction
+    value:           'std::make_shared'
+  - key:             modernize-make-shared.MakeSmartPtrFunctionHeader
+    value:           memory
+  - key:             modernize-make-unique.IgnoreMacros
+    value:           '1'
+  - key:             modernize-make-unique.IncludeStyle
+    value:           '0'
+  - key:             modernize-make-unique.MakeSmartPtrFunction
+    value:           'std::make_unique'
+  - key:             modernize-make-unique.MakeSmartPtrFunctionHeader
+    value:           memory
+  - key:             modernize-pass-by-value.IncludeStyle
+    value:           llvm
+  - key:             modernize-pass-by-value.ValuesOnly
+    value:           '0'
+  - key:             modernize-replace-auto-ptr.IncludeStyle
+    value:           llvm
+  - key:             modernize-replace-random-shuffle.IncludeStyle
+    value:           llvm
+  - key:             modernize-use-auto.RemoveStars
+    value:           '0'
+  - key:             modernize-use-emplace.ContainersWithPushBack
+    value:           '::std::vector;::std::list;::std::deque'
+  - key:             modernize-use-emplace.SmartPointers
+    value:           '::std::shared_ptr;::std::unique_ptr;::std::auto_ptr;::std::weak_ptr'
+  - key:             modernize-use-emplace.TupleMakeFunctions
+    value:           '::std::make_pair;::std::make_tuple'
+  - key:             modernize-use-emplace.TupleTypes
+    value:           '::std::pair;::std::tuple'
+  - key:             modernize-use-equals-default.IgnoreMacros
+    value:           '1'
+  - key:             modernize-use-noexcept.ReplacementString
+    value:           ''
+  - key:             modernize-use-noexcept.UseNoexceptFalse
+    value:           '1'
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+  - key:             modernize-use-transparent-functors.SafeMode
+    value:           '0'
+  - key:             performance-faster-string-find.StringLikeClasses
+    value:           'std::basic_string'
+  - key:             performance-for-range-copy.WarnOnAllAutoCopies
+    value:           '0'
+  - key:             performance-inefficient-string-concatenation.StrictMode
+    value:           '0'
+  - key:             performance-inefficient-vector-operation.VectorLikeClasses
+    value:           '::std::vector'
+  - key:             performance-move-const-arg.CheckTriviallyCopyableMove
+    value:           '1'
+  - key:             performance-move-constructor-init.IncludeStyle
+    value:           llvm
+  - key:             performance-type-promotion-in-math-fn.IncludeStyle
+    value:           llvm
+  - key:             performance-unnecessary-value-param.IncludeStyle
+    value:           llvm
+  - key:             readability-static-accessed-through-instance.NameSpecifierNestingThreshold
+    value:           '3'
+...
+

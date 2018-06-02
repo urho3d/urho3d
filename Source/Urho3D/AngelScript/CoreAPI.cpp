@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ static int StringHashCmp(const StringHash& lhs, const StringHash& rhs)
 
 static void RegisterStringHash(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<StringHash>() | asOBJ_APP_CLASS_ALLINTS);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructStringHashCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringHashInit), asCALL_CDECL_OBJLAST);
@@ -383,7 +383,7 @@ static CScriptArray* VariantGetStringVector(Variant* ptr)
 
 static asIScriptObject* VariantGetScriptObject(Variant* ptr)
 {
-    asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
+    auto* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
     if (!object)
         return nullptr;
 
@@ -983,7 +983,7 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
     ptr->~WeakPtr<RefCounted>();
 }
 
-static void SetGlobalVar(const String& key, Variant value)
+static void SetGlobalVar(const String& key, const Variant& value)
 {
     GetScriptContext()->SetGlobalVar(key, value);
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,10 @@ class VertexBuffer;
 /// Trail is consisting of series of tails. Two connected points make a tail.
 struct URHO3D_API TrailPoint
 {
+    /// Construct a zero-initialized TrailPoint.
+    TrailPoint() = default;
+    /// Construct a TrailPoint with the given position and forward vector.
+    TrailPoint(const Vector3& position, const Vector3& forward);
     /// Position.
     Vector3 position_;
     /// Forward vector.
@@ -46,13 +50,13 @@ struct URHO3D_API TrailPoint
     /// Parent position. Trail bone type uses this.
     Vector3 parentPos_;
     /// Elapsed length inside the trail.
-    float elapsedLength_;
+    float elapsedLength_{};
     /// Next point to make a tail.
-    TrailPoint* next_;
+    TrailPoint* next_{};
     /// Tail time to live.
-    float lifetime_;
+    float lifetime_{};
     /// Distance for sorting.
-    float sortDistance_;
+    float sortDistance_{};
 };
 
 /// Drawable component that creates a tail.
@@ -62,23 +66,23 @@ class URHO3D_API RibbonTrail : public Drawable
 
 public:
     /// Construct.
-    RibbonTrail(Context* context);
+    explicit RibbonTrail(Context* context);
     /// Destruct.
-    virtual ~RibbonTrail() override;
+    ~RibbonTrail() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Update before octree reinsertion. Is called from a main thread.
-    virtual void Update(const FrameInfo &frame) override;
+    void Update(const FrameInfo &frame) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame) override;
+    void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame) override;
+    void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType() override;
+    UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Set material.
     void SetMaterial(Material* material);
@@ -98,13 +102,15 @@ public:
     void SetEndScale(float endScale);
     /// Set how the trail behave.
     void SetTrailType(TrailType type);
+    /// Set base velocity applied to the trail.
+    void SetBaseVelocity(const Vector3& baseVelocity);
     /// Set whether tails are sorted by distance. Default false.
     void SetSorted(bool enable);
     /// Set tail time to live.
     void SetLifetime(float time);
     /// Set whether trail should be emitting.
     void SetEmitting(bool emitting);
-    /// Set whether to update when trail emiiter are not visible.
+    /// Set whether to update when trail emitter are not visible.
     void SetUpdateInvisible(bool enable);
     /// Set number of column for every tails. Can be useful for fixing distortion at high angle.
     void SetTailColumn(unsigned tailColumn);
@@ -149,7 +155,10 @@ public:
     /// Return how the trail behave.
     TrailType GetTrailType() const { return trailType_; }
 
-    /// Get number of column for tails.
+    /// Return base trail velocity.
+    const Vector3& GetBaseVelocity() const { return baseVelocity_; }
+
+    /// Return number of column for tails.
     unsigned GetTailColumn() const { return tailColumn_; }
 
     /// Return whether is currently emitting.
@@ -160,9 +169,9 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Mark vertex buffer to need an update.
     void MarkPositionsDirty();
     /// Tails.
@@ -175,6 +184,8 @@ protected:
     float animationLodTimer_;
     /// Trail type.
     TrailType trailType_;
+    /// Base velocity applied to the trail.
+    Vector3 baseVelocity_;
 
 private:
     /// Handle scene post-update event.
@@ -185,7 +196,7 @@ private:
     /// Rewrite RibbonTrail vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
     /// Update/Rebuild tail mesh only if position changed (called by UpdateBatches())
-    void UpdateTail();
+    void UpdateTail(float timeStep);
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
@@ -216,7 +227,7 @@ private:
     float endScale_;
     /// Last scene timestep.
     float lastTimeStep_;
-    // Lifetime
+    /// Lifetime
     float lifetime_;
     /// Number of columns for every tails.
     unsigned tailColumn_;

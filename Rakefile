@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'TVOS', 'APPLETVOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'DIRECTX_INC_SEARCH_PATHS', 'DIRECTX_LIB_SEARCH_PATHS', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_LINT', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'TVOS', 'APPLETVOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'DIRECTX_INC_SEARCH_PATHS', 'DIRECTX_LIB_SEARCH_PATHS', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -331,7 +331,7 @@ task :ci do
     data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"].each { |name| ENV["EXCLUDED_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample'] && data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"]
   end
   # Unshallow the clone's history when necessary
-  if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
+  if ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
     puts; $stdout.flush
   end
@@ -349,13 +349,13 @@ task :ci do
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
   ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
   # When not explicitly specified then use generic generator
-  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2015' : '')
+  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2017' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
   # LuaJIT on Web platform is not possible
   jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
   system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if ENV['OSX'] && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
   system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
-  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include}" if ENV['OSX'] && ENV['CI']
+  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null" if ENV['OSX'] && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
@@ -367,9 +367,23 @@ task :ci do
     system 'rake ci_push_bindings' or abort
     next
   end
-  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system 'rake make' }
+  redirect = '2>/tmp/lint.err' if ENV['URHO3D_LINT']
+  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make #{redirect}" }
     abort 'Failed to build Urho3D library' unless File.exists?('already_timeup.log')
     $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+    next
+  end
+  if ENV['URHO3D_LINT']
+    lint_err = File.read('/tmp/lint.err')
+    puts "\nLinter result:\n\n#{lint_err}\n"; $stdout.flush
+    # Exclude ThirdParty and generated code
+    filtered_lint_err = lint_err.scan(/(.+:\d+:\d+:.+\[.+\])/).flatten.select { |it| it =~ /\[\w+-.+\]/ }.reject { |it| it =~ /ThirdParty|generated|HashMap\.h.+?clang-analyzer-core.CallAndMessag/ }
+    unless filtered_lint_err.empty?
+      puts "New linter error(s) found:\n\n"
+      filtered_lint_err.each { |it| puts it }
+      puts; $stdout.flush
+      abort 'Failed to pass linter checks'
+    end
     next
   end
   if ENV['URHO3D_TESTING'] && !ENV['WEB'] && !timeup
@@ -560,7 +574,8 @@ task :ci_create_mirrors do
   # Limit the scanning to only master branch
   scan = ENV['TRAVIS_BRANCH'] == 'master'
   # Check if it is time to generate annotation
-  annotate = ENV['TRAVIS_BRANCH'] == 'master' && (ENV['PACKAGE_UPLOAD'] || /\[ci annotate\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
+  #annotate = ENV['TRAVIS_BRANCH'] == 'master' && (ENV['PACKAGE_UPLOAD'] || /\[ci annotate\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
+  annotate = false
   # Determine which CI mirror branches to be auto created
   unless ENV['RELEASE_TAG']
     skip_travis = /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
@@ -646,13 +661,13 @@ task :ci_package_upload do
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
       system "export SNAPSHOT_VER=$(git describe $TRAVIS_COMMIT |ruby -pe 'gsub(/-(?!g)/, %q{.})'); wget -q https://github.com/$TRAVIS_REPO_SLUG/tarball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/zipball/$TRAVIS_COMMIT -O Urho3D-$SNAPSHOT_VER-Source-snapshot.zip" or abort 'Failed to get source packages'
-      # Only keep the snapshots from the last 30 revisions
-      system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +11
+      # Only keep the snapshots from the last 10 revisions
+      retry_block { system "for v in $(sftp urho-travis-ci@frs.sourceforge.net <<EOF |tr ' ' '\n' |grep Urho3D- |cut -d '-' -f1,2 |uniq |tail -n +11
 cd #{upload_dir}
 ls -1t
 bye
 EOF
-); do echo rm #{upload_dir}/${v}-*; done |sftp -b - urho-travis-ci@frs.sourceforge.net >/dev/null 2>&1" or abort 'Failed to housekeep snapshots'
+); do echo rm #{upload_dir}/${v}-*; done |sftp -b - urho-travis-ci@frs.sourceforge.net >/dev/null 2>&1" } or warn 'Failed to housekeep snapshots'
     end
   else
     upload_dir = "/home/frs/project/#{repo}/#{ENV['RELEASE_TAG']}"
@@ -661,29 +676,29 @@ EOF
       system 'wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.tar.gz -O Urho3D-$RELEASE_TAG-Source.tar.gz && wget -q https://github.com/$TRAVIS_REPO_SLUG/archive/$RELEASE_TAG.zip -O Urho3D-$RELEASE_TAG-Source.zip' or abort 'Failed to get source packages'
     end
     # Make sure the release directory exists remotely, do this in all the build jobs as we don't know which one would start uploading first
-    system "bash -c 'sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
+    retry_block { system "bash -c 'sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
 mkdir #{upload_dir}
 bye
-EOF'" or abort 'Failed to create release directory remotely'
+EOF'" } or abort 'Failed to create release directory remotely'
   end
   if ENV['SITE_UPDATE']
     # Upload the source package
-    system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload source package'
+    retry_block { system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" } or abort 'Failed to upload source package'
     if ENV['RELEASE_TAG']
       # Mark the source tarball as default download for host systems other than Windows/Mac/Linux
-      system "curl -H 'Accept: application/json' -X PUT -d 'default=bsd&default=solaris&default=others' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-Source.tar.gz" % ENV['TRAVIS_REPO_SLUG'].split('/') or abort 'Failed to set source tarball as default download'
+      retry_block { system "curl -H 'Accept: application/json' -X PUT -d 'default=bsd&default=solaris&default=others' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-Source.tar.gz" % ENV['TRAVIS_REPO_SLUG'].split('/') } or abort 'Failed to set source tarball as default download'
     end
     # Sync readme and license files, just in case they are updated in the repo
-    system 'for f in README.md LICENSE; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
-    system 'rsync -e ssh -az README.md LICENSE urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
+    retry_block { system 'for f in README.md LICENSE; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' } or abort 'Failed to acquire file modified time'
+    retry_block { system 'rsync -e ssh -az README.md LICENSE urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' } or abort 'Failed to sync readme and license files'
     # Mark that the site has been updated
     File.open('.site_updated', 'w') {}
   end
   # Upload the binary package
-  system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" or abort 'Failed to upload binary package'
+  retry_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } or abort 'Failed to upload binary package'
   if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
-    system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten or abort 'Failed to set binary tarball/zip as default download'
+    retry_block { system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten } or abort 'Failed to set binary tarball/zip as default download'
   end
 end
 
@@ -694,7 +709,7 @@ task :ci_timer do
 end
 
 # Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
-def timeup quiet = false, cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 40.0
+def timeup quiet = false, cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 45.0
   unless File.exists?('start_time.log')
     system 'touch start_time.log split_time.log'
     return nil
@@ -891,6 +906,16 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   puts "\n" if str == '.'; $stdout.flush
   thread.join
   return thread.value
+end
+
+# Usage: retry_block { code-block } or abort
+def retry_block retries = 10, retry_interval = 1
+    until yield
+        retries -= 1
+        return nil if retries == 0
+        sleep retry_interval
+    end
+    0
 end
 
 def append_new_release release, filename = '../urho3d.github.io/_data/urho3d.json'

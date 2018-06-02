@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
-    Matrix3x4 shadowView(shadowCamera->GetView());
+    const Matrix3x4& shadowView(shadowCamera->GetView());
     Matrix4 shadowProj(shadowCamera->GetGPUProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
 
@@ -93,8 +93,8 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     if (!shadowMap)
         return;
 
-    float width = (float)shadowMap->GetWidth();
-    float height = (float)shadowMap->GetHeight();
+    auto width = (float)shadowMap->GetWidth();
+    auto height = (float)shadowMap->GetHeight();
 
     Vector3 offset(
         (float)viewport.left_ / width,
@@ -161,18 +161,18 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light)
 
 void Batch::CalculateSortKey()
 {
-    unsigned shaderID = (unsigned)(
+    auto shaderID = (unsigned)(
         ((*((unsigned*)&vertexShader_) / sizeof(ShaderVariation)) + (*((unsigned*)&pixelShader_) / sizeof(ShaderVariation))) &
-        0x7fff);
+        0x7fffu);
     if (!isBase_)
         shaderID |= 0x8000;
 
-    unsigned lightQueueID = (unsigned)((*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffff);
-    unsigned materialID = (unsigned)((*((unsigned*)&material_) / sizeof(Material)) & 0xffff);
-    unsigned geometryID = (unsigned)((*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff);
+    auto lightQueueID = (unsigned)((*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffffu);
+    auto materialID = (unsigned)((*((unsigned*)&material_) / sizeof(Material)) & 0xffffu);
+    auto geometryID = (unsigned)((*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffffu);
 
-    sortKey_ = (((unsigned long long)shaderID) << 48) | (((unsigned long long)lightQueueID) << 32) |
-               (((unsigned long long)materialID) << 16) | geometryID;
+    sortKey_ = (((unsigned long long)shaderID) << 48u) | (((unsigned long long)lightQueueID) << 32u) |
+               (((unsigned long long)materialID) << 16u) | geometryID;
 }
 
 void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const
@@ -228,10 +228,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         view->SetGlobalShaderParameters();
 
     // Set camera & viewport shader parameters
-    unsigned cameraHash = (unsigned)(size_t)camera;
+    auto cameraHash = (unsigned)(size_t)camera;
     IntRect viewport = graphics->GetViewport();
     IntVector2 viewSize = IntVector2(viewport.Width(), viewport.Height());
-    unsigned viewportHash = (unsigned)(viewSize.x_ | (viewSize.y_ << 16));
+    auto viewportHash = (unsigned)viewSize.x_ | (unsigned)viewSize.y_ << 16u;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<const void*>(cameraHash + viewportHash)))
     {
         view->SetCameraShaderParameters(camera);
@@ -264,7 +264,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     BlendMode blend = graphics->GetBlendMode();
     // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
     bool overrideFogColorToBlack = blend == BLEND_ADD || blend == BLEND_ADDALPHA;
-    unsigned zoneHash = (unsigned)(size_t)zone_;
+    auto zoneHash = (unsigned)(size_t)zone_;
     if (overrideFogColorToBlack)
         zoneHash += 0x80000000;
     if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<const void*>(zoneHash)))
@@ -427,10 +427,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             {
                 {
                     // Calculate point light shadow sampling offsets (unrolled cube map)
-                    unsigned faceWidth = (unsigned)(shadowMap->GetWidth() / 2);
-                    unsigned faceHeight = (unsigned)(shadowMap->GetHeight() / 3);
-                    float width = (float)shadowMap->GetWidth();
-                    float height = (float)shadowMap->GetHeight();
+                    auto faceWidth = (unsigned)(shadowMap->GetWidth() / 2);
+                    auto faceHeight = (unsigned)(shadowMap->GetHeight() / 3);
+                    auto width = (float)shadowMap->GetWidth();
+                    auto height = (float)shadowMap->GetHeight();
 #ifdef URHO3D_OPENGL
                     float mulX = (float)(faceWidth - 3) / width;
                     float mulY = (float)(faceHeight - 3) / height;
@@ -655,7 +655,7 @@ void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& 
     {
         const InstanceData& instance = instances_[i];
 
-        memcpy(buffer, instance.worldTransform_, sizeof(Matrix3x4));
+        memcpy(buffer, instance.worldTransform_, sizeof(Matrix3x4));    // NOLINT(bugprone-undefined-memory-manipulation)
         if (instance.instancingData_)
             memcpy(buffer + sizeof(Matrix3x4), instance.instancingData_, stride - sizeof(Matrix3x4));
 
@@ -696,7 +696,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
 
             // Get the geometry vertex buffers, then add the instancing stream buffer
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
-            Vector<SharedPtr<VertexBuffer> >& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>(
+            auto& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>(
                 geometry_->GetVertexBuffers());
             vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
 
@@ -735,11 +735,11 @@ void BatchQueue::SortBackToFront()
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
 
     sortedBatchGroups_.Resize(batchGroups_.Size());
-    
+
     unsigned index = 0;
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
-    
+
     Sort(sortedBatchGroups_.Begin(), sortedBatchGroups_.End(), CompareBatchGroupOrder);
 }
 
@@ -797,7 +797,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     {
         Batch* batch = *i;
 
-        unsigned shaderID = (unsigned)(batch->sortKey_ >> 32);
+        auto shaderID = (unsigned)(batch->sortKey_ >> 32u);
         HashMap<unsigned, unsigned>::ConstIterator j = shaderRemapping_.Find(shaderID);
         if (j != shaderRemapping_.End())
             shaderID = j->second_;
@@ -807,7 +807,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
             ++freeShaderID;
         }
 
-        unsigned short materialID = (unsigned short)(batch->sortKey_ & 0xffff0000);
+        auto materialID = (unsigned short)(batch->sortKey_ & 0xffff0000);
         HashMap<unsigned short, unsigned short>::ConstIterator k = materialRemapping_.Find(materialID);
         if (k != materialRemapping_.End())
             materialID = k->second_;
@@ -817,7 +817,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
             ++freeMaterialID;
         }
 
-        unsigned short geometryID = (unsigned short)(batch->sortKey_ & 0xffff);
+        auto geometryID = (unsigned short)(batch->sortKey_ & 0xffffu);
         HashMap<unsigned short, unsigned short>::ConstIterator l = geometryRemapping_.Find(geometryID);
         if (l != geometryRemapping_.End())
             geometryID = l->second_;
@@ -827,7 +827,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
             ++freeGeometryID;
         }
 
-        batch->sortKey_ = (((unsigned long long)shaderID) << 32) | (((unsigned long long)materialID) << 16) | geometryID;
+        batch->sortKey_ = (((unsigned long long)shaderID) << 32u) | (((unsigned long long)materialID) << 16u) | geometryID;
     }
 
     shaderRemapping_.Clear();

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,13 @@ class XMLFile;
 /// Base class for texture resources.
 class URHO3D_API Texture : public ResourceWithMetadata, public GPUObject
 {
+    URHO3D_OBJECT(Texture, ResourceWithMetadata);
+
 public:
     /// Construct.
-    Texture(Context* context);
+    explicit Texture(Context* context);
     /// Destruct.
-    virtual ~Texture() override;
+    ~Texture() override;
 
     /// Set number of requested mip levels. Needs to be called before setting size.
     /** The default value (0) allocates as many mip levels as necessary to reach 1x1 size. Set value 1 to disable mipmapping.
@@ -51,9 +53,9 @@ public:
      */
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
-    void SetFilterMode(TextureFilterMode filter);
+    void SetFilterMode(TextureFilterMode mode);
     /// Set addressing mode by texture coordinate.
-    void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    void SetAddressMode(TextureCoordinate coord, TextureAddressMode mode);
     /// Set texture max. anisotropy level. No effect if not using anisotropic filtering. Value 0 (default) uses the default setting from Renderer.
     void SetAnisotropy(unsigned level);
     /// Set shadow compare mode. Not used on Direct3D9.
@@ -89,7 +91,7 @@ public:
     TextureFilterMode GetFilterMode() const { return filterMode_; }
 
     /// Return addressing mode by texture coordinate.
-    TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+    TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressModes_[coord]; }
 
     /// Return texture max. anisotropy level. Value 0 means to use the default value from Renderer.
     unsigned GetAnisotropy() const { return anisotropy_; }
@@ -143,7 +145,7 @@ public:
     bool GetParametersDirty() const;
 
     /// Set additional parameters from an XML file.
-    void SetParameters(XMLFile* xml);
+    void SetParameters(XMLFile* file);
     /// Set additional parameters from an XML element.
     void SetParameters(const XMLElement& element);
     /// Mark parameters dirty. Called by Graphics.
@@ -193,57 +195,54 @@ protected:
     /// Create the GPU texture. Implemented in subclasses.
     virtual bool Create() { return true; }
 
-    union
-    {
-        /// Direct3D11 shader resource view.
-        void* shaderResourceView_;
-        /// OpenGL target.
-        unsigned target_;
-    };
+    /// OpenGL target.
+    unsigned target_{};
 
+    /// Direct3D11 shader resource view.
+    void* shaderResourceView_{};
     /// Direct3D11 sampler state object.
-    void* sampler_;
+    void* sampler_{};
     /// Direct3D11 resolve texture object when multisample with autoresolve is used.
-    void* resolveTexture_;
+    void* resolveTexture_{};
 
     /// Texture format.
-    unsigned format_;
+    unsigned format_{};
     /// Texture usage type.
-    TextureUsage usage_;
+    TextureUsage usage_{TEXTURE_STATIC};
     /// Current mip levels.
-    unsigned levels_;
+    unsigned levels_{};
     /// Requested mip levels.
-    unsigned requestedLevels_;
+    unsigned requestedLevels_{};
     /// Texture width.
-    int width_;
+    int width_{};
     /// Texture height.
-    int height_;
+    int height_{};
     /// Texture depth.
-    int depth_;
+    int depth_{};
     /// Shadow compare mode.
-    bool shadowCompare_;
+    bool shadowCompare_{};
     /// Filtering mode.
-    TextureFilterMode filterMode_;
+    TextureFilterMode filterMode_{FILTER_DEFAULT};
     /// Addressing mode.
-    TextureAddressMode addressMode_[MAX_COORDS];
+    TextureAddressMode addressModes_[MAX_COORDS]{ADDRESS_WRAP, ADDRESS_WRAP, ADDRESS_WRAP};
     /// Texture anisotropy level.
-    unsigned anisotropy_;
+    unsigned anisotropy_{};
     /// Mip levels to skip when loading per texture quality setting.
-    unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
+    unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS]{2, 1, 0};
     /// Border color.
     Color borderColor_;
     /// Multisampling level.
-    int multiSample_;
+    int multiSample_{1};
     /// sRGB sampling and writing mode flag.
-    bool sRGB_;
+    bool sRGB_{};
     /// Parameters dirty flag.
-    bool parametersDirty_;
+    bool parametersDirty_{true};
     /// Multisampling autoresolve flag.
-    bool autoResolve_;
+    bool autoResolve_{};
     /// Multisampling resolve needed -flag.
-    bool resolveDirty_;
+    bool resolveDirty_{};
     /// Mipmap levels regeneration needed -flag.
-    bool levelsDirty_;
+    bool levelsDirty_{};
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

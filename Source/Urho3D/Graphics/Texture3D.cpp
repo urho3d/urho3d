@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,8 +45,6 @@ Texture3D::Texture3D(Context* context) :
 #ifdef URHO3D_OPENGL
 #ifndef GL_ES_VERSION_2_0
     target_ = GL_TEXTURE_3D;
-#else
-    target_ = 0;
 #endif
 #endif
 }
@@ -63,7 +61,7 @@ void Texture3D::RegisterObject(Context* context)
 
 bool Texture3D::BeginLoad(Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)

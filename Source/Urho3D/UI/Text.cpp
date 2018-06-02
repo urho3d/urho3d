@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ extern const char* horizontalAlignments[];
 extern const char* UI_CATEGORY;
 
 Text::Text(Context* context) :
-    UIElement(context),
+    UISelectable(context),
     fontSize_(DEFAULT_FONT_SIZE),
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
@@ -61,8 +61,6 @@ Text::Text(Context* context) :
     charLocationsDirty_(true),
     selectionStart_(0),
     selectionLength_(0),
-    selectionColor_(Color::TRANSPARENT),
-    hoverColor_(Color::TRANSPARENT),
     textEffect_(TE_NONE),
     shadowOffset_(IntVector2(1, 1)),
     strokeThickness_(1),
@@ -75,15 +73,13 @@ Text::Text(Context* context) :
     useDerivedOpacity_ = false;
 }
 
-Text::~Text()
-{
-}
+Text::~Text() = default;
 
 void Text::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text>(UI_CATEGORY);
 
-    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_COPY_BASE_ATTRIBUTES(UISelectable);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     URHO3D_ATTRIBUTE("Font Size", float, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
@@ -92,8 +88,6 @@ void Text::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
     URHO3D_ATTRIBUTE("Word Wrap", bool, wordWrap_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Auto Localizable", GetAutoLocalizable, SetAutoLocalizable, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
     URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, shadowOffset_, IntVector2(1, 1), AM_FILE);
     URHO3D_ATTRIBUTE("Stroke Thickness", int, strokeThickness_, 1, AM_FILE);
@@ -106,12 +100,12 @@ void Text::RegisterObject(Context* context)
 
 void Text::ApplyAttributes()
 {
-    UIElement::ApplyAttributes();
+    UISelectable::ApplyAttributes();
 
     // Localize now if attributes were loaded out-of-order
     if (autoLocalizable_ && stringId_.Length())
     {
-        Localization* l10n = GetSubsystem<Localization>();
+        auto* l10n = GetSubsystem<Localization>();
         text_ = l10n->Get(stringId_);
     }
 
@@ -143,15 +137,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     }
 
     // Hovering and/or whole selection batch
-    if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
-    {
-        bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
-        batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
-            (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
-        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
-        UIBatch::AddOrMerge(batch, batches);
-    }
+    UISelectable::GetBatches(batches, vertexData, currentScissor);
 
     // Partial selection batch
     if (!selected_ && selectionLength_ && charLocations_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
@@ -218,7 +204,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 int thickness = Min(strokeThickness_, fontSize_);
                 int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
                 float angle = 360.f / samples;
-                float floatThickness = (float)thickness;
+                auto floatThickness = (float)thickness;
                 for (int i = 0; i < samples; ++i)
                 {
                     float x = Cos(angle * i) * floatThickness;
@@ -249,9 +235,6 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
         UIBatch::AddOrMerge(pageBatch, batches);
     }
-
-    // Reset hovering for next frame
-    hovering_ = false;
 }
 
 void Text::OnResize(const IntVector2& newSize, const IntVector2& delta)
@@ -269,7 +252,7 @@ void Text::OnIndentSet()
 
 bool Text::SetFont(const String& fontName, float size)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     return SetFont(cache->GetResource<Font>(fontName), size);
 }
 
@@ -312,7 +295,7 @@ void Text::SetText(const String& text)
     if (autoLocalizable_)
     {
         stringId_ = text;
-        Localization* l10n = GetSubsystem<Localization>();
+        auto* l10n = GetSubsystem<Localization>();
         text_ = l10n->Get(stringId_);
     }
     else
@@ -360,7 +343,7 @@ void Text::SetAutoLocalizable(bool enable)
         if (enable)
         {
             stringId_ = text_;
-            Localization* l10n = GetSubsystem<Localization>();
+            auto* l10n = GetSubsystem<Localization>();
             text_ = l10n->Get(stringId_);
             SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(Text, HandleChangeLanguage));
         }
@@ -378,7 +361,7 @@ void Text::SetAutoLocalizable(bool enable)
 
 void Text::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
-    Localization* l10n = GetSubsystem<Localization>();
+    auto* l10n = GetSubsystem<Localization>();
     text_ = l10n->Get(stringId_);
     DecodeToUnicode();
     ValidateSelection();
@@ -396,16 +379,6 @@ void Text::ClearSelection()
 {
     selectionStart_ = 0;
     selectionLength_ = 0;
-}
-
-void Text::SetSelectionColor(const Color& color)
-{
-    selectionColor_ = color;
-}
-
-void Text::SetHoverColor(const Color& color)
-{
-    hoverColor_ = color;
 }
 
 void Text::SetTextEffect(TextEffect textEffect)
@@ -469,7 +442,7 @@ Vector2 Text::GetCharSize(unsigned index)
 
 void Text::SetFontAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     font_ = cache->GetResource<Font>(value.name_);
 }
 
@@ -495,7 +468,7 @@ String Text::GetTextAttr() const
 
 bool Text::FilterImplicitAttributes(XMLElement& dest) const
 {
-    if (!UIElement::FilterImplicitAttributes(dest))
+    if (!UISelectable::FilterImplicitAttributes(dest))
         return false;
 
     if (!IsFixedWidth())
@@ -527,7 +500,7 @@ void Text::UpdateText(bool onResize)
         int width = 0;
         int height = 0;
         int rowWidth = 0;
-        int rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
+        auto rowHeight = RoundToInt(rowSpacing_ * rowHeight_);
 
         // First see if the text must be split up
         if (!wordWrap_)
@@ -711,7 +684,7 @@ void Text::UpdateCharLocations()
         return;
     fontFace_ = face;
 
-    int rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
+    auto rowHeight = RoundToInt(rowSpacing_ * rowHeight_);
 
     // Store position & size of each character, and locations per texture page
     unsigned numChars = unicodeText_.Size();
@@ -724,8 +697,8 @@ void Text::UpdateCharLocations()
 
     unsigned rowIndex = 0;
     unsigned lastFilled = 0;
-    float x = floor(GetRowStartPosition(rowIndex) + offset.x_ + 0.5f);
-    float y = floor(offset.y_ + 0.5f);
+    float x = Round(GetRowStartPosition(rowIndex) + offset.x_);
+    float y = Round(offset.y_);
 
     for (unsigned i = 0; i < printText_.Size(); ++i)
     {

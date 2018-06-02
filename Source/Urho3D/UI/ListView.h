@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,16 +45,16 @@ class URHO3D_API ListView : public ScrollView
 
 public:
     /// Construct.
-    ListView(Context* context);
+    explicit ListView(Context* context);
     /// Destruct.
-    virtual ~ListView() override;
+    ~ListView() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers) override;
+    void OnKey(int key, int buttons, int qualifiers) override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Manually update layout on internal elements.
     void UpdateInternalLayout();
@@ -159,7 +159,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const override;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
 

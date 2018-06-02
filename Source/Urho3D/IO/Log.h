@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,9 +51,7 @@ class File;
 struct StoredLogMessage
 {
     /// Construct undefined.
-    StoredLogMessage()
-    {
-    }
+    StoredLogMessage() = default;
 
     /// Construct with parameters.
     StoredLogMessage(const String& message, int level, bool error) :
@@ -66,9 +64,9 @@ struct StoredLogMessage
     /// Message text.
     String message_;
     /// Message level. -1 for raw messages.
-    int level_;
+    int level_{};
     /// Error flag for raw messages.
-    bool error_;
+    bool error_{};
 };
 
 /// Logging subsystem.
@@ -78,9 +76,9 @@ class URHO3D_API Log : public Object
 
 public:
     /// Construct.
-    Log(Context* context);
+    explicit Log(Context* context);
     /// Destruct. Close the log file if open.
-    virtual ~Log() override;
+    ~Log() override;
 
     /// Open the log file.
     void Open(const String& fileName);

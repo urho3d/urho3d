@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,13 +37,13 @@ class Character2D : public LogicComponent
 
 public:
     /// Construct.
-    Character2D(Context* context);
+    explicit Character2D(Context* context);
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
 
     /// Handle update. Called by LogicComponent base class.
-    virtual void Update(float timeStep) override;
+    void Update(float timeStep) override;
     /// Handle player state/behavior when wounded.
     void HandleWoundedState(float timeStep);
     /// Handle death of the player.

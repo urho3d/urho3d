@@ -62,19 +62,19 @@ class ParticleEffect : public Resource
     void SetMaxRotationSpeed(float speed);
     void SetSizeAdd(float sizeAdd);
     void SetSizeMul(float sizeMul);
-    void AddColorTime(const Color& color, const float time);
+    void AddColorTime(const Color& color, float time);
     void AddColorFrame(const ColorFrame& colorFrame);
     void RemoveColorFrame(unsigned index);
     void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
     void SetNumColorFrames(unsigned number);
     void SortColorFrames();
-    void AddTextureTime(const Rect& uv, const float time);
+    void AddTextureTime(const Rect& uv, float time);
     void AddTextureFrame(const TextureFrame& textureFrame);
     void RemoveTextureFrame(unsigned index);
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
     void SetNumTextureFrames(unsigned number);
     void SortTextureFrames();
-    
+
     // SharedPtr<ParticleEffect> Clone(const String cloneName = String::EMPTY) const;
     tolua_outside ParticleEffect* ParticleEffectClone @ Clone(const String cloneName = String::EMPTY) const;
 

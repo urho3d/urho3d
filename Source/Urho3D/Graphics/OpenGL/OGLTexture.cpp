@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,10 +99,10 @@ void Texture::UpdateParameters()
 #endif
 
     // Wrapping
-    glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressMode_[COORD_U]));
-    glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressMode_[COORD_V]));
+    glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressModes_[COORD_U]));
+    glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressModes_[COORD_V]));
 #ifndef GL_ES_VERSION_2_0
-    glTexParameteri(target_, GL_TEXTURE_WRAP_R, GetWrapMode(addressMode_[COORD_W]));
+    glTexParameteri(target_, GL_TEXTURE_WRAP_R, GetWrapMode(addressModes_[COORD_W]));
 #endif
 
     TextureFilterMode filterMode = filterMode_;
@@ -226,22 +226,22 @@ unsigned Texture::GetRowDataSize(int width) const
 #endif
 
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-        return (unsigned)(((width + 3) >> 2) * 8);
+        return ((unsigned)(width + 3) >> 2u) * 8;
 
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-        return (unsigned)(((width + 3) >> 2) * 16);
+        return ((unsigned)(width + 3) >> 2u) * 16;
 
     case GL_ETC1_RGB8_OES:
-        return (unsigned)(((width + 3) >> 2) * 8);
+        return ((unsigned)(width + 3) >> 2u) * 8;
 
     case COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
-        return (unsigned)((width * 4 + 7) >> 3);
+        return (unsigned)(width * 4 + 7) >> 3u;
 
     case COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
-        return (unsigned)((width * 2 + 7) >> 3);
+        return (unsigned)(width * 2 + 7) >> 3u;
 
     default:
         return 0;

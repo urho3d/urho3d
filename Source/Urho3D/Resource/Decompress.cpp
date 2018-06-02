@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,24 +34,24 @@ namespace Urho3D
     Copyright (c) 2006 Simon Brown                          si@sjbrown.co.uk
 
     Permission is hereby granted, free of charge, to any person obtaining
-    a copy of this software and associated documentation files (the 
+    a copy of this software and associated documentation files (the
     "Software"), to    deal in the Software without restriction, including
     without limitation the rights to use, copy, modify, merge, publish,
-    distribute, sublicense, and/or sell copies of the Software, and to 
-    permit persons to whom the Software is furnished to do so, subject to 
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
     the following conditions:
 
     The above copyright notice and this permission notice shall be included
     in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
     MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-    
+
    -------------------------------------------------------------------------- */
 
 static int Unpack565(unsigned char const* packed, unsigned char* colour)
@@ -60,9 +60,9 @@ static int Unpack565(unsigned char const* packed, unsigned char* colour)
     int value = (int)packed[0] | ((int)packed[1] << 8);
 
     // get the components in the stored range
-    unsigned char red = (unsigned char)((value >> 11) & 0x1f);
-    unsigned char green = (unsigned char)((value >> 5) & 0x3f);
-    unsigned char blue = (unsigned char)(value & 0x1f);
+    auto red = (unsigned char)((value >> 11) & 0x1f);
+    auto green = (unsigned char)((value >> 5) & 0x3f);
+    auto blue = (unsigned char)(value & 0x1f);
 
     // scale up to 8 bits
     colour[0] = (red << 3) | (red >> 2);
@@ -77,7 +77,7 @@ static int Unpack565(unsigned char const* packed, unsigned char* colour)
 static void DecompressColourDXT(unsigned char* rgba, void const* block, bool isDxt1)
 {
     // get the block bytes
-    unsigned char const* bytes = reinterpret_cast< unsigned char const* >( block );
+    auto const* bytes = reinterpret_cast< unsigned char const* >( block );
 
     // unpack the endpoints
     unsigned char codes[16];
@@ -122,7 +122,7 @@ static void DecompressColourDXT(unsigned char* rgba, void const* block, bool isD
     // store out the colours
     for (int i = 0; i < 16; ++i)
     {
-        unsigned char offset = (unsigned char)(4 * indices[i]);
+        auto offset = (unsigned char)(4 * indices[i]);
         for (int j = 0; j < 4; ++j)
             rgba[4 * i + j] = codes[offset + j];
     }
@@ -130,7 +130,7 @@ static void DecompressColourDXT(unsigned char* rgba, void const* block, bool isD
 
 static void DecompressAlphaDXT3(unsigned char* rgba, void const* block)
 {
-    unsigned char const* bytes = reinterpret_cast< unsigned char const* >( block );
+    auto const* bytes = reinterpret_cast< unsigned char const* >( block );
 
     // unpack the alpha values pairwise
     for (int i = 0; i < 8; ++i)
@@ -139,8 +139,8 @@ static void DecompressAlphaDXT3(unsigned char* rgba, void const* block)
         unsigned char quant = bytes[i];
 
         // unpack the values
-        unsigned char lo = (unsigned char)(quant & 0x0f);
-        unsigned char hi = (unsigned char)(quant & 0xf0);
+        auto lo = (unsigned char)(quant & 0x0f);
+        auto hi = (unsigned char)(quant & 0xf0);
 
         // convert back up to bytes
         rgba[8 * i + 3] = lo | (lo << 4);
@@ -151,7 +151,7 @@ static void DecompressAlphaDXT3(unsigned char* rgba, void const* block)
 static void DecompressAlphaDXT5(unsigned char* rgba, void const* block)
 {
     // get the two alpha values
-    unsigned char const* bytes = reinterpret_cast< unsigned char const* >( block );
+    auto const* bytes = reinterpret_cast< unsigned char const* >( block );
     int alpha0 = bytes[0];
     int alpha1 = bytes[1];
 
@@ -222,7 +222,7 @@ static void DecompressDXT(unsigned char* rgba, const void* block, CompressedForm
 void DecompressImageDXT(unsigned char* rgba, const void* blocks, int width, int height, int depth, CompressedFormat format)
 {
     // initialise the block input
-    unsigned char const* sourceBlock = reinterpret_cast< unsigned char const* >( blocks );
+    auto const* sourceBlock = reinterpret_cast< unsigned char const* >( blocks );
     int bytesPerBlock = format == CF_DXT1 ? 8 : 16;
 
     // loop over blocks
@@ -283,9 +283,9 @@ redistribute it freely, subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim
 that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not 
+acknowledgment in the product documentation would be appreciated but is not
 required.
-2. Altered source versions must be plainly marked as such, and must not be 
+2. Altered source versions must be plainly marked as such, and must not be
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
@@ -408,7 +408,7 @@ static void DecompressETC(unsigned char* pDestData, const void* pSrcData)
 void DecompressImageETC(unsigned char* rgba, const void* blocks, int width, int height)
 {
     // initialise the block input
-    unsigned char const* sourceBlock = reinterpret_cast< unsigned char const* >( blocks );
+    auto const* sourceBlock = reinterpret_cast< unsigned char const* >( blocks );
     int bytesPerBlock = 8;
 
     // loop over blocks
@@ -463,11 +463,11 @@ void DecompressImageETC(unsigned char* rgba, const void* blocks, int width, int 
 #define CLAMP(X, lower, upper) (_MIN(_MAX((X),(lower)), (upper)))
 #define LIMIT_COORD(Val, Size, AssumeImageTiles) ((AssumeImageTiles)? WRAP_COORD((Val), (Size)): CLAMP((Val), 0, (Size)-1))
 
-typedef struct
+using AMTC_BLOCK_STRUCT = struct
 {
     // Uses 64 bits pre block
     unsigned PackedData[2];
-} AMTC_BLOCK_STRUCT;
+};
 
 static void Unpack5554Colour(const AMTC_BLOCK_STRUCT* pBlock, int ABColours[2][4])
 {
@@ -802,9 +802,9 @@ static unsigned TwiddleUV(unsigned YSize, unsigned XSize, unsigned YPos, unsigne
     return Twiddled;
 }
 
-void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, int height, CompressedFormat format)
+void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format)
 {
-    AMTC_BLOCK_STRUCT* pCompressedData = (AMTC_BLOCK_STRUCT*)blocks;
+    auto* pCompressedData = (AMTC_BLOCK_STRUCT*)blocks;
     int AssumeImageTiles = 1;
     int Do2bitMode = format == CF_PVRTC_RGB_2BPP || format == CF_PVRTC_RGBA_2BPP;
 
@@ -940,15 +940,15 @@ void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, in
 
             // Store the result in the output image
             uPosition = (unsigned)((x + y * width) << 2);
-            dest[uPosition + 0] = (unsigned char)Result[0];
-            dest[uPosition + 1] = (unsigned char)Result[1];
-            dest[uPosition + 2] = (unsigned char)Result[2];
-            dest[uPosition + 3] = (unsigned char)Result[3];
+            rgba[uPosition + 0] = (unsigned char)Result[0];
+            rgba[uPosition + 1] = (unsigned char)Result[1];
+            rgba[uPosition + 2] = (unsigned char)Result[2];
+            rgba[uPosition + 3] = (unsigned char)Result[3];
         }
     }
 }
 
-void FlipBlockVertical(unsigned char* dest, unsigned char* src, CompressedFormat format)
+void FlipBlockVertical(unsigned char* dest, const unsigned char* src, CompressedFormat format)
 {
     switch (format)
     {
@@ -1018,7 +1018,7 @@ static unsigned FlipDXT5AlphaHorizontal(unsigned src)
            ((src & 0x7000) << 9) | ((src & 0x38000) << 3) | ((src & 0x1c0000) >> 3) | ((src & 0xe00000) >> 9);
 }
 
-void FlipBlockHorizontal(unsigned char* dest, unsigned char* src, CompressedFormat format)
+void FlipBlockHorizontal(unsigned char* dest, const unsigned char* src, CompressedFormat format)
 {
     switch (format)
     {

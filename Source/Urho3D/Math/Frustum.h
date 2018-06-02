@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,12 +50,13 @@ class URHO3D_API Frustum
 {
 public:
     /// Construct a degenerate frustum with all points at origin.
-    Frustum();
+    Frustum() noexcept = default;
+
     /// Copy-construct from another frustum.
-    Frustum(const Frustum& frustum);
+    Frustum(const Frustum& frustum) noexcept;
 
     /// Assign from another frustum.
-    Frustum& operator =(const Frustum& rhs);
+    Frustum& operator =(const Frustum& rhs) noexcept;
 
     /// Define with projection parameters and a transform matrix.
     void
@@ -79,9 +80,9 @@ public:
     /// Test if a point is inside or outside.
     Intersection IsInside(const Vector3& point) const
     {
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (const auto& plane : planes_)
         {
-            if (planes_[i].Distance(point) < 0.0f)
+            if (plane.Distance(point) < 0.0f)
                 return OUTSIDE;
         }
 
@@ -92,9 +93,9 @@ public:
     Intersection IsInside(const Sphere& sphere) const
     {
         bool allInside = true;
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (const auto& plane : planes_)
         {
-            float dist = planes_[i].Distance(sphere.center_);
+            float dist = plane.Distance(sphere.center_);
             if (dist < -sphere.radius_)
                 return OUTSIDE;
             else if (dist < sphere.radius_)
@@ -107,9 +108,9 @@ public:
     /// Test if a sphere if (partially) inside or outside.
     Intersection IsInsideFast(const Sphere& sphere) const
     {
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (const auto& plane : planes_)
         {
-            if (planes_[i].Distance(sphere.center_) < -sphere.radius_)
+            if (plane.Distance(sphere.center_) < -sphere.radius_)
                 return OUTSIDE;
         }
 
@@ -123,9 +124,8 @@ public:
         Vector3 edge = center - box.min_;
         bool allInside = true;
 
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (const auto& plane : planes_)
         {
-            const Plane& plane = planes_[i];
             float dist = plane.normal_.DotProduct(center) + plane.d_;
             float absDist = plane.absNormal_.DotProduct(edge);
 
@@ -144,9 +144,8 @@ public:
         Vector3 center = box.Center();
         Vector3 edge = center - box.min_;
 
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (const auto& plane : planes_)
         {
-            const Plane& plane = planes_[i];
             float dist = plane.normal_.DotProduct(center) + plane.d_;
             float absDist = plane.absNormal_.DotProduct(edge);
 
@@ -161,8 +160,8 @@ public:
     float Distance(const Vector3& point) const
     {
         float distance = 0.0f;
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
-            distance = Max(-planes_[i].Distance(point), distance);
+        for (const auto& plane : planes_)
+            distance = Max(-plane.Distance(point), distance);
 
         return distance;
     }
@@ -172,7 +171,7 @@ public:
     /// Return transformed by a 3x4 matrix.
     Frustum Transformed(const Matrix3x4& transform) const;
     /// Return projected by a 4x4 projection matrix.
-    Rect Projected(const Matrix4& transform) const;
+    Rect Projected(const Matrix4& projection) const;
 
     /// Update the planes. Called internally.
     void UpdatePlanes();

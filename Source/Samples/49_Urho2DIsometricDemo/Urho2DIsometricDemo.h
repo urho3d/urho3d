@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,13 +42,13 @@ class Urho2DIsometricDemo : public Sample
 
 public:
     /// Construct.
-    Urho2DIsometricDemo(Context* context);
+    explicit Urho2DIsometricDemo(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    void Start() override;
     /// Setup before engine initialization. Modifies the engine parameters.
-    virtual void Setup();
-    
+    void Setup() override;
+
 private:
     /// Construct the scene content.
     void CreateScene();

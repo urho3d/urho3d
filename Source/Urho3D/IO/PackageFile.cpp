@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,7 @@ PackageFile::PackageFile(Context* context, const String& fileName, unsigned star
     Open(fileName, startOffset);
 }
 
-PackageFile::~PackageFile()
-{
-}
+PackageFile::~PackageFile() = default;
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
@@ -96,7 +94,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
     for (unsigned i = 0; i < numFiles; ++i)
     {
         String entryName = file->ReadString();
-        PackageEntry newEntry;
+        PackageEntry newEntry{};
         newEntry.offset_ = file->ReadUInt() + startOffset;
         totalDataSize_ += (newEntry.size_ = file->ReadUInt());
         newEntry.checksum_ = file->ReadUInt();

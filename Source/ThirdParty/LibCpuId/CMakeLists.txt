@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 set (TARGET_NAME LibCpuId)
 
 # Define preprocessor macros
-add_definitions (-DVERSION="0.4.0")
+add_definitions (-DVERSION="0.4.0+")
 if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()

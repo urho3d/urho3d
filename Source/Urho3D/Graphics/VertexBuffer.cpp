@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +35,7 @@ namespace Urho3D
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(forceHeadless ? nullptr : GetSubsystem<Graphics>()),
-    vertexCount_(0),
-    elementMask_(0),
-    lockState_(LOCK_NONE),
-    lockStart_(0),
-    lockCount_(0),
-    lockScratchData_(nullptr),
-    shadowed_(false),
-    dynamic_(false),
-    discardLock_(false)
+    GPUObject(forceHeadless ? nullptr : GetSubsystem<Graphics>())
 {
     UpdateOffsets();
 
@@ -115,7 +106,7 @@ void VertexBuffer::UpdateOffsets()
         {
             const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
             if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
-                elementMask_ |= (1 << j);
+                elementMask_ |= (1u << j);
         }
     }
 
@@ -172,7 +163,7 @@ PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
 
     for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1 << i))
+        if (elementMask & (1u << i))
             ret.Push(LEGACY_VERTEXELEMENTS[i]);
     }
 
@@ -195,7 +186,7 @@ unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 
     for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1 << i))
+        if (elementMask & (1u << i))
             size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
     }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -306,13 +306,9 @@ CubeMapFace RenderPathCommand::GetOutputFace(unsigned index) const
     return index < outputs_.Size() ? outputs_[index].second_ : FACE_POSITIVE_X;
 }
 
-RenderPath::RenderPath()
-{
-}
+RenderPath::RenderPath() = default;
 
-RenderPath::~RenderPath()
-{
-}
+RenderPath::~RenderPath() = default;
 
 SharedPtr<RenderPath> RenderPath::Clone()
 {

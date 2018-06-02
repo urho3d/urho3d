@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -456,7 +456,7 @@ void Context::BeginSendEvent(Object* sender, StringHash eventType)
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginBlock(eventType);
     }
@@ -472,7 +472,7 @@ void Context::EndSendEvent()
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->EndBlock();
     }

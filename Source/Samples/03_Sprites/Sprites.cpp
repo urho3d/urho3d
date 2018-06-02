@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,16 +61,16 @@ void Sprites::Start()
 
 void Sprites::CreateSprites()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Graphics* graphics = GetSubsystem<Graphics>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* graphics = GetSubsystem<Graphics>();
+    auto* ui = GetSubsystem<UI>();
 
     // Get rendering window size as floats
-    float width = (float)graphics->GetWidth();
-    float height = (float)graphics->GetHeight();
+    auto width = (float)graphics->GetWidth();
+    auto height = (float)graphics->GetHeight();
 
     // Get the Urho3D fish texture
-    Texture2D* decalTex = cache->GetResource<Texture2D>("Textures/UrhoDecal.dds");
+    auto* decalTex = cache->GetResource<Texture2D>("Textures/UrhoDecal.dds");
 
     for (unsigned i = 0; i < NUM_SPRITES; ++i)
     {
@@ -106,9 +106,9 @@ void Sprites::CreateSprites()
 
 void Sprites::MoveSprites(float timeStep)
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    float width = (float)graphics->GetWidth();
-    float height = (float)graphics->GetHeight();
+    auto* graphics = GetSubsystem<Graphics>();
+    auto width = (float)graphics->GetWidth();
+    auto height = (float)graphics->GetHeight();
 
     // Go through all sprites
     for (unsigned i = 0; i < sprites_.Size(); ++i)

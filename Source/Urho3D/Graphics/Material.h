@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,11 +56,11 @@ struct MaterialShaderParameter
 struct TechniqueEntry
 {
     /// Construct with defaults.
-    TechniqueEntry();
+    TechniqueEntry() noexcept;
     /// Construct with parameters.
-    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance);
+    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) noexcept;
     /// Destruct.
-    ~TechniqueEntry();
+    ~TechniqueEntry() noexcept = default;
 
     /// Technique.
     SharedPtr<Technique> technique_;
@@ -82,14 +82,14 @@ public:
     /// Copy construct.
     ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other);
     /// Destruct.
-    virtual ~ShaderParameterAnimationInfo() override;
+    ~ShaderParameterAnimationInfo() override;
 
     /// Return shader parameter name.
     const String& GetName() const { return name_; }
 
 protected:
     /// Apply new animation value to the target object. Called by Update().
-    virtual void ApplyValue(const Variant& newValue) override;
+    void ApplyValue(const Variant& newValue) override;
 
 private:
     /// Shader parameter name.
@@ -109,18 +109,18 @@ class URHO3D_API Material : public Resource
 
 public:
     /// Construct.
-    Material(Context* context);
+    explicit Material(Context* context);
     /// Destruct.
-    virtual ~Material() override;
+    ~Material() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Load from an XML element. Return true if successful.
     bool Load(const XMLElement& source);
@@ -239,7 +239,7 @@ public:
 
     /// Return render order.
     unsigned char GetRenderOrder() const { return renderOrder_; }
-    
+
     /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
 
@@ -294,31 +294,31 @@ private:
     /// Pixel shader defines.
     String pixelShaderDefines_;
     /// Normal culling mode.
-    CullMode cullMode_;
+    CullMode cullMode_{};
     /// Culling mode for shadow rendering.
-    CullMode shadowCullMode_;
+    CullMode shadowCullMode_{};
     /// Polygon fill mode.
-    FillMode fillMode_;
+    FillMode fillMode_{};
     /// Depth bias parameters.
-    BiasParameters depthBias_;
+    BiasParameters depthBias_{};
     /// Render order value.
-    unsigned char renderOrder_;
+    unsigned char renderOrder_{};
     /// Last auxiliary view rendered frame number.
-    unsigned auxViewFrameNumber_;
+    unsigned auxViewFrameNumber_{};
     /// Shader parameter hash value.
-    unsigned shaderParameterHash_;
+    unsigned shaderParameterHash_{};
     /// Alpha-to-coverage flag.
-    bool alphaToCoverage_;
+    bool alphaToCoverage_{};
     /// Line antialiasing flag.
-    bool lineAntiAlias_;
+    bool lineAntiAlias_{};
     /// Render occlusion flag.
-    bool occlusion_;
+    bool occlusion_{true};
     /// Specular lighting flag.
-    bool specular_;
+    bool specular_{};
     /// Flag for whether is subscribed to animation updates.
-    bool subscribed_;
+    bool subscribed_{};
     /// Flag to suppress parameter hash and memory use recalculation when setting multiple shader parameters (loading or resetting the material.)
-    bool batchedParameterUpdate_;
+    bool batchedParameterUpdate_{};
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// JSON file used while loading.

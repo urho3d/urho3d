@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -108,9 +108,9 @@ class URHO3D_API Connection : public Object
 
 public:
     /// Construct with context and kNet message connection pointers.
-    Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
+    Connection(Context* context, bool isClient, const kNet::SharedPtr<kNet::MessageConnection>& connection);
     /// Destruct.
-    virtual ~Connection() override;
+    ~Connection() override;
 
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);

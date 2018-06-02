@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ struct URHO3D_API AnimationTrack
     }
 
     /// Assign keyframe at index.
-    void SetKeyFrame(unsigned index, const AnimationKeyFrame& command);
+    void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
     /// Add a keyframe at the end.
     void AddKeyFrame(const AnimationKeyFrame& keyFrame);
     /// Insert a keyframe at index.
@@ -113,16 +113,16 @@ class URHO3D_API Animation : public ResourceWithMetadata
 
 public:
     /// Construct.
-    Animation(Context* context);
+    explicit Animation(Context* context);
     /// Destruct.
-    virtual ~Animation() override;
+    ~Animation() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Set animation name.
     void SetAnimationName(const String& name);

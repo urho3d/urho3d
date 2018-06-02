@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,9 +34,9 @@ class URHO3D_API ConstraintWheel2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintWheel2D(Context* context);
+    explicit ConstraintWheel2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintWheel2D() override;
+    ~ConstraintWheel2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -78,7 +78,7 @@ public:
 
 private:
     /// Return joint def.
-    virtual b2JointDef* GetJointDef() override;
+    b2JointDef* GetJointDef() override;
 
     /// Box2D joint def.
     b2WheelJointDef jointDef_;

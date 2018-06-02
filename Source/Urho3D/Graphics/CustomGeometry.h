@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,20 +51,20 @@ class URHO3D_API CustomGeometry : public Drawable
 
 public:
     /// Construct.
-    CustomGeometry(Context* context);
+    explicit CustomGeometry(Context* context);
     /// Destruct.
-    virtual ~CustomGeometry() override;
+    ~CustomGeometry() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Return the geometry for a specific LOD level.
-    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
+    Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles() override;
+    unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
-    virtual bool DrawOcclusion(OcclusionBuffer* buffer) override;
+    bool DrawOcclusion(OcclusionBuffer* buffer) override;
 
     /// Clear all geometries.
     void Clear();
@@ -124,7 +124,7 @@ public:
 
 protected:
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
 
 private:
     /// Primitive type per geometry.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,17 +42,17 @@ class URHO3D_API SplinePath : public Component
 
 public:
     /// Construct an Empty SplinePath.
-    SplinePath(Context* context);
+    explicit SplinePath(Context* context);
 
     /// Destructor.
-    virtual ~SplinePath() override { };
+    ~SplinePath() override = default;;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply Attributes to the SplinePath.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Draw the Debug Geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Add a Node to the SplinePath as a Control Point.
     void AddControlPoint(Node* point, unsigned index = M_MAX_UNSIGNED);
@@ -77,7 +77,7 @@ public:
 
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
-    
+
     /// Get the length of SplinePath;
     float GetLength() const { return length_; }
 
@@ -112,9 +112,9 @@ public:
 
 protected:
     /// Listener to manage Control Point movement.
-    virtual void OnMarkedDirty(Node* point) override;
+    void OnMarkedDirty(Node* point) override;
     /// Listener to manage Control Point enabling.
-    virtual void OnNodeSetEnabled(Node* point) override;
+    void OnNodeSetEnabled(Node* point) override;
 
 private:
     /// Update the Node IDs of the Control Points.

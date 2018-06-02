@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
 #
 
 version: '{build}'
+image: Visual Studio 2017
 platform:
   - x86
   - x64
@@ -63,14 +64,19 @@ before_build:
         {
           $env:PACKAGE_UPLOAD = "1";
           if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
-          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
+          do { "Installing doxygen and graphviz..."; choco install doxygen.install graphviz >$null } until ($?);
         }
         else
         {
           $env:URHO3D_TOOLS = "0";
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
-  - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
+  - if "%PLATFORM%" == "x64" (
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" &&
+      set "URHO3D_64BIT=1"
+    ) else (
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+    )
   # rake ci_setup_cache
 build_script:
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,31 +78,31 @@ void Urho2DSpriterAnimation::CreateScene()
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
     camera->SetZoom(1.5f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    AnimationSet2D* spriterAnimationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* spriterAnimationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
     if (!spriterAnimationSet)
         return;
 
     spriterNode_ = scene_->CreateChild("SpriterAnimation");
-    AnimatedSprite2D* spriterAnimatedSprite = spriterNode_->CreateComponent<AnimatedSprite2D>();
+    auto* spriterAnimatedSprite = spriterNode_->CreateComponent<AnimatedSprite2D>();
     spriterAnimatedSprite->SetAnimationSet(spriterAnimationSet);
     spriterAnimatedSprite->SetAnimation(spriterAnimationSet->GetAnimation(spriterAnimationIndex_));
 }
 
 void Urho2DSpriterAnimation::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Mouse click to play next animation, \nUse WASD keys to move, use PageUp PageDown keys to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     instructionText->SetTextAlignment(HA_CENTER); // Center rows in relation to each other
@@ -115,7 +115,7 @@ void Urho2DSpriterAnimation::CreateInstructions()
 
 void Urho2DSpriterAnimation::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -128,7 +128,7 @@ void Urho2DSpriterAnimation::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 4.0f;
@@ -145,13 +145,13 @@ void Urho2DSpriterAnimation::MoveCamera(float timeStep)
 
     if (input->GetKeyDown(KEY_PAGEUP))
     {
-        Camera* camera = cameraNode_->GetComponent<Camera>();
+        auto* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 1.01f);
     }
 
     if (input->GetKeyDown(KEY_PAGEDOWN))
     {
-        Camera* camera = cameraNode_->GetComponent<Camera>();
+        auto* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 0.99f);
     }
 }
@@ -179,7 +179,7 @@ void Urho2DSpriterAnimation::HandleUpdate(StringHash eventType, VariantMap& even
 
 void Urho2DSpriterAnimation::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    AnimatedSprite2D* spriterAnimatedSprite = spriterNode_->GetComponent<AnimatedSprite2D>();
+    auto* spriterAnimatedSprite = spriterNode_->GetComponent<AnimatedSprite2D>();
     AnimationSet2D* spriterAnimationSet = spriterAnimatedSprite->GetAnimationSet();
     spriterAnimationIndex_ = (spriterAnimationIndex_ + 1) % spriterAnimationSet->GetNumAnimations();
     spriterAnimatedSprite->SetAnimation(spriterAnimationSet->GetAnimation(spriterAnimationIndex_), LM_FORCE_LOOPED);

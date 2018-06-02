@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -166,9 +166,9 @@ public:
     };
 
     /// Construct an IK root component.
-    IKSolver(Context* context);
+    explicit IKSolver(Context* context);
     /// Default destructor.
-    virtual ~IKSolver() override;
+    ~IKSolver() override;
     /// Registers this class to the context.
     static void RegisterObject(Context* context);
 
@@ -306,7 +306,7 @@ public:
     void ApplyOriginalPoseToActivePose();
 
     void DrawDebugGeometry(bool depthTest);
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
 private:
     friend class IKEffector;
@@ -319,9 +319,9 @@ private:
     bool IsSolverTreeValid() const;
 
     /// Subscribe to drawable update finished event here
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Destroys and creates the tree
-    virtual void OnNodeSet(Node* scene) override;
+    void OnNodeSet(Node* node) override;
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
     ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);

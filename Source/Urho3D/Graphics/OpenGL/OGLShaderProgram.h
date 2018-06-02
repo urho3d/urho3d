@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,12 +41,12 @@ public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);
     /// Destruct.
-    virtual ~ShaderProgram() override;
+    ~ShaderProgram() override;
 
     /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost() override;
+    void OnDeviceLost() override;
     /// Release shader program.
-    virtual void Release() override;
+    void Release() override;
 
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful.
     bool Link();
@@ -59,7 +59,7 @@ public:
     bool HasParameter(StringHash param) const;
 
     /// Return whether uses a texture unit.
-    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnits_[unit]; }
 
     /// Return the info for a shader parameter, or null if does not exist.
     const ShaderParameter* GetParameter(StringHash param) const;
@@ -94,19 +94,19 @@ private:
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Texture unit use.
-    bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    bool useTextureUnits_[MAX_TEXTURE_UNITS]{};
     /// Vertex attributes.
     HashMap<Pair<unsigned char, unsigned char>, unsigned> vertexAttributes_;
     /// Used vertex attribute location bitmask.
-    unsigned usedVertexAttributes_;
+    unsigned usedVertexAttributes_{};
     /// Constant buffers by binding index.
     SharedPtr<ConstantBuffer> constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
     /// Remembered shader parameter sources for individual uniform mode.
-    const void* parameterSources_[MAX_SHADER_PARAMETER_GROUPS];
+    const void* parameterSources_[MAX_SHADER_PARAMETER_GROUPS]{};
     /// Shader link error string.
     String linkerOutput_;
     /// Shader parameter source framenumber.
-    unsigned frameNumber_;
+    unsigned frameNumber_{};
 
     /// Global shader parameter source framenumber.
     static unsigned globalFrameNumber;

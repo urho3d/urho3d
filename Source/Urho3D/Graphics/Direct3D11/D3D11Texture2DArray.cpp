@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -450,7 +450,7 @@ bool Texture2DArray::Create()
 
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
-    textureDesc.MipLevels = levels_;
+    textureDesc.MipLevels = usage_ != TEXTURE_DYNAMIC ? levels_ : 1;
     textureDesc.ArraySize = layers_;
     textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.SampleDesc.Count = 1;
@@ -477,13 +477,13 @@ bool Texture2DArray::Create()
     if (layers_ == 1)
     {
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = (UINT)levels_;
+        srvDesc.Texture2D.MipLevels = usage_ != TEXTURE_DYNAMIC ? (UINT)levels_ : 1;
         srvDesc.Texture2D.MostDetailedMip = 0;
     }
     else
     {
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-        srvDesc.Texture2DArray.MipLevels = (UINT)levels_;
+        srvDesc.Texture2DArray.MipLevels = usage_ != TEXTURE_DYNAMIC ? (UINT)levels_ : 1;
         srvDesc.Texture2DArray.ArraySize = layers_;
         srvDesc.Texture2DArray.FirstArraySlice = 0;
         srvDesc.Texture2DArray.MostDetailedMip = 0;

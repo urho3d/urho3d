@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,9 +69,7 @@ LineEdit::LineEdit(Context* context) :
     SubscribeToEvent(this, E_LAYOUTUPDATED, URHO3D_HANDLER(LineEdit, HandleLayoutUpdated));
 }
 
-LineEdit::~LineEdit()
-{
-}
+LineEdit::~LineEdit() = default;
 
 void LineEdit::RegisterObject(Context* context)
 {
@@ -191,13 +189,13 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
         StringHash sourceType = source->GetType();
         if (sourceType == LineEdit::GetTypeStatic())
         {
-            LineEdit* sourceLineEdit = static_cast<LineEdit*>(source);
+            auto* sourceLineEdit = static_cast<LineEdit*>(source);
             SetText(sourceLineEdit->GetText());
             return true;
         }
         else if (sourceType == Text::GetTypeStatic())
         {
-            Text* sourceText = static_cast<Text*>(source);
+            auto* sourceText = static_cast<Text*>(source);
             SetText(sourceText->GetText());
             return true;
         }

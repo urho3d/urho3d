@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,10 @@ class URHO3D_API IKConstraint : public Component
 public:
 
     /// Constructs a new IK constraint.
-    IKConstraint(Context* context);
+    explicit IKConstraint(Context* context);
 
     /// Destructs he IK constraint.
-    virtual ~IKConstraint() override;
+    ~IKConstraint() override;
 
     /// Registers this class as an object factory.
     static void RegisterObject(Context* context);

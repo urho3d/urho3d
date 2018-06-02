@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ class URHO3D_API Geometry : public Object
 
 public:
     /// Construct with one empty vertex buffer.
-    Geometry(Context* context);
+    explicit Geometry(Context* context);
     /// Destruct.
-    virtual ~Geometry() override;
+    ~Geometry() override;
 
     /// Set number of vertex buffers.
     bool SetNumVertexBuffers(unsigned num);
@@ -59,11 +59,11 @@ public:
     /// Set the LOD distance.
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
-    void SetRawVertexData(SharedArrayPtr<unsigned char> data, const PODVector<VertexElement>& elements);
+    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements);
     /// Override raw vertex data to be returned for CPU-side operations using a legacy vertex bitmask.
-    void SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned elementMask);
+    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask);
     /// Override raw index data to be returned for CPU-side operations.
-    void SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize);
+    void SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize);
     /// Draw.
     void Draw(Graphics* graphics);
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ public:
     using ConstIterator = RandomAccessConstIterator<char>;
 
     /// Construct empty.
-    String() :
+    String() noexcept :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -61,7 +61,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(const char* str) :
+    String(const char* str) :   // NOLINT(google-explicit-constructor)
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -70,7 +70,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(char* str) :
+    String(char* str) :         // NOLINT(google-explicit-constructor)
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -89,7 +89,7 @@ public:
     }
 
     /// Construct from a null-terminated wide character array.
-    String(const wchar_t* str) :
+    explicit String(const wchar_t* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -98,7 +98,7 @@ public:
     }
 
     /// Construct from a null-terminated wide character array.
-    String(wchar_t* str) :
+    explicit String(wchar_t* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -107,7 +107,7 @@ public:
     }
 
     /// Construct from a wide character string.
-    String(const WString& str);
+    explicit String(const WString& str);
 
     /// Construct from an integer.
     explicit String(int value);
@@ -224,7 +224,7 @@ public:
     String& operator +=(bool rhs);
 
     /// Add-assign (concatenate as string) an arbitrary type.
-    template <class T> String operator +=(const T& rhs) { return *this += rhs.ToString(); }
+    template <class T> String& operator +=(const T& rhs) { return *this += rhs.ToString(); }
 
     /// Add a string.
     String operator +(const String& rhs) const
@@ -446,7 +446,7 @@ public:
         const char* ptr = buffer_;
         while (*ptr)
         {
-            hash = *ptr + (hash << 6) + (hash << 16) - hash;
+            hash = *ptr + (hash << 6u) + (hash << 16u) - hash;
             ++ptr;
         }
 
@@ -477,7 +477,7 @@ public:
     String& AppendWithFormatArgs(const char* formatString, va_list args);
 
     /// Compare two C strings.
-    static int Compare(const char* str1, const char* str2, bool caseSensitive);
+    static int Compare(const char* lhs, const char* rhs, bool caseSensitive);
 
     /// Position for "not found."
     static const unsigned NPOS = 0xffffffff;
@@ -548,7 +548,7 @@ public:
     /// Construct empty.
     WString();
     /// Construct from a string.
-    WString(const String& str);
+    explicit WString(const String& str);
     /// Destruct.
     ~WString();
 

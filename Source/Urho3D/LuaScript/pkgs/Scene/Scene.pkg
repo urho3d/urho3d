@@ -16,7 +16,7 @@ class Scene : public Node
 {
     Scene();
     virtual ~Scene();
-    
+
     tolua_outside bool SceneLoad @ Load(File* source);
     tolua_outside bool SceneSave @ Save(File* dest) const;
     tolua_outside bool SceneLoad @ Load(const String fileName);
@@ -47,9 +47,11 @@ class Scene : public Node
     void SetSmoothingConstant(float constant);
     void SetSnapThreshold(float threshold);
     void SetAsyncLoadingMs(int ms);
-    
+
     Node* GetNode(unsigned id) const;
-    //Component* GetComponent(unsigned id) const;
+    Component* GetComponent(unsigned id) const;
+    Component* GetComponent(const String type, bool recursive = false) const; // Copy-pasted from Node.pkg to avoid shadowing
+    static bool IsReplicatedID(unsigned id);
 
     bool IsUpdateEnabled() const;
     bool IsAsyncLoading() const;
@@ -82,9 +84,9 @@ class Scene : public Node
     void MarkNetworkUpdate(Node* node);
     void MarkNetworkUpdate(Component* component);
     void MarkReplicationDirty(Node* node);
-    
+
     // bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const;
-    tolua_outside const PODVector<Node*>&  SceneGetNodesWithTag @ GetNodesWithTag( const String& tag) const; 
+    tolua_outside const PODVector<Node*>&  SceneGetNodesWithTag @ GetNodesWithTag( const String& tag) const;
 
     tolua_property__is_set bool updateEnabled;
     tolua_readonly tolua_property__is_set bool asyncLoading;

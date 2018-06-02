@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace Urho3D
 {
@@ -72,7 +72,7 @@ template <class T> class Allocator
 {
 public:
     /// Construct.
-    Allocator(unsigned initialCapacity = 0) :
+    explicit Allocator(unsigned initialCapacity = 0) :
         allocator_(nullptr)
     {
         if (initialCapacity)
@@ -85,12 +85,17 @@ public:
         AllocatorUninitialize(allocator_);
     }
 
+    /// Prevent copy construction.
+    Allocator(const Allocator<T>& rhs) = delete;
+    /// Prevent assignment.
+    Allocator<T>& operator =(const Allocator<T>& rhs) = delete;
+
     /// Reserve and default-construct an object.
     T* Reserve()
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize((unsigned)sizeof(T));
-        T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
+        auto* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T();
 
         return newObject;
@@ -101,7 +106,7 @@ public:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize((unsigned)sizeof(T));
-        T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
+        auto* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T(object);
 
         return newObject;
@@ -115,11 +120,6 @@ public:
     }
 
 private:
-    /// Prevent copy construction.
-    Allocator(const Allocator<T>& rhs);
-    /// Prevent assignment.
-    Allocator<T>& operator =(const Allocator<T>& rhs);
-
     /// Allocator block.
     AllocatorBlock* allocator_;
 };

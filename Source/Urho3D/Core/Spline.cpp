@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,12 +50,6 @@ Spline::Spline(InterpolationMode mode) :
 Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode) :
     interpolationMode_(mode),
     knots_(knots)
-{
-}
-
-Spline::Spline(const Spline& rhs) :
-    interpolationMode_(rhs.interpolationMode_),
-    knots_(rhs.knots_)
 {
 }
 
@@ -203,7 +197,7 @@ Variant Spline::CatmullRomInterpolation(const Vector<Variant>& knots, float t) c
         if (t >= 1.f)
             return knots[knots.Size() - 2];
 
-        int originIndex = static_cast<int>(t * (knots.Size() - 3));
+        auto originIndex = static_cast<int>(t * (knots.Size() - 3));
         t = fmodf(t * (knots.Size() - 3), 1.f);
         float t2 = t * t;
         float t3 = t2 * t;

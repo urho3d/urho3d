@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,9 +38,9 @@ class URHO3D_API Engine : public Object
 
 public:
     /// Construct.
-    Engine(Context* context);
+    explicit Engine(Context* context);
     /// Destruct. Free all subsystems.
-    virtual ~Engine() override;
+    ~Engine() override;
 
     /// Initialize engine using parameters given and show the application window. Return true if successful.
     bool Initialize(const VariantMap& parameters);

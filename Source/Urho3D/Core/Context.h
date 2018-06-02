@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ public:
     /// Construct.
     Context();
     /// Destruct.
-    virtual ~Context() override;
+    ~Context() override;
 
     /// Create an object by type. Return pointer to it or null if no factory found.
     template <class T> inline SharedPtr<T> CreateObject()
@@ -85,7 +85,7 @@ public:
     /// Register a factory for an object type and specify the object category.
     void RegisterFactory(ObjectFactory* factory, const char* category);
     /// Register a subsystem.
-    void RegisterSubsystem(Object* subsystem);
+    void RegisterSubsystem(Object* object);
     /// Remove a subsystem.
     void RemoveSubsystem(StringHash objectType);
     /// Register object attribute.
@@ -255,7 +255,7 @@ template <class T> void Context::RegisterFactory(const char* category)
 
 template <class T> T* Context::RegisterSubsystem()
 {
-    T* subsystem = new T(this);
+    auto* subsystem = new T(this);
     RegisterSubsystem(subsystem);
     return subsystem;
 }

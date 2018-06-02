@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,12 +59,6 @@ struct CollisionGeometryData;
 /// Physics raycast hit.
 struct URHO3D_API PhysicsRaycastResult
 {
-    /// Construct with defaults.
-    PhysicsRaycastResult() :
-        body_(nullptr)
-    {
-    }
-
     /// Test for inequality, added to prevent GCC from complaining.
     bool operator !=(const PhysicsRaycastResult& rhs) const
     {
@@ -76,11 +70,11 @@ struct URHO3D_API PhysicsRaycastResult
     /// Hit worldspace normal.
     Vector3 normal_;
     /// Hit distance from ray origin.
-    float distance_;
+    float distance_{};
     /// Hit fraction.
-    float hitFraction_;
+    float hitFraction_{};
     /// Rigid body that was hit.
-    RigidBody* body_;
+    RigidBody* body_{};
 };
 
 /// Delayed world transform assignment for parented rigidbodies.
@@ -124,6 +118,7 @@ struct PhysicsWorldConfig
     btCollisionConfiguration* collisionConfig_;
 };
 
+static const int DEFAULT_FPS = 60;
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Cache of collision geometry data.
@@ -139,32 +134,32 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 
 public:
     /// Construct.
-    PhysicsWorld(Context* scontext);
+    explicit PhysicsWorld(Context* context);
     /// Destruct.
-    virtual ~PhysicsWorld() override;
+    ~PhysicsWorld() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Check if an AABB is visible for debug drawing.
-    virtual bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override;
+    bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override;
     /// Draw a physics debug line.
-    virtual void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
+    void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
     /// Log warning from the physics engine.
-    virtual void reportErrorWarning(const char* warningString) override;
+    void reportErrorWarning(const char* warningString) override;
     /// Draw a physics debug contact point. Not implemented.
-    virtual void drawContactPoint
+    void drawContactPoint
         (const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) override;
     /// Draw physics debug 3D text. Not implemented.
-    virtual void draw3dText(const btVector3& location, const char* textString) override;
+    void draw3dText(const btVector3& location, const char* textString) override;
 
     /// Set debug draw flags.
-    virtual void setDebugMode(int debugMode) override { debugMode_ = debugMode; }
+    void setDebugMode(int debugMode) override { debugMode_ = debugMode; }
 
     /// Return debug draw flags.
-    virtual int getDebugMode() const override { return debugMode_; }
+    int getDebugMode() const override { return debugMode_; }
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Step the simulation forward.
     void Update(float timeStep);
@@ -194,7 +189,8 @@ public:
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
-    void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// overlapDistance is used to make sure there are no gap between segments, and must be smaller than segmentDistance.
+    void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED, float overlapDistance = 0.1f);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast
         (PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
@@ -251,9 +247,9 @@ public:
     /// Remove a collision shape. Called by CollisionShape.
     void RemoveCollisionShape(CollisionShape* shape);
     /// Add a constraint to keep track of. Called by Constraint.
-    void AddConstraint(Constraint* joint);
+    void AddConstraint(Constraint* constraint);
     /// Remove a constraint. Called by Constraint.
-    void RemoveConstraint(Constraint* joint);
+    void RemoveConstraint(Constraint* constraint);
     /// Add a delayed world transform assignment. Called by RigidBody.
     void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
     /// Add debug geometry to the debug renderer.
@@ -292,7 +288,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
 
 private:
     /// Handle the scene subsystem update event, step simulation here.
@@ -305,7 +301,7 @@ private:
     void SendCollisionEvents();
 
     /// Bullet collision configuration.
-    btCollisionConfiguration* collisionConfiguration_;
+    btCollisionConfiguration* collisionConfiguration_{};
     /// Bullet collision dispatcher.
     UniquePtr<btDispatcher> collisionDispatcher_;
     /// Bullet collision broadphase.
@@ -341,29 +337,29 @@ private:
     /// Preallocated buffer for physics collision contact data.
     VectorBuffer contacts_;
     /// Simulation substeps per second.
-    unsigned fps_;
+    unsigned fps_{DEFAULT_FPS};
     /// Maximum number of simulation substeps per frame. 0 (default) unlimited, or negative values for adaptive timestep.
-    int maxSubSteps_;
+    int maxSubSteps_{};
     /// Time accumulator for non-interpolated mode.
-    float timeAcc_;
+    float timeAcc_{};
     /// Maximum angular velocity for network replication.
-    float maxNetworkAngularVelocity_;
+    float maxNetworkAngularVelocity_{DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY};
     /// Automatic simulation update enabled flag.
-    bool updateEnabled_;
+    bool updateEnabled_{true};
     /// Interpolation flag.
-    bool interpolation_;
+    bool interpolation_{true};
     /// Use internal edge utility flag.
-    bool internalEdge_;
+    bool internalEdge_{true};
     /// Applying transforms flag.
-    bool applyingTransforms_;
+    bool applyingTransforms_{};
     /// Simulating flag.
-    bool simulating_;
+    bool simulating_{};
     /// Debug draw depth test mode.
-    bool debugDepthTest_;
+    bool debugDepthTest_{};
     /// Debug renderer.
-    DebugRenderer* debugRenderer_;
+    DebugRenderer* debugRenderer_{};
     /// Debug draw flags.
-    int debugMode_;
+    int debugMode_{};
 };
 
 /// Register Physics library objects.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,12 +76,8 @@ void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
 
 CrowdManager::CrowdManager(Context* context) :
     Component(context),
-    crowd_(nullptr),
-    navigationMeshId_(0),
     maxAgents_(DEFAULT_MAX_AGENTS),
-    maxAgentRadius_(DEFAULT_MAX_AGENT_RADIUS),
-    numQueryFilterTypes_(0),
-    numObstacleAvoidanceTypes_(0)
+    maxAgentRadius_(DEFAULT_MAX_AGENT_RADIUS)
 {
     // The actual buffer is allocated inside dtCrowd, we only track the number of "slots" being configured explicitly
     numAreas_.Reserve(DT_CROWD_MAX_QUERY_FILTER_TYPE);
@@ -120,7 +116,7 @@ void CrowdManager::ApplyAttributes()
     Scene* scene = GetScene();
     if (scene && navigationMeshId_)
     {
-        NavigationMesh* navMesh = dynamic_cast<NavigationMesh*>(scene->GetComponent(navigationMeshId_));
+        auto* navMesh = dynamic_cast<NavigationMesh*>(scene->GetComponent(navigationMeshId_));
         if (navMesh && navMesh != navigationMesh_)
         {
             SetNavigationMesh(navMesh); // This will also CreateCrowd(), so the rest of the function is unnecessary
@@ -147,7 +143,7 @@ void CrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 continue;
 
             // Draw CrowdAgent shape (from its radius & height)
-            CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(ag->params.userData);
+            auto* crowdAgent = static_cast<CrowdAgent*>(ag->params.userData);
             crowdAgent->DrawDebugGeometry(debug, depthTest);
 
             // Draw move target if any
@@ -183,7 +179,7 @@ void CrowdManager::DrawDebugGeometry(bool depthTest)
     Scene* scene = GetScene();
     if (scene)
     {
-        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        auto* debug = scene->GetComponent<DebugRenderer>();
         if (debug)
             DrawDebugGeometry(debug, depthTest);
     }
@@ -314,7 +310,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
 
 void CrowdManager::SetIncludeFlags(unsigned queryFilterType, unsigned short flags)
 {
-    dtQueryFilter* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
+    auto* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
     if (filter)
     {
         filter->setIncludeFlags(flags);
@@ -326,7 +322,7 @@ void CrowdManager::SetIncludeFlags(unsigned queryFilterType, unsigned short flag
 
 void CrowdManager::SetExcludeFlags(unsigned queryFilterType, unsigned short flags)
 {
-    dtQueryFilter* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
+    auto* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
     if (filter)
     {
         filter->setExcludeFlags(flags);
@@ -338,7 +334,7 @@ void CrowdManager::SetExcludeFlags(unsigned queryFilterType, unsigned short flag
 
 void CrowdManager::SetAreaCost(unsigned queryFilterType, unsigned areaID, float cost)
 {
-    dtQueryFilter* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
+    auto* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
     if (filter && areaID < DT_MAX_AREAS)
     {
         filter->setAreaCost((int)areaID, cost);
@@ -363,7 +359,7 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
     {
         if (index + 10 <= value.Size())
         {
-            dtObstacleAvoidanceParams params;
+            dtObstacleAvoidanceParams params;       // NOLINT(hicpp-member-init)
             params.velBias = value[index++].GetFloat();
             params.weightDesVel = value[index++].GetFloat();
             params.weightCurVel = value[index++].GetFloat();
@@ -620,7 +616,7 @@ int CrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
 {
     if (!crowd_ || !navigationMesh_ || !agent)
         return -1;
-    dtCrowdAgentParams params;
+    dtCrowdAgentParams params{};
     params.userData = agent;
     if (agent->radius_ == 0.f)
         agent->radius_ = navigationMesh_->GetAgentRadius();
@@ -658,7 +654,7 @@ void CrowdManager::OnSceneSet(Scene* scene)
         // Attempt to auto discover a NavigationMesh component (or its derivative) under the scene node
         if (navigationMeshId_ == 0)
         {
-            NavigationMesh* navMesh = scene->GetDerivedComponent<NavigationMesh>(true);
+            auto* navMesh = scene->GetDerivedComponent<NavigationMesh>(true);
             if (navMesh)
                 SetNavigationMesh(navMesh);
             else
@@ -737,7 +733,7 @@ void CrowdManager::HandleComponentAdded(StringHash eventType, VariantMap& eventD
     Scene* scene = GetScene();
     if (scene)
     {
-        NavigationMesh* navMesh = scene->GetDerivedComponent<NavigationMesh>(true);
+        auto* navMesh = scene->GetDerivedComponent<NavigationMesh>(true);
         if (navMesh)
             SetNavigationMesh(navMesh);
     }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,14 +37,14 @@ class URHO3D_API ConstantBuffer : public Object, public GPUObject
 
 public:
     /// Construct.
-    ConstantBuffer(Context* context);
+    explicit ConstantBuffer(Context* context);
     /// Destruct.
-    virtual ~ConstantBuffer() override;
+    ~ConstantBuffer() override;
 
     /// Recreate the GPU resource and restore data if applicable.
-    virtual void OnDeviceReset() override;
+    void OnDeviceReset() override;
     /// Release the buffer.
-    virtual void Release() override;
+    void Release() override;
 
     /// Set size and create GPU-side buffer. Return true on success.
     bool SetSize(unsigned size);
@@ -65,9 +65,9 @@ private:
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Buffer byte size.
-    unsigned size_;
+    unsigned size_{};
     /// Dirty flag.
-    bool dirty_;
+    bool dirty_{};
 };
 
 }

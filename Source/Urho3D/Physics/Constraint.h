@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,20 +51,20 @@ class URHO3D_API Constraint : public Component
 
 public:
     /// Construct.
-    Constraint(Context* context);
+    explicit Constraint(Context* context);
     /// Destruct.
-    virtual ~Constraint() override;
+    ~Constraint() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Return the depended on nodes to order network updates.
-    virtual void GetDependencyNodes(PODVector<Node*>& dest) override;
+    void GetDependencyNodes(PODVector<Node*>& dest) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set constraint type and recreate the constraint.
     void SetConstraintType(ConstraintType type);
@@ -147,11 +147,11 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
 
 private:
     /// Create the constraint.

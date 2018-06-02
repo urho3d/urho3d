@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1318,7 +1318,8 @@ static void RegisterStaticModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "Model@+ get_model() const", asMETHOD(StaticModel, GetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void set_material(Material@+)", asMETHODPR(StaticModel, SetMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "bool set_materials(uint, Material@+)", asMETHODPR(StaticModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticModel", "Material@+ get_materials(uint) const", asMETHOD(StaticModel, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModel", "Material@+ get_material() const", asMETHODPR(StaticModel, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModel", "Material@+ get_materials(uint) const", asMETHODPR(StaticModel, GetMaterial, (unsigned) const, Material*), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_numGeometries() const", asMETHOD(StaticModel, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void set_occlusionLodLevel(uint) const", asMETHOD(StaticModel, SetOcclusionLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_occlusionLodLevel() const", asMETHOD(StaticModel, GetOcclusionLodLevel), asCALL_THISCALL);
@@ -1631,7 +1632,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(ParticleEffect, SetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "FaceCameraMode get_faceCameraMode() const", asMETHOD(ParticleEffect, GetFaceCameraMode), asCALL_THISCALL);
 
-    engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(Color&, float)", asMETHOD(ParticleEffect, AddColorTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(const Color&, float)", asMETHOD(ParticleEffect, AddColorTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void AddColorFrame(ColorFrame@+)", asMETHOD(ParticleEffect, AddColorFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void SortColorFrames()", asMETHOD(ParticleEffect, SortColorFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void RemoveColorFrame(uint)", asMETHOD(ParticleEffect, RemoveColorFrame), asCALL_THISCALL);
@@ -1640,7 +1641,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "uint get_numColorFrames() const", asMETHOD(ParticleEffect, GetNumColorFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "ColorFrame@+ GetColorFrame(uint) const", asMETHOD(ParticleEffect, GetColorFrame), asCALL_THISCALL);
 
-    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureTime(Rect&, float)", asMETHOD(ParticleEffect, AddTextureTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureTime(const Rect&, float)", asMETHOD(ParticleEffect, AddTextureTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void AddTextureFrame(TextureFrame@+)", asMETHOD(ParticleEffect, AddTextureFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void SortTextureFrames()", asMETHOD(ParticleEffect, SortTextureFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void RemoveTextureFrame(uint)", asMETHOD(ParticleEffect, RemoveTextureFrame), asCALL_THISCALL);
@@ -1714,6 +1715,8 @@ static void RegisterRibbonTrail(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RibbonTrail", "float get_endScale() const", asMETHOD(RibbonTrail, GetEndScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_trailType(TrailType)", asMETHOD(RibbonTrail, SetTrailType), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "TrailType get_trailType() const", asMETHOD(RibbonTrail, GetTrailType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RibbonTrail", "void set_baseVelocity(const Vector3&in)", asMETHOD(RibbonTrail, SetBaseVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RibbonTrail", "const Vector3& get_baseVelocity() const", asMETHOD(RibbonTrail, GetBaseVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_sorted(bool)", asMETHOD(RibbonTrail, SetSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "bool get_sorted() const", asMETHOD(RibbonTrail, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_lifetime(float)", asMETHOD(RibbonTrail, SetLifetime), asCALL_THISCALL);

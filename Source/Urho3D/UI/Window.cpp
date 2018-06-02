@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,9 +57,7 @@ Window::Window(Context* context) :
     SetEnabled(true);
 }
 
-Window::~Window()
-{
-}
+Window::~Window() = default;
 
 void Window::RegisterObject(Context* context)
 {
@@ -281,7 +279,7 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,13 +47,13 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     // If layout file is not given, use the default message box layout
     if (!layoutFile)
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         layoutFile = cache->GetResource<XMLFile>("UI/MessageBox.xml");
         if (!layoutFile)    // Error is already logged
             return;         // Note: windowless MessageBox should not be used!
     }
 
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     UIElement* root = ui->GetRoot();
     {
         SharedPtr<UIElement> holder = ui->LoadLayout(layoutFile, styleFile);
@@ -72,7 +72,7 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         messageText_->SetText(messageString);
 
     // Center window after the message is set
-    Window* window = dynamic_cast<Window*>(window_);
+    auto* window = dynamic_cast<Window*>(window_);
     if (window)
     {
         const IntVector2& size = window->GetSize();
@@ -88,10 +88,10 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         ui->SetFocusElement(okButton_);
         SubscribeToEvent(okButton_, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
-    Button* cancelButton = window_->GetChildDynamicCast<Button>("CancelButton", true);
+    auto* cancelButton = window_->GetChildDynamicCast<Button>("CancelButton", true);
     if (cancelButton)
         SubscribeToEvent(cancelButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
-    Button* closeButton = window_->GetChildDynamicCast<Button>("CloseButton", true);
+    auto* closeButton = window_->GetChildDynamicCast<Button>("CloseButton", true);
     if (closeButton)
         SubscribeToEvent(closeButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -73,64 +73,64 @@ class URHO3D_API JSONValue
 {
 public:
     /// Construct null value.
-    JSONValue() : 
+    JSONValue() :
         type_(0)
     {
     }
     /// Construct with a boolean.
-    JSONValue(bool value) :
+    JSONValue(bool value) :         // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a integer.
-    JSONValue(int value) :
+    JSONValue(int value) :          // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a unsigned integer.
-    JSONValue(unsigned value) :
+    JSONValue(unsigned value) :     // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a float.
-    JSONValue(float value) :
+    JSONValue(float value) :        // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a double.
-    JSONValue(double value) :
+    JSONValue(double value) :       // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a string.
-    JSONValue(const String& value) :
+    JSONValue(const String& value) :    // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a C string.
-    JSONValue(const char* value) :
+    JSONValue(const char* value) :      // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON array.
-    JSONValue(const JSONArray& value) :
+    JSONValue(const JSONArray& value) :     // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON object.
-    JSONValue(const JSONObject& value) :
+    JSONValue(const JSONObject& value) :    // NOLINT(google-explicit-constructor)
         type_(0)
     {
         *this = value;
-    }    
+    }
     /// Copy-construct from another JSON value.
     JSONValue(const JSONValue& value) :
         type_(0)

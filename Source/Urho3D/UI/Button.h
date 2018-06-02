@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,29 +34,29 @@ class URHO3D_API Button : public BorderImage
 
 public:
     /// Construct.
-    Button(Context* context);
+    explicit Button(Context* context);
     /// Destruct.
-    virtual ~Button() override;
+    ~Button() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Perform UI element update.
-    virtual void Update(float timeStep) override;
+    void Update(float timeStep) override;
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to mouse click begin.
-    virtual void OnClickBegin
+    void OnClickBegin
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse click end.
-    virtual void OnClickEnd
+    void OnClickEnd
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
             UIElement* beginElement) override;
     /// React to mouse drag motion.
-    virtual void OnDragMove
+    void OnDragMove
         (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
             Cursor* cursor) override;
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers) override;
+    void OnKey(int key, int buttons, int qualifiers) override;
 
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(const IntVector2& offset);
@@ -79,7 +79,7 @@ public:
 
     /// Return pressed image offset.
     const IntVector2& GetPressedOffset() const { return pressedOffset_; }
-    
+
     /// Return disabled image offset.
     const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
 

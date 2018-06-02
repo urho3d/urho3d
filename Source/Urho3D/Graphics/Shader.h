@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,16 +37,16 @@ class URHO3D_API Shader : public Resource
 
 public:
     /// Construct.
-    Shader(Context* context);
+    explicit Shader(Context* context);
     /// Destruct.
-    virtual ~Shader() override;
+    ~Shader() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
 
     /// Return a variation with defines. Separate multiple defines with spaces.
     ShaderVariation* GetVariation(ShaderType type, const String& defines);
@@ -61,7 +61,7 @@ public:
 
 private:
     /// Process source code and include files. Return true if successful.
-    bool ProcessSource(String& code, Deserializer& file);
+    bool ProcessSource(String& code, Deserializer& source);
     /// Sort the defines and strip extra spaces to prevent creation of unnecessary duplicate shader variations.
     String NormalizeDefines(const String& defines);
     /// Recalculate the memory used by the shader.

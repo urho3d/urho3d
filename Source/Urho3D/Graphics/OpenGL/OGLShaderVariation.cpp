@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -191,5 +191,12 @@ void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
 }
+
+// These methods are no-ops for OpenGL
+bool ShaderVariation::LoadByteCode(const String& binaryShaderName) { return false; }
+bool ShaderVariation::Compile() { return false; }
+void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize) {}
+void ShaderVariation::SaveByteCode(const String& binaryShaderName) {}
+void ShaderVariation::CalculateConstantBufferSizes() {}
 
 }

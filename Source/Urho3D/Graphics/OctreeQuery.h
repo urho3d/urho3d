@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,9 +47,12 @@ public:
     }
 
     /// Destruct.
-    virtual ~OctreeQuery()
-    {
-    }
+    virtual ~OctreeQuery() = default;
+
+    /// Prevent copy construction.
+    OctreeQuery(const OctreeQuery& rhs) = delete;
+    /// Prevent assignment.
+    OctreeQuery& operator =(const OctreeQuery& rhs) = delete;
 
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) = 0;
@@ -62,12 +65,6 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-
-private:
-    /// Prevent copy construction.
-    OctreeQuery(const OctreeQuery& rhs);
-    /// Prevent assignment.
-    OctreeQuery& operator =(const OctreeQuery& rhs);
 };
 
 /// Point octree query.
@@ -83,9 +80,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Point.
     Vector3 point_;
@@ -104,9 +101,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Sphere.
     Sphere sphere_;
@@ -125,9 +122,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Bounding box.
     BoundingBox box_;
@@ -146,9 +143,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Frustum.
     Frustum frustum_;
@@ -211,13 +208,13 @@ struct URHO3D_API RayQueryResult
     /// Hit texture position
     Vector2 textureUV_;
     /// Distance from ray origin.
-    float distance_;
+    float distance_{};
     /// Drawable.
     Drawable* drawable_;
     /// Scene node.
     Node* node_;
     /// Drawable specific subobject if applicable.
-    unsigned subObject_;
+    unsigned subObject_{};
 };
 
 /// Raycast octree query.
@@ -236,6 +233,11 @@ public:
     {
     }
 
+    /// Prevent copy construction.
+    RayOctreeQuery(const RayOctreeQuery& rhs) = delete;
+    /// Prevent assignment.
+    RayOctreeQuery& operator =(const RayOctreeQuery& rhs) = delete;
+
     /// Result vector reference.
     PODVector<RayQueryResult>& result_;
     /// Ray.
@@ -248,12 +250,6 @@ public:
     float maxDistance_;
     /// Raycast detail level.
     RayQueryLevel level_;
-
-private:
-    /// Prevent copy construction.
-    RayOctreeQuery(const RayOctreeQuery& rhs);
-    /// Prevent assignment.
-    RayOctreeQuery& operator =(const RayOctreeQuery& rhs);
 };
 
 class URHO3D_API AllContentOctreeQuery : public OctreeQuery
@@ -266,9 +262,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 };
 
 }

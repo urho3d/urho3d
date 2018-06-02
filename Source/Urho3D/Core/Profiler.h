@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -128,7 +128,7 @@ public:
                 return *i;
         }
 
-        ProfilerBlock* newBlock = new ProfilerBlock(this, name);
+        auto* newBlock = new ProfilerBlock(this, name);
         children_.Push(newBlock);
 
         return newBlock;
@@ -175,9 +175,9 @@ class URHO3D_API Profiler : public Object
 
 public:
     /// Construct.
-    Profiler(Context* context);
+    explicit Profiler(Context* context);
     /// Destruct.
-    virtual ~Profiler() override;
+    ~Profiler() override;
 
     /// Begin timing a profiling block.
     void BeginBlock(const char* name)

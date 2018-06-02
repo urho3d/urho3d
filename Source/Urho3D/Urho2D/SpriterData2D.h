@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,14 +52,14 @@ struct TimelineKey;
 /// Spriter data.
 struct SpriterData
 {
-    SpriterData();
+    SpriterData() = default;
     ~SpriterData();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
     bool Load(const void* data, size_t size);
 
-    int scmlVersion_;
+    int scmlVersion_{};
     String generator_;
     String generatorVersion_;
     PODVector<Folder*> folders_;
@@ -69,13 +69,13 @@ struct SpriterData
 /// Folder.
 struct Folder
 {
-    Folder();
+    Folder() = default;
     ~Folder();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
 
-    int id_;
+    int id_{};
     String name_;
     PODVector<File*> files_;
 };
@@ -83,30 +83,30 @@ struct Folder
 /// File.
 struct File
 {
-    File(Folder* folder);
-    ~File();
+    explicit File(Folder* folder);
+    ~File() = default;
 
     bool Load(const pugi::xml_node& node);
 
-    Folder* folder_;
-    int id_;
+    Folder* folder_{};
+    int id_{};
     String name_;
-    float width_;
-    float height_;
-    float pivotX_;
-    float pivotY_;
+    float width_{};
+    float height_{};
+    float pivotX_{};
+    float pivotY_{};
 };
 
 /// Entity.
 struct Entity
 {
-    Entity();
+    Entity() = default;
     ~Entity();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
 
-    int id_;
+    int id_{};
     String name_;
     PODVector<CharacterMap*> characterMaps_;
     PODVector<Animation*> animations_;
@@ -115,13 +115,13 @@ struct Entity
 /// Character map.
 struct CharacterMap
 {
-    CharacterMap();
+    CharacterMap() = default;
     ~CharacterMap();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
 
-    int id_;
+    int id_{};
     String name_;
     PODVector<MapInstruction*> maps_;
 };
@@ -129,30 +129,30 @@ struct CharacterMap
 /// Map instruction.
 struct MapInstruction
 {
-    MapInstruction();
-    ~MapInstruction();
+    MapInstruction() = default;
+    ~MapInstruction() = default;
 
     bool Load(const pugi::xml_node& node);
 
-    int folder_;
-    int file_;
-    int targetFolder_;
-    int targetFile_;
+    int folder_{};
+    int file_{};
+    int targetFolder_{};
+    int targetFile_{};
 };
 
 /// Animation.
 struct Animation
 {
-    Animation();
+    Animation() = default;
     ~Animation();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
 
-    int id_;
+    int id_{};
     String name_;
-    float length_;
-    bool looping_;
+    float length_{};
+    bool looping_{};
     PODVector<MainlineKey*> mainlineKeys_;
     PODVector<Timeline*> timelines_;
 };
@@ -160,14 +160,14 @@ struct Animation
 /// Mainline key.
 struct MainlineKey
 {
-    MainlineKey();
+    MainlineKey() = default;
     ~MainlineKey();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
 
-    int id_;
-    float time_;
+    int id_{};
+    float time_{};
     PODVector<Ref*> boneRefs_;
     PODVector<Ref*> objectRefs_;
 };
@@ -175,16 +175,16 @@ struct MainlineKey
 /// Ref.
 struct Ref
 {
-    Ref();
-    ~Ref();
+    Ref() = default;
+    ~Ref() = default;
 
     bool Load(const pugi::xml_node& node);
 
-    int id_;
-    int parent_;
-    int timeline_;
-    int key_;
-    int zIndex_;
+    int id_{};
+    int parent_{};
+    int timeline_{};
+    int key_{};
+    int zIndex_{};
 };
 
 /// Object type.
@@ -197,20 +197,20 @@ enum ObjectType
 /// Timeline.
 struct Timeline
 {
-    Timeline();
+    Timeline() = default;
     ~Timeline();
 
     void Reset();
     bool Load(const pugi::xml_node& node);
 
-    int id_;
+    int id_{};
     String name_;
     ObjectType objectType_;
     PODVector<SpatialTimelineKey*> keys_;
 };
 
 /// Curve type.
-enum CurveType 
+enum CurveType
 {
     INSTANT = 0,
     LINEAR,
@@ -221,8 +221,8 @@ enum CurveType
 /// Timeline key.
 struct TimelineKey
 {
-    TimelineKey(Timeline* timeline);
-    virtual ~TimelineKey();
+    explicit TimelineKey(Timeline* timeline);
+    virtual ~TimelineKey() = default;
 
     virtual ObjectType GetObjectType() const = 0;
     virtual TimelineKey* Clone() const = 0;
@@ -231,79 +231,82 @@ struct TimelineKey
     TimelineKey& operator=(const TimelineKey& rhs);
     float GetTByCurveType(float currentTime, float nextTimelineTime) const;
 
-    Timeline* timeline_;
-    int id_;
-    float time_;
-    CurveType curveType_;
-    float c1_;
-    float c2_;
+    Timeline* timeline_{};
+    int id_{};
+    float time_{};
+    CurveType curveType_{};
+    float c1_{};
+    float c2_{};
 };
 
 /// Spatial info.
 struct SpatialInfo
 {
+    SpatialInfo(float x, float y, float angle, float scale_x, float scale_y, float alpha = 1, int spin = 1);
+
+    SpatialInfo UnmapFromParent(const SpatialInfo& parentInfo) const;
+    void Interpolate(const SpatialInfo& other, float t);
+
     float x_;
     float y_;
     float angle_;
     float scaleX_;
     float scaleY_;
     float alpha_;
-    int spin;
-
-    SpatialInfo(float x = 0.0f, float y = 0.0f, float angle = 0.0f, float scale_x = 1, float scale_y = 1, float a = 1, int spin = 1);
-    SpatialInfo UnmapFromParent(const SpatialInfo& parentInfo) const;
-    void Interpolate(const SpatialInfo& other, float t);
+    int spin_;
 };
 
 /// Spatial timeline key.
 struct SpatialTimelineKey : TimelineKey
 {
+    explicit SpatialTimelineKey(Timeline* timeline);
+    ~SpatialTimelineKey() override = default;
+
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
+    SpatialTimelineKey& operator=(const SpatialTimelineKey& rhs) = default;
+
     SpatialInfo info_;
-
-    SpatialTimelineKey(Timeline* timeline);
-    virtual ~SpatialTimelineKey() override;
-
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
-    SpatialTimelineKey& operator=(const SpatialTimelineKey& rhs);
 };
 
 /// Bone timeline key.
 struct BoneTimelineKey : SpatialTimelineKey
 {
-    float length_;
-    float width_;
+    explicit BoneTimelineKey(Timeline* timeline);
+    ~BoneTimelineKey() override = default;
 
-    BoneTimelineKey(Timeline* timeline);
-    virtual ~BoneTimelineKey() override;
+    ObjectType GetObjectType() const override { return BONE; }
 
-    virtual ObjectType GetObjectType() const override { return BONE; }
-    virtual TimelineKey* Clone() const override;
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
-    BoneTimelineKey& operator=(const BoneTimelineKey& rhs);
+    TimelineKey* Clone() const override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
+    BoneTimelineKey& operator=(const BoneTimelineKey& rhs) = default;
+
+    float length_{};
+    float width_{};
 };
 
 /// Sprite timeline key.
 struct SpriteTimelineKey : SpatialTimelineKey
 {
-    int folderId_;
-    int fileId_;
-    bool useDefaultPivot_;
-    float pivotX_;
-    float pivotY_;
+    explicit SpriteTimelineKey(Timeline* timeline);
+    ~SpriteTimelineKey() override = default;
+
+    ObjectType GetObjectType() const override { return SPRITE; }
+
+    TimelineKey* Clone() const override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
+    SpriteTimelineKey& operator=(const SpriteTimelineKey& rhs);
+
+    int folderId_{};
+    int fileId_{};
+    bool useDefaultPivot_{};
+    float pivotX_{};
+    float pivotY_{};
 
     /// Run time data.
-    int zIndex_;
-
-    SpriteTimelineKey(Timeline* timeline);
-    virtual ~SpriteTimelineKey() override;
-
-    virtual ObjectType GetObjectType() const override { return SPRITE; }
-    virtual TimelineKey* Clone() const override;
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
-    SpriteTimelineKey& operator=(const SpriteTimelineKey& rhs);
+    int zIndex_{};
 };
 
 }

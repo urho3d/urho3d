@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,14 +40,14 @@ class URHO3D_API View3D : public Window
 
 public:
     /// Construct.
-    View3D(Context* context);
+    explicit View3D(Context* context);
     /// Destruct.
-    virtual ~View3D() override;
+    ~View3D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Define the scene and camera to use in rendering. When ownScene is true the View3D will take ownership of them with shared pointers.
     void SetView(Scene* scene, Camera* camera, bool ownScene = true);

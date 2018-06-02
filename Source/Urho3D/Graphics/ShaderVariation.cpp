@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,16 +31,35 @@
 namespace Urho3D
 {
 
+ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) :   // NOLINT(hicpp-member-init)
+    name_{name},
+    glType_{glType},
+    location_{location}
+{
+}
+
+ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer) :    // NOLINT(hicpp-member-init)
+    type_{type},
+    name_{name},
+    offset_{offset},
+    size_{size},
+    buffer_{buffer}
+{
+}
+
+ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) :    // NOLINT(hicpp-member-init)
+    type_{type},
+    name_{name},
+    register_{reg},
+    regCount_{regCount}
+{
+}
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    type_(type),
-    elementHash_(0)
+    type_(type)
 {
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        constantBufferSizes_[i] = 0;
 }
 
 ShaderVariation::~ShaderVariation()

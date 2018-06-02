@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,13 @@
 namespace Urho3D
 {
 
+const IntVector3 RaycastVehicle::RIGHT_UP_FORWARD(0, 1, 2);
+const IntVector3 RaycastVehicle::RIGHT_FORWARD_UP(0, 2, 1);
+const IntVector3 RaycastVehicle::UP_FORWARD_RIGHT(1, 2, 0);
+const IntVector3 RaycastVehicle::UP_RIGHT_FORWARD(1, 0, 2);
+const IntVector3 RaycastVehicle::FORWARD_RIGHT_UP(2, 0, 1);
+const IntVector3 RaycastVehicle::FORWARD_UP_RIGHT(2, 1, 0);
+
 struct RaycastVehicleData
 {
     RaycastVehicleData()
@@ -45,10 +52,8 @@ struct RaycastVehicleData
 
     ~RaycastVehicleData()
     {
-        if (vehicleRayCaster_)
-        {
-            delete vehicleRayCaster_;
-        }
+        delete vehicleRayCaster_;
+
         vehicleRayCaster_ = nullptr;
         if (vehicle_)
         {
@@ -69,19 +74,15 @@ struct RaycastVehicleData
         return vehicle_;
     }
 
-    void Init(Scene* scene, RigidBody* body, bool enabled)
+    void Init(Scene* scene, RigidBody* body, bool enabled, const IntVector3& coordinateSystem)
     {
-        int rightIndex = 0;
-        int upIndex = 1;
-        int forwardIndex = 2;
-        PhysicsWorld* pPhysWorld = scene->GetComponent<PhysicsWorld>();
+        auto* pPhysWorld = scene->GetComponent<PhysicsWorld>();
         btDynamicsWorld* pbtDynWorld = pPhysWorld->GetWorld();
         if (!pbtDynWorld)
             return;
 
         // Delete old vehicle & action first
-        if (vehicleRayCaster_)
-            delete vehicleRayCaster_;
+        delete vehicleRayCaster_;
         if (vehicle_)
         {
             if (added_)
@@ -98,8 +99,14 @@ struct RaycastVehicleData
             added_ = true;
         }
 
-        vehicle_->setCoordinateSystem(rightIndex, upIndex, forwardIndex);
+        SetCoordinateSystem(coordinateSystem);
         physWorld_ = pPhysWorld;
+    }
+
+    void SetCoordinateSystem(const IntVector3& coordinateSystem)
+    {
+        if (vehicle_)
+            vehicle_->setCoordinateSystem(coordinateSystem.x_, coordinateSystem.y_, coordinateSystem.z_);
     }
 
     void SetEnabled(bool enabled)
@@ -135,6 +142,7 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     // fixed update() for inputs and post update() to sync wheels for rendering
     SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
     vehicleData_ = new RaycastVehicleData();
+    coordinateSystem_ = RIGHT_UP_FORWARD;
     wheelNodes_.Clear();
     activate_ = false;
     inAirRPM_ = 0.0f;
@@ -180,6 +188,7 @@ void RaycastVehicle::RegisterObject(Context* context)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);
     URHO3D_ATTRIBUTE("Maximum side slip threshold", float, maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Coordinate system", IntVector3, coordinateSystem_, RIGHT_UP_FORWARD, AM_DEFAULT);
 }
 
 void RaycastVehicle::OnSetEnabled()
@@ -193,7 +202,7 @@ void RaycastVehicle::ApplyAttributes()
     int index = 0;
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_, IsEnabledEffective());
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem_);
     VariantVector& value = loadedWheelData_;
     int numObjects = value[index++].GetInt();
     int wheelIndex = 0;
@@ -271,7 +280,7 @@ void RaycastVehicle::Init()
 {
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_, IsEnabledEffective());
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem_);
 }
 
 void RaycastVehicle::FixedUpdate(float timeStep)
@@ -412,7 +421,7 @@ Vector3 RaycastVehicle::GetWheelPosition(int wheel)
 Quaternion RaycastVehicle::GetWheelRotation(int wheel)
 {
     btRaycastVehicle* vehicle = vehicleData_->Get();
-    btTransform transform = vehicle->getWheelTransformWS(wheel);
+    const btTransform& transform = vehicle->getWheelTransformWS(wheel);
     Quaternion rotation = ToQuaternion(transform.getRotation());
     return rotation;
 }
@@ -671,6 +680,12 @@ void RaycastVehicle::SetInAirRPM(float rpm)
 float RaycastVehicle::GetInAirRPM() const
 {
     return inAirRPM_;
+}
+
+void RaycastVehicle::SetCoordinateSystem(const IntVector3& coordinateSystem)
+{
+    coordinateSystem_ = coordinateSystem;
+    vehicleData_->SetCoordinateSystem(coordinateSystem_);
 }
 
 void RaycastVehicle::ResetWheels()

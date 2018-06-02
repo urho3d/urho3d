@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,12 +35,12 @@ class URHO3D_API FontFaceBitmap : public FontFace
 {
 public:
     /// Construct.
-    FontFaceBitmap(Font* font);
+    explicit FontFaceBitmap(Font* font);
     /// Destruct.
-    virtual ~FontFaceBitmap() override;
+    ~FontFaceBitmap() override;
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) override;
+    bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) override;
     /// Load from existed font face, pack used glyphs into smallest texture size and smallest number of texture.
     bool Load(FontFace* fontFace, bool usedGlyphs);
     /// Save as a new bitmap font type in XML format. Return true if successful.

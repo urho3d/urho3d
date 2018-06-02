@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -112,9 +112,7 @@ Animation::Animation(Context* context) :
 {
 }
 
-Animation::~Animation()
-{
-}
+Animation::~Animation() = default;
 
 void Animation::RegisterObject(Context* context)
 {
@@ -166,7 +164,7 @@ bool Animation::BeginLoad(Deserializer& source)
     }
 
     // Optionally read triggers from an XML file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
@@ -256,7 +254,7 @@ bool Animation::Save(Serializer& dest) const
     // If triggers have been defined, write an XML file for them
     if (!triggers_.Empty() || HasMetadata())
     {
-        File* destFile = dynamic_cast<File*>(&dest);
+        auto* destFile = dynamic_cast<File*>(&dest);
         if (destFile)
         {
             String xmlName = ReplaceExtension(destFile->GetName(), ".xml");

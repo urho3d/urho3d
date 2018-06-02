@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,10 @@
 namespace Urho3D
 {
 
-RenderSurface::RenderSurface(Texture* parentTexture) :
+RenderSurface::RenderSurface(Texture* parentTexture) :      // NOLINT(hicpp-member-init)
     parentTexture_(parentTexture),
     renderTargetView_(nullptr),
-    readOnlyView_(nullptr),
-    updateMode_(SURFACE_UPDATEVISIBLE),
-    updateQueued_(false)
+    readOnlyView_(nullptr)
 {
 }
 
@@ -53,7 +51,7 @@ void RenderSurface::Release()
             if (graphics->GetRenderTarget(i) == this)
                 graphics->ResetRenderTarget(i);
         }
-        
+
         if (graphics->GetDepthStencil() == this)
             graphics->ResetDepthStencil();
     }

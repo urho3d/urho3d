@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,9 +47,9 @@ class URHO3D_API Serializable : public Object
 
 public:
     /// Construct.
-    Serializable(Context* context);
+    explicit Serializable(Context* context);
     /// Destruct.
-    virtual ~Serializable() override;
+    ~Serializable() override;
 
     /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
@@ -59,16 +59,16 @@ public:
     virtual const Vector<AttributeInfo>* GetAttributes() const;
     /// Return network replication attribute descriptions, or null if none defined.
     virtual const Vector<AttributeInfo>* GetNetworkAttributes() const;
-    /// Load from binary data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
+    /// Load from binary data. Return true if successful.
+    virtual bool Load(Deserializer& source);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from XML data. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
-    /// Load from JSON data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source);
     /// Save as JSON data. Return true if successful.
     virtual bool SaveJSON(JSONValue& dest) const;
 
@@ -85,6 +85,8 @@ public:
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
+    /// Set instance-level default flag.
+    void SetInstanceDefault(bool enable) { setInstanceDefault_ = enable; }
     /// Reset all editable attributes to their default values.
     void ResetToDefault();
     /// Remove instance's default values if they are set previously.
@@ -140,6 +142,8 @@ private:
 
     /// Attribute default value at each instance level.
     UniquePtr<VariantMap> instanceDefaultValues_;
+    /// When true, store the attribute value as instance's default value (internal use only).
+    bool setInstanceDefault_;
     /// Temporary flag.
     bool temporary_;
 };
@@ -153,7 +157,7 @@ public:
     VariantAttributeAccessorImpl(TGetFunction getFunction, TSetFunction setFunction) : getFunction_(getFunction), setFunction_(setFunction) { }
 
     /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& value) const override
+    void Get(const Serializable* ptr, Variant& value) const override
     {
         assert(ptr);
         const auto classPtr = static_cast<const TClassType*>(ptr);
@@ -161,7 +165,7 @@ public:
     }
 
     /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value) override
+    void Set(Serializable* ptr, const Variant& value) override
     {
         assert(ptr);
         auto classPtr = static_cast<TClassType*>(ptr);

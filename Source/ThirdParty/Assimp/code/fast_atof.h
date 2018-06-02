@@ -13,6 +13,7 @@
 //     to ensure long numbers are handled correctly
 // ------------------------------------------------------------------------------------
 
+
 #ifndef __FAST_A_TO_F_H_INCLUDED__
 #define __FAST_A_TO_F_H_INCLUDED__
 
@@ -359,7 +360,7 @@ inline const char* fast_atoreal_move(const char* c, Real& out, bool check_comma 
 // The same but more human.
 inline ai_real fast_atof(const char* c)
 {
-    ai_real ret;
+    ai_real ret(0.0);
     fast_atoreal_move<ai_real>(c, ret);
     return ret;
 }
@@ -367,7 +368,7 @@ inline ai_real fast_atof(const char* c)
 
 inline ai_real fast_atof( const char* c, const char** cout)
 {
-    ai_real ret;
+    ai_real ret(0.0);
     *cout = fast_atoreal_move<ai_real>(c, ret);
 
     return ret;
@@ -375,7 +376,7 @@ inline ai_real fast_atof( const char* c, const char** cout)
 
 inline ai_real fast_atof( const char** inout)
 {
-    ai_real ret;
+    ai_real ret(0.0);
     *inout = fast_atoreal_move<ai_real>(*inout, ret);
 
     return ret;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
         return result;
     }
 
-    unsigned numCols = (unsigned)sqlite3_column_count(pStmt);
+    auto numCols = (unsigned)sqlite3_column_count(pStmt);
     result.columns_.Resize(numCols);
     for (unsigned i = 0; i < numCols; ++i)
         result.columns_[i] = sqlite3_column_name(pStmt, i);
@@ -90,7 +90,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     bool filtered = false;
     bool aborted = false;
 
-    while (1)
+    while (true)
     {
         rc = sqlite3_step(pStmt);
         if (rc == SQLITE_ROW)

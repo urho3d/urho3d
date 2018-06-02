@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,12 +42,12 @@ class URHO3D_API LogicComponent : public Component
     URHO3D_OBJECT(LogicComponent, Component);
 
     /// Construct.
-    LogicComponent(Context* context);
+    explicit LogicComponent(Context* context);
     /// Destruct.
-    virtual ~LogicComponent() override;
+    ~LogicComponent() override;
 
     /// Handle enabled/disabled state change. Changes update event subscription.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Called when the component is added to a scene node. Other components may not yet exist.
     virtual void Start() { }
@@ -78,9 +78,9 @@ class URHO3D_API LogicComponent : public Component
 
 protected:
     /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
 
 private:
     /// Subscribe/unsubscribe to update events based on current enabled state and update event mask.

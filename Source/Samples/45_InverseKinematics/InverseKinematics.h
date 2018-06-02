@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,35 +34,37 @@ class Scene;
 }
 
 /// Inverse Kinematics demo.
-/// This sample demonstrates how to adjust the position of animated feet so they match the ground's angle using IK
+/// This sample demonstrates how to adjust the position of animated feet so they match the ground's angle using IK.
 class InverseKinematics : public Sample
 {
     URHO3D_OBJECT(InverseKinematics, Sample);
 
 public:
     /// Construct.
-    InverseKinematics(Context* context);
+    explicit InverseKinematics(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start() override;
+    void Start() override;
 
 protected:
     /// Animation controller of Jack.
     SharedPtr<Urho3D::AnimationController> jackAnimCtrl_;
-    /// Inverse kinematic effectors and solver
+    /// Inverse kinematic left effector.
     SharedPtr<Urho3D::IKEffector> leftEffector_;
+    /// Inverse kinematic right effector.
     SharedPtr<Urho3D::IKEffector> rightEffector_;
+    /// Inverse kinematic solver.
     SharedPtr<Urho3D::IKSolver> solver_;
-    /// Need references to these nodes to calculate foot angles and offsets
+    /// Need references to these nodes to calculate foot angles and offsets.
     SharedPtr<Urho3D::Node> leftFoot_;
     SharedPtr<Urho3D::Node> rightFoot_;
     SharedPtr<Urho3D::Node> jackNode_;
-    /// So we can rotate the floor
+    /// So we can rotate the floor.
     SharedPtr<Urho3D::Node> floorNode_;
-    float floorPitch_;
-    float floorRoll_;
-    /// Whether or not to draw debug geometry
-    bool drawDebug_;
+    float floorPitch_{};
+    float floorRoll_{};
+    /// Whether or not to draw debug geometry.
+    bool drawDebug_{};
 
 private:
     /// Construct the scene content.
@@ -77,10 +79,10 @@ private:
     void SubscribeToEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Draw debug geometry
+    /// Draw debug geometry.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    /// Process IK logic
+    /// Process IK logic.
     void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
-
+    /// Camera node.
     SharedPtr<Node> cameraRotateNode_;
 };

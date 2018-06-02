@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,14 +49,14 @@ class URHO3D_API Font : public Resource
 
 public:
     /// Construct.
-    Font(Context* context);
+    explicit Font(Context* context);
     /// Destruct.
-    virtual ~Font() override;
+    ~Font() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false, const String& indentation = "\t");
     /// Set absolute (in pixels) position adjustment for glyphs.

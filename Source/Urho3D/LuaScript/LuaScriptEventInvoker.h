@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +37,11 @@ class LuaScriptEventInvoker : public Object
 
 public:
     /// Construct.
-    LuaScriptEventInvoker(Context* context);
+    explicit LuaScriptEventInvoker(Context* context);
     /// Construct from LuaScriptInstance.
-    LuaScriptEventInvoker(LuaScriptInstance* instance);
+    explicit LuaScriptEventInvoker(LuaScriptInstance* instance);
     /// Destruct.
-    virtual ~LuaScriptEventInvoker() override;
+    ~LuaScriptEventInvoker() override;
 
     /// Add a scripted event handler.
     void AddEventHandler(Object* sender, const StringHash& eventType, LuaFunction* function);

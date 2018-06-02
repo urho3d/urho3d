@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,10 +38,7 @@ class MemoryBuffer;
 class Scene;
 
 /// MessageConnection hash function.
-template <class T> unsigned MakeHash(kNet::MessageConnection* value)
-{
-    return ((unsigned)(size_t)value) >> 9;
-}
+template <class T> unsigned MakeHash(kNet::MessageConnection* value) { return (unsigned)((size_t)value >> 9u); }
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
@@ -50,19 +47,19 @@ class URHO3D_API Network : public Object, public kNet::IMessageHandler, public k
 
 public:
     /// Construct.
-    Network(Context* context);
+    explicit Network(Context* context);
     /// Destruct.
-    virtual ~Network() override;
+    ~Network() override;
 
     /// Handle a kNet message from either a client or the server.
-    virtual void HandleMessage
+    void HandleMessage
         (kNet::MessageConnection* source, kNet::packet_id_t packetId, kNet::message_id_t msgId, const char* data, size_t numBytes) override;
     /// Compute the content ID for a message.
-    virtual u32 ComputeContentID(kNet::message_id_t msgId, const char* data, size_t numBytes) override;
+    u32 ComputeContentID(kNet::message_id_t msgId, const char* data, size_t numBytes) override;
     /// Handle a new client connection.
-    virtual void NewConnectionEstablished(kNet::MessageConnection* connection) override;
+    void NewConnectionEstablished(kNet::MessageConnection* connection) override;
     /// Handle a client disconnection.
-    virtual void ClientDisconnected(kNet::MessageConnection* connection) override;
+    void ClientDisconnected(kNet::MessageConnection* connection) override;
 
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);

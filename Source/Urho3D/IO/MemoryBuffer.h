@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,16 +36,16 @@ public:
     /// Construct as read-only with a pointer and size.
     MemoryBuffer(const void* data, unsigned size);
     /// Construct from a vector, which must not go out of scope before MemoryBuffer.
-    MemoryBuffer(PODVector<unsigned char>& data);
+    explicit MemoryBuffer(PODVector<unsigned char>& data);
     /// Construct from a read-only vector, which must not go out of scope before MemoryBuffer.
-    MemoryBuffer(const PODVector<unsigned char>& data);
+    explicit MemoryBuffer(const PODVector<unsigned char>& data);
 
     /// Read bytes from the memory area. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size) override;
+    unsigned Read(void* dest, unsigned size) override;
     /// Set position from the beginning of the memory area. Return actual new position.
-    virtual unsigned Seek(unsigned position) override;
+    unsigned Seek(unsigned position) override;
     /// Write bytes to the memory area.
-    virtual unsigned Write(const void* data, unsigned size) override;
+    unsigned Write(const void* data, unsigned size) override;
 
     /// Return memory area.
     unsigned char* GetData() { return buffer_; }

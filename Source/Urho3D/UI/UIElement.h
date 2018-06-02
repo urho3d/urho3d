@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -118,22 +118,22 @@ class URHO3D_API UIElement : public Animatable
 
 public:
     /// Construct.
-    UIElement(Context* context);
+    explicit UIElement(Context* context);
     /// Destruct.
-    virtual ~UIElement() override;
+    ~UIElement() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
+    bool LoadXML(const XMLElement& source) override;
     /// Load from XML data with style. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
+    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Create a child by loading from XML data with style. Returns the child element if successful, null if otherwise.
-    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = nullptr, bool setInstanceDefault = false);
+    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const override;
+    bool SaveXML(XMLElement& dest) const override;
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -468,7 +468,7 @@ public:
     const IntRect& GetClipBorder() const { return clipBorder_; }
 
     /// Return corner color.
-    const Color& GetColor(Corner corner) const { return color_[corner]; }
+    const Color& GetColor(Corner corner) const { return colors_[corner]; }
 
     /// Return priority.
     int GetPriority() const { return priority_; }
@@ -627,7 +627,7 @@ public:
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
 
     /// Return color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return color_[0]; }
+    const Color& GetColorAttr() const { return colors_[0]; }
 
     /// Return traversal mode for rendering.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
@@ -646,11 +646,11 @@ public:
 
 protected:
     /// Handle attribute animation added.
-    virtual void OnAttributeAnimationAdded() override;
+    void OnAttributeAnimationAdded() override;
     /// Handle attribute animation removed.
-    virtual void OnAttributeAnimationRemoved() override;
+    void OnAttributeAnimationRemoved() override;
     /// Find target of an attribute animation from object hierarchy by name.
-    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
+    Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.
@@ -669,73 +669,73 @@ protected:
     /// Child elements.
     Vector<SharedPtr<UIElement> > children_;
     /// Parent element.
-    UIElement* parent_;
+    UIElement* parent_{};
     /// Child element clipping border.
     IntRect clipBorder_;
     /// Colors.
-    Color color_[MAX_UIELEMENT_CORNERS];
+    Color colors_[MAX_UIELEMENT_CORNERS];
     /// User variables.
     VariantMap vars_;
     /// Priority.
-    int priority_;
+    int priority_{};
     /// Bring to front when focused flag.
-    bool bringToFront_;
+    bool bringToFront_{};
     /// Bring to back when defocused flag.
-    bool bringToBack_;
+    bool bringToBack_{true};
     /// Clip children flag.
-    bool clipChildren_;
+    bool clipChildren_{};
     /// Sort children according to priority flag.
-    bool sortChildren_;
+    bool sortChildren_{true};
     /// Use derived opacity flag.
-    bool useDerivedOpacity_;
+    bool useDerivedOpacity_{true};
     /// Input enabled flag.
-    bool enabled_;
+    bool enabled_{};
     /// Last SetEnabled flag before any SetDeepEnabled.
-    bool enabledPrev_;
+    bool enabledPrev_{};
     /// Value editable flag.
-    bool editable_;
+    bool editable_{true};
     /// Selected flag.
-    bool selected_;
+    bool selected_{};
     /// Visible flag.
-    bool visible_;
+    bool visible_{true};
     /// Hovering flag.
-    bool hovering_;
+    bool hovering_{};
     /// Internally created flag.
-    bool internal_;
+    bool internal_{};
     /// Focus mode.
-    FocusMode focusMode_;
+    FocusMode focusMode_{FM_NOTFOCUSABLE};
     /// Drag and drop flags.
-    unsigned dragDropMode_;
+    unsigned dragDropMode_{DD_DISABLED};
     /// Layout mode.
-    LayoutMode layoutMode_;
+    LayoutMode layoutMode_{LM_FREE};
     /// Layout spacing.
-    int layoutSpacing_;
+    int layoutSpacing_{};
     /// Layout borders.
-    IntRect layoutBorder_;
+    IntRect layoutBorder_{};
     /// Layout flex scale.
-    Vector2 layoutFlexScale_;
+    Vector2 layoutFlexScale_{Vector2::ONE};
     /// Resize nesting level to prevent multiple events and endless loop.
-    unsigned resizeNestingLevel_;
+    unsigned resizeNestingLevel_{};
     /// Layout update nesting level to prevent endless loop.
-    unsigned layoutNestingLevel_;
+    unsigned layoutNestingLevel_{};
     /// Layout element maximum size in layout direction.
-    int layoutElementMaxSize_;
+    int layoutElementMaxSize_{};
     /// Horizontal indentation.
-    int indent_;
+    int indent_{};
     /// Indent spacing (number of pixels per indentation level).
-    int indentSpacing_;
+    int indentSpacing_{16};
     /// Position.
-    IntVector2 position_;
+    IntVector2 position_{};
     /// Screen position.
     mutable IntVector2 screenPosition_;
     /// Screen position dirty flag.
-    mutable bool positionDirty_;
+    mutable bool positionDirty_{true};
     /// Applied style.
     String appliedStyle_;
     /// Drag button combo.
-    int dragButtonCombo_;
+    int dragButtonCombo_{};
     /// Drag button count.
-    unsigned dragButtonCount_;
+    unsigned dragButtonCount_{};
 
 private:
     /// Return child elements recursively.
@@ -749,7 +749,7 @@ private:
     /// Calculate child widths/positions in the layout.
     void CalculateLayout
         (PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes,
-            const PODVector<float>& flexScales, int targetWidth, int begin, int end, int spacing);
+            const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing);
     /// Get child element constant position in a layout.
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.
@@ -764,7 +764,7 @@ private:
     /// Minimum size.
     IntVector2 minSize_;
     /// Maximum size.
-    IntVector2 maxSize_;
+    IntVector2 maxSize_{M_MAX_INT, M_MAX_INT};
     /// Child elements' offset. Used internally.
     IntVector2 childOffset_;
     /// Parent's minimum size calculated by layout. Used internally.
@@ -774,9 +774,9 @@ private:
     /// Maximum offset.
     IntVector2 maxOffset_;
     /// Use min/max anchor & min/max offset for position & size instead of setting explicitly.
-    bool enableAnchor_;
+    bool enableAnchor_{};
     /// Has pivot changed manually.
-    bool pivotSet_;
+    bool pivotSet_{};
     /// Anchor minimum position.
     Vector2 anchorMin_;
     /// Anchor maximum position.
@@ -784,27 +784,27 @@ private:
     /// Pivot Position
     Vector2 pivot_;
     /// Opacity.
-    float opacity_;
+    float opacity_{1.0f};
     /// Derived opacity.
-    mutable float derivedOpacity_;
+    mutable float derivedOpacity_{};
     /// Derived color. Only valid when no gradient.
     mutable Color derivedColor_;
     /// Derived opacity dirty flag.
-    mutable bool opacityDirty_;
+    mutable bool opacityDirty_{true};
     /// Derived color dirty flag (only used when no gradient.)
-    mutable bool derivedColorDirty_;
+    mutable bool derivedColorDirty_{true};
     /// Child priority sorting dirty flag.
-    bool sortOrderDirty_;
+    bool sortOrderDirty_{};
     /// Has color gradient flag.
-    bool colorGradient_;
+    bool colorGradient_{};
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
     /// Last applied style file.
     WeakPtr<XMLFile> appliedStyleFile_;
     /// Traversal mode for rendering.
-    TraversalMode traversalMode_;
+    TraversalMode traversalMode_{TM_BREADTH_FIRST};
     /// Flag whether node should send child added / removed events by itself.
-    bool elementEventSender_;
+    bool elementEventSender_{};
     /// XPath query for selecting UI-style.
     static XPathQuery styleXPathQuery_;
     /// Tag list.

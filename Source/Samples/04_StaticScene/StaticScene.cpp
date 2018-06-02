@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ void StaticScene::Start()
 
 void StaticScene::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -85,7 +85,7 @@ void StaticScene::CreateScene()
     // (100 x 100 world units)
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
+    auto* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
@@ -94,7 +94,7 @@ void StaticScene::CreateScene()
     // The light will use default settings (white light, no shadows)
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
 
     // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
@@ -110,7 +110,7 @@ void StaticScene::CreateScene()
         mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
         mushroomNode->SetScale(0.5f + Random(2.0f));
-        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+        auto* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
     }
@@ -126,11 +126,11 @@ void StaticScene::CreateScene()
 
 void StaticScene::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -142,7 +142,7 @@ void StaticScene::CreateInstructions()
 
 void StaticScene::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen. We need to define the scene and the camera
     // at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
@@ -157,7 +157,7 @@ void StaticScene::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;

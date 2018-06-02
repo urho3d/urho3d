@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Audio/Audio.h>
 #include <Urho3D/Urho2D/AnimatedSprite2D.h>
 #include <Urho3D/Urho2D/AnimationSet2D.h>
@@ -33,7 +31,6 @@
 #include <Urho3D/Urho2D/CollisionPolygon2D.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
-#include <Urho3D/Urho2D/Drawable2D.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/Graphics/Graphics.h>
@@ -67,8 +64,7 @@
 URHO3D_DEFINE_APPLICATION_MAIN(Urho2DPlatformer)
 
 Urho2DPlatformer::Urho2DPlatformer(Context* context) :
-    Sample(context),
-    drawDebug_(false)
+    Sample(context)
 {
     // Register factory for the Character2D component so it can be created via CreateComponent
     Character2D::RegisterObject(context);
@@ -97,7 +93,7 @@ void Urho2DPlatformer::Start()
 
     // Create the UI content
     sample2D_->CreateUIContent("PLATFORMER 2D DEMO", character2D_->remainingLifes_, character2D_->remainingCoins_);
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     Button* playButton = static_cast<Button*>(ui->GetRoot()->GetChild("PlayButton", true));
     SubscribeToEvent(playButton, E_RELEASED, URHO3D_HANDLER(Urho2DPlatformer, HandlePlayButton));
 
@@ -113,20 +109,20 @@ void Urho2DPlatformer::CreateScene()
     // Create the Octree, DebugRenderer and PhysicsWorld2D components to the scene
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-    /*PhysicsWorld2D* physicsWorld =*/ scene_->CreateComponent<PhysicsWorld2D>(); 
+    /*PhysicsWorld2D* physicsWorld =*/ scene_->CreateComponent<PhysicsWorld2D>();
 
     // Create camera
     cameraNode_ = scene_->CreateChild("Camera");
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
     camera->SetZoom(2.0f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (2.0) is set for full visibility at 1280x800 resolution)
 
     // Setup the viewport for displaying the scene
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, camera));
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     renderer->SetViewport(0, viewport);
 
     // Set background color for the scene
@@ -134,9 +130,9 @@ void Urho2DPlatformer::CreateScene()
     zone->SetFogColor(Color(0.2f, 0.2f, 0.2f));
 
     // Create tile map from tmx file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap"));
-    TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>();
+    auto* tileMap = tileMapNode->CreateComponent<TileMap2D>();
     tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/Tilesets/Ortho.tmx"));
     const TileMapInfo2D& info = tileMap->GetInfo();
 
@@ -200,7 +196,7 @@ void Urho2DPlatformer::SubscribeToEvents()
 void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& eventData)
 {
     // Get colliding node
-    Node* hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEA].GetPtr());
+    auto* hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEA].GetPtr());
     if (hitNode->GetName() == "Imp")
         hitNode = static_cast<Node*>(eventData[PhysicsBeginContact2D::P_NODEB].GetPtr());
     String nodeName = hitNode->GetName();
@@ -214,7 +210,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
         else
         {
             character2D_->isClimbing_ = true;
-            RigidBody2D* body = character2DNode->GetComponent<RigidBody2D>();
+            auto* body = character2DNode->GetComponent<RigidBody2D>();
             body->SetGravityScale(0.0f); // Override gravity so that the character doesn't fall
             // Clear forces so that the character stops (should be performed by setting linear velocity to zero, but currently doesn't work)
             body->SetLinearVelocity(Vector2(0.0f, 0.0f));
@@ -231,7 +227,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
     {
         hitNode->Remove();
         character2D_->remainingCoins_ -= 1;
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         if (character2D_->remainingCoins_ == 0)
         {
             Text* instructions = static_cast<Text*>(ui->GetRoot()->GetChild("Instructions", true));
@@ -245,7 +241,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
     // Handle interactions with enemies
     if (nodeName == "Enemy" || nodeName == "Orc")
     {
-        AnimatedSprite2D* animatedSprite = character2DNode->GetComponent<AnimatedSprite2D>();
+        auto* animatedSprite = character2DNode->GetComponent<AnimatedSprite2D>();
         float deltaX = character2DNode->GetPosition().x_ - hitNode->GetPosition().x_;
 
         // Orc killed if character is fighting in its direction when the contact occurs (flowers are not destroyable)
@@ -267,7 +263,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
                 character2D_->wounded_ = true;
                 if (nodeName == "Orc")
                 {
-                    Mover* orc = static_cast<Mover*>(hitNode->GetComponent<Mover>());
+                    auto* orc = static_cast<Mover*>(hitNode->GetComponent<Mover>());
                     orc->fightTimer_ = 1;
                 }
                 sample2D_->SpawnEffect(character2DNode);
@@ -280,7 +276,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
     if (nodeName == "Exit" && character2D_->remainingCoins_ == 0)
     {
         // Update UI
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         Text* instructions = static_cast<Text*>(ui->GetRoot()->GetChild("Instructions", true));
         instructions->SetText("!!! WELL DONE !!!");
         instructions->SetPosition(IntVector2(0, 0));
@@ -292,7 +288,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
     // Handle falling into lava
     if (nodeName == "Lava")
     {
-        RigidBody2D* body = character2DNode->GetComponent<RigidBody2D>();
+        auto* body = character2DNode->GetComponent<RigidBody2D>();
         body->ApplyForceToCenter(Vector2(0.0f, 1000.0f), true);
         if (!character2DNode->GetChild("Emitter", true))
         {
@@ -310,7 +306,7 @@ void Urho2DPlatformer::HandleCollisionBegin(StringHash eventType, VariantMap& ev
 void Urho2DPlatformer::HandleCollisionEnd(StringHash eventType, VariantMap& eventData)
 {
     // Get colliding node
-    Node* hitNode = static_cast<Node*>(eventData[PhysicsEndContact2D::P_NODEA].GetPtr());
+    auto* hitNode = static_cast<Node*>(eventData[PhysicsEndContact2D::P_NODEA].GetPtr());
     if (hitNode->GetName() == "Imp")
         hitNode = static_cast<Node*>(eventData[PhysicsEndContact2D::P_NODEB].GetPtr());
     String nodeName = hitNode->GetName();
@@ -324,7 +320,7 @@ void Urho2DPlatformer::HandleCollisionEnd(StringHash eventType, VariantMap& even
         else
         {
             character2D_->isClimbing_ = false;
-            RigidBody2D* body = character2DNode->GetComponent<RigidBody2D>();
+            auto* body = character2DNode->GetComponent<RigidBody2D>();
             body->SetGravityScale(1.0f); // Restore gravity
         }
     }
@@ -337,7 +333,7 @@ void Urho2DPlatformer::HandleCollisionEnd(StringHash eventType, VariantMap& even
     {
         character2D_->onSlope_ = false;
         // Clear forces (should be performed by setting linear velocity to zero, but currently doesn't work)
-        RigidBody2D* body = character2DNode->GetComponent<RigidBody2D>();
+        auto* body = character2DNode->GetComponent<RigidBody2D>();
         body->SetLinearVelocity(Vector2::ZERO);
         body->SetAwake(false);
         body->SetAwake(true);
@@ -352,7 +348,7 @@ void Urho2DPlatformer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (cameraNode_)
         sample2D_->Zoom(cameraNode_->GetComponent<Camera>());
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Toggle debug geometry with 'Z' key
     if (input->GetKeyPress(KEY_Z))
@@ -378,11 +374,11 @@ void Urho2DPlatformer::HandlePostRenderUpdate(StringHash eventType, VariantMap& 
 {
     if (drawDebug_)
     {
-        PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
+        auto* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
         physicsWorld->DrawDebugGeometry();
 
         Node* tileMapNode = scene_->GetChild("TileMap", true);
-        TileMap2D* map = tileMapNode->GetComponent<TileMap2D>();
+        auto* map = tileMapNode->GetComponent<TileMap2D>();
         map->DrawDebugGeometry(scene_->GetComponent<DebugRenderer>(), false);
     }
 }
@@ -411,7 +407,7 @@ void Urho2DPlatformer::ReloadScene(bool reInit)
     }
 
     // Update lifes UI
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     Text* lifeText = static_cast<Text*>(ui->GetRoot()->GetChild("LifeText", true));
     lifeText->SetText(String(lifes));
 
@@ -423,7 +419,7 @@ void Urho2DPlatformer::ReloadScene(bool reInit)
 void Urho2DPlatformer::HandlePlayButton(StringHash eventType, VariantMap& eventData)
 {
     // Remove fullscreen UI and unfreeze the scene
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     if (static_cast<Text*>(ui->GetRoot()->GetChild("FullUI", true)))
     {
         ui->GetRoot()->GetChild("FullUI", true)->Remove();
@@ -442,6 +438,6 @@ void Urho2DPlatformer::HandlePlayButton(StringHash eventType, VariantMap& eventD
     playButton->SetVisible(false);
 
     // Hide mouse cursor
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     input->SetMouseVisible(false);
 }

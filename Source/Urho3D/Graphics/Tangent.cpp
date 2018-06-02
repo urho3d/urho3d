@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,12 @@ inline unsigned GetIndex(void*& indexPointer, unsigned indexSize)
 {
     if (indexSize == sizeof(unsigned short))
     {
-        unsigned short*& p = (unsigned short*&)indexPointer;
+        auto& p = (unsigned short*&)indexPointer;
         return *p++;
     }
     else
     {
-        unsigned*& p = (unsigned*&)indexPointer;
+        auto& p = (unsigned*&)indexPointer;
         return *p++;
     }
 }
@@ -49,9 +49,9 @@ void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexDa
     // http://www.terathon.com/code/tangent.html
     unsigned minVertex = M_MAX_UNSIGNED;
     unsigned maxVertex = 0;
-    unsigned char* vertices = (unsigned char*)vertexData;
+    auto* vertices = (unsigned char*)vertexData;
 
-    void* indexPointer = const_cast<void*>(indexData);
+    auto* indexPointer = const_cast<void*>(indexData);
     for (unsigned i = indexStart; i < indexStart + indexCount; ++i)
     {
         unsigned v = GetIndex(indexPointer, indexSize);
@@ -62,7 +62,7 @@ void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexDa
     }
 
     unsigned vertexCount = maxVertex + 1;
-    Vector3* tan1 = new Vector3[vertexCount * 2];
+    auto* tan1 = new Vector3[vertexCount * 2];
     Vector3* tan2 = tan1 + vertexCount;
     memset(tan1, 0, sizeof(Vector3) * vertexCount * 2);
 

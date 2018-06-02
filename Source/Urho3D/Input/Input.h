@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -73,12 +73,6 @@ struct TouchState
 /// %Input state for a joystick.
 struct JoystickState
 {
-    /// Construct with defaults.
-    JoystickState() :
-        joystick_(nullptr), controller_(nullptr), screenJoystick_(nullptr)
-    {
-    }
-
     /// Initialize the number of buttons, axes and hats and set them to neutral state.
     void Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats);
     /// Reset button, axis and hat states to neutral.
@@ -109,13 +103,13 @@ struct JoystickState
     int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
 
     /// SDL joystick.
-    SDL_Joystick* joystick_;
+    SDL_Joystick* joystick_{};
     /// SDL joystick instance ID.
-    SDL_JoystickID joystickID_;
+    SDL_JoystickID joystickID_{};
     /// SDL game controller.
-    SDL_GameController* controller_;
+    SDL_GameController* controller_{};
     /// UI element containing the screen joystick.
-    UIElement* screenJoystick_;
+    UIElement* screenJoystick_{};
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -143,9 +137,9 @@ class URHO3D_API Input : public Object
 
 public:
     /// Construct.
-    Input(Context* context);
+    explicit Input(Context* context);
     /// Destruct.
-    virtual ~Input() override;
+    ~Input() override;
 
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();

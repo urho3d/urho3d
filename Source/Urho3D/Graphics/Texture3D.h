@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,22 +37,22 @@ class URHO3D_API Texture3D : public Texture
 
 public:
     /// Construct.
-    Texture3D(Context* context);
+    explicit Texture3D(Context* context);
     /// Destruct.
-    virtual ~Texture3D() override;
+    ~Texture3D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
     /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost() override;
+    void OnDeviceLost() override;
     /// Recreate the GPU resource and restore data if applicable.
-    virtual void OnDeviceReset() override;
+    void OnDeviceReset() override;
     /// Release the texture.
-    virtual void Release() override;
+    void Release() override;
 
     /// Set size, format and usage. Zero size will follow application window size. Return true if successful.
     bool SetSize(int width, int height, int depth, unsigned format, TextureUsage usage = TEXTURE_STATIC);
@@ -66,7 +66,7 @@ public:
 
 protected:
     /// Create the GPU texture.
-    virtual bool Create() override;
+    bool Create() override;
 
 private:
     /// Image file acquired during BeginLoad.

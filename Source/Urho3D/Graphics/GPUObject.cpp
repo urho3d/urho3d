@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,7 @@ namespace Urho3D
 {
 
 GPUObject::GPUObject(Graphics* graphics) :
-    graphics_(graphics),
-    dataLost_(false),
-    dataPending_(false)
+    graphics_(graphics)
 {
 #ifdef URHO3D_OPENGL
     object_.name_ = 0;

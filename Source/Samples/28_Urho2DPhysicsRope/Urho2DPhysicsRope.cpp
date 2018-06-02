@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,23 +83,23 @@ void Urho2DPhysicsRope::CreateScene()
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, -10.0f));
 
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * 0.05f);
     camera->SetZoom(1.5f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
     // Create 2D physics world component
-    PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
+    auto* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
     physicsWorld->SetDrawJoint(true);
 
     // Create ground
     Node* groundNode = scene_->CreateChild("Ground");
     // Create 2D rigid body for gound
-    RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
+    auto* groundBody = groundNode->CreateComponent<RigidBody2D>();
     // Create edge collider for ground
-    CollisionEdge2D* groundShape = groundNode->CreateComponent<CollisionEdge2D>();
+    auto* groundShape = groundNode->CreateComponent<CollisionEdge2D>();
     groundShape->SetVertices(Vector2(-40.0f, 0.0f), Vector2(40.0f, 0.0f));
 
     const float y = 15.0f;
@@ -110,15 +110,15 @@ void Urho2DPhysicsRope::CreateScene()
         Node* node  = scene_->CreateChild("RigidBody");
 
         // Create rigid body
-        RigidBody2D* body = node->CreateComponent<RigidBody2D>();
+        auto* body = node->CreateComponent<RigidBody2D>();
         body->SetBodyType(BT_DYNAMIC);
 
         // Create box
-        CollisionBox2D* box = node->CreateComponent<CollisionBox2D>();
+        auto* box = node->CreateComponent<CollisionBox2D>();
         // Set friction
         box->SetFriction(0.2f);
         // Set mask bits.
-        box->SetMaskBits(0xFFFF & ~0x0002);
+        box->SetMaskBits(0xFFFFu & ~0x0002u);
 
         if (i == NUM_OBJECTS - 1)
         {
@@ -136,7 +136,7 @@ void Urho2DPhysicsRope::CreateScene()
             box->SetCategoryBits(0x0001);
         }
 
-        ConstraintRevolute2D* joint = node->CreateComponent<ConstraintRevolute2D>();
+        auto* joint = node->CreateComponent<ConstraintRevolute2D>();
         joint->SetOtherBody(prevBody);
         joint->SetAnchor(Vector2(float(i), y));
         joint->SetCollideConnected(false);
@@ -144,7 +144,7 @@ void Urho2DPhysicsRope::CreateScene()
         prevBody = body;
     }
 
-    ConstraintRope2D* constraintRope = groundNode->CreateComponent<ConstraintRope2D>();
+    auto* constraintRope = groundNode->CreateComponent<ConstraintRope2D>();
     constraintRope->SetOtherBody(prevBody);
     constraintRope->SetOwnerBodyAnchor(Vector2(0.0f, y));
     constraintRope->SetMaxLength(NUM_OBJECTS - 1.0f + 0.01f);
@@ -152,11 +152,11 @@ void Urho2DPhysicsRope::CreateScene()
 
 void Urho2DPhysicsRope::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move, Use PageUp PageDown to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -168,7 +168,7 @@ void Urho2DPhysicsRope::CreateInstructions()
 
 void Urho2DPhysicsRope::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -181,7 +181,7 @@ void Urho2DPhysicsRope::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 4.0f;
@@ -198,13 +198,13 @@ void Urho2DPhysicsRope::MoveCamera(float timeStep)
 
     if (input->GetKeyDown(KEY_PAGEUP))
     {
-        Camera* camera = cameraNode_->GetComponent<Camera>();
+        auto* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 1.01f);
     }
 
     if (input->GetKeyDown(KEY_PAGEDOWN))
     {
-        Camera* camera = cameraNode_->GetComponent<Camera>();
+        auto* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 0.99f);
     }
 }
@@ -228,6 +228,6 @@ void Urho2DPhysicsRope::HandleUpdate(StringHash eventType, VariantMap& eventData
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 
-    PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
+    auto* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
     physicsWorld->DrawDebugGeometry();
 }

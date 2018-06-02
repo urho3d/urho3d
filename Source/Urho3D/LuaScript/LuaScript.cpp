@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -243,8 +243,8 @@ bool LuaScript::ExecuteFile(const String& fileName)
         return true;
 #endif
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    LuaFile* luaFile = cache->GetResource<LuaFile>(fileName);
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* luaFile = cache->GetResource<LuaFile>(fileName);
     return luaFile && luaFile->LoadAndExecute(luaState_);
 }
 
@@ -269,7 +269,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
 
     URHO3D_LOGINFO("Finding Lua file on file system: " + fileName);
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String filePath = cache->GetResourceFileName(fileName);
 
     if (filePath.Empty())
@@ -360,21 +360,21 @@ int LuaScript::Loader(lua_State* L)
 #ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
     // First attempt to load lua script file from the file system
     // Attempt to load .luc file first, then fall back to .lua
-    LuaScript* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
+    auto* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
     if (lua->LoadRawFile(fileName + ".luc") || lua->LoadRawFile(fileName + ".lua"))
         return 1;
 #endif
 
-    ResourceCache* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
+    auto* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
 
     // Attempt to get .luc file first
-    LuaFile* lucFile = cache->GetResource<LuaFile>(fileName + ".luc", false);
+    auto* lucFile = cache->GetResource<LuaFile>(fileName + ".luc", false);
     if (lucFile)
         return lucFile->LoadChunk(L) ? 1 : 0;
 
     // Then try to get .lua file. If this also fails, error is logged and
     // resource not found event is sent
-    LuaFile* luaFile = cache->GetResource<LuaFile>(fileName + ".lua");
+    auto* luaFile = cache->GetResource<LuaFile>(fileName + ".lua");
     if (luaFile)
         return luaFile->LoadChunk(L) ? 1 : 0;
 

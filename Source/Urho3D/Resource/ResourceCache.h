@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ class URHO3D_API ResourceRouter : public Object
 {
 public:
     /// Construct.
-    ResourceRouter(Context* context) :
+    explicit ResourceRouter(Context* context) :
         Object(context)
     {
     }
@@ -84,9 +84,9 @@ class URHO3D_API ResourceCache : public Object
 
 public:
     /// Construct.
-    ResourceCache(Context* context);
+    explicit ResourceCache(Context* context);
     /// Destruct. Free all resources.
-    virtual ~ResourceCache() override;
+    ~ResourceCache() override;
 
     /// Add a resource load directory. Optional priority parameter which will control search order.
     bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST);
@@ -222,9 +222,9 @@ private:
     /// Handle begin frame event. Automatic resource reloads and the finalization of background loaded resources are processed here.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Search FileSystem for file.
-    File* SearchResourceDirs(const String& nameIn);
+    File* SearchResourceDirs(const String& name);
     /// Search resource packages for file.
-    File* SearchPackages(const String& nameIn);
+    File* SearchPackages(const String& name);
 
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
@@ -286,7 +286,7 @@ template <class T> bool ResourceCache::BackgroundLoadResource(const String& name
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
-    PODVector<Resource*>& resources = reinterpret_cast<PODVector<Resource*>&>(result);
+    auto& resources = reinterpret_cast<PODVector<Resource*>&>(result);
     StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
 

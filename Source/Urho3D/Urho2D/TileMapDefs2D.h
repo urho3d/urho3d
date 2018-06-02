@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ class URHO3D_API PropertySet2D : public RefCounted
 {
 public:
     PropertySet2D();
-    virtual ~PropertySet2D() override;
+    ~PropertySet2D() override;
 
     /// Load from XML element.
     void Load(const XMLElement& element);
@@ -118,6 +118,13 @@ protected:
     HashMap<String, String> nameToValueMapping_;
 };
 
+/// Tile flipping flags.
+static const unsigned FLIP_HORIZONTAL = 0x80000000u;
+static const unsigned FLIP_VERTICAL   = 0x40000000u;
+static const unsigned FLIP_DIAGONAL   = 0x20000000u;
+static const unsigned FLIP_RESERVED   = 0x10000000u;
+static const unsigned FLIP_ALL = FLIP_HORIZONTAL | FLIP_VERTICAL | FLIP_DIAGONAL | FLIP_RESERVED;
+
 /// Tile define.
 class URHO3D_API Tile2D : public RefCounted
 {
@@ -126,7 +133,13 @@ public:
     Tile2D();
 
     /// Return gid.
-    int GetGid() const { return gid_; }
+    unsigned GetGid() const { return gid_ & ~FLIP_ALL; }
+    /// Return flip X.
+    bool GetFlipX() const { return gid_ & FLIP_HORIZONTAL; }
+    /// Return flip Y.
+    bool GetFlipY() const { return gid_ & FLIP_VERTICAL; }
+    /// Return swap X and Y.
+    bool GetSwapXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return sprite.
     Sprite2D* GetSprite() const;
@@ -139,7 +152,7 @@ private:
     friend class TmxTileLayer2D;
 
     /// Gid.
-    int gid_;
+    unsigned gid_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Property set.
@@ -173,7 +186,13 @@ public:
     const Vector2& GetPoint(unsigned index) const;
 
     /// Return tile Gid.
-    int GetTileGid() const { return gid_; }
+    unsigned GetTileGid() const { return gid_ & ~FLIP_ALL; }
+    /// Return tile flip X.
+    bool GetTileFlipX() const { return gid_ & FLIP_HORIZONTAL; }
+    /// Return tile flip Y.
+    bool GetTileFlipY() const { return gid_ & FLIP_VERTICAL; }
+    /// Return tile swap X and Y.
+    bool GetTileSwapXY() const { return gid_ & FLIP_DIAGONAL; }
 
     /// Return tile sprite.
     Sprite2D* GetTileSprite() const;
@@ -186,7 +205,7 @@ private:
     friend class TmxObjectGroup2D;
 
     /// Object type.
-    TileMapObjectType2D objectType_;
+    TileMapObjectType2D objectType_{};
     /// Name.
     String name_;
     /// Type.
@@ -198,7 +217,7 @@ private:
     /// Points(for polygon and polyline).
     Vector<Vector2> points_;
     /// Gid (for tile).
-    int gid_;
+    unsigned gid_{};
     /// Sprite (for tile).
     SharedPtr<Sprite2D> sprite_;
     /// Property set.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -112,9 +112,9 @@ void Profiler::PrintData(ProfilerBlock* block, String& output, unsigned depth, u
 
         if (!showTotal)
         {
-            float avg = block->intervalTime_ / block->intervalCount_ / 1000.0f;
+            float avg = (float)block->intervalTime_ / block->intervalCount_ / 1000.0f;
             float max = block->intervalMaxTime_ / 1000.0f;
-            float frame = block->intervalTime_ / (intervalFrames_ ? intervalFrames_ : 1) / 1000.0f;
+            float frame = (float)block->intervalTime_ / (intervalFrames_ ? intervalFrames_ : 1) / 1000.0f;
             float all = block->intervalTime_ / 1000.0f;
 
             sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, Min(block->intervalCount_, 99999U),
@@ -122,11 +122,11 @@ void Profiler::PrintData(ProfilerBlock* block, String& output, unsigned depth, u
         }
         else
         {
-            float avg = (block->frameCount_ ? block->frameTime_ / block->frameCount_ : 0.0f) / 1000.0f;
+            float avg = (block->frameCount_ ? (float)block->frameTime_ / block->frameCount_ : 0.0f) / 1000.0f;
             float max = block->frameMaxTime_ / 1000.0f;
             float all = block->frameTime_ / 1000.0f;
 
-            float totalAvg = block->totalTime_ / block->totalCount_ / 1000.0f;
+            float totalAvg = (float)block->totalTime_ / block->totalCount_ / 1000.0f;
             float totalMax = block->totalMaxTime_ / 1000.0f;
             float totalAll = block->totalTime_ / 1000.0f;
 

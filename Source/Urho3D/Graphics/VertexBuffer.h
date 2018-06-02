@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,16 +37,16 @@ class URHO3D_API VertexBuffer : public Object, public GPUObject
 
 public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.
-    VertexBuffer(Context* context, bool forceHeadless = false);
+    explicit VertexBuffer(Context* context, bool forceHeadless = false);
     /// Destruct.
-    virtual ~VertexBuffer() override;
+    ~VertexBuffer() override;
 
     /// Mark the buffer destroyed on graphics context destruction. May be a no-op depending on the API.
-    virtual void OnDeviceLost() override;
+    void OnDeviceLost() override;
     /// Recreate the buffer and restore data if applicable. May be a no-op depending on the API.
-    virtual void OnDeviceReset() override;
+    void OnDeviceReset() override;
     /// Release buffer.
-    virtual void Release() override;
+    void Release() override;
 
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
@@ -147,29 +147,29 @@ private:
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Number of vertices.
-    unsigned vertexCount_;
+    unsigned vertexCount_{};
     /// Vertex size.
-    unsigned vertexSize_;
+    unsigned vertexSize_{};
     /// Vertex elements.
     PODVector<VertexElement> elements_;
     /// Vertex element hash.
-    unsigned long long elementHash_;
+    unsigned long long elementHash_{};
     /// Vertex element legacy bitmask.
-    unsigned elementMask_;
+    unsigned elementMask_{};
     /// Buffer locking state.
-    LockState lockState_;
+    LockState lockState_{LOCK_NONE};
     /// Lock start vertex.
-    unsigned lockStart_;
+    unsigned lockStart_{};
     /// Lock number of vertices.
-    unsigned lockCount_;
+    unsigned lockCount_{};
     /// Scratch buffer for fallback locking.
-    void* lockScratchData_;
+    void* lockScratchData_{};
     /// Dynamic flag.
-    bool dynamic_;
+    bool dynamic_{};
     /// Shadowed flag.
-    bool shadowed_;
+    bool shadowed_{};
     /// Discard lock flag. Used by OpenGL only.
-    bool discardLock_;
+    bool discardLock_{};
 };
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,8 +67,8 @@ void Hello3DUI::Start()
     GetSubsystem<Input>()->SetMouseVisible(true);
 
     // Load XML file containing default UI style sheet
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
 
     // Set the loaded style as default style
     uiRoot_->SetDefaultStyle(style);
@@ -95,16 +95,16 @@ void Hello3DUI::Start()
 void Hello3DUI::InitControls()
 {
     // Create a CheckBox
-    CheckBox* checkBox = new CheckBox(context_);
+    auto* checkBox = new CheckBox(context_);
     checkBox->SetName("CheckBox");
 
     // Create a Button
-    Button* button = new Button(context_);
+    auto* button = new Button(context_);
     button->SetName("Button");
     button->SetMinHeight(24);
 
     // Create a LineEdit
-    LineEdit* lineEdit = new LineEdit(context_);
+    auto* lineEdit = new LineEdit(context_);
     lineEdit->SetName("LineEdit");
     lineEdit->SetMinHeight(24);
 
@@ -138,18 +138,18 @@ void Hello3DUI::InitWindow()
     window_->SetName("Window");
 
     // Create Window 'titlebar' container
-    UIElement* titleBar = new UIElement(context_);
+    auto* titleBar = new UIElement(context_);
     titleBar->SetMinSize(0, 24);
     titleBar->SetVerticalAlignment(VA_TOP);
     titleBar->SetLayoutMode(LM_HORIZONTAL);
 
     // Create the Window title Text
-    Text* windowTitle = new Text(context_);
+    auto* windowTitle = new Text(context_);
     windowTitle->SetName("WindowTitle");
     windowTitle->SetText("Hello GUI!");
 
     // Create the Window's close button
-    Button* buttonClose = new Button(context_);
+    auto* buttonClose = new Button(context_);
     buttonClose->SetName("CloseButton");
 
     // Add the controls to the title bar
@@ -160,14 +160,14 @@ void Hello3DUI::InitWindow()
     window_->AddChild(titleBar);
 
     // Create a list.
-    ListView* list = window_->CreateChild<ListView>();
+    auto* list = window_->CreateChild<ListView>();
     list->SetSelectOnClickEnd(true);
     list->SetHighlightMode(HM_ALWAYS);
     list->SetMinHeight(200);
 
     for (int i = 0; i < 32; i++)
     {
-        Text* text = new Text(context_);
+        auto* text = new Text(context_);
         text->SetStyleAuto();
         text->SetText(ToString("List item %d", i));
         text->SetName(ToString("Item %d", i));
@@ -189,11 +189,11 @@ void Hello3DUI::InitWindow()
 
 void Hello3DUI::InitScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
-    Zone* zone = scene_->CreateComponent<Zone>();
+    auto* zone = scene_->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetFogColor(Color::GRAY);
     zone->SetFogStart(100.0f);
@@ -205,7 +205,7 @@ void Hello3DUI::InitScene()
     boxNode->SetRotation(Quaternion(90, Vector3::LEFT));
 
     // Create a box model and hide it initially.
-    StaticModel* boxModel = boxNode->CreateComponent<StaticModel>();
+    auto* boxModel = boxNode->CreateComponent<StaticModel>();
     boxModel->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
     boxNode->SetEnabled(false);
 
@@ -217,7 +217,7 @@ void Hello3DUI::InitScene()
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
     // Set up a viewport so 3D scene can be visible.
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
 
@@ -227,11 +227,11 @@ void Hello3DUI::InitScene()
 
 void Hello3DUI::CreateDraggableFish()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* graphics = GetSubsystem<Graphics>();
 
     // Create a draggable Fish button
-    Button* draggableFish = new Button(context_);
+    auto* draggableFish = new Button(context_);
     draggableFish->SetTexture(cache->GetResource<Texture2D>("Textures/UrhoDecal.dds")); // Set texture
     draggableFish->SetBlendMode(BLEND_ADD);
     draggableFish->SetSize(128, 128);
@@ -240,13 +240,13 @@ void Hello3DUI::CreateDraggableFish()
     uiRoot_->AddChild(draggableFish);
 
     // Add a tooltip to Fish button
-    ToolTip* toolTip = new ToolTip(context_);
+    auto* toolTip = new ToolTip(context_);
     draggableFish->AddChild(toolTip);
     toolTip->SetPosition(IntVector2(draggableFish->GetWidth() + 5, draggableFish->GetWidth() / 2)); // slightly offset from close button
-    BorderImage* textHolder = new BorderImage(context_);
+    auto* textHolder = new BorderImage(context_);
     toolTip->AddChild(textHolder);
     textHolder->SetStyle("ToolTipBorderImage");
-    Text* toolTipText = new Text(context_);
+    auto* toolTipText = new Text(context_);
     textHolder->AddChild(toolTipText);
     toolTipText->SetStyle("ToolTipText");
     toolTipText->SetText("Please drag me!");
@@ -284,10 +284,10 @@ void Hello3DUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
 void Hello3DUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
 {
     // Get the Text control acting as the Window's title
-    Text* windowTitle = window_->GetChildStaticCast<Text>("WindowTitle", true);
+    auto* windowTitle = window_->GetChildStaticCast<Text>("WindowTitle", true);
 
     // Get control that was clicked
-    UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+    auto* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
     String name = "...?";
     if (clicked)
@@ -302,12 +302,12 @@ void Hello3DUI::HandleControlClicked(StringHash eventType, VariantMap& eventData
 
 void Hello3DUI::Init3DUI()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Node that will get UI rendered on it.
     Node* boxNode = scene_->GetChild("Box");
     // Create a component that sets up UI rendering. It sets material to StaticModel of the node.
-    UIComponent* component = boxNode->CreateComponent<UIComponent>();
+    auto* component = boxNode->CreateComponent<UIComponent>();
     // Optionally modify material. Technique is changed so object is visible without any lights.
     component->GetMaterial()->SetTechnique(0, cache->GetResource<Technique>("Techniques/DiffUnlit.xml"));
     // Save root element of texture UI for later use.
@@ -320,7 +320,7 @@ void Hello3DUI::HandleUpdate(StringHash, VariantMap& eventData)
 {
     using namespace Update;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     Node* node = scene_->GetChild("Box");
 
     if (current_.NotNull() && drawDebug_)

@@ -64,7 +64,7 @@ function CreateScene()
     specColorAnimation:SetKeyFrame(2.0, Variant(Color(1.0, 1.0, 0.0, 2.0)))
     specColorAnimation:SetKeyFrame(3.0, Variant(Color(0.1, 0.1, 0.1, 16.0)))
     -- Optionally associate material with scene to make sure shader parameter animation respects scene time scale
-    mushroomMat.scene = scene_;
+    mushroomMat.scene = scene_
     mushroomMat:SetShaderParameterAnimation("MatSpecColor", specColorAnimation)
 
     local NUM_OBJECTS = 200

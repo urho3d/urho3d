@@ -187,6 +187,7 @@ namespace Urho3D
 <a href="#Class_StaticModel"><b>StaticModel</b></a>
 <a href="#Class_StaticModelGroup"><b>StaticModelGroup</b></a>
 <a href="#Class_StaticSprite2D"><b>StaticSprite2D</b></a>
+<a href="#Class_StretchableSprite2D"><b>StretchableSprite2D</b></a>
 <a href="#Class_StringHash"><b>StringHash</b></a>
 <a href="#Class_Technique"><b>Technique</b></a>
 <a href="#Class_Terrain"><b>Terrain</b></a>
@@ -211,6 +212,7 @@ namespace Urho3D
 <a href="#Class_UI"><b>UI</b></a>
 <a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_UISelectable"><b>UISelectable</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
 <a href="#Class_VariantMap"><b>VariantMap</b></a>
@@ -278,7 +280,7 @@ Methods:
 - unsigned GetNumAnimationStates() const
 - AnimationState* GetAnimationState(Animation* animation) const
 - AnimationState* GetAnimationState(const String animationName) const
-- AnimationState* GetAnimationState(const StringHash animationNameHash) const
+- AnimationState* GetAnimationState(StringHash animationNameHash) const
 - AnimationState* GetAnimationState(unsigned index) const
 - float GetAnimationLodBias() const
 - bool GetUpdateInvisible() const
@@ -1203,6 +1205,7 @@ Methods:
 - void Remove()
 - void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - unsigned GetID() const
+- bool IsReplicated() const
 - Node* GetNode() const
 - Scene* GetScene() const
 - bool IsEnabled() const
@@ -1213,6 +1216,7 @@ Methods:
 Properties:
 
 - unsigned ID (readonly)
+- bool replicated (readonly)
 - bool enabled
 - bool enabledEffective (readonly)
 - Node* node (readonly)
@@ -4195,6 +4199,7 @@ Methods:
 - int GetScriptObject() const
 - int GetScriptObject(const String scriptObjectType) const
 - unsigned GetID() const
+- bool IsReplicated() const
 - const String GetName() const
 - StringHash GetNameHash() const
 - Node* GetParent() const
@@ -4259,6 +4264,7 @@ Methods:
 Properties:
 
 - unsigned ID (readonly)
+- bool replicated (readonly)
 - String name
 - StringHash nameHash (readonly)
 - Node* parent
@@ -4485,13 +4491,13 @@ Methods:
 - void SetMaxRotationSpeed(float speed)
 - void SetSizeAdd(float sizeAdd)
 - void SetSizeMul(float sizeMul)
-- void AddColorTime(const Color& color, const float time)
+- void AddColorTime(const Color& color, float time)
 - void AddColorFrame(const ColorFrame& colorFrame)
 - void RemoveColorFrame(unsigned index)
 - void SetColorFrame(unsigned index, const ColorFrame& colorFrame)
 - void SetNumColorFrames(unsigned number)
 - void SortColorFrames()
-- void AddTextureTime(const Rect& uv, const float time)
+- void AddTextureTime(const Rect& uv, float time)
 - void AddTextureFrame(const TextureFrame& textureFrame)
 - void RemoveTextureFrame(unsigned index)
 - void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
@@ -4730,7 +4736,7 @@ Methods:
 - void SetMaxNetworkAngularVelocity(float velocity)
 - const PODVector<PhysicsRaycastResult>& Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
-- PhysicsRaycastResult RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED, float overlapDistance = 0.1f)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult ConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
@@ -5079,6 +5085,8 @@ Methods:
 - void SetMaxSideSlipSpeed(float speed)
 - void SetWheelSkidInfoCumulative(int wheel, float skid)
 - void SetInAirRPM(float rpm)
+- void SetCoordinateSystem()
+- void SetCoordinateSystem(const IntVector3& coordinateSystem)
 - void Init()
 - Vector3 GetWheelPosition(int wheel)
 - Quaternion GetWheelRotation(int wheel)
@@ -5106,6 +5114,16 @@ Methods:
 - Vector3 GetContactPosition(int wheel) const
 - Vector3 GetContactNormal(int wheel) const
 - float GetInAirRPM() const
+- IntVector3 GetCoordinateSystem() const
+
+Properties:
+
+- const IntVector3 RIGHT_UP_FORWARD
+- const IntVector3 RIGHT_FORWARD_UP
+- const IntVector3 UP_FORWARD_RIGHT
+- const IntVector3 UP_RIGHT_FORWARD
+- const IntVector3 FORWARD_RIGHT_UP
+- const IntVector3 FORWARD_UP_RIGHT
 
 <a name="Class_Rect"></a>
 ### Rect
@@ -5550,6 +5568,7 @@ Methods:
 - void SetStartScale(float startScale)
 - void SetEndScale(float endScale)
 - void SetTrailType(TrailType type)
+- void SetBaseVelocity(const Vector3& baseVelocity)
 - void SetSorted(bool enable)
 - void SetLifetime(float time)
 - void SetEmitting(bool emitting)
@@ -5565,6 +5584,7 @@ Methods:
 - float GetStartScale() const
 - float GetEndScale() const
 - TrailType GetTrailType() const
+- const Vector3& GetBaseVelocity() const
 - bool IsSorted() const
 - float GetLifetime() const
 - unsigned GetTailColumn() const
@@ -5582,6 +5602,7 @@ Properties:
 - float startScale
 - float endScale
 - TrailType trailType
+- Vector3 baseVelocity
 - bool sorted
 - float lifetime
 - unsigned tailColumn
@@ -5788,6 +5809,9 @@ Methods:
 - void SetSnapThreshold(float threshold)
 - void SetAsyncLoadingMs(int ms)
 - Node* GetNode(unsigned id) const
+- Component* GetComponent(unsigned id) const
+- Component* GetComponent(const String type, bool recursive = false) const
+- bool IsReplicatedID(unsigned id)
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
 - float GetAsyncProgress() const
@@ -6338,7 +6362,8 @@ Methods:
 - void ApplyMaterialList(const String fileName = String::EMPTY)
 - Model* GetModel() const
 - unsigned GetNumGeometries() const
-- Material* GetMaterial(unsigned index = 0) const
+- Material* GetMaterial() const
+- Material* GetMaterial(unsigned index) const
 - unsigned GetOcclusionLodLevel() const
 - bool IsInside(const Vector3& point) const
 - bool IsInsideLocal(const Vector3& point) const
@@ -6373,9 +6398,10 @@ Methods:
 
 - void SetSprite(Sprite2D* sprite)
 - void SetBlendMode(BlendMode mode)
-- void SetFlip(bool flipX, bool flipY)
+- void SetFlip(bool flipX, bool flipY, bool swapXY = false)
 - void SetFlipX(bool flipX)
 - void SetFlipY(bool flipY)
+- void SetSwapXY(bool swapXY)
 - void SetColor(const Color& color)
 - void SetAlpha(float alpha)
 - void SetUseHotSpot(bool useHotSpot)
@@ -6389,6 +6415,7 @@ Methods:
 - BlendMode GetBlendMode() const
 - bool GetFlipX() const
 - bool GetFlipY() const
+- bool GetSwapXY() const
 - const Color& GetColor() const
 - float GetAlpha() const
 - bool GetUseHotSpot() const
@@ -6405,6 +6432,7 @@ Properties:
 - BlendMode blendMode
 - bool flipX
 - bool flipY
+- bool swapXY
 - Color& color
 - float alpha
 - bool useHotSpot
@@ -6414,6 +6442,18 @@ Properties:
 - bool useDrawRect
 - Rect textureRect
 - bool useTextureRect
+
+<a name="Class_StretchableSprite2D"></a>
+### StretchableSprite2D : StaticSprite2D
+
+Methods:
+
+- void SetBorder(const IntRect& border)
+- const IntRect& GetBorder() const
+
+Properties:
+
+- IntRect border
 
 <a name="Class_StringHash"></a>
 ### StringHash
@@ -6599,7 +6639,7 @@ Properties:
 - unsigned lodLevel (readonly)
 
 <a name="Class_Text"></a>
-### Text : UIElement
+### Text : UISelectable
 
 Methods:
 
@@ -6615,8 +6655,6 @@ Methods:
 - void SetWordwrap(bool enable)
 - void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED)
 - void ClearSelection()
-- void SetSelectionColor(const Color& color)
-- void SetHoverColor(const Color& color)
 - void SetTextEffect(TextEffect textEffect)
 - void SetEffectShadowOffset(const IntVector2& offset)
 - void SetEffectStrokeThickness(int thickness)
@@ -6632,8 +6670,6 @@ Methods:
 - bool GetWordwrap() const
 - unsigned GetSelectionStart() const
 - unsigned GetSelectionLength() const
-- const Color& GetSelectionColor() const
-- const Color& GetHoverColor() const
 - TextEffect GetTextEffect() const
 - const IntVector2& GetEffectShadowOffset() const
 - int GetEffectStrokeThickness() const
@@ -6659,8 +6695,6 @@ Properties:
 - bool autoLocalizable
 - unsigned selectionStart (readonly)
 - unsigned selectionLength (readonly)
-- Color& selectionColor
-- Color& hoverColor
 - TextEffect textEffect
 - IntVector2& effectShadowOffset
 - int effectStrokeThickness
@@ -6892,14 +6926,17 @@ Properties:
 
 Methods:
 
-- int GetGid() const
+- unsigned GetGid() const
+- bool GetFlipX() const
+- bool GetFlipY() const
+- bool GetSwapXY() const
 - Sprite2D* GetSprite() const
 - bool HasProperty(const String name) const
 - const String GetProperty(const String name) const
 
 Properties:
 
-- int gid (readonly)
+- unsigned gid (readonly)
 - Sprite2D* sprite (readonly)
 
 <a name="Class_TileMap2D"></a>
@@ -6984,7 +7021,10 @@ Methods:
 - const Vector2& GetSize() const
 - unsigned GetNumPoints() const
 - const Vector2& GetPoint(unsigned index) const
-- int GetTileGid() const
+- unsigned GetTileGid() const
+- bool GetTileFlipX() const
+- bool GetTileFlipY() const
+- bool GetTileSwapXY() const
 - Sprite2D* GetTileSprite() const
 - bool HasProperty(const String name) const
 - const String GetProperty(const String name) const
@@ -6997,7 +7037,7 @@ Properties:
 - Vector2 position (readonly)
 - Vector2 size (readonly)
 - unsigned numPoints (readonly)
-- int tileGid (readonly)
+- unsigned tileGid (readonly)
 - Sprite2D* tileSprite (readonly)
 
 <a name="Class_Time"></a>
@@ -7024,6 +7064,15 @@ Properties:
 
 <a name="Class_TmxFile2D"></a>
 ### TmxFile2D : Resource
+
+Methods:
+
+- void SetSpriteTextureEdgeOffset(float offset)
+- float GetSpriteTextureEdgeOffset() const
+
+Properties:
+
+- float edgeOffset
 
 <a name="Class_ToolTip"></a>
 ### ToolTip : UIElement
@@ -7406,6 +7455,24 @@ Properties:
 - int indentWidth (readonly)
 - TraversalMode traversalMode
 - bool elementEventSender
+
+<a name="Class_UISelectable"></a>
+### UISelectable : UIElement
+
+Methods:
+
+- UISelectable() (GC)
+- UISelectable* new()
+- void delete()
+- void SetSelectionColor(const Color& color)
+- void SetHoverColor(const Color& color)
+- const Color& GetSelectionColor() const
+- const Color& GetHoverColor() const
+
+Properties:
+
+- Color& selectionColor
+- Color& hoverColor
 
 <a name="Class_ValueAnimation"></a>
 ### ValueAnimation : Resource
@@ -8794,8 +8861,8 @@ Properties:
 - Time* GetTime()
 - long GetTotalMemory()
 - UI* GetUI()
-- bool HasSubscribedToEvent(const String eventName)
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
+- bool HasSubscribedToEvent(const String eventName)
 - float InverseLerp(float lhs, float rhs, float x)
 - bool IsAbsolutePath(const String pathName)
 - bool IsAlpha(unsigned ch)
@@ -8814,11 +8881,12 @@ Properties:
 - void OpenConsoleWindow()
 - float Pow(float x, float y)
 - void PrintLine(const String str, bool error = false)
+- void PrintLine(const char* str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float min, float max)
 - float Random()
 - float Random(float range)
+- float Random(float min, float max)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
@@ -8837,9 +8905,9 @@ Properties:
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
 - float Sqrt(float x)
-- float StableRandom(const Vector3& seed)
 - float StableRandom(const Vector2& seed)
 - float StableRandom(float seed)
+- float StableRandom(const Vector3& seed)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
@@ -8867,37 +8935,37 @@ Properties:
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
-- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
 - Vector2 VectorCeil(const Vector2& vec)
-- Vector4 VectorCeil(const Vector4& vec)
 - Vector3 VectorCeil(const Vector3& vec)
+- Vector4 VectorCeil(const Vector4& vec)
 - IntVector2 VectorCeilToInt(const Vector2& vec)
 - IntVector3 VectorCeilToInt(const Vector3& vec)
+- Vector4 VectorFloor(const Vector4& vec)
 - Vector3 VectorFloor(const Vector3& vec)
 - Vector2 VectorFloor(const Vector2& vec)
-- Vector4 VectorFloor(const Vector4& vec)
-- IntVector2 VectorFloorToInt(const Vector2& vec)
 - IntVector3 VectorFloorToInt(const Vector3& vec)
+- IntVector2 VectorFloorToInt(const Vector2& vec)
 - Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t)
-- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
-- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
+- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
-- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
 - IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
 - Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
+- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
+- Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
+- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
+- IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
 - Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
 - IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
-- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
-- Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
-- IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
 - Vector2 VectorRound(const Vector2& vec)
-- Vector4 VectorRound(const Vector4& vec)
 - Vector3 VectorRound(const Vector3& vec)
-- IntVector3 VectorRoundToInt(const Vector3& vec)
+- Vector4 VectorRound(const Vector4& vec)
 - IntVector2 VectorRoundToInt(const Vector2& vec)
+- IntVector3 VectorRoundToInt(const Vector3& vec)
 
 
 \section LuaScriptAPI_GlobalProperties Global properties
@@ -8971,6 +9039,11 @@ Properties:
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID
+- unsigned FLIP_ALL
+- unsigned FLIP_DIAGONAL
+- unsigned FLIP_HORIZONTAL
+- unsigned FLIP_RESERVED
+- unsigned FLIP_VERTICAL
 - int HAT_CENTER
 - int HAT_DOWN
 - int HAT_LEFT

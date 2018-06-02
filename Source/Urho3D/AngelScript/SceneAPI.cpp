@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -406,6 +406,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", asFUNCTION(GetObjectAttributeInfos), asCALL_CDECL);
+
+    engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", asFUNCTION(Scene::IsReplicatedID), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)
