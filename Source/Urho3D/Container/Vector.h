@@ -214,7 +214,7 @@ public:
     }
 
     /// Create an element at the end.
-    template <class... Args> T& Emplace(Args&&... args)
+    template <class... Args> T& EmplaceBack(Args&&... args)
     {
         if (size_ < capacity_)
         {
