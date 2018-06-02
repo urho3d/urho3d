@@ -332,6 +332,7 @@ if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     set (MODULE MODULE)
     set (EMSCRIPTEN_ROOT_PATH "" CACHE PATH "Root path to Emscripten cross-compiler tools (Emscripten only)")
     set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten only)")
+    option (EMSCRIPTEN_AUTO_SHELL "Auto adding a default HTML shell-file when it is not explicitly specified (Emscripten only)" TRUE)
     cmake_dependent_option (EMSCRIPTEN_WASM "Enable Binaryen support to generate output to WASM (WebAssembly) format (Emscripten only)" TRUE "NOT EMSCRIPTEN_EMCC_VERSION VERSION_LESS 1.37.3" FALSE)
     # Currently Emscripten does not support memory growth with MODULE library type
     if (URHO3D_LIB_TYPE STREQUAL MODULE)
@@ -1662,9 +1663,9 @@ macro (setup_main_executable)
                         break ()
                     endif ()
                 endforeach ()
-                if (URHO3D_TESTING)
-                    # Auto adding the HTML shell-file during testing with emrun, if it has not been added yet
-                    if (NOT EMCC_OPTION STREQUAL shell-file)
+                # Auto adding the HTML shell-file if necessary
+                if (NOT EMCC_OPTION STREQUAL shell-file)
+                    if (URHO3D_TESTING OR EMSCRIPTEN_AUTO_SHELL)
                         add_html_shell ()
                         list (APPEND TARGET_PROPERTIES SUFFIX .html)
                         set (SELF_EXECUTABLE_SHELL 1)
