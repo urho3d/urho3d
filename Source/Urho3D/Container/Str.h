@@ -36,6 +36,12 @@ static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
 
+class StringHash;
+template <class T, class U> class HashMap;
+
+/// Map of strings.
+using StringMap = HashMap<StringHash, String>;
+
 /// %String class.
 class URHO3D_API String
 {

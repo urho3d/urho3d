@@ -129,6 +129,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_SSE           |*|Enable SIMD instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
+|URHO3D_HASH_DEBUG    |0|Enable StringHash reversing and hash collision detection at the expense of memory and performance penalty|
 |URHO3D_PACKAGING     |0|Enable resources packaging support|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
