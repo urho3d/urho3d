@@ -230,6 +230,13 @@ public:
         head_ = tail_ = ReserveNode();
         *this = map;
     }
+
+    /// Move-construct from another hash map.
+    HashMap(HashMap<T, U> && map) noexcept
+    {
+        Swap(map);
+    }
+
     /// Aggregate initialization constructor.
     HashMap(const std::initializer_list<Pair<T, U>>& list) : HashMap()
     {
@@ -238,13 +245,17 @@ public:
             Insert(*it);
         }
     }
+
     /// Destruct.
     ~HashMap()
     {
-        Clear();
-        FreeNode(Tail());
-        AllocatorUninitialize(allocator_);
-        delete[] ptrs_;
+        if (allocator_)
+        {
+            Clear();
+            FreeNode(Tail());
+            AllocatorUninitialize(allocator_);
+            delete[] ptrs_;
+        }
     }
 
     /// Assign a hash map.
@@ -256,6 +267,14 @@ public:
             Clear();
             Insert(rhs);
         }
+        return *this;
+    }
+
+    /// Move-assign a hash map.
+    HashMap& operator =(HashMap<T, U> && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 
@@ -340,7 +359,7 @@ public:
         return *this;
     };
     /// Populate the map using variadic template.
-    template <typename... Args> HashMap& Populate(const T& key, const U& value, Args... args)
+    template <typename... Args> HashMap& Populate(const T& key, const U& value, const Args&... args)
     {
         this->operator [](key) = value;
         return Populate(args...);

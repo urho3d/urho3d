@@ -60,6 +60,15 @@ public:
         *this = str;
     }
 
+    /// Move-construct from another string.
+    String(String && str) noexcept :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        Swap(str);
+    }
+
     /// Construct from a C string.
     String(const char* str) :   // NOLINT(google-explicit-constructor)
         length_(0),
@@ -136,7 +145,7 @@ public:
     /// Construct from a character and fill length.
     explicit String(char value, unsigned length);
 
-    /// Construct from a convertable value.
+    /// Construct from a convertible value.
     template <class T> explicit String(const T& value) :
         length_(0),
         capacity_(0),
@@ -155,9 +164,20 @@ public:
     /// Assign a string.
     String& operator =(const String& rhs)
     {
-        Resize(rhs.length_);
-        CopyChars(buffer_, rhs.buffer_, rhs.length_);
+        if (&rhs != this)
+        {
+            Resize(rhs.length_);
+            CopyChars(buffer_, rhs.buffer_, rhs.length_);
+        }
 
+        return *this;
+    }
+
+    /// Move-assign a string.
+    String& operator =(String && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 
