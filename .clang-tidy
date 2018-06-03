@@ -130,8 +130,6 @@ CheckOptions:
     value:           memory
   - key:             modernize-pass-by-value.IncludeStyle
     value:           llvm
-  - key:             modernize-pass-by-value.ValuesOnly
-    value:           '0'
   - key:             modernize-replace-auto-ptr.IncludeStyle
     value:           llvm
   - key:             modernize-replace-random-shuffle.IncludeStyle
