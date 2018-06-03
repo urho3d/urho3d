@@ -288,9 +288,9 @@ This section assumes you have already updated, installed, and activated the late
 
 Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. Alternatively, call the emsdk_env script to set the EMSCRIPTEN environment variable for you. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
 
-On Windows host, execute cmake_emscripten.bat. On OS X or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples. You may also optionally set the URHO3D_LUA build option to enable Lua scripting support. If you encounter "Too many open files" warning when archiving the Urho3D static library, follow by "Unresolved symbol" errors on OS X then you have to increase the soft-limit in your host system before rebuilding the library and all the main targets.
+On Windows host, execute cmake_emscripten.bat. On MacOS or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples. You may also optionally set the URHO3D_LUA build option to enable Lua scripting support. If you encounter "Too many open files" warning when archiving the Urho3D static library, follow by "Unresolved symbol" errors on MacOS then you have to increase the soft-limit in your host system before rebuilding the library and all the main targets.
 
-For example, to double the limit (which normally defaults to 256 on OS X):
+For example, to double the limit (which normally defaults to 256 on MacOS):
 \verbatim
 ulimit -Sn 512
 \endverbatim
@@ -303,7 +303,6 @@ If CMake complains that emcc is not able to compile a test program, try reactiva
 
 \subsection Emscripten_experimental_build_options Experimental build options
 
-- EMSCRIPTEN_WASM=1. Enabling this build option to target WebAssembly. Currently the WASM output requires Firefox Nightly or Chrome Canary to run.
 - URHO3D_LIB_TYPE=MODULE. For fast iteration during development time. This build option should be avoided for production due to reduce throughput.
 
 \section Building_64bit Native 64bit build
