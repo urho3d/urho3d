@@ -18,11 +18,15 @@
 #if   defined (WINDOWS_STORE_RT)
 #include <windows.h>
 #include <winsock.h>
-#elif defined (_WIN32)
+#elif defined (_WIN32) || defined(__MINGW32__)
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
+#if defined(__MINGW32__)
+#include <iphlpapi.h> // used for GetAdaptersAddresses()
+#else
 #include <IPHlpApi.h> // used for GetAdaptersAddresses()
+#endif
 #pragma comment(lib, "IPHLPAPI.lib") // used for GetAdaptersAddresses()
 
 // Must always include Winsock2.h before windows.h

@@ -974,14 +974,14 @@ void Table::PrintColumnHeaders(char *out, int outLength, char columnDelineator) 
 		{
 			len = (int) strlen(out);
 			if (len < outLength-1)
-				sprintf_s(out+len, outLength-len, "%c", columnDelineator);
+				sprintf(out+len, "%c", columnDelineator);
 			else
 				return;
 		}
 
 		len = (int) strlen(out);
 		if (len < outLength-(int) strlen(columns[i].columnName))
-			sprintf_s(out+len, outLength-len, "%s", columns[i].columnName);
+			sprintf(out+len, "%s", columns[i].columnName);
 		else
 			return;
 	}
@@ -1013,7 +1013,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false)
 			{
-				sprintf_s(buff, "%f", inputRow->cells[i]->i);
+				sprintf(buff, "%f", inputRow->cells[i]->i);
 				len=(int)strlen(buff);
 			}
 			else
@@ -1026,7 +1026,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false && inputRow->cells[i]->c)
 			{
-				strncpy_s(buff, inputRow->cells[i]->c, 512-2);
+				strncpy(buff, inputRow->cells[i]->c, 512-2);
 				buff[512-2]=0;
 				len=(int)strlen(buff);
 			}
@@ -1040,7 +1040,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false && inputRow->cells[i]->ptr)
 			{
-				sprintf_s(buff, "%p", inputRow->cells[i]->ptr);
+				sprintf(buff, "%p", inputRow->cells[i]->ptr);
 				len=(int)strlen(buff);
 			}
 			else

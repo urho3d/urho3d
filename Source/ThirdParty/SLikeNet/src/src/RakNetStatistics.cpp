@@ -83,7 +83,7 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString(RakNetStatistics *s, char *buffer,
 		if (s->BPSLimitByCongestionControl != 0)
 		{
 			char buff2[128];
-			sprintf_s(buff2,
+			sprintf(buff2,
 				"Send capacity                    %" PRINTF_64_BIT_MODIFIER "u bytes per second (%.0f%%)\n",
 				(long long unsigned int) s->BPSLimitByCongestionControl,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByCongestionControl
@@ -96,7 +96,7 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString(RakNetStatistics *s, char *buffer,
 		if (s->BPSLimitByOutgoingBandwidthLimit != 0)
 		{
 			char buff2[128];
-			sprintf_s(buff2,
+			sprintf(buff2,
 				"Send limit                       %" PRINTF_64_BIT_MODIFIER "u (%.0f%%)\n",
 				(long long unsigned int) s->BPSLimitByOutgoingBandwidthLimit,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByOutgoingBandwidthLimit

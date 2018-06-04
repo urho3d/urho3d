@@ -19,6 +19,7 @@
 #include "slikenet/sleep.h"
 #include "slikenet/SocketDefines.h"
 #include "slikenet/GetTime.h"
+#include "slikenet/linux_adapter.h"
 #include <stdio.h>
 #include <string.h> // memcpy
 
