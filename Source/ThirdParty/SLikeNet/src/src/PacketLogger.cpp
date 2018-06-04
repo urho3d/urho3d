@@ -67,7 +67,7 @@ void PacketLogger::FormatLine(char* into, const char* dir, const char* type, uns
 	// would just be redundant.
 	if (idToPrint == NULL)
 	{
-		sprintf(numericID, "%5u", id);
+		sprintf_s(numericID, "%5u", id);
 		idToPrint = numericID;
 	}
 
@@ -92,7 +92,7 @@ unsigned int splitPacketId, unsigned int splitPacketIndex, unsigned int splitPac
 	// would just be redundant.
 	if(idToPrint == NULL)
 	{
-		sprintf(numericID, "%5u", id);
+		sprintf_s(numericID, "%5u", id);
 		idToPrint = numericID;
 	}
 
@@ -119,10 +119,10 @@ unsigned int splitPacketId, unsigned int splitPacketIndex, unsigned int splitPac
 	}
 	else
 	{
-		sprintf(str3,"%5u",reliableMessageNumber);
+		sprintf_s(str3,"%5u",reliableMessageNumber);
 	}
 
-	sprintf(into, intoLength, "%s,%s%s,%s,%s,%5u,%s,%u,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,%i,%i,%i,%i,%s,"
+	sprintf_s(into, intoLength, "%s,%s%s,%s,%s,%5u,%s,%u,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,%i,%i,%i,%i,%s,"
 					, localtime
 					, prefix
 					, dir
@@ -160,7 +160,7 @@ void PacketLogger::FormatLine(char* into, const char* dir, const char* type, uns
 	}
 	else
 	{
-		sprintf(str3, "%5u", reliableMessageNumber);
+		sprintf_s(str3, "%5u", reliableMessageNumber);
 	}
 
 #pragma warning(push)
@@ -231,7 +231,7 @@ void PacketLogger::OnAck(unsigned int messageNumber, SystemAddress remoteSystemA
 	char localtime[128];
 	GetLocalTime(localtime);
 
-	sprintf(str, "%s,Rcv,Ack,%i,,,,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,,,,,,"
+	sprintf_s(str, "%s,Rcv,Ack,%i,,,,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,,,,,,"
 					, localtime
 					, messageNumber
 					, (unsigned long long) time
@@ -251,7 +251,7 @@ void PacketLogger::OnPushBackPacket(const char *data, const BitSize_t bitsUsed, 
 	char localtime[128];
 	GetLocalTime(localtime);
 
-	sprintf(str, "%s,Lcl,PBP,,,%s,%i,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,,,,,,"
+	sprintf_s(str, "%s,Lcl,PBP,,,%s,%i,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,,,,,,"
 					, localtime
 					, BaseIDTOString(data[0])
 					, bitsUsed
@@ -313,7 +313,7 @@ void PacketLogger::WriteMiscellaneous(const char *type, const char *msg)
 	char localtime[128];
 	GetLocalTime(localtime);
 
-	sprintf(str, "%s,Lcl,%s,,,,,%" PRINTF_64_BIT_MODIFIER "u,%s,,,,,,,%s"
+	sprintf_s(str, "%s,Lcl,%s,,,,,%" PRINTF_64_BIT_MODIFIER "u,%s,,,,,,,%s"
 					, localtime
 					, type
 					, (unsigned long long) time
@@ -517,7 +517,7 @@ void PacketLogger::GetLocalTime(char buffer[128])
 	localtime_s ( &timeinfo, &rawtime );
 	strftime (buffer,128,"%x %X",&timeinfo);
 	char buff[32];
-	sprintf(buff, ".%i", tv.tv_usec);
+	sprintf_s(buff, ".%i", tv.tv_usec);
 	strcat_s(buffer,128,buff);
 
 	// Commented version puts the time first
@@ -526,7 +526,7 @@ void PacketLogger::GetLocalTime(char buffer[128])
 	localtime_s ( &timeinfo, &rawtime );
 	strftime (buffer,128,"%X",&timeinfo);
 	char buff[32];
-	sprintf(buff, ".%i ", tv.tv_usec);
+	sprintf_s(buff, ".%i ", tv.tv_usec);
 	strcat_s(buffer,128,buff);
 	char buff2[32];
 	strftime (buff2,32,"%x",&timeinfo);

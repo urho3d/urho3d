@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -20,16 +20,7 @@
 #include "WindowsIncludes.h"
 #endif
 
-
-
-
-
 #include "Export.h"
-
-
-
-
-
 
 #if defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
 #include "../DependentExtensions/WinPhone8/ThreadEmulation.h"
@@ -42,10 +33,8 @@ namespace SLNet
 #if defined(_WIN32_WCE) || defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
 #define RAK_THREAD_DECLARATION(functionName) DWORD WINAPI functionName(LPVOID arguments)
 
-
 #elif defined(_WIN32)
 #define RAK_THREAD_DECLARATION(functionName) unsigned __stdcall functionName( void* arguments )
-
 
 #else
 #define RAK_THREAD_DECLARATION(functionName) void* functionName( void* arguments )
@@ -54,10 +43,6 @@ namespace SLNet
 class RAK_DLL_EXPORT RakThread
 {
 public:
-
-
-
-
 	/// Create a thread, simplified to be cross platform without all the extra junk
 	/// To then start that thread, call RakCreateThread(functionName, arguments);
 	/// \param[in] start_address Function you want to call
@@ -74,36 +59,11 @@ public:
 	*/
 #if defined(_WIN32_WCE) || defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
 	static int Create( LPTHREAD_START_ROUTINE start_address, void *arglist, int priority=0);
-
-
 #elif defined(_WIN32)
 	static int Create( unsigned __stdcall start_address( void* ), void *arglist, int priority=0);
-
-
-
 #else
 	static int Create( void* start_address( void* ), void *arglist, int priority=0);
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 };
 
 }

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -1303,9 +1303,9 @@ const char *RakString::ToString(int64_t i)
 	static int index=0;
 	static char buff[64][64];
 #if defined(_WIN32)
-	sprintf(buff[index], "%I64d", i);
+	sprintf_s(buff[index], "%I64d", i);
 #else
-	sprintf(buff[index], "%lld", (long long unsigned int) i);
+	sprintf_s(buff[index], "%lld", (long long unsigned int) i);
 #endif
 	int lastIndex=index;
 	if (++index==64)
@@ -1317,9 +1317,9 @@ const char *RakString::ToString(uint64_t i)
 	static int index=0;
 	static char buff[64][64];
 #if defined(_WIN32)
-	sprintf(buff[index], "%I64u", i);
+	sprintf_s(buff[index], "%I64u", i);
 #else
-	sprintf(buff[index], "%llu", (long long unsigned int) i);
+	sprintf_s(buff[index], "%llu", (long long unsigned int) i);
 #endif
 	int lastIndex=index;
 	if (++index==64)

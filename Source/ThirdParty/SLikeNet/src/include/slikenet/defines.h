@@ -160,16 +160,6 @@
 #define RAKNET_SUPPORT_IPV6 0
 #endif
 
-
-
-
-
-
-
-
-
-
-
 #ifndef RAKSTRING_TYPE
 #if defined(_UNICODE)
 #define RAKSTRING_TYPE RakWString
@@ -213,11 +203,6 @@
 #define USE_ALLOCA 1
 #endif
 
-
-
-
-
-
 //#define USE_THREADED_SEND
 
 // @since 0.1.1: added
@@ -230,10 +215,13 @@
 #define SLNET_MAX_RETRIEVABLE_FILESIZE (0xFFFFFFFF)
 #endif
 
+// #blocker_2_0 - remove RAKNET_COMPATIBILITY
 #ifdef RAKNET_COMPATIBILITY
-// set the namespace RakNet as alias to the SLikeNet namespace
-namespace SLNet { }
-namespace RakNet = SLNet;
+// note: we cannot use namespace aliases here since we need to ensure ABI compatibility with shared libraries/DLLs
+// if we'd use a namespace alias, the names in the DLLs would still point to the actual namespace (SLNet) rather
+// than the alias namespace and old apps would not be able to use the DLL as an in-place replacement
+// hence, go with a simple preprocessor macro which will replace the SLNet namespace names with RakNet
+#define SLNet RakNet
 #endif
 
 #endif // __RAKNET_DEFINES_H

@@ -21,9 +21,6 @@
 #include "string.h"
 
 #ifdef _WIN32
-
-
-
 #include "WindowsIncludes.h"
 #endif
 
@@ -120,10 +117,8 @@ namespace SLNet
 		wchar_t* c_str;
 		size_t c_strCharLength;
 	};
-
 }
 
 const SLNet::RakWString RAK_DLL_EXPORT operator+(const SLNet::RakWString &lhs, const SLNet::RakWString &rhs);
-
 
 #endif

@@ -105,7 +105,7 @@ errno_t mbstowcs_s(size_t *pReturnValue, wchar_t *wcstr, size_t sizeInWords, con
 	return 0;
 }
 
-int sprintf(char *buffer, size_t sizeOfBuffer, const char *format, ...)
+int sprintf_s(char *buffer, size_t sizeOfBuffer, const char *format, ...)
 {
 	if ((buffer == nullptr) || (sizeOfBuffer == 0) || (format == nullptr)) {
 		return -1;

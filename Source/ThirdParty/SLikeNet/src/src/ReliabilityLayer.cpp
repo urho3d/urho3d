@@ -790,180 +790,190 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 #endif
 		//		congestionManager.OnAck(timeRead, rtt, dhf.hasBAndAS, dhf.B, dhf.AS, totalUserDataBytesAcked );
 
-
 		incomingAcks.Clear();
-		if (incomingAcks.Deserialize(&socketData)==false)
-		{
-			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+		if (!incomingAcks.Deserialize(&socketData)) {
+			for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingAcks.Deserialize failed", BYTES_TO_BITS(length), systemAddress, true);
+			}
 
 			return false;
 		}
-		for (i=0; i<incomingAcks.ranges.Size();i++)
-		{
-            if (incomingAcks.ranges[i].minIndex>incomingAcks.ranges[i].maxIndex || (incomingAcks.ranges[i].maxIndex == (uint24_t)(0xFFFFFFFF)))
-			{
-				RakAssert(incomingAcks.ranges[i].minIndex<=incomingAcks.ranges[i].maxIndex);
 
-				for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-					messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingAcks minIndex > maxIndex or maxIndex is max value", BYTES_TO_BITS(length), systemAddress, true);
-				return false;
+		unsigned int k = 0;
+		while (k < unreliableWithAckReceiptHistory.Size()) {
+			if (incomingAcks.IsWithinRange(unreliableWithAckReceiptHistory[k].datagramNumber)) {
+				InternalPacket *ackReceipt = AllocateFromInternalPacketPool();
+				AllocInternalPacketData(ackReceipt, 5, false, _FILE_AND_LINE_);
+				ackReceipt->dataBitLength = BYTES_TO_BITS(5);
+				ackReceipt->data[0] = (MessageID)ID_SND_RECEIPT_ACKED;
+				memcpy(ackReceipt->data + sizeof(MessageID), &unreliableWithAckReceiptHistory[k].sendReceiptSerial, sizeof(uint32_t));
+				outputQueue.Push(ackReceipt, _FILE_AND_LINE_);
+
+				// Remove, swap with last
+				unreliableWithAckReceiptHistory.RemoveAtIndex(k);
+			} else {
+				k++;
 			}
-			for (datagramNumber=incomingAcks.ranges[i].minIndex; datagramNumber >= incomingAcks.ranges[i].minIndex && datagramNumber <= incomingAcks.ranges[i].maxIndex; datagramNumber++)
-			{
-				CCTimeType whenSent;
-				
-				if (unreliableWithAckReceiptHistory.Size()>0)
-				{
-					unsigned int k=0;
-					while (k < unreliableWithAckReceiptHistory.Size())
-					{
-						if (unreliableWithAckReceiptHistory[k].datagramNumber == datagramNumber)
-						{
-							InternalPacket *ackReceipt = AllocateFromInternalPacketPool();
-							AllocInternalPacketData(ackReceipt, 5,  false, _FILE_AND_LINE_ );
-							ackReceipt->dataBitLength=BYTES_TO_BITS(5);
-							ackReceipt->data[0]=(MessageID)ID_SND_RECEIPT_ACKED;
-							memcpy(ackReceipt->data+sizeof(MessageID), &unreliableWithAckReceiptHistory[k].sendReceiptSerial, sizeof(uint32_t));
-							outputQueue.Push(ackReceipt, _FILE_AND_LINE_ );
+		}
 
-							// Remove, swap with last
-							unreliableWithAckReceiptHistory.RemoveAtIndex(k);
-						}
-						else
-							k++;
-					}
+		// early out, if we've got no outstanding datagramHistory entries
+		if (datagramHistory.IsEmpty()) {
+			receivePacketCount++;
+			return true;
+		}
+
+		for (i = 0; i < incomingAcks.ranges.Size(); i++) {
+			// note: minIndex is ensured to be always <= maxIndex - otherwise Deserialize() would have failed
+			RakAssert(incomingAcks.ranges[i].minIndex <= incomingAcks.ranges[i].maxIndex);
+
+			if (incomingAcks.ranges[i].maxIndex == (uint24_t)(0xFFFFFFFF)) {
+				for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+					messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingAcks maxIndex is max value", BYTES_TO_BITS(length), systemAddress, true);
 				}
 
+				// it's an invalid incoming package --- let's abort processing (there's no point in continuing processing other ranges if the package is invalid)
+				return false;
+			}
+
+			for (datagramNumber = incomingAcks.ranges[i].minIndex; datagramNumber <= incomingAcks.ranges[i].maxIndex; datagramNumber++) {
+				const DatagramSequenceNumberType offsetIntoList = datagramNumber - datagramHistoryPopCount;
+				if (offsetIntoList >= datagramHistory.Size()) {
+					// reached the end of the datagramHistory list - hence, we are done
+					receivePacketCount++;
+					return true;
+				}
+
+				CCTimeType whenSent;
 				MessageNumberNode *messageNumberNode = GetMessageNumberNodeByDatagramIndex(datagramNumber, &whenSent);
-				if (messageNumberNode)
-				{
+				if (messageNumberNode) {
 				//	printf("%p Got ack for %i\n", this, datagramNumber.val);
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-					congestionManager.OnAck(timeRead, rtt, dhf.hasBAndAS, 0, dhf.AS, totalUserDataBytesAcked, bandwidthExceededStatistic, datagramNumber );
+					congestionManager.OnAck(timeRead, rtt, dhf.hasBAndAS, 0, dhf.AS, totalUserDataBytesAcked, bandwidthExceededStatistic, datagramNumber);
 #else
 					CCTimeType ping;
-					if (timeRead>whenSent)
-						ping=timeRead-whenSent;
-					else
-						ping=0;
-					congestionManager.OnAck(timeRead, ping, dhf.hasBAndAS, 0, dhf.AS, totalUserDataBytesAcked, bandwidthExceededStatistic, datagramNumber );
+					if (timeRead > whenSent) {
+						ping = timeRead - whenSent;
+					} else {
+						ping = 0;
+					}
+					congestionManager.OnAck(timeRead, ping, dhf.hasBAndAS, 0, dhf.AS, totalUserDataBytesAcked, bandwidthExceededStatistic, datagramNumber);
 #endif
-					while (messageNumberNode)
-					{
+					while (messageNumberNode) {
 						// TESTING1
 // 						printf("Remove %i on ack for datagramNumber=%i.\n", messageNumberNode->messageNumber.val, datagramNumber.val);
 
-						RemovePacketFromResendListAndDeleteOlderReliableSequenced( messageNumberNode->messageNumber, timeRead, messageHandlerList, systemAddress );
-						messageNumberNode=messageNumberNode->next;
+						RemovePacketFromResendListAndDeleteOlderReliableSequenced(messageNumberNode->messageNumber, timeRead, messageHandlerList, systemAddress);
+						messageNumberNode = messageNumberNode->next;
 					}
 
 					RemoveFromDatagramHistory(datagramNumber);
 				}
-// 				else if (isReliable)
-// 				{
+// 				else if (isReliable) {
 // 					// Previously used slot, rather than empty unreliable slot
 // 					printf("%p Ack %i is duplicate\n", this, datagramNumber.val);
 // 
-//  					congestionManager.OnDuplicateAck(timeRead, datagramNumber);
+//  				congestionManager.OnDuplicateAck(timeRead, datagramNumber);
 // 				}
 			}
 		}
-	}
-	else if (dhf.isNAK)
-	{
+	} else if (dhf.isNAK) {
+		// early out, if we've got no outstanding datagramHistory entries
+		if (datagramHistory.IsEmpty()) {
+			receivePacketCount++;
+			return true;
+		}
+
 		DatagramSequenceNumberType messageNumber;
 		DataStructures::RangeList<DatagramSequenceNumberType> incomingNAKs;
-		if (incomingNAKs.Deserialize(&socketData)==false)
-		{
-			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingNAKs.Deserialize failed", BYTES_TO_BITS(length), systemAddress, true);			
+		if (!incomingNAKs.Deserialize(&socketData)) {
+			for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingNAKs.Deserialize failed", BYTES_TO_BITS(length), systemAddress, true);
+			}
 
+			// it's an invalid incoming package --- let's abort processing (there's no point in continuing processing other ranges if the package is invalid)
 			return false;
 		}
-		for (i=0; i<incomingNAKs.ranges.Size();i++)
-		{
-			if (incomingNAKs.ranges[i].minIndex>incomingNAKs.ranges[i].maxIndex)
-			{
-				RakAssert(incomingNAKs.ranges[i].minIndex<=incomingNAKs.ranges[i].maxIndex);
+		for (i = 0; i < incomingNAKs.ranges.Size(); i++) {
+			// note: minIndex is ensured to be always <= maxIndex - otherwise Deserialize() would have failed
+			RakAssert(incomingNAKs.ranges[i].minIndex <= incomingNAKs.ranges[i].maxIndex);
 
-				for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-					messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingNAKs minIndex>maxIndex", BYTES_TO_BITS(length), systemAddress, true);			
+			if (incomingNAKs.ranges[i].maxIndex == (uint24_t)(0xFFFFFFFF)) {
+				for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+					messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingNAKs maxIndex is max value", BYTES_TO_BITS(length), systemAddress, true);
+				}
 
 				return false;
 			}
 			// Sanity check
 			//RakAssert(incomingNAKs.ranges[i].maxIndex.val-incomingNAKs.ranges[i].minIndex.val<1000);
-			for (messageNumber=incomingNAKs.ranges[i].minIndex; messageNumber >= incomingNAKs.ranges[i].minIndex && messageNumber <= incomingNAKs.ranges[i].maxIndex; messageNumber++)
-			{
+			for (messageNumber = incomingNAKs.ranges[i].minIndex; messageNumber <= incomingNAKs.ranges[i].maxIndex; messageNumber++) {
 				congestionManager.OnNAK(timeRead, messageNumber);
 
 				// REMOVEME
 				//				printf("%p NAK %i\n", this, dhf.datagramNumber.val);
 
+				const DatagramSequenceNumberType offsetIntoList = messageNumber - datagramHistoryPopCount;
+				if (offsetIntoList >= datagramHistory.Size()) {
+					// reached the end of the datagramHistory list - hence, we are done
+					receivePacketCount++;
+					return true;
+				}
 
 				CCTimeType timeSent;
 				MessageNumberNode *messageNumberNode = GetMessageNumberNodeByDatagramIndex(messageNumber, &timeSent);
-				while (messageNumberNode)
-				{
+				while (messageNumberNode) {
 					// Update timers so resends occur immediately
 					InternalPacket *internalPacket = resendBuffer[messageNumberNode->messageNumber & (uint32_t) RESEND_BUFFER_ARRAY_MASK];
-					if (internalPacket)
-					{
-						if (internalPacket->nextActionTime!=0)
-						{
-							internalPacket->nextActionTime=timeRead;
+					if (internalPacket) {
+						if (internalPacket->nextActionTime != 0) {
+							internalPacket->nextActionTime = timeRead;
 						}
 					}				
 
-					messageNumberNode=messageNumberNode->next;
+					messageNumberNode = messageNumberNode->next;
 				}
 			}
 		}
-	}
-	else
-	{
+	} else {
 		uint32_t skippedMessageCount;
-		if (!congestionManager.OnGotPacket(dhf.datagramNumber, dhf.isContinuousSend, timeRead, length, &skippedMessageCount))
-		{
-			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("congestionManager.OnGotPacket failed", BYTES_TO_BITS(length), systemAddress, true);			
+		if (!congestionManager.OnGotPacket(dhf.datagramNumber, dhf.isContinuousSend, timeRead, length, &skippedMessageCount)) {
+			for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("congestionManager.OnGotPacket failed", BYTES_TO_BITS(length), systemAddress, true);
+			}
 
 			return true;
 		}
-		if (dhf.isPacketPair)
+		if (dhf.isPacketPair) {
 			congestionManager.OnGotPacketPair(dhf.datagramNumber, length, timeRead);
+		}
 
 		DatagramHeaderFormat dhfNAK;
-		dhfNAK.isNAK=true;
+		dhfNAK.isNAK = true;
 		uint32_t skippedMessageOffset;
-		for (skippedMessageOffset=skippedMessageCount; skippedMessageOffset > 0; skippedMessageOffset--)
-		{
-			NAKs.Insert(dhf.datagramNumber-skippedMessageOffset);
+		for (skippedMessageOffset = skippedMessageCount; skippedMessageOffset > 0; skippedMessageOffset--) {
+			NAKs.Insert(dhf.datagramNumber - skippedMessageOffset);
 		}
-		remoteSystemNeedsBAndAS=dhf.needsBAndAs;
+		remoteSystemNeedsBAndAS = dhf.needsBAndAs;
 
 		// Ack dhf.datagramNumber
 		// Ack even unreliable messages for congestion control, just don't resend them on no ack
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-		SendAcknowledgementPacket( dhf.datagramNumber, dhf.sourceSystemTime);
+		SendAcknowledgementPacket(dhf.datagramNumber, dhf.sourceSystemTime);
 #else
-		SendAcknowledgementPacket( dhf.datagramNumber, 0);
+		SendAcknowledgementPacket(dhf.datagramNumber, 0);
 #endif
 
-		InternalPacket* internalPacket = CreateInternalPacketFromBitStream( &socketData, timeRead );
-		if (internalPacket==0)
-		{
-			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("CreateInternalPacketFromBitStream failed", BYTES_TO_BITS(length), systemAddress, true);			
+		InternalPacket* internalPacket = CreateInternalPacketFromBitStream(&socketData, timeRead);
+		if (internalPacket == 0) {
+			for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("CreateInternalPacketFromBitStream failed", BYTES_TO_BITS(length), systemAddress, true);
+			}
 
 			return true;
 		}
 
-		while ( internalPacket )
-		{
-			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-			{
+		while (internalPacket) {
+			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 #if CC_TIME_TYPE_BYTES==4
 				messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, receivePacketCount, systemAddress, timeRead, false);
 #else
@@ -975,8 +985,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 
 				// resetReceivedPackets is set from a non-threadsafe function.
 				// We do the actual reset in this function so the data is not modified by multiple threads
-				if (resetReceivedPackets)
-				{
+				if (resetReceivedPackets) {
 					hasReceivedPacketQueue.ClearAndForceAllocation(DEFAULT_HAS_RECEIVED_PACKET_QUEUE_SIZE, _FILE_AND_LINE_);
 					receivedPacketsBaseIndex=0;
 					resetReceivedPackets=false;
@@ -989,102 +998,95 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 					internalPacket->reliability == RELIABLE_ORDERED
 					)
 				{
-					if ( internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS )
-					{
-						for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+					if (internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS) {
+						for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 							messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS", BYTES_TO_BITS(length), systemAddress, true);
+						}
 
 						bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
 
-						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_ );
-						ReleaseToInternalPacketPool( internalPacket );
+						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_);
+						ReleaseToInternalPacketPool(internalPacket);
 						goto CONTINUE_SOCKET_DATA_PARSE_LOOP;
 					}
 				}
 
 				// 8/12/09 was previously not checking if the message was reliable. However, on packetloss this would mean you'd eventually exceed the
 				// hole count because unreliable messages were never resent, and you'd stop getting messages
-				if (internalPacket->reliability == RELIABLE || internalPacket->reliability == RELIABLE_SEQUENCED || internalPacket->reliability == RELIABLE_ORDERED )
-				{
+				if (internalPacket->reliability == RELIABLE || internalPacket->reliability == RELIABLE_SEQUENCED || internalPacket->reliability == RELIABLE_ORDERED) {
 					// If the following conditional is true then this either a duplicate packet
 					// or an older out of order packet
 					// The subtraction unsigned overflow is intentional
-					holeCount = (DatagramSequenceNumberType)(internalPacket->reliableMessageNumber-receivedPacketsBaseIndex);
+					holeCount = (DatagramSequenceNumberType)(internalPacket->reliableMessageNumber - receivedPacketsBaseIndex);
 					const DatagramSequenceNumberType typeRange = (DatagramSequenceNumberType)(const uint32_t)-1;
 
 					// TESTING1
 // 					printf("waiting on reliableMessageNumber=%i holeCount=%i datagramNumber=%i\n", receivedPacketsBaseIndex.val, holeCount.val, dhf.datagramNumber.val);
 
-					if (holeCount==(DatagramSequenceNumberType) 0)
-					{
+					if (holeCount == (DatagramSequenceNumberType)0) {
 						// Got what we were expecting
 						if (hasReceivedPacketQueue.Size())
 							hasReceivedPacketQueue.Pop();
 						++receivedPacketsBaseIndex;
-					}
-					else if (holeCount > typeRange/(DatagramSequenceNumberType) 2)
-					{
+					} else if (holeCount > typeRange/(DatagramSequenceNumberType) 2) {
 						bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
 
-						for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+						for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 							messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("holeCount > typeRange/(DatagramSequenceNumberType) 2", BYTES_TO_BITS(length), systemAddress, false);
+						}
 
 						// Duplicate packet
-						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_ );
-						ReleaseToInternalPacketPool( internalPacket );
+						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_);
+						ReleaseToInternalPacketPool(internalPacket);
 
 						goto CONTINUE_SOCKET_DATA_PARSE_LOOP;
-					}
-					else if ((unsigned int) holeCount<hasReceivedPacketQueue.Size())
-					{
+					} else if ((unsigned int)holeCount < hasReceivedPacketQueue.Size()) {
 						// Got a higher count out of order packet that was missing in the sequence or we already got
-						if (hasReceivedPacketQueue[holeCount]!=false) // non-zero means this is a hole
-						{
+						if (hasReceivedPacketQueue[holeCount] != false) { // non-zero means this is a hole
 #ifdef LOG_TRIVIAL_NOTIFICATIONS
-							for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+							for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 								messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("Higher count pushed to hasReceivedPacketQueue", BYTES_TO_BITS(length), systemAddress, false);
+							}
 #endif
 
 							// Fill in the hole
-							hasReceivedPacketQueue[holeCount]=false; // We got the packet at holeCount
-						}
-						else
-						{
-							bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
+							hasReceivedPacketQueue[holeCount] = false; // We got the packet at holeCount
+						} else {
+							bpsMetrics[(int)USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
 
 #ifdef LOG_TRIVIAL_NOTIFICATIONS
-							for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+							for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 								messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("Duplicate packet ignored", BYTES_TO_BITS(length), systemAddress, false);
+							}
 #endif
 
 							// Duplicate packet
-							FreeInternalPacketData(internalPacket, _FILE_AND_LINE_ );
-							ReleaseToInternalPacketPool( internalPacket );
+							FreeInternalPacketData(internalPacket, _FILE_AND_LINE_);
+							ReleaseToInternalPacketPool(internalPacket);
 
 							goto CONTINUE_SOCKET_DATA_PARSE_LOOP;
 						}
-					}
-					else // holeCount>=receivedPackets.Size()
-					{
-						if (holeCount > (DatagramSequenceNumberType) 1000000)
-						{
+					} else { // holeCount>=receivedPackets.Size()
+						if (holeCount > (DatagramSequenceNumberType)1000000) {
 							RakAssert("Hole count too high. See ReliabilityLayer.h" && 0);
 
-							for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+							for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 								messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("holeCount > 1000000", BYTES_TO_BITS(length), systemAddress, true);
+							}
 
-							bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
+							bpsMetrics[(int)USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead, BITS_TO_BYTES(internalPacket->dataBitLength));
 
 							// Would crash due to out of memory!
-							FreeInternalPacketData(internalPacket, _FILE_AND_LINE_ );
-							ReleaseToInternalPacketPool( internalPacket );
+							FreeInternalPacketData(internalPacket, _FILE_AND_LINE_);
+							ReleaseToInternalPacketPool(internalPacket);
 
 							goto CONTINUE_SOCKET_DATA_PARSE_LOOP;
 						}
 
 #ifdef LOG_TRIVIAL_NOTIFICATIONS
-						for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+						for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
 							messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("Adding to hasReceivedPacketQueue later ordered message", BYTES_TO_BITS(length), systemAddress, false);
+						}
 #endif
 
 						// Fix - sending on a higher priority gives us a very very high received packets base index if we formerly had pre-split a lot of messages and
@@ -1093,8 +1095,9 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 						// Fixed by late assigning message IDs on the sender
 
 						// Add 0 times to the queue until (reliableMessageNumber - baseIndex) < queue size.
-						while ((unsigned int)(holeCount) > hasReceivedPacketQueue.Size())
-							hasReceivedPacketQueue.Push(true, _FILE_AND_LINE_ ); // time+(CCTimeType)60 * (CCTimeType)1000 * (CCTimeType)1000); // Didn't get this packet - set the time to give up waiting
+						while ((unsigned int)(holeCount) > hasReceivedPacketQueue.Size()) {
+							hasReceivedPacketQueue.Push(true, _FILE_AND_LINE_); // time+(CCTimeType)60 * (CCTimeType)1000 * (CCTimeType)1000); // Didn't get this packet - set the time to give up waiting
+						}
 						hasReceivedPacketQueue.Push(false, _FILE_AND_LINE_ ); // Got the packet
 #ifdef _DEBUG
 						// If this assert hits then DatagramSequenceNumberType has overflowed
@@ -1102,70 +1105,63 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 #endif
 					}
 
-					while ( hasReceivedPacketQueue.Size()>0 && hasReceivedPacketQueue.Peek()==false )
-					{
+					while (hasReceivedPacketQueue.Size() > 0 && !hasReceivedPacketQueue.Peek()) {
 						hasReceivedPacketQueue.Pop();
 						++receivedPacketsBaseIndex;
 					}
 				}
 
 				// If the allocated buffer is > DEFAULT_HAS_RECEIVED_PACKET_QUEUE_SIZE and it is 3x greater than the number of elements actually being used
-				if (hasReceivedPacketQueue.AllocationSize() > (unsigned int) DEFAULT_HAS_RECEIVED_PACKET_QUEUE_SIZE && hasReceivedPacketQueue.AllocationSize() > hasReceivedPacketQueue.Size() * 3)
+				if (hasReceivedPacketQueue.AllocationSize() > (unsigned int)DEFAULT_HAS_RECEIVED_PACKET_QUEUE_SIZE && hasReceivedPacketQueue.AllocationSize() > hasReceivedPacketQueue.Size() * 3) {
 					hasReceivedPacketQueue.Compress(_FILE_AND_LINE_);
+				}
 
 
 				/*
-				if ( internalPacket->reliability == RELIABLE_SEQUENCED || internalPacket->reliability == UNRELIABLE_SEQUENCED )
-				{
+				if (internalPacket->reliability == RELIABLE_SEQUENCED || internalPacket->reliability == UNRELIABLE_SEQUENCED) {
 #ifdef _DEBUG
-					RakAssert( internalPacket->orderingChannel < NUMBER_OF_ORDERED_STREAMS );
+					RakAssert(internalPacket->orderingChannel < NUMBER_OF_ORDERED_STREAMS);
 #endif
 
-					if ( internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS )
-					{
+					if (internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS) {
+						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_);
+						ReleaseToInternalPacketPool(internalPacket);
 
-						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_ );
-						ReleaseToInternalPacketPool( internalPacket );
-
-						for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-							messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS", BYTES_TO_BITS(length), systemAddress);			
+						for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+							messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("internalPacket->orderingChannel >= NUMBER_OF_ORDERED_STREAMS", BYTES_TO_BITS(length), systemAddress);
+						}
 
 						bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
 
 						goto CONTINUE_SOCKET_DATA_PARSE_LOOP;
 					}
 
-					if ( IsOlderOrderedPacket( internalPacket->orderingIndex, waitingForSequencedPacketReadIndex[ internalPacket->orderingChannel ] ) == false )
-					{
+					if (!IsOlderOrderedPacket(internalPacket->orderingIndex, waitingForSequencedPacketReadIndex[internalPacket->orderingChannel])) {
 						// Is this a split packet?
-						if ( internalPacket->splitPacketCount > 0 )
-						{
+						if (internalPacket->splitPacketCount > 0) {
 							// Generate the split
 							// Verify some parameters to make sure we don't get junk data
 
 
 							// Check for a rebuilt packet
-							InsertIntoSplitPacketList( internalPacket, timeRead );
+							InsertIntoSplitPacketList(internalPacket, timeRead);
 							bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_PROCESSED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
 
 							// Sequenced
 							internalPacket = BuildPacketFromSplitPacketList( internalPacket->splitPacketId, timeRead,
 								s, systemAddress, rnr, remotePortRakNetWasStartedOn_PS3, extraSocketOptions);
 
-							if ( internalPacket )
-							{
+							if (internalPacket) {
 								// Update our index to the newest packet
 								waitingForSequencedPacketReadIndex[ internalPacket->orderingChannel ] = internalPacket->orderingIndex + (OrderingIndexType)1;
 
 								// If there is a rebuilt packet, add it to the output queue
-								outputQueue.Push( internalPacket, _FILE_AND_LINE_  );
+								outputQueue.Push(internalPacket, _FILE_AND_LINE_);
 								internalPacket = 0;
 							}
 
 							// else don't have all the parts yet
-						}
-						else
-						{
+						} else {
 							// Update our index to the newest packet
 							waitingForSequencedPacketReadIndex[ internalPacket->orderingChannel ] = internalPacket->orderingIndex + (OrderingIndexType)1;
 
@@ -1174,19 +1170,16 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 							outputQueue.Push( internalPacket, _FILE_AND_LINE_  );
 							internalPacket = 0;
 						}
-					}
-					else
-					{
+					} else {
 						// Older sequenced packet. Discard it
 						FreeInternalPacketData(internalPacket, _FILE_AND_LINE_ );
 						ReleaseToInternalPacketPool( internalPacket );
 
 						bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));
-
 					}
 
 					goto CONTINUE_SOCKET_DATA_PARSE_LOOP;
-					}
+				}
 
 				// Is this an unsequenced split packet?
 				if ( internalPacket->splitPacketCount > 0 )
@@ -1561,7 +1554,7 @@ CONTINUE_SOCKET_DATA_PARSE_LOOP:
 
 	}
 
-
+	// #med - review --- is this correct to not increase in error cases?
 	receivePacketCount++;
 
 	return true;
@@ -3858,14 +3851,14 @@ bool ReliabilityLayer::ResendBufferOverflow(void) const
 ReliabilityLayer::MessageNumberNode* ReliabilityLayer::GetMessageNumberNodeByDatagramIndex(DatagramSequenceNumberType index, CCTimeType *timeSent)
 {
 	if (datagramHistory.IsEmpty())
-		return 0;
+		return nullptr;
 
 	if (congestionManager.LessThan(index, datagramHistoryPopCount))
-		return 0;
+		return nullptr;
 
 	DatagramSequenceNumberType offsetIntoList = index - datagramHistoryPopCount;
 	if (offsetIntoList >= datagramHistory.Size())
-		return 0;
+		return nullptr;
 
 	*timeSent=datagramHistory[offsetIntoList].timeSent;
 	return datagramHistory[offsetIntoList].head;

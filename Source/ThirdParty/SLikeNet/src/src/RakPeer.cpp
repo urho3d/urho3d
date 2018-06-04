@@ -691,7 +691,7 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 #if RAKPEER_USER_THREADED!=1
 
 	#if defined(SN_TARGET_PSP2)
-				sprintf(threadName, "RecvFromLoop_%p", this);
+				sprintf_s(threadName, "RecvFromLoop_%p", this);
 				//errorCode = SLNet::RakThread::Create(RecvFromLoop, rpai, threadPriority, threadName, 1+i, runtime);
 				errorCode = SLNet::RakThread::Create(RecvFromLoop, rpai, threadPriority, threadName, 1024*1);
 	#else

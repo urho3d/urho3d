@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -43,11 +43,13 @@ namespace DataStructures
     template <class range_type>
     int RangeNodeComp(const range_type &a, const RangeNode<range_type> &b)
     {
-        if (a<b.minIndex)
+        if (a < b.minIndex) {
             return -1;
-        if (a==b.minIndex)
-            return 0;
-        return 1;
+		}
+        if (a > b.maxIndex) {
+            return 1;
+		}
+        return 0;
     }
 
 	template <class range_type>
@@ -58,12 +60,17 @@ namespace DataStructures
 		~RangeList();
 		void Insert(range_type index);
 		void Clear(void);
+		bool IsWithinRange(range_type value) const;
 		unsigned Size(void) const;
 		unsigned RangeSum(void) const;
 		SLNet::BitSize_t Serialize(SLNet::BitStream *in, SLNet::BitSize_t maxBits, bool clearSerialized);
 		bool Deserialize(SLNet::BitStream *out);
 
-		DataStructures::OrderedList<range_type, RangeNode<range_type> , RangeNodeComp<range_type> > ranges;
+		DataStructures::OrderedList<range_type, RangeNode<range_type>, RangeNodeComp<range_type>> ranges;
+
+		// internal helpers
+	private:
+		static bool DeserializeSingleRange(SLNet::BitStream *out, range_type& min, range_type& max);
 	};
 
 	template <class range_type>
@@ -76,20 +83,21 @@ namespace DataStructures
 		unsigned i;
 		countWritten=0;
 		bitsWritten=0;
-		for (i=0; i < ranges.Size(); i++)
-		{
-			if ((int)sizeof(unsigned short)*8+bitsWritten+(int)sizeof(range_type)*8*2+1>maxBits)
+		for (i=0; i < ranges.Size(); i++) {
+			// #med - review this calculation --- shouldn't this be +8 rather than +1 due to minEqualsMax being 1 byte?
+			if ((int)sizeof(unsigned short)*8+bitsWritten+(int)sizeof(range_type)*8*2+1>maxBits) {
 				break;
+			}
 			unsigned char minEqualsMax;
-			if (ranges[i].minIndex==ranges[i].maxIndex)
+			if (ranges[i].minIndex==ranges[i].maxIndex) {
 				minEqualsMax=1;
-			else
+			} else {
 				minEqualsMax=0;
-			tempBS.Write(minEqualsMax); // Use one byte, intead of one bit, for speed, as this is done a lot
+			}
+			tempBS.Write(minEqualsMax); // Use one byte, instead of one bit, for speed, as this is done a lot
 			tempBS.Write(ranges[i].minIndex);
 			bitsWritten+=sizeof(range_type)*8+8;
-			if (ranges[i].minIndex!=ranges[i].maxIndex)
-			{
+			if (ranges[i].minIndex!=ranges[i].maxIndex) {
 				tempBS.Write(ranges[i].maxIndex);
 				bitsWritten+=sizeof(range_type)*8;
 			}
@@ -104,11 +112,9 @@ namespace DataStructures
 		in->Write(&tempBS, tempBS.GetNumberOfBitsUsed());
 	//	RAKNET_DEBUG_PRINTF("%i %i \n", tempBS.GetNumberOfBitsUsed(),in->GetNumberOfBitsUsed());
 
-		if (clearSerialized && countWritten)
-		{
+		if (clearSerialized && countWritten) {
 			unsigned rangeSize=ranges.Size();
-			for (i=0; i < rangeSize-countWritten; i++)
-			{
+			for (i=0; i < rangeSize-countWritten; i++) {
 				ranges[i]=ranges[i+countWritten];
 			}
 			ranges.RemoveFromEnd(countWritten);
@@ -116,35 +122,64 @@ namespace DataStructures
 
 		return bitsWritten;
 	}
+
 	template <class range_type>
 	bool RangeList<range_type>::Deserialize(SLNet::BitStream *out)
 	{
 		ranges.Clear(true, _FILE_AND_LINE_);
 		unsigned short count;
 		out->AlignReadToByteBoundary();
-		out->Read(count);
-		unsigned short i;
-		range_type min,max;
-		unsigned char maxEqualToMin=0;
-
-		for (i=0; i < count; i++)
-		{
-			out->Read(maxEqualToMin);
-			if (out->Read(min)==false)
-				return false;
-			if (maxEqualToMin==false)
-			{
-				if (out->Read(max)==false)
-					return false;
-				if (max<min)
-					return false;
-			}
-			else
-				max=min;
-
-
-			ranges.InsertAtEnd(RangeNode<range_type>(min,max), _FILE_AND_LINE_);
+		if (!out->Read(count)) {
+			return false;
 		}
+		range_type absMin;
+		range_type min, max;
+
+		if (count == 0) {
+			return true;
+		}
+
+		if (!DeserializeSingleRange(out, min, max)) {
+			return false;
+		}
+		ranges.InsertAtEnd(RangeNode<range_type>(min, max), _FILE_AND_LINE_);
+
+		for (unsigned short i = 1; i < count; i++) {
+			absMin = max;
+
+			if (!DeserializeSingleRange(out, min, max)) {
+				return false;
+			}
+			if (min <= absMin) {
+				return false;
+			}
+			ranges.InsertAtEnd(RangeNode<range_type>(min, max), _FILE_AND_LINE_);
+		}
+		return true;
+	}
+
+	template <class range_type>
+	bool RangeList<range_type>::DeserializeSingleRange(SLNet::BitStream *out, range_type& min, range_type& max)
+	{
+		unsigned char maxEqualToMin;
+
+		if (!out->Read(maxEqualToMin)) {
+			return false;
+		}
+		if (!out->Read(min)) {
+			return false;
+		}
+		if (maxEqualToMin == 0) {
+			if (!out->Read(max)) {
+				return false;
+			}
+			if (max <= min) {
+				return false;
+			}
+		} else {
+			max = min;
+		}
+
 		return true;
 	}
 
@@ -163,35 +198,39 @@ namespace DataStructures
 	template <class range_type>
 	void RangeList<range_type>::Insert(range_type index)
 	{
-		if (ranges.Size()==0)
-		{
+		if (ranges.Size()==0) {
 			ranges.Insert(index, RangeNode<range_type>(index, index), true, _FILE_AND_LINE_);
 			return;
 		}
 
 		bool objectExists;
 		unsigned insertionIndex=ranges.GetIndexFromKey(index, &objectExists);
-		if (insertionIndex==ranges.Size())
-		{
-			if (index == ranges[insertionIndex-1].maxIndex+(range_type)1)
+		if (objectExists) {
+			return; // index already covered by a range entry - do not create a duplicated entry
+		}
+
+		// index > maxIndex on entire range list
+		if (insertionIndex==ranges.Size()) {
+			if (index == ranges[insertionIndex-1].maxIndex+(range_type)1) {
 				ranges[insertionIndex-1].maxIndex++;
-			else if (index > ranges[insertionIndex-1].maxIndex+(range_type)1)
-			{
+			} else if (index > ranges[insertionIndex-1].maxIndex+(range_type)1) {
 				// Insert at end
 				ranges.Insert(index, RangeNode<range_type>(index, index), true, _FILE_AND_LINE_);
 			}
-
 			return;
 		}
+
+		// verify it's really not within the current range (otherwise objectExists should have been true)
+		RakAssert(index < ranges[insertionIndex].minIndex || index > ranges[insertionIndex].maxIndex);
 
 		if (index < ranges[insertionIndex].minIndex-(range_type)1)
 		{
 			// Insert here
 			ranges.InsertAtIndex(RangeNode<range_type>(index, index), insertionIndex, _FILE_AND_LINE_);
-
 			return;
 		}
-		else if (index == ranges[insertionIndex].minIndex-(range_type)1)
+
+		if (index == ranges[insertionIndex].minIndex-(range_type)1)
 		{
 			// Decrease minIndex and join left
 			ranges[insertionIndex].minIndex--;
@@ -200,15 +239,10 @@ namespace DataStructures
 				ranges[insertionIndex-1].maxIndex=ranges[insertionIndex].maxIndex;
 				ranges.RemoveAtIndex(insertionIndex);
 			}
+			return;
+		}
 
-			return;
-		}
-		else if (index >= ranges[insertionIndex].minIndex && index <= ranges[insertionIndex].maxIndex)
-		{
-			// Already exists
-			return;
-		}
-		else if (index == ranges[insertionIndex].maxIndex+(range_type)1)
+		if (index == ranges[insertionIndex].maxIndex+(range_type)1)
 		{
 			// Increase maxIndex and join right
 			ranges[insertionIndex].maxIndex++;
@@ -217,8 +251,6 @@ namespace DataStructures
 				ranges[insertionIndex+1].minIndex=ranges[insertionIndex].minIndex;
 				ranges.RemoveAtIndex(insertionIndex);
 			}
-
-			return;
 		}
 	}
 
@@ -226,6 +258,15 @@ namespace DataStructures
 	void RangeList<range_type>::Clear(void)
 	{
 		ranges.Clear(true, _FILE_AND_LINE_);
+	}
+
+	template <class range_type>
+	bool RangeList<range_type>::IsWithinRange(range_type value) const
+	{
+		bool objectExists;
+		// not interested in the return value
+		(void)ranges.GetIndexFromKey(value, &objectExists);
+		return objectExists;
 	}
 
 	template <class range_type>
@@ -237,9 +278,10 @@ namespace DataStructures
 	template <class range_type>
 	unsigned RangeList<range_type>::RangeSum(void) const
 	{
-		unsigned sum=0,i;
-		for (i=0; i < ranges.Size(); i++)
-			sum+=ranges[i].maxIndex-ranges[i].minIndex+1;
+		unsigned sum = 0, i;
+		for (i = 0; i < ranges.Size(); i++) {
+			sum += ranges[i].maxIndex-ranges[i].minIndex + 1;
+		}
         return sum;
 	}
 

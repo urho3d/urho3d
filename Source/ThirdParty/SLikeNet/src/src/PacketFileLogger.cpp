@@ -43,9 +43,9 @@ void PacketFileLogger::StartLog(const char *filenamePrefix)
 	// Open file for writing
 	char filename[256];
 	if (filenamePrefix)
-		sprintf(filename, "%s_%i.csv", filenamePrefix, (int)SLNet::GetTimeMS());
+		sprintf_s(filename, "%s_%i.csv", filenamePrefix, (int)SLNet::GetTimeMS());
 	else
-		sprintf(filename, "PacketLog_%i.csv", (int)SLNet::GetTimeMS());
+		sprintf_s(filename, "PacketLog_%i.csv", (int)SLNet::GetTimeMS());
 	errno_t error = fopen_s(&packetLogFile, filename, "wt");
 	LogHeader();
 	if (error == 0)

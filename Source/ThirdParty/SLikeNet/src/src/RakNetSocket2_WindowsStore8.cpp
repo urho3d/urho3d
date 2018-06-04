@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -239,7 +239,7 @@ void ListenerContext::OnMessage(Windows::Networking::Sockets::DatagramSocket^ so
 void ListenerContext::EchoMessage(DatagramSocketMessageReceivedEventArgs^ eventArguments)
 {
 }
-SLNet::DataStructures::List<RNS2_WindowsStore8*> RNS2_WindowsStore8::rns2List;
+DataStructures::List<SLNet::RNS2_WindowsStore8*> SLNet::RNS2_WindowsStore8::rns2List;
 SimpleMutex RNS2_WindowsStore8::rns2ListMutex;
 RNS2_WindowsStore8::RNS2_WindowsStore8()
 {

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -19,7 +19,6 @@
 #include "slikenet/sleep.h"
 #include "slikenet/SocketDefines.h"
 #include "slikenet/GetTime.h"
-#include "slikenet/linux_adapter.h"
 #include <stdio.h>
 #include <string.h> // memcpy
 
@@ -31,7 +30,7 @@ using namespace SLNet;
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <errno.h>  // error numbers
-#if !defined(ANDROID) && !defined(__ANDROID__)
+#if !defined(ANDROID)
 #include <ifaddrs.h>
 #endif
 #include <netinet/in.h>
@@ -79,24 +78,9 @@ RakNetSocket2* RakNetSocket2Allocator::AllocRNS2(void)
 #if defined(WINDOWS_STORE_RT)
 	s2 = SLNet::OP_NEW<RNS2_WindowsStore8>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_WINDOWS_STORE_8);
-
-
-
-
-
-
 #elif defined(__native_client__)
 	s2 = SLNet::OP_NEW<RNS2_NativeClient>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_CHROME);
-
-
-
-
-
-
-
-
-
 #elif defined(_WIN32)
 	s2 = SLNet::OP_NEW<RNS2_Windows>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_WINDOWS);
@@ -110,18 +94,8 @@ void RakNetSocket2::GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_
 {
 #if defined(WINDOWS_STORE_RT)
 	RNS2_WindowsStore8::GetMyIP( addresses );
-
-
-
-
 #elif defined(__native_client__)
 	RNS2_NativeClient::GetMyIP( addresses );
-
-
-
-
-
-
 #elif defined(_WIN32)
 	RNS2_Windows::GetMyIP( addresses );
 #else
@@ -138,16 +112,6 @@ void RakNetSocket2::DomainNameToIP( const char *domainName, char ip[65] ) {
 	return RNS2_WindowsStore8::DomainNameToIP( domainName, ip );
 #elif defined(__native_client__)
 	return DomainNameToIP_Berkley( domainName, ip );
-
-
-
-
-
-
-
-
-
-
 #elif defined(_WIN32)
 	return DomainNameToIP_Berkley( domainName, ip );
 #else
@@ -341,9 +305,6 @@ RNS2BindResult RNS2_Berkley::BindShared( RNS2_BerkleyBindParameters *bindParamet
 
 RAK_THREAD_DECLARATION(RNS2_Berkley::RecvFromLoop)
 {
-
-
-
 	RNS2_Berkley *b = ( RNS2_Berkley * ) arguments;
 
 	b->RecvFromLoopInt();
@@ -376,11 +337,7 @@ unsigned RNS2_Berkley::RecvFromLoopInt(void)
 	}
 	isRecvFromLoopThreadActive.Decrement();
 
-
-
-
 	return 0;
-
 }
 RNS2_Berkley::RNS2_Berkley()
 {
@@ -404,13 +361,7 @@ int RNS2_Berkley::CreateRecvPollingThread(int threadPriority)
 {
 	endThreads=false;
 
-
-
-
-
-
 	int errorCode = SLNet::RakThread::Create(RecvFromLoop, this, threadPriority);
-
 	return errorCode;
 }
 void RNS2_Berkley::SignalStopRecvPollingThread(void)
@@ -441,48 +392,6 @@ void RNS2_Berkley::BlockOnStopRecvPollingThread(void)
 const RNS2_BerkleyBindParameters *RNS2_Berkley::GetBindings(void) const {return &binding;}
 RNS2Socket RNS2_Berkley::GetSocket(void) const {return rns2Socket;}
 // See RakNetSocket2_Berkley.cpp for WriteSharedIPV4, BindSharedIPV4And6 and other implementations
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #if   defined(_WIN32)
 RNS2_Windows::RNS2_Windows() {slo=0;}

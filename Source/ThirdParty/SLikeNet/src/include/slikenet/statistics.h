@@ -70,20 +70,20 @@ struct RAK_DLL_EXPORT RakNetStatistics
 	
 	/// When did the connection start?
 	/// \sa SLNet::GetTimeUS()
-	SLNet::TimeUS connectionStartTime  = 0;
+	SLNet::TimeUS connectionStartTime;
 
 	/// Is our current send rate throttled by congestion control?
 	/// This value should be true if you send more data per second than your bandwidth capacity
-	bool isLimitedByCongestionControl = false;
+	bool isLimitedByCongestionControl;
 
 	/// If \a isLimitedByCongestionControl is true, what is the limit, in bytes per second?
-	uint64_t BPSLimitByCongestionControl  = 0;
+	uint64_t BPSLimitByCongestionControl;
 
 	/// Is our current send rate throttled by a call to RakPeer::SetPerConnectionOutgoingBandwidthLimit()?
-	bool isLimitedByOutgoingBandwidthLimit  = 0;
+	bool isLimitedByOutgoingBandwidthLimit;
 
 	/// If \a isLimitedByOutgoingBandwidthLimit is true, what is the limit, in bytes per second?
-	uint64_t BPSLimitByOutgoingBandwidthLimit  = 0;
+	uint64_t BPSLimitByOutgoingBandwidthLimit;
 
 	/// For each priority level, how many messages are waiting to be sent out?
 	unsigned int messageInSendBuffer[NUMBER_OF_PRIORITIES];
@@ -93,16 +93,16 @@ struct RAK_DLL_EXPORT RakNetStatistics
 
 	/// How many messages are waiting in the resend buffer? This includes messages waiting for an ack, so should normally be a small value
 	/// If the value is rising over time, you are exceeding the bandwidth capacity. See BPSLimitByCongestionControl 
-	unsigned int messagesInResendBuffer = 0;
+	unsigned int messagesInResendBuffer;
 
 	/// How many bytes are waiting in the resend buffer. See also messagesInResendBuffer
-	uint64_t bytesInResendBuffer = 0;
+	uint64_t bytesInResendBuffer;
 
 	/// Over the last second, what was our packetloss? This number will range from 0.0 (for none) to 1.0 (for 100%)
-	float packetlossLastSecond = 0;
+	float packetlossLastSecond;
 
 	/// What is the average total packetloss over the lifetime of the connection?
-	float packetlossTotal = 0;
+	float packetlossTotal;
 
 	RakNetStatistics& operator +=(const RakNetStatistics& other)
 	{
