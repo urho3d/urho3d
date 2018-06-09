@@ -47,6 +47,7 @@
 #ifndef _MSC_VER
 #define _WIN32_IE 0x501
 #endif
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shellapi.h>
 #include <direct.h>
