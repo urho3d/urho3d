@@ -686,7 +686,7 @@ public:
     /// Identity matrix.
     static const Matrix3x4 IDENTITY;
 
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
 private:
     /// \brief Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters. Note: the w component of the scale parameter passed to this function must be 1.
     void inline SetFromTRS(__m128 t, __m128 q, __m128 s)
