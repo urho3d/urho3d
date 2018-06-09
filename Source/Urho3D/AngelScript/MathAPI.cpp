@@ -1431,7 +1431,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const Color CYAN", (void*)&Color::CYAN);
     engine->RegisterGlobalProperty("const Color MAGENTA", (void*)&Color::MAGENTA);
     engine->RegisterGlobalProperty("const Color YELLOW", (void*)&Color::YELLOW);
-    engine->RegisterGlobalProperty("const Color TRANSPARENT", (void*)&Color::TRANSPARENT);
+    engine->RegisterGlobalProperty("const Color TRANSPARENT_BLACK", (void*)&Color::TRANSPARENT_BLACK);
 }
 
 void RegisterMathAPI(asIScriptEngine* engine)

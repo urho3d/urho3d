@@ -1373,6 +1373,7 @@ From 1.6 to 1.7:
 From 1.7 to master:
 - URHO3D_CXX11 define was removed. C++11 mode is unconditionally enabled.
 - URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE and URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE macros were removed. Use attribute metadata instead. Element names shall be stored in StringVector (without trailing zero) instead of const char*[].
+- The Color::TRANSPARENT constant is renamed to Color::TRANSPARENT_BLACK to avoid name clash with Windows's TRANSPARENT macro defined in "windows.h".
 - Build system - the Android Java classes started to use Java 7 and 8 language features, so they must be built with Java 8 support turned on.
 - Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Also set the default for "EMSCRIPTEN_WASM" build option to TRUE in order to align with the upstream EMCC compiler changes.
 

@@ -56,9 +56,9 @@ public:
 
 protected:
     /// Selection background color.
-    Color selectionColor_{Color::TRANSPARENT};
+    Color selectionColor_{Color::TRANSPARENT_BLACK};
     /// Hover background color.
-    Color hoverColor_{Color::TRANSPARENT};
+    Color hoverColor_{Color::TRANSPARENT_BLACK};
 };
 
 }
