@@ -1174,7 +1174,7 @@ Properties:
 - const Color CYAN
 - const Color MAGENTA
 - const Color YELLOW
-- const Color TRANSPARENT
+- const Color TRANSPARENT_BLACK
 
 <a name="Class_ColorFrame"></a>
 ### ColorFrame
