@@ -544,7 +544,7 @@ private:
     unsigned length_;
     /// Capacity, zero if buffer not allocated.
     unsigned capacity_;
-    /// String buffer, null if not allocated.
+    /// String buffer, point to &endZero if buffer is not allocated.
     char* buffer_;
 
     /// End zero for empty strings.
