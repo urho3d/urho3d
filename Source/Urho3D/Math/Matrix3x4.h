@@ -149,7 +149,7 @@ public:
     /// Construct from translation, rotation and uniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale) noexcept
     {
-#if defined(URHO3D_SSE) && (!defined(__GNUC__) || __GNUC__ < 8)
+#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale, scale, scale);
@@ -163,7 +163,7 @@ public:
     /// Construct from translation, rotation and nonuniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale) noexcept
     {
-#if defined(URHO3D_SSE) && (!defined(__GNUC__) || __GNUC__ < 8)
+#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale.z_, scale.y_, scale.x_);
