@@ -58,7 +58,7 @@ static const int MSG_COMPONENTLATESTDATA = 0x94;
 static const int MSG_REMOVECOMPONENT = 0x95;
 
 /// Client->server and server->client: remote event.
-static const int MSG_REMOTEEVENT = 0x96;//0x14;
+static const int MSG_REMOTEEVENT = 0x96;
 /// Client->server and server->client: remote node event.
 static const int MSG_REMOTENODEEVENT = 0x97;
 /// Server->client: info about package.

@@ -155,7 +155,7 @@ public:
     void ProcessPendingLatestData();
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
-    /// Ban this connections IP address
+    /// Ban this connections IP address.
     void Ban();
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }

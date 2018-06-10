@@ -20,17 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "SLikeNet/NatPunchthroughClient.h"
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/RakPeerInterface.h>
-#include <SLikeNet/RakNetTypes.h>
-#include <SLikeNet/RakNetStatistics.h>
-
-/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
-#ifdef TRANSPARENT
-#undef TRANSPARENT
-#endif
-
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
@@ -48,6 +37,13 @@
 #include "../Network/NetworkPriority.h"
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
+
+#include <SLikeNet/NatPunchthroughClient.h>
+#include <SLikeNet/MessageIdentifiers.h>
+#include <SLikeNet/peerinterface.h>
+#include <SLikeNet/types.h>
+#include <SLikeNet/statistics.h>
+
 #include "../DebugNew.h"
 
 namespace Urho3D
@@ -290,7 +286,6 @@ Network::~Network()
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
-
 }
 
 void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes)

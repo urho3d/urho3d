@@ -91,23 +91,23 @@ URHO3D_EVENT(E_NETWORKSCENELOADFAILED, NetworkSceneLoadFailed)
     URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
-/// Remote event: adds Connection parameter to the event data
+/// Remote event: adds Connection parameter to the event data.
 URHO3D_EVENT(E_REMOTEEVENTDATA, RemoteEventData)
 {
     URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
-/// Server refuses client connection because of the ban
+/// Server refuses client connection because of the ban.
 URHO3D_EVENT(E_NETWORKBANNED, NetworkBanned)
 {
 }
 
-/// Server refuses connection because of invalid password
+/// Server refuses connection because of invalid password.
 URHO3D_EVENT(E_NETWORKINVALIDPASSWORD, NetworkInvalidPassword)
 {
 }
 
-/// When LAN discovery founds hosted server
+/// When LAN discovery found hosted server.
 URHO3D_EVENT(E_NETWORKHOSTDISCOVERED, NetworkHostDiscovered)
 {
     URHO3D_PARAM(P_ADDRESS, Address);   // String
@@ -115,28 +115,28 @@ URHO3D_EVENT(E_NETWORKHOSTDISCOVERED, NetworkHostDiscovered)
     URHO3D_PARAM(P_BEACON, Beacon);     // VariantMap
 }
 
-/// NAT punchtrough succeeds
+/// NAT punchtrough succeeds.
 URHO3D_EVENT(E_NETWORKNATPUNCHTROUGHSUCCEEDED, NetworkNatPunchtroughSucceeded)
 {
 	URHO3D_PARAM(P_ADDRESS, Address);   // String
 	URHO3D_PARAM(P_PORT, Port);         // int
 }
 
-/// NAT punchtrough fails
+/// NAT punchtrough fails.
 URHO3D_EVENT(E_NETWORKNATPUNCHTROUGHFAILED, NetworkNatPunchtroughFailed)
 {
 	URHO3D_PARAM(P_ADDRESS, Address);   // String
 	URHO3D_PARAM(P_PORT, Port);         // int
 }
 
-/// Connecting to NAT master server failed
+/// Connecting to NAT master server failed.
 URHO3D_EVENT(E_NATMASTERCONNECTIONFAILED, NetworkNatMasterConnectionFailed)
 {
     URHO3D_PARAM(P_ADDRESS, Address);   // String
     URHO3D_PARAM(P_PORT, Port);         // int
 }
 
-/// Connecting to NAT master server succeeded
+/// Connecting to NAT master server succeeded.
 URHO3D_EVENT(E_NATMASTERCONNECTIONSUCCEEDED, NetworkNatMasterConnectionSucceeded)
 {
     URHO3D_PARAM(P_ADDRESS, Address);   // String

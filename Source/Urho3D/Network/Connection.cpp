@@ -20,16 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/RakPeerInterface.h>
-#include <SLikeNet/RakNetTypes.h>
-#include <SLikeNet/RakNetStatistics.h>
-
-/// RakNet library include windows headers which may conflict with Color::TRANSPARENT
-#ifdef TRANSPARENT
-#undef TRANSPARENT
-#endif
-
 #include "../Precompiled.h"
 
 #include "../Core/Profiler.h"
@@ -47,6 +37,11 @@
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
+
+#include <SLikeNet/MessageIdentifiers.h>
+#include <SLikeNet/peerinterface.h>
+#include <SLikeNet/types.h>
+#include <SLikeNet/statistics.h>
 
 #include "../DebugNew.h"
 
@@ -1006,7 +1001,7 @@ float Connection::GetRoundTripTime() const
 {
     if (peer_)
     {
-        SLNet::RakNetStatistics stats;
+        SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)peer_->GetAveragePing(*address_);
     }
@@ -1023,7 +1018,7 @@ float Connection::GetBytesInPerSec() const
 {
     if (peer_)
     {
-        SLNet::RakNetStatistics stats;
+        SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_RECEIVED];
     }
@@ -1034,7 +1029,7 @@ float Connection::GetBytesOutPerSec() const
 {
     if (peer_)
     {
-        SLNet::RakNetStatistics stats;
+        SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_SENT];
     }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,19 +45,20 @@ public:
     /// Destruct.
     ~Network() override;
 
-
     /// Handle an inbound message.
     void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
+    /// Handle a new client connection.
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+    /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
 
     /// Set the data that will be used for a reply to attempts at host discovery on LAN/subnet.
     void SetDiscoveryBeacon(const VariantMap& data);
     /// Scan the LAN/subnet for available hosts.
     void DiscoverHosts(unsigned port);
-    /// Set password for the client/server communcation
+    /// Set password for the client/server communcation.
     void SetPassword(const String& password);
-    /// Set NAT server information
+    /// Set NAT server information.
     void SetNATServerInfo(const String& address, unsigned short port);
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
@@ -67,11 +68,11 @@ public:
     bool StartServer(unsigned short port);
     /// Stop the server.
     void StopServer();
-    /// Start NAT punchtrough client to allow remote connections
+    /// Start NAT punchtrough client to allow remote connections.
     void StartNATClient();
-    /// Get local server GUID
-    const String& GetGUID() const { return guid_; };
-    /// Attempt to connect to NAT server
+    /// Get local server GUID.
+    const String& GetGUID() const { return guid_; }
+    /// Attempt to connect to NAT server.
     void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Broadcast a message with content ID to all client connections.
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
@@ -101,7 +102,7 @@ public:
     void SendPackageToClients(Scene* scene, PackageFile* package);
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
     SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
-    /// Ban specific IP addresses
+    /// Ban specific IP addresses.
     void BanAddress(const String& address);
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
@@ -142,12 +143,12 @@ private:
     void OnServerDisconnected();
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
-    /// All incoming packages are handled here
+    /// All incoming packages are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
 
-    /// SLikeNet peer instance for server connection 
+    /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
-    /// SLikeNet peer instance for client connection
+    /// SLikeNet peer instance for client connection.
     SLNet::RakPeerInterface* rakPeerClient_;
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
@@ -173,21 +174,21 @@ private:
     String packageCacheDir_;
     /// Whether we started as server or not.
     bool isServer_;
-    /// Server/Client password used for connecting
+    /// Server/Client password used for connecting.
     String password_;
-    /// Scene which will be used for NAT punchtrough connections
+    /// Scene which will be used for NAT punchtrough connections.
     Scene* scene_;
-    /// Client identify for NAT punchtrough connections
+    /// Client identify for NAT punchtrough connections.
     VariantMap identity_;
-    /// NAT punchtrough server information
+    /// NAT punchtrough server information.
     SLNet::SystemAddress* natPunchServerAddress_;
-    /// NAT punchtrough client for the server
+    /// NAT punchtrough client for the server.
     SLNet::NatPunchthroughClient* natPunchthroughServerClient_;
-    /// NAT punchtrough client for the client
+    /// NAT punchtrough client for the client.
     SLNet::NatPunchthroughClient* natPunchthroughClient_;
-    /// Remote GUID information
+    /// Remote GUID information.
     SLNet::RakNetGUID* remoteGUID_;
-    /// Local server GUID
+    /// Local server GUID.
     String guid_;
 };
 
