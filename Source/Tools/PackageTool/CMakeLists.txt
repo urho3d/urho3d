@@ -58,6 +58,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Object.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/ProcessUtils.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Profiler.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/StringHashRegister.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/StringUtils.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Thread.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Timer.cpp

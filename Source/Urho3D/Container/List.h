@@ -180,6 +180,13 @@ public:
         head_ = tail_ = ReserveNode();
         *this = list;
     }
+
+    /// Move-construct from another list.
+    List(List<T> && list) noexcept
+    {
+        Swap(list);
+    }
+
     /// Aggregate initialization constructor.
     List(const std::initializer_list<T>& list) : List()
     {
@@ -188,6 +195,7 @@ public:
             Push(*it);
         }
     }
+
     /// Destruct.
     ~List()
     {
@@ -205,6 +213,14 @@ public:
             Clear();
             Insert(End(), rhs);
         }
+        return *this;
+    }
+
+    /// Move-assign from another list.
+    List& operator =(List<T> && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 

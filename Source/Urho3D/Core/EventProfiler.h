@@ -33,7 +33,7 @@ class URHO3D_API EventProfilerBlock : public ProfilerBlock
 public:
     /// Construct with the specified parent block and event ID.
     EventProfilerBlock(EventProfilerBlock* parent, StringHash eventID) :
-        ProfilerBlock(parent, EventNameRegistrar::GetEventName(eventID).CString()),
+        ProfilerBlock(parent, GetEventNameRegister().GetString(eventID).CString()),
         eventID_(eventID)
     {
     }

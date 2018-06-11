@@ -36,6 +36,12 @@ static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
 
+class StringHash;
+template <class T, class U> class HashMap;
+
+/// Map of strings.
+using StringMap = HashMap<StringHash, String>;
+
 /// %String class.
 class URHO3D_API String
 {
@@ -58,6 +64,15 @@ public:
         buffer_(&endZero)
     {
         *this = str;
+    }
+
+    /// Move-construct from another string.
+    String(String && str) noexcept :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        Swap(str);
     }
 
     /// Construct from a C string.
@@ -136,7 +151,7 @@ public:
     /// Construct from a character and fill length.
     explicit String(char value, unsigned length);
 
-    /// Construct from a convertable value.
+    /// Construct from a convertible value.
     template <class T> explicit String(const T& value) :
         length_(0),
         capacity_(0),
@@ -155,9 +170,20 @@ public:
     /// Assign a string.
     String& operator =(const String& rhs)
     {
-        Resize(rhs.length_);
-        CopyChars(buffer_, rhs.buffer_, rhs.length_);
+        if (&rhs != this)
+        {
+            Resize(rhs.length_);
+            CopyChars(buffer_, rhs.buffer_, rhs.length_);
+        }
 
+        return *this;
+    }
+
+    /// Move-assign a string.
+    String& operator =(String && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 
@@ -518,7 +544,7 @@ private:
     unsigned length_;
     /// Capacity, zero if buffer not allocated.
     unsigned capacity_;
-    /// String buffer, null if not allocated.
+    /// String buffer, point to &endZero if buffer is not allocated.
     char* buffer_;
 
     /// End zero for empty strings.

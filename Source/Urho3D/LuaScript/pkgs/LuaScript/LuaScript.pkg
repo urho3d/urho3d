@@ -26,7 +26,7 @@ ${
 
 static void RegisterEventName(const String eventName)
 {
-    EventNameRegistrar::RegisterEventName(eventName.CString());
+    GetEventNameRegister().RegisterString(eventName.CString());
 }
 
 static LuaScript* GetLuaScript(lua_State* L)

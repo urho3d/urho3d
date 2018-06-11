@@ -404,11 +404,11 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& drawables, Node* node)
 
 static inline bool CompareSourceBatch2Ds(const SourceBatch2D* lhs, const SourceBatch2D* rhs)
 {
-    if (lhs->distance_ != rhs->distance_)
-        return lhs->distance_ > rhs->distance_;
-
     if (lhs->drawOrder_ != rhs->drawOrder_)
         return lhs->drawOrder_ < rhs->drawOrder_;
+
+    if (lhs->distance_ != rhs->distance_)
+        return lhs->distance_ > rhs->distance_;
 
     if (lhs->material_ != rhs->material_)
         return lhs->material_->GetNameHash() < rhs->material_->GetNameHash();

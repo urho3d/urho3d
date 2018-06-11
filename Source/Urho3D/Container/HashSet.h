@@ -187,6 +187,13 @@ public:
         head_ = tail_ = ReserveNode();
         *this = set;
     }
+
+    /// Move-construct from another hash set.
+    HashSet(HashSet<T> && set) noexcept
+    {
+        Swap(set);
+    }
+
     /// Aggregate initialization constructor.
     HashSet(const std::initializer_list<T>& list) : HashSet()
     {
@@ -195,13 +202,17 @@ public:
             Insert(*it);
         }
     }
+
     /// Destruct.
     ~HashSet()
     {
-        Clear();
-        FreeNode(Tail());
-        AllocatorUninitialize(allocator_);
-        delete[] ptrs_;
+        if (allocator_)
+        {
+            Clear();
+            FreeNode(Tail());
+            AllocatorUninitialize(allocator_);
+            delete[] ptrs_;
+        }
     }
 
     /// Assign a hash set.
@@ -213,6 +224,14 @@ public:
             Clear();
             Insert(rhs);
         }
+        return *this;
+    }
+
+    /// Move-assign a hash set.
+    HashSet& operator =(HashSet<T> && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 
