@@ -1303,9 +1303,9 @@ const char *RakString::ToString(int64_t i)
 	static int index=0;
 	static char buff[64][64];
 #if defined(_WIN32)
-	sprintf_s(buff[index], "%I64d", i);
+	sprintf(buff[index], "%I64d", i);
 #else
-	sprintf_s(buff[index], "%lld", (long long unsigned int) i);
+	sprintf(buff[index], "%lld", (long long unsigned int) i);
 #endif
 	int lastIndex=index;
 	if (++index==64)
@@ -1317,9 +1317,9 @@ const char *RakString::ToString(uint64_t i)
 	static int index=0;
 	static char buff[64][64];
 #if defined(_WIN32)
-	sprintf_s(buff[index], "%I64u", i);
+	sprintf(buff[index], "%I64u", i);
 #else
-	sprintf_s(buff[index], "%llu", (long long unsigned int) i);
+	sprintf(buff[index], "%llu", (long long unsigned int) i);
 #endif
 	int lastIndex=index;
 	if (++index==64)
