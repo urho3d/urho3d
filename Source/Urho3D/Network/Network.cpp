@@ -38,11 +38,14 @@
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
 
-#include <SLikeNet/NatPunchthroughClient.h>
 #include <SLikeNet/MessageIdentifiers.h>
+#include <SLikeNet/NatPunchthroughClient.h>
 #include <SLikeNet/peerinterface.h>
-#include <SLikeNet/types.h>
 #include <SLikeNet/statistics.h>
+
+#ifdef SendMessage
+#undef SendMessage
+#endif
 
 #include "../DebugNew.h"
 
