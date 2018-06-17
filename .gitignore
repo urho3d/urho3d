@@ -90,6 +90,7 @@ CTestTestfile.cmake
 !/Source/ThirdParty/SDL/include/*cmake
 !/Source/ThirdParty/Assimp/cmake-modules/*cmake
 /Docs/**/*.cmake
+/build
 
 # Precompiled header files
 *.gch/

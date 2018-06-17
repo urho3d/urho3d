@@ -75,7 +75,7 @@ task :cmake do
       build_options = "#{build_options} -D#{option}" unless /build_tree=.*/ =~ option || script == 'cmake_clean'
     end
   }
-  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "build/#{platform}"
   if ENV['OS']
     # CMake claims mingw32-make does not build correctly with MSYS shell in the PATH env-var and prevents build tree generation if so
     # Our CI on Windows host requires MSYS shell, so we cannot just simply remove it from the PATH globally
@@ -85,7 +85,7 @@ task :cmake do
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
   end
-  system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
+  system "#{ccache_envvar} script/#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
 
 # Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
@@ -131,7 +131,7 @@ task :make do
       end
     end
   }
-  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "build/#{platform}"
   if ENV['OS']
     # While calling mingw-32-make itself does not require the PATH to be altered (as long as it is not inside an MSYS shell),
     # we have to do it again here because our build system invokes CMake internally to generate things on-the-fly as part of the build process
@@ -192,7 +192,7 @@ task :android do
   avd = ENV['avd'] || "test_#{api}_#{abi}"
   retries = ENV['retries'] || 10 # minutes
   retry_interval = ENV['retry_interval'] || 10 # seconds
-  build_tree = ENV['android_build_tree'] || ENV['build_tree'] || '../android-Build'
+  build_tree = ENV['android_build_tree'] || ENV['build_tree'] || './android-Build'
   install = false
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
@@ -775,9 +775,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform and avoid forward/backward slash conversion
   if ENV['OS']
-    system("@echo off && mkdir \"#{dir}\"\\bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* \"#{dir}\" >nul && (for %f in (*.bat Rakefile) do mklink \"#{dir}\"\\%f %cd%\\%f >nul) && mklink /D \"#{dir}\"\\CMake %cd%\\CMake && (for %d in (Autoload,CoreData,Data) do mklink /D \"#{dir}\"\\bin\\%d %cd%\\bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
+    system("@echo off && mkdir \"#{dir}\"\\bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* \"#{dir}\" >nul && (for %f in (script CMake) do mklink /D \"#{dir}\"\\%f %cd%\\%f >nul) && mklink \"#{dir}\"\\Rakefile %cd%\\Rakefile && (for %d in (Autoload,CoreData,Data) do mklink /D \"#{dir}\"\\bin\\%d %cd%\\bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
   else
-    system("bash -c \"mkdir -p '#{dir}'/bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* '#{dir}' && for f in {.,}*.sh Rakefile CMake; do ln -sf `pwd`/\\$f '#{dir}'; done && ln -sf `pwd`/bin/{Autoload,CoreData,Data} '#{dir}'/bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
+    system("bash -c \"mkdir -p '#{dir}'/bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* '#{dir}' && for f in script Rakefile CMake; do ln -snf `pwd`/\\$f '#{dir}'; done && ln -snf `pwd`/bin/{Autoload,CoreData,Data} '#{dir}'/bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
   end
   return dir
 end

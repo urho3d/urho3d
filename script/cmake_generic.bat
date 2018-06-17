@@ -25,7 +25,8 @@
 :: Determine source tree and build tree
 setlocal
 set "SOURCE=%~dp0"
-set "SOURCE=%SOURCE:~0,-1%"
+set "SOURCE=%SOURCE:~0,-1%\.."
+set "SOURCE=%cd%"
 set "BUILD="
 if "%~1" == "" goto :continue
 set "ARG1=%~1"
