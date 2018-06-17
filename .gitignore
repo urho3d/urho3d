@@ -67,6 +67,9 @@ generated/
 /*.project
 /*.workspace
 
+# Gradle project settings
+.gradle
+
 # Android project settings
 /Android/local.properties
 
