@@ -26,8 +26,7 @@
 #if SDL_VIDEO_DRIVER_ANDROID
 
 /* We're going to do this by default */
-// Urho3D: do not block on pause to allow exiting the application
-//#define SDL_ANDROID_BLOCK_ON_PAUSE  1
+#define SDL_ANDROID_BLOCK_ON_PAUSE  1
 
 #include "SDL_androidevents.h"
 #include "SDL_events.h"
