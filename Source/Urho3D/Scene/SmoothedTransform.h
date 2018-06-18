@@ -36,7 +36,7 @@ enum SmoothingType : unsigned
     /// Ongoing rotation smoothing.
     SMOOTH_ROTATION = 2,
 };
-template<> struct is_flagset<SmoothingType> { constexpr static bool value = true; };
+URHO3D_FLAGSET(SmoothingType, SmoothingTypeFlags);
 
 /// Transform smoothing component for network updates.
 class URHO3D_API SmoothedTransform : public Component

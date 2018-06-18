@@ -42,7 +42,7 @@ enum ClipMask : unsigned
     CLIPMASK_Z_POS = 0x10,
     CLIPMASK_Z_NEG = 0x20,
 };
-template<> struct is_flagset<ClipMask> { constexpr static bool value = true; };
+URHO3D_FLAGSET(ClipMask, ClipMaskFlags);
 
 void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
 {
@@ -588,15 +588,15 @@ void OcclusionBuffer::CalculateViewport()
 
 void OcclusionBuffer::DrawTriangle(Vector4* vertices, unsigned threadIndex)
 {
-    FlagSet<ClipMask> clipMask{};
-    FlagSet<ClipMask> andClipMask{};
+    ClipMaskFlags clipMask{};
+    ClipMaskFlags andClipMask{};
     bool drawOk = false;
     Vector3 projected[3];
 
     // Build the clip plane mask for the triangle
     for (unsigned i = 0; i < 3; ++i)
     {
-        FlagSet<ClipMask> vertexClipMask{};
+        ClipMaskFlags vertexClipMask{};
 
         if (vertices[i].x_ > vertices[i].w_)
             vertexClipMask |= CLIPMASK_X_POS;

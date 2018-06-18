@@ -203,7 +203,7 @@ void ListView::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Select On Click End", GetSelectOnClickEnd, SetSelectOnClickEnd, bool, false, AM_FILE);
 }
 
-void ListView::OnKey(Key key, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers)
+void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     // If no selection, can not move with keys
     unsigned numItems = GetNumItems();

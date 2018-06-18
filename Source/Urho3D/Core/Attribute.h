@@ -52,7 +52,7 @@ enum AttributeMode
     /// Attribute is readonly. Can't be used with binary serialized objects.
     AM_FILEREADONLY = 0x81,
 };
-template<> struct is_flagset<AttributeMode> { constexpr static bool value = true; };
+URHO3D_FLAGSET(AttributeMode, AttributeModeFlags);
 
 class Serializable;
 
@@ -73,7 +73,7 @@ struct AttributeInfo
     AttributeInfo() = default;
 
     /// Construct attribute.
-    AttributeInfo(VariantType type, const char* name, const SharedPtr<AttributeAccessor>& accessor, const char** enumNames, const Variant& defaultValue, FlagSet<AttributeMode> mode) :
+    AttributeInfo(VariantType type, const char* name, const SharedPtr<AttributeAccessor>& accessor, const char** enumNames, const Variant& defaultValue, AttributeModeFlags mode) :
         type_(type),
         name_(name),
         enumNames_(enumNames),
@@ -107,7 +107,7 @@ struct AttributeInfo
     /// Default value for network replication.
     Variant defaultValue_;
     /// Attribute mode: whether to use for serialization, network replication, or both.
-    FlagSet<AttributeMode> mode_ = AM_DEFAULT;
+    AttributeModeFlags mode_ = AM_DEFAULT;
     /// Attribute metadata.
     VariantMap metadata_;
     /// Attribute data pointer if elsewhere than in the Serializable.

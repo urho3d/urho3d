@@ -44,7 +44,7 @@ enum MouseButton : unsigned
     MOUSEB_X2 = SDL_BUTTON_X2MASK,
     MOUSEB_ANY = M_MAX_UNSIGNED
 };
-template<> struct is_flagset<MouseButton> { constexpr static bool value = true; };
+URHO3D_FLAGSET(MouseButton, MouseButtonFlags);
 
 enum Qualifier : unsigned
 {
@@ -54,7 +54,7 @@ enum Qualifier : unsigned
     QUAL_ALT = 4,
     QUAL_ANY = 8
 };
-template<> struct is_flagset<Qualifier> { constexpr static bool value = true; };
+URHO3D_FLAGSET(Qualifier, QualifierFlags);
 
 
 enum Key : unsigned

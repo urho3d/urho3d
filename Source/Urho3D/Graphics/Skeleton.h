@@ -34,7 +34,7 @@ enum BoneCollisionShape : unsigned char
     BONECOLLISION_SPHERE = 0x1,
     BONECOLLISION_BOX = 0x2,
 };
-template<> struct is_flagset<BoneCollisionShape> { constexpr static bool value = true; };
+URHO3D_FLAGSET(BoneCollisionShape, BoneCollisionShapeFlags);
 
 class Deserializer;
 class ResourceCache;
@@ -71,7 +71,7 @@ struct Bone
     /// Animation enable flag.
     bool animated_;
     /// Supported collision types.
-    FlagSet<BoneCollisionShape> collisionMask_ = BONECOLLISION_NONE;
+    BoneCollisionShapeFlags collisionMask_ = BONECOLLISION_NONE;
     /// Radius.
     float radius_;
     /// Local-space bounding box.

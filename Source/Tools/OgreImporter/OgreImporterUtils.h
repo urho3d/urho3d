@@ -111,7 +111,7 @@ struct ModelVertex
 
 struct ModelVertexBuffer
 {
-    FlagSet<VertexMask> elementMask_;
+    VertexMaskFlags elementMask_;
     unsigned morphStart_;
     unsigned morphCount_;
     Vector<ModelVertex> vertices_;

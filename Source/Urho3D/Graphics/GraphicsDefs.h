@@ -445,7 +445,7 @@ enum Clear : unsigned
     CLEAR_DEPTH = 0x2,
     CLEAR_STENCIL = 0x4,
 };
-template<> struct is_flagset<Clear> { constexpr static bool value = true; };
+URHO3D_FLAGSET(Clear, ClearFlags);
 
 // Legacy vertex element bitmasks.
 enum VertexMask : unsigned
@@ -466,7 +466,7 @@ enum VertexMask : unsigned
     MASK_INSTANCEMATRIX3 = 0x1000,
     MASK_OBJECTINDEX = 0x2000,
 };
-template<> struct is_flagset<VertexMask> { constexpr static bool value = true; };
+URHO3D_FLAGSET(VertexMask, VertexMaskFlags);
 
 static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;

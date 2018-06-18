@@ -38,7 +38,7 @@ enum AnimationChannel : unsigned char
     CHANNEL_ROTATION = 0x2,
     CHANNEL_SCALE = 0x4,
 };
-template<> struct is_flagset<AnimationChannel> { constexpr static bool value = true; };
+URHO3D_FLAGSET(AnimationChannel, AnimationChannelFlags);
 
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
@@ -89,7 +89,7 @@ struct URHO3D_API AnimationTrack
     /// Name hash.
     StringHash nameHash_;
     /// Bitmask of included data (position, rotation, scale.)
-    FlagSet<AnimationChannel> channelMask_{};
+    AnimationChannelFlags channelMask_{};
     /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;
 };

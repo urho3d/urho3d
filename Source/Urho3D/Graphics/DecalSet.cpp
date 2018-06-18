@@ -56,8 +56,8 @@ static const unsigned MIN_INDICES = 6;
 static const unsigned MAX_VERTICES = 65536;
 static const unsigned DEFAULT_MAX_VERTICES = 512;
 static const unsigned DEFAULT_MAX_INDICES = 1024;
-static const FlagSet<VertexMask> STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
-static const FlagSet<VertexMask> SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT |
+static const VertexMaskFlags STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
+static const VertexMaskFlags SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT |
     MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
 
 static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float d0, float d1, bool skinned)
@@ -577,7 +577,7 @@ void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
             Bone& newBone = bones_[i];
 
             newBone.name_ = buffer.ReadString();
-            newBone.collisionMask_ = FlagSet<BoneCollisionShape>(buffer.ReadUByte());
+            newBone.collisionMask_ = BoneCollisionShapeFlags(buffer.ReadUByte());
             if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
                 newBone.radius_ = buffer.ReadFloat();
             if (newBone.collisionMask_ & BONECOLLISION_BOX)

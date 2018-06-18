@@ -67,7 +67,7 @@
 
 #include "../DebugNew.h"
 
-#define TOUCHID_MASK(id) FlagSet<MouseButton>(1u << (unsigned)(id))
+#define TOUCHID_MASK(id) MouseButtonFlags(1u << (unsigned)(id))
 
 namespace Urho3D
 {
@@ -1268,7 +1268,7 @@ void UI::ReleaseFontFaces()
         fonts[i]->ReleaseFaces();
 }
 
-void UI::ProcessHover(const IntVector2& windowCursorPos, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor)
+void UI::ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     IntVector2 cursorPos;
     WeakPtr<UIElement> element(GetElementAt(windowCursorPos, true, &cursorPos));
@@ -1357,7 +1357,7 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, FlagSet<MouseButton> bu
     }
 }
 
-void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor, bool cursorVisible)
+void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor, bool cursorVisible)
 {
     if (cursorVisible)
     {
@@ -1439,7 +1439,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
     }
 }
 
-void UI::ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor, bool cursorVisible)
+void UI::ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor, bool cursorVisible)
 {
     WeakPtr<UIElement> element;
     IntVector2 cursorPos = windowCursorPos;
@@ -1505,7 +1505,7 @@ void UI::ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, 
     }
 }
 
-void UI::ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor,
+void UI::ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor,
     bool cursorVisible)
 {
     if (cursorVisible && dragElementsCount_ > 0 && buttons)
@@ -1619,7 +1619,7 @@ void UI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const In
 }
 
 void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, MouseButton button,
-    FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers)
+    MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     VariantMap& eventData = GetEventDataMap();
     eventData[UIMouseClick::P_ELEMENT] = endElement;
@@ -1647,7 +1647,7 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
 }
 
 void UI::SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, MouseButton button,
-    FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers)
+    MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     VariantMap& eventData = GetEventDataMap();
     eventData[UIMouseDoubleClick::P_ELEMENT] = endElement;
@@ -1685,8 +1685,8 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonDown;
 
-    mouseButtons_ = FlagSet<MouseButton>(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = FlagSet<Qualifier>(eventData[P_QUALIFIERS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
     usingTouchInput_ = false;
 
     IntVector2 cursorPos;
@@ -1699,15 +1699,15 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     auto* input = GetSubsystem<Input>();
 
     if (!input->IsMouseGrabbed())
-        ProcessClickBegin(cursorPos, FlagSet<MouseButton>(eventData[P_BUTTON].GetUInt()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
+        ProcessClickBegin(cursorPos, MouseButtonFlags(eventData[P_BUTTON].GetUInt()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonUp;
 
-    mouseButtons_ = FlagSet<MouseButton>(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = FlagSet<Qualifier>(eventData[P_QUALIFIERS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
 
     IntVector2 cursorPos;
     bool cursorVisible;
@@ -1720,8 +1720,8 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
-    mouseButtons_ = FlagSet<MouseButton>(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = FlagSet<Qualifier>(eventData[P_QUALIFIERS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
     usingTouchInput_ = false;
 
     auto* input = GetSubsystem<Input>();
@@ -1769,8 +1769,8 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
     using namespace MouseWheel;
 
-    mouseButtons_ = FlagSet<MouseButton>(eventData[P_BUTTONS].GetInt());
-    qualifiers_ = FlagSet<Qualifier>(eventData[P_QUALIFIERS].GetInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetInt());
     int delta = eventData[P_WHEEL].GetInt();
     usingTouchInput_ = false;
 
@@ -1881,7 +1881,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace KeyDown;
 
-    mouseButtons_ = FlagSet<MouseButton>(eventData[P_BUTTONS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
     qualifiers_ = FlagSet<Qualifier>(eventData[P_QUALIFIERS].GetUInt());
     auto key = (Key)eventData[P_KEY].GetUInt();
 

@@ -241,7 +241,7 @@ public:
     /// Check if a qualifier key has been pressed on this frame.
     bool GetQualifierPress(Qualifier qualifier) const;
     /// Return the currently held down qualifiers.
-    int GetQualifiers() const;
+    QualifierFlags GetQualifiers() const;
     /// Return mouse position within window. Should only be used with a visible mouse cursor. Uses the backbuffer (Graphics width/height) coordinates.
     IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
@@ -379,9 +379,9 @@ private:
     /// Opened joysticks.
     HashMap<SDL_JoystickID, JoystickState> joysticks_;
     /// Mouse buttons' down state.
-    unsigned mouseButtonDown_;
+    MouseButtonFlags mouseButtonDown_;
     /// Mouse buttons' pressed state.
-    unsigned mouseButtonPress_;
+    MouseButtonFlags mouseButtonPress_;
     /// Last mouse position for calculating movement.
     IntVector2 lastMousePosition_;
     /// Last mouse position before being set to not visible.

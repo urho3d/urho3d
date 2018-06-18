@@ -204,7 +204,7 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
     return false;
 }
 
-void LineEdit::OnKey(Key key, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers)
+void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     bool changed = false;
     bool cursorMoved = false;

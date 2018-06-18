@@ -186,7 +186,7 @@ void ScrollView::ApplyAttributes()
     SetViewPosition(viewPositionAttr_);
 }
 
-void ScrollView::OnWheel(int delta, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers)
+void ScrollView::OnWheel(int delta, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     if (delta > 0)
         verticalScrollBar_->StepBack();
@@ -194,7 +194,7 @@ void ScrollView::OnWheel(int delta, FlagSet<MouseButton> buttons, FlagSet<Qualif
         verticalScrollBar_->StepForward();
 }
 
-void ScrollView::OnKey(Key key, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers)
+void ScrollView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     switch (key)
     {

@@ -110,7 +110,7 @@ enum DragAndDropMode : unsigned
     /// Drag and drop source and target.
     DD_SOURCE_AND_TARGET = 0x3,
 };
-template<> struct is_flagset<DragAndDropMode> { constexpr static bool value = true; };
+URHO3D_FLAGSET(DragAndDropMode, DragAndDropModeFlags);
 
 class Cursor;
 class ResourceCache;
@@ -180,9 +180,9 @@ public:
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers) { }
+    virtual void OnWheel(int delta, MouseButtonFlags buttons, QualifierFlags qualifiers) { }
     /// React to a key press.
-    virtual void OnKey(Key key, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers) { }
+    virtual void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) { }
     /// React to text input event.
     virtual void OnTextInput(const String& text) { }
 
@@ -314,7 +314,7 @@ public:
     /// Set focus mode.
     void SetFocusMode(FocusMode mode);
     /// Set drag and drop flags.
-    void SetDragDropMode(FlagSet<DragAndDropMode> mode);
+    void SetDragDropMode(DragAndDropModeFlags mode);
     /// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
     bool SetStyle(const String& styleName, XMLFile* file = nullptr);
     /// Set style from an XML element. Return true if the style is applied successfully.
@@ -536,7 +536,7 @@ public:
     FocusMode GetFocusMode() const { return focusMode_; }
 
     /// Return drag and drop flags.
-    FlagSet<DragAndDropMode> GetDragDropMode() const { return dragDropMode_; }
+    DragAndDropModeFlags GetDragDropMode() const { return dragDropMode_; }
 
     /// Return applied style name. Return an empty string when the applied style is an 'auto' style (i.e. style derived from instance's type).
     const String& GetAppliedStyle() const;
@@ -710,7 +710,7 @@ protected:
     /// Focus mode.
     FocusMode focusMode_{FM_NOTFOCUSABLE};
     /// Drag and drop flags.
-    FlagSet<DragAndDropMode> dragDropMode_{DD_DISABLED};
+    DragAndDropModeFlags dragDropMode_{DD_DISABLED};
     /// Layout mode.
     LayoutMode layoutMode_{LM_FREE};
     /// Layout spacing.

@@ -1351,12 +1351,12 @@ bool Input::GetScancodePress(Scancode scancode) const
 
 bool Input::GetMouseButtonDown(MouseButton button) const
 {
-    return (mouseButtonDown_ & button) != 0;
+    return mouseButtonDown_ & button;
 }
 
 bool Input::GetMouseButtonPress(MouseButton button) const
 {
-    return (mouseButtonPress_ & button) != 0;
+    return mouseButtonPress_ & button;
 }
 
 bool Input::GetQualifierDown(Qualifier qualifier) const
@@ -1383,9 +1383,9 @@ bool Input::GetQualifierPress(Qualifier qualifier) const
     return false;
 }
 
-FlagSet<Qualifier> Input::GetQualifiers() const
+QualifierFlags Input::GetQualifiers() const
 {
-    FlagSet<Qualifier> ret;
+    QualifierFlags ret;
     if (GetQualifierDown(QUAL_SHIFT))
         ret |= QUAL_SHIFT;
     if (GetQualifierDown(QUAL_CTRL))

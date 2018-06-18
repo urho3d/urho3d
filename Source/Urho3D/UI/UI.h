@@ -224,7 +224,7 @@ public:
     struct DragData
     {
         /// Which button combo initiated the drag.
-        FlagSet<MouseButton> dragButtons;
+        MouseButtonFlags dragButtons;
         /// How many buttons initiated the drag.
         int numDragButtons;
         /// Sum of all touch locations
@@ -282,25 +282,25 @@ private:
     /// Force release of font faces when global font properties change.
     void ReleaseFontFaces();
     /// Handle button or touch hover.
-    void ProcessHover(const IntVector2& windowCursorPos, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor);
+    void ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
     void
-        ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor, bool cursorVisible);
+        ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
-    void ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor, bool cursorVisible);
+    void ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle mouse or touch move.
-    void ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers, Cursor* cursor,
+    void ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor,
         bool cursorVisible);
     /// Send a UI element drag or hover begin event.
     void SendDragOrHoverEvent
         (StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, UI::DragData* dragData);
     /// Send a UI click event.
     void SendClickEvent
-        (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, MouseButton button, FlagSet<MouseButton> buttons,
-            FlagSet<Qualifier> qualifiers);
+        (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, MouseButton button, MouseButtonFlags buttons,
+            QualifierFlags qualifiers);
 
     /// Send a UI double click event
-    void SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, MouseButton button, FlagSet<MouseButton> buttons, FlagSet<Qualifier> qualifiers);
+    void SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers);
     
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -376,11 +376,11 @@ private:
     /// Drag begin event distance threshold in pixels.
     int dragBeginDistance_;
     /// Mouse buttons held down.
-    FlagSet<MouseButton> mouseButtons_;
+    MouseButtonFlags mouseButtons_;
     /// Last mouse button pressed.
-    FlagSet<MouseButton> lastMouseButtons_;
+    MouseButtonFlags lastMouseButtons_;
     /// Qualifier keys held down.
-    FlagSet<Qualifier> qualifiers_;
+    QualifierFlags qualifiers_;
     /// Font texture maximum size.
     int maxFontTextureSize_;
     /// Initialized flag.
@@ -424,7 +424,7 @@ private:
     /// Number of elements in dragElements_ with dragPending = false.
     int dragConfirmedCount_;
     /// UI elements that are being touched with touch input.
-    HashMap<WeakPtr<UIElement>, FlagSet<MouseButton>> touchDragElements_;
+    HashMap<WeakPtr<UIElement>, MouseButtonFlags> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
     /// Current scale of UI.

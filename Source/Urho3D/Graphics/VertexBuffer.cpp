@@ -106,7 +106,7 @@ void VertexBuffer::UpdateOffsets()
         {
             const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
             if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
-                elementMask_ |= FlagSet<VertexMask>(1u << j);
+                elementMask_ |= VertexMaskFlags(1u << j);
         }
     }
 

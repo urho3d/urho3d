@@ -143,7 +143,7 @@ bool Animation::BeginLoad(Deserializer& source)
     for (unsigned i = 0; i < tracks; ++i)
     {
         AnimationTrack* newTrack = CreateTrack(source.ReadString());
-        newTrack->channelMask_ = FlagSet<AnimationChannel>(source.ReadUByte());
+        newTrack->channelMask_ = AnimationChannelFlags(source.ReadUByte());
 
         unsigned keyFrames = source.ReadUInt();
         newTrack->keyFrames_.Resize(keyFrames);

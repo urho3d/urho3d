@@ -41,7 +41,7 @@ enum UseEvent : unsigned
     /// Bitmask for using the physics post-update event.
     USE_FIXEDPOSTUPDATE = 0x8,
 };
-template<> struct is_flagset<UseEvent> { constexpr static bool value = true; };
+URHO3D_FLAGSET(UseEvent, UseEventFlags);
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class URHO3D_API LogicComponent : public Component

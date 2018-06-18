@@ -30,13 +30,17 @@ namespace Urho3D
 {
 
 /// Bitwise Type trait which enables against Enum value. for consumption by flagset class and it's global operators.
-template<typename T> struct is_flagset
+template<typename T> struct IsFlagSet
 {
-    constexpr static bool value = false;
+    constexpr static bool value_ = false;
 };
 
+#define URHO3D_FLAGSET(enumName, flagsetName) \
+    template<> struct IsFlagSet<enumName> { constexpr static bool value_ = true; }; \
+    using flagsetName = FlagSet<enumName>
+
 /// A set of flags defined by an Enum.
-template <class E, class = typename std::enable_if<is_flagset<E>::value>::type>
+template <class E, class = typename std::enable_if<IsFlagSet<E>::value_>::type>
 class FlagSet
 {
 public:
@@ -198,7 +202,7 @@ public:
     }
 
     /// Returns true if specified enum value is set.
-    inline bool is(const Enum value) const
+    inline bool Is(const Enum value) const
     {
         Integer flags = (Integer) value;
         return (value_ & flags) == flags && (flags != 0 || value_ == flags);
@@ -212,28 +216,28 @@ protected:
 }
 
 /// Bitwise Operator OR for against Enum value.s
-template <class Enum, class = typename std::enable_if<Urho3D::is_flagset<Enum>::value>::type>
+template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator |(const Enum lhs, const Enum rhs)
 {
     return Urho3D::FlagSet<Enum>(lhs) | rhs;
 }
 
 /// Bitwise Operator AND for against Enum value.s
-template <class Enum, class = typename std::enable_if<Urho3D::is_flagset<Enum>::value>::type>
+template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator & (const Enum lhs, const Enum rhs)
 {
     return Urho3D::FlagSet<Enum>(lhs) & rhs;
 }
 
 /// Bitwise Operator XOR for against Enum value.s
-template <class Enum, class = typename std::enable_if<Urho3D::is_flagset<Enum>::value>::type>
+template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator ^ (const Enum lhs, const Enum rhs)
 {
     return Urho3D::FlagSet<Enum>(lhs) ^ rhs;
 }
 
 /// Bitwise Operator RESET for against Enum value.s
-template <class Enum, class = typename std::enable_if<Urho3D::is_flagset<Enum>::value>::type>
+template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator ~ (const Enum rhs)
 {
     return (Enum)(~(typename std::underlying_type<Enum>::type)rhs);
