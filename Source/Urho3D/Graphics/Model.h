@@ -41,7 +41,7 @@ class VertexBuffer;
 struct VertexBufferMorph
 {
     /// Vertex elements.
-    unsigned elementMask_;
+    FlagSet<VertexMask> elementMask_;
     /// Number of vertices.
     unsigned vertexCount_;
     /// Morphed vertices data size as bytes.

@@ -500,7 +500,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     }
 
     const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-    unsigned char channelMask = track->channelMask_;
+    auto channelMask = track->channelMask_;
 
     Vector3 newPosition;
     Quaternion newRotation;

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Container/FlagSet.h"
 #include "../Container/Ptr.h"
 #include "../Math/Quaternion.h"
 #include "../Math/Vector3.h"
@@ -29,6 +30,15 @@
 
 namespace Urho3D
 {
+
+enum AnimationChannel : unsigned char
+{
+    CHANNEL_NONE = 0x0,
+    CHANNEL_POSITION = 0x1,
+    CHANNEL_ROTATION = 0x2,
+    CHANNEL_SCALE = 0x4,
+};
+template<> struct is_flagset<AnimationChannel> { constexpr static bool value = true; };
 
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
@@ -54,10 +64,7 @@ struct AnimationKeyFrame
 struct URHO3D_API AnimationTrack
 {
     /// Construct.
-    AnimationTrack() :
-        channelMask_(0)
-    {
-    }
+    AnimationTrack() = default;
 
     /// Assign keyframe at index.
     void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
@@ -82,7 +89,7 @@ struct URHO3D_API AnimationTrack
     /// Name hash.
     StringHash nameHash_;
     /// Bitmask of included data (position, rotation, scale.)
-    unsigned char channelMask_;
+    FlagSet<AnimationChannel> channelMask_{};
     /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;
 };
@@ -101,10 +108,6 @@ struct AnimationTriggerPoint
     /// Trigger data.
     Variant data_;
 };
-
-static const unsigned char CHANNEL_POSITION = 0x1;
-static const unsigned char CHANNEL_ROTATION = 0x2;
-static const unsigned char CHANNEL_SCALE = 0x4;
 
 /// Skeletal animation resource.
 class URHO3D_API Animation : public ResourceWithMetadata
