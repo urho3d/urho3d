@@ -1132,7 +1132,7 @@ macro (enable_pch HEADER_PATHNAME)
     # No op when PCH support is not enabled
     if (URHO3D_PCH)
         # Get the optional LANG parameter to indicate whether the header should be treated as C or C++ header, default to C++
-        if ("${ARGN}" STREQUAL C) # Stringify as the LANG paramater could be empty
+        if ("${ARGN}" STREQUAL C) # Stringify as the LANG parameter could be empty
             set (EXT c)
             set (LANG C)
             set (LANG_H c-header)
@@ -1593,38 +1593,36 @@ macro (setup_main_executable)
         define_resource_dirs ()
     endif ()
     if (ANDROID)
-        # Setup shared library output path
-        set_output_directories (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME} LIBRARY)
         # Setup target as main shared library
         setup_library (SHARED)
         if (DEST_LIBRARY_DIR)
             install (TARGETS ${TARGET_NAME} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
         endif ()
-        # Copy other dependent shared libraries to Android library output path
-        if (ANDROID_STL MATCHES shared)
-            # Android toolchain may already copy a shared C++ STL runtime to library output path,
-            # still we configure another post build command to copy the runtime and its clean up here for consistency sake
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${STL_LIBRARY_DIR}/lib${ANDROID_STL}.so ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
-            add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
-        endif ()
-        foreach (FILE ${ABSOLUTE_PATH_LIBS})
-            get_filename_component (EXT ${FILE} EXT)
-            if (EXT STREQUAL .so)
-                get_filename_component (NAME ${FILE} NAME)
-                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}
-                    COMMENT "Copying ${NAME} to library output directory")
-                add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/${NAME})
-            endif ()
-        endforeach ()
-        if (ANDROID_NDK_GDB)
-            # Copy the library while it still has debug symbols for ndk-gdb
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
-                COMMENT "Copying lib${TARGET_NAME}.so with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
-            add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
-        endif ()
+#        # Copy other dependent shared libraries to Android library output path
+#        if (ANDROID_STL MATCHES shared)
+#            # Android toolchain may already copy a shared C++ STL runtime to library output path,
+#            # still we configure another post build command to copy the runtime and its clean up here for consistency sake
+#            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+#                COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${STL_LIBRARY_DIR}/lib${ANDROID_STL}.so ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
+#            add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
+#        endif ()
+#        foreach (FILE ${ABSOLUTE_PATH_LIBS})
+#            get_filename_component (EXT ${FILE} EXT)
+#            if (EXT STREQUAL .so)
+#                get_filename_component (NAME ${FILE} NAME)
+#                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+#                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}
+#                    COMMENT "Copying ${NAME} to library output directory")
+#                add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/${NAME})
+#            endif ()
+#        endforeach ()
+#        if (ANDROID_NDK_GDB)
+#            # Copy the library while it still has debug symbols for ndk-gdb
+#            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+#                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
+#                COMMENT "Copying lib${TARGET_NAME}.so with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
+#            add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
+#        endif ()
         # When performing packaging, include the final apk file
         if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
             install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D-debug.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
@@ -1741,10 +1739,9 @@ macro (setup_main_executable)
             set (INSTALLED_RESOURCE_DIRS ${INSTALLED_RESOURCE_DIRS} CACHE INTERNAL "Installed resource dirs")
         endforeach ()
     endif ()
-    # Define a custom command for stripping the main target executable (or shared library for Android) for Release build configuration
-    # Exclude multi-config generators, plus MSVC explicitly since it could also be used through NMake which is not multi-config,
-    # but MSVC does not have a strip command
-    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT WEB AND NOT MSVC)
+    # Define a custom command for stripping the main target executable for Release build configuration,
+    # but only for platforms that support it and require it (for Android, let Android plugin handle it)
+    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT ANDROID AND NOT WEB AND NOT MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
     endif ()
 endmacro ()
@@ -1806,7 +1803,7 @@ macro (_setup_target)
                 list (APPEND LINK_FLAGS "-s WASM=0")
             endif ()
         endif ()
-        # Pass EMCC-specifc setting to differentiate between main and side modules
+        # Pass EMCC-specific setting to differentiate between main and side modules
         if (URHO3D_LIB_TYPE STREQUAL MODULE)
             if (${TARGET_NAME} STREQUAL Urho3D)
                 # Main module has standard libs statically linked
@@ -1873,23 +1870,13 @@ macro (_setup_target)
         unset (TARGET_PROPERTIES)
     endif ()
     # Create symbolic links in the build tree
-    if (ANDROID)
-        foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
-            if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
-                create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
-            endif ()
-        endforeach ()
-        set (ASSET_ROOT assets)
-    else ()
-        set (ASSET_ROOT bin)
-    endif ()
-    if (NOT URHO3D_PACKAGING)
+    if (NOT ANDROID AND NOT URHO3D_PACKAGING)
         # Ensure the asset root directory exist before creating the symlinks
-        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${ASSET_ROOT})
+        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
         foreach (I ${RESOURCE_DIRS})
             get_filename_component (NAME ${I} NAME)
-            if (NOT EXISTS ${CMAKE_BINARY_DIR}/${ASSET_ROOT}/${NAME} AND EXISTS ${I})
-                create_symlink (${I} ${CMAKE_BINARY_DIR}/${ASSET_ROOT}/${NAME} FALLBACK_TO_COPY)
+            if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${NAME} AND EXISTS ${I})
+                create_symlink (${I} ${CMAKE_BINARY_DIR}/bin/${NAME} FALLBACK_TO_COPY)
             endif ()
         endforeach ()
     endif ()

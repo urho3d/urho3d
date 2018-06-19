@@ -34,7 +34,7 @@ include_directories (${URHO3D_INCLUDE_DIRS})
 # The CTest could "run" the Urho3DPlayer.html with script name as parameter, thanks to emrun performing this parsing automatically
 # In a production environment, however, the request parameters parsing has to be done by the application itself one way or another
 if (URHO3D_ANGELSCRIPT OR URHO3D_LUA${JIT})
-    # Add Urho3DPlayer as target only when one of the supported scripting subystems is enabled
+    # Add Urho3DPlayer as target only when one of the supported scripting subsystems is enabled
     add_subdirectory (Urho3DPlayer)
 endif ()
 

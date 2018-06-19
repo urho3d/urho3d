@@ -12,6 +12,9 @@
 /lib*/
 generated/
 /Source/Urho3D/tolua++-prefix/
+build/
+/captures/
+.externalNativeBuild/
 
 # Output files
 /Source/**/*.a
@@ -59,6 +62,7 @@ generated/
 # JetBrains IDE project settings
 /.idea/
 /cmake-build-*/
+*.iml
 
 # Code::Blocks project settings
 /*.cbp
@@ -71,12 +75,7 @@ generated/
 .gradle
 
 # Android project settings
-/Android/local.properties
-
-# Android output directories
-/Android/Urho3D/
-/Android/ThirdParty/
-/Android/libs/
+/local.properties
 
 # CMake generated build files
 CMakeCache.txt
@@ -93,7 +92,6 @@ CTestTestfile.cmake
 !/Source/ThirdParty/SDL/include/*cmake
 !/Source/ThirdParty/Assimp/cmake-modules/*cmake
 /Docs/**/*.cmake
-/build
 
 # Precompiled header files
 *.gch/

@@ -318,12 +318,9 @@ if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.3.
 endif ()
 
 # Setup library output path
-if (ANDROID)
-    set (OUTPUT_PATH ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME})
-else ()
-    set (OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+if (NOT ANDROID)
+    set_output_directories (${CMAKE_BINARY_DIR}/lib ARCHIVE LIBRARY)
 endif ()
-set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
 
 # Setup target
 if (IOS OR TVOS)
