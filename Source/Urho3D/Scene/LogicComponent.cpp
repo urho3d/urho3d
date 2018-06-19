@@ -64,7 +64,7 @@ void LogicComponent::FixedPostUpdate(float timeStep)
 {
 }
 
-void LogicComponent::SetUpdateEventMask(FlagSet<UpdateEvent> mask)
+void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
 {
     if (updateEventMask_ != mask)
     {

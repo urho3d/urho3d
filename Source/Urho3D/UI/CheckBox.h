@@ -46,7 +46,7 @@ public:
     void OnClickBegin
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to a key press.
-    void OnKey(Key key, MouseButtonFlags buttons, FlagSet<Qualifier> qualifiers) override;
+    void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
 
     /// Set checked state.
     void SetChecked(bool enable);

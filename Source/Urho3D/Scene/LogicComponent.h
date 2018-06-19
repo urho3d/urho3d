@@ -75,10 +75,10 @@ class URHO3D_API LogicComponent : public Component
     virtual void FixedPostUpdate(float timeStep);
 
     /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
-    void SetUpdateEventMask(FlagSet<UpdateEvent> mask);
+    void SetUpdateEventMask(UpdateEventFlags mask);
 
     /// Return what update events are subscribed to.
-    FlagSet<UpdateEvent> GetUpdateEventMask() const { return updateEventMask_; }
+    UpdateEventFlags GetUpdateEventMask() const { return updateEventMask_; }
 
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
@@ -103,9 +103,9 @@ private:
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
 #endif
     /// Requested event subscription mask.
-    FlagSet<UpdateEvent> updateEventMask_;
+    UpdateEventFlags updateEventMask_;
     /// Current event subscription mask.
-    FlagSet<UpdateEvent> currentEventMask_;
+    UpdateEventFlags currentEventMask_;
     /// Flag for delayed start.
     bool delayedStartCalled_;
 };

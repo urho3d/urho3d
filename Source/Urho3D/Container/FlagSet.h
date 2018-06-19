@@ -35,8 +35,13 @@ template<typename T> struct IsFlagSet
     constexpr static bool value_ = false;
 };
 
-#define URHO3D_FLAGSET(enumName, flagsetName) \
+/// Enable enum for using in FlagSet. Shall be called within Urho3D namespace.
+#define URHO3D_ENABLE_FLAGSET(enumName) \
     template<> struct IsFlagSet<enumName> { constexpr static bool value_ = true; }; \
+
+/// Enable enum for using in FlagSet and declare FlagSet specialization. Shall be called within Urho3D namespace.
+#define URHO3D_FLAGSET(enumName, flagsetName) \
+    URHO3D_ENABLE_FLAGSET(enumName) \
     using flagsetName = FlagSet<enumName>
 
 /// A set of flags defined by an Enum.
@@ -48,6 +53,7 @@ public:
     using Enum = E;
     /// Integer type
     using Integer = typename std::underlying_type<Enum>::type;
+
 public:
     /// Ctor by integer
     explicit FlagSet(Integer value)

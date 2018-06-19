@@ -89,7 +89,7 @@ private:
     /// Target rotation.
     Quaternion targetRotation_;
     /// Active smoothing operations bitmask.
-    FlagSet<SmoothingType> smoothingMask_;
+    SmoothingTypeFlags smoothingMask_;
     /// Subscribed to smoothing update event flag.
     bool subscribed_;
 };

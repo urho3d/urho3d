@@ -1882,7 +1882,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     using namespace KeyDown;
 
     mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = FlagSet<Qualifier>(eventData[P_QUALIFIERS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
     auto key = (Key)eventData[P_KEY].GetUInt();
 
     // Cancel UI dragging
@@ -2064,12 +2064,12 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
     IntVector2 sendPos = oldSendPos;
     if (usingTouchInput_)
     {
-        FlagSet<MouseButton> buttons = dragData->dragButtons;
+        MouseButtonFlags buttons = dragData->dragButtons;
         dragData->sumPos = IntVector2::ZERO;
         auto* input = GetSubsystem<Input>();
         for (unsigned i = 0; (1u << i) <= (unsigned)buttons; i++)
         {
-            if (FlagSet<MouseButton>(1u << i) & buttons)
+            if (buttons.Test(MouseButton(1u << i)))
             {
                 TouchState* ts = input->GetTouch((unsigned)i);
                 if (!ts)
