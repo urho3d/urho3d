@@ -233,9 +233,9 @@ public:
     /// Check if a key has been pressed on this frame by scancode.
     bool GetScancodePress(Scancode scancode) const;
     /// Check if a mouse button is held down.
-    bool GetMouseButtonDown(MouseButton button) const;
+    bool GetMouseButtonDown(MouseButtonFlags button) const;
     /// Check if a mouse button has been pressed on this frame.
-    bool GetMouseButtonPress(MouseButton button) const;
+    bool GetMouseButtonPress(MouseButtonFlags button) const;
     /// Check if a qualifier key is held down.
     bool GetQualifierDown(Qualifier qualifier) const;
     /// Check if a qualifier key has been pressed on this frame.

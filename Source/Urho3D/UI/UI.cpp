@@ -67,7 +67,7 @@
 
 #include "../DebugNew.h"
 
-#define TOUCHID_MASK(id) MouseButtonFlags(1u << (unsigned)(id))
+#define TOUCHID_MASK(id) MouseButton(1u << (unsigned)(id))
 
 namespace Urho3D
 {
@@ -1699,7 +1699,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     auto* input = GetSubsystem<Input>();
 
     if (!input->IsMouseGrabbed())
-        ProcessClickBegin(cursorPos, MouseButtonFlags(eventData[P_BUTTON].GetUInt()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
+        ProcessClickBegin(cursorPos, MouseButton(eventData[P_BUTTON].GetUInt()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
@@ -1848,7 +1848,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     for (auto i = touchDragElements_.Begin(); i != touchDragElements_.End();)
     {
         auto touches = i->second_;
-        if (touchId & touches)
+        if (touches.Test(touchId))
             i = touchDragElements_.Erase(i);
         else
             ++i;

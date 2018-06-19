@@ -29,7 +29,7 @@
 namespace Urho3D
 {
 
-/// Bitwise Type trait which enables against Enum value. for consumption by flagset class and it's global operators.
+/// Bitwise Type trait which enables against Enum value. For consumption by flagset class and it's global operators.
 template<typename T> struct IsFlagSet
 {
     constexpr static bool value_ = false;
@@ -172,37 +172,43 @@ public:
     }
 
     /// Cast to enum value.
-    operator Enum() const
+    explicit operator Enum() const
     {
         return (Enum)value_;
     }
 
+    /// Cast to double. Used by Lua bindings.
+    explicit operator double() const
+    {
+        return (double)value_;
+    }
+
     /// Equality check against enum value.
-    bool operator ==(Enum rhs)
+    bool operator ==(Enum rhs) const
     {
         return value_ == (Integer)rhs;
     }
 
     /// Equality check against another flagset.
-    bool operator ==(FlagSet rhs)
+    bool operator ==(FlagSet rhs) const
     {
         return value_ == rhs.value_;
     }
 
     /// Non-equality check against enum value.
-    bool operator !=(Enum rhs)
+    bool operator !=(Enum rhs) const
     {
         return value_ != (Integer)rhs;
     }
 
     /// Non-equality check against another flagset value.
-    bool operator !=(FlagSet rhs)
+    bool operator !=(FlagSet rhs) const
     {
         return value_ != rhs.value_;
     }
 
     /// Returns true if specified enum value is set.
-    inline bool Is(const Enum value) const
+    inline bool Test(const Enum value) const
     {
         Integer flags = (Integer) value;
         return (value_ & flags) == flags && (flags != 0 || value_ == flags);
@@ -236,7 +242,7 @@ Urho3D::FlagSet<Enum> operator ^ (const Enum lhs, const Enum rhs)
     return Urho3D::FlagSet<Enum>(lhs) ^ rhs;
 }
 
-/// Bitwise Operator RESET for against Enum value.s
+/// Bitwise Operator INVERSION for against Enum value.s
 template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator ~ (const Enum rhs)
 {

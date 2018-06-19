@@ -64,7 +64,9 @@ struct AnimationKeyFrame
 struct URHO3D_API AnimationTrack
 {
     /// Construct.
-    AnimationTrack() = default;
+    AnimationTrack()
+    {
+    }
 
     /// Assign keyframe at index.
     void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);

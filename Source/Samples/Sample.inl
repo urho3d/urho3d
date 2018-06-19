@@ -284,7 +284,7 @@ void Sample::HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
             ++quality;
             if (quality > QUALITY_HIGH)
                 quality = QUALITY_LOW;
-            renderer->SetTextureQuality((Quality)quality);
+            renderer->SetTextureQuality((MaterialQuality)quality);
         }
 
         // Material quality
@@ -294,7 +294,7 @@ void Sample::HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
             ++quality;
             if (quality > QUALITY_HIGH)
                 quality = QUALITY_LOW;
-            renderer->SetMaterialQuality((Quality)quality);
+            renderer->SetMaterialQuality((MaterialQuality)quality);
         }
 
         // Specular lighting

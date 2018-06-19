@@ -28,7 +28,7 @@
 namespace Urho3D
 {
 
-enum UseEvent : unsigned
+enum UpdateEvent : unsigned
 {
     /// Bitmask for not using any events.
     USE_NONE = 0x0,
@@ -41,7 +41,7 @@ enum UseEvent : unsigned
     /// Bitmask for using the physics post-update event.
     USE_FIXEDPOSTUPDATE = 0x8,
 };
-URHO3D_FLAGSET(UseEvent, UseEventFlags);
+URHO3D_FLAGSET(UpdateEvent, UpdateEventFlags);
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class URHO3D_API LogicComponent : public Component
@@ -75,10 +75,10 @@ class URHO3D_API LogicComponent : public Component
     virtual void FixedPostUpdate(float timeStep);
 
     /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
-    void SetUpdateEventMask(FlagSet<UseEvent> mask);
+    void SetUpdateEventMask(FlagSet<UpdateEvent> mask);
 
     /// Return what update events are subscribed to.
-    FlagSet<UseEvent> GetUpdateEventMask() const { return updateEventMask_; }
+    FlagSet<UpdateEvent> GetUpdateEventMask() const { return updateEventMask_; }
 
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
@@ -103,9 +103,9 @@ private:
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
 #endif
     /// Requested event subscription mask.
-    FlagSet<UseEvent> updateEventMask_;
+    FlagSet<UpdateEvent> updateEventMask_;
     /// Current event subscription mask.
-    FlagSet<UseEvent> currentEventMask_;
+    FlagSet<UpdateEvent> currentEventMask_;
     /// Flag for delayed start.
     bool delayedStartCalled_;
 };

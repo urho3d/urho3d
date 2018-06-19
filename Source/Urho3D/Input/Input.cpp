@@ -1349,12 +1349,12 @@ bool Input::GetScancodePress(Scancode scancode) const
     return scancodePress_.Contains(scancode);
 }
 
-bool Input::GetMouseButtonDown(MouseButton button) const
+bool Input::GetMouseButtonDown(MouseButtonFlags button) const
 {
     return mouseButtonDown_ & button;
 }
 
-bool Input::GetMouseButtonPress(MouseButton button) const
+bool Input::GetMouseButtonPress(MouseButtonFlags button) const
 {
     return mouseButtonPress_ & button;
 }

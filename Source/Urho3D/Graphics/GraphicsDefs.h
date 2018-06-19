@@ -431,7 +431,7 @@ extern URHO3D_API const StringHash PSP_ZONEMAX;
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
 
-enum Quality : unsigned
+enum MaterialQuality : unsigned
 {
     QUALITY_LOW = 0,
     QUALITY_MEDIUM = 1,
@@ -439,13 +439,13 @@ enum Quality : unsigned
     QUALITY_MAX = 15,
 };
 
-enum Clear : unsigned
+enum ClearFlag : unsigned
 {
     CLEAR_COLOR = 0x1,
     CLEAR_DEPTH = 0x2,
     CLEAR_STENCIL = 0x4,
 };
-URHO3D_FLAGSET(Clear, ClearFlags);
+URHO3D_FLAGSET(ClearFlag, ClearFlags);
 
 // Legacy vertex element bitmasks.
 enum VertexMask : unsigned
