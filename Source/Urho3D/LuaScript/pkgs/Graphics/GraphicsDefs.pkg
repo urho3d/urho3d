@@ -237,7 +237,7 @@ enum MaterialQuality
     QUALITY_MAX
 };
 
-enum ClearFlag
+enum ClearMode
 {
     CLEAR_COLOR,
     CLEAR_DEPTH,

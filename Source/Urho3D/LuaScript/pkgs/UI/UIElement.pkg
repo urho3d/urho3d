@@ -123,7 +123,7 @@ class UIElement : public Animatable
     void SetSelected(bool enable);
     void SetVisible(bool enable);
     void SetFocusMode(FocusMode mode);
-    void SetDragDropMode(unsigned mode);
+    void SetDragDropMode(DragAndDropMode mode);
 
     bool SetStyle(const String styleName, XMLFile* file = 0);
 
@@ -207,7 +207,7 @@ class UIElement : public Animatable
     bool IsInternal() const;
     bool HasColorGradient() const;
     FocusMode GetFocusMode() const;
-    unsigned GetDragDropMode() const;
+    DragAndDropMode GetDragDropMode() const;
     const String GetAppliedStyle() const;
     XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
     LayoutMode GetLayoutMode() const;
@@ -295,7 +295,7 @@ class UIElement : public Animatable
     tolua_property__is_set bool internal;
     tolua_readonly tolua_property__has_set bool colorGradient;
     tolua_property__get_set FocusMode focusMode;
-    tolua_property__get_set unsigned dragDropMode;
+    tolua_property__get_set DragAndDropMode dragDropMode;
     tolua_property__get_set String style;
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_property__get_set LayoutMode layoutMode;

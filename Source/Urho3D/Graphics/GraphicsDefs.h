@@ -439,13 +439,13 @@ enum MaterialQuality : unsigned
     QUALITY_MAX = 15,
 };
 
-enum ClearFlag : unsigned
+enum ClearMode : unsigned
 {
     CLEAR_COLOR = 0x1,
     CLEAR_DEPTH = 0x2,
     CLEAR_STENCIL = 0x4,
 };
-URHO3D_FLAGSET(ClearFlag, ClearFlags);
+URHO3D_FLAGSET(ClearMode, ClearModeFlags);
 
 // Legacy vertex element bitmasks.
 enum VertexMask : unsigned

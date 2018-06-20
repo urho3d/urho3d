@@ -659,7 +659,7 @@ void Graphics::EndFrame()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear(ClearFlags flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear(ClearModeFlags flags, const Color& color, float depth, unsigned stencil)
 {
     PrepareDraw();
 
