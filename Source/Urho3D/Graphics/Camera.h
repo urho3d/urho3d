@@ -35,10 +35,14 @@ static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_CAMERA_FOV = 45.0f;
 static const float DEFAULT_ORTHOSIZE = 20.0f;
 
-static const unsigned VO_NONE = 0x0;
-static const unsigned VO_LOW_MATERIAL_QUALITY = 0x1;
-static const unsigned VO_DISABLE_SHADOWS = 0x2;
-static const unsigned VO_DISABLE_OCCLUSION = 0x4;
+enum ViewOverride : unsigned
+{
+    VO_NONE = 0x0,
+    VO_LOW_MATERIAL_QUALITY = 0x1,
+    VO_DISABLE_SHADOWS = 0x2,
+    VO_DISABLE_OCCLUSION = 0x4,
+};
+URHO3D_FLAGSET(ViewOverride, ViewOverrideFlags);
 
 /// %Camera component.
 class URHO3D_API Camera : public Component
@@ -77,7 +81,7 @@ public:
     /// Set view mask. Will be and'ed with object's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
     /// Set view override flags.
-    void SetViewOverrideFlags(unsigned flags);
+    void SetViewOverrideFlags(ViewOverrideFlags flags);
     /// Set orthographic mode enabled/disabled.
     void SetOrthographic(bool enable);
     /// Set automatic aspect ratio based on viewport dimensions. Enabled by default.
@@ -125,7 +129,7 @@ public:
     unsigned GetViewMask() const { return viewMask_; }
 
     /// Return view override flags.
-    unsigned GetViewOverrideFlags() const { return viewOverrideFlags_; }
+    ViewOverrideFlags GetViewOverrideFlags() const { return viewOverrideFlags_; }
 
     /// Return fill mode.
     FillMode GetFillMode() const { return fillMode_; }
@@ -255,7 +259,7 @@ private:
     /// View mask.
     unsigned viewMask_;
     /// View override flags.
-    unsigned viewOverrideFlags_;
+    ViewOverrideFlags viewOverrideFlags_;
     /// Fill mode.
     FillMode fillMode_;
     /// Projection offset.

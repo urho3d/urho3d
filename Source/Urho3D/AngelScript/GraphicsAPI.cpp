@@ -67,10 +67,11 @@ void FakeReleaseRef(void* ptr);
 
 static void RegisterCamera(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint VO_NONE", (void*)&VO_NONE);
-    engine->RegisterGlobalProperty("const uint VO_LOW_MATERIAL_QUALITY", (void*)&VO_LOW_MATERIAL_QUALITY);
-    engine->RegisterGlobalProperty("const uint VO_DISABLE_SHADOWS", (void*)&VO_DISABLE_SHADOWS);
-    engine->RegisterGlobalProperty("const uint VO_DISABLE_OCCLUSION", (void*)&VO_DISABLE_OCCLUSION);
+    engine->RegisterEnum("ViewOverride");
+    engine->RegisterEnumValue("ViewOverride", "VO_NONE", VO_NONE);
+    engine->RegisterEnumValue("ViewOverride", "VO_LOW_MATERIAL_QUALITY", VO_LOW_MATERIAL_QUALITY);
+    engine->RegisterEnumValue("ViewOverride", "VO_DISABLE_SHADOWS", VO_DISABLE_SHADOWS);
+    engine->RegisterEnumValue("ViewOverride", "VO_DISABLE_OCCLUSION", VO_DISABLE_OCCLUSION);
 
     engine->RegisterEnum("FillMode");
     engine->RegisterEnumValue("FillMode", "FILL_SOLID", FILL_SOLID);

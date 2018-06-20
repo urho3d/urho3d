@@ -26,6 +26,7 @@
 #include "../Core/Object.h"
 
 #include <cstddef>
+#include <type_traits>
 
 namespace Urho3D
 {
@@ -191,8 +192,8 @@ SharedPtr<AttributeAccessor> MakeVariantAttributeAccessor(TGetFunction getFuncti
 
 /// Make member attribute accessor.
 #define URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
-    [](const ClassName& self, Urho3D::Variant& value) { value = self.variable; }, \
-    [](ClassName& self, const Urho3D::Variant& value) { self.variable = value.Get<typeName>(); })
+    [](const ClassName& self, Urho3D::Variant& value) { value = static_cast<typeName>(self.variable); }, \
+    [](ClassName& self, const Urho3D::Variant& value) { self.variable = static_cast<std::remove_reference<decltype(variable)>::type>(value.Get<typeName>()); })
 
 /// Make member attribute accessor with custom post-set callback.
 #define URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
