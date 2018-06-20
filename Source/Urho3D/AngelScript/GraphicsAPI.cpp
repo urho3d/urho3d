@@ -327,10 +327,10 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
 
-    engine->RegisterEnum("ClearMode");
-    engine->RegisterEnumValue("ClearMode", "CLEAR_COLOR", CLEAR_COLOR);
-    engine->RegisterEnumValue("ClearMode", "CLEAR_DEPTH", CLEAR_DEPTH);
-    engine->RegisterEnumValue("ClearMode", "CLEAR_STENCIL", CLEAR_STENCIL);
+    engine->RegisterEnum("ClearTarget");
+    engine->RegisterEnumValue("ClearTarget", "CLEAR_COLOR", CLEAR_COLOR);
+    engine->RegisterEnumValue("ClearTarget", "CLEAR_DEPTH", CLEAR_DEPTH);
+    engine->RegisterEnumValue("ClearTarget", "CLEAR_STENCIL", CLEAR_STENCIL);
 
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderTargetInfo), asCALL_CDECL_OBJLAST);

@@ -237,7 +237,7 @@ enum MaterialQuality
     QUALITY_MAX
 };
 
-enum ClearMode
+enum ClearTarget
 {
     CLEAR_COLOR,
     CLEAR_DEPTH,
