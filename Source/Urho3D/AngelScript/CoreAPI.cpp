@@ -950,7 +950,7 @@ static bool HasSubscribedToSenderEvent(Object* sender, const String& eventType)
 
 static void RegisterEventName(const String& eventName)
 {
-    EventNameRegistrar::RegisterEventName(eventName.CString());
+    GetEventNameRegister().RegisterString(eventName.CString());
 }
 
 static Object* GetEventSender()

@@ -60,29 +60,7 @@ public:
     }
 
     /// Copy-construct from another matrix.
-    Matrix3x4(const Matrix3x4& matrix) noexcept
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
-    {
-        _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
-        _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
-        _mm_storeu_ps(&m20_, _mm_loadu_ps(&matrix.m20_));
-    }
-#else
-       :m00_(matrix.m00_),
-        m01_(matrix.m01_),
-        m02_(matrix.m02_),
-        m03_(matrix.m03_),
-        m10_(matrix.m10_),
-        m11_(matrix.m11_),
-        m12_(matrix.m12_),
-        m13_(matrix.m13_),
-        m20_(matrix.m20_),
-        m21_(matrix.m21_),
-        m22_(matrix.m22_),
-        m23_(matrix.m23_)
-    {
-    }
-#endif
+    Matrix3x4(const Matrix3x4& matrix) noexcept = default;
 
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
     explicit Matrix3x4(const Matrix3& matrix) noexcept :
@@ -171,7 +149,7 @@ public:
     /// Construct from translation, rotation and uniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale) noexcept
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale, scale, scale);
@@ -185,7 +163,7 @@ public:
     /// Construct from translation, rotation and nonuniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale) noexcept
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale.z_, scale.y_, scale.x_);
@@ -197,28 +175,7 @@ public:
     }
 
     /// Assign from another matrix.
-    Matrix3x4& operator =(const Matrix3x4& rhs) noexcept
-    {
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
-        _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
-        _mm_storeu_ps(&m10_, _mm_loadu_ps(&rhs.m10_));
-        _mm_storeu_ps(&m20_, _mm_loadu_ps(&rhs.m20_));
-#else
-        m00_ = rhs.m00_;
-        m01_ = rhs.m01_;
-        m02_ = rhs.m02_;
-        m03_ = rhs.m03_;
-        m10_ = rhs.m10_;
-        m11_ = rhs.m11_;
-        m12_ = rhs.m12_;
-        m13_ = rhs.m13_;
-        m20_ = rhs.m20_;
-        m21_ = rhs.m21_;
-        m22_ = rhs.m22_;
-        m23_ = rhs.m23_;
-#endif
-        return *this;
-    }
+    Matrix3x4& operator =(const Matrix3x4& rhs) noexcept = default;
 
     /// Assign from a 3x3 matrix and set the extra elements to identity.
     Matrix3x4& operator =(const Matrix3& rhs) noexcept
@@ -226,15 +183,15 @@ public:
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
         m02_ = rhs.m02_;
-        m03_ = 0.0;
+        m03_ = 0.0f;
         m10_ = rhs.m10_;
         m11_ = rhs.m11_;
         m12_ = rhs.m12_;
-        m13_ = 0.0;
+        m13_ = 0.0f;
         m20_ = rhs.m20_;
         m21_ = rhs.m21_;
         m22_ = rhs.m22_;
-        m23_ = 0.0;
+        m23_ = 0.0f;
         return *this;
     }
 
@@ -729,7 +686,7 @@ public:
     /// Identity matrix.
     static const Matrix3x4 IDENTITY;
 
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
 private:
     /// \brief Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters. Note: the w component of the scale parameter passed to this function must be 1.
     void inline SetFromTRS(__m128 t, __m128 q, __m128 s)

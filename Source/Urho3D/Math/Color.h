@@ -24,9 +24,6 @@
 
 #include "../Math/Vector4.h"
 
-// Defined by Windows headers
-#undef TRANSPARENT
-
 namespace Urho3D
 {
 
@@ -219,8 +216,8 @@ public:
     static const Color MAGENTA;
     /// Opaque yellow color.
     static const Color YELLOW;
-    /// Transparent color (black with no alpha).
-    static const Color TRANSPARENT;
+    /// Transparent black color (black with no alpha).
+    static const Color TRANSPARENT_BLACK;
 
 protected:
     /// Return hue value given greatest and least RGB component, value-wise.

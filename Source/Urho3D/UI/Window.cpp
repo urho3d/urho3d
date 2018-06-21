@@ -48,8 +48,8 @@ Window::Window(Context* context) :
     dragMode_(DRAG_NONE),
     modal_(false),
     modalAutoDismiss_(true),
-    modalShadeColor_(Color::TRANSPARENT),
-    modalFrameColor_(Color::TRANSPARENT),
+    modalShadeColor_(Color::TRANSPARENT_BLACK),
+    modalFrameColor_(Color::TRANSPARENT_BLACK),
     modalFrameSize_(IntVector2::ZERO)
 {
     bringToFront_ = true;
@@ -74,8 +74,8 @@ void Window::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Width Resizing", GetFixedWidthResizing, SetFixedWidthResizing, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Height Resizing", GetFixedHeightResizing, SetFixedHeightResizing, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Modal", IsModal, SetModal, bool, false, AM_FILE | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT_BLACK, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT_BLACK, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Modal Frame Size", GetModalFrameSize, SetModalFrameSize, IntVector2, IntVector2::ZERO, AM_FILE);
     // Modal auto dismiss is purposefully not an attribute, as using it can make the editor lock up.
     // Instead it should be set false in code when needed
@@ -86,7 +86,7 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     if (modal_)
     {
         // Modal shade
-        if (modalShadeColor_ != Color::TRANSPARENT)
+        if (modalShadeColor_ != Color::TRANSPARENT_BLACK)
         {
             UIElement* rootElement = GetRoot();
             const IntVector2& rootSize = rootElement->GetSize();
@@ -97,7 +97,7 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
         }
 
         // Modal frame
-        if (modalFrameColor_ != Color::TRANSPARENT && modalFrameSize_ != IntVector2::ZERO)
+        if (modalFrameColor_ != Color::TRANSPARENT_BLACK && modalFrameSize_ != IntVector2::ZERO)
         {
             UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
             int x = GetIndentWidth();

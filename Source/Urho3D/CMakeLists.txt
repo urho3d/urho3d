@@ -101,6 +101,9 @@ if (WIN32)
         add_definitions (-DHAVE_RTL_OSVERSIONINFOW)
     endif ()
 endif ()
+if (URHO3D_HASH_DEBUG)
+    add_definitions (-DURHO3D_HASH_DEBUG)
+endif ()
 
 # Define source files
 foreach (DIR IK Navigation Network Physics Urho2D WebP)

@@ -1276,7 +1276,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             }
         }
 
-        if (texture->GetLevelsDirty())
+        if (texture && texture->GetLevelsDirty())
             texture->RegenerateLevels();
     }
 

@@ -129,6 +129,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_SSE           |*|Enable SIMD instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
+|URHO3D_HASH_DEBUG    |0|Enable StringHash reversing and hash collision detection at the expense of memory and performance penalty|
 |URHO3D_PACKAGING     |0|Enable resources packaging support|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
@@ -167,7 +168,8 @@ A number of build options can be defined when invoking the build scripts or when
 |ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
 |EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten only)|
 |EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten only)|
-|EMSCRIPTEN_WASM      |0|Enable Binaryen support to generate output to WASM (WebAssembly) format (Emscripten only)|
+|EMSCRIPTEN_WASM      |1|Enable Binaryen support to generate output to WASM (WebAssembly) format (Emscripten only)|
+|EMSCRIPTEN_AUTO_SHELL|1|Auto adding a default HTML shell-file when it is not explicitly specified (Emscripten only)|
 |EMSCRIPTEN_ALLOW_MEMORY_GROWTH|*|Enable memory growing based on application demand when targeting asm.js, it is not set by default due to performance penalty (Emscripten with STATIC or SHARED library type only)|
 |EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten only); default to 128 MB, must be in multiple of 64 KB when targeting WebAssembly and in multiple of 16 MB when targeting asm.js|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten only)|
@@ -286,9 +288,9 @@ This section assumes you have already updated, installed, and activated the late
 
 Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. Alternatively, call the emsdk_env script to set the EMSCRIPTEN environment variable for you. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
 
-On Windows host, execute cmake_emscripten.bat. On OS X or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples. You may also optionally set the URHO3D_LUA build option to enable Lua scripting support. If you encounter "Too many open files" warning when archiving the Urho3D static library, follow by "Unresolved symbol" errors on OS X then you have to increase the soft-limit in your host system before rebuilding the library and all the main targets.
+On Windows host, execute cmake_emscripten.bat. On MacOS or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples. You may also optionally set the URHO3D_LUA build option to enable Lua scripting support. If you encounter "Too many open files" warning when archiving the Urho3D static library, follow by "Unresolved symbol" errors on MacOS then you have to increase the soft-limit in your host system before rebuilding the library and all the main targets.
 
-For example, to double the limit (which normally defaults to 256 on OS X):
+For example, to double the limit (which normally defaults to 256 on MacOS):
 \verbatim
 ulimit -Sn 512
 \endverbatim
@@ -301,7 +303,6 @@ If CMake complains that emcc is not able to compile a test program, try reactiva
 
 \subsection Emscripten_experimental_build_options Experimental build options
 
-- EMSCRIPTEN_WASM=1. Enabling this build option to target WebAssembly. Currently the WASM output requires Firefox Nightly or Chrome Canary to run.
 - URHO3D_LIB_TYPE=MODULE. For fast iteration during development time. This build option should be avoided for production due to reduce throughput.
 
 \section Building_64bit Native 64bit build
