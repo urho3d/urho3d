@@ -110,10 +110,13 @@ void Chat::CreateUI()
 
     UpdateButtons();
 
-    int rowHeight = chatHistoryText_->GetRowHeight();
+    float rowHeight = chatHistoryText_->GetRowHeight();
     // Row height would be zero if the font failed to load
     if (rowHeight)
-        chatHistory_.Resize((graphics->GetHeight() - 20) / rowHeight);
+    {
+        float numberOfRows = (graphics->GetHeight() - 20) / rowHeight;
+        chatHistory_.Resize(static_cast<unsigned int>(numberOfRows));
+    }
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
