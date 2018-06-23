@@ -181,14 +181,14 @@ void Chat::UpdateButtons()
     startServerButton_->SetVisible(!serverConnection && !serverRunning);
 }
 
-void Chat::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+void Chat::HandleLogMessage(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace LogMessage;
 
     ShowChatText(eventData[P_MESSAGE].GetString());
 }
 
-void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
+void Chat::HandleSend(StringHash /*eventType*/, VariantMap& eventData)
 {
     String text = textEdit_->GetText();
     if (text.Empty())
@@ -209,7 +209,7 @@ void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
+void Chat::HandleConnect(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
     String address = textEdit_->GetText().Trimmed();
@@ -226,7 +226,7 @@ void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
+void Chat::HandleDisconnect(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
@@ -240,7 +240,7 @@ void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleStartServer(StringHash eventType, VariantMap& eventData)
+void Chat::HandleStartServer(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
     network->StartServer(CHAT_SERVER_PORT);
@@ -248,7 +248,7 @@ void Chat::HandleStartServer(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
+void Chat::HandleNetworkMessage(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
 
@@ -280,7 +280,7 @@ void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Chat::HandleConnectionStatus(StringHash eventType, VariantMap& eventData)
+void Chat::HandleConnectionStatus(StringHash /*eventType*/, VariantMap& eventData)
 {
     UpdateButtons();
 }
