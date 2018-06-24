@@ -106,6 +106,7 @@ Urho3D development, contributions and bugfixes by:
 - Fastran
 - Firegorilla
 - Gordon-F
+- LordGolias
 - Lumak
 - Magic.Lixin
 - Mike3D
