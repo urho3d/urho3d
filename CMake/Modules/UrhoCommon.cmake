@@ -628,8 +628,6 @@ else ()
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
                 endif ()
             endif ()
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
             # We don't add these flags directly here for Xcode because we support Mach-O universal binary build
             # The compiler flags will be added later conditionally when the effective arch is i386 during build time (using XCODE_ATTRIBUTE target property)
             if (NOT XCODE)
