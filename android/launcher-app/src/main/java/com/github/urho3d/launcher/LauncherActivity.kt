@@ -85,7 +85,6 @@ class LauncherActivity : ExpandableListActivity() {
                     )
             )
         }
-        finish()
         return true
     }
 
