@@ -54,7 +54,8 @@ android {
             abi {
                 isEnable = project.hasProperty("abi")
                 reset()
-                include(if (isEnable) project.property("abi") as String else "")
+                include(*(if (isEnable) project.property("abi") as String else "")
+                        .split(',').toTypedArray())
             }
         }
     }
