@@ -1931,7 +1931,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_MOUSEBUTTONDOWN:
         if (!touchEmulation_)
         {
-            const auto mouseButton = static_cast<MouseButton>(1u << (static_cast<MouseButtonFlags::Integer>(evt.button.button) - 1));
+            const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
             SetMouseButton(mouseButton, true);
         }
         else
@@ -1957,7 +1957,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_MOUSEBUTTONUP:
         if (!touchEmulation_)
         {
-            const auto mouseButton = static_cast<MouseButton>(1u << (static_cast<MouseButtonFlags::Integer>(evt.button.button) - 1));
+            const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
             SetMouseButton(mouseButton, false);
         }
         else

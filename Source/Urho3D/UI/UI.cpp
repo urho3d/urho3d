@@ -67,10 +67,13 @@
 
 #include "../DebugNew.h"
 
-#define TOUCHID_MASK(id) MouseButton(1u << static_cast<MouseButtonFlags::Integer>(id))
-
 namespace Urho3D
 {
+
+static MouseButton MakeTouchIDMask(int id)
+{
+    return static_cast<MouseButton>(1u << static_cast<MouseButtonFlags::Integer>(id)); // NOLINT(misc-misplaced-widening-cast)
+}
 
 StringHash VAR_ORIGIN("Origin");
 const StringHash VAR_ORIGINAL_PARENT("OriginalParent");
@@ -377,7 +380,7 @@ void UI::Update(float timeStep)
         IntVector2 touchPos = touch->position_;
         touchPos.x_ = (int)(touchPos.x_ / uiScale_);
         touchPos.y_ = (int)(touchPos.y_ / uiScale_);
-        ProcessHover(touchPos, TOUCHID_MASK(touch->touchID_), QUAL_NONE, nullptr);
+        ProcessHover(touchPos, MakeTouchIDMask(touch->touchID_), QUAL_NONE, nullptr);
     }
 
     // End hovers that expired without refreshing
@@ -1818,7 +1821,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     pos.y_ = int(pos.y_ / uiScale_);
     usingTouchInput_ = true;
 
-    auto touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    auto touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
@@ -1839,7 +1842,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     pos.y_ = int(pos.y_ / uiScale_);
 
     // Get the touch index
-    const MouseButton touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));
@@ -1872,7 +1875,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     deltaPos.y_ = int(deltaPos.y_ / uiScale_);
     usingTouchInput_ = true;
 
-    auto touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    auto touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
 
     ProcessMove(pos, deltaPos, touchId, QUAL_NONE, nullptr, true);
 }
@@ -2069,7 +2072,7 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
         auto* input = GetSubsystem<Input>();
         for (unsigned i = 0; (1u << i) <= (unsigned)buttons; i++)
         {
-            auto mouseButton = static_cast<MouseButton>(1u << i);
+            auto mouseButton = static_cast<MouseButton>(1u << i); // NOLINT(misc-misplaced-widening-cast)
             if (buttons & mouseButton)
             {
                 TouchState* ts = input->GetTouch((unsigned)i);
