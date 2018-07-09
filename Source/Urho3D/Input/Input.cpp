@@ -1930,7 +1930,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_MOUSEBUTTONDOWN:
         if (!touchEmulation_)
-            SetMouseButton(static_cast<MouseButton>(1u << (evt.button.button - 1)), true);
+        {
+            const auto mouseButton = static_cast<MouseButton>(1u << (static_cast<MouseButtonFlags::Integer>(evt.button.button) - 1));
+            SetMouseButton(mouseButton, true);
+        }
         else
         {
             int x, y;
@@ -1953,7 +1956,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_MOUSEBUTTONUP:
         if (!touchEmulation_)
-            SetMouseButton(static_cast<MouseButton>(1u << (evt.button.button - 1)), false);
+        {
+            const auto mouseButton = static_cast<MouseButton>(1u << (static_cast<MouseButtonFlags::Integer>(evt.button.button) - 1));
+            SetMouseButton(mouseButton, false);
+        }
         else
         {
             int x, y;
