@@ -68,24 +68,29 @@ class LauncherActivity : ExpandableListActivity() {
                 intArrayOf(android.R.id.text1)
         ))
         setContentView(R.layout.activity_launcher)
+
+        // Pass the argument to the main activity, if any
+        launch(intent.getStringExtra(MainActivity.argument))
     }
 
-    override fun onChildClick(parent: ExpandableListView?, v: View?, groupPosition: Int,
-                              childPosition: Int, id: Long): Boolean {
+    override fun onChildClick(parent: ExpandableListView?, v: View?, groupPos: Int, childPos: Int,
+                              id: Long): Boolean {
         @Suppress("UNCHECKED_CAST")
-        val item = (expandableListAdapter.getChild(groupPosition, childPosition) as Map<String, String>)["item"]
-        if (item != null) {
-            // Start main activity with the intention to load the selected library name
+        launch((expandableListAdapter.getChild(groupPos, childPos) as Map<String, String>)["item"])
+        return true
+    }
+
+    private fun launch(argument: String?) {
+        if (argument != null) {
             startActivity(Intent(this, MainActivity::class.java)
                     .putExtra(MainActivity.argument,
-                            if (item.contains('.')) {
-                                if (item.endsWith(".as")) "Urho3DPlayer:Scripts/$item"
-                                else "Urho3DPlayer:LuaScripts/$item"
-                            } else item
+                            if (argument.contains('.')) {
+                                if (argument.endsWith(".as")) "Urho3DPlayer:Scripts/$argument"
+                                else "Urho3DPlayer:LuaScripts/$argument"
+                            } else argument
                     )
             )
         }
-        return true
     }
 
 }

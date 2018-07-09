@@ -182,7 +182,7 @@ end
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=21] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
 desc 'Test run APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
-  parameter = ENV['parameter'] || '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'
+  parameter = ENV['parameter'] || '--es argument NinjaSnowWar.as'
   intent = ENV['intent'] || '.SampleLauncher'
   package = ENV['package'] || 'com.github.urho3d'
   success_indicator = ENV['success_indicator'] || 'Initialized engine'
