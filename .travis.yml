@@ -335,7 +335,7 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([[ $AVD ]] || [[ $PACKAGE_UPLOAD ]]) && [[ $INSTALL ]]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
+  - git clone --depth 1 --branch r13b-strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([[ $AVD ]] || [[ $PACKAGE_UPLOAD ]]) && [[ $INSTALL ]]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
   - export C_PATH=$(pwd)/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH
   - for compiler in $C_PATH/{clang,clang++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
