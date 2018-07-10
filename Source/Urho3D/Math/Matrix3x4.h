@@ -149,7 +149,7 @@ public:
     /// Construct from translation, rotation and uniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale) noexcept
     {
-#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
+#ifdef URHO3D_SSE
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale, scale, scale);
@@ -163,7 +163,7 @@ public:
     /// Construct from translation, rotation and nonuniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale) noexcept
     {
-#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
+#ifdef URHO3D_SSE
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale.z_, scale.y_, scale.x_);
@@ -686,7 +686,7 @@ public:
     /// Identity matrix.
     static const Matrix3x4 IDENTITY;
 
-#if defined(URHO3D_SSE) && (__clang__ || !defined(__GNUC__) || __GNUC__ < 8)
+#ifdef URHO3D_SSE
 private:
     /// \brief Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters. Note: the w component of the scale parameter passed to this function must be 1.
     void inline SetFromTRS(__m128 t, __m128 q, __m128 s)
