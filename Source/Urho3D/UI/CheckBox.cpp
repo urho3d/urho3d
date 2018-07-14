@@ -74,7 +74,7 @@ void CheckBox::OnClickBegin(const IntVector2& position, const IntVector2& screen
         SetChecked(!checked_);
 }
 
-void CheckBox::OnKey(int key, int buttons, int qualifiers)
+void CheckBox::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     if (HasFocus() && key == KEY_SPACE)
     {

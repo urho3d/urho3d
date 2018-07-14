@@ -203,7 +203,7 @@ void ListView::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Select On Click End", GetSelectOnClickEnd, SetSelectOnClickEnd, bool, false, AM_FILE);
 }
 
-void ListView::OnKey(int key, int buttons, int qualifiers)
+void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     // If no selection, can not move with keys
     unsigned numItems = GetNumItems();
@@ -307,8 +307,8 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = this;
     eventData[P_KEY] = key;
-    eventData[P_BUTTONS] = buttons;
-    eventData[P_QUALIFIERS] = qualifiers;
+    eventData[P_BUTTONS] = (unsigned)buttons;
+    eventData[P_QUALIFIERS] = (unsigned)qualifiers;
     SendEvent(E_UNHANDLEDKEY, eventData);
 }
 

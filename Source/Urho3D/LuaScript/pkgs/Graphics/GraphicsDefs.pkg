@@ -229,28 +229,36 @@ struct VertexElement
     unsigned offset_ @ offset;
 };
 
+enum MaterialQuality
+{
+    QUALITY_LOW,
+    QUALITY_MEDIUM,
+    QUALITY_HIGH,
+    QUALITY_MAX
+};
 
-static const int QUALITY_LOW;
-static const int QUALITY_MEDIUM;
-static const int QUALITY_HIGH;
-static const int QUALITY_MAX;
+enum ClearTarget
+{
+    CLEAR_COLOR,
+    CLEAR_DEPTH,
+    CLEAR_STENCIL
+};
 
-static const unsigned CLEAR_COLOR;
-static const unsigned CLEAR_DEPTH;
-static const unsigned CLEAR_STENCIL;
-
-static const unsigned MASK_NONE;
-static const unsigned MASK_POSITION;
-static const unsigned MASK_NORMAL;
-static const unsigned MASK_COLOR;
-static const unsigned MASK_TEXCOORD1;
-static const unsigned MASK_TEXCOORD2;
-static const unsigned MASK_CUBETEXCOORD1;
-static const unsigned MASK_CUBETEXCOORD2;
-static const unsigned MASK_TANGENT;
-static const unsigned MASK_BLENDWEIGHTS;
-static const unsigned MASK_BLENDINDICES;
-static const unsigned MASK_INSTANCEMATRIX1;
-static const unsigned MASK_INSTANCEMATRIX2;
-static const unsigned MASK_INSTANCEMATRIX3;
-static const unsigned MASK_OBJECTINDEX;
+enum VertexMask
+{
+    MASK_NONE,
+    MASK_POSITION,
+    MASK_NORMAL,
+    MASK_COLOR,
+    MASK_TEXCOORD1,
+    MASK_TEXCOORD2,
+    MASK_CUBETEXCOORD1,
+    MASK_CUBETEXCOORD2,
+    MASK_TANGENT,
+    MASK_BLENDWEIGHTS,
+    MASK_BLENDINDICES,
+    MASK_INSTANCEMATRIX1,
+    MASK_INSTANCEMATRIX2,
+    MASK_INSTANCEMATRIX3,
+    MASK_OBJECTINDEX
+};

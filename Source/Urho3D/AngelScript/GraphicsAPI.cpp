@@ -67,10 +67,11 @@ void FakeReleaseRef(void* ptr);
 
 static void RegisterCamera(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint VO_NONE", (void*)&VO_NONE);
-    engine->RegisterGlobalProperty("const uint VO_LOW_MATERIAL_QUALITY", (void*)&VO_LOW_MATERIAL_QUALITY);
-    engine->RegisterGlobalProperty("const uint VO_DISABLE_SHADOWS", (void*)&VO_DISABLE_SHADOWS);
-    engine->RegisterGlobalProperty("const uint VO_DISABLE_OCCLUSION", (void*)&VO_DISABLE_OCCLUSION);
+    engine->RegisterEnum("ViewOverride");
+    engine->RegisterEnumValue("ViewOverride", "VO_NONE", VO_NONE);
+    engine->RegisterEnumValue("ViewOverride", "VO_LOW_MATERIAL_QUALITY", VO_LOW_MATERIAL_QUALITY);
+    engine->RegisterEnumValue("ViewOverride", "VO_DISABLE_SHADOWS", VO_DISABLE_SHADOWS);
+    engine->RegisterEnumValue("ViewOverride", "VO_DISABLE_OCCLUSION", VO_DISABLE_OCCLUSION);
 
     engine->RegisterEnum("FillMode");
     engine->RegisterEnumValue("FillMode", "FILL_SOLID", FILL_SOLID);
@@ -326,9 +327,10 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
 
-    engine->RegisterGlobalProperty("uint CLEAR_COLOR", (void*)&CLEAR_COLOR);
-    engine->RegisterGlobalProperty("uint CLEAR_DEPTH", (void*)&CLEAR_DEPTH);
-    engine->RegisterGlobalProperty("uint CLEAR_STENCIL", (void*)&CLEAR_STENCIL);
+    engine->RegisterEnum("ClearTarget");
+    engine->RegisterEnumValue("ClearTarget", "CLEAR_COLOR", CLEAR_COLOR);
+    engine->RegisterEnumValue("ClearTarget", "CLEAR_DEPTH", CLEAR_DEPTH);
+    engine->RegisterEnumValue("ClearTarget", "CLEAR_STENCIL", CLEAR_STENCIL);
 
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderTargetInfo), asCALL_CDECL_OBJLAST);
@@ -725,21 +727,22 @@ static VectorBuffer IndexBufferGetData(IndexBuffer* ptr)
 
 static void RegisterBuffers(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint MASK_NONE", (void*)&MASK_NONE);
-    engine->RegisterGlobalProperty("const uint MASK_POSITION", (void*)&MASK_POSITION);
-    engine->RegisterGlobalProperty("const uint MASK_NORMAL", (void*)&MASK_NORMAL);
-    engine->RegisterGlobalProperty("const uint MASK_COLOR", (void*)&MASK_COLOR);
-    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD1", (void*)&MASK_TEXCOORD1);
-    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD2", (void*)&MASK_TEXCOORD2);
-    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD1", (void*)&MASK_CUBETEXCOORD1);
-    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD2", (void*)&MASK_CUBETEXCOORD2);
-    engine->RegisterGlobalProperty("const uint MASK_TANGENT", (void*)&MASK_TANGENT);
-    engine->RegisterGlobalProperty("const uint MASK_BLENDWEIGHTS", (void*)&MASK_BLENDWEIGHTS);
-    engine->RegisterGlobalProperty("const uint MASK_BLENDINDICES", (void*)&MASK_BLENDINDICES);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX1", (void*)&MASK_INSTANCEMATRIX1);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX2", (void*)&MASK_INSTANCEMATRIX2);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&MASK_INSTANCEMATRIX3);
-    engine->RegisterGlobalProperty("const uint MASK_OBJECTINDEX", (void*)&MASK_OBJECTINDEX);
+    engine->RegisterEnum("VertexMask");
+    engine->RegisterEnumValue("VertexMask", "MASK_NONE", MASK_NONE);
+    engine->RegisterEnumValue("VertexMask", "MASK_POSITION", MASK_POSITION);
+    engine->RegisterEnumValue("VertexMask", "MASK_NORMAL", MASK_NORMAL);
+    engine->RegisterEnumValue("VertexMask", "MASK_COLOR", MASK_COLOR);
+    engine->RegisterEnumValue("VertexMask", "MASK_TEXCOORD1", MASK_TEXCOORD1);
+    engine->RegisterEnumValue("VertexMask", "MASK_TEXCOORD2", MASK_TEXCOORD2);
+    engine->RegisterEnumValue("VertexMask", "MASK_CUBETEXCOORD1", MASK_CUBETEXCOORD1);
+    engine->RegisterEnumValue("VertexMask", "MASK_CUBETEXCOORD2", MASK_CUBETEXCOORD2);
+    engine->RegisterEnumValue("VertexMask", "MASK_TANGENT", MASK_TANGENT);
+    engine->RegisterEnumValue("VertexMask", "MASK_BLENDWEIGHTS", MASK_BLENDWEIGHTS);
+    engine->RegisterEnumValue("VertexMask", "MASK_BLENDINDICES", MASK_BLENDINDICES);
+    engine->RegisterEnumValue("VertexMask", "MASK_INSTANCEMATRIX1", MASK_INSTANCEMATRIX1);
+    engine->RegisterEnumValue("VertexMask", "MASK_INSTANCEMATRIX2", MASK_INSTANCEMATRIX2);
+    engine->RegisterEnumValue("VertexMask", "MASK_INSTANCEMATRIX3", MASK_INSTANCEMATRIX3);
+    engine->RegisterEnumValue("VertexMask", "MASK_OBJECTINDEX", MASK_OBJECTINDEX);
 
     engine->RegisterEnum("PrimitiveType");
     engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
@@ -799,7 +802,7 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHOD(VertexBuffer, IsDynamic), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexCount() const", asMETHOD(VertexBuffer, GetVertexCount), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "uint get_elementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_elementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, VertexMaskFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "Array<VertexElement>@ get_elements() const", asFUNCTION(VertexBufferGetElements), asCALL_CDECL_OBJLAST);
 
     RegisterObject<IndexBuffer>(engine, "IndexBuffer");
@@ -1085,9 +1088,10 @@ static Animation* AnimationClone(const String& cloneName, Animation* ptr)
 
 static void RegisterAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_POSITION", (void*)&CHANNEL_POSITION);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_ROTATION", (void*)&CHANNEL_ROTATION);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_SCALE", (void*)&CHANNEL_SCALE);
+    engine->RegisterEnum("AnimationChannel");
+    engine->RegisterEnumValue("AnimationChannel", "CHANNEL_POSITION", CHANNEL_POSITION);
+    engine->RegisterEnumValue("AnimationChannel", "CHANNEL_ROTATION", CHANNEL_ROTATION);
+    engine->RegisterEnumValue("AnimationChannel", "CHANNEL_SCALE", CHANNEL_SCALE);
 
     engine->RegisterObjectType("AnimationKeyFrame", sizeof(AnimationKeyFrame), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAnimationKeyFrame), asCALL_CDECL_OBJLAST);
@@ -1953,10 +1957,11 @@ static void RendererSetVSMShadowParameters(const Vector2& parameters, Renderer* 
 
 static void RegisterRenderer(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const int QUALITY_LOW", (void*)&QUALITY_LOW);
-    engine->RegisterGlobalProperty("const int QUALITY_MEDIUM", (void*)&QUALITY_MEDIUM);
-    engine->RegisterGlobalProperty("const int QUALITY_HIGH", (void*)&QUALITY_HIGH);
-    engine->RegisterGlobalProperty("const int QUALITY_MAX", (void*)&QUALITY_MAX);
+    engine->RegisterEnum("MaterialQuality");
+    engine->RegisterEnumValue("MaterialQuality", "QUALITY_LOW", QUALITY_LOW);
+    engine->RegisterEnumValue("MaterialQuality", "QUALITY_MEDIUM", QUALITY_MEDIUM);
+    engine->RegisterEnumValue("MaterialQuality", "QUALITY_HIGH", QUALITY_HIGH);
+    engine->RegisterEnumValue("MaterialQuality", "QUALITY_MAX", QUALITY_MAX);
 
     engine->RegisterEnum("ShadowQuality");
     engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_16BIT", SHADOWQUALITY_SIMPLE_16BIT);

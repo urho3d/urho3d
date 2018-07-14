@@ -9,7 +9,7 @@ class Material : public Resource
     ~Material();
     
     void SetNumTechniques(unsigned num);
-    void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    void SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel = 0, float lodDistance = 0.0f);
     void SetVertexShaderDefines(const String defines);
     void SetPixelShaderDefines(const String defines);
     void SetShaderParameter(const String name, const Variant& value);

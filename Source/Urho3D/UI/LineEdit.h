@@ -65,7 +65,7 @@ public:
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
     bool OnDragDropFinish(UIElement* source) override;
     /// React to a key press.
-    void OnKey(int key, int buttons, int qualifiers) override;
+    void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
     /// React to text input event.
     void OnTextInput(const String& text) override;
 

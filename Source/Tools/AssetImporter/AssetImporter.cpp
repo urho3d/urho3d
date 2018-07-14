@@ -1368,7 +1368,7 @@ void BuildAndSaveAnimations(OutModel* model)
             AnimationTrack* track = outAnim->CreateTrack(channelName);
 
             // Check which channels are used
-            track->channelMask_ = 0;
+            track->channelMask_ = CHANNEL_NONE;
             if (channel->mNumPositionKeys > 1 || !posEqual)
                 track->channelMask_ |= CHANNEL_POSITION;
             if (channel->mNumRotationKeys > 1 || !rotEqual)

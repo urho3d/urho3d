@@ -28,6 +28,9 @@
 #include "../Math/Ray.h"
 #include "../Math/Matrix2.h"
 
+// Some headers could re-define M_PI, ensure that it's undefined.
+#undef M_PI
+
 namespace Urho3D
 {
 

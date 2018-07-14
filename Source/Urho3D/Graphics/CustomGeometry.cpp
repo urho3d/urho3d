@@ -454,7 +454,7 @@ void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
     MemoryBuffer buffer(value);
 
     SetNumGeometries(buffer.ReadVLE());
-    elementMask_ = buffer.ReadUInt();
+    elementMask_ = VertexMaskFlags(buffer.ReadUInt());
 
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {

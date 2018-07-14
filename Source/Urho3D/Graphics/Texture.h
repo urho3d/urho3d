@@ -67,7 +67,7 @@ public:
     /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
     /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
-    void SetMipsToSkip(int quality, int toSkip);
+    void SetMipsToSkip(MaterialQuality quality, int toSkip);
 
     /// Return API-specific texture format.
     unsigned GetFormat() const { return format_; }
@@ -121,7 +121,7 @@ public:
     Texture* GetBackupTexture() const { return backupTexture_; }
 
     /// Return mip levels to skip on a quality setting when loading.
-    int GetMipsToSkip(int quality) const;
+    int GetMipsToSkip(MaterialQuality quality) const;
     /// Return mip level width, or 0 if level does not exist.
     int GetLevelWidth(unsigned level) const;
     /// Return mip level width, or 0 if level does not exist.

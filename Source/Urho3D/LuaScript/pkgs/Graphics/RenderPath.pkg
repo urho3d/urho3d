@@ -129,4 +129,20 @@ static RenderPath* RenderPathClone(RenderPath* renderPath)
 
     return renderPath->Clone().Detach();
 }
+
+#define TOLUA_DISABLE_tolua_set_RenderPathCommand_clearFlags
+static int tolua_set_RenderPathCommand_clearFlags(lua_State* tolua_S)
+{
+  RenderPathCommand* self = (RenderPathCommand*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'clearFlags_'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->clearFlags_ = ClearTargetFlags((unsigned)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
 $}

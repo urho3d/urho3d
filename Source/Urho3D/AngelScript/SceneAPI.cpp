@@ -36,21 +36,21 @@ namespace Urho3D
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint AM_FILE", (void*)&AM_FILE);
-    engine->RegisterGlobalProperty("const uint AM_NET", (void*)&AM_NET);
-    engine->RegisterGlobalProperty("const uint AM_DEFAULT", (void*)&AM_DEFAULT);
-    engine->RegisterGlobalProperty("const uint AM_LATESTDATA", (void*)&AM_LATESTDATA);
-    engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)&AM_NOEDIT);
-    engine->RegisterGlobalProperty("const uint AM_NODEID", (void*)&AM_NODEID);
-    engine->RegisterGlobalProperty("const uint AM_COMPONENTID", (void*)&AM_COMPONENTID);
-    engine->RegisterGlobalProperty("const uint AM_NODEIDVECTOR", (void*)&AM_NODEIDVECTOR);
+    engine->RegisterEnum("AttributeMode");
+    engine->RegisterEnumValue("AttributeMode", "AM_FILE", AM_FILE);
+    engine->RegisterEnumValue("AttributeMode", "AM_NET", AM_NET);
+    engine->RegisterEnumValue("AttributeMode", "AM_DEFAULT", AM_DEFAULT);
+    engine->RegisterEnumValue("AttributeMode", "AM_LATESTDATA", AM_LATESTDATA);
+    engine->RegisterEnumValue("AttributeMode", "AM_NOEDIT", AM_NOEDIT);
+    engine->RegisterEnumValue("AttributeMode", "AM_NODEID", AM_NODEID);
+    engine->RegisterEnumValue("AttributeMode", "AM_COMPONENTID", AM_COMPONENTID);
+    engine->RegisterEnumValue("AttributeMode", "AM_NODEIDVECTOR", AM_NODEIDVECTOR);
+    engine->RegisterEnumValue("AttributeMode", "AM_FILEREADONLY", AM_FILEREADONLY);
 
     engine->RegisterEnum("AutoRemoveMode");
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_DISABLED", REMOVE_DISABLED);
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_COMPONENT", REMOVE_COMPONENT);
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_NODE", REMOVE_NODE);
-
-    engine->RegisterGlobalProperty("const uint AM_FILEREADONLY", (void*)&AM_FILEREADONLY);
 
     RegisterSerializable<Serializable>(engine, "Serializable");
 }

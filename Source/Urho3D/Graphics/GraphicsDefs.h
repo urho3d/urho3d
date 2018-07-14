@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Container/FlagSet.h"
 #include "../Container/HashBase.h"
 #include "../Math/StringHash.h"
 
@@ -430,31 +431,42 @@ extern URHO3D_API const StringHash PSP_ZONEMAX;
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
 
-static const int QUALITY_LOW = 0;
-static const int QUALITY_MEDIUM = 1;
-static const int QUALITY_HIGH = 2;
-static const int QUALITY_MAX = 15;
+enum MaterialQuality : unsigned
+{
+    QUALITY_LOW = 0,
+    QUALITY_MEDIUM = 1,
+    QUALITY_HIGH = 2,
+    QUALITY_MAX = 15,
+};
 
-static const unsigned CLEAR_COLOR = 0x1;
-static const unsigned CLEAR_DEPTH = 0x2;
-static const unsigned CLEAR_STENCIL = 0x4;
+enum ClearTarget : unsigned
+{
+    CLEAR_COLOR = 0x1,
+    CLEAR_DEPTH = 0x2,
+    CLEAR_STENCIL = 0x4,
+};
+URHO3D_FLAGSET(ClearTarget, ClearTargetFlags);
 
 // Legacy vertex element bitmasks.
-static const unsigned MASK_NONE = 0x0;
-static const unsigned MASK_POSITION = 0x1;
-static const unsigned MASK_NORMAL = 0x2;
-static const unsigned MASK_COLOR = 0x4;
-static const unsigned MASK_TEXCOORD1 = 0x8;
-static const unsigned MASK_TEXCOORD2 = 0x10;
-static const unsigned MASK_CUBETEXCOORD1 = 0x20;
-static const unsigned MASK_CUBETEXCOORD2 = 0x40;
-static const unsigned MASK_TANGENT = 0x80;
-static const unsigned MASK_BLENDWEIGHTS = 0x100;
-static const unsigned MASK_BLENDINDICES = 0x200;
-static const unsigned MASK_INSTANCEMATRIX1 = 0x400;
-static const unsigned MASK_INSTANCEMATRIX2 = 0x800;
-static const unsigned MASK_INSTANCEMATRIX3 = 0x1000;
-static const unsigned MASK_OBJECTINDEX = 0x2000;
+enum VertexMask : unsigned
+{
+    MASK_NONE = 0x0,
+    MASK_POSITION = 0x1,
+    MASK_NORMAL = 0x2,
+    MASK_COLOR = 0x4,
+    MASK_TEXCOORD1 = 0x8,
+    MASK_TEXCOORD2 = 0x10,
+    MASK_CUBETEXCOORD1 = 0x20,
+    MASK_CUBETEXCOORD2 = 0x40,
+    MASK_TANGENT = 0x80,
+    MASK_BLENDWEIGHTS = 0x100,
+    MASK_BLENDINDICES = 0x200,
+    MASK_INSTANCEMATRIX1 = 0x400,
+    MASK_INSTANCEMATRIX2 = 0x800,
+    MASK_INSTANCEMATRIX3 = 0x1000,
+    MASK_OBJECTINDEX = 0x2000,
+};
+URHO3D_FLAGSET(VertexMask, VertexMaskFlags);
 
 static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;
