@@ -31,7 +31,7 @@ namespace Urho3D
 enum UpdateEvent : unsigned
 {
     /// Bitmask for not using any events.
-    USE_NONE = 0x0,
+    USE_NO_EVENT = 0x0,
     /// Bitmask for using the scene update event.
     USE_UPDATE = 0x1,
     /// Bitmask for using the scene post-update event.

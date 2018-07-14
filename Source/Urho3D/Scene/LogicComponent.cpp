@@ -99,7 +99,7 @@ void LogicComponent::OnSceneSet(Scene* scene)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
-        currentEventMask_ = USE_NONE;
+        currentEventMask_ = USE_NO_EVENT;
     }
 }
 

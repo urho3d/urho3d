@@ -1377,6 +1377,7 @@ From 1.7 to master:
 - The Color::TRANSPARENT constant is renamed to Color::TRANSPARENT_BLACK to avoid name clash with Windows's TRANSPARENT macro defined in "windows.h".
 - Build system - the Android Java classes started to use Java 7 and 8 language features, so they must be built with Java 8 support turned on.
 - Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Also set the default for "EMSCRIPTEN_WASM" build option to TRUE in order to align with the upstream EMCC compiler changes.
+- Constants are replaced with enums and flag sets in multiple places. Use corresponding types and typed constants instead of integers and integer constants. For example, "unsigned vertexMask = MASK_POSITION" becomes "VertexMaskFlags vertexMask = MASK_POSITION" and "input->GetKeyDown('A')" becomes "input->GetKeyDown(KEY_A)".
 
 */
 
