@@ -29,19 +29,19 @@
 namespace Urho3D
 {
 
-/// Bitwise Type trait which enables against Enum value. For consumption by flagset class and it's global operators.
-template<typename T> struct IsFlagSet
+/// Type trait which enables Enum to be used as FlagSet template parameter. Bitwise operators (| & ^ ~) over enabled Enum will result in FlagSet<Enum>.
+template <typename T> struct IsFlagSet
 {
     constexpr static bool value_ = false;
 };
 
 /// Enable enum for using in FlagSet. Shall be called within Urho3D namespace.
 #define URHO3D_ENABLE_FLAGSET(enumName) \
-    template<> struct IsFlagSet<enumName> { constexpr static bool value_ = true; }; \
+    template<> struct IsFlagSet<enumName> { constexpr static bool value_ = true; } \
 
 /// Enable enum for using in FlagSet and declare FlagSet specialization. Shall be called within Urho3D namespace.
 #define URHO3D_FLAGSET(enumName, flagsetName) \
-    URHO3D_ENABLE_FLAGSET(enumName) \
+    URHO3D_ENABLE_FLAGSET(enumName); \
     using flagsetName = FlagSet<enumName>
 
 /// A set of flags defined by an Enum.
@@ -238,28 +238,28 @@ protected:
 
 }
 
-/// Bitwise Operator OR for against Enum value.s
+/// Bitwise Operator OR for against Enum values
 template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator |(const Enum lhs, const Enum rhs)
 {
     return Urho3D::FlagSet<Enum>(lhs) | rhs;
 }
 
-/// Bitwise Operator AND for against Enum value.s
+/// Bitwise Operator AND for against Enum values
 template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator & (const Enum lhs, const Enum rhs)
 {
     return Urho3D::FlagSet<Enum>(lhs) & rhs;
 }
 
-/// Bitwise Operator XOR for against Enum value.s
+/// Bitwise Operator XOR for against Enum values
 template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator ^ (const Enum lhs, const Enum rhs)
 {
     return Urho3D::FlagSet<Enum>(lhs) ^ rhs;
 }
 
-/// Bitwise Operator INVERSION for against Enum value.s
+/// Bitwise Operator INVERSION for against Enum values
 template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator ~ (const Enum rhs)
 {

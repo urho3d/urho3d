@@ -1386,7 +1386,7 @@ void AnimatedModel::UpdateMorphs()
 void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph,
     float weight)
 {
-    auto elementMask = morph.elementMask_ & buffer->GetElementMask();
+    const VertexMaskFlags elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
     unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);

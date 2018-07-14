@@ -1010,7 +1010,7 @@ void DecalSet::CalculateBoundingBox()
 
 void DecalSet::UpdateBuffers()
 {
-    auto newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
+    const VertexMaskFlags newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
     unsigned newVBSize = optimizeBufferSize_ ? numVertices_ : maxVertices_;
     unsigned newIBSize = optimizeBufferSize_ ? numIndices_ : maxIndices_;
 

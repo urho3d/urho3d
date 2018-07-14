@@ -22,7 +22,6 @@
 
 #pragma once
 
-
 #include "../Input/InputConstants.h"
 #include "../UI/ScrollView.h"
 

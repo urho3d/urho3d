@@ -1821,7 +1821,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     pos.y_ = int(pos.y_ / uiScale_);
     usingTouchInput_ = true;
 
-    auto touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
@@ -1875,7 +1875,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     deltaPos.y_ = int(deltaPos.y_ / uiScale_);
     usingTouchInput_ = true;
 
-    auto touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
 
     ProcessMove(pos, deltaPos, touchId, QUAL_NONE, nullptr, true);
 }
