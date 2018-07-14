@@ -296,65 +296,52 @@ after_script:
 
 branch: {name: Android-CI, active: yes}
 language: android
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution
 cache:
   directories:
     - $HOME/.ccache
-    - $HOME/cmake-3.9.2-Linux-x86_64/bin
-    - $HOME/cmake-3.9.2-Linux-x86_64/share
+    - $HOME/.gradle/caches
+    - $HOME/.gradle/wrapper
+    - $HOME/.android/build-cache
 dist: trusty
 sudo: false
-addons: {apt: {packages: [doxygen, graphviz, g++-multilib]}}
+addons: {apt: {packages: [doxygen, graphviz, g++-multilib, ninja-build]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-    - numjobs=4
     - ANDROID=1
     - ANDROID_TMP=~/tmp
-    - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
   matrix:
-    - &armeabi-v7a-static ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC             # Using default native API Level android-9
-    - &armeabi-v7a-shared ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
-    # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
-    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21    # Using default native API level android-21
-    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
-    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21   # At least android-12 is needed when LuaJIT is on
-    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21
-    # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
-    - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1 # Using default native API level android-21
-    - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
-stage: release build configuration
+    # Travis CI VM does not has enough disk space to build the STATIC lib type
+    # ORG_GRADLE_PROJECT_abi=x86 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC SYS_IMG=android-28 PLATFORM=android-17
+    - ORG_GRADLE_PROJECT_abi=x86 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED SYS_IMG=android-28 PLATFORM=android-17
+    # ORG_GRADLE_PROJECT_abi=x86_64 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC SYS_IMG=android-28 PLATFORM=android-21
+    - ORG_GRADLE_PROJECT_abi=x86_64 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED SYS_IMG=android-28 PLATFORM=android-21
+    # ORG_GRADLE_PROJECT_abi=armeabi-v7a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC SYS_IMG=android-25 PLATFORM=android-17
+    - ORG_GRADLE_PROJECT_abi=armeabi-v7a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED SYS_IMG=android-25 PLATFORM=android-17
+    # ORG_GRADLE_PROJECT_abi=arm64-v8a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC SYS_IMG=android-25 PLATFORM=android-21
+    - ORG_GRADLE_PROJECT_abi=arm64-v8a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED SYS_IMG=android-25 PLATFORM=android-21
+stage: split ABI build configuration
 before_script:
-  # Temporarily disable the test to build the APK as Travis-CI Trusty beta VM has not yet setup the environment for Android properly
-  - export NO_SDK_SYSIMG=1; unset AVD INSTALL
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - git clone --depth 1 --branch r13b-strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([[ $AVD ]] || [[ $PACKAGE_UPLOAD ]]) && [[ $INSTALL ]]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
-  - export C_PATH=$(pwd)/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
-  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH
-  - for compiler in $C_PATH/{clang,clang++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
-  - if [[ ! -f $HOME/cmake-3.9.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.9.2-Linux-x86_64/bin:$PATH
+  - touch $HOME/.android/repositories.cfg && (while :; do echo 'y'; sleep 1; done) |sdkmanager 'tools' 'platform-tools' 'build-tools;28.0.1' "platforms;$PLATFORM" 'ndk-bundle' 'cmake;3.6.4111459' "system-images;$SYS_IMG;google_apis;$ORG_GRADLE_PROJECT_abi"
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH ANDROID_CCACHE=$(which ccache)
   - rake ci_setup_cache
-script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: ./gradlew build && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 matrix:
   fast_finish: true
-  include:
-    - &debug-build-stage
-      stage: debug build configuration
-      addons: {apt: {packages: g++-multilib}}
-      env: [*armeabi-v7a-static, CMAKE_BUILD_TYPE=Debug]
-      script: rake ci && rake ci_timer
-    - <<: *debug-build-stage
-      env: [*armeabi-v7a-shared, CMAKE_BUILD_TYPE=Debug]
-    - stage: housekeep
+  include: [stage: housekeep]
 
 ---
 

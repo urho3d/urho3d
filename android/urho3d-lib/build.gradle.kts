@@ -39,15 +39,32 @@ android {
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                arguments.addAll(
-                        listOf(
-                                "ANDROID_CCACHE=${System.getenv("ANDROID_CCACHE")}",
-                                "URHO3D_LIB_TYPE=SHARED",
-                                "URHO3D_LUAJIT=1",
-                                "URHO3D_LUAJIT_AMALG=1",
-                                "URHO3D_SAMPLES=1"
-                        ).map { "-D$it" }
-                )
+                arguments.apply {
+                    add("-DANDROID_CCACHE=${System.getenv("ANDROID_CCACHE")}")
+                    addAll(listOf(
+                            "URHO3D_LIB_TYPE",
+                            "URHO3D_ANGELSCRIPT",
+                            "URHO3D_LUA",
+                            "URHO3D_LUAJIT",
+                            "URHO3D_LUAJIT_AMALG",
+                            "URHO3D_IK",
+                            "URHO3D_NETWORK",
+                            "URHO3D_PHYSICS",
+                            "URHO3D_NAVIGATION",
+                            "URHO3D_URHO2D",
+                            "URHO3D_PCH",
+                            "URHO3D_DATABASE_SQLITE",
+                            "URHO3D_WEBP",
+                            "URHO3D_FILEWATCHER",
+                            "URHO3D_PACKAGING",
+                            "URHO3D_PROFILING",
+                            "URHO3D_LOGGING",
+                            "URHO3D_THREADING",
+                            "URHO3D_SAMPLES")
+                            .filter { project.hasProperty(it) }
+                            .map { "-D$it=${project.property(it) as String}" }
+                    )
+                }
             }
         }
         splits {
@@ -113,7 +130,7 @@ fun symlinkWorkaround(config: String, keep: Boolean, symlinkDirs: List<String>) 
                 // Keep the dir somewhere else that the original Gradle task doesn't touch it
                 File(oriDir, "$abi/$dir").renameTo(File(bakDir, "$abi-$dir"))
             } else {
-                // It is OK to fail here because the dir might get regenerated back by CMake
+                // It is OK to fail here because the dir might get regenerated back by original task
                 File(bakDir, "$abi-$dir").renameTo(File(oriDir, "$abi/$dir"))
             }
         }
