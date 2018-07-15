@@ -55,7 +55,7 @@ else ()
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 endif ()
 
-# LLVM/Clang is assumed to be installed in a system-wide location when not explicitily defined using env-var
+# LLVM/Clang is assumed to be installed in a system-wide location when not explicitly defined using env-var
 if (DEFINED ENV{LLVM_CLANG_ROOT})
     set (CMAKE_SYSROOT $ENV{LLVM_CLANG_ROOT})
 endif ()

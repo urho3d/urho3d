@@ -33,7 +33,7 @@ include_directories (${URHO3D_INCLUDE_DIRS})
 # In order to test the player on Web platform built using Emscripten, the request parameters need to be parsed into Module['argument'] (see https://github.com/kripken/emscripten/blob/master/src/emrun_prejs.js for inspiration)
 # The CTest could "run" the Urho3DPlayer.html with script name as parameter, thanks to emrun performing this parsing automatically
 # In a production environment, however, the request parameters parsing has to be done by the application itself one way or another
-if (URHO3D_ANGELSCRIPT OR URHO3D_LUA${JIT})
+if (URHO3D_ANGELSCRIPT OR URHO3D_LUA)
     # Add Urho3DPlayer as target only when one of the supported scripting subsystems is enabled
     add_subdirectory (Urho3DPlayer)
 endif ()

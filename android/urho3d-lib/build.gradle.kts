@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import java.nio.file.Files
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 
 plugins {
@@ -35,12 +34,14 @@ android {
         minSdkVersion(17)
         targetSdkVersion(27)
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.8-SNAPSHOT"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
                 arguments.apply {
                     add("-DANDROID_CCACHE=${System.getenv("ANDROID_CCACHE")}")
+                    add("-DGRADLE_BUILD_DIR=$buildDir")
+                    // Pass along matching Gradle properties as CMake build options
                     addAll(listOf(
                             "URHO3D_LIB_TYPE",
                             "URHO3D_ANGELSCRIPT",
@@ -56,22 +57,26 @@ android {
                             "URHO3D_DATABASE_SQLITE",
                             "URHO3D_WEBP",
                             "URHO3D_FILEWATCHER",
-                            "URHO3D_PACKAGING",
                             "URHO3D_PROFILING",
                             "URHO3D_LOGGING",
-                            "URHO3D_THREADING",
-                            "URHO3D_SAMPLES")
+                            "URHO3D_THREADING")
                             .filter { project.hasProperty(it) }
-                            .map { "-D$it=${project.property(it) as String}" }
+                            .map { "-D$it=${project.property(it)}" }
                     )
+                    // In order to get clean module segregation, always exclude player/samples from AAR
+                    addAll(listOf(
+                            "URHO3D_PLAYER",
+                            "URHO3D_SAMPLES"
+                    ).map { "-D$it=0" })
                 }
+                targets.add("Urho3D")
             }
         }
         splits {
             abi {
-                isEnable = project.hasProperty("abi")
+                isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(if (isEnable) project.property("abi") as String else "")
+                include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
                         .split(',').toTypedArray())
             }
         }
@@ -87,11 +92,6 @@ android {
             path = project.file("../../CMakeLists.txt")
         }
     }
-    sourceSets {
-        getByName("main") {
-            assets.srcDir(project.file("../../bin"))
-        }
-    }
 }
 
 dependencies {
@@ -102,45 +102,50 @@ dependencies {
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
 }
 
-// This is a hack - workaround Android plugin for Gradle's bug where it erroneously dereference
-// the symlink causing the actual file being deleted when it attempts to remove stale contents
 afterEvaluate {
-    val symlinkDirs = listOf("include")       // This list is specific to Urho3D
+    // Part of the our external native build tree resided in Gradle buildDir
+    // When the buildDir is cleaned then we need a way to re-configure that part back
+    // It is achieved by ensuring that CMake configuration phase is rerun
     tasks {
-        "generateJsonModelDebug" {
-            doFirst { symlinkWorkaround("debug", true, symlinkDirs) }
-            doLast { symlinkWorkaround("debug", false, symlinkDirs) }
-        }
-        "generateJsonModelRelease" {
-            doFirst { symlinkWorkaround("release", true, symlinkDirs) }
-            doLast { symlinkWorkaround("release", false, symlinkDirs) }
-        }
-    }
-}
-//
-fun symlinkWorkaround(config: String, keep: Boolean, symlinkDirs: List<String>) {
-    val stagingDir = android.externalNativeBuild.cmake.buildStagingDirectory
-            ?: project.file(".externalNativeBuild")
-    val oriDir = File(stagingDir, "cmake/$config")
-    val bakDir = File(stagingDir, ".cmake-$config")
-    bakDir.mkdir()
-    oriDir.list().forEach { abi ->
-        symlinkDirs.forEach { dir ->
-            if (keep) {
-                // Keep the dir somewhere else that the original Gradle task doesn't touch it
-                File(oriDir, "$abi/$dir").renameTo(File(bakDir, "$abi-$dir"))
-            } else {
-                // It is OK to fail here because the dir might get regenerated back by original task
-                File(bakDir, "$abi-$dir").renameTo(File(oriDir, "$abi/$dir"))
+        getByName("clean") {
+            doLast {
+                delete(android.externalNativeBuild.cmake.buildStagingDirectory
+                        ?: project.file(".externalNativeBuild"))
             }
         }
     }
-    if (!keep) {
-        // Whatever remaining in the backup dir must be disposed of with respect to symlink
-        bakDir.walkBottomUp()
-                .filterNot { it.parentFile.isSymlink() }
-                .forEach { Files.delete(it.toPath()) }
+
+    // This is a hack - workaround Android plugin for Gradle not providing way to bundle extra "stuffs"
+    android.buildTypes.forEach {
+        val config = it.name.capitalize()
+        tasks {
+            create<Zip>("zipBuildTree$config") {
+                val aarDir = File(buildDir, "outputs/aar")
+                val aarName = "${project.name}-${it.name}.aar"
+                val aarFile = File(aarDir, aarName)
+                archiveName = "$aarName.new"
+                destinationDir = aarDir
+                outputs.upToDateWhen { false }
+                from(zipTree(aarFile))
+                dependsOn("zipBuildTreeConfigurer$config")
+                doLast { archivePath.renameTo(aarFile) }
+            }
+            create("zipBuildTreeConfigurer$config") {
+                val externalNativeBuildDir = File(buildDir, "tree/$config")
+                doLast {
+                    tasks.getByName<Zip>("zipBuildTree$config") {
+                        onlyIf { tasks["assemble$config"].state.executed }
+                        externalNativeBuildDir.list()?.forEach { abi ->
+                            listOf("include", "lib").forEach {
+                                from(File(externalNativeBuildDir, "$abi/$it")) {
+                                    into("tree/$config/$abi/$it")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            "assemble$config" { finalizedBy("zipBuildTree$config") }
+        }
     }
 }
-//
-fun File.isSymlink() = absoluteFile != canonicalFile

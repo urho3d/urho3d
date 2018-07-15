@@ -1,5 +1,6 @@
+#
 # Copyright (c) 2008-2018 the Urho3D project.
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -19,19 +20,29 @@
 # THE SOFTWARE.
 #
 
-# Project-wide Gradle settings.
+# Set CMake minimum version and CMake policy required by UrhoCommon module
+cmake_minimum_required (VERSION 3.2.3)
+if (COMMAND cmake_policy)
+    # Libraries linked via full path no longer produce linker search paths
+    cmake_policy (SET CMP0003 NEW)
+    # INTERFACE_LINK_LIBRARIES defines the link interface
+    cmake_policy (SET CMP0022 NEW)
+    # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+    cmake_policy (SET CMP0026 OLD)
+    # MACOSX_RPATH is enabled by default
+    cmake_policy (SET CMP0042 NEW)
+    # Honor the visibility properties for SHARED target types only
+    cmake_policy (SET CMP0063 OLD)
+endif ()
 
-# IDE (e.g. Android Studio) users:
-# Gradle settings configured through the IDE *will override*
-# any settings specified in this file.
-# For more details on how to configure your build environment visit
-# http://www.gradle.org/docs/current/userguide/build_environment.html
+# Set project name
+project (Launcher)
 
-# Specifies the JVM arguments used for the daemon process.
-# The setting is particularly useful for tweaking memory settings.
-org.gradle.jvmargs=-Xmx3G
+# Set CMake modules search path
+set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../CMake/Modules)
 
-# When configured, Gradle will run in incubating parallel mode.
-# This option should only be used with decoupled projects. More details, visit
-# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
-# org.gradle.parallel=true
+# Include UrhoCommon.cmake module after setting project name
+include (UrhoCommon)
+
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/../../Source/Tools/Urho3DPlayer Urho3DPlayer)
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/../../Source/Samples Samples)

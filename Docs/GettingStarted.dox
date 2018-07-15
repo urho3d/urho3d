@@ -115,6 +115,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
+|URHO3D_PLAYER        |1|Build Urho3D script player|
 |URHO3D_SAMPLES       |1|Build sample applications|
 |URHO3D_TOOLS         |1|Build tools (native, RPI, and ARM on Linux only)|
 |URHO3D_EXTRAS        |0|Build extras (native, RPI, and ARM on Linux only)|

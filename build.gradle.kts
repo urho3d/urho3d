@@ -32,7 +32,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.1.3")
+        classpath("com.android.tools.build:gradle:3.2.0-beta04")
         classpath(kotlin("gradle-plugin", kotlinVersion))
 
         // NOTE: Do not place your application dependencies here; they belong

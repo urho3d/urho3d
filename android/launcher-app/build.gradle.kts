@@ -35,8 +35,39 @@ android {
         targetSdkVersion(27)
         applicationId = "com.github.urho3d.launcher"
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.8-SNAPSHOT"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                arguments.apply {
+                    add("-DANDROID_CCACHE=${System.getenv("ANDROID_CCACHE")}")
+                    add("-DGRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
+                    addAll(listOf(
+                            "URHO3D_LIB_TYPE",
+                            // TODO: "URHO3D_PACKAGING",
+                            "URHO3D_ANGELSCRIPT",
+                            "URHO3D_LUA")
+                            .filter { project.hasProperty(it) }
+                            .map { "-D$it=${project.property(it)}" }
+                    )
+                    // In order to get clean module segregation, only build player/samples here
+                    // unless it is explicitly excluded
+                    addAll(listOf(
+                            "URHO3D_PLAYER",
+                            "URHO3D_SAMPLES")
+                            .map { "-D$it=${if (project.hasProperty(it)) project.property(it) else "1"}" }
+                    )
+                }
+            }
+        }
+        splits {
+            abi {
+                isEnable = project.hasProperty("ANDROID_ABI")
+                reset()
+                include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
+                        .split(',').toTypedArray())
+            }
+        }
     }
     buildTypes {
         getByName("release") {
@@ -44,9 +75,10 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
+    externalNativeBuild {
+        cmake {
+            path = project.file("CMakeLists.txt")
+        }
     }
 }
 
@@ -57,4 +89,15 @@ dependencies {
     testImplementation("junit:junit:4.12")
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
+}
+
+afterEvaluate {
+    android.buildTypes.forEach {
+        val config = it.name.capitalize()
+        tasks {
+            "externalNativeBuild$config" {
+                mustRunAfter(":android:urho3d-lib:externalNativeBuild$config")
+            }
+        }
+    }
 }

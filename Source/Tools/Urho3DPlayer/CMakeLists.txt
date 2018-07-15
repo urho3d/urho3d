@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_PLAYER)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME Urho3DPlayer)
 
