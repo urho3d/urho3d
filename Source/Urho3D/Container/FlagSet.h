@@ -68,7 +68,7 @@ public:
 
     /// Construct from Enum value.
     FlagSet(const Enum value)
-        : value_((Integer) value)
+        : value_(static_cast<Integer>(value))
     {
     }
 
@@ -78,7 +78,7 @@ public:
     /// Bitwise AND against Enum value.
     FlagSet& operator &= (const Enum value)
     {
-        value_ &= (Integer) value;
+        value_ &= static_cast<Integer>(value);
         return *this;
     }
 
@@ -92,7 +92,7 @@ public:
     /// Bitwise OR against Enum value.
     FlagSet& operator |= (const Enum value)
     {
-        value_ |= (Integer) value;
+        value_ |= static_cast<Integer>(value);
         return *this;
     }
 
@@ -106,7 +106,7 @@ public:
     /// Bitwise XOR against Enum value.
     FlagSet& operator ^= (const Enum value)
     {
-        value_ ^= (Integer) value;
+        value_ ^= static_cast<Integer>(value);
         return *this;
     }
 
@@ -120,7 +120,7 @@ public:
     /// Bitwise AND against Enum value.
     FlagSet operator & (const Enum value) const
     {
-        return FlagSet(value_ & (Integer) value);
+        return FlagSet(value_ & static_cast<Integer>(value));
     }
 
     /// Bitwise AND against flagset value.
@@ -132,7 +132,7 @@ public:
     /// Bitwise OR against Enum value.
     FlagSet operator | (const Enum value) const
     {
-        return FlagSet(value_ | (Integer) value);
+        return FlagSet(value_ | static_cast<Integer>(value));
     }
 
     /// Bitwise OR against flagset value.
@@ -144,7 +144,7 @@ public:
     /// Bitwise XOR against Enum value.
     FlagSet operator ^ (const Enum value) const
     {
-        return FlagSet(value_ ^ (Integer) value);
+        return FlagSet(value_ ^ static_cast<Integer>(value));
     }
 
     /// Bitwise XOR against flagset value.
@@ -180,19 +180,19 @@ public:
     /// Cast to enum value.
     explicit operator Enum() const
     {
-        return (Enum)value_;
+        return static_cast<Enum>(value_);
     }
 
     /// Cast to double. Used by Lua bindings.
     explicit operator double() const
     {
-        return (double)value_;
+        return static_cast<double>(value_);
     }
 
     /// Equality check against enum value.
     bool operator ==(Enum rhs) const
     {
-        return value_ == (Integer)rhs;
+        return value_ == static_cast<Integer>(rhs);
     }
 
     /// Equality check against another flagset.
@@ -204,19 +204,19 @@ public:
     /// Non-equality check against enum value.
     bool operator !=(Enum rhs) const
     {
-        return value_ != (Integer)rhs;
+        return !(*this == rhs);
     }
 
     /// Non-equality check against another flagset value.
     bool operator !=(FlagSet rhs) const
     {
-        return value_ != rhs.value_;
+        return !(*this == rhs);
     }
 
     /// Return true if specified enum value is set.
     inline bool Test(const Enum value) const
     {
-        return Test((Integer)value);
+        return Test(static_cast<Integer>(value));
     }
 
     /// Return true if specified bits are set.
@@ -263,5 +263,5 @@ Urho3D::FlagSet<Enum> operator ^ (const Enum lhs, const Enum rhs)
 template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
 Urho3D::FlagSet<Enum> operator ~ (const Enum rhs)
 {
-    return (Enum)(~(typename std::underlying_type<Enum>::type)rhs);
+    return ~Urho3D::FlagSet<Enum>(rhs);
 }
