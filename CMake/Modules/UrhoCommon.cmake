@@ -872,6 +872,13 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
+    # ThirdParty/SLikeNet external dependency
+    if (${TARGET} MATCHES SLikeNet|Urho3D)
+        if (WIN32)
+            list (APPEND LIBS iphlpapi)
+        endif ()
+    endif ()
+
     # Urho3D/LuaJIT external dependency
     if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32 AND NOT WEB)

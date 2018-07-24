@@ -828,7 +828,7 @@ const char *RakNetGUID::ToString(void) const
 
 	unsigned char lastStrIndex=strIndex;
 	strIndex++;
-	ToString(str[lastStrIndex&7], 64);
+	ToString(str[lastStrIndex&7]);
 	return (char*) str[lastStrIndex&7];
 }
 void RakNetGUID::ToString(char *dest) const

@@ -20,7 +20,7 @@
 #ifndef RAKNETSOCKET2_WINDOWS_LINUX_CPP
 #define RAKNETSOCKET2_WINDOWS_LINUX_CPP
 
-#ifndef _WIN32
+#if defined(_WIN32_) && !defined(__ANDROID__)
 #include <sys/types.h> // used for getifaddrs()
 #include <ifaddrs.h>   // used for getifaddrs()
 #endif // _WIN32
