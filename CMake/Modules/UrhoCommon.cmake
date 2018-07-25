@@ -141,7 +141,7 @@ option (URHO3D_IK "Enable inverse kinematics support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 # Urho's Network subsystem depends on kNet library which uses C++ exceptions feature
-cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB AND EXCEPTIONS" FALSE)
+cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 option (URHO3D_WEBP "Enable WebP support" TRUE)
@@ -865,8 +865,8 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
-    # ThirdParty/kNet & ThirdParty/Civetweb external dependency
-    if (${TARGET} MATCHES Civetweb|kNet|Urho3D)
+    # ThirdParty/Civetweb external dependency
+    if (${TARGET} MATCHES Civetweb|Urho3D)
         if (WIN32)
             list (APPEND LIBS ws2_32)
         endif ()

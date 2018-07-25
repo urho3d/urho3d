@@ -29,10 +29,6 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
 
-#ifdef SendMessage
-#undef SendMessage
-#endif
-
 namespace SLNet
 {
     class SystemAddress;

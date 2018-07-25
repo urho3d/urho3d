@@ -20,15 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "SLikeNet/NatPunchthroughClient.h"
 #include <SLikeNet/MessageIdentifiers.h>
+#include "SLikeNet/NatPunchthroughClient.h"
 #include <SLikeNet/RakPeerInterface.h>
-#include <SLikeNet/RakNetTypes.h>
 #include <SLikeNet/RakNetStatistics.h>
 
 /// RakNet library include windows headers which may conflict with Color::TRANSPARENT
 #ifdef TRANSPARENT
 #undef TRANSPARENT
+#endif
+
+#ifdef SendMessage
+#undef SendMessage
 #endif
 
 #include "../Precompiled.h"

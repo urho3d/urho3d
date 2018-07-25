@@ -13,7 +13,12 @@
  *  license found in the license.txt file in the root directory of this source tree.
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+
+// Urho3D: avoid redefinition on newer version of MinGW
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 
 #if   defined (WINDOWS_STORE_RT)
 #include <windows.h>
