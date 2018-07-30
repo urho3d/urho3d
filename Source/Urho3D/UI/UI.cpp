@@ -516,6 +516,7 @@ void UI::Render(bool renderUICommand)
                 SetVertexData(data.debugVertexBuffer_, data.debugVertexData_);
 
                 RenderSurface* surface = data.texture_->GetRenderSurface();
+                graphics_->SetDepthStencil(surface->GetLinkedDepthStencil());
                 graphics_->SetRenderTarget(0, surface);
                 graphics_->SetViewport(IntRect(0, 0, surface->GetWidth(), surface->GetHeight()));
                 graphics_->Clear(Urho3D::CLEAR_COLOR);
