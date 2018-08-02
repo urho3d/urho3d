@@ -456,7 +456,7 @@ static void interpretLink(struct nlmsghdr *p_hdr, struct ifaddrs **p_links, stru
 
     struct ifaddrs *l_entry = (ifaddrs*)malloc(sizeof(struct ifaddrs) + l_nameSize + l_addrSize + l_dataSize);
     memset(l_entry, 0, sizeof(struct ifaddrs));
-    l_entry->ifa_name = (char)0;
+    l_entry->ifa_name = nullptr;
 
     char *l_name = ((char *)l_entry) + sizeof(struct ifaddrs);
     char *l_addr = l_name + l_nameSize;
