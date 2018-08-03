@@ -40,7 +40,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments.apply {
-                    add("-DANDROID_CCACHE=${System.getenv("ANDROID_CCACHE")}")
+                    System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
                     add("-DGRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
                     addAll(listOf(
                             "URHO3D_LIB_TYPE",
@@ -92,6 +92,14 @@ dependencies {
 }
 
 afterEvaluate {
+    tasks {
+        getByName("clean") {
+            doLast {
+                delete(android.externalNativeBuild.cmake.buildStagingDirectory
+                        ?: project.file(".externalNativeBuild"))
+            }
+        }
+    }
     android.buildTypes.forEach {
         val config = it.name.capitalize()
         tasks {

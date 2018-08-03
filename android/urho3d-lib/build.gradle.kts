@@ -39,7 +39,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments.apply {
-                    add("-DANDROID_CCACHE=${System.getenv("ANDROID_CCACHE")}")
+                    System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
                     add("-DGRADLE_BUILD_DIR=$buildDir")
                     // Pass along matching Gradle properties as CMake build options
                     addAll(listOf(

@@ -114,6 +114,11 @@ elseif (XCODE)
     set (DEPLOYMENT_TARGET_SAVED ${CMAKE_OSX_DEPLOYMENT_TARGET} CACHE INTERNAL "Last known deployment target")
 endif ()
 
+# To support Android Gradle build system on Windows host system
+if (ANDROID AND GRADLE_BUILD_DIR)
+    file (TO_CMAKE_PATH "${GRADLE_BUILD_DIR}" GRADLE_BUILD_DIR)
+endif ()
+
 include (CheckHost)
 include (CheckCompilerToolchain)
 
