@@ -23,7 +23,6 @@
 package com.github.urho3d.launcher
 
 import com.github.urho3d.UrhoActivity
-import java.util.*
 
 class MainActivity : UrhoActivity() {
 

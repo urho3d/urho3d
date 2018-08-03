@@ -59,8 +59,8 @@ class LauncherActivity : ExpandableListActivity() {
                 arrayOf("api", "info"),
                 intArrayOf(android.R.id.text1, android.R.id.text2),
                 items.map {
-                    it.value.map {
-                        mapOf("item" to it)
+                    it.value.map { name ->
+                        mapOf("item" to name)
                     }
                 },
                 R.layout.launcher_list_item,

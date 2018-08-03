@@ -26,7 +26,7 @@ plugins {
 
 buildscript {
     var kotlinVersion: String by extra
-    kotlinVersion = "1.2.51"
+    kotlinVersion = "1.2.60"
     repositories {
         google()
         jcenter()

@@ -116,12 +116,12 @@ afterEvaluate {
     }
 
     // This is a hack - workaround Android plugin for Gradle not providing way to bundle extra "stuffs"
-    android.buildTypes.forEach {
-        val config = it.name.capitalize()
+    android.buildTypes.forEach { buildType ->
+        val config = buildType.name.capitalize()
         tasks {
             create<Zip>("zipBuildTree$config") {
                 val aarDir = File(buildDir, "outputs/aar")
-                val aarName = "${project.name}-${it.name}.aar"
+                val aarName = "${project.name}-${buildType.name}.aar"
                 val aarFile = File(aarDir, aarName)
                 archiveName = "$aarName.new"
                 destinationDir = aarDir
