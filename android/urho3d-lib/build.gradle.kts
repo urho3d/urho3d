@@ -26,6 +26,7 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("kotlin-android-extensions")
+    `maven-publish`
 }
 
 android {
@@ -34,7 +35,7 @@ android {
         minSdkVersion(17)
         targetSdkVersion(27)
         versionCode = 1
-        versionName = "1.8-SNAPSHOT"
+        versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -134,7 +135,7 @@ afterEvaluate {
                 val externalNativeBuildDir = File(buildDir, "tree/$config")
                 doLast {
                     tasks.getByName<Zip>("zipBuildTree$config") {
-                        onlyIf { tasks["assemble$config"].state.executed }
+                        onlyIf { tasks["bundle${config}Aar"].state.executed }
                         externalNativeBuildDir.list()?.forEach { abi ->
                             listOf("include", "lib").forEach {
                                 from(File(externalNativeBuildDir, "$abi/$it")) {
@@ -145,7 +146,28 @@ afterEvaluate {
                     }
                 }
             }
-            "assemble$config" { finalizedBy("zipBuildTree$config") }
+            "bundle${config}Aar" { finalizedBy("zipBuildTree$config") }
+        }
+    }
+}
+
+tasks {
+    create<Jar>("sourcesJar") {
+        from(android.sourceSets.getByName("main").java.srcDirs)
+        classifier = "sources"
+    }
+}
+
+publishing {
+    (publications) {
+        create<MavenPublication>("mavenAndroid") {
+            afterEvaluate {
+                android.buildTypes.forEach {
+                    artifact(tasks.getByName("bundle${it.name.capitalize()}Aar"))
+                            .classifier = it.name
+                }
+            }
+            artifact(tasks.getByName("sourcesJar"))
         }
     }
 }

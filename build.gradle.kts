@@ -41,6 +41,8 @@ buildscript {
 }
 
 allprojects {
+    group = "com.github.urho3d"
+    version = "1.8-SNAPSHOT"
     repositories {
         google()
         jcenter()

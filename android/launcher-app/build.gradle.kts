@@ -35,7 +35,7 @@ android {
         targetSdkVersion(27)
         applicationId = "com.github.urho3d.launcher"
         versionCode = 1
-        versionName = "1.8-SNAPSHOT"
+        versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {

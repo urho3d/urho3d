@@ -20,4 +20,7 @@
 // THE SOFTWARE.
 //
 
+// See https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:deferred_configuration
+enableFeaturePreview("STABLE_PUBLISHING")
+
 include(":android:urho3d-lib", ":android:launcher-app")
