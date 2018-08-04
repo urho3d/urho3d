@@ -91,6 +91,9 @@ dependencies {
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
 }
 
+// Ensure IDE "gradle sync" evaluate the urho3d-lib module first
+evaluationDependsOn(":android:urho3d-lib")
+
 afterEvaluate {
     tasks {
         getByName("clean") {

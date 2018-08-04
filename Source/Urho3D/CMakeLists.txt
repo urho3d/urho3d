@@ -555,6 +555,15 @@ if (ANDROID AND GRADLE_BUILD_DIR)
     # Copy the library to URHO3D_HOME directory
     set (ABI_LIB_DIR ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI}/lib)
     file (MAKE_DIRECTORY ${ABI_LIB_DIR})
+    # Workaround execute_process does not support generator expression
+    if (URHO3D_LIB_TYPE STREQUAL STATIC)
+        set (LIB_EXT .a)
+    else ()
+        set (LIB_EXT .so)
+    endif ()
+    # Put a placeholder during Gradle configuration phase so that initial IDE "gradle sync" works cleanly
+    execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${ABI_LIB_DIR}/lib${TARGET_NAME}${LIB_EXT})
+    # Replace the placeholder with the actual target file during Gradle execution phase
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ABI_LIB_DIR}
         COMMENT "Copying Urho3D library to URHO3D_HOME directory")
     add_make_clean_files (${ABI_LIB_DIR}/$<TARGET_FILE_NAME:${TARGET_NAME}>)

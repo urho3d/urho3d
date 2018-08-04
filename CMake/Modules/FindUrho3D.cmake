@@ -239,8 +239,9 @@ else ()
                 execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq arm RESULT_VARIABLE SKIP_COMPILE_TEST OUTPUT_QUIET ERROR_QUIET)
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
-            if (SKIP_COMPILE_TEST OR URHO3D_LIB_TYPE STREQUAL MODULE)
-                # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
+            if (SKIP_COMPILE_TEST
+                OR URHO3D_LIB_TYPE STREQUAL MODULE                  # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
+                OR CMAKE_PROJECT_NAME STREQUAL Urho3D-Launcher)     # Workaround initial IDE "gradle sync" error due to library has not been built yet
                 set (URHO3D_COMPILE_RESULT 1)
             else ()
                 while (NOT URHO3D_COMPILE_RESULT)
