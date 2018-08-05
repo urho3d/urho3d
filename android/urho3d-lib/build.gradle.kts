@@ -121,21 +121,15 @@ afterEvaluate {
         val config = buildType.name.capitalize()
         tasks {
             create<Zip>("zipBuildTree$config") {
-                val aarDir = File(buildDir, "outputs/aar")
-                val aarName = "${project.name}-${buildType.name}.aar"
-                val aarFile = File(aarDir, aarName)
-                archiveName = "$aarName.new"
-                destinationDir = aarDir
-                outputs.upToDateWhen { false }
-                from(zipTree(aarFile))
-                dependsOn("zipBuildTreeConfigurer$config")
-                doLast { archivePath.renameTo(aarFile) }
+                classifier = buildType.name
+                extension = "aar"
+                dependsOn("zipBuildTreeConfigurer$config", "bundle${config}Aar")
+                from(zipTree(tasks.getByName("bundle${config}Aar").outputs.files.first()))
             }
             create("zipBuildTreeConfigurer$config") {
                 val externalNativeBuildDir = File(buildDir, "tree/$config")
                 doLast {
                     tasks.getByName<Zip>("zipBuildTree$config") {
-                        onlyIf { tasks["bundle${config}Aar"].state.executed }
                         externalNativeBuildDir.list()?.forEach { abi ->
                             listOf("include", "lib").forEach {
                                 from(File(externalNativeBuildDir, "$abi/$it")) {
@@ -146,15 +140,14 @@ afterEvaluate {
                     }
                 }
             }
-            "bundle${config}Aar" { finalizedBy("zipBuildTree$config") }
         }
     }
 }
 
 tasks {
     create<Jar>("sourcesJar") {
-        from(android.sourceSets.getByName("main").java.srcDirs)
         classifier = "sources"
+        from(android.sourceSets.getByName("main").java.srcDirs)
     }
 }
 
@@ -163,8 +156,7 @@ publishing {
         create<MavenPublication>("mavenAndroid") {
             afterEvaluate {
                 android.buildTypes.forEach {
-                    artifact(tasks.getByName("bundle${it.name.capitalize()}Aar"))
-                            .classifier = it.name
+                    artifact(tasks.getByName("zipBuildTree${it.name.capitalize()}"))
                 }
             }
             artifact(tasks.getByName("sourcesJar"))
