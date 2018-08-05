@@ -337,7 +337,7 @@ before_script:
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH ANDROID_CCACHE=$(which ccache)
   - if [[ "$ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE" == "STATIC" ]]; then export EXTRA_PROPS='-P URHO3D_SAMPLES=0'; fi
   - rake ci_setup_cache
-script: ./gradlew -P URHO3D_LUAJIT=1 -P URHO3D_LUAJIT_AMALG=1 $EXTRA_PROPS build && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: ./gradlew -P URHO3D_LUAJIT=1 -P URHO3D_LUAJIT_AMALG=1 $EXTRA_PROPS build publishToMavenLocal && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 matrix:
   fast_finish: true
