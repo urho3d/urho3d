@@ -60,9 +60,9 @@ public:
     /// Clear all loaded strings.
     void Reset();
     /// Load strings from JSONValue.
-    void LoadJSON(const JSONValue& source);
+    void LoadJSON(const JSONValue& source, const String& language = String::EMPTY);
     /// Load strings from JSONFile. The file should be UTF8 without BOM.
-    void LoadJSONFile(const String& name);
+    void LoadJSONFile(const String& name, const String& language = String::EMPTY);
 
 private:
     /// Language names.

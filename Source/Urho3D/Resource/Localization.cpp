@@ -152,7 +152,7 @@ void Localization::Reset()
     strings_.Clear();
 }
 
-void Localization::LoadJSON(const JSONValue& source)
+void Localization::LoadJSON(const JSONValue& source, const String& language)
 {
     for (JSONObject::ConstIterator i = source.Begin(); i != source.End(); ++i)
     {
@@ -162,42 +162,47 @@ void Localization::LoadJSON(const JSONValue& source)
             URHO3D_LOGWARNING("Localization::LoadJSON(source): string ID is empty");
             continue;
         }
-        const JSONValue& langs = i->second_;
-        for (JSONObject::ConstIterator j = langs.Begin(); j != langs.End(); ++j)
-        {
-            const String& lang = j->first_;
-            if (lang.Empty())
-            {
-                URHO3D_LOGWARNING("Localization::LoadJSON(source): language name is empty, string ID=\"" + id + "\"");
-                continue;
+        const JSONValue& value = i->second_;
+        if (value.IsObject()) {
+            for (JSONObject::ConstIterator j = value.Begin(); j != value.End(); ++j) {
+                const String &lang = j->first_;
+                if (lang.Empty()) {
+                    URHO3D_LOGWARNING(
+                            "Localization::LoadJSON(source): language name is empty, string ID=\"" + id + "\"");
+                    continue;
+                }
+                const String &string = j->second_.GetString();
+                if (string.Empty()) {
+                    URHO3D_LOGWARNING(
+                            "Localization::LoadJSON(source): translation is empty, string ID=\"" + id +
+                            "\", language=\"" + lang + "\"");
+                    continue;
+                }
+                if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY) {
+                    URHO3D_LOGWARNING(
+                            "Localization::LoadJSON(source): override translation, string ID=\"" + id +
+                            "\", language=\"" + lang + "\"");
+                }
+                strings_[StringHash(lang)][StringHash(id)] = string;
+                if (!languages_.Contains(lang))
+                    languages_.Push(lang);
+                if (languageIndex_ == -1)
+                    languageIndex_ = 0;
             }
-            const String& string = j->second_.GetString();
-            if (string.Empty())
-            {
-                URHO3D_LOGWARNING(
-                    "Localization::LoadJSON(source): translation is empty, string ID=\"" + id + "\", language=\"" + lang + "\"");
-                continue;
-            }
-            if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY)
-            {
-                URHO3D_LOGWARNING(
-                    "Localization::LoadJSON(source): override translation, string ID=\"" + id + "\", language=\"" + lang + "\"");
-            }
-            strings_[StringHash(lang)][StringHash(id)] = string;
-            if (!languages_.Contains(lang))
-                languages_.Push(lang);
-            if (languageIndex_ == -1)
-                languageIndex_ = 0;
+        } else if (value.IsString() && !language.Empty()) {
+            strings_[StringHash(language)][StringHash(id)] = value.GetString();
+            if (!languages_.Contains(language))
+                languages_.Push(language);
         }
     }
 }
 
-void Localization::LoadJSONFile(const String& name)
+void Localization::LoadJSONFile(const String& name, const String& language)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* jsonFile = cache->GetResource<JSONFile>(name);
     if (jsonFile)
-        LoadJSON(jsonFile->GetRoot());
+        LoadJSON(jsonFile->GetRoot(), language);
 }
 
 }

@@ -33,6 +33,7 @@ function InitLocalizationSystem()
     localization:LoadJSONFile("StringsEnRu.json")
     -- You can load multiple files
     localization:LoadJSONFile("StringsDe.json")
+    localization:LoadJSONFile("StringsLv.json", "lv")
     -- Hook up to the change language
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage")
 end
