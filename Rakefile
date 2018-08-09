@@ -641,11 +641,6 @@ task :ci_package_upload do
     # TODO: There is a bug in CMake/CPack that causes the 'package' target failed to build for iOS and tvOS platforms, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
     system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
   else
-    if ENV['ANDROID']
-      if !ENV['NO_SDK_SYSIMG']
-        system 'cd ../Build && android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
-      end
-    end
     if ENV['URHO3D_USE_LIB64_RPM']
       system 'rake cmake' or abort 'Failed to reconfigure to generate 64-bit RPM package'
       system "rm #{ENV['build_tree']}/Urho3D-*" or abort 'Failed to remove previously generated artifacts'  # This task can be invoked more than one time

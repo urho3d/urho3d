@@ -318,7 +318,9 @@ if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.3.
 endif ()
 
 # Setup library output path
-if (NOT ANDROID)
+if (ANDROID)
+    # Let SDK's android.toolchain.cmake controls where are the output directories
+else ()
     set_output_directories (${CMAKE_BINARY_DIR}/lib ARCHIVE LIBRARY)
 endif ()
 
@@ -546,7 +548,8 @@ if (MSVC)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/CMake/Modules/AdjustPkgConfigForMSVC.cmake)
 endif ()
 if (ANDROID)
-    set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)
+    # After migration to Gradle build system we do not support Android cross-compiling build via pkgconfig anymore, however, this file is still being provided as reference only
+    set (RENAME RENAME Urho3D-${ANDROID_ABI}.pc)
 endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
 
@@ -568,8 +571,8 @@ if (ANDROID AND GRADLE_BUILD_DIR)
         COMMENT "Copying Urho3D library to URHO3D_HOME directory")
     add_make_clean_files (${ABI_LIB_DIR}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
 endif ()
-if (URHO3D_LIB_TYPE STREQUAL SHARED AND (ANDROID OR ARM))
-    # Strip the output shared library for embedded devices
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND ARM)
+    # Strip the output shared library for embedded ARM platforms (we don't do this for Android anymore, assuming Android plugin will take care of it)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
         COMMENT "Stripping Urho3D shared library")
 endif ()

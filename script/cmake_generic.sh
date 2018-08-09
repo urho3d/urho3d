@@ -51,7 +51,8 @@ for a in $@; do
             TVOS=1
             ;;
         -DANDROID=1)
-            ANDROID=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Android.cmake"
+            echo For Android platform, use Gradle build system instead of invoking CMake build system directly!
+            exit 1
             ;;
         -DRPI=1)
             if [[ ! $(uname -m) =~ ^arm ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/RaspberryPi.cmake"; fi

@@ -46,7 +46,7 @@ set "BUILD_OPTS="
 set "arch="
 :loop
 if not "%~1" == "" (
-    if "%~1" == "-DANDROID" if "%~2" == "1" set "OPTS=-G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Android.cmake""
+    if "%~1" == "-DANDROID" if "%~2" == "1" (echo For Android platform, use Gradle build system instead of invoking CMake build system directly! && exit /B 1)
     if "%~1" == "-DWEB" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Emscripten.cmake""
     if "%~1" == "-DMINGW" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles""
     if "%~1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch= Win64"

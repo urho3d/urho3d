@@ -112,7 +112,7 @@ if (WIN32)
 elseif (HAIKU OR ANDROID OR IOS OR TVOS)   # IOS/TVOS CMake variables are defined in Urho3D when targeting iOS/tvOS platforms, respectively
   # Do nothing here but this should prevent these platforms from entering the more generic case below, i.e.
   # - preventing LINUX variable being set for Android (when using older CMake)
-  # - preventing DARWIN/MACOSX variabe being set for iOS
+  # - preventing DARWIN/MACOSX variable being set for iOS
   # - preventing UNIX_SYS variable being set for Haiku
 elseif (APPLE)
   if (CMAKE_SYSTEM_NAME MATCHES Darwin)
@@ -150,7 +150,7 @@ elseif (UNIX)
 endif()
 
 # Default option knobs
-# Urho3D - commented out OPT_DEF_SSEMATH default variable as the underyling SSEMATH build option is also being commented out by us
+# Urho3D - commented out OPT_DEF_SSEMATH default variable as the underlying SSEMATH build option is also being commented out by us
 if(UNIX OR MINGW OR MSYS)
   set(OPT_DEF_LIBC ON)
 endif()

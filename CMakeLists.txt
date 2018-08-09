@@ -54,10 +54,7 @@ if (WIN32)
 else ()
     set (SCRIPT_EXT .sh)
 endif ()
-if (ANDROID)
-    # For Android platform, install to a path based on the chosen Android ABI, e.g. libs/armeabi-v7a
-    set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
-elseif (URHO3D_64BIT)
+if (URHO3D_64BIT)
     # Install to 'lib64' when one of these conditions is true
     if ((MINGW AND CMAKE_CROSSCOMPILING) OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
         set (LIB_SUFFIX 64)
@@ -151,8 +148,8 @@ if (WIN32 AND NOT URHO3D_OPENGL)
     else ()
         set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-3D9)
     endif ()
-elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
+elseif (ANDROID)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${ANDROID_ABI})
 elseif (RPI AND RPI_ABI MATCHES ^armeabi-v7a)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-v7a)
 elseif (ARM_ABI_FLAGS)
