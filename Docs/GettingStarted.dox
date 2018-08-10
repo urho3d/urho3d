@@ -215,9 +215,9 @@ To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to e
 
 \section Building_Android Android build process
 
-First, if you are building under Windows host then after checking out the project you need to prepare the "assets" directory of both the "urho3d-lib" and "launcher-app" modules. Due to a bug in Android plugin of the version we are currently using, where it does not honor custom source set with filter setting, we are forced to use asset symlink with the default source set. In Windows host system, the asset symlinks must be replaced with an equivalent directory link created by MKLINK command. If your account does not allow you to use MKLINK command then use copy command instead to copy the content of the linked directory directory directly to the "assets" directory. Ensure you have preserved the directory structure, i.e. "urho3d-lib" assets directory has one subdir called "CoreData", while "launcher-app" assets directory has two subdirs: "Data" and "Autoload".
+First, if you are building under Windows host then after checking out the project you need to prepare the "assets" directory of both the "urho3d-lib" and "launcher-app" modules. Due to a bug in Android plugin of the version we are currently using, where it does not honor custom source set with filter setting, we are forced to use asset symlink with the default source set. So in Windows host system, the asset symlinks must be replaced with an equivalent directory link created with MKLINK command. If your account does not allow you to use MKLINK command then use copy command instead to copy the content of the linked directory directly to the "assets" directory. Ensure you have preserved the directory structure, i.e. "urho3d-lib" assets directory has one subdir called "CoreData", while "launcher-app" assets directory has two subdirs: "Data" and "Autoload".
 
-Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location. Ensure the "ninja" build tool is globally installed when you intend to build Urho3D with Lua/LuaJIT subsystem enabled as "ninja" is required for host tool building required by Lua/LuaJIT.
+Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location. Ensure the "ninja" build tool is globally installed when you intend to build Urho3D with subsystems that require host tool building, such as Lua/LuaJIT subsystem.
 
 For CLI user, build the Gradle modules with the following command:
 
@@ -237,29 +237,30 @@ For Android Studio user, open the project using the IDE. It should prompt you to
 
 The Gradle build script has been setup to automatically pass the matching Gradle properties as CMake build options. The following is the list of supported Gradle properties.
 
-|Gradle Property|
-|---------------|
-|URHO3D_ANGELSCRIPT|
-|URHO3D_DATABASE_SQLITE|
-|URHO3D_FILEWATCHER|
-|URHO3D_IK|
-|URHO3D_LIB_TYPE|
-|URHO3D_LUA|
-|URHO3D_LUAJIT|
-|URHO3D_LUAJIT_AMALG|
-|URHO3D_LOGGING|
-|URHO3D_NAVIGATION|
-|URHO3D_NETWORK|
-|URHO3D_PCH|
-|URHO3D_PLAYER|
-|URHO3D_PHYSICS|
-|URHO3D_PROFILING|
-|URHO3D_SAMPLES|
-|URHO3D_THREADING|
-|URHO3D_URHO2D|
-|URHO3D_WEBP|
+|Gradle Property|Description    |
+|---------------|---------------|
+|ANDROID_ABI|A comma-separated list of ABIs for split build configuration; when not specified defaults to universal build|
+|URHO3D_ANGELSCRIPT|Pass-through as CMake build option|
+|URHO3D_DATABASE_SQLITE|Pass-through as CMake build option|
+|URHO3D_FILEWATCHER|Pass-through as CMake build option|
+|URHO3D_IK|Pass-through as CMake build option|
+|URHO3D_LIB_TYPE|Pass-through as CMake build option|
+|URHO3D_LUA|Pass-through as CMake build option|
+|URHO3D_LUAJIT|Pass-through as CMake build option|
+|URHO3D_LUAJIT_AMALG|Pass-through as CMake build option|
+|URHO3D_LOGGING|Pass-through as CMake build option|
+|URHO3D_NAVIGATION|Pass-through as CMake build option|
+|URHO3D_NETWORK|Pass-through as CMake build option|
+|URHO3D_PCH|Pass-through as CMake build option|
+|URHO3D_PLAYER|Pass-through as CMake build option|
+|URHO3D_PHYSICS|Pass-through as CMake build option|
+|URHO3D_PROFILING|Pass-through as CMake build option|
+|URHO3D_SAMPLES|Pass-through as CMake build option|
+|URHO3D_THREADING|Pass-through as CMake build option|
+|URHO3D_URHO2D|Pass-through as CMake build option|
+|URHO3D_WEBP|Pass-through as CMake build option|
 
-Refer to \ref build_options for their meaning. The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P URHO3D_LUA=0 build" to build without Lua subsystem.
+The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P URHO3D_LUA=0 build" to build without Lua subsystem.
 
 \section Building_iOS_tvOS iOS and tvOS build process (tvOS is still EXPERIMENTAL)
 
@@ -330,6 +331,8 @@ If CMake complains that emcc is not able to compile a test program, try reactiva
 When using MSVC compiler, Urho3D common CMake module configures the build tree to target a 32-bit platform by default. When using other non-MSVC compilers (like GCC or Clang), the module sets the default to 32-bit or 64-bit based on the chosen toolchain in the build tree. You can, however, use the "URHO3D_64BIT" build option to override the default, i.e. by setting the option to '0' (for 32-bit) and '1' (for 64-bit) explicitly.
 
 \section Building_Library Library build
+
+> This section is not applicable for Android platform, which publishes the Android library (AAR) among other artifacts using maven-publish Gradle plugin.
 
 The build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.
 
