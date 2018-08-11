@@ -7783,6 +7783,7 @@ class Network
 {
 public:
 // Methods:
+bool AttemptNATPunchtrough(const String&, Scene, const VariantMap& = VariantMap ( ));
 void BroadcastMessage(int, bool, bool, const VectorBuffer&, uint = 0);
 void BroadcastRemoteEvent(Node, const String&, bool, const VariantMap& = VariantMap ( ));
 void BroadcastRemoteEvent(Scene, const String&, bool, const VariantMap& = VariantMap ( ));
@@ -7790,12 +7791,17 @@ void BroadcastRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( 
 bool CheckRemoteEvent(const String&) const;
 bool Connect(const String&, uint16, Scene, const VariantMap& = VariantMap ( ));
 void Disconnect(int = 0);
+bool DiscoverHosts(uint16);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 HttpRequest MakeHttpRequest(const String&, const String& = String ( ), Array<String> = null, const String& = String ( ));
 void RegisterRemoteEvent(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SendPackageToClients(Scene, PackageFile);
+bool SetDiscoveryBeacon(const VariantMap& = VariantMap ( ));
+void SetNATServerInfo(const String&, uint16);
+bool SetPassword(const String&);
+void StartNATClient() const;
 bool StartServer(uint16);
 void StopServer();
 void UnregisterAllRemoteEvents();
@@ -7806,6 +7812,8 @@ void UnregisterRemoteEvent(const String&) const;
 String category;
 /* readonly */
 Array<Connection> clientConnections;
+/* readonly */
+String guid;
 String packageCacheDir;
 /* readonly */
 int refs;
@@ -7815,6 +7823,8 @@ Connection serverConnection;
 bool serverRunning;
 int simulatedLatency;
 float simulatedPacketLoss;
+/* readonly */
+String startNATClient;
 /* readonly */
 StringHash type;
 /* readonly */
