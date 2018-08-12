@@ -503,7 +503,7 @@ cache:
   directories:
     - $HOME/.ccache
     - $HOME/initial-build-tree
-osx_image: xcode9.2
+osx_image: xcode9.4
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
