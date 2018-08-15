@@ -3116,6 +3116,7 @@ Methods:
 - JSONFile* new()
 - void delete()
 - bool FromString(const String source)
+- String ToString(const String indendation = "\t") const
 - const JSONValue& GetRoot() const
 - bool Save(const String fileName, const String indentation = "\t") const
 

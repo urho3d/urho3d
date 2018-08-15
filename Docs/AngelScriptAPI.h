@@ -6099,6 +6099,7 @@ bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+String ToString(const String& = String ( "\t" )) const;
 
 // Properties:
 /* readonly */
