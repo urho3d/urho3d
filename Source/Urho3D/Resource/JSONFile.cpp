@@ -238,7 +238,7 @@ bool JSONFile::FromString(const String & source)
     return Load(buffer);
 }
 
-String JSONFile::ToString(const String& indendation)
+String JSONFile::ToString(const String& indendation) const
 {
     rapidjson::Document document;
     ToRapidjsonValue(document, root_, document.GetAllocator());
