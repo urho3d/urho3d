@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 
 plugins {
@@ -103,6 +104,8 @@ dependencies {
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
 }
 
+lateinit var docABI: String
+
 afterEvaluate {
     // Part of the our external native build tree resided in Gradle buildDir
     // When the buildDir is cleaned then we need a way to re-configure that part back
@@ -110,8 +113,7 @@ afterEvaluate {
     tasks {
         getByName("clean") {
             doLast {
-                delete(android.externalNativeBuild.cmake.buildStagingDirectory
-                        ?: project.file(".externalNativeBuild"))
+                delete(cmakeStagingDir())
             }
         }
     }
@@ -129,13 +131,15 @@ afterEvaluate {
             create("zipBuildTreeConfigurer$config") {
                 val externalNativeBuildDir = File(buildDir, "tree/$config")
                 doLast {
-                    tasks.getByName<Zip>("zipBuildTree$config") {
-                        externalNativeBuildDir.list()?.forEach { abi ->
-                            listOf("include", "lib").forEach {
-                                from(File(externalNativeBuildDir, "$abi/$it")) {
-                                    into("tree/$config/$abi/$it")
-                                }
+                    val zipTask = tasks.getByName<Zip>("zipBuildTree$config")
+                    externalNativeBuildDir.list()?.forEach { abi ->
+                        listOf("include", "lib").forEach {
+                            zipTask.from(File(externalNativeBuildDir, "$abi/$it")) {
+                                into("tree/$config/$abi/$it")
                             }
+                        }
+                        if (config == "Release") {
+                            docABI = abi
                         }
                     }
                 }
@@ -149,6 +153,29 @@ tasks {
         classifier = "sources"
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
+    create<Exec>("makeDoc") {
+        // Ignore the exit status on Windows host system because Doxygen may not return exit status correctly on Windows
+        isIgnoreExitValue = OperatingSystem.current().isWindows
+        executable = "ninja"
+        args("doc")
+        dependsOn("makeDocConfigurer")
+        mustRunAfter("zipBuildTreeRelease")
+    }
+    create<Zip>("documentationZip") {
+        classifier = "documentation"
+        dependsOn("makeDoc")
+    }
+    create("makeDocConfigurer") {
+        doLast {
+            val workingDir = File(cmakeStagingDir(), "cmake/release/$docABI")
+            tasks.getByName<Exec>("makeDoc").workingDir = workingDir
+            tasks.getByName<Zip>("documentationZip") {
+                from(File(workingDir, "Docs/html")) {
+                    into("docs")
+                }
+            }
+        }
+    }
 }
 
 publishing {
@@ -160,6 +187,9 @@ publishing {
                 }
             }
             artifact(tasks.getByName("sourcesJar"))
+            artifact(tasks.getByName("documentationZip"))
         }
     }
 }
+
+fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".externalNativeBuild")
