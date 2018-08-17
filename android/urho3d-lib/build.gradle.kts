@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+import org.gradle.internal.io.NullOutputStream
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 
@@ -156,8 +157,8 @@ tasks {
     create<Exec>("makeDoc") {
         // Ignore the exit status on Windows host system because Doxygen may not return exit status correctly on Windows
         isIgnoreExitValue = OperatingSystem.current().isWindows
-        executable = "ninja"
-        args("doc")
+        standardOutput = NullOutputStream.INSTANCE
+        args("--build", ".", "--target", "doc")
         dependsOn("makeDocConfigurer")
         mustRunAfter("zipBuildTreeRelease")
     }
@@ -167,10 +168,14 @@ tasks {
     }
     create("makeDocConfigurer") {
         doLast {
-            val workingDir = File(cmakeStagingDir(), "cmake/release/$docABI")
-            tasks.getByName<Exec>("makeDoc").workingDir = workingDir
+            val buildTree = File(cmakeStagingDir(), "cmake/release/$docABI")
+            tasks.getByName<Exec>("makeDoc") {
+                // This is a hack - expect the first line to contain the path to the embedded CMake executable
+                executable = File(buildTree, "cmake_build_command.txt").readLines().first().split(":").last().trim()
+                workingDir = buildTree
+            }
             tasks.getByName<Zip>("documentationZip") {
-                from(File(workingDir, "Docs/html")) {
+                from(File(buildTree, "Docs/html")) {
                     into("docs")
                 }
             }
