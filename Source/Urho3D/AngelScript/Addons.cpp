@@ -2290,11 +2290,6 @@ void RegisterDictionary(asIScriptEngine *engine)
 }
 
 
-static String StringFactory(asUINT length, const char* s)
-{
-    return String(s, length);
-}
-
 static void ConstructString(String* ptr)
 {
     new(ptr) String();
@@ -2483,10 +2478,11 @@ static void StringSetUTF8FromLatin1(const String& src, String& str)
 void RegisterString(asIScriptEngine *engine)
 {
     static const unsigned NPOS = String::NPOS; // workaround for GCC
+    static StringFactory stringFactory;
 
     engine->RegisterGlobalProperty("const uint NPOS", (void*)&NPOS);
     engine->RegisterObjectType("String", sizeof(String), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
-    engine->RegisterStringFactory("String", asFUNCTION(StringFactory), asCALL_CDECL);
+    engine->RegisterStringFactory("String", &stringFactory);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructString), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructString), asCALL_CDECL_OBJLAST);
@@ -2555,6 +2551,35 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "String& opAddAssign(bool)", asFUNCTION(StringAddAssignBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(bool) const", asFUNCTION(StringAddBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd_r(bool) const", asFUNCTION(StringAddBoolReverse), asCALL_CDECL_OBJLAST);
+}
+
+const void* StringFactory::GetStringConstant(const char* data, asUINT length)
+{
+    assert(strlen(data) == length);
+
+    StringHash hash(data);
+    auto iter = map_.Find(hash);
+    return reinterpret_cast<const void*>(&(iter == map_.End() ? map_.Insert(MakePair(hash, String(data))) : iter)->second_);
+}
+
+int StringFactory::ReleaseStringConstant(const void* str)
+{
+    // Cache all the strings
+    return str ? asSUCCESS : asERROR;
+}
+
+int StringFactory::GetRawStringData(const void* str, char* data, asUINT* length) const
+{
+    if (!str)
+        return asERROR;
+
+    auto p = reinterpret_cast<const String*>(str);
+    if (length)
+        *length = p->Length();
+    if (data)
+        memcpy(data, p->CString(), p->Length());
+
+    return asSUCCESS;
 }
 
 }

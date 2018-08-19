@@ -51,15 +51,16 @@ public:
     }
 
     /// Read from stream (no-op).
-    void Read(void* ptr, asUINT size) override
+    int Read(void* ptr, asUINT size) override
     {
         // No-op, can not read from a Serializer
+        return 0;
     }
 
     /// Write to stream.
-    void Write(const void* ptr, asUINT size) override
+    int Write(const void* ptr, asUINT size) override
     {
-        dest_.Write(ptr, size);
+        return dest_.Write(ptr, size);
     }
 
 private:
@@ -78,14 +79,15 @@ public:
     }
 
     /// Read from stream.
-    void Read(void* ptr, asUINT size) override
+    int Read(void* ptr, asUINT size) override
     {
-        source_.Read(ptr, size);
+        return source_.Read(ptr, size);
     }
 
     /// Write to stream (no-op).
-    void Write(const void* ptr, asUINT size) override
+    int Write(const void* ptr, asUINT size) override
     {
+        return 0;
     }
 
 private:

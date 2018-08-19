@@ -624,10 +624,10 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         else if (mode == C_HEADER)
             Log::WriteRaw("\nenum " + String(enumType->GetName()) + "\n{\n");
 
-        for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
+        for (unsigned j = 0; j < enumType->GetEnumValueCount(); ++j)
         {
             int value = 0;
-            const char* name = scriptEngine_->GetEnumValueByIndex(typeId, j, &value);
+            const char* name = enumType->GetEnumValueByIndex(j, &value);
             OutputAPIRow(mode, String(name), false, ",");
         }
 
