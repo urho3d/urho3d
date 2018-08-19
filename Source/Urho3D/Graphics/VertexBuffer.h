@@ -100,7 +100,7 @@ public:
     unsigned GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { const VertexElement* element = GetElement(type, semantic, index); return element ? element->offset_ : M_MAX_UNSIGNED; }
 
     /// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
-    unsigned GetElementMask() const { return elementMask_; }
+    VertexMaskFlags GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
@@ -155,7 +155,7 @@ private:
     /// Vertex element hash.
     unsigned long long elementHash_{};
     /// Vertex element legacy bitmask.
-    unsigned elementMask_{};
+    VertexMaskFlags elementMask_{};
     /// Buffer locking state.
     LockState lockState_{LOCK_NONE};
     /// Lock start vertex.

@@ -2981,13 +2981,14 @@ Each attribute can have a combination of the following flags:
 - `AM_NODEID`: Is a node ID and may need rewriting when instantiating scene content.
 - `AM_COMPONENTID`: Is a component ID and may need rewriting when instantiating scene content.
 
+
 The default flags are `AM_FILE` and `AM_NET`. Note that it is legal to define neither `AM_FILE` or `AM_NET`, meaning the attribute has only run-time significance (perhaps for editing.)
 
 See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
 \page Network Networking
 
-The Network subsystem provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
+The Network subsystem provides reliable and unreliable UDP messaging using SLikeNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
 
 %Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 30 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
@@ -3002,6 +3003,24 @@ Starting the server and connecting to it both happen through the Network subsyst
 Note the scene (to be used for replication) and identity VariantMap supplied as parameters when connecting. The identity data can contain for example the user name or credentials, it is completely application-specified. The identity data is sent right after connecting and causes the E_CLIENTIDENTITY event to be sent on the server when received. By subscribing to this event, server code can examine incoming connections and accept or deny them. The default is to accept all connections.
 
 After connecting successfully, client code can get the Connection object representing the server connection, see \ref Network::GetServerConnection "GetServerConnection()". Likewise, on the server a Connection object will be created for each connected client, and these can be iterated through. This object is used to send network messages or remote events to the remote peer, to assign the client into a scene (on the server only), or to disconnect.
+
+\section Network_NAT_Punchtrough NAT punchtrough
+
+It is possible to use NAT punchtrough functionality with network subsystem. This requires NAT punchtrough master server to be running on a public host. To set it up you first have to tell the networking subsystem the IP address or a domain name to NAT punchtrough master server, to do this, call \ref Network::SetNATServerInfo "SetNATServerInfo()".
+
+Server:
+Server should be started first by calling \ref Network::StartServer "StartServer()" and after that \ref Network::StartNATClient "StartNATClient()". If connection to NAT punchtrough master server succeeds, unique GUID will be generated. Clients should use this generated GUID to connect to this server.
+
+Client:
+When server has been successfully started and connected with NAT punchtrough master server, clients should connect to server by calling \ref Network::AttemptNATPunchtrough "AttemptNATPunchtrough()" and pass in the server generated GUID.
+
+For a demonstration, check example 52_NATPunchtrough.
+
+\section Network_Lan_Discovery Lan Discovery
+
+Network subsystem supports LAN discovery mode to search for running servers. When creating server you can set what data should be sent to the network when someone starts LAN discovery mode, see \ref Network::SetDiscoveryBeacon "SetDiscoveryBeacon()". This data can contain any information about the server. To start LAN discovery mode you should call \ref Network::DiscoverHosts "DiscoverHosts()". When server is found, "NetworkHostDiscovered" event will be sent out.
+
+For a demonstration, check example 53_LANDiscovery.
 
 \section Network_Replication Scene replication
 
@@ -3077,7 +3096,7 @@ The event includes the attribute name, index, new value as a Variant, and the la
 
 \section Network_Messages Raw network messages
 
-All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+All network messages have an integer ID. The first ID you can use for custom messages is 153 (lower ID's are either reserved for SLikeNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
 
 To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
 

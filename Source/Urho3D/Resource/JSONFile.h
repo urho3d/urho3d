@@ -50,6 +50,8 @@ public:
 
     /// Deserialize from a string. Return true if successful.
     bool FromString(const String& source);
+    /// Save to a string.
+    String ToString(const String& indendation = "\t") const;
 
     /// Return root value.
     JSONValue& GetRoot() { return root_; }

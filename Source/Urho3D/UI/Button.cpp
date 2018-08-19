@@ -146,7 +146,7 @@ void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     SetPressed(true);
 }
 
-void Button::OnKey(int key, int buttons, int qualifiers)
+void Button::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {

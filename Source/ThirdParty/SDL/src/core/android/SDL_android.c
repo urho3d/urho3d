@@ -718,8 +718,10 @@ JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(nativeQuit)(
     // Urho3D: added log print
     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeQuit()");
     // Urho3D: Free the memory that we allocate during init
-    if (mFilesDir)
+    if (mFilesDir) {
         free(mFilesDir);
+        mFilesDir = 0;
+    }
 
     /* Discard previous events. The user should have handled state storage
      * in SDL_APP_WILLENTERBACKGROUND. After nativeQuit() is called, no

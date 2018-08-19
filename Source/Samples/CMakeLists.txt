@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_SAMPLES)
+    return ()
+endif ()
+
 # Set project name
 project (Urho3D-Samples)
 

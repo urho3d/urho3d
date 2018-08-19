@@ -164,7 +164,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
     // Use a shared ptr for managing the temporary mip images created during this function
     SharedPtr<Image> mipImage;
     unsigned memoryUse = sizeof(Texture3D);
-    int quality = QUALITY_HIGH;
+    MaterialQuality quality = QUALITY_HIGH;
     auto* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();

@@ -198,7 +198,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
     // Use a shared ptr for managing the temporary mip images created during this function
     SharedPtr<Image> mipImage;
     unsigned memoryUse = 0;
-    int quality = QUALITY_HIGH;
+    MaterialQuality quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();

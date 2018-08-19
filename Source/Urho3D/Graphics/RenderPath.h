@@ -161,7 +161,7 @@ struct URHO3D_API RenderPathCommand
     /// Depth-stencil output name.
     String depthStencilName_;
     /// Clear flags. Affects clear command only.
-    unsigned clearFlags_{};
+    ClearTargetFlags clearFlags_{};
     /// Clear color. Affects clear command only.
     Color clearColor_;
     /// Clear depth. Affects clear command only.

@@ -106,7 +106,7 @@ void Texture::SetBackupTexture(Texture* texture)
     backupTexture_ = texture;
 }
 
-void Texture::SetMipsToSkip(int quality, int toSkip)
+void Texture::SetMipsToSkip(MaterialQuality quality, int toSkip)
 {
     if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
     {
@@ -121,7 +121,7 @@ void Texture::SetMipsToSkip(int quality, int toSkip)
     }
 }
 
-int Texture::GetMipsToSkip(int quality) const
+int Texture::GetMipsToSkip(MaterialQuality quality) const
 {
     return (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS) ? mipsToSkip_[quality] : 0;
 }

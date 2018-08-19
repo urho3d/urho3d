@@ -42,7 +42,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
-- For Android, the Android SDK (version 12 or later) and Android NDK (r7 or later) need to be installed.
+- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed. The "ninja" build tool needs to be installed globally for host-tool building such as when building with Lua/LuaJIT subsystem enabled.
 
 - For Web, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
@@ -56,7 +56,7 @@ To run Urho3D, the minimum system requirements are:
 
 - Raspberry Pi: %Model B revision 2.0 with at least 128 MB of 512 MB SDRAM allocated for GPU.
 
-- Android: OS version 2.3 or newer, OpenGL ES 2.0 capable GPU.
+- Android: Jelly Bean 4.1 (API level 16) or newer, OpenGL ES 2.0 capable GPU.
 
 - iOS: armv7, iPhone 3GS or newer including iPad, OS version 3 or newer.
 
@@ -72,7 +72,7 @@ CMake (https://www.cmake.org) is required to configure and generate the Urho3D p
 
 \section Build_Scripts Build scripts
 
-As this is a cross-platform project, we have provided a number of build scripts for the most common use cases. The shell scripts end with extension *.sh are meant for building Urho3D project in a Unix-like host system (Linux, Mac, and even Raspberry Pi), while the batch files end with *.bat are meant for Windows host system only. They only provide a convenient way to invoke CMake to process our CMakeLists.txt files. Their usage is not a must as you can also invoke CMake to do the same via cmake-gui or via your IDE when your IDE supports that.
+As this is a cross-platform project, we have provided a number of build scripts in the "script" directory for the most common use cases, with the exception for Android platform. The shell scripts end with extension *.sh are meant for building Urho3D project in a Unix-like host system (Linux, Mac, and even Raspberry Pi), while the batch files end with *.bat are meant for Windows host system only. They only provide a convenient way to invoke CMake to process our CMakeLists.txt files. Their usage is not a must as you can also invoke CMake to do the same via cmake-gui or via your IDE when your IDE supports that.
 
 The basic usage is as follows:
 
@@ -92,12 +92,14 @@ Naturally you have to specify a fully qualified path to the build script for thi
 
 Our CMakeLists.txt files are designed to work with most of the generators supported by CMake: Makefile, Xcode, VS, and even Ninja. Which build script to use is determined by which CMake generator (and toolchain) you intend to use in your build tree. For native build, you can just use cmake_generic.sh or cmake_generic.bat to let CMake to detect and decide which generator to use automatically. CMake should default to use "Unix Makefiles" generator on Linux and Mac host systems and it should default to use 32-bit "Visual Studio" generator on Windows host system when it is installed.
 
+Since Urho3D version 1.8 we have integrated with Gradle build system for Android platform. We have provided Gradle wrapper script and batch file at the project root directory to interface with Gradle build system. Currently it is the only platform that does not allow user to interface with CMake build system directly. See \ref Building_Android for more detail.
+
 \section Build_Options Build options
 
-A number of build options can be defined when invoking the build scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes. Most of the build options are boolean variables where setting their values to 0 means disabling a feature or setting an option to false, while 1 means enabling a feature or setting an option to true. The table below shows all the available build options and their default values. Non-boolean build options generally do not have any default values and are marked with '-' in the table. However, a few build options marked with '*' have their default values set differently based on the value of other variables or external factors.
+A number of build options can be defined when invoking the build scripts or when configuring the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes. Most of the build options are boolean variables where setting their values to 0 means disabling a feature or setting an option to false, while 1 means enabling a feature or setting an option to true. The table below shows all the available build options and their default values. Non-boolean build options generally do not have any default values and are marked with '-' in the table. However, a few build options marked with '*' have their default values set differently based on the value of other variables or external factors.
+
 |Build Option         |Value|Description          |
 |---------------------|-----|---------------------|
-|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Android toolchain file for cross-compiling explicitly|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
 |WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
 |WEB                  |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
@@ -115,6 +117,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
+|URHO3D_PLAYER        |1|Build Urho3D script player|
 |URHO3D_SAMPLES       |1|Build sample applications|
 |URHO3D_TOOLS         |1|Build tools (native, RPI, and ARM on Linux only)|
 |URHO3D_EXTRAS        |0|Build extras (native, RPI, and ARM on Linux only)|
@@ -129,7 +132,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_SSE           |*|Enable SIMD instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
-|URHO3D_HASH_DEBUG    |0|Enable StringHash reversing and hash collision detection at the expense of memory and performance penalty|
+|URHO3D_HASH_DEBUG    |0|Enable %StringHash reversing and hash collision detection at the expense of memory and performance penalty|
 |URHO3D_PACKAGING     |0|Enable resources packaging support|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
@@ -152,12 +155,7 @@ A number of build options can be defined when invoking the build scripts or when
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.9|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iOS deployment target (iOS platform only); default to latest installed iOS SDK if not specified, the minimum supported target is 3.0 due to constraint from SDL library|
-|APPLETVOS_DEPLOYMENT_TARGET|-|Specify AppleTV OS deployment target (tvOS platform only); default to latest installed tvOS SDK if not specified, the minimum spported target is 9.0|
-|ANDROID_NDK          |-|Path to Android NDK (Android platform only)|
-|ANDROID_TOOLCHAIN_NAME|*|Specify the name of compiler toolchain (Android platform only), possible values depends on installed Android NDK, default to Clang compiler toolchain|
-|ANDROID_ABI          |*|Specify target ABI (Android platform only), possible values depends on the target arch of the chosen Android compiler toolchain, default to first ABI of each target arch|
-|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android platform only), possible values depends on installed NDK version, default to 'android-9' on 32-bit ABIs, default to 'android-21' on 64-bit ABIs|
-|ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
+|APPLETVOS_DEPLOYMENT_TARGET|-|Specify AppleTV OS deployment target (tvOS platform only); default to latest installed tvOS SDK if not specified, the minimum supported target is 9.0|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
 |MINGW_SYSROOT        |-|Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
@@ -217,29 +215,52 @@ To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to e
 
 \section Building_Android Android build process
 
-First, if you are building under Windows host without MKLINK support then copy bin/Data and bin/CoreData directories to the Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for Windows host with MKLINK support and other non-Windows host systems.
+First, if you are building under Windows host then after checking out the project you need to prepare the "assets" directory of both the "urho3d-lib" and "launcher-app" modules. Due to a bug in Android plugin of the version we are currently using, where it does not honor custom source set with filter setting, we are forced to use asset symlink with the default source set. So in Windows host system, the asset symlinks must be replaced with an equivalent directory link created with MKLINK command. If your account does not allow you to use MKLINK command then use copy command instead to copy the content of the linked directory directly to the "assets" directory. Ensure you have preserved the directory structure, i.e. "urho3d-lib" assets directory has one subdir called "CoreData", while "launcher-app" assets directory has two subdirs: "Data" and "Autoload".
 
-Set the ANDROID_NDK environment variable to point to your Android NDK. On Windows, ensure that make.exe from the Android NDK is included in the path and is executable from the command line.
+Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location. Ensure the "ninja" build tool is globally installed when you intend to build Urho3D with subsystems that require host tool building, such as Lua/LuaJIT subsystem.
 
-On Windows host, execute cmake_android.bat. On Mac or Linux host, execute cmake_android.sh. Then go to the build tree and execute the below commands to start the build.
+For CLI user, build the Gradle modules with the following command:
 
 \verbatim
-- make -j <num_jobs>
-- android update project -p . -t <target-id>
-- ant debug
+./gradlew build
 \endverbatim
 
-You only need to update the Android project once in each new build tree, use the -t <target-id> option when you want to modify the target SDK version. The <target-id> is one of the target id returned by "android list target" command (or "android list target |grep android-" when you are on *nix host system). The <num-jobs> is the number of concurrent compiler jobs to be spawned by make command.
+or on Windows host:
 
-After the commands finish successfully, the APK should have been generated in the build tree's "bin" subdirectory, from where it can be installed on a device or an emulator. The command "ant installd" can be used for this. Optionally when you have Rake installed, after the debug APK has been installed then you can use "rake android" command to automate the test running of the APK on an attached Android (virtual) device.
+\verbatim
+gradlew.bat build
+\endverbatim
 
-For a release build, use the "ant release" command instead of "ant debug" and follow the Android SDK instructions on how to sign your APK properly.
+After the command finishes successfully, the AAR (Android library) and the APK (Android application) should have been generated in the "build/output" directory of the respective Gradle modules.
 
-By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
+For Android Studio user, open the project using the IDE. It should prompt you to auto-import the Gradle project, accept the default. After the “gradle sync” completes without any error, press Ctrl+F9 to build the project or Shift+F10 to run the launcher app in the Android device or emulator.
 
-Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by reconfiguring the build tree again with the build option "-DANDROID_ABI=armeabi" added, then execute make again in the build directory. Similarly, the native code can be built using 64-bit ABI by changing the value of this build option. See \ref Build_Options for all the possible values. Note that CMake doesn't allow changing of its compiler settings in an existing build tree, so before reconfiguring to use an incompatible ANDROID_ABI most likely you need to clean the CMake cache first.
+The Gradle build script has been setup to automatically pass the matching Gradle properties as CMake build options. The following is the list of supported Gradle properties.
 
-You can also build and deploy using Eclipse IDE with ADT plugin. To do that, execute cmake_eclipse.sh with "-DANDROID=1" build option set. Import "Existing Android Code into Workspace" from the CMake generated Eclipse project file in the build tree. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target. Choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
+|Gradle Property|Description    |
+|---------------|---------------|
+|ANDROID_ABI|A comma-separated list of ABIs for split build configuration; when not specified defaults to universal build|
+|URHO3D_ANGELSCRIPT|Pass-through as CMake build option|
+|URHO3D_DATABASE_SQLITE|Pass-through as CMake build option|
+|URHO3D_FILEWATCHER|Pass-through as CMake build option|
+|URHO3D_IK|Pass-through as CMake build option|
+|URHO3D_LIB_TYPE|Pass-through as CMake build option|
+|URHO3D_LUA|Pass-through as CMake build option|
+|URHO3D_LUAJIT|Pass-through as CMake build option|
+|URHO3D_LUAJIT_AMALG|Pass-through as CMake build option|
+|URHO3D_LOGGING|Pass-through as CMake build option|
+|URHO3D_NAVIGATION|Pass-through as CMake build option|
+|URHO3D_NETWORK|Pass-through as CMake build option|
+|URHO3D_PCH|Pass-through as CMake build option|
+|URHO3D_PLAYER|Pass-through as CMake build option|
+|URHO3D_PHYSICS|Pass-through as CMake build option|
+|URHO3D_PROFILING|Pass-through as CMake build option|
+|URHO3D_SAMPLES|Pass-through as CMake build option|
+|URHO3D_THREADING|Pass-through as CMake build option|
+|URHO3D_URHO2D|Pass-through as CMake build option|
+|URHO3D_WEBP|Pass-through as CMake build option|
+
+The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P URHO3D_LUA=0 build" to build without Lua subsystem.
 
 \section Building_iOS_tvOS iOS and tvOS build process (tvOS is still EXPERIMENTAL)
 
@@ -282,7 +303,7 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 \section Building_Emscripten Emscripten build process
 
 > WHAT DOESN'T WORK:
->    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
+>    - Networking. Javascript can only use http and websockets protocols and at the moment it's not supported.
 
 This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain on your host system as per described in https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
 
@@ -310,6 +331,8 @@ If CMake complains that emcc is not able to compile a test program, try reactiva
 When using MSVC compiler, Urho3D common CMake module configures the build tree to target a 32-bit platform by default. When using other non-MSVC compilers (like GCC or Clang), the module sets the default to 32-bit or 64-bit based on the chosen toolchain in the build tree. You can, however, use the "URHO3D_64BIT" build option to override the default, i.e. by setting the option to '0' (for 32-bit) and '1' (for 64-bit) explicitly.
 
 \section Building_Library Library build
+
+> This section is not applicable for Android platform, which publishes the Android library (AAR) among other artifacts using maven-publish Gradle plugin.
 
 The build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.
 
@@ -687,7 +710,7 @@ As its name implies, this task just creates a basic project structure for your n
 
 On Windows host system, this task requires privilege to create symlinks by using mklink command. The task would fail when the Windows user account does not have that privilege. We strongly advise you not to use "Administrator" account just for this purpose. Instead, grant your "normal" user account to have the privilege correctly.
 
-WARNING: As of this writing, this rake scaffolding task does not yet create a complete new project suitable for Android platform. You need to supply the missing bits manually yourself for now.
+WARNING: As of this writing, this rake scaffolding task does not yet create a complete new project suitable for Android platform. In future a custom Gradle scaffolding task will be added to perform this job. You need to supply the missing bits manually yourself for now.
 
 The Ruby and Rake are not prerequisite software components for building Urho3D and your projects. However, if you are reading this section this far and that your host system actually already has them installed then you can take advantage of them by utilising the 'rake cmake' and 'rake make' tasks. The former configures and generates the build tree (by invoking one of our build scripts under the hood) and the latter builds the project in the generated build tree (by invoking 'cmake --build' command which in turns calls the respective build tools, such as 'make' or 'xcodebuild', or 'MSBuild.exe') at the convenient of your finger tips in a command line interface.
 

@@ -75,7 +75,7 @@ task :cmake do
       build_options = "#{build_options} -D#{option}" unless /build_tree=.*/ =~ option || script == 'cmake_clean'
     end
   }
-  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "build/#{platform}"
   if ENV['OS']
     # CMake claims mingw32-make does not build correctly with MSYS shell in the PATH env-var and prevents build tree generation if so
     # Our CI on Windows host requires MSYS shell, so we cannot just simply remove it from the PATH globally
@@ -85,7 +85,7 @@ task :cmake do
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
   end
-  system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
+  system "#{ccache_envvar} script/#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
 
 # Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
@@ -131,7 +131,7 @@ task :make do
       end
     end
   }
-  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "build/#{platform}"
   if ENV['OS']
     # While calling mingw-32-make itself does not require the PATH to be altered (as long as it is not inside an MSYS shell),
     # we have to do it again here because our build system invokes CMake internally to generate things on-the-fly as part of the build process
@@ -182,7 +182,7 @@ end
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=21] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
 desc 'Test run APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
-  parameter = ENV['parameter'] || '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'
+  parameter = ENV['parameter'] || '--es argument NinjaSnowWar.as'
   intent = ENV['intent'] || '.SampleLauncher'
   package = ENV['package'] || 'com.github.urho3d'
   success_indicator = ENV['success_indicator'] || 'Initialized engine'
@@ -192,7 +192,7 @@ task :android do
   avd = ENV['avd'] || "test_#{api}_#{abi}"
   retries = ENV['retries'] || 10 # minutes
   retry_interval = ENV['retry_interval'] || 10 # seconds
-  build_tree = ENV['android_build_tree'] || ENV['build_tree'] || '../android-Build'
+  build_tree = ENV['android_build_tree'] || ENV['build_tree'] || './android-Build'
   install = false
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
@@ -641,11 +641,6 @@ task :ci_package_upload do
     # TODO: There is a bug in CMake/CPack that causes the 'package' target failed to build for iOS and tvOS platforms, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
     system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
   else
-    if ENV['ANDROID']
-      if !ENV['NO_SDK_SYSIMG']
-        system 'cd ../Build && android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
-      end
-    end
     if ENV['URHO3D_USE_LIB64_RPM']
       system 'rake cmake' or abort 'Failed to reconfigure to generate 64-bit RPM package'
       system "rm #{ENV['build_tree']}/Urho3D-*" or abort 'Failed to remove previously generated artifacts'  # This task can be invoked more than one time
@@ -775,9 +770,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform and avoid forward/backward slash conversion
   if ENV['OS']
-    system("@echo off && mkdir \"#{dir}\"\\bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* \"#{dir}\" >nul && (for %f in (*.bat Rakefile) do mklink \"#{dir}\"\\%f %cd%\\%f >nul) && mklink /D \"#{dir}\"\\CMake %cd%\\CMake && (for %d in (Autoload,CoreData,Data) do mklink /D \"#{dir}\"\\bin\\%d %cd%\\bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
+    system("@echo off && mkdir \"#{dir}\"\\bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* \"#{dir}\" >nul && (for %f in (script CMake) do mklink /D \"#{dir}\"\\%f %cd%\\%f >nul) && mklink \"#{dir}\"\\Rakefile %cd%\\Rakefile && (for %d in (Autoload,CoreData,Data) do mklink /D \"#{dir}\"\\bin\\%d %cd%\\bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
   else
-    system("bash -c \"mkdir -p '#{dir}'/bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* '#{dir}' && for f in {.,}*.sh Rakefile CMake; do ln -sf `pwd`/\\$f '#{dir}'; done && ln -sf `pwd`/bin/{Autoload,CoreData,Data} '#{dir}'/bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
+    system("bash -c \"mkdir -p '#{dir}'/bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* '#{dir}' && for f in script Rakefile CMake; do ln -snf `pwd`/\\$f '#{dir}'; done && ln -snf `pwd`/bin/{Autoload,CoreData,Data} '#{dir}'/bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to scaffolding'
   end
   return dir
 end

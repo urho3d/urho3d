@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Input/InputConstants.h"
 #include "../UI/ScrollView.h"
 
 namespace Urho3D
@@ -52,7 +53,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// React to a key press.
-    void OnKey(int key, int buttons, int qualifiers) override;
+    void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
     /// React to resize.
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 

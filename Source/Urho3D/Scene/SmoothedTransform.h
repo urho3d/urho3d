@@ -27,12 +27,16 @@
 namespace Urho3D
 {
 
-/// No ongoing smoothing.
-static const unsigned SMOOTH_NONE = 0;
-/// Ongoing position smoothing.
-static const unsigned SMOOTH_POSITION = 1;
-/// Ongoing rotation smoothing.
-static const unsigned SMOOTH_ROTATION = 2;
+enum SmoothingType : unsigned
+{
+    /// No ongoing smoothing.
+    SMOOTH_NONE = 0,
+    /// Ongoing position smoothing.
+    SMOOTH_POSITION = 1,
+    /// Ongoing rotation smoothing.
+    SMOOTH_ROTATION = 2,
+};
+URHO3D_FLAGSET(SmoothingType, SmoothingTypeFlags);
 
 /// Transform smoothing component for network updates.
 class URHO3D_API SmoothedTransform : public Component
@@ -70,7 +74,7 @@ public:
     Quaternion GetTargetWorldRotation() const;
 
     /// Return whether smoothing is in progress.
-    bool IsInProgress() const { return smoothingMask_ != 0; }
+    bool IsInProgress() const { return smoothingMask_ != SMOOTH_NONE; }
 
 protected:
     /// Handle scene node being assigned at creation.
@@ -85,7 +89,7 @@ private:
     /// Target rotation.
     Quaternion targetRotation_;
     /// Active smoothing operations bitmask.
-    unsigned char smoothingMask_;
+    SmoothingTypeFlags smoothingMask_;
     /// Subscribed to smoothing update event flag.
     bool subscribed_;
 };

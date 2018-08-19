@@ -1,0 +1,110 @@
+#This file includes the global macros for the RakNet CMake files
+
+#
+# This file was taken from RakNet 4.082.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+#
+# Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+#
+# This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+# license found in the license.txt file in the root directory of this source tree.
+#
+
+MACRO(STANDARDSUBPROJECT PROJECTNAME)#Many of the projects just need the cpp files compiled and the header added to the project, this avoids repeating code
+	project(${PROJECTNAME})
+	FILE(GLOB ALL_CPP_SRCS *.cpp)
+	FILE(GLOB ALL_HEADER_SRCS *.h)
+	include_directories(${RAKNETHEADERFILES} ./) 
+	FIXCOMPILEOPTIONS()
+	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS})
+	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS})
+	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
+ENDMACRO(STANDARDSUBPROJECT)
+
+MACRO(STANDARDSUBPROJECTWITHOPTIONS PROJECTNAME EXTRAINCLUDES EXTRASOURCES EXTRALIBS)#Same as STANDARDSUBPROJECT but allows options changing
+	project(${PROJECTNAME})
+	FILE(GLOB ALL_CPP_SRCS *.cpp)
+	FILE(GLOB ALL_HEADER_SRCS *.h)
+	FIXCOMPILEOPTIONS()
+	include_directories(${RAKNETHEADERFILES} ./ ${EXTRAINCLUDES}) 
+	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${EXTRASOURCES})
+	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS} ${EXTRALIBS})
+	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
+ENDMACRO(STANDARDSUBPROJECTWITHOPTIONS)
+
+MACRO(STANDARDSUBPROJECTWITHOPTIONSSET PROJECTNAME)#Same as STANDARDSUBPROJECT but allows options changing, Items are passed by setting them for times when passing variable to the macro doesn't work
+	project(${PROJECTNAME})
+	FILE(GLOB ALL_CPP_SRCS *.cpp)
+	FILE(GLOB ALL_HEADER_SRCS *.h)
+	FIXCOMPILEOPTIONS()
+	include_directories(${RAKNETHEADERFILES} ./ ${EXTRAINCLUDES}) 
+	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${EXTRASOURCES})
+	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS} ${EXTRALIBS})
+	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
+ENDMACRO(STANDARDSUBPROJECTWITHOPTIONSSET) 
+
+MACRO(STANDARDCSUBPROJECT PROJECTNAME)#Same as STANDARDSUBPROJECT but for C files
+	project(${PROJECTNAME})
+	FILE(GLOB ALL_C_SRCS *.c)
+	FILE(GLOB ALL_HEADER_SRCS *.h)
+	include_directories(${RAKNETHEADERFILES} ./) 
+	FIXCOMPILEOPTIONS()
+	add_executable(${PROJECTNAME} ${ALL_C_SRCS} ${ALL_HEADER_SRCS})
+	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS})
+	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
+ENDMACRO(STANDARDCSUBPROJECT)
+
+MACRO(GETCURRENTFOLDER)#Gets the current foldername without the path
+	string(REGEX REPLACE
+	  ".+/(.?)"
+	  "\\1"
+	  current_folder "${CMAKE_CURRENT_SOURCE_DIR}")
+ENDMACRO(GETCURRENTFOLDER)
+
+MACRO(VSUBFOLDER PROJECTNAME FOLDERNAME)#A macro interface for adding solution folders with a patched cmake
+	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP ${FOLDERNAME})
+ENDMACRO(VSUBFOLDER)
+
+MACRO(STANDARDNOTFOUNDMESSAGE NAME PLIBRARIES PINCLUDES EXTRA_INFORMATION)#If the libraries are not found, what to display
+	message(STATUS "${NAME} was not found, paths were set to:\nLibrary: ${PLIBRARIES}\nInclude: ${PINCLUDES}\n${EXTRA_INFORMATION}The project will not compile unless installed to those locations.\nAs an alternative you can install the libraries and rerun cmake\n and see if the autosearch finds them")
+ENDMACRO(STANDARDNOTFOUNDMESSAGE)
+
+MACRO(ADDCPPDEF DEF)#Currently replaces CXX flags with a define for WIN32 projects, may be changed
+	IF(WIN32)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D ${DEF}")
+	ENDIF()
+ENDMACRO(ADDCPPDEF)
+
+MACRO(FIXCOMPILEOPTIONS)#Fix added compile options that may cause problems, also fix warnings
+
+	IF(NOT ${CMAKE_GENERATOR} STREQUAL "MSYS Makefiles")
+		IF(WIN32 AND NOT UNIX)
+			STRING(REGEX REPLACE "/Z[0-9a-zA-Z]+" ""  CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+			STRING(REGEX REPLACE "/Z[0-9a-zA-Z]+" ""  CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+		ADDCPPDEF(_CRT_SECURE_NO_DEPRECATE)
+		ADDCPPDEF(_CRT_NONSTDC_NO_DEPRECATE)
+		SET(CMAKE_CXX_WARNING_LEVEL 0)
+		IF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+			STRING(REGEX REPLACE "/W[0-4]" "/W0" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		ELSE(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
+		ENDIF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")# -nowarn 4018 -nowarn 4305 -nowarn 4244")
+		ENDIF(WIN32 AND NOT UNIX)
+	ENDIF(NOT ${CMAKE_GENERATOR} STREQUAL "MSYS Makefiles")
+ENDMACRO(FIXCOMPILEOPTIONS)
+
+MACRO(FIXLINKOPTIONS)#Fix added link options that may cause problems
+	IF(WIN32 AND NOT UNIX)
+		IF(NOT ${CMAKE_GENERATOR} STREQUAL "MSYS Makefiles")
+			STRING(REGEX REPLACE "/STACK:[0-9]+" ""  CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+			STRING(REGEX REPLACE "/STACK:[0-9]+" ""  CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+			STRING(REGEX REPLACE "/machine:[0-9a-zA-Z]+" ""  CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+			STRING(REGEX REPLACE "/machine:[0-9a-zA-Z]+" ""  CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+		ENDIF(NOT ${CMAKE_GENERATOR} STREQUAL "MSYS Makefiles")
+	ENDIF(WIN32 AND NOT UNIX)
+ENDMACRO(FIXLINKOPTIONS)
+
+#include(${RakNet_SOURCE_DIR}/CmakeIncludes/FindMacros.txt)#The macros for setting variables and performing finds

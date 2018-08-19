@@ -346,9 +346,10 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     newBuffer.size_ = size;
     newBuffer.reserved_ = true;
     scratchBuffers_.Push(newBuffer);
-    return newBuffer.data_.Get();
 
     URHO3D_LOGDEBUG("Allocated scratch buffer with size " + String(size));
+
+    return newBuffer.data_.Get();
 }
 
 void Graphics::FreeScratchBuffer(void* buffer)

@@ -51,7 +51,7 @@
 #endif
 
 // Identifier for the chat network messages
-const int MSG_CHAT = 32;
+const int MSG_CHAT = 153;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 
@@ -110,10 +110,13 @@ void Chat::CreateUI()
 
     UpdateButtons();
 
-    int rowHeight = chatHistoryText_->GetRowHeight();
+    float rowHeight = chatHistoryText_->GetRowHeight();
     // Row height would be zero if the font failed to load
     if (rowHeight)
-        chatHistory_.Resize((graphics->GetHeight() - 20) / rowHeight);
+    {
+        float numberOfRows = (graphics->GetHeight() - 100) / rowHeight;
+        chatHistory_.Resize(static_cast<unsigned int>(numberOfRows));
+    }
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -181,14 +184,14 @@ void Chat::UpdateButtons()
     startServerButton_->SetVisible(!serverConnection && !serverRunning);
 }
 
-void Chat::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+void Chat::HandleLogMessage(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace LogMessage;
 
     ShowChatText(eventData[P_MESSAGE].GetString());
 }
 
-void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
+void Chat::HandleSend(StringHash /*eventType*/, VariantMap& eventData)
 {
     String text = textEdit_->GetText();
     if (text.Empty())
@@ -209,7 +212,7 @@ void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
+void Chat::HandleConnect(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
     String address = textEdit_->GetText().Trimmed();
@@ -226,7 +229,7 @@ void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
+void Chat::HandleDisconnect(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
@@ -240,7 +243,7 @@ void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleStartServer(StringHash eventType, VariantMap& eventData)
+void Chat::HandleStartServer(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
     network->StartServer(CHAT_SERVER_PORT);
@@ -248,7 +251,7 @@ void Chat::HandleStartServer(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
+void Chat::HandleNetworkMessage(StringHash /*eventType*/, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
 
@@ -280,7 +283,7 @@ void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Chat::HandleConnectionStatus(StringHash eventType, VariantMap& eventData)
+void Chat::HandleConnectionStatus(StringHash /*eventType*/, VariantMap& eventData)
 {
     UpdateButtons();
 }

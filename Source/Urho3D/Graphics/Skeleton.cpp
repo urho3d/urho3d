@@ -59,7 +59,7 @@ bool Skeleton::Load(Deserializer& source)
         source.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
 
         // Read bone collision data
-        newBone.collisionMask_ = source.ReadUByte();
+        newBone.collisionMask_ = BoneCollisionShapeFlags(source.ReadUByte());
         if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
             newBone.radius_ = source.ReadFloat();
         if (newBone.collisionMask_ & BONECOLLISION_BOX)

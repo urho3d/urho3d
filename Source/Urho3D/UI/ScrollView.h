@@ -48,9 +48,9 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     void ApplyAttributes() override;
     /// React to mouse wheel.
-    void OnWheel(int delta, int buttons, int qualifiers) override;
+    void OnWheel(int delta, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
     /// React to a key press.
-    void OnKey(int key, int buttons, int qualifiers) override;
+    void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
     /// React to resize.
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 

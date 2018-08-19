@@ -268,7 +268,7 @@ bool Model::BeginLoad(Deserializer& source)
             VertexBufferMorph newBuffer;
             unsigned bufferIndex = source.ReadUInt();
 
-            newBuffer.elementMask_ = source.ReadUInt();
+            newBuffer.elementMask_ = VertexMaskFlags(source.ReadUInt());
             newBuffer.vertexCount_ = source.ReadUInt();
 
             // Base size: size of each vertex index

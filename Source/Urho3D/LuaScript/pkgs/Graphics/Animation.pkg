@@ -92,4 +92,20 @@ static Animation* AnimationClone(const Animation* animation, const String& clone
         
     return animation->Clone(cloneName).Detach();
 }
+
+#define TOLUA_DISABLE_tolua_set_AnimationTrack_unsigned_channelMask
+static int tolua_set_AnimationTrack_unsigned_channelMask(lua_State* tolua_S)
+{
+  AnimationTrack* self = (AnimationTrack*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'channelMask_'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->channelMask_ = AnimationChannelFlags((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
 $}

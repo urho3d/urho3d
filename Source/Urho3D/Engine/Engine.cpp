@@ -270,8 +270,8 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetDrawShadows(GetParameter(parameters, EP_SHADOWS, true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, EP_LOW_QUALITY_SHADOWS, false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
-        renderer->SetMaterialQuality(GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureQuality(GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
+        renderer->SetMaterialQuality((MaterialQuality)GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
+        renderer->SetTextureQuality((MaterialQuality)GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
         renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetInt());
         renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetInt());
 

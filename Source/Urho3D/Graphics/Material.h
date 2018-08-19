@@ -58,7 +58,7 @@ struct TechniqueEntry
     /// Construct with defaults.
     TechniqueEntry() noexcept;
     /// Construct with parameters.
-    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) noexcept;
+    TechniqueEntry(Technique* tech, MaterialQuality qualityLevel, float lodDistance) noexcept;
     /// Destruct.
     ~TechniqueEntry() noexcept = default;
 
@@ -67,7 +67,7 @@ struct TechniqueEntry
     /// Original technique, in case the material adds shader compilation defines. The modified clones are requested from it.
     SharedPtr<Technique> original_;
     /// Quality level.
-    int qualityLevel_;
+    MaterialQuality qualityLevel_;
     /// LOD distance.
     float lodDistance_;
 };
@@ -135,7 +135,7 @@ public:
     /// Set number of techniques.
     void SetNumTechniques(unsigned num);
     /// Set technique.
-    void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    void SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel = QUALITY_LOW, float lodDistance = 0.0f);
     /// Set additional vertex shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
     void SetVertexShaderDefines(const String& defines);
     /// Set additional pixel shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.

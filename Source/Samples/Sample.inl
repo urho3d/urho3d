@@ -280,21 +280,21 @@ void Sample::HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
         // Texture quality
         else if (key == '1')
         {
-            int quality = renderer->GetTextureQuality();
+            auto quality = (unsigned)renderer->GetTextureQuality();
             ++quality;
             if (quality > QUALITY_HIGH)
                 quality = QUALITY_LOW;
-            renderer->SetTextureQuality(quality);
+            renderer->SetTextureQuality((MaterialQuality)quality);
         }
 
         // Material quality
         else if (key == '2')
         {
-            int quality = renderer->GetMaterialQuality();
+            auto quality = (unsigned)renderer->GetMaterialQuality();
             ++quality;
             if (quality > QUALITY_HIGH)
                 quality = QUALITY_LOW;
-            renderer->SetMaterialQuality(quality);
+            renderer->SetMaterialQuality((MaterialQuality)quality);
         }
 
         // Specular lighting

@@ -106,6 +106,7 @@ Urho3D development, contributions and bugfixes by:
 - Fastran
 - Firegorilla
 - Gordon-F
+- LordGolias
 - Lumak
 - Magic.Lixin
 - Mike3D
@@ -126,6 +127,7 @@ Urho3D development, contributions and bugfixes by:
 - att
 - att-kin9
 - celeron55
+- chenjie199234
 - cosmy1
 - damu
 - dragonCASTjosh

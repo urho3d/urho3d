@@ -33,12 +33,16 @@
 namespace Urho3D
 {
 
-static const unsigned CLIPMASK_X_POS = 0x1;
-static const unsigned CLIPMASK_X_NEG = 0x2;
-static const unsigned CLIPMASK_Y_POS = 0x4;
-static const unsigned CLIPMASK_Y_NEG = 0x8;
-static const unsigned CLIPMASK_Z_POS = 0x10;
-static const unsigned CLIPMASK_Z_NEG = 0x20;
+enum ClipMask : unsigned
+{
+    CLIPMASK_X_POS = 0x1,
+    CLIPMASK_X_NEG = 0x2,
+    CLIPMASK_Y_POS = 0x4,
+    CLIPMASK_Y_NEG = 0x8,
+    CLIPMASK_Z_POS = 0x10,
+    CLIPMASK_Z_NEG = 0x20,
+};
+URHO3D_FLAGSET(ClipMask, ClipMaskFlags);
 
 void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
 {
@@ -584,15 +588,15 @@ void OcclusionBuffer::CalculateViewport()
 
 void OcclusionBuffer::DrawTriangle(Vector4* vertices, unsigned threadIndex)
 {
-    unsigned clipMask = 0;
-    unsigned andClipMask = 0;
+    ClipMaskFlags clipMask{};
+    ClipMaskFlags andClipMask{};
     bool drawOk = false;
     Vector3 projected[3];
 
     // Build the clip plane mask for the triangle
     for (unsigned i = 0; i < 3; ++i)
     {
-        unsigned vertexClipMask = 0;
+        ClipMaskFlags vertexClipMask{};
 
         if (vertices[i].x_ > vertices[i].w_)
             vertexClipMask |= CLIPMASK_X_POS;

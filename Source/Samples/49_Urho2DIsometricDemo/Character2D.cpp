@@ -81,12 +81,12 @@ void Character2D::Update(float timeStep)
     float speedX = Clamp(MOVE_SPEED_X / zoom_, 0.4f, 1.0f);
     float speedY = speedX;
 
-    if (input->GetKeyDown('A') || input->GetKeyDown(KEY_LEFT))
+    if (input->GetKeyDown(KEY_A) || input->GetKeyDown(KEY_LEFT))
     {
         moveDir = moveDir + Vector3::LEFT * speedX;
         animatedSprite->SetFlipX(false); // Flip sprite (reset to default play on the X axis)
     }
-    if (input->GetKeyDown('D') || input->GetKeyDown(KEY_RIGHT))
+    if (input->GetKeyDown(KEY_D) || input->GetKeyDown(KEY_RIGHT))
     {
         moveDir = moveDir + Vector3::RIGHT * speedX;
         animatedSprite->SetFlipX(true); // Flip sprite (flip animation on the X axis)
@@ -95,9 +95,9 @@ void Character2D::Update(float timeStep)
     if (!moveDir.Equals(Vector3::ZERO))
         speedY = speedX * moveSpeedScale_;
 
-    if (input->GetKeyDown('W') || input->GetKeyDown(KEY_UP))
+    if (input->GetKeyDown(KEY_W) || input->GetKeyDown(KEY_UP))
         moveDir = moveDir + Vector3::UP * speedY;
-    if (input->GetKeyDown('S') || input->GetKeyDown(KEY_DOWN))
+    if (input->GetKeyDown(KEY_S) || input->GetKeyDown(KEY_DOWN))
         moveDir = moveDir + Vector3::DOWN * speedY;
 
     // Move

@@ -64,7 +64,7 @@ void LogicComponent::FixedPostUpdate(float timeStep)
 {
 }
 
-void LogicComponent::SetUpdateEventMask(unsigned char mask)
+void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
 {
     if (updateEventMask_ != mask)
     {
@@ -99,7 +99,7 @@ void LogicComponent::OnSceneSet(Scene* scene)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
-        currentEventMask_ = 0;
+        currentEventMask_ = USE_NO_EVENT;
     }
 }
 

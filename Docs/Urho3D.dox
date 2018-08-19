@@ -152,6 +152,7 @@ Urho3D development, contributions and bugfixes by:
 - Fastran
 - Firegorilla
 - Gordon-F
+- LordGolias
 - Lumak
 - Magic.Lixin
 - Mike3D
@@ -172,6 +173,7 @@ Urho3D development, contributions and bugfixes by:
 - att
 - att-kin9
 - celeron55
+- chenjie199234
 - cosmy1
 - damu
 - dragonCASTjosh
@@ -223,7 +225,7 @@ Urho3D uses the following third-party libraries:
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
 - FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
-- kNet (https://github.com/juj/kNet)
+- SLikeNet (https://github.com/SLikeSoft/SLikeNet)
 - libcpuid 0.4.0+ (https://github.com/anrieff/libcpuid)
 - Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
@@ -1374,8 +1376,9 @@ From 1.7 to master:
 - URHO3D_CXX11 define was removed. C++11 mode is unconditionally enabled.
 - URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE and URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE macros were removed. Use attribute metadata instead. Element names shall be stored in StringVector (without trailing zero) instead of const char*[].
 - The Color::TRANSPARENT constant is renamed to Color::TRANSPARENT_BLACK to avoid name clash with Windows's TRANSPARENT macro defined in "windows.h".
-- Build system - the Android Java classes started to use Java 7 and 8 language features, so they must be built with Java 8 support turned on.
+- Build system - integrate with Gradle build system and migration to use Kotlin for Android platform.
 - Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Also set the default for "EMSCRIPTEN_WASM" build option to TRUE in order to align with the upstream EMCC compiler changes.
+- Constants are replaced with enums and flag sets in multiple places. Use corresponding types and typed constants instead of integers and integer constants. For example, "unsigned vertexMask = MASK_POSITION" becomes "VertexMaskFlags vertexMask = MASK_POSITION" and "input->GetKeyDown('A')" becomes "input->GetKeyDown(KEY_A)".
 
 */
 

@@ -232,7 +232,7 @@ private:
     /// The frame number animation LOD distance was last calculated on.
     unsigned animationLodFrameNumber_;
     /// Morph vertex element mask.
-    unsigned morphElementMask_;
+    VertexMaskFlags morphElementMask_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.
