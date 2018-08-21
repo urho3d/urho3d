@@ -2168,6 +2168,11 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     // (the application will switch manually if it wants to)
     dxgiFactory->MakeWindowAssociation(GetWindowHandle(window_), DXGI_MWA_NO_ALT_ENTER);
 
+	DXGI_ADAPTER_DESC desc;
+	dxgiAdapter->GetDesc(&desc);
+	String adapterDesc(desc.Description);
+	URHO3D_LOGINFO("Adapter used " + adapterDesc);
+
     dxgiFactory->Release();
     dxgiAdapter->Release();
     dxgiDevice->Release();
