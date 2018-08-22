@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -395,15 +395,14 @@ bool asCDataType::CanBeCopied() const
 	// It must be possible to instantiate the type
 	if( !CanBeInstantiated() ) return false;
 
-	// It must have a default constructor or factory
+	// It must have a default constructor or factory and the opAssign
+	// Alternatively it must have the copy constructor
 	asCObjectType *ot = CastToObjectType(typeInfo);
-	if( ot && ot->beh.construct == 0 &&
-		ot->beh.factory == 0 ) return false;
+	if (ot && (((ot->beh.construct != 0 || ot->beh.factory != 0) && ot->beh.copy != 0) || 
+		       (ot->beh.copyconstruct != 0 || ot->beh.copyfactory != 0)) )
+		return true;
 
-	// It must be possible to copy the type
-	if( ot && ot->beh.copy == 0 ) return false;
-
-	return true;
+	return false;
 }
 
 bool asCDataType::IsReadOnly() const

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -143,8 +143,6 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 		if( index >= 0 )
 			engine->registeredGlobalFuncs.Erase(index);
 		scriptFunctions[n]->ReleaseInternal();
-		if( engine->stringFactory == scriptFunctions[n] )
-			engine->stringFactory = 0;
 	}
 	scriptFunctions.SetLength(0);
 

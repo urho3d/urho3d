@@ -147,8 +147,6 @@
 #define RegisterObjectBehaviorFPRasCALL_GENERIC(clsdcl,behavior,decl,...) RegisterObjectBehaviour(clsdcl,behavior,decl, _asFUNCTIONPR(__VA_ARGS__), asCALL_GENERIC);
 #define RegisterObjectBehaviorFPRasCALL_CDECL(clsdcl,behavior,decl,clsfunc) RegisterObjectBehaviour(clsdcl,behavior,decl, WRAP_FN_PR clsfunc, asCALL_GENERIC);
 
-#define RegisterStringFactory(...) EV(RegisterStringFactory_2(__VA_ARGS__))
-#define RegisterStringFactory_2(str,F,params,kind) RegisterStringFactory(str, WRAP_FN (params), asCALL_GENERIC);
 
 /*#define SetExceptionCallback(...) SetExceptionCallback_2(__VA_ARGS__)
 #define SetExceptionCallback_2(M,params,obj,kind) SetExceptionCallback(WRAP_MFN params, obj, asCALL_GENERIC);
