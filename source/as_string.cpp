@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -283,20 +283,24 @@ size_t asCString::Format(const char *format, ...)
 	va_list args;
 	va_start(args, format);
 
-	char tmp[256];
-	int r = asVSNPRINTF(tmp, 255, format, args);
+	const size_t startSize = 1024;
+	char tmp[startSize];
+	int r = asVSNPRINTF(tmp, startSize-1, format, args);
 
-	if( r > 0 )
+	if( r > 0 && r < int(startSize) )
 	{
 		Assign(tmp, r);
 	}
 	else
 	{
-		size_t n = 512;
+		// TODO: For some reason this doesn't work properly on Linux. Perhaps the
+		//       problem is related to vsnprintf not keeping the state of va_arg.
+		//       Perhaps I need to rewrite this in some way to keep the state
+		size_t n = startSize*2;
 		asCString str; // Use temporary string in case the current buffer is a parameter
 		str.Allocate(n, false);
 
-		while( (r = asVSNPRINTF(str.AddressOf(), n, format, args)) < 0 )
+		while( (r = asVSNPRINTF(str.AddressOf(), n, format, args)) < 0 || r >= int(n) )
 		{
 			n *= 2;
 			str.Allocate(n, false);
