@@ -1115,6 +1115,9 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
 {
     sceneLoaded_ = true;
 
+    // Clear all replicated nodes
+    scene_->Clear(true, false);
+
     msg_.Clear();
     msg_.WriteUInt(scene_->GetChecksum());
     SendMessage(MSG_SCENELOADED, true, true, msg_);
