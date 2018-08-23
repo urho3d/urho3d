@@ -114,7 +114,7 @@ afterEvaluate {
     tasks {
         getByName("clean") {
             doLast {
-                delete(cmakeStagingDir())
+                android.externalNativeBuild.cmake.path?.touch()
             }
         }
     }
