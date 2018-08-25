@@ -22,7 +22,6 @@
 
 import org.gradle.internal.io.NullOutputStream
 import org.gradle.internal.os.OperatingSystem
-import org.jetbrains.kotlin.config.KotlinCompilerVersion
 
 plugins {
     id("com.android.library")
@@ -92,17 +91,14 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path = project.file("../../CMakeLists.txt")
+            setPath(project.file("../../CMakeLists.txt"))
         }
     }
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(kotlin("stdlib-jdk8", KotlinCompilerVersion.VERSION))
-    testImplementation("junit:junit:4.12")
-    androidTestImplementation("com.android.support.test:runner:1.0.2")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
+    kotlinAndroidDependencies()
 }
 
 lateinit var docABI: String

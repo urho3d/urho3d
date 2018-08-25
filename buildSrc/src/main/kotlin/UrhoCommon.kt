@@ -20,6 +20,43 @@
 // THE SOFTWARE.
 //
 
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.DependencyHandlerScope
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.project
 import java.io.File
 
+const val kotlinVersion = "1.2.61"
+const val junitVersion = "4.12"
+const val testRunnerVersion = "1.0.2"
+const val testExpressoVersion = "3.0.2"
+
+/**
+ * Prepare the module as Android Application with Urho3D AAR dependency.
+ */
+@Suppress("unused")
+fun Project.urhoAndroidModule() {
+    dependencies {
+        "implementation"(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+        "implementation"(project(":android:urho3d-lib"))
+        kotlinAndroidDependencies()
+    }
+}
+
+/**
+ * Add default dependencies for Android/Kotlin module.
+ */
+@Suppress("unused")
+fun DependencyHandlerScope.kotlinAndroidDependencies() {
+    "implementation"(kotlin("stdlib-jdk8", kotlinVersion))
+    "testImplementation"("junit:junit:$junitVersion")
+    "androidTestImplementation"("com.android.support.test:runner:$testRunnerVersion")
+    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:$testExpressoVersion")
+}
+
+/**
+ * Naive implementation of "touch" command.
+ */
+@Suppress("unused")
 fun File.touch() = createNewFile() || setLastModified(System.currentTimeMillis())
