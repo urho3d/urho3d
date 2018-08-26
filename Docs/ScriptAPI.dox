@@ -888,10 +888,10 @@ namespace Urho3D
 ### FileSelected
 - %FileName : String
 - %Filter : String
-- %Ok : bool
+- %OK : bool
 
 ### MessageACK
-- %Ok : bool
+- %OK : bool
 
 ### ElementAdded
 - %Root : UIElement pointer
