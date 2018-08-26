@@ -23,4 +23,22 @@
 // See https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:deferred_configuration
 enableFeaturePreview("STABLE_PUBLISHING")
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        jcenter()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id.startsWith("com.android.")) {
+                useModule("com.android.tools.build:gradle:$androidToolsVersion")
+            }
+            if (requested.id.id.startsWith("org.jetbrains.kotlin.")) {
+                useVersion(kotlinVersion)
+            }
+        }
+    }
+}
+
 include(":android:urho3d-lib", ":android:launcher-app")

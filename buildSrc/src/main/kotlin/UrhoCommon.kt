@@ -27,10 +27,11 @@ import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.project
 import java.io.File
 
+const val androidToolsVersion = "3.2.0-beta04"
 const val kotlinVersion = "1.2.61"
 const val junitVersion = "4.12"
 const val testRunnerVersion = "1.0.2"
-const val testExpressoVersion = "3.0.2"
+const val testEspressoVersion = "3.0.2"
 
 /**
  * Prepare the module as Android Application with Urho3D AAR dependency.
@@ -52,7 +53,7 @@ fun DependencyHandlerScope.kotlinAndroidDependencies() {
     "implementation"(kotlin("stdlib-jdk8", kotlinVersion))
     "testImplementation"("junit:junit:$junitVersion")
     "androidTestImplementation"("com.android.support.test:runner:$testRunnerVersion")
-    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:$testExpressoVersion")
+    "androidTestImplementation"("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
 }
 
 /**
