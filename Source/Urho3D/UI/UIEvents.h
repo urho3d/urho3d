@@ -254,7 +254,7 @@ URHO3D_EVENT(E_TEXTFINISHED, TextFinished)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
     URHO3D_PARAM(P_TEXT, Text);                    // String
-    URHO3D_PARAM(P_VALUE, Value);                 // Float
+    URHO3D_PARAM(P_VALUE, Value);                  // Float
 }
 
 /// Menu selected.
@@ -319,13 +319,13 @@ URHO3D_EVENT(E_FILESELECTED, FileSelected)
 {
     URHO3D_PARAM(P_FILENAME, FileName);            // String
     URHO3D_PARAM(P_FILTER, Filter);                // String
-    URHO3D_PARAM(P_OK, Ok);                        // bool
+    URHO3D_PARAM(P_OK, OK);                        // bool
 }
 
 /// MessageBox acknowlegement.
 URHO3D_EVENT(E_MESSAGEACK, MessageACK)
 {
-    URHO3D_PARAM(P_OK, Ok);                        // bool
+    URHO3D_PARAM(P_OK, OK);                        // bool
 }
 
 /// A child element has been added to an element. Sent by the UI root element, or element-event-sender if set.
