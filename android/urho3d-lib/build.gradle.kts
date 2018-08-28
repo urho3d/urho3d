@@ -98,7 +98,10 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    kotlinAndroidDependencies()
+    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    testImplementation("junit:junit:$junitVersion")
+    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
 }
 
 lateinit var docABI: String
@@ -182,6 +185,7 @@ tasks {
 publishing {
     (publications) {
         create<MavenPublication>("mavenAndroid") {
+            artifactId = "${project.name}-${project.libraryType}"
             afterEvaluate {
                 android.buildTypes.forEach {
                     artifact(tasks.getByName("zipBuildTree${it.name.capitalize()}"))
@@ -194,3 +198,6 @@ publishing {
 }
 
 fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".externalNativeBuild")
+
+val Project.libraryType: String
+    get() = if (hasProperty("URHO3D_LIB_TYPE")) property("URHO3D_LIB_TYPE") as String else "STATIC"

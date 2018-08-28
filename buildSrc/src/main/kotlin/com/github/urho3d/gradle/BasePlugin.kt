@@ -20,27 +20,9 @@
 // THE SOFTWARE.
 //
 
-import org.gradle.plugin.use.PluginDependenciesSpec
-import org.gradle.plugin.use.PluginDependencySpec
-import java.io.File
+package com.github.urho3d.gradle
 
-const val androidToolsVersion = "3.2.0-beta04"
-const val kotlinVersion = "1.2.61"
-const val junitVersion = "4.12"
-const val testRunnerVersion = "1.0.2"
-const val testEspressoVersion = "3.0.2"
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
-/**
- * Apply Urho3D custom plugin for the given platform.
- *
- * Current supported platforms: android.
- */
-@Suppress("unused")
-fun PluginDependenciesSpec.urho3d(platform: String): PluginDependencySpec =
-        id("com.github.urho3d.$platform")
-
-/**
- * Naive implementation of "touch" command.
- */
-@Suppress("unused")
-fun File.touch() = createNewFile() || setLastModified(System.currentTimeMillis())
+abstract class BasePlugin : Plugin<Project>

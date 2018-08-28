@@ -24,9 +24,8 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("android.extensions")
+    urho3d("android")
 }
-
-urhoAndroidModule()
 
 android {
     compileSdkVersion(27)
@@ -80,6 +79,15 @@ android {
             setPath(project.file("CMakeLists.txt"))
         }
     }
+}
+
+dependencies {
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":android:urho3d-lib"))
+    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    testImplementation("junit:junit:$junitVersion")
+    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
 }
 
 // Ensure IDE "gradle sync" evaluate the urho3d-lib module first
