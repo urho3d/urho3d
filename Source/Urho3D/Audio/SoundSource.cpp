@@ -178,7 +178,7 @@ void SoundSource::Play(Sound* sound)
     if (!audio_)
         return;
 
-	currentVolumeL_ = currentVolumeR_ = 0;
+    currentVolumeL_ = currentVolumeR_ = 0;
 
     // If no frequency set yet, set from the sound's default
     if (frequency_ == 0.0f && sound)
@@ -236,7 +236,7 @@ void SoundSource::Play(SoundStream* stream)
     if (!audio_)
         return;
 
-	currentVolumeL_ = currentVolumeR_ = 0;
+    currentVolumeL_ = currentVolumeR_ = 0;
 
     // If no frequency set yet, set from the stream's default
     if (frequency_ == 0.0f && stream)
@@ -266,7 +266,7 @@ void SoundSource::Stop()
     if (!audio_)
         return;
 
-	currentVolumeL_ = currentVolumeR_ = 0;
+    currentVolumeL_ = currentVolumeR_ = 0;
 
     // If sound source is currently playing, have to lock the audio mutex
     if (position_)
@@ -615,24 +615,24 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
 
 void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
-	int& currentVolume = currentVolumeL_;
-	if (!vol && !currentVolume)
+    int& currentVolume = currentVolumeL_;
+    if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int volDelta = Clamp(vol - currentVolume, -1, 1);
-	unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
+    int volDelta = Clamp(vol - currentVolume, -1, 1);
+    unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -646,17 +646,17 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (*pos * currentVolume) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (*pos * currentVolume) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (*pos * vol) / denom;
+                *dest = *dest + (*pos * vol) / denom;
                 ++dest;
                 INC_POS_LOOPED();
             }
@@ -664,17 +664,17 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (*pos * currentVolume) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (*pos * currentVolume) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (*pos * vol) / denom;
+                *dest = *dest + (*pos * vol) / denom;
                 ++dest;
                 INC_POS_ONESHOT();
             }
@@ -689,17 +689,17 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (*pos * currentVolume) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (*pos * currentVolume) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (*pos * vol) / denom;
+                *dest = *dest + (*pos * vol) / denom;
                 ++dest;
                 INC_POS_LOOPED();
             }
@@ -707,17 +707,17 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (*pos * currentVolume) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (*pos * currentVolume) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (*pos * vol) / denom;
+                *dest = *dest + (*pos * vol) / denom;
                 ++dest;
                 INC_POS_ONESHOT();
             }
@@ -729,28 +729,28 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 
 void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto leftVol = RoundToInt((-panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
     auto rightVol = RoundToInt((panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
 
-	if (!currentVolumeL_ && !currentVolumeR_ && !leftVol && !rightVol)
+    if (!currentVolumeL_ && !currentVolumeR_ && !leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int leftVolDelta = Clamp(leftVol - currentVolumeL_, -1, 1);
-	int rightVolDelta = Clamp(rightVol - currentVolumeR_, -1, 1);
+    int leftVolDelta = Clamp(leftVol - currentVolumeL_, -1, 1);
+    int rightVolDelta = Clamp(rightVol - currentVolumeR_, -1, 1);
 
-	unsigned leftRampSamples = Min(samples, (unsigned)((leftVol - currentVolumeL_) * leftVolDelta));
-	unsigned rightRampSamples = Min(samples, (unsigned)((rightVol - currentVolumeR_) * rightVolDelta));
-	unsigned rampSamples = Max(leftRampSamples, rightRampSamples);
+    unsigned leftRampSamples = Min(samples, (unsigned)((leftVol - currentVolumeL_) * leftVolDelta));
+    unsigned rightRampSamples = Min(samples, (unsigned)((rightVol - currentVolumeR_) * rightVolDelta));
+    unsigned rampSamples = Max(leftRampSamples, rightRampSamples);
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -764,17 +764,17 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				*dest = *dest + (*pos * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (*pos * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                *dest = *dest + (*pos * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (*pos * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (*pos * leftVol) / denom;
@@ -787,17 +787,17 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				*dest = *dest + (*pos * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (*pos * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                *dest = *dest + (*pos * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (*pos * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (*pos * leftVol) / denom;
@@ -817,22 +817,22 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				*dest = *dest + (*pos * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (*pos * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                *dest = *dest + (*pos * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (*pos * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (*pos * leftVol) / denom;
+                *dest = *dest + (*pos * leftVol) / denom;
                 ++dest;
-				*dest = *dest + (*pos * rightVol) / denom;
+                *dest = *dest + (*pos * rightVol) / denom;
                 ++dest;
                 INC_POS_LOOPED();
             }
@@ -840,22 +840,22 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				*dest = *dest + (*pos * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (*pos * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                *dest = *dest + (*pos * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (*pos * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (*pos * leftVol) / denom;
+                *dest = *dest + (*pos * leftVol) / denom;
                 ++dest;
-				*dest = *dest + (*pos * rightVol) / denom;
+                *dest = *dest + (*pos * rightVol) / denom;
                 ++dest;
                 INC_POS_ONESHOT();
             }
@@ -868,24 +868,24 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
-	int& currentVolume = currentVolumeL_;
+    int& currentVolume = currentVolumeL_;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int volDelta = Clamp(vol - currentVolume, -1, 1);
-	unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
+    int volDelta = Clamp(vol - currentVolume, -1, 1);
+    unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -899,14 +899,14 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE() * vol) / denom;
@@ -917,14 +917,14 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE() * vol) / denom;
@@ -942,17 +942,17 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (GET_IP_SAMPLE() * vol) / denom;
+                *dest = *dest + (GET_IP_SAMPLE() * vol) / denom;
                 ++dest;
                 INC_POS_LOOPED();
             }
@@ -960,17 +960,17 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE() * currentVolume) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (GET_IP_SAMPLE() * vol) / denom;
+                *dest = *dest + (GET_IP_SAMPLE() * vol) / denom;
                 ++dest;
                 INC_POS_ONESHOT();
             }
@@ -983,28 +983,28 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto leftVol = RoundToInt((-panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
     auto rightVol = RoundToInt((panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
 
-	if(!currentVolumeL_ && !currentVolumeR_ && !leftVol && !rightVol)
+    if(!currentVolumeL_ && !currentVolumeR_ && !leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int leftVolDelta = Clamp(leftVol  - currentVolumeL_, -1, 1);
-	int rightVolDelta = Clamp(rightVol - currentVolumeR_, -1, 1);
+    int leftVolDelta = Clamp(leftVol  - currentVolumeL_, -1, 1);
+    int rightVolDelta = Clamp(rightVol - currentVolumeR_, -1, 1);
 
-	unsigned leftRampSamples = Min(samples, (unsigned)((leftVol - currentVolumeL_) * leftVolDelta));
-	unsigned rightRampSamples = Min(samples, (unsigned)((rightVol - currentVolumeR_) * rightVolDelta));
-	unsigned rampSamples = Max(leftRampSamples, rightRampSamples);
+    unsigned leftRampSamples = Min(samples, (unsigned)((leftVol - currentVolumeL_) * leftVolDelta));
+    unsigned rightRampSamples = Min(samples, (unsigned)((rightVol - currentVolumeR_) * rightVolDelta));
+    unsigned rampSamples = Max(leftRampSamples, rightRampSamples);
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -1018,24 +1018,24 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				int s = GET_IP_SAMPLE();
-				*dest = *dest + (s * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (s * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                int s = GET_IP_SAMPLE();
+                *dest = *dest + (s * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (s * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = GET_IP_SAMPLE();
-				*dest = *dest + (s * leftVol) / denom;
+                *dest = *dest + (s * leftVol) / denom;
                 ++dest;
-				*dest = *dest + (s * rightVol) / denom;
+                *dest = *dest + (s * rightVol) / denom;
                 ++dest;
                 INC_POS_LOOPED();
             }
@@ -1043,18 +1043,18 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				int s = GET_IP_SAMPLE();
-				*dest = *dest + (s * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (s * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                int s = GET_IP_SAMPLE();
+                *dest = *dest + (s * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (s * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = GET_IP_SAMPLE();
@@ -1075,18 +1075,18 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				int s = GET_IP_SAMPLE();
-				*dest = *dest + (s * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (s * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                int s = GET_IP_SAMPLE();
+                *dest = *dest + (s * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (s * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = GET_IP_SAMPLE();
@@ -1100,24 +1100,24 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
-				currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
-				int s = GET_IP_SAMPLE();
-				*dest = *dest + (s * currentVolumeL_) / denom;
-				++dest;
-				*dest = *dest + (s * currentVolumeR_) / denom;
-				++dest;
-				INC_POS_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolumeL_ += leftVolDelta * (currentVolumeL_ != leftVol);
+                currentVolumeR_ += rightVolDelta * (currentVolumeR_ != rightVol);
+                int s = GET_IP_SAMPLE();
+                *dest = *dest + (s * currentVolumeL_) / denom;
+                ++dest;
+                *dest = *dest + (s * currentVolumeR_) / denom;
+                ++dest;
+                INC_POS_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = GET_IP_SAMPLE();
-				*dest = *dest + (s * leftVol) / denom;
+                *dest = *dest + (s * leftVol) / denom;
                 ++dest;
-				*dest = *dest + (s * rightVol) / denom;
+                *dest = *dest + (s * rightVol) / denom;
                 ++dest;
                 INC_POS_ONESHOT();
             }
@@ -1130,24 +1130,24 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 
 void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
-	int& currentVolume = currentVolumeL_;
-	if (!vol && !currentVolume)
+    int& currentVolume = currentVolumeL_;
+    if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int volDelta = Clamp(vol - currentVolume, -1, 1);
-	unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
+    int volDelta = Clamp(vol - currentVolume, -1, 1);
+    unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -1161,15 +1161,15 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = ((int)pos[0] + (int)pos[1]) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
@@ -1181,15 +1181,15 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = ((int)pos[0] + (int)pos[1]) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
@@ -1208,19 +1208,19 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = ((int)pos[0] + (int)pos[1]) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
-				*dest = *dest + (s * vol) / denom;
+                *dest = *dest + (s * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_LOOPED();
             }
@@ -1228,19 +1228,19 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = ((int)pos[0] + (int)pos[1]) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
-				*dest = *dest + (s * vol) / denom;
+                *dest = *dest + (s * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_ONESHOT();
             }
@@ -1253,24 +1253,24 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
-	int& currentVolume = currentVolumeL_;
-	if (!vol && !currentVolume)
+    int& currentVolume = currentVolumeL_;
+    if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int volDelta = Clamp(vol - currentVolume, -1, 1);
-	unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
+    int volDelta = Clamp(vol - currentVolume, -1, 1);
+    unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -1284,16 +1284,16 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (pos[0] * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (pos[1] * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (pos[0] * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (pos[1] * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (pos[0] * vol) / denom;
@@ -1306,16 +1306,16 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (pos[0] * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (pos[1] * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (pos[0] * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (pos[1] * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (pos[0] * vol) / denom;
@@ -1335,21 +1335,21 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (pos[0] * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (pos[1] * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (pos[0] * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (pos[1] * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (pos[0] * vol) / denom;
+                *dest = *dest + (pos[0] * vol) / denom;
                 ++dest;
-				*dest = *dest + (pos[1] * vol) / denom;
+                *dest = *dest + (pos[1] * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_LOOPED();
             }
@@ -1357,21 +1357,21 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (pos[0] * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (pos[1] * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (pos[0] * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (pos[1] * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (pos[0] * vol) / denom;
+                *dest = *dest + (pos[0] * vol) / denom;
                 ++dest;
-				*dest = *dest + (pos[1] * vol) / denom;
+                *dest = *dest + (pos[1] * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_ONESHOT();
             }
@@ -1384,23 +1384,23 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 
 void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
-	int& currentVolume = currentVolumeL_;
+    int& currentVolume = currentVolumeL_;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int volDelta = Clamp(vol - currentVolume, -1, 1);
-	unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
+    int volDelta = Clamp(vol - currentVolume, -1, 1);
+    unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -1414,15 +1414,15 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
@@ -1434,15 +1434,15 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
@@ -1461,19 +1461,19 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
-				*dest = *dest + (s * vol) / denom;
+                *dest = *dest + (s * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_LOOPED();
             }
@@ -1481,19 +1481,19 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
-				*dest = *dest + (s * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
+                *dest = *dest + (s * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
-				*dest = *dest + (s * vol) / denom;
+                *dest = *dest + (s * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_ONESHOT();
             }
@@ -1506,23 +1506,23 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 
 void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-	int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
+    int denom = sound->IsSixteenBit() ? VOLUME_DENOM : (VOLUME_DENOM >> 8);
 
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
-	int& currentVolume = currentVolumeL_;
-	if (!vol && !currentVolume)
+    int& currentVolume = currentVolumeL_;
+    if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-	int volDelta = Clamp(vol - currentVolume, -1, 1);
-	unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
+    int volDelta = Clamp(vol - currentVolume, -1, 1);
+    unsigned rampSamples = Min(samples, (unsigned)((vol - currentVolume) * volDelta));
 #ifdef DISABLE_SMOOTH_VOLUME
-	rampSamples = 0;
+    rampSamples = 0;
 #endif
-	samples -= rampSamples;
+    samples -= rampSamples;
     float add = frequency_ / (float)mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
@@ -1536,16 +1536,16 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / denom;
@@ -1558,16 +1558,16 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / denom;
@@ -1587,21 +1587,21 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
 
         if (sound->IsLooped())
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_LOOPED();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_LOOPED();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / denom;
+                *dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / denom;
                 ++dest;
-				*dest = *dest + (GET_IP_SAMPLE_RIGHT() * vol) / denom;
+                *dest = *dest + (GET_IP_SAMPLE_RIGHT() * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_LOOPED();
             }
@@ -1609,21 +1609,21 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         }
         else
         {
-			while (rampSamples--)
-			{
-				currentVolume += volDelta * (currentVolume != vol);
-				*dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
-				++dest;
-				*dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
-				++dest;
-				INC_POS_STEREO_ONESHOT();
-			}
-			if (!~rampSamples)
+            while (rampSamples--)
+            {
+                currentVolume += volDelta * (currentVolume != vol);
+                *dest = *dest + (GET_IP_SAMPLE_LEFT() * currentVolume) / denom;
+                ++dest;
+                *dest = *dest + (GET_IP_SAMPLE_RIGHT() * currentVolume) / denom;
+                ++dest;
+                INC_POS_STEREO_ONESHOT();
+            }
+            if (!~rampSamples)
             while (samples--)
             {
-				*dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / denom;
+                *dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / denom;
                 ++dest;
-				*dest = *dest + (GET_IP_SAMPLE_RIGHT() * vol) / denom;
+                *dest = *dest + (GET_IP_SAMPLE_RIGHT() * vol) / denom;
                 ++dest;
                 INC_POS_STEREO_ONESHOT();
             }

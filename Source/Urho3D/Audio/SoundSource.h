@@ -192,10 +192,10 @@ private:
     /// Unused stream bytes from previous frame.
     int unusedStreamSize_;
 
-	/// Current volume state of left channel.
-	int currentVolumeL_{};
-	/// Current volume state of right channel.
-	int currentVolumeR_{};
+    /// Current volume state of left channel.
+    int currentVolumeL_{};
+    /// Current volume state of right channel.
+    int currentVolumeR_{};
 };
 
 }
