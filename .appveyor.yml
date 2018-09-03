@@ -77,6 +77,8 @@ before_build:
     ) else (
       call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
     )
+  # Temporarily disable AngelScript as VS 2017 15.8 cannot handle it
+  - set "URHO3D_ANGELSCRIPT=0"
   # rake ci_setup_cache
 build_script:
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
