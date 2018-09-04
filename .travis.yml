@@ -25,6 +25,7 @@
 language: cpp
 compiler: gcc
 cache:
+  timeout: 500
   ccache: true
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
@@ -222,6 +223,7 @@ branch: {name: Coverity-Scan, active: no}
 language: cpp
 compiler: gcc
 cache:
+  timeout: 500
   ccache: true
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
@@ -266,6 +268,7 @@ branch: {name: Annotate, active: no}
 language: cpp
 compiler: gcc
 cache:
+  timeout: 500
   ccache: true
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
@@ -300,6 +303,7 @@ before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -rf $HOME/.gradle/caches/*/plugin-resolution
 cache:
+  timeout: 500
   directories:
     - $HOME/.ccache
     - $HOME/.gradle/caches
@@ -349,6 +353,7 @@ branch: {name: RPI-CI, active: yes}
 language: cpp
 compiler: gcc
 cache:
+  timeout: 500
   ccache: true
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
@@ -397,6 +402,7 @@ branch: {name: ARM-CI, active: yes}
 language: cpp
 compiler: gcc
 cache:
+  timeout: 500
   ccache: true
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
@@ -448,6 +454,7 @@ branch: {name: Web-CI, active: yes}
 language: cpp
 compiler: gcc
 cache:
+  timeout: 500
   ccache: true
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
@@ -500,6 +507,7 @@ matrix:
 branch: {name: OSX-CI, active: yes}
 language: objective-c
 cache:
+  timeout: 500
   directories:
     - $HOME/.ccache
     - $HOME/initial-build-tree
