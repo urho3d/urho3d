@@ -369,9 +369,17 @@ task :ci do
   end
   redirect = '2>/tmp/lint.err' if ENV['URHO3D_LINT']
   if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make #{redirect}" }
-    abort 'Failed to build Urho3D library' unless File.exists?('already_timeup.log')
-    $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
-    next
+    already_timeup = File.exists?('already_timeup.log')
+    success = false
+    if ENV['TRAVIS'] && !ENV['XCODE'] && !already_timeup && !timeup(true, 10)
+      # The build cache could be corrupted, so clear the cache and retry one more time
+      success = system "ccache -Cz && rake make clean_first #{redirect}"
+    end
+    unless success
+      abort 'Failed to build Urho3D library' unless already_timeup
+      $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+      next
+    end
   end
   if ENV['URHO3D_LINT']
     lint_err = File.read('/tmp/lint.err')
