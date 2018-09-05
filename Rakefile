@@ -373,6 +373,7 @@ task :ci do
     success = false
     if ENV['TRAVIS'] && !ENV['XCODE'] && !already_timeup && !timeup(true, 10)
       # The build cache could be corrupted, so clear the cache and retry one more time
+      system "cd #{ENV['build_tree']}/Source/Urho3D/tolua++-prefix/src/tolua++-build && make clean"
       success = system "ccache -Cz && rake make clean_first #{redirect}"
     end
     unless success
