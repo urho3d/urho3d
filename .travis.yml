@@ -311,7 +311,7 @@ cache:
     - $HOME/.android/build-cache
 dist: trusty
 sudo: false
-addons: {apt: {packages: [doxygen, graphviz, g++-multilib, ninja-build]}}
+addons: {apt: {packages: [doxygen, graphviz, g++-multilib]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -337,7 +337,7 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - touch $HOME/.android/repositories.cfg && (while :; do echo 'y'; sleep 1; done) |sdkmanager 'tools' 'platform-tools' 'build-tools;28.0.1' "platforms;$PLATFORM" 'ndk-bundle' 'cmake;3.6.4111459' "system-images;$SYS_IMG;google_apis;$ORG_GRADLE_PROJECT_ANDROID_ABI"
+  - touch $HOME/.android/repositories.cfg && (while :; do echo 'y'; sleep 1; done) |sdkmanager 'tools' 'platform-tools' 'build-tools;28.0.2' "platforms;$PLATFORM" 'ndk-bundle' 'cmake;3.6.4111459' "system-images;$SYS_IMG;google_apis;$ORG_GRADLE_PROJECT_ANDROID_ABI"
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH ANDROID_CCACHE=$(which ccache)
   - if [[ "$ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE" == "STATIC" ]]; then export EXTRA_PROPS='-P URHO3D_SAMPLES=0'; fi
   - rake ci_setup_cache

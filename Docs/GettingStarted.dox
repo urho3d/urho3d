@@ -42,7 +42,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
-- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed. The "ninja" build tool needs to be installed globally for host-tool building such as when building with Lua/LuaJIT subsystem enabled.
+- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed.
 
 - For Web, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
@@ -217,7 +217,7 @@ To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to e
 
 First, if you are building under Windows host then after checking out the project you need to prepare the "assets" directory of both the "urho3d-lib" and "launcher-app" modules. Due to a bug in Android plugin of the version we are currently using, where it does not honor custom source set with filter setting, we are forced to use asset symlink with the default source set. So in Windows host system, the asset symlinks must be replaced with an equivalent directory link created with MKLINK command. If your account does not allow you to use MKLINK command then use copy command instead to copy the content of the linked directory directly to the "assets" directory. Ensure you have preserved the directory structure, i.e. "urho3d-lib" assets directory has one subdir called "CoreData", while "launcher-app" assets directory has two subdirs: "Data" and "Autoload".
 
-Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location. Ensure the "ninja" build tool is globally installed when you intend to build Urho3D with subsystems that require host tool building, such as Lua/LuaJIT subsystem.
+Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location.
 
 For CLI user, build the Gradle modules with the following command:
 
