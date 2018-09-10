@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -95,14 +95,14 @@ class URHO3D_API NavigationMesh : public Component
 
 public:
     /// Construct.
-    NavigationMesh(Context* context);
+    explicit NavigationMesh(Context* context);
     /// Destruct.
-    virtual ~NavigationMesh() override;
+    ~NavigationMesh() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tile size.
     void SetTileSize(int size);
@@ -250,7 +250,7 @@ public:
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
 
     /// Set the partition type used for polygon generation.
-    void SetPartitionType(NavmeshPartitionType aType);
+    void SetPartitionType(NavmeshPartitionType partitionType);
 
     /// Return Partition Type.
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }

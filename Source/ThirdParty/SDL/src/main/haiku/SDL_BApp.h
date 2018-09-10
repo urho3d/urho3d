@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,9 @@
 #define SDL_BAPP_H
 
 #include <InterfaceKit.h>
+#if SDL_VIDEO_OPENGL
 #include <OpenGLKit.h>
+#endif
 
 #include "../../video/haiku/SDL_bkeyboard.h"
 
@@ -37,7 +39,6 @@ extern "C" {
 
 /* Local includes */
 #include "../../events/SDL_events_c.h"
-#include "../../video/haiku/SDL_bkeyboard.h"
 #include "../../video/haiku/SDL_bframebuffer.h"
 
 #ifdef __cplusplus
@@ -81,7 +82,9 @@ class SDL_BApp : public BApplication {
 public:
     SDL_BApp(const char* signature) :
         BApplication(signature) {
+#if SDL_VIDEO_OPENGL
         _current_context = NULL;
+#endif
     }
 
 
@@ -189,6 +192,7 @@ public:
         return _window_map[winID];
     }
 
+#if SDL_VIDEO_OPENGL
     void SetCurrentContext(BGLView *newContext) {
         if(_current_context)
             _current_context->UnlockGL();
@@ -196,6 +200,8 @@ public:
         if (_current_context)
 	        _current_context->LockGL();
     }
+#endif
+
 private:
     /* Event management */
     void _HandleBasicWindowEvent(BMessage *msg, int32 sdlEventType) {
@@ -385,8 +391,9 @@ private:
     /* Members */
     std::vector<SDL_Window*> _window_map; /* Keeps track of SDL_Windows by index-id */
 
-    display_mode *_saved_mode;
+#if SDL_VIDEO_OPENGL
     BGLView      *_current_context;
+#endif
 };
 
 #endif

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,7 @@ BorderImage::BorderImage(Context* context) :
 {
 }
 
-BorderImage::~BorderImage()
-{
-}
+BorderImage::~BorderImage() = default;
 
 void BorderImage::RegisterObject(Context* context)
 {
@@ -129,8 +127,8 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     const IntVector2& offset)
 {
     bool allOpaque = true;
-    if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
-        color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
+    if (GetDerivedOpacity() < 1.0f || colors_[C_TOPLEFT].a_ < 1.0f || colors_[C_TOPRIGHT].a_ < 1.0f ||
+        colors_[C_BOTTOMLEFT].a_ < 1.0f || colors_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
 
     UIBatch
@@ -201,7 +199,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 
 void BorderImage::SetTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 

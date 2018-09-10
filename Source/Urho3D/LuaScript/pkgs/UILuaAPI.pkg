@@ -1,4 +1,5 @@
 $pfile "UI/UIElement.pkg"
+$pfile "UI/UISelectable.pkg"
 $pfile "UI/BorderImage.pkg"
 $pfile "UI/Button.pkg"
 $pfile "UI/CheckBox.pkg"

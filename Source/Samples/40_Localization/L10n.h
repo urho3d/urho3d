@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,10 +35,10 @@ class L10n : public Sample
 
 public:
     /// Construct.
-    L10n(Context* context);
+    explicit L10n(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start() override;
+    void Start() override;
 
 private:
     // Load strings from JSON files and subscribe to the change language event

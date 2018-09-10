@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,9 @@ static const unsigned COMPRESSED_BLOCK_SIZE = 32768;
 struct FileEntry
 {
     String name_;
-    unsigned offset_;
-    unsigned size_;
-    unsigned checksum_;
+    unsigned offset_{};
+    unsigned size_{};
+    unsigned checksum_{};
 };
 
 SharedPtr<Context> context_(new Context());
@@ -286,7 +286,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (pos + unpackedSize > dataSize)
                     unpackedSize = dataSize - pos;
 
-                unsigned packedSize = (unsigned)LZ4_compress_HC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize, LZ4_compressBound(unpackedSize), 0);
+                auto packedSize = (unsigned)LZ4_compress_HC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize, LZ4_compressBound(unpackedSize), 0);
                 if (!packedSize)
                     ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + String(pos));
 

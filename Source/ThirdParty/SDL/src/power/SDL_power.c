@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,7 @@
 */
 #include "../SDL_internal.h"
 #include "SDL_power.h"
+#include "SDL_syspower.h"
 
 /*
  * Returns SDL_TRUE if we have a definitive answer.
@@ -28,18 +29,6 @@
 typedef SDL_bool
     (*SDL_GetPowerInfo_Impl) (SDL_PowerState * state, int *seconds,
                               int *percent);
-
-SDL_bool SDL_GetPowerInfo_Linux_sys_class_power_supply(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_Linux_proc_acpi(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_Linux_proc_apm(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_Windows(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_MacOSX(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_Haiku(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_UIKit(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_Android(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_PSP(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_WinRT(SDL_PowerState *, int *, int *);
-SDL_bool SDL_GetPowerInfo_Emscripten(SDL_PowerState *, int *, int *);
 
 #ifndef SDL_POWER_DISABLED
 #ifdef SDL_POWER_HARDWIRED
@@ -59,6 +48,7 @@ SDL_GetPowerInfo_Hardwired(SDL_PowerState * state, int *seconds, int *percent)
 static SDL_GetPowerInfo_Impl implementations[] = {
 #ifndef SDL_POWER_DISABLED
 #ifdef SDL_POWER_LINUX          /* in order of preference. More than could work. */
+    SDL_GetPowerInfo_Linux_org_freedesktop_upower,
     SDL_GetPowerInfo_Linux_sys_class_power_supply,
     SDL_GetPowerInfo_Linux_proc_acpi,
     SDL_GetPowerInfo_Linux_proc_apm,

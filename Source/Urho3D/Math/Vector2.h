@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,40 +33,37 @@ class URHO3D_API IntVector2
 {
 public:
     /// Construct a zero vector.
-    IntVector2() :
+    IntVector2() noexcept :
         x_(0),
         y_(0)
     {
     }
 
     /// Construct from coordinates.
-    IntVector2(int x, int y) :
+    IntVector2(int x, int y) noexcept :
         x_(x),
         y_(y)
     {
     }
 
     /// Construct from an int array.
-    IntVector2(const int* data) :
+    explicit IntVector2(const int* data) noexcept :
         x_(data[0]),
         y_(data[1])
     {
     }
 
-    /// Copy-construct from another vector.
-    IntVector2(const IntVector2& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_)
+    /// Construct from an float array.
+    explicit IntVector2(const float* data) :
+        x_((int)data[0]),
+        y_((int)data[1])
     {
     }
+    /// Copy-construct from another vector.
+    IntVector2(const IntVector2& rhs) noexcept = default;
 
     /// Assign from another vector.
-    IntVector2& operator =(const IntVector2& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        return *this;
-    }
+    IntVector2& operator =(const IntVector2& rhs) noexcept = default;
 
     /// Test for equality with another vector.
     bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
@@ -179,47 +176,38 @@ class URHO3D_API Vector2
 {
 public:
     /// Construct a zero vector.
-    Vector2() :
+    Vector2() noexcept :
         x_(0.0f),
         y_(0.0f)
     {
     }
 
     /// Copy-construct from another vector.
-    Vector2(const Vector2& vector) :
-        x_(vector.x_),
-        y_(vector.y_)
-    {
-    }
+    Vector2(const Vector2& vector) noexcept = default;
 
     /// Construct from an IntVector2.
-    explicit Vector2(const IntVector2& vector) :
+    explicit Vector2(const IntVector2& vector) noexcept :
         x_((float)vector.x_),
         y_((float)vector.y_)
     {
     }
 
     /// Construct from coordinates.
-    Vector2(float x, float y) :
+    Vector2(float x, float y) noexcept :
         x_(x),
         y_(y)
     {
     }
 
     /// Construct from a float array.
-    explicit Vector2(const float* data) :
+    explicit Vector2(const float* data) noexcept :
         x_(data[0]),
         y_(data[1])
     {
     }
 
     /// Assign from another vector.
-    Vector2& operator =(const Vector2& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        return *this;
-    }
+    Vector2& operator =(const Vector2& rhs) noexcept = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }

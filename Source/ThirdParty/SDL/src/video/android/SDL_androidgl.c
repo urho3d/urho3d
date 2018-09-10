@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,6 +29,7 @@
 #include "SDL_androidwindow.h"
 
 #include "SDL_androidvideo.h"
+#include "SDL_androidgl.h"
 #include "../../core/android/SDL_android.h"
 
 #include <android/log.h>
@@ -38,7 +39,7 @@
 SDL_EGL_CreateContext_impl(Android)
 SDL_EGL_MakeCurrent_impl(Android)
 
-void
+int
 Android_GLES_SwapWindow(_THIS, SDL_Window * window)
 {
     /* The following two calls existed in the original Java code
@@ -48,12 +49,12 @@ Android_GLES_SwapWindow(_THIS, SDL_Window * window)
     
     /*_this->egl_data->eglWaitNative(EGL_CORE_NATIVE_ENGINE);
     _this->egl_data->eglWaitGL();*/
-    SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
+    return SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
 }
 
 int
 Android_GLES_LoadLibrary(_THIS, const char *path) {
-    return SDL_EGL_LoadLibrary(_this, path, (NativeDisplayType) 0);
+    return SDL_EGL_LoadLibrary(_this, path, (NativeDisplayType) 0, 0);
 }
 
 #endif /* SDL_VIDEO_DRIVER_ANDROID */

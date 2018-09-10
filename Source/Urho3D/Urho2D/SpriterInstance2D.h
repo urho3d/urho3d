@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@ public:
     /// Set root spatial info.
     void setSpatialInfo(float x, float y, float angle, float scaleX, float scaleY);
     /// Update animation.
-    void Update(float delta_time);
+    void Update(float deltaTime);
 
     /// Return current entity.
     Entity* GetEntity() const { return entity_; }
@@ -88,21 +88,21 @@ private:
     void Clear();
 
     /// Parent component.
-    Component* owner_;
+    Component* owner_{};
     /// Spriter data.
-    SpriterData* spriterData_;
+    SpriterData* spriterData_{};
     /// Current entity.
-    Entity* entity_;
+    Entity* entity_{};
     /// Current animation.
-    Animation* animation_;
+    Animation* animation_{};
     /// Looping.
-    bool looping_;
+    bool looping_{};
     /// Root spatial info.
     SpatialInfo spatialInfo_;
     /// Current time.
-    float currentTime_;
+    float currentTime_{};
     /// Current mainline key.
-    MainlineKey* mainlineKey_;
+    MainlineKey* mainlineKey_{};
     /// Current timeline keys.
     PODVector<SpatialTimelineKey*> timelineKeys_;
 };

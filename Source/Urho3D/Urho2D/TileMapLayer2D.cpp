@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,16 +37,11 @@ namespace Urho3D
 {
 
 TileMapLayer2D::TileMapLayer2D(Context* context) :
-    Component(context),
-    tmxLayer_(nullptr),
-    drawOrder_(0),
-    visible_(true)
+    Component(context)
 {
 }
 
-TileMapLayer2D::~TileMapLayer2D()
-{
-}
+TileMapLayer2D::~TileMapLayer2D() = default;
 
 void TileMapLayer2D::RegisterObject(Context* context)
 {
@@ -54,7 +49,7 @@ void TileMapLayer2D::RegisterObject(Context* context)
 }
 
 // Transform vector from node-local space to global space
-static Vector2 TransformNode2D(Matrix3x4 transform, Vector2 local)
+static Vector2 TransformNode2D(const Matrix3x4& transform, Vector2 local)
 {
     Vector3 transformed = transform * Vector4(local.x_, local.y_, 0.f, 1.f);
     return Vector2(transformed.x_, transformed.y_);
@@ -106,8 +101,9 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                     }
 
                     for (unsigned j = 0; j < points.Size(); ++j)
-                        debug->AddLine(TransformNode2D(transform, points[j] + object->GetPosition()),
-                                       TransformNode2D(transform, points[(j + 1) % points.Size()] + object->GetPosition()), color, depthTest);
+                        debug->AddLine(Vector3(TransformNode2D(transform, points[j] + object->GetPosition())),
+                            Vector3(TransformNode2D(transform, points[(j + 1) % points.Size()] + object->GetPosition())), color,
+                            depthTest);
                 }
                 break;
 
@@ -142,7 +138,8 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                             point2 = Vector2((point2.x_ + point2.y_) * ratio, (point2.y_ - point2.x_) * 0.5f);
                         }
 
-                        debug->AddLine(TransformNode2D(transform, pivot + point1), TransformNode2D(transform, pivot + point2), color, depthTest);
+                        debug->AddLine(Vector3(TransformNode2D(transform, pivot + point1)),
+                            Vector3(TransformNode2D(transform, pivot + point2)), color, depthTest);
                     }
                 }
                 break;
@@ -151,15 +148,16 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             case OT_POLYLINE:
                 {
                     for (unsigned j = 0; j < object->GetNumPoints() - 1; ++j)
-                        debug->AddLine(TransformNode2D(transform, object->GetPoint(j)),
-                                       TransformNode2D(transform, object->GetPoint(j + 1)), color, depthTest);
+                        debug->AddLine(Vector3(TransformNode2D(transform, object->GetPoint(j))),
+                            Vector3(TransformNode2D(transform, object->GetPoint(j + 1))), color, depthTest);
 
                     if (object->GetObjectType() == OT_POLYGON)
-                        debug->AddLine(TransformNode2D(transform, object->GetPoint(0)),
-                                       TransformNode2D(transform, object->GetPoint(object->GetNumPoints() - 1)), color, depthTest);
+                        debug->AddLine(Vector3(TransformNode2D(transform, object->GetPoint(0))),
+                            Vector3(TransformNode2D(transform, object->GetPoint(object->GetNumPoints() - 1))), color, depthTest);
                     // Also draw a circle at origin to indicate direction
                     else
-                        debug->AddCircle(TransformNode2D(transform, object->GetPoint(0)), Vector3::FORWARD, 0.05f, color, 64, depthTest);
+                        debug->AddCircle(Vector3(TransformNode2D(transform, object->GetPoint(0))), Vector3::FORWARD, 0.05f, color,
+                            64, depthTest);
                 }
                 break;
 
@@ -228,7 +226,7 @@ void TileMapLayer2D::SetDrawOrder(int drawOrder)
         if (!nodes_[i])
             continue;
 
-        StaticSprite2D* staticSprite = nodes_[i]->GetComponent<StaticSprite2D>();
+        auto* staticSprite = nodes_[i]->GetComponent<StaticSprite2D>();
         if (staticSprite)
             staticSprite->SetLayer(drawOrder_);
     }
@@ -355,10 +353,11 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
                 continue;
 
             SharedPtr<Node> tileNode(GetNode()->CreateTemporaryChild("Tile"));
-            tileNode->SetPosition(info.TileIndexToPosition(x, y));
+            tileNode->SetPosition(Vector3(info.TileIndexToPosition(x, y)));
 
-            StaticSprite2D* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
+            auto* staticSprite = tileNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(tile->GetSprite());
+            staticSprite->SetFlip(tile->GetFlipX(), tile->GetFlipY(), tile->GetSwapXY());
             staticSprite->SetLayer(drawOrder_);
             staticSprite->SetOrderInLayer(y * width + x);
 
@@ -380,13 +379,14 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
 
         // Create dummy node for all object
         SharedPtr<Node> objectNode(GetNode()->CreateTemporaryChild("Object"));
-        objectNode->SetPosition(object->GetPosition());
+        objectNode->SetPosition(Vector3(object->GetPosition()));
 
         // If object is tile, create static sprite component
         if (object->GetObjectType() == OT_TILE && object->GetTileGid() && object->GetTileSprite())
         {
-            StaticSprite2D* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
+            auto* staticSprite = objectNode->CreateComponent<StaticSprite2D>();
             staticSprite->SetSprite(object->GetTileSprite());
+            staticSprite->SetFlip(object->GetTileFlipX(), object->GetTileFlipY(), object->GetTileSwapXY());
             staticSprite->SetLayer(drawOrder_);
             staticSprite->SetOrderInLayer((int)((10.0f - object->GetPosition().y_) * 100));
 
@@ -409,9 +409,9 @@ void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
         return;
 
     SharedPtr<Node> imageNode(GetNode()->CreateTemporaryChild("Tile"));
-    imageNode->SetPosition(imageLayer->GetPosition());
+    imageNode->SetPosition(Vector3(imageLayer->GetPosition()));
 
-    StaticSprite2D* staticSprite = imageNode->CreateComponent<StaticSprite2D>();
+    auto* staticSprite = imageNode->CreateComponent<StaticSprite2D>();
     staticSprite->SetSprite(imageLayer->GetSprite());
     staticSprite->SetOrderInLayer(0);
 

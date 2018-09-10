@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,7 @@ SpriteSheet2D::SpriteSheet2D(Context* context) :
 {
 }
 
-SpriteSheet2D::~SpriteSheet2D()
-{
-}
+SpriteSheet2D::~SpriteSheet2D() = default;
 
 void SpriteSheet2D::RegisterObject(Context* context)
 {
@@ -150,7 +148,7 @@ bool SpriteSheet2D::BeginLoadFromPListFile(Deserializer& source)
 
 bool SpriteSheet2D::EndLoadFromPListFile()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
@@ -184,8 +182,8 @@ bool SpriteSheet2D::EndLoadFromPListFile()
             offset.y_ = -sourceColorRect.top_;
 
             IntVector2 sourceSize = frameInfo["sourceSize"]->GetIntVector2();
-            hotSpot.x_ = ((float)offset.x_ + sourceSize.x_ / 2) / rectangle.Width();
-            hotSpot.y_ = 1.0f - ((float)offset.y_ + sourceSize.y_ / 2) / rectangle.Height();
+            hotSpot.x_ = (offset.x_ + sourceSize.x_ / 2.f) / rectangle.Width();
+            hotSpot.y_ = 1.0f - (offset.y_ + sourceSize.y_ / 2.f) / rectangle.Height();
         }
 
         DefineSprite(name, rectangle, hotSpot, offset);
@@ -226,7 +224,7 @@ bool SpriteSheet2D::BeginLoadFromXMLFile(Deserializer& source)
 
 bool SpriteSheet2D::EndLoadFromXMLFile()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
@@ -256,8 +254,8 @@ bool SpriteSheet2D::EndLoadFromXMLFile()
             offset.y_ = subTextureElem.GetInt("frameY");
             int frameWidth = subTextureElem.GetInt("frameWidth");
             int frameHeight = subTextureElem.GetInt("frameHeight");
-            hotSpot.x_ = ((float)offset.x_ + frameWidth / 2) / width;
-            hotSpot.y_ = 1.0f - ((float)offset.y_ + frameHeight / 2) / height;
+            hotSpot.x_ = (offset.x_ + frameWidth / 2.f) / width;
+            hotSpot.y_ = 1.0f - (offset.y_ + frameHeight / 2.f) / height;
         }
 
         DefineSprite(name, rectangle, hotSpot, offset);
@@ -300,7 +298,7 @@ bool SpriteSheet2D::BeginLoadFromJSONFile(Deserializer& source)
 
 bool SpriteSheet2D::EndLoadFromJSONFile()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
@@ -335,8 +333,8 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
             offset.y_ = subTextureVal.Get("frameY").GetInt();
             int frameWidth = frameWidthVal.GetInt();
             int frameHeight = frameHeightVal.GetInt();
-            hotSpot.x_ = ((float)offset.x_ + frameWidth / 2) / width;
-            hotSpot.y_ = 1.0f - ((float)offset.y_ + frameHeight / 2) / height;
+            hotSpot.x_ = (offset.x_ + frameWidth / 2.f) / width;
+            hotSpot.y_ = 1.0f - (offset.y_ + frameHeight / 2.f) / height;
         }
 
         DefineSprite(name, rectangle, hotSpot, offset);

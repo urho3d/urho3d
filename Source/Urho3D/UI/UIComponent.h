@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 #pragma once
 
 #include "../Scene/Component.h"
+#include "../UI/UIElement.h"
 
 namespace Urho3D
 {
@@ -33,6 +34,7 @@ class Viewport;
 class UIElement;
 class UIBatch;
 class VertexBuffer;
+class UIElement3D;
 
 class URHO3D_API UIComponent : public Component
 {
@@ -40,9 +42,9 @@ class URHO3D_API UIComponent : public Component
 
 public:
     /// Construct.
-    UIComponent(Context* context);
+    explicit UIComponent(Context* context);
     /// Destruct.
-    virtual ~UIComponent() override;
+    ~UIComponent() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -52,38 +54,25 @@ public:
     Material* GetMaterial() const;
     /// Return texture which will be used for rendering UI to.
     Texture2D* GetTexture() const;
+    /// Set index of viewport to be used for screen coordinate translation.
+    void SetViewportIndex(unsigned int index);
 
 protected:
+    /// Handle component being added to Node or removed from it.
+    void OnNodeSet(Node* node) override;
+    /// Handle resizing of element. Setting size of element will automatically resize texture. UIElement size matches size of texture.
+    void OnElementResized(StringHash eventType, VariantMap& args);
+
     /// Material that is set to the model.
     SharedPtr<Material> material_;
     /// Texture that UIElement will be rendered into.
     SharedPtr<Texture2D> texture_;
-    /// Model that texture will be applied to.
+    /// Model created by this component. If node already has StaticModel then this will be null.
     SharedPtr<StaticModel> model_;
-    /// UIElement to be rendered into texture.
-    SharedPtr<UIElement> rootElement_;
-    /// UI rendering batches.
-    PODVector<UIBatch> batches_;
-    /// UI rendering vertex data.
-    PODVector<float> vertexData_;
-    /// UI vertex buffer.
-    SharedPtr<VertexBuffer> vertexBuffer_;
-    /// UI rendering batches for debug draw.
-    PODVector<UIBatch> debugDrawBatches_;
-    /// UI rendering vertex data for debug draw.
-    PODVector<float> debugVertexData_;
-    /// UI debug geometry vertex buffer.
-    SharedPtr<VertexBuffer> debugVertexBuffer_;
-    /// Is StaticModel component created by this component.
-    bool isStaticModelOwned_;
-
-    virtual void OnNodeSet(Node* node) override;
-    /// Handle resizing of element. Setting size of element will automatically resize texture. UIElement size matches size of texture.
-    void OnElementResized(StringHash eventType, VariantMap& args);
-    /// Convert screen position to position on UIElement.
-    bool ScreenToUIPosition(IntVector2 screenPos, IntVector2& result);
-
-    friend class UI;
+    /// UIElement to be rendered into texture. It also handles screen to UI coordinate translation.
+    SharedPtr<UIElement3D> rootElement_;
+    /// Viewport index to be set when component is added to a node.
+    unsigned viewportIndex_;
 };
 
 }

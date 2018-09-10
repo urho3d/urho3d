@@ -26,6 +26,10 @@ class Vector3
     float DotProduct(const Vector3& rhs) const;
     float AbsDotProduct(const Vector3& rhs) const;
     float ProjectOntoAxis(const Vector3& axis) const;
+    Vector3 ProjectOntoPlane(const Vector3& origin, const Vector3& normal);
+    Vector3 ProjectOntoLine(const Vector3& from, const Vector3& to, bool clamped = false);
+    float DistanceToPoint(const Vector3& point) const;
+    float DistanceToPlane(const Vector3& origin, const Vector3& normal) const;
     Vector3 Orthogonalize(const Vector3& axis) const;
     Vector3 CrossProduct(const Vector3& rhs) const;
     Vector3 Abs() const;

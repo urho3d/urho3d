@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ void UnknownComponent::RegisterObject(Context* context)
     context->RegisterFactory<UnknownComponent>();
 }
 
-bool UnknownComponent::Load(Deserializer& source, bool setInstanceDefault)
+bool UnknownComponent::Load(Deserializer& source)
 {
     useXML_ = false;
     xmlAttributes_.Clear();
@@ -104,7 +104,7 @@ bool UnknownComponent::Load(Deserializer& source, bool setInstanceDefault)
     return dataSize ? source.Read(&binaryAttributes_[0], dataSize) == dataSize : true;
 }
 
-bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
+bool UnknownComponent::LoadXML(const XMLElement& source)
 {
     useXML_ = true;
     xmlAttributes_.Clear();
@@ -138,7 +138,7 @@ bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault
 }
 
 
-bool UnknownComponent::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+bool UnknownComponent::LoadJSON(const JSONValue& source)
 {
     useXML_ = true;
     xmlAttributes_.Clear();

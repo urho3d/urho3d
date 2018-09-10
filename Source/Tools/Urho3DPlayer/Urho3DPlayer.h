@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,14 +33,14 @@ class Urho3DPlayer : public Application
 
 public:
     /// Construct.
-    Urho3DPlayer(Context* context);
+    explicit Urho3DPlayer(Context* context);
 
     /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual void Setup() override;
+    void Setup() override;
     /// Setup after engine initialization. Load the script and execute its start function.
-    virtual void Start() override;
+    void Start() override;
     /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual void Stop() override;
+    void Stop() override;
 
 private:
     /// Handle reload start of the script file.
@@ -56,7 +56,7 @@ private:
     String scriptFileName_;
     /// Flag whether CommandLine.txt was already successfully read.
     bool commandLineRead_;
-    
+
 #ifdef URHO3D_ANGELSCRIPT
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;

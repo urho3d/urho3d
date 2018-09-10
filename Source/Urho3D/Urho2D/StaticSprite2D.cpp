@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@ StaticSprite2D::StaticSprite2D(Context* context) :
     blendMode_(BLEND_ALPHA),
     flipX_(false),
     flipY_(false),
+    swapXY_(false),
     color_(Color::WHITE),
     useHotSpot_(false),
     useDrawRect_(false),
@@ -56,9 +57,7 @@ StaticSprite2D::StaticSprite2D(Context* context) :
     sourceBatches_[0].owner_ = this;
 }
 
-StaticSprite2D::~StaticSprite2D()
-{
-}
+StaticSprite2D::~StaticSprite2D() = default;
 
 void StaticSprite2D::RegisterObject(Context* context)
 {
@@ -127,13 +126,14 @@ void StaticSprite2D::SetBlendMode(BlendMode blendMode)
     MarkNetworkUpdate();
 }
 
-void StaticSprite2D::SetFlip(bool flipX, bool flipY)
+void StaticSprite2D::SetFlip(bool flipX, bool flipY, bool swapXY)
 {
-    if (flipX == flipX_ && flipY == flipY_)
+    if (flipX == flipX_ && flipY == flipY_ && swapXY == swapXY_)
         return;
 
     flipX_ = flipX;
     flipY_ = flipY;
+    swapXY_ = swapXY;
     sourceBatchesDirty_ = true;
 
     MarkNetworkUpdate();
@@ -141,12 +141,17 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
 
 void StaticSprite2D::SetFlipX(bool flipX)
 {
-    SetFlip(flipX, flipY_);
+    SetFlip(flipX, flipY_, swapXY_);
 }
 
 void StaticSprite2D::SetFlipY(bool flipY)
 {
-    SetFlip(flipX_, flipY);
+    SetFlip(flipX_, flipY, swapXY_);
+}
+
+void StaticSprite2D::SetSwapXY(bool swapXY)
+{
+    SetFlip(flipX_, flipY_, swapXY);
 }
 
 void StaticSprite2D::SetColor(const Color& color)
@@ -254,7 +259,7 @@ ResourceRef StaticSprite2D::GetSpriteAttr() const
 
 void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetCustomMaterial(cache->GetResource<Material>(value.name_));
 }
 
@@ -326,9 +331,9 @@ void StaticSprite2D::UpdateSourceBatches()
     vertex3.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.min_.y_, 0.0f);
 
     vertex0.uv_ = textureRect_.min_;
-    vertex1.uv_ = Vector2(textureRect_.min_.x_, textureRect_.max_.y_);
+    (swapXY_ ? vertex3.uv_ : vertex1.uv_) = Vector2(textureRect_.min_.x_, textureRect_.max_.y_);
     vertex2.uv_ = textureRect_.max_;
-    vertex3.uv_ = Vector2(textureRect_.max_.x_, textureRect_.min_.y_);
+    (swapXY_ ? vertex1.uv_ : vertex3.uv_) = Vector2(textureRect_.max_.x_, textureRect_.min_.y_);
 
     vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
 

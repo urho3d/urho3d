@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,14 +45,14 @@ public:
     /// Copy construct.
     AttributeAnimationInfo(const AttributeAnimationInfo& other);
     /// Destruct.
-    virtual ~AttributeAnimationInfo() override;
+    ~AttributeAnimationInfo() override;
 
     /// Return attribute information.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
 
 protected:
     /// Apply new animation value to the target object. Called by Update().
-    virtual void ApplyValue(const Variant& newValue) override;
+    void ApplyValue(const Variant& newValue) override;
 
 private:
     /// Attribute information.
@@ -66,20 +66,20 @@ class URHO3D_API Animatable : public Serializable
 
 public:
     /// Construct.
-    Animatable(Context* context);
+    explicit Animatable(Context* context);
     /// Destruct.
-    virtual ~Animatable() override;
+    ~Animatable() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
+    /// Load from XML data. Return true if successful.
+    bool LoadXML(const XMLElement& source) override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const override;
-    /// Load from JSON data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
+    bool SaveXML(XMLElement& dest) const override;
+    /// Load from JSON data. Return true if successful.
+    bool LoadJSON(const JSONValue& source) override;
     /// Save as JSON data. Return true if successful.
-    virtual bool SaveJSON(JSONValue& dest) const override;
+    bool SaveJSON(JSONValue& dest) const override;
 
     /// Set automatic update of animation, default true.
     void SetAnimationEnabled(bool enable);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ Shader::Shader(Context* context) :
 
 Shader::~Shader()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     if (cache)
         cache->ResetDependencies(this);
 }
@@ -83,7 +83,7 @@ void Shader::RegisterObject(Context* context)
 
 bool Shader::BeginLoad(Deserializer& source)
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return false;
 
@@ -159,13 +159,13 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
 
 bool Shader::ProcessSource(String& code, Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // If the source if a non-packaged file, store the timestamp
-    File* file = dynamic_cast<File*>(&source);
+    auto* file = dynamic_cast<File*>(&source);
     if (file && !file->IsPackaged())
     {
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        auto* fileSystem = GetSubsystem<FileSystem>();
         String fullName = cache->GetResourceFileName(file->GetName());
         unsigned fileTimeStamp = fileSystem->GetLastModifiedTime(fullName);
         if (fileTimeStamp > timeStamp_)

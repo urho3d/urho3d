@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ void SoundSynthesis::CreateSound()
 {
     // Sound source needs a node so that it is considered enabled
     node_ = new Node(context_);
-    SoundSource* source = node_->CreateComponent<SoundSource>();
+    auto* source = node_->CreateComponent<SoundSource>();
 
     soundStream_ = new BufferedSoundStream();
     // Set format: 44100 Hz, sixteen bit, mono
@@ -95,7 +95,7 @@ void SoundSynthesis::UpdateSound()
     if (requiredLength < 0.0f)
         return;
 
-    unsigned numSamples = (unsigned)(soundStream_->GetFrequency() * requiredLength);
+    auto numSamples = (unsigned)(soundStream_->GetFrequency() * requiredLength);
     if (!numSamples)
         return;
 
@@ -118,8 +118,8 @@ void SoundSynthesis::UpdateSound()
 
 void SoundSynthesis::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
     instructionText_ = ui->GetRoot()->CreateChild<Text>();
@@ -147,7 +147,7 @@ void SoundSynthesis::HandleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
     // Use keys to control the filter constant
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input->GetKeyDown(KEY_UP))
         filter_ += timeStep * 0.5f;
     if (input->GetKeyDown(KEY_DOWN))

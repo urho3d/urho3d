@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -223,6 +223,12 @@ void Context::RemoveAttribute(StringHash objectType, const char* name)
 {
     RemoveNamedAttribute(attributes_, objectType, name);
     RemoveNamedAttribute(networkAttributes_, objectType, name);
+}
+
+void Context::RemoveAllAttributes(StringHash objectType)
+{
+    attributes_.Erase(objectType);
+    networkAttributes_.Erase(objectType);
 }
 
 void Context::UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue)
@@ -450,7 +456,7 @@ void Context::BeginSendEvent(Object* sender, StringHash eventType)
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginBlock(eventType);
     }
@@ -466,7 +472,7 @@ void Context::EndSendEvent()
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->EndBlock();
     }

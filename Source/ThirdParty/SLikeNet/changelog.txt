@@ -1,0 +1,218 @@
+legend:
++        = added feature
+*        = changed feature (bugfixes, changed behavior, etc.)
+-        = removed feature
+***      = special note
+#x       = refers to the JIRA issue number
+LARKU_x  = GitHub pull request / issue number (project: larku/RakNet)
+RAKNET_x = GitHub pull request / issue number (project: facebookarchive/RakNet)
+SLNET_x  = GitHub pull request / issue number (project: SLikeSoft/SLikeNet)
+SECURITY = special marker to indicate fixes related to security issues
+
+If you require a more detailed list on the changes, please refer to the
+Subversion repository history at: https://www.slikesoft.com/svn/slikenet/
+
+version 0.2.0 (xx-xx-xxxx xx:xx UTC)
+*** This release satisfies/processes 3 complete 3 partial GitHub pull requests
+*** This release resolves 1 user reported issue (1 completely)
+General:
+  * extended supported compilers to VS 2017 15.4.1 (#163)
+  * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30)
+Core:
+  RakNetSocket2:
+    * revised RakNetSocket2::GetMyIP() to determine own IPs more reliably (f.e. on OSX) (#217 - SLNET_36)
+  RakPeer:
+    * improve handling of disconnecting peers (#123 - SLNET_16)
+  ReliabilityLayer:
+    * fixed case where larger bitstreams/packets would be corrupted on the receiver's side (#177 - LARKU_2/SLNET_28/SLNET_30)
+    * provide means to ensure sending outstanding ACKs (#123 - SLNET_16)
+  WindowsStore8:
+    * some minor code tweaks (#195 - RAKNET_96)
+Samples:
+  General:
+    * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
+Building:
+  General:
+    * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155, #162)
+  CMake:
+    * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
+    * small tweaks/improvements to CMake files (#130)
+  iOS:
+    * updated file name reference in XCode project (#188 - RAKNET_84)
+
+version 0.1.2 (05-06-2018 21:00 UTC)
+*** This release satisfies/processes 3 complete and 1 partial GitHub pull request (up to pull request RAKNET_124)
+*** This release resolves 3 user reported issues (1 partially and 2 completely)
+*** This release contains security fixes - overall CVSS score: 7.2
+General:
+  * several smaller changes, fixes, and code cleanup (#186 - RAKNET_80, #207)
+  * several documentation updates (#207)
+Core:
+  General
+    * fixed broken ABI compatibility with RakNet 4.081/4.082 (#203)
+  DataStructures:
+    + added DataStructures::RangeList::IsWithinRange() to easily determine whether a value is within a range (#205)
+    * fixed DataStructures::OrderedList::GetIndexFromKey() on a RangeList not indicating correctly that an object already exists (#204)
+    * SECURITY: fixed invalid range list being constructed via DataStructures::RangeList::Deserialize() (#204 - SLNET_19/SLNET_32/RAKNET_102 - CVSS score: 7.2)
+    * several small improvements to DataStructures::RangeList (#205)
+  RakNetSocket2:
+    * fixed out of bounds read in RNS2_Berkley::BindSharedIPV4And6() with RAKNET_SUPPORT_IPV6 set to 1 (#202 - RAKNET_116)
+  RakString:
+    * fixed crash/stack corruption if freeing the returned wide char pointer from RakString::ToWideChar() for an empty string (#190)
+  ReliabilityLayer:
+    * SECURITY: overhauled ACK/NAK handling (#194 - SLNET_32/RAKNET_102 - CVSS score: 7.2)
+    * SECURITY: prevent endless loop when retrieving NAK ranges 0-0xFFFFFE (#194 - SLNET_32/RAKNET_102 - CVSS score: 7.2)
+  SocketLayer:
+    * fixed socket resource leak on non-Windows platforms in an error case (#186 - RAKNET_80)
+Samples:
+  NAT Punchthrough:
+    * fixed crash when exiting the NATCompleteServer (#192 - RAKNET_91)
+Building:
+  Core:
+    * fixed build error in RakNet compatibility mode (#180 - SLNET_28/SLNET_30)
+  CMake:
+    * fixed build errors with CMake < 3.0.0 (#183)
+
+version 0.1.1 (03-10-2018 21:00 UTC)
+*** This release satisfies/processes 3 complete and 3 partial GitHub pull requests/issues
+*** This release contains security fixes - overall CVSS score: 4.8
+General:
+  * several smaller changes, fixes, and code cleanup (#105, #156, #165 - RAKNET_29)
+  * added new chapter about configuring SLikeNet (#105)
+  * changed GitHub pull request markers to support pull requests from different GitHub forks (#105)
+  * dropped optional license requirement to notifiy "Mersenne Twister"-algorithm devs due to lack of valid contact information (#105)
+  * corrected text encoding throughout all files (#116)
+  * several small documentation updates (#105, #112 - SLNET_10, #168)
+Core:
+  General:
+    * fixed several cases of API/ABI breakage with RakNet 4.081/4.082 (#175)
+  FileListTransfer:
+    * SECURITY: provide compile time setting to limit the max file size for retrieving files (#168 - SLNET_19 - CVSS score: 4.0)
+  RakNetSocket2:
+    * fixed certain error messages producing garbled output in unicode configurations (#119)
+  RakPeer:
+    * improve handling of disconnecting peers (#170 - SLNET_16)
+  SocketLayer:
+    * fixed certain error messages producing garbled output in unicode configurations (#119)
+  TCPInterface:
+    * SECURITY: fixed memory leak upon stopping TCP servers (#125 - SLNET_18 - CVSS score: 4.8)
+Extensions:
+  Autopatcher:
+    * fixed crash/undefined behavior upon file read error in postgreSQL-based Autopatcher (#143)
+  Lobby2:
+    * fixed Clans_GetMemberProperties::clanMemberState not being populated (#141)
+    * fixed API/ABI breakage of ProfanityFilter::FilterProfanity() with RakNet 4.081/4.082 (#175)
+Samples:
+  ComprehensiveTest:
+    * fixed very rare occasional crash (#148)
+  FileListTransfer:
+    * fixed incorrect file sizes being reported (#167)
+  Lobby3:
+    * fixed incorrectly referenced string.h header file in VS project file (#105)
+  NAT Punchthrough:
+    * fixed memory/resource leak in NATCompleteServer/NATCompleteClient's ConnectBlocking() functions (#150)
+  Ping:
+    * removed unnecessary/unused query for client port to listen to (#161)
+  ReplicaManager3:
+    * fixed spelling mistake in ClientCreateible structs (#122 - SLNET_15)
+Building:
+  General:
+    * added support for Windows SDK 10.0.16299.0 (#179)
+    * added missing libcat big_x64.o object file (#117)
+    * fixed different compiler warnings with VS2015+ (#119)
+    * fixed RakNet backwards compatibility and SLikeNet projects sharing the same intermediate directories (#118)
+  CMake:
+    * fixed make install not constructing a RakNet backwards compatible include structure (#115)
+    * fixed installing SLikeNet without RAKNET_ENABLE_STATIC being set, not installing the header files (#165 - RAKNET_29)
+  Core:
+    * fixed compile error with Windows SDK >= 10.x on 64-bit (with LIBCAT_SECURITY) (#120)
+  Autopatcher:
+    * fixed incorrect mysql repository library references for certain configurations (#121)
+  CrashReporter:
+    * enabled treating compile warnings as errors in the VS project file (#105)
+  NAT Punchthrough:
+    * fixed server sample not building via CMake projects (#172)
+    * fixed client sample compile errors on Linux/OSX (#174)
+  Router2:
+    * fixed compile errors on OSX (#174)
+
+version 0.1.0 (07-26-2017 21:00 UTC)
+*** This release satisfies/processes 29 complete and 3 partial GitHub pull requests (up to pull request RAKNET_78)
+*** This release contains security fixes - overall CVSS score: 6.0
++ Initial Release
+
+The following lists changes compared to RakNet 4.081/4.082:
+General:
+  + added support for VS 2010-2017, GCC 4.6.4-5.4.0, and Xcode 7.3.1 (#1)
+  + added new retail configuration (#96)
+  * SECURITY: security fix
+  * replaced multi-byte character set support with unicode support (#23)
+  * fixed mixup between Unicode/MBCS/ANSI character set usage (#23)
+  * several further changes, fixes, and code cleanup (#6, #9, #11, etc.)
+  * several documentation updates including a more detailed Doxygen documentation (#101)
+  - dropped support for VS < 2010 and GCC < 4.6.4 (#1)
+Core:
+  General:
+    * fixed case for Windows includes in WindowsIncludes.h (#42 - RAKNET_37)
+  BitStream:
+    * fixed <<-operator for BitStream not accepting const parameters (#44 - RAKNET_53)
+  CCRakNetSlidingWindow:
+    * use std::abs() instead of abs for proper C++11 support in CCRakNetSlidingWindow.cpp (#46 - RAKNET_64)
+  DataStructures:
+    * minor improvement to DataStructures::Queue:WeightedGraph::GetShortestPath() by replacing Queue::Size() calls with Queue::IsEmpty() (#34 - RAKNET_14)
+    * fixed incorrect DataStructures::Queue-copy-ctor (#26)
+  NatPunchthrough:
+    * fixed NatPunchthroughClient::SendOutOfBand() producing undefined messages, if __GET_TIME_64BIT is set to 0 (#38 - RAKNET_34)
+    * fixed TestModeToString() returning non-const char pointer (#35, #59, #65 - RAKNET_22, RAKNET_31, RAKNET_61)
+  PacketFileLogger:
+    * fixed incorrectly instantiating/destroying the PacketLogger class instead of the PacketFileLogger when calling PacketFileLogger::GetInstance()/DestroyInstance() (#81)
+  RakNetSocket2:
+    * fixed incomplete zeroing of data in RakNetSocket2_Berkley_NativeClient with RAKNET_SUPPORT_IPV6 set to 1 (#31 - RAKNET_4)
+  RakPeer:
+    * fixed RakPeer::GetTimeoutTime() always returning defaultTimeoutTime (#37 - RAKNET_30)
+    * fixed incorrect delete in RakPeer::DerefAllSockets() when using a custom allocator (#48 - RAKNET_72)
+    * fixed deadlock in ProcessOfflineNetworkPacket() when building with LIBCAT_SECURITY set to 1 (#43)
+  RakString:
+    * fixed undefined behavior in RakString::Assign() on non-Windows platforms if either the passed or the formated string exceeds 511 characters (#64 - RAKNET_60)
+    * fixed undefined behavior in RakString::ToWideChar() if called with very long strings (#12)
+    * fixed undefined behavior in RakString::FromWideChar() if called with very long strings (#102)
+    * SECURITY: fixed memory/resource leak in RakString format-ctors and Set() method on certain platforms/compilers (#40 - RAKNET_36 - CVSS score: 6.0)
+  ReplicaManager3:
+    * fixed resource leak caused by ReplicaManager3::OnConstruction() (#45 - RAKNET_63)
+    * fixed comparing pointer to boolean in ReplicaManager3::AutoCreateConnectionList() (#36, #63 - RAKNET_29, RAKNET_56)
+  UDPProxy:
+    * fixed crash in UDPProxyClient::OnPingServers() (#39 - RAKNET_35)
+    * fixed wrong sort order in UDPProxyCoordinator::ForwardingRequestComp() and related incorrectly sorted UDPProxyCoordinator::forwardingRequestList (#47 - RAKNET_67)
+Extensions:
+  Autopatcher:
+    * fixed memory leak in ApplyPatch: TestPatchInMemory() (#32 - RAKNET_7)
+  IrrlichtDemo:
+    * fixed only partial upgrade of Irrlicht SDK to 1.8 (#91)
+    * SECURITY: fixed potential non-null-terminated string (#104 - CVSS score: n/a)
+  Lobby2:
+    * SECURITY: fixed crash (dangling pointer and usage after free issue) when detaching Steam Lobby2Client plugin and destroying the instance (#95 - CVSS score: n/a)
+    * fixed Lobby2 Steam client staying attached, even after calling RakPeer::DetachPlugin() (#95)
+  XML:
+    * upgraded XMLParser library from 2.41 to 2.44 (#103)
+Samples:
+  Autopatcher:
+    * fixed broken AutopatcherPostgreRepository2_WithXDelta due to non-overwritten MakePatch()-method (#14)
+  Cloud:
+    * fixed CloudServerHelper::OnJoinCloudResult() setting incorrect default port (#15)
+  CrossConnectionTest:
+    * fixed incorrect check for incoming connection in CrossConnectionTest (#33 - RAKNET_10)
+  FileListTransfer:
+    * fixed FileListTransfer sample passing incorrect values to TCPInterface::Start() (#21)
+Building:
+  General:
+    * resolved several compile/link errors in specific configurations/projects (#7, #13, #16, #18, #19, #20, #24, #25, #26, #28, #87, #88, #89, #90, #92, #94, #97)
+    * resolved compile/link warnings (#11)
+  CMake:
+    * resolved CMake warnings/issues (#11, #78, #98, #99)
+    * update to CMake file to support VS 2015 (#46 - RAKNET_64, RAKNET_105, RAKNET_110)
+    * updated FindBoost CMake file from CMake 2.8.0 -> CMake 2.8.10.2 (#99)
+    * updated CMake file to detect FMOD Ex up to version 4.44.59 (#78)
+    * changed to not build sample projects on Linux/Mac by default (#79)
+    * fixed CMake not compiling samples by default (#30, #62 - RAKNET_51, RAKNET_54)
+    * fixed FindPortAudio CMake module ignoring libPortAudioCpp setting (#29 - RAKNET_48)
+    * fixed incorrect usage of PARENT_SCOPE and missing quoting of env-variable in CMake file (#77 - RAKNET_37)

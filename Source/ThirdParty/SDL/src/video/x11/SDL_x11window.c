@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,11 +40,10 @@
 
 #include "SDL_timer.h"
 #include "SDL_syswm.h"
-#include "SDL_assert.h"
+#include "SDL_log.h"
 
 #define _NET_WM_STATE_REMOVE    0l
 #define _NET_WM_STATE_ADD       1l
-#define _NET_WM_STATE_TOGGLE    2l
 
 static Bool isMapNotify(Display *dpy, XEvent *ev, XPointer win)
 {
@@ -226,6 +225,19 @@ X11_GetNetWMState(_THIS, Window xwindow)
         if (fullscreen == 1) {
             flags |= SDL_WINDOW_FULLSCREEN;
         }
+
+        /* If the window is unmapped, numItems will be zero and _NET_WM_STATE_HIDDEN
+         * will not be set. Do an additional check to see if the window is unmapped
+         * and mark it as SDL_WINDOW_HIDDEN if it is.
+         */
+        {
+            XWindowAttributes attr;
+            SDL_memset(&attr,0,sizeof(attr));
+            X11_XGetWindowAttributes(videodata->display, xwindow, &attr);
+            if (attr.map_state == IsUnmapped) {
+                flags |= SDL_WINDOW_HIDDEN;
+            }
+        }
         X11_XFree(propertyValue);
     }
 
@@ -376,7 +388,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
     Atom _NET_WM_WINDOW_TYPE;
     Atom wintype;
     const char *wintype_name = NULL;
-    int compositor = 1;
+    long compositor = 1;
     Atom _NET_WM_PID;
     Atom XdndAware, xdnd_version = 5;
     long fevent = 0;
@@ -389,7 +401,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
 #if SDL_VIDEO_OPENGL_EGL
         if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES 
 #if SDL_VIDEO_OPENGL_GLX            
-            && ( !_this->gl_data || ! _this->gl_data->HAS_GLX_EXT_create_context_es2_profile )
+            && ( !_this->gl_data || X11_GL_UseEGL(_this) )
 #endif
         ) {
             vinfo = X11_GLES_GetVisual(_this, display, screen);
@@ -600,7 +612,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
     if ((window->flags & SDL_WINDOW_OPENGL) && 
         _this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES
 #if SDL_VIDEO_OPENGL_GLX            
-        && ( !_this->gl_data || ! _this->gl_data->HAS_GLX_EXT_create_context_es2_profile )
+        && ( !_this->gl_data || X11_GL_UseEGL(_this) )
 #endif  
     ) {
 #if SDL_VIDEO_OPENGL_EGL  
@@ -617,7 +629,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
             return SDL_SetError("Could not create GLES window surface");
         }
 #else
-        return SDL_SetError("Could not create GLES window surface (no EGL support available)");
+        return SDL_SetError("Could not create GLES window surface (EGL support not configured)");
 #endif /* SDL_VIDEO_OPENGL_EGL */
     }
 #endif
@@ -1029,7 +1041,8 @@ X11_ShowWindow(_THIS, SDL_Window * window)
         /* Blocking wait for "MapNotify" event.
          * We use X11_XIfEvent because pXWindowEvent takes a mask rather than a type,
          * and XCheckTypedWindowEvent doesn't block */
-        X11_XIfEvent(display, &event, &isMapNotify, (XPointer)&data->xwindow);
+        if(!(window->flags & SDL_WINDOW_FOREIGN))
+            X11_XIfEvent(display, &event, &isMapNotify, (XPointer)&data->xwindow);
         X11_XFlush(display);
     }
 
@@ -1051,7 +1064,8 @@ X11_HideWindow(_THIS, SDL_Window * window)
     if (X11_IsWindowMapped(_this, window)) {
         X11_XWithdrawWindow(display, data->xwindow, displaydata->screen);
         /* Blocking wait for "UnmapNotify" event */
-        X11_XIfEvent(display, &event, &isUnmapNotify, (XPointer)&data->xwindow);
+        if(!(window->flags & SDL_WINDOW_FOREIGN))
+            X11_XIfEvent(display, &event, &isUnmapNotify, (XPointer)&data->xwindow);
         X11_XFlush(display);
     }
 }
@@ -1484,14 +1498,25 @@ X11_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 
     if (oldstyle_fullscreen || grabbed) {
         /* Try to grab the mouse */
-        for (;;) {
-            int result =
-                X11_XGrabPointer(display, data->xwindow, True, 0, GrabModeAsync,
-                             GrabModeAsync, data->xwindow, None, CurrentTime);
-            if (result == GrabSuccess) {
-                break;
+        if (!data->videodata->broken_pointer_grab) {
+            const unsigned int mask = ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask;
+            int attempts;
+            int result;
+
+            /* Try for up to 5000ms (5s) to grab. If it still fails, stop trying. */
+            for (attempts = 0; attempts < 100; attempts++) {
+                result = X11_XGrabPointer(display, data->xwindow, True, mask, GrabModeAsync,
+                                 GrabModeAsync, data->xwindow, None, CurrentTime);
+                if (result == GrabSuccess) {
+                    break;
+                }
+                SDL_Delay(50);
             }
-            SDL_Delay(50);
+
+            if (result != GrabSuccess) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO, "The X server refused to let us grab the mouse. You might experience input bugs.");
+                data->videodata->broken_pointer_grab = SDL_TRUE;  /* don't try again. */
+            }
         }
 
         /* Raise the window if we grab the mouse */
@@ -1566,7 +1591,7 @@ X11_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
         info->info.x11.window = data->xwindow;
         return SDL_TRUE;
     } else {
-        SDL_SetError("Application not compiled with SDL %d.%d\n",
+        SDL_SetError("Application not compiled with SDL %d.%d",
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }

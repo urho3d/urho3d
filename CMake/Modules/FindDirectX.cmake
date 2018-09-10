@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -45,12 +45,15 @@
 #  DIRECT3D_LIBRARIES
 #  DIRECT3D_DLL
 #
-# When corresponding header listed below is found:
+
+set (DIRECTX_HEADERS audioclient.h d3dcompiler.h d3d9.h d3d11.h ddraw.h dsound.h dinput.h dxgi.h mmdeviceapi.h xaudio2.h xinput.h)
+
+# When corresponding header listed above is found:
 #  HAVE_<UPCASE_NAME>_H
+#  HAVE_XINPUT_GAMEPAD_EX
+#  HAVE_XINPUT_STATE_EX
 #  HAVE_D3D_H (Currently synonym to HAVE_D3D9_H)
 #
-
-set (DIRECTX_HEADERS d3dcompiler.h d3d9.h d3d11.h ddraw.h dsound.h dinput.h dxgi.h xaudio2.h xinput.h)
 
 # Optional input variables (see corresponding code comments for details):
 #  DIRECTX_INC_SEARCH_PATHS
@@ -213,12 +216,15 @@ endif ()
 # For now take shortcut for the other DirectX components by just checking on the headers and not the libraries
 include (CheckIncludeFiles)
 include (CheckIncludeFileCXX)
+include (CheckStructHasMember)
 foreach (NAME ${DIRECTX_HEADERS})
     string (REPLACE . _ BASE_NAME ${NAME})
     string (TOUPPER ${BASE_NAME} UPCASE_NAME)
     if (NAME STREQUAL xinput.h)
         # Workaround an issue in finding xinput.h using check_include_file() as it depends on windows.h but not included it by itself in WinSDK
         check_include_files (windows.h\;${NAME} HAVE_${UPCASE_NAME})
+        check_struct_has_member (XINPUT_GAMEPAD_EX wButtons xinput.h HAVE_XINPUT_GAMEPAD_EX)
+        check_struct_has_member (XINPUT_STATE_EX dwPacketNumber xinput.h HAVE_XINPUT_STATE_EX)
     else ()
         check_include_file_cxx (${NAME} HAVE_${UPCASE_NAME})
     endif ()

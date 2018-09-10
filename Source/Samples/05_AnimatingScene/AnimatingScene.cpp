@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ void AnimatingScene::Start()
 
 void AnimatingScene::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -86,7 +86,7 @@ void AnimatingScene::CreateScene()
     // it also defines its volume with a bounding box, but can be rotated (so it does not need to be aligned to the world X, Y
     // and Z axes.) Drawable objects "pick up" the zone they belong to and use it when rendering; several zones can exist
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     // Set same volume as the Octree, set a close bluish fog and some ambient light
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.05f, 0.1f, 0.15f));
@@ -102,7 +102,7 @@ void AnimatingScene::CreateScene()
         boxNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(200.0f) - 100.0f, Random(200.0f) - 100.0f));
         // Orient using random pitch, yaw and roll Euler angles
         boxNode->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
-        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+        auto* boxObject = boxNode->CreateComponent<StaticModel>();
         boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
 
@@ -111,29 +111,29 @@ void AnimatingScene::CreateScene()
         // to the various update events, and forward them to virtual functions that can be implemented by subclasses. This way
         // writing logic/update components in C++ becomes similar to scripting.
         // Now we simply set same rotation speed for all objects
-        Rotator* rotator = boxNode->CreateComponent<Rotator>();
+        auto* rotator = boxNode->CreateComponent<Rotator>();
         rotator->SetRotationSpeed(Vector3(10.0f, 20.0f, 30.0f));
     }
 
     // Create the camera. Let the starting position be at the world origin. As the fog limits maximum visible distance, we can
     // bring the far clip plane closer for more effective culling of distant objects
     cameraNode_ = scene_->CreateChild("Camera");
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(100.0f);
 
     // Create a point light to the camera scene node
-    Light* light = cameraNode_->CreateComponent<Light>();
+    auto* light = cameraNode_->CreateComponent<Light>();
     light->SetLightType(LIGHT_POINT);
     light->SetRange(30.0f);
 }
 
 void AnimatingScene::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -145,7 +145,7 @@ void AnimatingScene::CreateInstructions()
 
 void AnimatingScene::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -164,7 +164,7 @@ void AnimatingScene::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;

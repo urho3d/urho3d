@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,19 +33,12 @@ namespace Urho3D
 
 Vector3 UIBatch::posAdjust(0.0f, 0.0f, 0.0f);
 
-UIBatch::UIBatch() :
-    element_(nullptr),
-    blendMode_(BLEND_REPLACE),
-    texture_(nullptr),
-    invTextureSize_(Vector2::ONE),
-    vertexData_(nullptr),
-    vertexStart_(0),
-    vertexEnd_(0)
+UIBatch::UIBatch()
 {
     SetDefaultColor();
 }
 
-UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
+UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :     // NOLINT(modernize-pass-by-value)
     element_(element),
     blendMode_(blendMode),
     scissor_(scissor),
@@ -312,7 +305,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     ((unsigned&)dest[9]) = color_;
     dest[10] = uv2.x_;
     dest[11] = uv2.y_;
-    
+
     dest[12] = v3.x_;
     dest[13] = v3.y_;
     dest[14] = 0.0f;
@@ -379,7 +372,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     ((unsigned&)dest[9]) = c2;
     dest[10] = uv2.x_;
     dest[11] = uv2.y_;
-    
+
     dest[12] = v3.x_;
     dest[13] = v3.y_;
     dest[14] = 0.0f;

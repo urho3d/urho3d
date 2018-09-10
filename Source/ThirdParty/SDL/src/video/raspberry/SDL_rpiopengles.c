@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,9 +27,17 @@
 
 /* EGL implementation of SDL OpenGL support */
 
+void
+RPI_GLES_DefaultProfileConfig(_THIS, int *mask, int *major, int *minor)
+{
+    *mask = SDL_GL_CONTEXT_PROFILE_ES;
+    *major = 2;
+    *minor = 0;
+}
+
 int
 RPI_GLES_LoadLibrary(_THIS, const char *path) {
-    return SDL_EGL_LoadLibrary(_this, path, EGL_DEFAULT_DISPLAY);
+    return SDL_EGL_LoadLibrary(_this, path, EGL_DEFAULT_DISPLAY, 0);
 }
 
 SDL_EGL_CreateContext_impl(RPI)

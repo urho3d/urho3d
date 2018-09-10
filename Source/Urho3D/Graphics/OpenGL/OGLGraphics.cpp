@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -220,43 +220,12 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 bool Graphics::gl3Support = false;
 
-Graphics::Graphics(Context* context_) :
-    Object(context_),
+Graphics::Graphics(Context* context) :
+    Object(context),
     impl_(new GraphicsImpl()),
-    window_(nullptr),
-    externalWindow_(nullptr),
-    width_(0),
-    height_(0),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
-    multiSample_(1),
-    fullscreen_(false),
-    borderless_(false),
-    resizable_(false),
-    highDPI_(false),
-    vsync_(false),
-    monitor_(0),
-    refreshRate_(0),
-    tripleBuffer_(false),
-    sRGB_(false),
-    forceGL2_(false),
-    instancingSupport_(false),
-    lightPrepassSupport_(false),
-    deferredSupport_(false),
-    anisotropySupport_(false),
-    dxtTextureSupport_(false),
-    etcTextureSupport_(false),
-    pvrtcTextureSupport_(false),
-    hardwareShadowSupport_(false),
-    sRGBSupport_(false),
-    sRGBWriteSupport_(false),
-    numPrimitives_(0),
-    numBatches_(0),
-    maxScratchBufferRequest_(0),
-    dummyColorFormat_(0),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
-    defaultTextureFilterMode_(FILTER_TRILINEAR),
-    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -425,10 +394,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
 
-        // Reposition the window on the specified monitor
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(monitor, &display_rect);
-        SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
         bool reposition = fullscreen || (borderless && width >= display_rect.w && height >= display_rect.h);
 
         int x = reposition ? display_rect.x : position_.x_;
@@ -477,6 +444,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 }
             }
         }
+
+        // Reposition the window on the specified monitor
+        if (reposition)
+            SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
 
         CreateWindowIcon();
 
@@ -529,6 +500,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     CheckFeatureSupport();
 
 #ifdef URHO3D_LOGGING
+    URHO3D_LOGINFOF("Adapter used %s %s", (const char *) glGetString(GL_VENDOR), (const char *) glGetString(GL_RENDERER));
+    
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)
@@ -688,7 +661,7 @@ void Graphics::EndFrame()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
 {
     PrepareDraw();
 
@@ -1655,7 +1628,7 @@ void Graphics::SetTextureParametersDirty()
 
     for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
-        Texture* texture = dynamic_cast<Texture*>(*i);
+        auto* texture = dynamic_cast<Texture*>(*i);
         if (texture)
             texture->SetParametersDirty();
     }
@@ -1739,8 +1712,8 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         // Check size similarly
         if (width <= width_ && height <= height_)
         {
-            int searchKey = (width << 16) | height;
-            HashMap<int, SharedPtr<Texture2D> >::Iterator i = impl_->depthTextures_.Find(searchKey);
+            unsigned searchKey = (width << 16u) | height;
+            HashMap<unsigned, SharedPtr<Texture2D> >::Iterator i = impl_->depthTextures_.Find(searchKey);
             if (i != impl_->depthTextures_.End())
                 depthStencil = i->second_->GetRenderSurface();
             else
@@ -2108,7 +2081,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     for (int i = 2; i <= maxSamples && i <= 16; i *= 2)
         ret.Push(i);
 #endif
-    
+
     return ret;
 }
 
@@ -2175,7 +2148,7 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
 {
     if (lastShaderName_ != name || !lastShader_)
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
 
         String fullShaderName = shaderPath_ + name + shaderExtension_;
         // Try to reduce repeated error log prints because of missing shaders
@@ -2301,7 +2274,7 @@ void Graphics::OnWindowMoved()
     position_.x_ = newX;
     position_.y_ = newY;
 
-    URHO3D_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+    URHO3D_LOGTRACEF("Window was moved to %d,%d", position_.x_, position_.y_);
 
     using namespace WindowPos;
 
@@ -2372,12 +2345,12 @@ void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
         impl_->shaderProgram_ = nullptr;
 }
 
-ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsigned bindingIndex, unsigned size)
+ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsigned index, unsigned size)
 {
     // Note: shaderType parameter is not used on OpenGL, instead binding index should already use the PS range
     // for PS constant buffers
 
-    unsigned key = (bindingIndex << 16) | size;
+    unsigned key = (index << 16u) | size;
     HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = impl_->allConstantBuffers_.Find(key);
     if (i == impl_->allConstantBuffers_.End())
     {
@@ -2879,9 +2852,9 @@ void Graphics::PrepareDraw()
         bool noFbo = !depthStencil_;
         if (noFbo)
         {
-            for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+            for (auto& renderTarget : renderTargets_)
             {
-                if (renderTargets_[i])
+                if (renderTarget)
                 {
                     noFbo = false;
                     break;
@@ -2924,8 +2897,7 @@ void Graphics::PrepareDraw()
         else if (depthStencil_)
             format = depthStencil_->GetParentTexture()->GetFormat();
 
-        unsigned long long fboKey = (rtSize.x_ << 16 | rtSize.y_) | (((unsigned long long)format) << 32);
-
+        auto fboKey = (unsigned long long)format << 32u | rtSize.x_ << 16u | rtSize.y_;
         HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Find(fboKey);
         if (i == impl_->frameBuffers_.End())
         {
@@ -2953,7 +2925,7 @@ void Graphics::PrepareDraw()
         for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
         {
             if (renderTargets_[j])
-                newDrawBuffers |= 1 << j;
+                newDrawBuffers |= 1u << j;
         }
 
         if (newDrawBuffers != i->second_.drawBuffers_)
@@ -3115,7 +3087,7 @@ void Graphics::PrepareDraw()
                 if (k != impl_->vertexAttributes_->End())
                 {
                     unsigned location = k->second_;
-                    unsigned locationMask = 1 << location;
+                    unsigned locationMask = 1u << location;
                     if (assignedLocations & locationMask)
                         continue; // Already assigned by higher index vertex buffer
                     assignedLocations |= locationMask;
@@ -3160,10 +3132,10 @@ void Graphics::PrepareDraw()
         unsigned location = 0;
         while (disableVertexAttributes)
         {
-            if (disableVertexAttributes & 1)
+            if (disableVertexAttributes & 1u)
             {
                 glDisableVertexAttribArray(location);
-                impl_->enabledVertexAttributes_ &= ~(1 << location);
+                impl_->enabledVertexAttributes_ &= ~(1u << location);
             }
             ++location;
             disableVertexAttributes >>= 1;
@@ -3191,19 +3163,18 @@ void Graphics::CleanupFramebuffers()
             DeleteFramebuffer(impl_->resolveDestFBO_);
     }
     else
-    {
         impl_->boundFBO_ = 0;
-        impl_->resolveSrcFBO_ = 0;
-        impl_->resolveDestFBO_ = 0;
-    }
+
+    impl_->resolveSrcFBO_ = 0;
+    impl_->resolveDestFBO_ = 0;
 
     impl_->frameBuffers_.Clear();
 }
 
 void Graphics::ResetCachedState()
 {
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-        vertexBuffers_[i] = nullptr;
+    for (auto& vertexBuffer : vertexBuffers_)
+        vertexBuffer = nullptr;
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
@@ -3211,8 +3182,8 @@ void Graphics::ResetCachedState()
         impl_->textureTypes_[i] = 0;
     }
 
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        renderTargets_[i] = nullptr;
+    for (auto& renderTarget : renderTargets_)
+        renderTarget = nullptr;
 
     depthStencil_ = nullptr;
     viewport_ = IntRect(0, 0, 0, 0);
@@ -3260,8 +3231,8 @@ void Graphics::ResetCachedState()
         SetDepthWrite(true);
     }
 
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
-        impl_->constantBuffers_[i] = nullptr;
+    for (auto& constantBuffer : impl_->constantBuffers_)
+        constantBuffer = nullptr;
     impl_->dirtyConstantBuffers_.Clear();
 }
 

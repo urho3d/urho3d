@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,9 @@
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#ifndef STB_VORBIS_HEADER_ONLY
 #define STB_VORBIS_HEADER_ONLY
+#endif
 #include <STB/stb_vorbis.h>
 
 #include "../DebugNew.h"
@@ -72,9 +74,7 @@ Sound::Sound(Context* context) :
 {
 }
 
-Sound::~Sound()
-{
-}
+Sound::~Sound() = default;
 
 void Sound::RegisterObject(Context* context)
 {
@@ -133,7 +133,7 @@ bool Sound::LoadOggVorbis(Deserializer& source)
 
 bool Sound::LoadWav(Deserializer& source)
 {
-    WavHeader header;
+    WavHeader header{};
 
     // Try to open
     memset(&header, 0, sizeof header);
@@ -141,7 +141,7 @@ bool Sound::LoadWav(Deserializer& source)
     header.totalLength_ = source.ReadUInt();
     source.Read(&header.waveText_, 4);
 
-    if (memcmp("RIFF", header.riffText_, 4) || memcmp("WAVE", header.waveText_, 4))
+    if (memcmp("RIFF", header.riffText_, 4) != 0 || memcmp("WAVE", header.waveText_, 4) != 0)
     {
         URHO3D_LOGERROR("Could not read WAV data from " + source.GetName());
         return false;
@@ -340,7 +340,7 @@ unsigned Sound::GetSampleSize() const
 
 void Sound::LoadParameters()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));

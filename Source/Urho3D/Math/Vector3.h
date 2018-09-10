@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ class URHO3D_API IntVector3
 {
 public:
     /// Construct a zero vector.
-    IntVector3() :
+    IntVector3() noexcept :
         x_(0),
         y_(0),
         z_(0)
@@ -41,7 +41,7 @@ public:
     }
 
     /// Construct from coordinates.
-    IntVector3(int x, int y, int z) :
+    IntVector3(int x, int y, int z) noexcept :
         x_(x),
         y_(y),
         z_(z)
@@ -49,7 +49,7 @@ public:
     }
 
     /// Construct from an int array.
-    IntVector3(const int* data) :
+    explicit IntVector3(const int* data) noexcept :
         x_(data[0]),
         y_(data[1]),
         z_(data[2])
@@ -57,21 +57,10 @@ public:
     }
 
     /// Copy-construct from another vector.
-    IntVector3(const IntVector3& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_),
-        z_(rhs.z_)
-    {
-    }
+    IntVector3(const IntVector3& rhs) noexcept = default;
 
     /// Assign from another vector.
-    IntVector3& operator =(const IntVector3& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        return *this;
-    }
+    IntVector3& operator =(const IntVector3& rhs) noexcept = default;
 
     /// Test for equality with another vector.
     bool operator ==(const IntVector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
@@ -196,7 +185,7 @@ class URHO3D_API Vector3
 {
 public:
     /// Construct a zero vector.
-    Vector3() :
+    Vector3() noexcept :
         x_(0.0f),
         y_(0.0f),
         z_(0.0f)
@@ -204,15 +193,10 @@ public:
     }
 
     /// Copy-construct from another vector.
-    Vector3(const Vector3& vector) :
-        x_(vector.x_),
-        y_(vector.y_),
-        z_(vector.z_)
-    {
-    }
+    Vector3(const Vector3& vector) noexcept = default;
 
     /// Construct from a two-dimensional vector and the Z coordinate.
-    Vector3(const Vector2& vector, float z) :
+    Vector3(const Vector2& vector, float z) noexcept :
         x_(vector.x_),
         y_(vector.y_),
         z_(z)
@@ -220,7 +204,7 @@ public:
     }
 
     /// Construct from a two-dimensional vector (for Urho2D).
-    Vector3(const Vector2& vector) :
+    explicit Vector3(const Vector2& vector) noexcept :
         x_(vector.x_),
         y_(vector.y_),
         z_(0.0f)
@@ -228,7 +212,7 @@ public:
     }
 
     /// Construct from an IntVector3.
-    explicit Vector3(const IntVector3& vector) :
+    explicit Vector3(const IntVector3& vector) noexcept :
         x_((float)vector.x_),
         y_((float)vector.y_),
         z_((float)vector.z_)
@@ -236,7 +220,7 @@ public:
     }
 
     /// Construct from coordinates.
-    Vector3(float x, float y, float z) :
+    Vector3(float x, float y, float z) noexcept :
         x_(x),
         y_(y),
         z_(z)
@@ -244,7 +228,7 @@ public:
     }
 
     /// Construct from two-dimensional coordinates (for Urho2D).
-    Vector3(float x, float y) :
+    Vector3(float x, float y) noexcept :
         x_(x),
         y_(y),
         z_(0.0f)
@@ -252,7 +236,7 @@ public:
     }
 
     /// Construct from a float array.
-    explicit Vector3(const float* data) :
+    explicit Vector3(const float* data) noexcept :
         x_(data[0]),
         y_(data[1]),
         z_(data[2])
@@ -260,13 +244,7 @@ public:
     }
 
     /// Assign from another vector.
-    Vector3& operator =(const Vector3& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        return *this;
-    }
+    Vector3& operator =(const Vector3& rhs) noexcept = default;
 
     /// Test for equality with another vector without epsilon.
     bool operator ==(const Vector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
@@ -378,8 +356,34 @@ public:
         return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_);
     }
 
-    /// Project vector onto axis.
+    /// Project direction vector onto axis.
     float ProjectOntoAxis(const Vector3& axis) const { return DotProduct(axis.Normalized()); }
+
+    /// Project position vector onto plane with given origin and normal.
+    Vector3 ProjectOntoPlane(const Vector3& origin, const Vector3& normal) const
+    {
+        const Vector3 delta = *this - origin;
+        return *this - normal.Normalized() * delta.ProjectOntoAxis(normal);
+    }
+
+    /// Project position vector onto line segment.
+    Vector3 ProjectOntoLine(const Vector3& from, const Vector3& to, bool clamped = false) const
+    {
+        const Vector3 direction = to - from;
+        const float lengthSquared = direction.LengthSquared();
+        float factor = (*this - from).DotProduct(direction) / lengthSquared;
+
+        if (clamped)
+            factor = Clamp(factor, 0.0f, 1.0f);
+
+        return from + direction * factor;
+    }
+
+    /// Calculate distance to another position vector.
+    float DistanceToPoint(const Vector3& point) const { return (*this - point).Length(); }
+
+    /// Calculate distance to the plane with given origin and normal.
+    float DistanceToPlane(const Vector3& origin, const Vector3& normal) const { return (*this - origin).ProjectOntoAxis(normal); }
 
     /// Make vector orthogonal to the axis.
     Vector3 Orthogonalize(const Vector3& axis) const { return axis.CrossProduct(*this).CrossProduct(axis).Normalized(); }

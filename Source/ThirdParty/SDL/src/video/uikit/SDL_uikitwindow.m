@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -107,6 +107,14 @@ static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bo
 
 #if !TARGET_OS_TV
     if (displaydata.uiscreen == [UIScreen mainScreen]) {
+        /* SDL_CreateWindow sets the window w&h to the display's bounds if the
+         * fullscreen flag is set. But the display bounds orientation might not
+         * match what we want, and GetSupportedOrientations call below uses the
+         * window w&h. They're overridden below anyway, so we'll just set them
+         * to the requested size for the purposes of determining orientation. */
+        window->w = window->windowed.w;
+        window->h = window->windowed.h;
+
         NSUInteger orients = UIKit_GetSupportedOrientations(window);
         BOOL supportsLandscape = (orients & UIInterfaceOrientationMaskLandscape) != 0;
         BOOL supportsPortrait = (orients & (UIInterfaceOrientationMaskPortrait|UIInterfaceOrientationMaskPortraitUpsideDown)) != 0;
@@ -360,7 +368,7 @@ UIKit_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
 
             return SDL_TRUE;
         } else {
-            SDL_SetError("Application not compiled with SDL %d.%d\n",
+            SDL_SetError("Application not compiled with SDL %d.%d",
                          SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
             return SDL_FALSE;
         }

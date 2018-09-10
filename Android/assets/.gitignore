@@ -1,3 +1,0 @@
-# Ignore everything as it just contains symlinks or copied of files (Windows platform without MKLINK)
-*
-!.gitignore

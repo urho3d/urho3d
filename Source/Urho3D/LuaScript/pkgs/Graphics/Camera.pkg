@@ -19,7 +19,7 @@ class Camera : public Component
     void SetZoom(float zoom);
     void SetLodBias(float bias);
     void SetViewMask(unsigned mask);
-    void SetViewOverrideFlags(unsigned flags);
+    void SetViewOverrideFlags(ViewOverride flags);
     void SetOrthographic(bool enable);
     void SetAutoAspectRatio(bool enable);
     void SetProjectionOffset(const Vector2& offset);
@@ -37,7 +37,7 @@ class Camera : public Component
     float GetZoom() const;
     float GetLodBias() const;
     unsigned GetViewMask() const;
-    unsigned GetViewOverrideFlags() const;
+    ViewOverride GetViewOverrideFlags() const;
     FillMode GetFillMode() const;
     bool IsOrthographic() const;
     bool GetAutoAspectRatio() const;
@@ -73,7 +73,7 @@ class Camera : public Component
     tolua_property__get_set float zoom;
     tolua_property__get_set float lodBias;
     tolua_property__get_set unsigned viewMask;
-    tolua_property__get_set unsigned viewOverrideFlags;
+    tolua_property__get_set ViewOverride viewOverrideFlags;
     tolua_property__get_set FillMode fillMode;
     tolua_property__is_set bool orthographic;
     tolua_property__get_set bool autoAspectRatio;

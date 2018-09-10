@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventD
     using namespace NodeCollision;
 
     // Get the other colliding body, make sure it is moving (has nonzero mass)
-    RigidBody* otherBody = static_cast<RigidBody*>(eventData[P_OTHERBODY].GetPtr());
+    auto* otherBody = static_cast<RigidBody*>(eventData[P_OTHERBODY].GetPtr());
 
     if (otherBody->GetMass() > 0.0f)
     {
@@ -102,7 +102,7 @@ void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventD
             Vector2(90.0f, 0.0f), Vector2::ZERO);
 
         // Disable keyframe animation from all bones so that they will not interfere with the ragdoll
-        AnimatedModel* model = GetComponent<AnimatedModel>();
+        auto* model = GetComponent<AnimatedModel>();
         Skeleton& skeleton = model->GetSkeleton();
         for (unsigned i = 0; i < skeleton.GetNumBones(); ++i)
             skeleton.GetBone(i)->animated_ = false;
@@ -123,7 +123,7 @@ void CreateRagdoll::CreateRagdollBone(const String& boneName, ShapeType type, co
         return;
     }
 
-    RigidBody* body = boneNode->CreateComponent<RigidBody>();
+    auto* body = boneNode->CreateComponent<RigidBody>();
     // Set mass to make movable
     body->SetMass(1.0f);
     // Set damping parameters to smooth out the motion
@@ -133,7 +133,7 @@ void CreateRagdoll::CreateRagdollBone(const String& boneName, ShapeType type, co
     body->SetLinearRestThreshold(1.5f);
     body->SetAngularRestThreshold(2.5f);
 
-    CollisionShape* shape = boneNode->CreateComponent<CollisionShape>();
+    auto* shape = boneNode->CreateComponent<CollisionShape>();
     // We use either a box or a capsule shape for all of the bones
     if (type == SHAPE_BOX)
         shape->SetBox(size, position, rotation);
@@ -158,7 +158,7 @@ void CreateRagdoll::CreateRagdollConstraint(const String& boneName, const String
         return;
     }
 
-    Constraint* constraint = boneNode->CreateComponent<Constraint>();
+    auto* constraint = boneNode->CreateComponent<Constraint>();
     constraint->SetConstraintType(type);
     // Most of the constraints in the ragdoll will work better when the connected bodies don't collide against each other
     constraint->SetDisableCollision(disableCollision);

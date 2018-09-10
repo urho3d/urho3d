@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ void DynamicGeometry::Start()
 
 void DynamicGeometry::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -88,7 +88,7 @@ void DynamicGeometry::CreateScene()
 
     // Create a Zone for ambient light & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetFogColor(Color(0.2f, 0.2f, 0.2f));
     zone->SetFogStart(200.0f);
@@ -97,13 +97,13 @@ void DynamicGeometry::CreateScene()
     // Create a directional light
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(-0.6f, -1.0f, -0.8f)); // The direction vector does not need to be normalized
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetColor(Color(0.4f, 1.0f, 0.4f));
     light->SetSpecularIntensity(1.5f);
 
     // Get the original model and its unmodified vertices, which are used as source data for the animation
-    Model* originalModel = cache->GetResource<Model>("Models/Box.mdl");
+    auto* originalModel = cache->GetResource<Model>("Models/Box.mdl");
     if (!originalModel)
     {
         URHO3D_LOGERROR("Model not found, cannot initialize example scene");
@@ -111,7 +111,7 @@ void DynamicGeometry::CreateScene()
     }
     // Get the vertex buffer from the first geometry's first LOD level
     VertexBuffer* buffer = originalModel->GetGeometry(0, 0)->GetVertexBuffer(0);
-    const unsigned char* vertexData = (const unsigned char*)buffer->Lock(0, buffer->GetVertexCount());
+    const auto* vertexData = (const unsigned char*)buffer->Lock(0, buffer->GetVertexCount());
     if (vertexData)
     {
         unsigned numVertices = buffer->GetVertexCount();
@@ -152,7 +152,7 @@ void DynamicGeometry::CreateScene()
         {
             Node* node = scene_->CreateChild("Object");
             node->SetPosition(Vector3(x * 2.0f, 0.0f, y * 2.0f));
-            StaticModel* object = node->CreateComponent<StaticModel>();
+            auto* object = node->CreateComponent<StaticModel>();
             SharedPtr<Model> cloneModel = originalModel->Clone();
             object->SetModel(cloneModel);
             // Store the cloned vertex buffer that we will modify when animating
@@ -258,24 +258,24 @@ void DynamicGeometry::CreateScene()
 
         Node* node = scene_->CreateChild("FromScratchObject");
         node->SetPosition(Vector3(0.0f, 3.0f, 0.0f));
-        StaticModel* object = node->CreateComponent<StaticModel>();
+        auto* object = node->CreateComponent<StaticModel>();
         object->SetModel(fromScratchModel);
     }
 
     // Create the camera
     cameraNode_ = new Node(context_);
     cameraNode_->SetPosition(Vector3(0.0f, 2.0f, -20.0f));
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 }
 
 void DynamicGeometry::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "Space to toggle animation"
@@ -292,7 +292,7 @@ void DynamicGeometry::CreateInstructions()
 
 void DynamicGeometry::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -311,7 +311,7 @@ void DynamicGeometry::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -352,7 +352,7 @@ void DynamicGeometry::AnimateObjects(float timeStep)
 
         // Lock the vertex buffer for update and rewrite positions with sine wave modulated ones
         // Cannot use discard lock as there is other data (normals, UVs) that we are not overwriting
-        unsigned char* vertexData = (unsigned char*)buffer->Lock(0, buffer->GetVertexCount());
+        auto* vertexData = (unsigned char*)buffer->Lock(0, buffer->GetVertexCount());
         if (vertexData)
         {
             unsigned vertexSize = buffer->GetVertexSize();
@@ -381,7 +381,7 @@ void DynamicGeometry::HandleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
     // Toggle animation with space
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input->GetKeyPress(KEY_SPACE))
         animate_ = !animate_;
 

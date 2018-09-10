@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ DropDownList::DropDownList(Context* context) :
 {
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
-    Window* window = new Window(context_);
+    auto* window = new Window(context_);
     window->SetInternal(true);
     SetPopup(window);
 
@@ -57,7 +57,7 @@ DropDownList::DropDownList(Context* context) :
     popup_->AddChild(listView_);
     placeholder_ = CreateChild<UIElement>("DDL_Placeholder");
     placeholder_->SetInternal(true);
-    Text* text = placeholder_->CreateChild<Text>("DDL_Placeholder_Text");
+    auto* text = placeholder_->CreateChild<Text>("DDL_Placeholder_Text");
     text->SetInternal(true);
     text->SetVisible(false);
 
@@ -66,9 +66,7 @@ DropDownList::DropDownList(Context* context) :
     SubscribeToEvent(listView_, E_SELECTIONCHANGED, URHO3D_HANDLER(DropDownList, HandleSelectionChanged));
 }
 
-DropDownList::~DropDownList()
-{
-}
+DropDownList::~DropDownList() = default;
 
 void DropDownList::RegisterObject(Context* context)
 {

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -242,7 +242,7 @@ void BackgroundLoader::FinishResources(int maxMs)
             }
 
             // Break when the time limit passed so that we keep sufficient FPS
-            if (timer.GetUSec(false) >= maxMs * 1000)
+            if (timer.GetUSec(false) >= maxMs * 1000LL)
                 break;
         }
 
@@ -267,7 +267,7 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
 #ifdef URHO3D_PROFILING
         String profileBlockName("Finish" + resource->GetTypeName());
 
-        Profiler* profiler = owner_->GetSubsystem<Profiler>();
+        auto* profiler = owner_->GetSubsystem<Profiler>();
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif

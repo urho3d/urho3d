@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,12 +40,12 @@ class URHO3D_API FileWatcher : public Object, public Thread
 
 public:
     /// Construct.
-    FileWatcher(Context* context);
+    explicit FileWatcher(Context* context);
     /// Destruct.
-    virtual ~FileWatcher() override;
+    ~FileWatcher() override;
 
     /// Directory watching loop.
-    virtual void ThreadFunction() override;
+    void ThreadFunction() override;
 
     /// Start watching a directory. Return true if successful.
     bool StartWatching(const String& pathName, bool watchSubDirs);
@@ -91,7 +91,7 @@ private:
     int watchHandle_;
 
 #elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
-    
+
     /// Flag indicating whether the running OS supports individual file watching.
     bool supported_;
     /// Pointer to internal MacFileWatcher delegate.

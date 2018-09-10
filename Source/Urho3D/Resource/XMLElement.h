@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,10 @@ public:
     XMLElement GetOrCreateChild(const String& name);
     /// Return the first child element with name or create if does not exist.
     XMLElement GetOrCreateChild(const char* name);
+    /// Append element. If asCopy is set to true then original element is copied and appended, otherwise specified element is appended.
+    bool AppendChild(XMLElement element, bool asCopy = false);
+    /// Remove element from its parent.
+    bool Remove();
     /// Remove a child element. Return true if successful.
     bool RemoveChild(const XMLElement& element);
     /// Remove a child element by name. Return true if successful.
@@ -174,7 +178,7 @@ public:
     /// Return whether refers to an element or an XPath node.
     bool NotNull() const;
     /// Return true if refers to an element or an XPath node.
-    operator bool() const;
+    explicit operator bool() const;
     /// Return element name (or attribute name if it is an attribute only XPath query result).
     String GetName() const;
     /// Return whether has a child element.
@@ -353,7 +357,7 @@ public:
     /// Construct empty.
     XPathQuery();
     /// Construct XPath query object with query string and variable string. The variable string format is "name1:type1,name2:type2,..." where type is one of "Bool", "Float", "String", "ResultSet".
-    XPathQuery(const String& queryString, const String& variableString = String::EMPTY);
+    explicit XPathQuery(const String& queryString, const String& variableString = String::EMPTY);
     /// Destruct.
     ~XPathQuery();
     /// Bind query object with variable set.
@@ -373,14 +377,14 @@ public:
     /// Clear by removing all variables and XPath query object.
     void Clear();
     /// Evaluate XPath query and expecting a boolean return value.
-    bool EvaluateToBool(XMLElement element) const;
+    bool EvaluateToBool(const XMLElement& element) const;
     /// Evaluate XPath query and expecting a float return value.
-    float EvaluateToFloat(XMLElement element) const;
+    float EvaluateToFloat(const XMLElement& element) const;
     /// Evaluate XPath query and expecting a string return value.
-    String EvaluateToString(XMLElement element) const;
+    String EvaluateToString(const XMLElement& element) const;
     /// Evaluate XPath query and expecting an XPath query result set as return value.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
-    XPathResultSet Evaluate(XMLElement element) const;
+    XPathResultSet Evaluate(const XMLElement& element) const;
 
     /// Return query string.
     String GetQuery() const { return queryString_; }

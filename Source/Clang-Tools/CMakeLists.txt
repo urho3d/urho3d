@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ else ()
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 endif ()
 
-# LLVM/Clang is assumed to be installed in a system-wide location when not explicitily defined using env-var
+# LLVM/Clang is assumed to be installed in a system-wide location when not explicitly defined using env-var
 if (DEFINED ENV{LLVM_CLANG_ROOT})
     set (CMAKE_SYSROOT $ENV{LLVM_CLANG_ROOT})
 endif ()

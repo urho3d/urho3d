@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,9 @@
 #include "../Graphics/Technique.h"
 #include "../Graphics/Terrain.h"
 #include "../Graphics/TerrainPatch.h"
+#ifdef _WIN32
 #include "../Graphics/Texture2D.h"
+#endif
 #include "../Graphics/Texture2DArray.h"
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
@@ -53,7 +55,6 @@
 #include "../IO/Log.h"
 
 #include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
 
 #include "../DebugNew.h"
 
@@ -168,8 +169,12 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 IntVector2 Graphics::GetWindowPosition() const
 {
     if (window_)
-        return position_;
-    return IntVector2::ZERO;
+    {
+        IntVector2 position;
+        SDL_GetWindowPosition(window_, &position.x_, &position.y_);
+        return position;
+    }
+    return position_;
 }
 
 PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
@@ -177,7 +182,7 @@ PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
     PODVector<IntVector3> ret;
     // Emscripten is not able to return a valid list
 #ifndef __EMSCRIPTEN__
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
+    auto numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
 
     for (unsigned i = 0; i < numModes; ++i)
     {
@@ -223,6 +228,23 @@ int Graphics::GetMonitorCount() const
     return SDL_GetNumVideoDisplays();
 }
 
+int Graphics::GetCurrentMonitor() const
+{
+    return window_ ? SDL_GetWindowDisplayIndex(window_) : 0;
+}
+
+bool Graphics::GetMaximized() const
+{
+    return window_? static_cast<bool>(SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED) : false;
+}
+
+Vector3 Graphics::GetDisplayDPI(int monitor) const
+{
+    Vector3 result;
+    SDL_GetDisplayDPI(monitor, &result.z_, &result.x_, &result.y_);
+    return result;
+}
+
 void Graphics::Maximize()
 {
     if (!window_)
@@ -237,6 +259,14 @@ void Graphics::Minimize()
         return;
 
     SDL_MinimizeWindow(window_);
+}
+
+void Graphics::Raise() const
+{
+    if (!window_)
+        return;
+
+    SDL_RaiseWindow(window_);
 }
 
 void Graphics::BeginDumpShaders(const String& fileName)
@@ -316,9 +346,10 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     newBuffer.size_ = size;
     newBuffer.reserved_ = true;
     scratchBuffers_.Push(newBuffer);
-    return newBuffer.data_.Get();
 
     URHO3D_LOGDEBUG("Allocated scratch buffer with size " + String(size));
+
+    return newBuffer.data_.Get();
 }
 
 void Graphics::FreeScratchBuffer(void* buffer)
@@ -344,7 +375,7 @@ void Graphics::CleanupScratchBuffers()
     {
         if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
         {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : nullptr;
+            i->data_ = maxScratchBufferRequest_ > 0 ? (new unsigned char[maxScratchBufferRequest_]) : nullptr;
             i->size_ = maxScratchBufferRequest_;
 
             URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));

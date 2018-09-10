@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@
 #include <sys/utime.h>
 #else
 #include <dirent.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
 #include <utime.h>
 #include <sys/wait.h>
@@ -182,7 +182,7 @@ int DoSystemRun(const String& fileName, const Vector<String>& arguments)
         argPtrs.Push(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.Size(); ++i)
             argPtrs.Push(arguments[i].CString());
-        argPtrs.Push(0);
+        argPtrs.Push(nullptr);
 
         execvp(argPtrs[0], (char**)&argPtrs[0]);
         return -1; // Return -1 if we could not spawn the process
@@ -204,9 +204,8 @@ class AsyncExecRequest : public Thread
 {
 public:
     /// Construct.
-    AsyncExecRequest(unsigned& requestID) :
-        requestID_(requestID),
-        completed_(false)
+    explicit AsyncExecRequest(unsigned& requestID) :
+        requestID_(requestID)
     {
         // Increment ID for next request
         ++requestID;
@@ -225,11 +224,11 @@ public:
 
 protected:
     /// Request ID.
-    unsigned requestID_;
+    unsigned requestID_{};
     /// Exit code.
-    int exitCode_;
+    int exitCode_{};
     /// Completed flag.
-    volatile bool completed_;
+    volatile bool completed_{};
 };
 
 /// Async system command operation.
@@ -245,7 +244,7 @@ public:
     }
 
     /// The function to run in the thread.
-    virtual void ThreadFunction() override
+    void ThreadFunction() override
     {
         exitCode_ = DoSystemCommand(commandLine_, false, nullptr);
         completed_ = true;
@@ -270,7 +269,7 @@ public:
     }
 
     /// The function to run in the thread.
-    virtual void ThreadFunction() override
+    void ThreadFunction() override
     {
         exitCode_ = DoSystemRun(fileName_, arguments_);
         completed_ = true;
@@ -284,9 +283,7 @@ private:
 };
 
 FileSystem::FileSystem(Context* context) :
-    Object(context),
-    nextAsyncExecID_(1),
-    executeConsoleCommands_(false)
+    Object(context)
 {
     SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(FileSystem, HandleBeginFrame));
 
@@ -401,7 +398,7 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
-        AsyncSystemCommand* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
+        auto* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
         asyncExecQueue_.Push(cmd);
         return requestID;
     }
@@ -422,7 +419,7 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
-        AsyncSystemRun* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
+        auto* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
         asyncExecQueue_.Push(cmd);
         return requestID;
     }
@@ -585,7 +582,7 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
     else
         return 0;
 #else
-    struct stat st;
+    struct stat st{};
     if (!stat(fileName.CString(), &st))
         return (unsigned)st.st_mtime;
     else
@@ -619,7 +616,7 @@ bool FileSystem::FileExists(const String& fileName) const
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
         return false;
 #else
-    struct stat st;
+    struct stat st{};
     if (stat(fixedName.CString(), &st) || st.st_mode & S_IFDIR)
         return false;
 #endif
@@ -673,7 +670,7 @@ bool FileSystem::DirExists(const String& pathName) const
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
 #else
-    struct stat st;
+    struct stat st{};
     if (stat(fixedName.CString(), &st) || !(st.st_mode & S_IFDIR))
         return false;
 #endif
@@ -781,8 +778,8 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
     newTimes.modtime = newTime;
     return _utime(fileName.CString(), &newTimes) == 0;
 #else
-    struct stat oldTime;
-    struct utimbuf newTimes;
+    struct stat oldTime{};
+    struct utimbuf newTimes{};
     if (stat(fileName.CString(), &oldTime) != 0)
         return false;
     newTimes.actime = oldTime.st_atime;
@@ -799,7 +796,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
 
-    String filterExtension = filter.Substring(filter.Find('.'));
+    String filterExtension = filter.Substring(filter.FindLast('.'));
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
@@ -871,7 +868,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 #else
     DIR* dir;
     struct dirent* de;
-    struct stat st;
+    struct stat st{};
     dir = opendir(GetNativePath(path).CString());
     if (dir)
     {
@@ -1065,6 +1062,28 @@ bool IsAbsolutePath(const String& pathName)
 #endif
 
     return false;
+}
+
+String FileSystem::GetTemporaryDir() const
+{
+#if defined(_WIN32)
+#if defined(MINI_URHO)
+    return getenv("TMP");
+#else
+    wchar_t pathName[MAX_PATH];
+    pathName[0] = 0;
+    GetTempPathW(SDL_arraysize(pathName), pathName);
+    return AddTrailingSlash(String(pathName));
+#endif
+#else
+    if (char* pathName = getenv("TMPDIR"))
+        return AddTrailingSlash(pathName);
+#ifdef P_tmpdir
+    return AddTrailingSlash(P_tmpdir);
+#else
+    return "/tmp/";
+#endif
+#endif
 }
 
 }

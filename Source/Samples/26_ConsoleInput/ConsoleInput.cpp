@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@
 URHO3D_DEFINE_APPLICATION_MAIN(ConsoleInput)
 
 // Hunger level descriptions
-String hungerLevels[] = {
+const char* hungerLevels[] = {
     "bursting",
     "well-fed",
     "fed",
@@ -48,7 +48,7 @@ String hungerLevels[] = {
 };
 
 // Urho threat level descriptions
-String urhoThreatLevels[] = {
+const char* urhoThreatLevels[] = {
     "Suddenly Urho appears from a dark corner of the fish tank",
     "Urho seems to have his eyes set on you",
     "Urho is homing in on you mercilessly"
@@ -77,7 +77,7 @@ void ConsoleInput::Start()
 
     // Show the console by default, make it large. Console will show the text edit field when there is at least one
     // subscriber for the console command event
-    Console* console = GetSubsystem<Console>();
+    auto* console = GetSubsystem<Console>();
     console->SetNumRows(GetSubsystem<Graphics>()->GetHeight() / 16);
     console->SetNumBufferedRows(2 * console->GetNumRows());
     console->SetCommandInterpreter(GetTypeName());
@@ -169,9 +169,9 @@ void ConsoleInput::Advance()
         ++urhoThreat_;
 
     if (urhoThreat_ > 0)
-        Print(urhoThreatLevels[urhoThreat_ - 1] + ".");
+        Print(String(urhoThreatLevels[urhoThreat_ - 1]) + ".");
 
-    if ((numTurns_ & 3) == 0 && !eatenLastTurn_)
+    if ((numTurns_ & 3u) == 0 && !eatenLastTurn_)
     {
         ++hunger_;
         if (hunger_ > 5)
@@ -180,7 +180,7 @@ void ConsoleInput::Advance()
             return;
         }
         else
-            Print("You are " + hungerLevels[hunger_] + ".");
+            Print("You are " + String(hungerLevels[hunger_]) + ".");
     }
 
     eatenLastTurn_ = false;
@@ -231,7 +231,7 @@ void ConsoleInput::HandleInput(const String& input)
                     return;
                 }
                 else
-                    Print("You are now " + hungerLevels[hunger_] + ".");
+                    Print("You are now " + String(hungerLevels[hunger_]) + ".");
             }
             else
                 Print("There is no food available.");

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
 # Set project name
 project (Urho3D-Tools)
 
+setup_lint ()
+
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
@@ -31,8 +33,8 @@ include_directories (${URHO3D_INCLUDE_DIRS})
 # In order to test the player on Web platform built using Emscripten, the request parameters need to be parsed into Module['argument'] (see https://github.com/kripken/emscripten/blob/master/src/emrun_prejs.js for inspiration)
 # The CTest could "run" the Urho3DPlayer.html with script name as parameter, thanks to emrun performing this parsing automatically
 # In a production environment, however, the request parameters parsing has to be done by the application itself one way or another
-if (URHO3D_ANGELSCRIPT OR URHO3D_LUA${JIT})
-    # Add Urho3DPlayer as target only when one of the supported scripting subystems is enabled
+if (URHO3D_ANGELSCRIPT OR URHO3D_LUA)
+    # Add Urho3DPlayer as target only when one of the supported scripting subsystems is enabled
     add_subdirectory (Urho3DPlayer)
 endif ()
 
@@ -50,7 +52,7 @@ if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     endif ()
     ExternalProject_Add (PackageTool
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
-        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
+        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         ${ALTERNATE_COMMAND})
     add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/PackageTool)
     if (CMAKE_HOST_WIN32 AND NOT HAS_MKLINK)

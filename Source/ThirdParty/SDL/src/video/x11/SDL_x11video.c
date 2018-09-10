@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
@@ -29,6 +26,7 @@
 
 #include "SDL_video.h"
 #include "SDL_mouse.h"
+#include "SDL_timer.h"
 #include "../SDL_sysvideo.h"
 #include "../SDL_pixels_c.h"
 
@@ -42,9 +40,7 @@
 #include "SDL_x11opengles.h"
 #endif
 
-#ifdef X_HAVE_UTF8_STRING
-#include <locale.h>
-#endif
+#include "SDL_x11vulkan.h"
 
 /* Initialization/Query functions */
 static int X11_VideoInit(_THIS);
@@ -113,6 +109,9 @@ static void
 X11_DeleteDevice(SDL_VideoDevice * device)
 {
     SDL_VideoData *data = (SDL_VideoData *) device->driverdata;
+    if (device->vulkan_config.loader_handle) {
+        device->Vulkan_UnloadLibrary(device);
+    }
     if (data->display) {
         X11_XCloseDisplay(data->display);
     }
@@ -193,8 +192,8 @@ X11_CreateDevice(int devindex)
        }
      */
     data->display = X11_XOpenDisplay(display);
-#if defined(__osf__) && defined(SDL_VIDEO_DRIVER_X11_DYNAMIC)
-    /* On Tru64 if linking without -lX11, it fails and you get following message.
+#ifdef SDL_VIDEO_DRIVER_X11_DYNAMIC
+    /* On some systems if linking without -lX11, it fails and you get following message.
      * Xlib: connection to ":0.0" refused by server
      * Xlib: XDM authorization key matches an existing client!
      *
@@ -223,6 +222,7 @@ X11_CreateDevice(int devindex)
     /* Set the function pointers */
     device->VideoInit = X11_VideoInit;
     device->VideoQuit = X11_VideoQuit;
+    device->ResetTouch = X11_ResetTouch;
     device->GetDisplayModes = X11_GetDisplayModes;
     device->GetDisplayBounds = X11_GetDisplayBounds;
     device->GetDisplayUsableBounds = X11_GetDisplayUsableBounds;
@@ -231,8 +231,8 @@ X11_CreateDevice(int devindex)
     device->SuspendScreenSaver = X11_SuspendScreenSaver;
     device->PumpEvents = X11_PumpEvents;
 
-    device->CreateWindow = X11_CreateWindow;
-    device->CreateWindowFrom = X11_CreateWindowFrom;
+    device->CreateSDLWindow = X11_CreateWindow;
+    device->CreateSDLWindowFrom = X11_CreateWindowFrom;
     device->SetWindowTitle = X11_SetWindowTitle;
     device->SetWindowIcon = X11_SetWindowIcon;
     device->SetWindowPosition = X11_SetWindowPosition;
@@ -295,6 +295,13 @@ X11_CreateDevice(int devindex)
     device->SetTextInputRect = X11_SetTextInputRect;
 
     device->free = X11_DeleteDevice;
+
+#if SDL_VIDEO_VULKAN
+    device->Vulkan_LoadLibrary = X11_Vulkan_LoadLibrary;
+    device->Vulkan_UnloadLibrary = X11_Vulkan_UnloadLibrary;
+    device->Vulkan_GetInstanceExtensions = X11_Vulkan_GetInstanceExtensions;
+    device->Vulkan_CreateSurface = X11_Vulkan_CreateSurface;
+#endif
 
     return device;
 }
@@ -391,66 +398,6 @@ X11_VideoInit(_THIS)
     /* I have no idea how random this actually is, or has to be. */
     data->window_group = (XID) (((size_t) data->pid) ^ ((size_t) _this));
 
-    /* Open a connection to the X input manager */
-#ifdef X_HAVE_UTF8_STRING
-    if (SDL_X11_HAVE_UTF8) {
-        /* Set the locale, and call XSetLocaleModifiers before XOpenIM so that 
-           Compose keys will work correctly. */
-        char *prev_locale = setlocale(LC_ALL, NULL);
-        char *prev_xmods  = X11_XSetLocaleModifiers(NULL);
-        // Urho3D - bug fix - the default XMODIFIERS should be null instead of empty string
-        const char *new_xmods = 0;
-#if defined(HAVE_IBUS_IBUS_H) || defined(HAVE_FCITX_FRONTEND_H)
-        const char *env_xmods = SDL_getenv("XMODIFIERS");
-#endif
-        SDL_bool has_dbus_ime_support = SDL_FALSE;
-
-        if (prev_locale) {
-            prev_locale = SDL_strdup(prev_locale);
-        }
-
-        if (prev_xmods) {
-            prev_xmods = SDL_strdup(prev_xmods);
-        }
-
-        /* IBus resends some key events that were filtered by XFilterEvents
-           when it is used via XIM which causes issues. Prevent this by forcing
-           @im=none if XMODIFIERS contains @im=ibus. IBus can still be used via 
-           the DBus implementation, which also has support for pre-editing. */
-#ifdef HAVE_IBUS_IBUS_H
-        if (env_xmods && SDL_strstr(env_xmods, "@im=ibus") != NULL) {
-            has_dbus_ime_support = SDL_TRUE;
-        }
-#endif
-#ifdef HAVE_FCITX_FRONTEND_H
-        if (env_xmods && SDL_strstr(env_xmods, "@im=fcitx") != NULL) {
-            has_dbus_ime_support = SDL_TRUE;
-        }
-#endif
-        if (has_dbus_ime_support) {
-            new_xmods = "@im=none";
-        }
-
-        setlocale(LC_ALL, "");
-        X11_XSetLocaleModifiers(new_xmods);
-
-        data->im = X11_XOpenIM(data->display, NULL, data->classname, data->classname);
-
-        /* Reset the locale + X locale modifiers back to how they were,
-           locale first because the X locale modifiers depend on it. */
-        setlocale(LC_ALL, prev_locale);
-        X11_XSetLocaleModifiers(prev_xmods);
-
-        if (prev_locale) {
-            SDL_free(prev_locale);
-        }
-
-        if (prev_xmods) {
-            SDL_free(prev_xmods);
-        }
-    }
-#endif
-
     /* Look up some useful Atoms */
 #define GET_ATOM(X) data->X = X11_XInternAtom(data->display, #X, False)
     GET_ATOM(WM_PROTOCOLS);
@@ -515,6 +462,10 @@ X11_VideoQuit(_THIS)
 {
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
 
+    if (data->clipboard_window) {
+        X11_XDestroyWindow(data->display, data->clipboard_window);
+    }
+
     SDL_free(data->classname);
 #ifdef X_HAVE_UTF8_STRING
     if (data->im) {
@@ -527,6 +478,8 @@ X11_VideoQuit(_THIS)
     X11_QuitMouse(_this);
     X11_QuitTouch(_this);
 
+/* !!! FIXME: other subsystems use D-Bus, so we shouldn't quit it here;
+       have SDL.c do this at a higher level, or add refcounting. */
 #if SDL_USE_LIBDBUS
     SDL_DBus_Quit();
 #endif

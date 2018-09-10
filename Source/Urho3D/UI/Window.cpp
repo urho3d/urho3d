@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,8 +48,8 @@ Window::Window(Context* context) :
     dragMode_(DRAG_NONE),
     modal_(false),
     modalAutoDismiss_(true),
-    modalShadeColor_(Color::TRANSPARENT),
-    modalFrameColor_(Color::TRANSPARENT),
+    modalShadeColor_(Color::TRANSPARENT_BLACK),
+    modalFrameColor_(Color::TRANSPARENT_BLACK),
     modalFrameSize_(IntVector2::ZERO)
 {
     bringToFront_ = true;
@@ -57,9 +57,7 @@ Window::Window(Context* context) :
     SetEnabled(true);
 }
 
-Window::~Window()
-{
-}
+Window::~Window() = default;
 
 void Window::RegisterObject(Context* context)
 {
@@ -76,8 +74,8 @@ void Window::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Width Resizing", GetFixedWidthResizing, SetFixedWidthResizing, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Height Resizing", GetFixedHeightResizing, SetFixedHeightResizing, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Modal", IsModal, SetModal, bool, false, AM_FILE | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT_BLACK, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT_BLACK, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Modal Frame Size", GetModalFrameSize, SetModalFrameSize, IntVector2, IntVector2::ZERO, AM_FILE);
     // Modal auto dismiss is purposefully not an attribute, as using it can make the editor lock up.
     // Instead it should be set false in code when needed
@@ -88,7 +86,7 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     if (modal_)
     {
         // Modal shade
-        if (modalShadeColor_ != Color::TRANSPARENT)
+        if (modalShadeColor_ != Color::TRANSPARENT_BLACK)
         {
             UIElement* rootElement = GetRoot();
             const IntVector2& rootSize = rootElement->GetSize();
@@ -99,7 +97,7 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
         }
 
         // Modal frame
-        if (modalFrameColor_ != Color::TRANSPARENT && modalFrameSize_ != IntVector2::ZERO)
+        if (modalFrameColor_ != Color::TRANSPARENT_BLACK && modalFrameSize_ != IntVector2::ZERO)
         {
             UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
             int x = GetIndentWidth();
@@ -281,7 +279,7 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;

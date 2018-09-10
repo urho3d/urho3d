@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ class URHO3D_API LuaScriptEventListener
 {
 public:
     /// Destruct.
-    virtual ~LuaScriptEventListener() { };
+    virtual ~LuaScriptEventListener() = default;;
 
     /// Add a scripted event handler by function at the given stack index.
     virtual void AddEventHandler(const String& eventName, int index) = 0;

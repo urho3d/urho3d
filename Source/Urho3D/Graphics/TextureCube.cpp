@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,12 +66,9 @@ TextureCube::TextureCube(Context* context) :
 #endif
 
     // Default to clamp mode addressing
-    addressMode_[COORD_U] = ADDRESS_CLAMP;
-    addressMode_[COORD_V] = ADDRESS_CLAMP;
-    addressMode_[COORD_W] = ADDRESS_CLAMP;
-
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-        faceMemoryUse_[i] = 0;
+    addressModes_[COORD_U] = ADDRESS_CLAMP;
+    addressModes_[COORD_V] = ADDRESS_CLAMP;
+    addressModes_[COORD_W] = ADDRESS_CLAMP;
 }
 
 TextureCube::~TextureCube()
@@ -86,7 +83,7 @@ void TextureCube::RegisterObject(Context* context)
 
 bool TextureCube::BeginLoad(Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
@@ -142,10 +139,10 @@ bool TextureCube::BeginLoad(Deserializer& source)
         }
         else
         {
-        
+
             CubeMapLayout layout =
                 (CubeMapLayout)GetStringListIndex(imageElem.GetAttribute("layout").CString(), cubeMapLayoutNames, CML_HORIZONTAL);
-            
+
             switch (layout)
             {
             case CML_HORIZONTAL:
@@ -324,13 +321,13 @@ SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
         return SharedPtr<Image>();
     }
 
-    Image* rawImage = new Image(context_);
+    auto* rawImage = new Image(context_);
     if (format_ == Graphics::GetRGBAFormat())
         rawImage->SetSize(width_, height_, 4);
     else if (format_ == Graphics::GetRGBFormat())
         rawImage->SetSize(width_, height_, 3);
     else
-        assert(0);
+        assert(false);
 
     GetData(face, 0, rawImage->GetData());
     return SharedPtr<Image>(rawImage);
@@ -338,15 +335,15 @@ SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
 
 void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    for (auto& renderSurface : renderSurfaces_)
     {
-        if (renderSurfaces_[i] && (renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurfaces_[i]->IsUpdateQueued()))
+        if (renderSurface && (renderSurface->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface->IsUpdateQueued()))
         {
             if (renderer)
-                renderer->QueueRenderSurface(renderSurfaces_[i]);
-            renderSurfaces_[i]->ResetUpdateQueued();
+                renderer->QueueRenderSurface(renderSurface);
+            renderSurface->ResetUpdateQueued();
         }
     }
 }

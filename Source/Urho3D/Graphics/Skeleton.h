@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,13 @@
 namespace Urho3D
 {
 
-static const unsigned BONECOLLISION_NONE = 0x0;
-static const unsigned BONECOLLISION_SPHERE = 0x1;
-static const unsigned BONECOLLISION_BOX = 0x2;
+enum BoneCollisionShape : unsigned char
+{
+    BONECOLLISION_NONE = 0x0,
+    BONECOLLISION_SPHERE = 0x1,
+    BONECOLLISION_BOX = 0x2,
+};
+URHO3D_FLAGSET(BoneCollisionShape, BoneCollisionShapeFlags);
 
 class Deserializer;
 class ResourceCache;
@@ -46,7 +50,6 @@ struct Bone
         initialRotation_(Quaternion::IDENTITY),
         initialScale_(Vector3::ONE),
         animated_(true),
-        collisionMask_(0),
         radius_(0.0f)
     {
     }
@@ -68,7 +71,7 @@ struct Bone
     /// Animation enable flag.
     bool animated_;
     /// Supported collision types.
-    unsigned char collisionMask_;
+    BoneCollisionShapeFlags collisionMask_ = BONECOLLISION_NONE;
     /// Radius.
     float radius_;
     /// Local-space bounding box.
@@ -110,14 +113,22 @@ public:
 
     /// Return root bone.
     Bone* GetRootBone();
+    /// Return index of the bone by name. Return M_MAX_UNSIGNED if not found.
+    unsigned GetBoneIndex(const String& boneName) const;
+    /// Return index of the bone by name hash. Return M_MAX_UNSIGNED if not found.
+    unsigned GetBoneIndex(const StringHash& boneNameHash) const;
+    /// Return index of the bone by the bone pointer. Return M_MAX_UNSIGNED if not found.
+    unsigned GetBoneIndex(const Bone* bone) const;
+    /// Return parent of the given bone. Return null for root bones.
+    Bone* GetBoneParent(const Bone* bone);
     /// Return bone by index.
     Bone* GetBone(unsigned index);
     /// Return bone by name.
-    Bone* GetBone(const String& boneName);
+    Bone* GetBone(const String& name);
     /// Return bone by name.
-    Bone* GetBone(const char* boneName);
+    Bone* GetBone(const char* name);
     /// Return bone by name hash.
-    Bone* GetBone(StringHash boneNameHash);
+    Bone* GetBone(const StringHash& boneNameHash);
 
     /// Reset all animating bones to initial positions without marking the nodes dirty. Requires the node dirtying to be performed later.
     void ResetSilent();

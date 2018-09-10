@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -105,9 +105,7 @@ BillboardSet::BillboardSet(Context* context) :
     batches_[0].worldTransform_ = &transforms_[0];
 }
 
-BillboardSet::~BillboardSet()
-{
-}
+BillboardSet::~BillboardSet() = default;
 
 void BillboardSet::RegisterObject(Context* context)
 {
@@ -363,7 +361,7 @@ Billboard* BillboardSet::GetBillboard(unsigned index)
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
@@ -539,7 +537,7 @@ void BillboardSet::UpdateBufferSize()
 
     if (!largeIndices)
     {
-        unsigned short* dest = (unsigned short*)destPtr;
+        auto* dest = (unsigned short*)destPtr;
         unsigned short vertexIndex = 0;
         while (numBillboards--)
         {
@@ -556,7 +554,7 @@ void BillboardSet::UpdateBufferSize()
     }
     else
     {
-        unsigned* dest = (unsigned*)destPtr;
+        auto* dest = (unsigned*)destPtr;
         unsigned vertexIndex = 0;
         while (numBillboards--)
         {
@@ -635,7 +633,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         previousOffset_ = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     }
 
-    float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
+    auto* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
     if (!dest)
         return;
 

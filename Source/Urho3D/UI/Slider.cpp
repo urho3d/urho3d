@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,9 +57,7 @@ Slider::Slider(Context* context) :
     UpdateSlider();
 }
 
-Slider::~Slider()
-{
-}
+Slider::~Slider() = default;
 
 void Slider::RegisterObject(Context* context)
 {
@@ -165,9 +163,9 @@ void Slider::OnResize(const IntVector2& newSize, const IntVector2& delta)
     UpdateSlider();
 }
 
-void Slider::SetOrientation(Orientation type)
+void Slider::SetOrientation(Orientation orientation)
 {
-    orientation_ = type;
+    orientation_ = orientation;
     UpdateSlider();
 }
 
@@ -234,7 +232,7 @@ void Slider::UpdateSlider()
     {
         if (orientation_ == O_HORIZONTAL)
         {
-            int sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
+            auto sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
 
             if (knob_->IsFixedWidth())
                 sliderLength = knob_->GetWidth();
@@ -244,14 +242,14 @@ void Slider::UpdateSlider()
             if (!knob_->IsFixedSize())
             {
                 knob_->SetSize(sliderLength, GetHeight());
-                knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+                knob_->SetPosition(Clamp(RoundToInt(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
             }
             else
                 knob_->SetPosition(Clamp((int)(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
         }
         else
         {
-            int sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
+            auto sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
 
             if (knob_->IsFixedHeight())
                 sliderLength = knob_->GetHeight();
@@ -261,10 +259,10 @@ void Slider::UpdateSlider()
             if (!knob_->IsFixedSize())
             {
                 knob_->SetSize(GetWidth(), sliderLength);
-                knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+                knob_->SetPosition(0, Clamp(RoundToInt(sliderPos), 0, GetHeight() - knob_->GetHeight()));
             }
             else
-                knob_->SetPosition(0, Clamp((int)(sliderPos), 0, GetHeight() - knob_->GetHeight()));
+                knob_->SetPosition(0, Clamp(RoundToInt(sliderPos), 0, GetHeight() - knob_->GetHeight()));
         }
     }
     else
@@ -283,7 +281,7 @@ void Slider::Page(const IntVector2& position, bool pressed)
 
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
-    float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
+    auto length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
 
     using namespace SliderPaged;
 

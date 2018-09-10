@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ void Font::RegisterObject(Context* context)
 bool Font::BeginLoad(Deserializer& source)
 {
     // In headless mode, do not actually load, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
@@ -139,7 +139,7 @@ void Font::SetScaledGlyphOffset(const Vector2& offset)
 FontFace* Font::GetFace(float pointSize)
 {
     // In headless mode, always return null
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return nullptr;
 
@@ -181,7 +181,7 @@ FontFace* Font::GetFace(float pointSize)
 IntVector2 Font::GetTotalGlyphOffset(float pointSize) const
 {
     Vector2 multipliedOffset = pointSize * scaledOffset_;
-    return absoluteOffset_ + IntVector2((int)(multipliedOffset.x_ + 0.5f), (int)(multipliedOffset.y_ + 0.5f));
+    return absoluteOffset_ + IntVector2(RoundToInt(multipliedOffset.x_), RoundToInt(multipliedOffset.y_));
 }
 
 void Font::ReleaseFaces()
@@ -191,7 +191,7 @@ void Font::ReleaseFaces()
 
 void Font::LoadParameters()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, false);
     if (!xml)

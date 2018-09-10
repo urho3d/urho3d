@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,14 +37,14 @@ class URHO3D_API Sound : public ResourceWithMetadata
 
 public:
     /// Construct.
-    Sound(Context* context);
+    explicit Sound(Context* context);
     /// Destruct and free sound data.
-    virtual ~Sound() override;
+    ~Sound() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
 
     /// Load raw sound data.
     bool LoadRaw(Deserializer& source);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,9 @@ class URHO3D_API Audio : public Object
 
 public:
     /// Construct.
-    Audio(Context* context);
+    explicit Audio(Context* context);
     /// Destruct. Terminate the audio thread and free the audio buffer.
-    virtual ~Audio() override;
+    ~Audio() override;
 
     /// Initialize sound output with specified buffer length and output mode.
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
@@ -115,12 +115,6 @@ public:
     /// Mix sound sources into the buffer.
     void MixOutput(void* dest, unsigned samples);
 
-    /// Final multiplier for audio byte conversion.
-#ifdef __EMSCRIPTEN__
-    static const int SAMPLE_SIZE_MUL = 2;
-#else
-    static const int SAMPLE_SIZE_MUL = 1;
-#endif
 private:
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
@@ -134,19 +128,19 @@ private:
     /// Audio thread mutex.
     Mutex audioMutex_;
     /// SDL audio device ID.
-    unsigned deviceID_;
+    unsigned deviceID_{};
     /// Sample size.
-    unsigned sampleSize_;
+    unsigned sampleSize_{};
     /// Clip buffer size in samples.
-    unsigned fragmentSize_;
+    unsigned fragmentSize_{};
     /// Mixing rate.
-    int mixRate_;
+    int mixRate_{};
     /// Mixing interpolation flag.
-    bool interpolation_;
+    bool interpolation_{};
     /// Stereo flag.
-    bool stereo_;
+    bool stereo_{};
     /// Playing flag.
-    bool playing_;
+    bool playing_{};
     /// Master gain by sound source type.
     HashMap<StringHash, Variant> masterGain_;
     /// Paused sound types.

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -83,6 +83,10 @@ SDL_WAYLAND_INTERFACE(wl_compositor_interface)
 SDL_WAYLAND_INTERFACE(wl_output_interface)
 SDL_WAYLAND_INTERFACE(wl_shell_interface)
 SDL_WAYLAND_INTERFACE(wl_shm_interface)
+SDL_WAYLAND_INTERFACE(wl_data_device_interface)
+SDL_WAYLAND_INTERFACE(wl_data_source_interface)
+SDL_WAYLAND_INTERFACE(wl_data_offer_interface)
+SDL_WAYLAND_INTERFACE(wl_data_device_manager_interface)
 
 SDL_WAYLAND_MODULE(WAYLAND_EGL)
 SDL_WAYLAND_SYM(struct wl_egl_window *, wl_egl_window_create, (struct wl_surface *, int, int))

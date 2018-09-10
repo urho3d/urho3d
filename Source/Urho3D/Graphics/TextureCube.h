@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,22 +39,22 @@ class URHO3D_API TextureCube : public Texture
 
 public:
     /// Construct.
-    TextureCube(Context* context);
+    explicit TextureCube(Context* context);
     /// Destruct.
-    virtual ~TextureCube() override;
+    ~TextureCube() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
     /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost() override;
+    void OnDeviceLost() override;
     /// Recreate the GPU resource and restore data if applicable.
-    virtual void OnDeviceReset() override;
+    void OnDeviceReset() override;
     /// Release the texture.
-    virtual void Release() override;
+    void Release() override;
 
     /// Set size, format, usage and multisampling parameter for rendertargets. Note that cube textures always use autoresolve when multisampled due to lacking support (on all APIs) to multisample them in a shader. Return true if successful.
     bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1);
@@ -75,7 +75,7 @@ public:
 
 protected:
     /// Create the GPU texture.
-    virtual bool Create() override;
+    bool Create() override;
 
 private:
     /// Handle render surface update event.
@@ -84,7 +84,7 @@ private:
     /// Render surfaces.
     SharedPtr<RenderSurface> renderSurfaces_[MAX_CUBEMAP_FACES];
     /// Memory use per face.
-    unsigned faceMemoryUse_[MAX_CUBEMAP_FACES];
+    unsigned faceMemoryUse_[MAX_CUBEMAP_FACES]{};
     /// Face image files acquired during BeginLoad.
     Vector<SharedPtr<Image> > loadImages_;
     /// Parameter file acquired during BeginLoad.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,7 @@
 #include "Vehicle.h"
 
 Vehicle::Vehicle(Context* context) :
-    LogicComponent(context),
-    steering_(0.0f)
+    LogicComponent(context)
 {
     // Only the physics update event is needed: unsubscribe from the rest for optimization
     SetUpdateEventMask(USE_FIXEDUPDATE);
@@ -122,11 +121,11 @@ void Vehicle::FixedUpdate(float timeStep)
 void Vehicle::Init()
 {
     // This function is called only from the main program when initially creating the vehicle, not on scene load
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
-    StaticModel* hullObject = node_->CreateComponent<StaticModel>();
+    auto* hullObject = node_->CreateComponent<StaticModel>();
     hullBody_ = node_->CreateComponent<RigidBody>();
-    CollisionShape* hullShape = node_->CreateComponent<CollisionShape>();
+    auto* hullShape = node_->CreateComponent<CollisionShape>();
 
     node_->SetScale(Vector3(1.5f, 1.0f, 3.0f));
     hullObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
@@ -148,7 +147,7 @@ void Vehicle::Init()
 
 void Vehicle::InitWheel(const String& name, const Vector3& offset, WeakPtr<Node>& wheelNode, unsigned& wheelNodeID)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Note: do not parent the wheel to the hull scene node. Instead create it on the root level and let the physics
     // constraint keep it together
@@ -160,10 +159,10 @@ void Vehicle::InitWheel(const String& name, const Vector3& offset, WeakPtr<Node>
     // Remember the ID for serialization
     wheelNodeID = wheelNode->GetID();
 
-    StaticModel* wheelObject = wheelNode->CreateComponent<StaticModel>();
-    RigidBody* wheelBody = wheelNode->CreateComponent<RigidBody>();
-    CollisionShape* wheelShape = wheelNode->CreateComponent<CollisionShape>();
-    Constraint* wheelConstraint = wheelNode->CreateComponent<Constraint>();
+    auto* wheelObject = wheelNode->CreateComponent<StaticModel>();
+    auto* wheelBody = wheelNode->CreateComponent<RigidBody>();
+    auto* wheelShape = wheelNode->CreateComponent<CollisionShape>();
+    auto* wheelConstraint = wheelNode->CreateComponent<Constraint>();
 
     wheelObject->SetModel(cache->GetResource<Model>("Models/Cylinder.mdl"));
     wheelObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TextureAtlas imagePath="Orc_Atlas.png">
+	<SubTexture name="orc_0000_eyes"	x="100"	y="477"	width="71"	height="33"/>
+	<SubTexture name="orc_0000_eyes_closed"	x="0"	y="481"	width="71"	height="9"/>
+	<SubTexture name="orc_0001_head"	x="0"	y="291"	width="109"	height="126"/>
+	<SubTexture name="orc_0001_head_angry"	x="110"	y="291"	width="109"	height="126"/>
+	<SubTexture name="orc_0002_thing_!"	x="220"	y="291"	width="69"	height="146"/>
+	<SubTexture name="orc_0003_hand1"	x="179"	y="205"	width="86"	height="85"/>
+	<SubTexture name="orc_0004_body"	x="0"	y="0"	width="178"	height="290"/>
+	<SubTexture name="orc_0005_hand2"	x="179"	y="0"	width="96"	height="204"/>
+	<SubTexture name="orc_0006_foot1"	x="0"	y="418"	width="99"	height="62"/>
+	<SubTexture name="orc_0007_foot2"	x="100"	y="418"	width="82"	height="58"/>
+</TextureAtlas>

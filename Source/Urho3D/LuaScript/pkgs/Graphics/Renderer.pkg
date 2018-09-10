@@ -11,8 +11,8 @@ class Renderer
     void SetSpecularLighting(bool enable);
     void SetTextureAnisotropy(int level);
     void SetTextureFilterMode(TextureFilterMode mode);
-    void SetTextureQuality(int quality);
-    void SetMaterialQuality(int quality);
+    void SetTextureQuality(MaterialQuality quality);
+    void SetMaterialQuality(MaterialQuality quality);
     void SetDrawShadows(bool enable);
     void SetShadowMapSize(int size);
     void SetShadowQuality(ShadowQuality quality);
@@ -44,8 +44,8 @@ class Renderer
     bool GetDrawShadows() const;
     int GetTextureAnisotropy() const;
     TextureFilterMode GetTextureFilterMode() const;
-    int GetTextureQuality() const;
-    int GetMaterialQuality() const;
+    MaterialQuality GetTextureQuality() const;
+    MaterialQuality GetMaterialQuality() const;
     int GetShadowMapSize() const;
     ShadowQuality GetShadowQuality() const;
     float GetShadowSoftness() const;
@@ -86,8 +86,8 @@ class Renderer
     tolua_property__get_set bool drawShadows;
     tolua_property__get_set int textureAnisotropy;
     tolua_property__get_set TextureFilterMode textureFilterMode;
-    tolua_property__get_set int textureQuality;
-    tolua_property__get_set int materialQuality;
+    tolua_property__get_set MaterialQuality textureQuality;
+    tolua_property__get_set MaterialQuality materialQuality;
     tolua_property__get_set int shadowMapSize;
     tolua_property__get_set ShadowQuality shadowQuality;
     tolua_property__get_set float shadowSoftness;

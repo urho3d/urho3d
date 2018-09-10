@@ -16,6 +16,7 @@ class Color
     unsigned ToUInt() const;
     Vector3 ToHSL() const;
     Vector3 ToHSV() const;
+    void FromUInt(unsigned color);
     void FromHSL(float h, float s, float l, float a);
     void FromHSV(float h, float s, float v, float a);
 
@@ -59,5 +60,5 @@ class Color
     static const Color CYAN;
     static const Color MAGENTA;
     static const Color YELLOW;
-    static const Color TRANSPARENT;
+    static const Color TRANSPARENT_BLACK;
 };

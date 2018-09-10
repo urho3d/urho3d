@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@
 #include "SDL_events.h"
 #include "SDL_cocoamouse.h"
 #include "SDL_cocoamousetap.h"
+#include "SDL_cocoavideo.h"
 
 #include "../../events/SDL_mouse_c.h"
 
@@ -363,10 +364,10 @@ void
 Cocoa_HandleMouseEvent(_THIS, NSEvent *event)
 {
     switch ([event type]) {
-        case NSMouseMoved:
-        case NSLeftMouseDragged:
-        case NSRightMouseDragged:
-        case NSOtherMouseDragged:
+        case NSEventTypeMouseMoved:
+        case NSEventTypeLeftMouseDragged:
+        case NSEventTypeRightMouseDragged:
+        case NSEventTypeOtherMouseDragged:
             break;
 
         default:
@@ -431,17 +432,7 @@ Cocoa_HandleMouseWheel(SDL_Window *window, NSEvent *event)
         }
     }
 
-    if (x > 0) {
-        x = SDL_ceil(x);
-    } else if (x < 0) {
-        x = SDL_floor(x);
-    }
-    if (y > 0) {
-        y = SDL_ceil(y);
-    } else if (y < 0) {
-        y = SDL_floor(y);
-    }
-    SDL_SendMouseWheel(window, mouse->mouseID, (int)x, (int)y, direction);
+    SDL_SendMouseWheel(window, mouse->mouseID, x, y, direction);
 }
 
 void

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,7 @@ Sprite::Sprite(Context* context) :
 {
 }
 
-Sprite::~Sprite()
-{
-}
+Sprite::~Sprite() = default;
 
 void Sprite::RegisterObject(Context* context)
 {
@@ -73,10 +71,10 @@ void Sprite::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Top Left Color", Color, color_[0], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Top Right Color", Color, color_[1], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Bottom Left Color", Color, color_[2], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Bottom Right Color", Color, color_[3], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Top Left Color", Color, colors_[0], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Top Right Color", Color, colors_[1], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Bottom Left Color", Color, colors_[2], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Bottom Right Color", Color, colors_[3], Color::WHITE, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE);
@@ -112,8 +110,8 @@ IntVector2 Sprite::ElementToScreen(const IntVector2& position)
 void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     bool allOpaque = true;
-    if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
-        color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
+    if (GetDerivedOpacity() < 1.0f || colors_[C_TOPLEFT].a_ < 1.0f || colors_[C_TOPRIGHT].a_ < 1.0f ||
+        colors_[C_BOTTOMLEFT].a_ < 1.0f || colors_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
 
     const IntVector2& size = GetSize();
@@ -227,7 +225,7 @@ const Matrix3x4& Sprite::GetTransform() const
 
         if (parent_)
         {
-            Sprite* parentSprite = dynamic_cast<Sprite*>(parent_);
+            auto* parentSprite = dynamic_cast<Sprite*>(parent_);
             if (parentSprite)
                 parentTransform = parentSprite->GetTransform();
             else
@@ -243,7 +241,7 @@ const Matrix3x4& Sprite::GetTransform() const
                 break;
 
             case HA_CENTER:
-                pos.x_ += (float)(parent_->GetSize().x_ / 2);
+                pos.x_ += (float)parent_->GetSize().x_ / 2.f;
                 break;
 
             case HA_RIGHT:
@@ -256,7 +254,7 @@ const Matrix3x4& Sprite::GetTransform() const
                 break;
 
             case VA_CENTER:
-                pos.y_ += (float)(parent_->GetSize().y_ / 2);
+                pos.y_ += (float)parent_->GetSize().y_ / 2.f;
                 break;
 
             case VA_BOTTOM:
@@ -285,7 +283,7 @@ const Matrix3x4& Sprite::GetTransform() const
 
 void Sprite::SetTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ class URHO3D_API Database : public Object
 
 public:
     /// Construct.
-    Database(Context* context_);
+    explicit Database(Context* context_);
     /// Return the underlying database API.
     static DBAPI GetAPI();
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@
 #include "../IO/Log.h"
 #include "../Resource/Decompress.h"
 
-#include <JO/jo_jpeg.h>
 #include <SDL/SDL_surface.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB/stb_image.h>
@@ -244,22 +243,11 @@ bool CompressedLevel::Decompress(unsigned char* dest)
 }
 
 Image::Image(Context* context) :
-    Resource(context),
-    width_(0),
-    height_(0),
-    depth_(0),
-    components_(0),
-    numCompressedLevels_(0),
-    cubemap_(false),
-    array_(false),
-    sRGB_(false),
-    compressedFormat_(CF_NONE)
+    Resource(context)
 {
 }
 
-Image::~Image()
-{
-}
+Image::~Image() = default;
 
 void Image::RegisterObject(Context* context)
 {
@@ -274,12 +262,12 @@ bool Image::BeginLoad(Deserializer& source)
     if (fileID == "DDS ")
     {
         // DDS compressed format
-        DDSurfaceDesc2 ddsd;
+        DDSurfaceDesc2 ddsd;        // NOLINT(hicpp-member-init)
         source.Read(&ddsd, sizeof(ddsd));
 
         // DDS DX10+
         const bool hasDXGI = ddsd.ddpfPixelFormat_.dwFourCC_ == FOURCC_DX10;
-        DDSHeader10 dxgiHeader;
+        DDSHeader10 dxgiHeader;     // NOLINT(hicpp-member-init)
         if (hasDXGI)
             source.Read(&dxgiHeader, sizeof(dxgiHeader));
 
@@ -443,15 +431,15 @@ bool Image::BeginLoad(Deserializer& source)
                 unsigned numPixels = dataSize / sourcePixelByteSize;
 
 #define ADJUSTSHIFT(mask, l, r) \
-                if (mask && mask >= 0x100) \
+                if ((mask) >= 0x100) \
                 { \
-                    while ((mask >> r) >= 0x100) \
-                    ++r; \
+                    while (((mask) >> (r)) >= 0x100) \
+                    ++(r); \
                 } \
-                else if (mask && mask < 0x80) \
+                else if ((mask) && (mask) < 0x80) \
                 { \
-                    while ((mask << l) < 0x80) \
-                    ++l; \
+                    while (((mask) << (l)) < 0x80) \
+                    ++(l); \
                 }
 
                 unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
@@ -471,7 +459,7 @@ bool Image::BeginLoad(Deserializer& source)
                 {
                 case 4:
                 {
-                    unsigned* src = (unsigned*)currentImage->data_.Get();
+                    auto* src = (unsigned*)currentImage->data_.Get();
                     unsigned char* dest = rgbaData.Get();
 
                     while (numPixels--)
@@ -504,7 +492,7 @@ bool Image::BeginLoad(Deserializer& source)
 
                 default:
                 {
-                    unsigned short* src = (unsigned short*)currentImage->data_.Get();
+                    auto* src = (unsigned short*)currentImage->data_.Get();
                     unsigned char* dest = rgbaData.Get();
 
                     while (numPixels--)
@@ -622,7 +610,7 @@ bool Image::BeginLoad(Deserializer& source)
         }
 
         source.Seek(source.GetPosition() + keyValueBytes);
-        unsigned dataSize = (unsigned)(source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned));
+        auto dataSize = (unsigned)(source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned));
 
         data_ = new unsigned char[dataSize];
         width_ = width;
@@ -762,7 +750,7 @@ bool Image::BeginLoad(Deserializer& source)
             return false;
         }
         const uint8_t WEBP[TAG_SIZE] = {'W', 'E', 'B', 'P'};
-        if (memcmp(fourCC, WEBP, TAG_SIZE))
+        if (memcmp(fourCC, WEBP, TAG_SIZE) != 0)
         {
             // VP8_STATUS_BITSTREAM_ERROR
             URHO3D_LOGERROR("Invalid header");
@@ -785,7 +773,7 @@ bool Image::BeginLoad(Deserializer& source)
             return false;
         }
 
-        size_t imgSize(features.width * features.height * (features.has_alpha ? 4 : 3));
+        size_t imgSize = (size_t)features.width * features.height * (features.has_alpha ? 4 : 3);
         SharedArrayPtr<uint8_t> pixelData(new uint8_t[imgSize]);
 
         bool decodeError(false);
@@ -846,7 +834,7 @@ bool Image::Save(Serializer& dest) const
     int len;
     unsigned char* png = stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
     bool success = dest.Write(png, (unsigned)len) == (unsigned)len;
-    free(png);
+    free(png);      // NOLINT(hicpp-no-malloc)
     return success;
 }
 
@@ -921,7 +909,7 @@ void Image::SetPixelInt(int x, int y, int z, unsigned uintColor)
         return;
 
     unsigned char* dest = data_ + (z * width_ * height_ + y * width_ + x) * components_;
-    unsigned char* src = (unsigned char*)&uintColor;
+    auto* src = (unsigned char*)&uintColor;
 
     switch (components_)
     {
@@ -951,7 +939,11 @@ void Image::SetData(const unsigned char* pixelData)
         return;
     }
 
-    memcpy(data_.Get(), pixelData, width_ * height_ * depth_ * components_);
+    auto size = (size_t)width_ * height_ * depth_ * components_;
+    if (pixelData)
+        memcpy(data_.Get(), pixelData, size);
+    else
+        memset(data_.Get(), 0, size);
     nextLevel_.Reset();
 }
 
@@ -1163,7 +1155,7 @@ bool Image::Resize(int width, int height)
             float yF = (height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
             unsigned uintColor = GetPixelBilinear(xF, yF).ToUInt();
             unsigned char* dest = newData + (y * width + x) * components_;
-            unsigned char* src = (unsigned char*)&uintColor;
+            auto* src = (unsigned char*)&uintColor;
 
             switch (components_)
             {
@@ -1211,14 +1203,14 @@ void Image::ClearInt(unsigned uintColor)
     if (components_ == 4)
     {
         unsigned color = uintColor;
-        unsigned* data = (unsigned*)GetData();
-        unsigned* data_end = (unsigned*)(GetData() + width_ * height_ * depth_ * components_);
+        auto* data = (unsigned*)GetData();
+        auto* data_end = (unsigned*)(GetData() + width_ * height_ * depth_ * components_);
         for (; data < data_end; ++data)
             *data = color;
     }
     else
     {
-        unsigned char* src = (unsigned char*)&uintColor;
+        auto* src = (unsigned char*)&uintColor;
         for (unsigned i = 0; i < width_ * height_ * depth_ * components_; ++i)
             data_[i] = src[i % components_];
     }
@@ -1228,7 +1220,7 @@ bool Image::SaveBMP(const String& fileName) const
 {
     URHO3D_PROFILE(SaveImageBMP);
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         URHO3D_LOGERROR("Access denied to " + fileName);
@@ -1262,7 +1254,7 @@ bool Image::SaveTGA(const String& fileName) const
 {
     URHO3D_PROFILE(SaveImageTGA);
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         URHO3D_LOGERROR("Access denied to " + fileName);
@@ -1285,7 +1277,7 @@ bool Image::SaveJPG(const String& fileName, int quality) const
 {
     URHO3D_PROFILE(SaveImageJPG);
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         URHO3D_LOGERROR("Access denied to " + fileName);
@@ -1299,7 +1291,7 @@ bool Image::SaveJPG(const String& fileName, int quality) const
     }
 
     if (data_)
-        return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
+        return stbi_write_jpg(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), quality) != 0;
     else
         return false;
 }
@@ -1333,7 +1325,7 @@ bool Image::SaveDDS(const String& fileName) const
 
     outFile.WriteFileID("DDS ");
 
-    DDSurfaceDesc2 ddsd;
+    DDSurfaceDesc2 ddsd;        // NOLINT(hicpp-member-init)
     memset(&ddsd, 0, sizeof(ddsd));
     ddsd.dwSize_ = sizeof(ddsd);
     ddsd.dwFlags_ = 0x00000001l /*DDSD_CAPS*/
@@ -1361,7 +1353,7 @@ bool Image::SaveWEBP(const String& fileName, float compression /* = 0.0f */) con
 #ifdef URHO3D_WEBP
     URHO3D_PROFILE(SaveImageWEBP);
 
-    FileSystem* fileSystem(GetSubsystem<FileSystem>());
+    auto* fileSystem(GetSubsystem<FileSystem>());
     File outFile(context_, fileName, FILE_WRITE);
 
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
@@ -1529,8 +1521,8 @@ Color Image::GetPixelBilinear(float x, float y) const
     x = Clamp(x * width_ - 0.5f, 0.0f, (float)(width_ - 1));
     y = Clamp(y * height_ - 0.5f, 0.0f, (float)(height_ - 1));
 
-    int xI = (int)x;
-    int yI = (int)y;
+    auto xI = (int)x;
+    auto yI = (int)y;
     float xF = Fract(x);
     float yF = Fract(y);
 
@@ -1548,9 +1540,9 @@ Color Image::GetPixelTrilinear(float x, float y, float z) const
     y = Clamp(y * height_ - 0.5f, 0.0f, (float)(height_ - 1));
     z = Clamp(z * depth_ - 0.5f, 0.0f, (float)(depth_ - 1));
 
-    int xI = (int)x;
-    int yI = (int)y;
-    int zI = (int)z;
+    auto xI = (int)x;
+    auto yI = (int)y;
+    auto zI = (int)z;
     if (zI == depth_ - 1)
         return GetPixelBilinear(x, y);
     float xF = Fract(x);
@@ -2096,14 +2088,14 @@ Image* Image::GetSubimage(const IntRect& rect) const
         int width = rect.Width();
         int height = rect.Height();
 
-        Image* image = new Image(context_);
+        auto* image = new Image(context_);
         image->SetSize(width, height, components_);
 
         unsigned char* dest = image->GetData();
         unsigned char* src = data_.Get() + (y * width_ + x) * components_;
         for (int i = 0; i < height; ++i)
         {
-            memcpy(dest, src, width * components_);
+            memcpy(dest, src, (size_t)width * components_);
             dest += width * components_;
             src += width_ * components_;
         }
@@ -2165,7 +2157,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
             return nullptr;
         }
 
-        Image* image = new Image(context_);
+        auto* image = new Image(context_);
         image->width_ = paddedRect.Width();
         image->height_ = paddedRect.Height();
         image->depth_ = 1;
@@ -2229,11 +2221,11 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
     {
         SDL_LockSurface(surface);
 
-        unsigned char* destination = reinterpret_cast<unsigned char*>(surface->pixels);
+        auto* destination = reinterpret_cast<unsigned char*>(surface->pixels);
         unsigned char* source = data_ + components_ * (imageWidth * imageRect.top_ + imageRect.left_);
         for (int i = 0; i < height; ++i)
         {
-            memcpy(destination, source, components_ * width);
+            memcpy(destination, source, (size_t)components_ * width);
             destination += surface->pitch;
             source += components_ * imageWidth;
         }
@@ -2311,6 +2303,72 @@ void Image::FreeImageData(unsigned char* pixelData)
         return;
 
     stbi_image_free(pixelData);
+}
+
+bool Image::HasAlphaChannel() const
+{
+    return components_ > 3;
+}
+
+// Author: Josh Engebretson (AtomicGameEngine)
+bool Image::SetSubimage(const Image* image, const IntRect& rect)
+{
+    if (!data_)
+        return false;
+
+    if (depth_ > 1 || IsCompressed())
+    {
+        URHO3D_LOGERROR("Image::SetSubimage is not supported for compressed or 3D images");
+        return false;
+    }
+
+    if (components_ != image->components_)
+    {
+        URHO3D_LOGERROR("Can not set subimage in image " + GetName() + " with different number of components");
+        return false;
+    }
+
+    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
+    {
+        URHO3D_LOGERROR("Can not set subimage in image " + GetName() + " with invalid region");
+        return false;
+    }
+
+    const int destWidth = rect.Width();
+    const int destHeight = rect.Height();
+    if (destWidth == image->GetWidth() && destHeight == image->GetHeight())
+    {
+        unsigned char* src = image->GetData();
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        for (int i = 0; i < destHeight; ++i)
+        {
+            memcpy(dest, src, (size_t)destWidth * components_);
+
+            src += destWidth * image->components_;
+            dest += width_ * components_;
+        }
+    }
+    else
+    {
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        for (int y = 0; y < destHeight; ++y)
+        {
+            for (int x = 0; x < destWidth; ++x)
+            {
+                // Calculate float coordinates between 0 - 1 for resampling
+                const float xF = (image->width_ > 1) ? static_cast<float>(x) / (destWidth - 1) : 0.0f;
+                const float yF = (image->height_ > 1) ? static_cast<float>(y) / (destHeight - 1) : 0.0f;
+                const unsigned uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
+
+                memcpy(dest, reinterpret_cast<const unsigned char*>(&uintColor), components_);
+
+                dest += components_;
+            }
+            dest += (width_ - destWidth) * components_;
+        }
+    }
+
+    return true;
 }
 
 }

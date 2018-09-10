@@ -146,7 +146,7 @@ function CreateMenu(label, items, handler)
         list:AddItem(t)
         t.text = item
         t:SetStyleAuto()
-        t:SetMinWidth(t:GetRowWidth(0) + 10);
+        t:SetMinWidth(t:GetRowWidth(0) + 10)
         t:AddTag(TEXT_TAG) 
     end
 

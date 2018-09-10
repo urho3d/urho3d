@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -109,7 +109,7 @@ public:
     /// Write a 32-bit StringHash.
     bool WriteStringHash(const StringHash& value);
     /// Write a buffer, with size encoded as VLE.
-    bool WriteBuffer(const PODVector<unsigned char>& buffer);
+    bool WriteBuffer(const PODVector<unsigned char>& value);
     /// Write a resource reference.
     bool WriteResourceRef(const ResourceRef& value);
     /// Write a resource reference list.

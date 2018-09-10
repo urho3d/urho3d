@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ namespace Urho3D
     } \
 
 #define INC_POS_STEREO_LOOPED() \
-    pos += (intAdd << 1); \
+    pos += ((unsigned)intAdd << 1u); \
     fractPos += fractAdd; \
     if (fractPos > 65535) \
     { \
@@ -75,7 +75,7 @@ namespace Urho3D
         pos -= (end - repeat); \
 
 #define INC_POS_STEREO_ONESHOT() \
-    pos += (intAdd << 1); \
+    pos += ((unsigned)intAdd << 1u); \
     fractPos += fractAdd; \
     if (fractPos > 65535) \
     { \
@@ -374,7 +374,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     {
         int streamBufferSize = streamBuffer_->GetDataSize();
         // Calculate how many bytes of stream sound data is needed
-        int neededSize = (int)((float)samples * frequency_ / (float)mixRate);
+        auto neededSize = (int)((float)samples * frequency_ / (float)mixRate);
         // Add a little safety buffer. Subtract previous unused data
         neededSize += STREAM_SAFETY_SAMPLES;
         neededSize *= soundStream_->GetSampleSize();
@@ -465,8 +465,8 @@ void SoundSource::UpdateMasterGain()
 
 void SoundSource::SetSoundAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Sound* newSound = cache->GetResource<Sound>(value.name_);
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* newSound = cache->GetResource<Sound>(value.name_);
     if (IsPlaying())
         Play(newSound);
     else
@@ -545,7 +545,7 @@ void SoundSource::PlayLockless(Sound* sound)
     sound_.Reset();
 }
 
-void SoundSource::PlayLockless(SharedPtr<SoundStream> stream)
+void SoundSource::PlayLockless(const SharedPtr<SoundStream>& stream)
 {
     // Reset the time position in any case
     timePosition_ = 0.0f;
@@ -593,7 +593,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
     signed char* end = sound_->GetEnd();
     if (pos < start)
         pos = start;
-    if (sound_->IsSixteenBit() && (pos - start) & 1)
+    if (sound_->IsSixteenBit() && (pos - start) & 1u)
         ++pos;
     if (pos > end)
         pos = end;
@@ -605,7 +605,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
 void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int vol = (int)(256.0f * totalGain + 0.5f);
+    auto vol = RoundToInt(256.0f * totalGain);
     if (!vol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -613,15 +613,15 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -646,7 +646,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -677,8 +677,8 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    int rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -686,15 +686,15 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -723,7 +723,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -759,7 +759,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int vol = (int)(256.0f * totalGain + 0.5f);
+    auto vol = RoundToInt(256.0f * totalGain);
     if (!vol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -767,15 +767,15 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -800,7 +800,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -832,8 +832,8 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    int rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -841,15 +841,15 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -880,7 +880,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -918,7 +918,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int vol = (int)(256.0f * totalGain + 0.5f);
+    auto vol = RoundToInt(256.0f * totalGain);
     if (!vol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -926,15 +926,15 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -961,7 +961,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -995,7 +995,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int vol = (int)(256.0f * totalGain + 0.5f);
+    auto vol = RoundToInt(256.0f * totalGain);
     if (!vol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1003,15 +1003,15 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -1040,7 +1040,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -1076,7 +1076,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int vol = (int)(256.0f * totalGain + 0.5f);
+    auto vol = RoundToInt(256.0f * totalGain);
     if (!vol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1084,15 +1084,15 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -1119,7 +1119,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -1153,7 +1153,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    int vol = (int)(256.0f * totalGain + 0.5f);
+    auto vol = RoundToInt(256.0f * totalGain);
     if (!vol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1161,15 +1161,15 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
     }
 
     float add = frequency_ / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
     {
-        short* pos = (short*)position_;
-        short* end = (short*)sound->GetEnd();
-        short* repeat = (short*)sound->GetRepeat();
+        auto* pos = (short*)position_;
+        auto* end = (short*)sound->GetEnd();
+        auto* repeat = (short*)sound->GetRepeat();
 
         if (sound->IsLooped())
         {
@@ -1198,7 +1198,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
     }
     else
     {
-        signed char* pos = (signed char*)position_;
+        auto* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
 
@@ -1234,8 +1234,8 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
 void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
 {
     float add = frequency_ * (float)samples / (float)mixRate;
-    int intAdd = (int)add;
-    int fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = (int)add;
+    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     unsigned sampleSize = sound->GetSampleSize();
 
     fractPosition_ += fractAdd;

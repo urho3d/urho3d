@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ class URHO3D_API Matrix3x4
 {
 public:
     /// Construct an identity matrix.
-    Matrix3x4()
+    Matrix3x4() noexcept
 #ifndef URHO3D_SSE
        :m00_(1.0f),
         m01_(0.0f),
@@ -60,32 +60,10 @@ public:
     }
 
     /// Copy-construct from another matrix.
-    Matrix3x4(const Matrix3x4& matrix)
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
-    {
-        _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
-        _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
-        _mm_storeu_ps(&m20_, _mm_loadu_ps(&matrix.m20_));
-    }
-#else
-       :m00_(matrix.m00_),
-        m01_(matrix.m01_),
-        m02_(matrix.m02_),
-        m03_(matrix.m03_),
-        m10_(matrix.m10_),
-        m11_(matrix.m11_),
-        m12_(matrix.m12_),
-        m13_(matrix.m13_),
-        m20_(matrix.m20_),
-        m21_(matrix.m21_),
-        m22_(matrix.m22_),
-        m23_(matrix.m23_)
-    {
-    }
-#endif
+    Matrix3x4(const Matrix3x4& matrix) noexcept = default;
 
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
-    Matrix3x4(const Matrix3& matrix) :
+    explicit Matrix3x4(const Matrix3& matrix) noexcept :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -102,7 +80,7 @@ public:
     }
 
     /// Copy-construct from a 4x4 matrix which is assumed to contain no projection.
-    Matrix3x4(const Matrix4& matrix)
+    explicit Matrix3x4(const Matrix4& matrix) noexcept
 #ifndef URHO3D_SSE
        :m00_(matrix.m00_),
         m01_(matrix.m01_),
@@ -128,7 +106,7 @@ public:
     /// Construct from values.
     Matrix3x4(float v00, float v01, float v02, float v03,
               float v10, float v11, float v12, float v13,
-              float v20, float v21, float v22, float v23) :
+              float v20, float v21, float v22, float v23) noexcept :
         m00_(v00),
         m01_(v01),
         m02_(v02),
@@ -145,7 +123,7 @@ public:
     }
 
     /// Construct from a float array.
-    explicit Matrix3x4(const float* data)
+    explicit Matrix3x4(const float* data) noexcept
 #ifndef URHO3D_SSE
        :m00_(data[0]),
         m01_(data[1]),
@@ -169,7 +147,7 @@ public:
     }
 
     /// Construct from translation, rotation and uniform scale.
-    Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale) noexcept
     {
 #ifdef URHO3D_SSE
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
@@ -183,7 +161,7 @@ public:
     }
 
     /// Construct from translation, rotation and nonuniform scale.
-    Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale) noexcept
     {
 #ifdef URHO3D_SSE
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
@@ -197,49 +175,28 @@ public:
     }
 
     /// Assign from another matrix.
-    Matrix3x4& operator =(const Matrix3x4& rhs)
-    {
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
-        _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
-        _mm_storeu_ps(&m10_, _mm_loadu_ps(&rhs.m10_));
-        _mm_storeu_ps(&m20_, _mm_loadu_ps(&rhs.m20_));
-#else
-        m00_ = rhs.m00_;
-        m01_ = rhs.m01_;
-        m02_ = rhs.m02_;
-        m03_ = rhs.m03_;
-        m10_ = rhs.m10_;
-        m11_ = rhs.m11_;
-        m12_ = rhs.m12_;
-        m13_ = rhs.m13_;
-        m20_ = rhs.m20_;
-        m21_ = rhs.m21_;
-        m22_ = rhs.m22_;
-        m23_ = rhs.m23_;
-#endif
-        return *this;
-    }
+    Matrix3x4& operator =(const Matrix3x4& rhs) noexcept = default;
 
     /// Assign from a 3x3 matrix and set the extra elements to identity.
-    Matrix3x4& operator =(const Matrix3& rhs)
+    Matrix3x4& operator =(const Matrix3& rhs) noexcept
     {
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
         m02_ = rhs.m02_;
-        m03_ = 0.0;
+        m03_ = 0.0f;
         m10_ = rhs.m10_;
         m11_ = rhs.m11_;
         m12_ = rhs.m12_;
-        m13_ = 0.0;
+        m13_ = 0.0f;
         m20_ = rhs.m20_;
         m21_ = rhs.m21_;
         m22_ = rhs.m22_;
-        m23_ = 0.0;
+        m23_ = 0.0f;
         return *this;
     }
 
     /// Assign from a 4x4 matrix which is assumed to contain no projection.
-    Matrix3x4& operator =(const Matrix4& rhs)
+    Matrix3x4& operator =(const Matrix4& rhs) noexcept
     {
 #ifdef URHO3D_SSE
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));

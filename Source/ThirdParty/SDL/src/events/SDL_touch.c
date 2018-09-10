@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,6 +25,7 @@
 #include "SDL_assert.h"
 #include "SDL_events.h"
 #include "SDL_events_c.h"
+#include "../video/SDL_sysvideo.h"
 
 
 static int SDL_num_touch = 0;
@@ -48,7 +49,7 @@ SDL_TouchID
 SDL_GetTouchDevice(int index)
 {
     if (index < 0 || index >= SDL_num_touch) {
-        SDL_SetError("Unknown touch device");
+        SDL_SetError("Unknown touch device index %d", index);
         return 0;
     }
     return SDL_touchDevices[index]->id;
@@ -74,7 +75,12 @@ SDL_GetTouch(SDL_TouchID id)
 {
     int index = SDL_GetTouchIndex(id);
     if (index < 0 || index >= SDL_num_touch) {
-        SDL_SetError("Unknown touch device");
+        if (SDL_GetVideoDevice()->ResetTouch != NULL) {
+            SDL_SetError("Unknown touch id %d, resetting", (int) id);
+            (SDL_GetVideoDevice()->ResetTouch)(SDL_GetVideoDevice());
+        } else {
+            SDL_SetError("Unknown touch device id %d, cannot reset", (int) id);
+        }
         return NULL;
     }
     return SDL_touchDevices[index];
@@ -92,7 +98,7 @@ SDL_GetFingerIndex(const SDL_Touch * touch, SDL_FingerID fingerid)
     return -1;
 }
 
-SDL_Finger *
+static SDL_Finger *
 SDL_GetFinger(const SDL_Touch * touch, SDL_FingerID id)
 {
     int index = SDL_GetFingerIndex(touch, id);
@@ -346,6 +352,9 @@ SDL_DelTouch(SDL_TouchID id)
 
     SDL_num_touch--;
     SDL_touchDevices[index] = SDL_touchDevices[SDL_num_touch];
+
+    /* Delete this touch device for gestures */
+    SDL_GestureDelTouch(id);
 }
 
 void
@@ -360,6 +369,7 @@ SDL_TouchQuit(void)
 
     SDL_free(SDL_touchDevices);
     SDL_touchDevices = NULL;
+    SDL_GestureQuit();
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

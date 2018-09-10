@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,9 +64,11 @@ public:
         {
         }
 
+        /// Prevent assignment.
+        KeyValue& operator =(const KeyValue& rhs) = delete;
+
         /// Test for equality with another pair.
         bool operator ==(const KeyValue& rhs) const { return first_ == rhs.first_ && second_ == rhs.second_; }
-
         /// Test for inequality with another pair.
         bool operator !=(const KeyValue& rhs) const { return first_ != rhs.first_ || second_ != rhs.second_; }
 
@@ -74,19 +76,13 @@ public:
         const T first_;
         /// Value.
         U second_;
-
-    private:
-        /// Prevent assignment.
-        KeyValue& operator =(const KeyValue& rhs);
     };
 
     /// Hash map node.
     struct Node : public HashNodeBase
     {
         /// Construct undefined.
-        Node()
-        {
-        }
+        Node() = default;
 
         /// Construct with key and value.
         Node(const T& key, const U& value) :
@@ -111,12 +107,10 @@ public:
     struct Iterator : public HashIteratorBase
     {
         /// Construct.
-        Iterator()
-        {
-        }
+        Iterator() = default;
 
         /// Construct with a node pointer.
-        Iterator(Node* ptr) :
+        explicit Iterator(Node* ptr) :
             HashIteratorBase(ptr)
         {
         }
@@ -162,18 +156,16 @@ public:
     struct ConstIterator : public HashIteratorBase
     {
         /// Construct.
-        ConstIterator()
-        {
-        }
+        ConstIterator() = default;
 
         /// Construct with a node pointer.
-        ConstIterator(Node* ptr) :
+        explicit ConstIterator(Node* ptr) :
             HashIteratorBase(ptr)
         {
         }
 
         /// Construct from a non-const iterator.
-        ConstIterator(const Iterator& rhs) :
+        ConstIterator(const Iterator& rhs) :        // NOLINT(google-explicit-constructor)
             HashIteratorBase(rhs.ptr_)
         {
         }
@@ -238,6 +230,13 @@ public:
         head_ = tail_ = ReserveNode();
         *this = map;
     }
+
+    /// Move-construct from another hash map.
+    HashMap(HashMap<T, U> && map) noexcept
+    {
+        Swap(map);
+    }
+
     /// Aggregate initialization constructor.
     HashMap(const std::initializer_list<Pair<T, U>>& list) : HashMap()
     {
@@ -246,13 +245,17 @@ public:
             Insert(*it);
         }
     }
+
     /// Destruct.
     ~HashMap()
     {
-        Clear();
-        FreeNode(Tail());
-        AllocatorUninitialize(allocator_);
-        delete[] ptrs_;
+        if (allocator_)
+        {
+            Clear();
+            FreeNode(Tail());
+            AllocatorUninitialize(allocator_);
+            delete[] ptrs_;
+        }
     }
 
     /// Assign a hash map.
@@ -264,6 +267,14 @@ public:
             Clear();
             Insert(rhs);
         }
+        return *this;
+    }
+
+    /// Move-assign a hash map.
+    HashMap& operator =(HashMap<T, U> && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 
@@ -348,7 +359,7 @@ public:
         return *this;
     };
     /// Populate the map using variadic template.
-    template <typename... Args> HashMap& Populate(const T& key, const U& value, Args... args)
+    template <typename... Args> HashMap& Populate(const T& key, const U& value, const Args&... args)
     {
         this->operator [](key) = value;
         return Populate(args...);
@@ -420,13 +431,13 @@ public:
         if (!ptrs_ || !it.ptr_)
             return End();
 
-        Node* node = static_cast<Node*>(it.ptr_);
+        auto* node = static_cast<Node*>(it.ptr_);
         Node* next = node->Next();
 
         unsigned hashKey = Hash(node->pair_.first_);
 
         Node* previous = 0;
-        Node* current = static_cast<Node*>(Ptrs()[hashKey]);
+        auto* current = static_cast<Node*>(Ptrs()[hashKey]);
         while (current && current != node)
         {
             previous = current;
@@ -470,7 +481,7 @@ public:
         if (!numKeys)
             return;
 
-        Node** ptrs = new Node* [numKeys];
+        auto** ptrs = new Node* [numKeys];
         Node* ptr = Head();
 
         for (unsigned i = 0; i < numKeys; ++i)
@@ -504,7 +515,7 @@ public:
 
         // Check for being power of two
         unsigned check = numBuckets;
-        while (!(check & 1))
+        while (!(check & 1u))
             check >>= 1;
         if (check != 1)
             return false;
@@ -616,7 +627,7 @@ private:
     /// Find a node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey) const
     {
-        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
+        auto* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -632,7 +643,7 @@ private:
     {
         previous = 0;
 
-        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
+        auto* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -730,7 +741,7 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -738,7 +749,7 @@ private:
     /// Reserve a node with specified key and value.
     Node* ReserveNode(const T& key, const U& value)
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
     }
@@ -755,7 +766,7 @@ private:
     {
         for (Iterator i = Begin(); i != End(); ++i)
         {
-            Node* node = static_cast<Node*>(i.ptr_);
+            auto* node = static_cast<Node*>(i.ptr_);
             unsigned hashKey = Hash(i->first_);
             node->down_ = Ptrs()[hashKey];
             Ptrs()[hashKey] = node;

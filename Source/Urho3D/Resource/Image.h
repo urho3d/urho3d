@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,41 +50,27 @@ enum CompressedFormat
 /// Compressed image mip level.
 struct CompressedLevel
 {
-    /// Construct empty.
-    CompressedLevel() :
-        data_(nullptr),
-        format_(CF_NONE),
-        width_(0),
-        height_(0),
-        depth_(0),
-        blockSize_(0),
-        dataSize_(0),
-        rowSize_(0),
-        rows_(0)
-    {
-    }
-
     /// Decompress to RGBA. The destination buffer required is width * height * 4 bytes. Return true if successful.
     bool Decompress(unsigned char* dest);
 
     /// Compressed image data.
-    unsigned char* data_;
+    unsigned char* data_{};
     /// Compression format.
-    CompressedFormat format_;
+    CompressedFormat format_{CF_NONE};
     /// Width.
-    int width_;
+    int width_{};
     /// Height.
-    int height_;
+    int height_{};
     /// Depth.
-    int depth_;
+    int depth_{};
     /// Block size in bytes.
-    unsigned blockSize_;
+    unsigned blockSize_{};
     /// Total data size in bytes.
-    unsigned dataSize_;
+    unsigned dataSize_{};
     /// Row size in bytes.
-    unsigned rowSize_;
+    unsigned rowSize_{};
     /// Number of rows.
-    unsigned rows_;
+    unsigned rows_{};
 };
 
 /// %Image resource.
@@ -94,18 +80,18 @@ class URHO3D_API Image : public Resource
 
 public:
     /// Construct empty.
-    Image(Context* context);
+    explicit Image(Context* context);
     /// Destruct.
-    virtual ~Image() override;
+    ~Image() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save the image to a stream. Regardless of original format, the image is saved as png. Compressed image data is not supported. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
     /// Save the image to a file. Format of the image is determined by file extension. JPG is saved with maximum quality.
-    virtual bool SaveFile(const String& fileName) const override;
+    bool SaveFile(const String& fileName) const override;
 
     /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
     bool SetSize(int width, int height, unsigned components);
@@ -203,6 +189,10 @@ public:
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     /// Precalculate the mip levels. Used by asynchronous texture loading.
     void PrecalculateLevels();
+    /// Whether this texture has an alpha channel
+    bool HasAlphaChannel() const;
+    /// Copy contents of the image into the defined rect, scaling if necessary. This image should already be large enough to include the rect. Compressed and 3D images are not supported.
+    bool SetSubimage(const Image* image, const IntRect& rect);
     /// Clean up the mip levels.
     void CleanupLevels();
     /// Get all stored mip levels starting from this.
@@ -217,23 +207,23 @@ private:
     static void FreeImageData(unsigned char* pixelData);
 
     /// Width.
-    int width_;
+    int width_{};
     /// Height.
-    int height_;
+    int height_{};
     /// Depth.
-    int depth_;
+    int depth_{};
     /// Number of color components.
-    unsigned components_;
+    unsigned components_{};
     /// Number of compressed mip levels.
-    unsigned numCompressedLevels_;
+    unsigned numCompressedLevels_{};
     /// Cubemap status if DDS.
-    bool cubemap_;
+    bool cubemap_{};
     /// Texture array status if DDS.
-    bool array_;
+    bool array_{};
     /// Data is sRGB.
-    bool sRGB_;
+    bool sRGB_{};
     /// Compressed format.
-    CompressedFormat compressedFormat_;
+    CompressedFormat compressedFormat_{CF_NONE};
     /// Pixel data.
     SharedArrayPtr<unsigned char> data_;
     /// Precalculated mip level image.

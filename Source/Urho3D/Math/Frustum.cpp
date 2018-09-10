@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,16 +57,12 @@ void ProjectAndMergeEdge(Vector3 v0, Vector3 v1, Rect& rect, const Matrix4& proj
     rect.Merge(Vector2(tV1.x_, tV1.y_));
 }
 
-Frustum::Frustum()
-{
-}
-
-Frustum::Frustum(const Frustum& frustum)
+Frustum::Frustum(const Frustum& frustum) noexcept
 {
     *this = frustum;
 }
 
-Frustum& Frustum::operator =(const Frustum& rhs)
+Frustum& Frustum::operator =(const Frustum& rhs) noexcept
 {
     for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         planes_[i] = rhs.planes_[i];
@@ -176,16 +172,16 @@ void Frustum::DefineSplit(const Matrix4& projection, float near, float far)
 
 void Frustum::Transform(const Matrix3& transform)
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
-        vertices_[i] = transform * vertices_[i];
+    for (auto& vertice : vertices_)
+        vertice = transform * vertice;
 
     UpdatePlanes();
 }
 
 void Frustum::Transform(const Matrix3x4& transform)
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
-        vertices_[i] = transform * vertices_[i];
+    for (auto& vertice : vertices_)
+        vertice = transform * vertice;
 
     UpdatePlanes();
 }
@@ -238,10 +234,10 @@ void Frustum::UpdatePlanes()
     // Check if we ended up with inverted planes (reflected transform) and flip in that case
     if (planes_[PLANE_NEAR].Distance(vertices_[5]) < 0.0f)
     {
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (auto& plane : planes_)
         {
-            planes_[i].normal_ = -planes_[i].normal_;
-            planes_[i].d_ = -planes_[i].d_;
+            plane.normal_ = -plane.normal_;
+            plane.d_ = -plane.d_;
         }
     }
 

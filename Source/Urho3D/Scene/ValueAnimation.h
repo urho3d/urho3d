@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,16 +69,16 @@ class URHO3D_API ValueAnimation : public Resource
 
 public:
     /// Construct.
-    ValueAnimation(Context* context);
+    explicit ValueAnimation(Context* context);
     /// Destruct.
-    virtual ~ValueAnimation() override;
+    ~ValueAnimation() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
     /// Load from XML data. Return true if successful.
     bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
@@ -125,6 +125,9 @@ public:
 
     /// Return animation value.
     Variant GetAnimationValue(float scaledTime) const;
+
+    /// Return all key frames.
+    const Vector<VAnimKeyFrame>& GetKeyFrames() const { return keyFrames_; }
 
     /// Has event frames.
     bool HasEventFrames() const { return !eventFrames_.Empty(); }

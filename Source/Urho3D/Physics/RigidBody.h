@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,24 +53,22 @@ class URHO3D_API RigidBody : public Component, public btMotionState
 
 public:
     /// Construct.
-    RigidBody(Context* context);
+    explicit RigidBody(Context* context);
     /// Destruct. Free the rigid body and geometries.
-    virtual ~RigidBody() override;
+    ~RigidBody() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Return initial world transform to Bullet.
-    virtual void getWorldTransform(btTransform& worldTrans) const override;
+    void getWorldTransform(btTransform& worldTrans) const override;
     /// Update world transform from Bullet.
-    virtual void setWorldTransform(const btTransform& worldTrans) override;
+    void setWorldTransform(const btTransform& worldTrans) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set mass. Zero mass makes the body static.
     void SetMass(float mass);
@@ -89,13 +87,13 @@ public:
     /// Set linear velocity damping factor.
     void SetLinearDamping(float damping);
     /// Set angular velocity.
-    void SetAngularVelocity(const Vector3& angularVelocity);
+    void SetAngularVelocity(const Vector3& velocity);
     /// Set angular degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
     void SetAngularFactor(const Vector3& factor);
     /// Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
     /// Set angular velocity damping factor.
-    void SetAngularDamping(float factor);
+    void SetAngularDamping(float damping);
     /// Set friction coefficient.
     void SetFriction(float friction);
     /// Set anisotropic friction.
@@ -247,11 +245,11 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
 
 private:
     /// Create the rigid body, or re-add to the physics world with changed flags. Calls UpdateMass().
@@ -262,6 +260,8 @@ private:
     void HandleTargetPosition(StringHash eventType, VariantMap& eventData);
     /// Handle SmoothedTransform target rotation update.
     void HandleTargetRotation(StringHash eventType, VariantMap& eventData);
+    /// Mark body dirty.
+    void MarkBodyDirty() { readdBody_ = true; }
 
     /// Bullet rigid body.
     UniquePtr<btRigidBody> body_;

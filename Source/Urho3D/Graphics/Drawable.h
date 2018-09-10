@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@
 namespace Urho3D
 {
 
+static const unsigned DRAWABLE_UNDEFINED = 0x0;
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
 static const unsigned DRAWABLE_ZONE = 0x4;
@@ -88,19 +89,19 @@ struct URHO3D_API SourceBatch
     SourceBatch& operator =(const SourceBatch& rhs);
 
     /// Distance from camera.
-    float distance_;
+    float distance_{};
     /// Geometry.
-    Geometry* geometry_;
+    Geometry* geometry_{};
     /// Material.
     SharedPtr<Material> material_;
     /// World transform(s). For a skinned model, these are the bone transforms.
-    const Matrix3x4* worldTransform_;
+    const Matrix3x4* worldTransform_{&Matrix3x4::IDENTITY};
     /// Number of world transforms.
-    unsigned numWorldTransforms_;
+    unsigned numWorldTransforms_{1};
     /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
-    void* instancingData_;
+    void* instancingData_{};
     /// %Geometry type.
-    GeometryType geometryType_;
+    GeometryType geometryType_{GEOM_STATIC};
 };
 
 /// Base class for visible components.
@@ -116,12 +117,12 @@ public:
     /// Construct.
     Drawable(Context* context, unsigned char drawableFlags);
     /// Destruct.
-    virtual ~Drawable() override;
+    ~Drawable() override;
     /// Register object attributes. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread
@@ -143,7 +144,7 @@ public:
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set draw distance.
     void SetDrawDistance(float distance);
@@ -242,7 +243,7 @@ public:
     void LimitVertexLights(bool removeConvertedLights);
 
     /// Set base pass flag for a batch.
-    void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
+    void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1u << batchIndex); }
 
     /// Return octree octant.
     Octant* GetOctant() const { return octant_; }
@@ -266,7 +267,7 @@ public:
     bool IsInView(const FrameInfo& frame, bool anyCamera = false) const;
 
     /// Return whether has a base pass.
-    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
+    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1u << batchIndex)) != 0; }
 
     /// Return per-pixel lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
@@ -303,11 +304,11 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate() = 0;
 

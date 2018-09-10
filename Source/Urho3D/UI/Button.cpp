@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,9 +49,7 @@ Button::Button(Context* context) :
     focusMode_ = FM_FOCUSABLE;
 }
 
-Button::~Button()
-{
-}
+Button::~Button() = default;
 
 void Button::RegisterObject(Context* context)
 {
@@ -148,7 +146,7 @@ void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     SetPressed(true);
 }
 
-void Button::OnKey(int key, int buttons, int qualifiers)
+void Button::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {

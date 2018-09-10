@@ -47,14 +47,23 @@ class PropertySet2D
     const String GetProperty(const String name) const;
 };
 
+static const unsigned FLIP_HORIZONTAL;
+static const unsigned FLIP_VERTICAL;
+static const unsigned FLIP_DIAGONAL;
+static const unsigned FLIP_RESERVED;
+static const unsigned FLIP_ALL;
+
 class Tile2D
 {
-    int GetGid() const;
+    unsigned GetGid() const;
+    bool GetFlipX() const;
+    bool GetFlipY() const;
+    bool GetSwapXY() const;
     Sprite2D* GetSprite() const;
     bool HasProperty(const String name) const;
     const String GetProperty(const String name) const;
 
-    tolua_readonly tolua_property__get_set int gid;
+    tolua_readonly tolua_property__get_set unsigned gid;
     tolua_readonly tolua_property__get_set Sprite2D* sprite;
 };
 
@@ -67,7 +76,10 @@ class TileMapObject2D
     const Vector2& GetSize() const;
     unsigned GetNumPoints() const;
     const Vector2& GetPoint(unsigned index) const;
-    int GetTileGid() const;
+    unsigned GetTileGid() const;
+    bool GetTileFlipX() const;
+    bool GetTileFlipY() const;
+    bool GetTileSwapXY() const;
     Sprite2D* GetTileSprite() const;
     bool HasProperty(const String name) const;
     const String GetProperty(const String name) const;
@@ -78,6 +90,6 @@ class TileMapObject2D
     tolua_readonly tolua_property__get_set Vector2 position;
     tolua_readonly tolua_property__get_set Vector2 size;
     tolua_readonly tolua_property__get_set unsigned numPoints;
-    tolua_readonly tolua_property__get_set int tileGid;
+    tolua_readonly tolua_property__get_set unsigned tileGid;
     tolua_readonly tolua_property__get_set Sprite2D* tileSprite;
 };

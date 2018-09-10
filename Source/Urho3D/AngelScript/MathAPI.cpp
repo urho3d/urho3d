@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,9 @@
 #include "../Math/Ray.h"
 #include "../Math/Matrix2.h"
 
+// Some headers could re-define M_PI, ensure that it's undefined.
+#undef M_PI
+
 namespace Urho3D
 {
 
@@ -53,7 +56,8 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
 
     engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals<float>), asCALL_CDECL);
-    engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTIONPR(IsNaN, (float), bool), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool IsNaN(double)", asFUNCTIONPR(IsNaN, (double), bool), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Cos(float)", asFUNCTION(Cos<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Tan(float)", asFUNCTION(Tan<float>), asCALL_CDECL);
@@ -131,7 +135,7 @@ static CScriptArray* IntRectData(IntRect* ptr)
 
 static void RegisterIntRect(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("IntRect", sizeof(IntRect), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("IntRect", sizeof(IntRect), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<IntRect>() | asOBJ_APP_CLASS_ALLINTS);
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructIntRect), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntRect&in)", asFUNCTION(ConstructIntRectCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(ConstructIntRectInit), asCALL_CDECL_OBJLAST);
@@ -179,7 +183,7 @@ static CScriptArray* IntVector2Data(IntVector2* ptr)
 
 static void RegisterIntVector2(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("IntVector2", sizeof(IntVector2), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("IntVector2", sizeof(IntVector2), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<IntVector2>() | asOBJ_APP_CLASS_ALLINTS);
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructIntVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(ConstructIntVector2Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(ConstructIntVector2Init), asCALL_CDECL_OBJLAST);
@@ -245,7 +249,7 @@ static CScriptArray* IntVector3Data(IntVector3* ptr)
 
 static void RegisterIntVector3(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("IntVector3", sizeof(IntVector3), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("IntVector3", sizeof(IntVector3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<IntVector3>() | asOBJ_APP_CLASS_ALLINTS);
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructIntVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", asFUNCTION(ConstructIntVector3Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int, int, int)", asFUNCTION(ConstructIntVector3Init), asCALL_CDECL_OBJLAST);
@@ -319,7 +323,7 @@ static CScriptArray* Vector2Data(Vector2* ptr)
 
 static void RegisterVector2(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Vector2", sizeof(Vector2), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Vector2", sizeof(Vector2), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vector2>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(ConstructVector2Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(ConstructVector2IntVector2), asCALL_CDECL_OBJLAST);
@@ -426,7 +430,7 @@ static CScriptArray* Vector3Data(Vector3* ptr)
 
 static void RegisterVector3(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Vector3", sizeof(Vector3), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Vector3", sizeof(Vector3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vector3>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructVector3Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f(const Vector2&in, float)", asFUNCTION(ConstructVector3Vector2Z), asCALL_CDECL_OBJLAST);
@@ -455,6 +459,10 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "float DotProduct(const Vector3&in) const", asMETHOD(Vector3, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float AbsDotProduct(const Vector3&in) const", asMETHOD(Vector3, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float ProjectOntoAxis(const Vector3&in) const", asMETHOD(Vector3, ProjectOntoAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "Vector3 ProjectOntoPlane(const Vector3&in, const Vector3&in) const", asMETHOD(Vector3, ProjectOntoPlane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "Vector3 ProjectOntoLine(const Vector3&in, const Vector3&in, bool=false) const", asMETHOD(Vector3, ProjectOntoLine), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "float DistanceToPoint(const Vector3&in) const", asMETHOD(Vector3, DistanceToPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "float DistanceToPlane(const Vector3&in, const Vector3&in) const", asMETHOD(Vector3, DistanceToPlane), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Orthogonalize(const Vector3&in) const", asMETHOD(Vector3, Orthogonalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Abs() const", asMETHOD(Vector3, Abs), asCALL_THISCALL);
@@ -525,7 +533,7 @@ static CScriptArray* Vector4Data(Vector4* ptr)
 
 static void RegisterVector4(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Vector4", sizeof(Vector4), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Vector4", sizeof(Vector4), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vector4>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVector4), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(ConstructVector4Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructVector4Init), asCALL_CDECL_OBJLAST);
@@ -687,7 +695,7 @@ static void ConstructMatrix3Init(float v00, float v01, float v02, float v10, flo
 
 static void RegisterMatrix3(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Matrix3", sizeof(Matrix3), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Matrix3", sizeof(Matrix3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Matrix3>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructMatrix3Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float, float, float, float)", asFUNCTION(ConstructMatrix3Init), asCALL_CDECL_OBJLAST);
@@ -734,7 +742,7 @@ static void ConstructMatrix2Init(float v00, float v01, float v10, float v11, Mat
 
 static void RegisterMatrix2(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Matrix2", sizeof(Matrix2), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Matrix2", sizeof(Matrix2), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Matrix2>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(const Matrix2&in)", asFUNCTION(ConstructMatrix2Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructMatrix2Init), asCALL_CDECL_OBJLAST);
@@ -781,7 +789,7 @@ static void ConstructMatrix4Init(float v00, float v01, float v02, float v03, flo
 
 static void RegisterMatrix4(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Matrix4", sizeof(Matrix4), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Matrix4", sizeof(Matrix4), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Matrix4>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix4), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f(const Matrix4&in)", asFUNCTION(ConstructMatrix4Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructMatrix4CopyMatrix3), asCALL_CDECL_OBJLAST);
@@ -940,7 +948,7 @@ static void ConstructPlaneInitVector4(const Vector4& plane, Plane* ptr)
 
 static void RegisterPlane(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Plane", sizeof(Plane), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Plane", sizeof(Plane), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Plane>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPlane), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Plane&in)", asFUNCTION(ConstructPlaneCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, const Vector3&in)", asFUNCTION(ConstructPlaneInitVertices), asCALL_CDECL_OBJLAST);
@@ -982,7 +990,7 @@ static void ConstructRayInit(const Vector3& origin, const Vector3& direction, Ra
 
 static void RegisterRay(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Ray", sizeof(Ray), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Ray", sizeof(Ray), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Ray>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRay), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f(const Ray&in)", asFUNCTION(ConstructRayCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(ConstructRayInit), asCALL_CDECL_OBJLAST);
@@ -1030,7 +1038,7 @@ static void ConstructRectInitVec4(const Vector4& vec, Rect* ptr)
 
 static void RegisterRect(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Rect", sizeof(Rect), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Rect", sizeof(Rect), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Rect>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRect), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(const Rect&in)", asFUNCTION(ConstructRectCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructRectInit), asCALL_CDECL_OBJLAST);
@@ -1207,7 +1215,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectType("BoundingBox", sizeof(BoundingBox), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectType("Frustum", sizeof(Frustum), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("Polyhedron", sizeof(Polyhedron), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
-    engine->RegisterObjectType("Sphere", sizeof(Sphere), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Sphere", sizeof(Sphere), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Sphere>() | asOBJ_APP_CLASS_ALLFLOATS);
 
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBoundingBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f(const BoundingBox&in)", asFUNCTION(ConstructBoundingBoxCopy), asCALL_CDECL_OBJLAST);
@@ -1373,7 +1381,7 @@ static float ColorSaturationHSV(Color* ptr)
 
 static void RegisterColor(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Color", sizeof(Color), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectType("Color", sizeof(Color), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Color>() | asOBJ_APP_CLASS_ALLFLOATS);
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructColor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(const Color&in)", asFUNCTION(ConstructColorCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructColorRGBA), asCALL_CDECL_OBJLAST);
@@ -1388,6 +1396,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Color", "uint ToUInt() const", asMETHOD(Color, ToUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 ToHSL() const", asMETHOD(Color, ToHSL), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 ToHSV() const", asMETHOD(Color, ToHSV), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "void FromUInt(uint)", asMETHOD(Color, FromUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "void FromHSL(float, float, float, float)", asMETHOD(Color, FromHSL), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "void FromHSV(float, float, float, float)", asMETHOD(Color, FromHSV), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, ToVector3), asCALL_THISCALL);
@@ -1425,7 +1434,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const Color CYAN", (void*)&Color::CYAN);
     engine->RegisterGlobalProperty("const Color MAGENTA", (void*)&Color::MAGENTA);
     engine->RegisterGlobalProperty("const Color YELLOW", (void*)&Color::YELLOW);
-    engine->RegisterGlobalProperty("const Color TRANSPARENT", (void*)&Color::TRANSPARENT);
+    engine->RegisterGlobalProperty("const Color TRANSPARENT_BLACK", (void*)&Color::TRANSPARENT_BLACK);
 }
 
 void RegisterMathAPI(asIScriptEngine* engine)

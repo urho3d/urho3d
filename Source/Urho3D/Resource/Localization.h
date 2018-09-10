@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,9 @@ class URHO3D_API Localization : public Object
 
 public:
     /// Construct.
-    Localization(Context* context);
+    explicit Localization(Context* context);
     /// Destruct. Free all resources.
-    virtual ~Localization() override;
+    ~Localization() override;
 
     /// Return the number of languages.
     int GetNumLanguages() const { return (int)languages_.Size(); }

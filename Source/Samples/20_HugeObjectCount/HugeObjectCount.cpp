@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ void HugeObjectCount::Start()
 
 void HugeObjectCount::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     if (!scene_)
         scene_ = new Scene(context_);
@@ -90,7 +90,7 @@ void HugeObjectCount::CreateScene()
 
     // Create a Zone for ambient light & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetFogColor(Color(0.2f, 0.2f, 0.2f));
     zone->SetFogStart(200.0f);
@@ -99,7 +99,7 @@ void HugeObjectCount::CreateScene()
     // Create a directional light
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(-0.6f, -1.0f, -0.8f)); // The direction vector does not need to be normalized
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
 
     if (!useGroups_)
@@ -114,7 +114,7 @@ void HugeObjectCount::CreateScene()
                 Node* boxNode = scene_->CreateChild("Box");
                 boxNode->SetPosition(Vector3(x * 0.3f, 0.0f, y * 0.3f));
                 boxNode->SetScale(0.25f);
-                StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+                auto* boxObject = boxNode->CreateComponent<StaticModel>();
                 boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
                 boxNodes_.Push(SharedPtr<Node>(boxNode));
             }
@@ -156,18 +156,18 @@ void HugeObjectCount::CreateScene()
     {
         cameraNode_ = new Node(context_);
         cameraNode_->SetPosition(Vector3(0.0f, 10.0f, -100.0f));
-        Camera* camera = cameraNode_->CreateComponent<Camera>();
+        auto* camera = cameraNode_->CreateComponent<Camera>();
         camera->SetFarClip(300.0f);
     }
 }
 
 void HugeObjectCount::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse/touch to move\n"
         "Space to toggle animation\n"
@@ -185,7 +185,7 @@ void HugeObjectCount::CreateInstructions()
 
 void HugeObjectCount::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -204,7 +204,7 @@ void HugeObjectCount::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -251,7 +251,7 @@ void HugeObjectCount::HandleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
     // Toggle animation with space
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input->GetKeyPress(KEY_SPACE))
         animate_ = !animate_;
 

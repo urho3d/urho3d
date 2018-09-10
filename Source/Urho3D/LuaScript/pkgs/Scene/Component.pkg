@@ -14,6 +14,7 @@ class Component : public Animatable
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     unsigned GetID() const;
+    bool IsReplicated() const;
     Node* GetNode() const;
     Scene* GetScene() const;
     bool IsEnabled() const;
@@ -23,6 +24,7 @@ class Component : public Animatable
     Component* GetComponent(const String type) const;
 
     tolua_readonly tolua_property__get_set unsigned ID;
+    tolua_readonly tolua_property__is_set bool replicated;
     tolua_property__is_set bool enabled;
     tolua_readonly tolua_property__is_set bool enabledEffective;
     tolua_readonly tolua_property__get_set Node* node;

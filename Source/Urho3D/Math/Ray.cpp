@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -153,10 +153,9 @@ float Ray::HitDistance(const Frustum& frustum, bool solidInside) const
     float minInside = M_INFINITY;
     bool allInside = true;
 
-    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+    for (const auto& plane : frustum.planes_)
     {
-        const Plane& plane = frustum.planes_[i];
-        float distance = HitDistance(frustum.planes_[i]);
+        float distance = HitDistance(plane);
 
         if (plane.Distance(origin_) < 0.0f)
         {
@@ -289,7 +288,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
     unsigned indexStart, unsigned indexCount, Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
 {
     float nearest = M_INFINITY;
-    const unsigned char* vertices = (const unsigned char*)vertexData;
+    const auto* vertices = (const unsigned char*)vertexData;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : nullptr;
 
@@ -406,7 +405,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
 {
     float currentFrontFace = M_INFINITY;
     float currentBackFace = M_INFINITY;
-    const unsigned char* vertices = (const unsigned char*)vertexData;
+    const auto* vertices = (const unsigned char*)vertexData;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))

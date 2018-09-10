@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Object.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/ProcessUtils.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Profiler.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/StringHashRegister.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/StringUtils.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Thread.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Timer.cpp

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,7 +99,7 @@ void SceneReplication::CreateScene()
 {
     scene_ = new Scene(context_);
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Create octree and physics world with default settings. Create them as local so that they are not needlessly replicated
     // when a client connects
@@ -109,7 +109,7 @@ void SceneReplication::CreateScene()
     // All static scene content and the camera are also created as local, so that they are unaffected by scene replication and are
     // not removed from the client upon connection. Create a Zone component first for ambient lighting & fog control.
     Node* zoneNode = scene_->CreateChild("Zone", LOCAL);
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.1f, 0.1f, 0.1f));
     zone->SetFogStart(100.0f);
@@ -118,7 +118,7 @@ void SceneReplication::CreateScene()
     // Create a directional light without shadows
     Node* lightNode = scene_->CreateChild("DirectionalLight", LOCAL);
     lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetColor(Color(0.2f, 0.2f, 0.2f));
     light->SetSpecularIntensity(1.0f);
@@ -131,13 +131,13 @@ void SceneReplication::CreateScene()
             Node* floorNode = scene_->CreateChild("FloorTile", LOCAL);
             floorNode->SetPosition(Vector3(x * 20.2f, -0.5f, y * 20.2f));
             floorNode->SetScale(Vector3(20.0f, 1.0f, 20.0f));
-            StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
+            auto* floorObject = floorNode->CreateComponent<StaticModel>();
             floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
             floorObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
 
-            RigidBody* body = floorNode->CreateComponent<RigidBody>();
+            auto* body = floorNode->CreateComponent<RigidBody>();
             body->SetFriction(1.0f);
-            CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
+            auto* shape = floorNode->CreateComponent<CollisionShape>();
             shape->SetBox(Vector3::ONE);
         }
     }
@@ -148,7 +148,7 @@ void SceneReplication::CreateScene()
     // the screen would become blank if the camera node was replicated (as only the locally created camera is assigned to a
     // viewport in SetupViewports() below)
     cameraNode_ = scene_->CreateChild("Camera", LOCAL);
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 
     // Set an initial position for the camera scene node above the plane
@@ -157,10 +157,10 @@ void SceneReplication::CreateScene()
 
 void SceneReplication::CreateUI()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
     UIElement* root = ui->GetRoot();
-    XMLFile* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     // Set style to the UI root so that elements will inherit it
     root->SetDefaultStyle(uiStyle);
 
@@ -170,7 +170,7 @@ void SceneReplication::CreateUI()
     cursor->SetStyleAuto(uiStyle);
     ui->SetCursor(cursor);
     // Set starting position of the cursor at the rendering window center
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
     // Construct the instructions text element
@@ -203,7 +203,7 @@ void SceneReplication::CreateUI()
 
 void SceneReplication::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -239,14 +239,14 @@ void SceneReplication::SubscribeToEvents()
 
 Button* SceneReplication::CreateButton(const String& text, int width)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
 
-    Button* button = buttonContainer_->CreateChild<Button>();
+    auto* button = buttonContainer_->CreateChild<Button>();
     button->SetStyleAuto();
     button->SetFixedWidth(width);
 
-    Text* buttonText = button->CreateChild<Text>();
+    auto* buttonText = button->CreateChild<Text>();
     buttonText->SetFont(font, 12);
     buttonText->SetAlignment(HA_CENTER, VA_CENTER);
     buttonText->SetText(text);
@@ -256,7 +256,7 @@ Button* SceneReplication::CreateButton(const String& text, int width)
 
 void SceneReplication::UpdateButtons()
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
     bool serverRunning = network->IsServerRunning();
 
@@ -269,30 +269,31 @@ void SceneReplication::UpdateButtons()
 
 Node* SceneReplication::CreateControllableObject()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Create the scene node & visual representation. This will be a replicated object
     Node* ballNode = scene_->CreateChild("Ball");
     ballNode->SetPosition(Vector3(Random(40.0f) - 20.0f, 5.0f, Random(40.0f) - 20.0f));
     ballNode->SetScale(0.5f);
-    StaticModel* ballObject = ballNode->CreateComponent<StaticModel>();
+    auto* ballObject = ballNode->CreateComponent<StaticModel>();
     ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
     ballObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
 
     // Create the physics components
-    RigidBody* body = ballNode->CreateComponent<RigidBody>();
+    auto* body = ballNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
     body->SetLinearDamping(0.5f);
     body->SetAngularDamping(0.5f);
-    CollisionShape* shape = ballNode->CreateComponent<CollisionShape>();
+    auto* shape = ballNode->CreateComponent<CollisionShape>();
     shape->SetSphere(1.0f);
 
     // Create a random colored point light at the ball so that can see better where is going
-    Light* light = ballNode->CreateComponent<Light>();
+    auto* light = ballNode->CreateComponent<Light>();
     light->SetRange(3.0f);
-    light->SetColor(Color(0.5f + (Rand() & 1) * 0.5f, 0.5f + (Rand() & 1) * 0.5f, 0.5f + (Rand() & 1) * 0.5f));
+    light->SetColor(
+        Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
 
     return ballNode;
 }
@@ -300,8 +301,8 @@ Node* SceneReplication::CreateControllableObject()
 void SceneReplication::MoveCamera()
 {
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    UI* ui = GetSubsystem<UI>();
-    Input* input = GetSubsystem<Input>();
+    auto* ui = GetSubsystem<UI>();
+    auto* input = GetSubsystem<Input>();
     ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
 
     // Mouse sensitivity as degrees per pixel
@@ -349,14 +350,14 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
     // This function is different on the client and server. The client collects controls (WASD controls + yaw angle)
     // and sets them to its server connection object, so that they will be sent to the server automatically at a
     // fixed rate, by default 30 FPS. The server will actually apply the controls (authoritative simulation.)
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
 
     // Client: collect controls
     if (serverConnection)
     {
-        UI* ui = GetSubsystem<UI>();
-        Input* input = GetSubsystem<Input>();
+        auto* ui = GetSubsystem<UI>();
+        auto* input = GetSubsystem<Input>();
         Controls controls;
 
         // Copy mouse yaw
@@ -389,7 +390,7 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
             if (!ballNode)
                 continue;
 
-            RigidBody* body = ballNode->GetComponent<RigidBody>();
+            auto* body = ballNode->GetComponent<RigidBody>();
 
             // Get the last controls sent by the client
             const Controls& controls = connection->GetControls();
@@ -415,7 +416,7 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
 
 void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     String address = textEdit_->GetText().Trimmed();
     if (address.Empty())
         address = "localhost"; // Use localhost to connect if nothing else specified
@@ -429,7 +430,7 @@ void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData
 
 void SceneReplication::HandleDisconnect(StringHash eventType, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
     // If we were connected to server, disconnect. Or if we were running a server, stop it. In both cases clear the
     // scene of all replicated content, but let the local nodes & components (the static world + camera) stay
@@ -451,7 +452,7 @@ void SceneReplication::HandleDisconnect(StringHash eventType, VariantMap& eventD
 
 void SceneReplication::HandleStartServer(StringHash eventType, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     network->StartServer(SERVER_PORT);
 
     UpdateButtons();
@@ -467,7 +468,7 @@ void SceneReplication::HandleClientConnected(StringHash eventType, VariantMap& e
     using namespace ClientConnected;
 
     // When a client connects, assign to scene to begin scene replication
-    Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
 
     // Then create a controllable object for that client
@@ -485,7 +486,7 @@ void SceneReplication::HandleClientDisconnected(StringHash eventType, VariantMap
     using namespace ClientConnected;
 
     // When a client disconnects, remove the controlled object
-    Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     Node* object = serverObjects_[connection];
     if (object)
         object->Remove();

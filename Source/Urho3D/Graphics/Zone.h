@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,16 +36,14 @@ class URHO3D_API Zone : public Drawable
 
 public:
     /// Construct.
-    Zone(Context* context);
+    explicit Zone(Context* context);
     /// Destruct.
-    virtual ~Zone() override;
+    ~Zone() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
@@ -122,15 +120,17 @@ public:
 
 protected:
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Handle removal from octree.
-    virtual void OnRemoveFromOctree() override;
+    void OnRemoveFromOctree() override;
     /// Recalculate the ambient gradient colors from neighbor zones. Not safe to call from worker threads due to octree query.
     void UpdateAmbientGradient();
     /// Clear zone reference from drawables inside the bounding box.
     void ClearDrawablesZone();
+    /// Mark node transform dirty.
+    void MarkNodeDirty() { OnMarkedDirty(node_); }
 
     /// Cached inverse world transform matrix.
     mutable Matrix3x4 inverseWorld_;

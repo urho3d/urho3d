@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,14 +87,14 @@ class URHO3D_API AnimationController : public Component
 
 public:
     /// Construct.
-    AnimationController(Context* context);
+    explicit AnimationController(Context* context);
     /// Destruct.
-    virtual ~AnimationController() override;
+    ~AnimationController() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Update the animations. Is called from HandleScenePostUpdate().
     virtual void Update(float timeStep);
@@ -107,7 +107,7 @@ public:
     /// Stop all animations on a specific layer. Zero fadetime is instant.
     void StopLayer(unsigned char layer, float fadeOutTime = 0.0f);
     /// Stop all animations. Zero fadetime is instant.
-    void StopAll(float fadeTime = 0.0f);
+    void StopAll(float fadeOutTime = 0.0f);
     /// Fade animation to target weight. Return true on success.
     bool Fade(const String& name, float targetWeight, float fadeTime);
     /// Fade other animations on the same layer to target weight. Return true on success.
@@ -190,7 +190,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
 
 private:
     /// Add an animation state either to AnimatedModel or as a node animation.

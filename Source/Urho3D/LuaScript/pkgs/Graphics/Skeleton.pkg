@@ -4,7 +4,7 @@ struct Bone
 {
     Bone();
     ~Bone();
-    
+
     String name_ @ name;
     StringHash nameHash_ @ nameHash;
     unsigned parentIndex_ @ parentIndex;
@@ -25,7 +25,29 @@ class Skeleton
     Bone* GetRootBone();
     Bone* GetBone(const String name);
     Bone* GetBone(unsigned index);
-    
+    unsigned GetBoneIndex(const String boneName) const;
+    unsigned GetBoneIndex(const Bone* bone) const;
+    Bone* GetBoneParent(const Bone* bone);
+
     tolua_readonly tolua_property__get_set unsigned numBones;
     tolua_readonly tolua_property__get_set Bone* rootBone;
 };
+
+${
+
+#define TOLUA_DISABLE_tolua_set_Bone_unsigned_collisionMask
+static int tolua_set_Bone_unsigned_collisionMask(lua_State* tolua_S)
+{
+  Bone* self = (Bone*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'collisionMask_'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->collisionMask_ = BoneCollisionShape((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+$}

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,18 +34,18 @@ public:
     /// Construct an empty buffer.
     VectorBuffer();
     /// Construct from another buffer.
-    VectorBuffer(const PODVector<unsigned char>& data);
+    explicit VectorBuffer(const PODVector<unsigned char>& data);
     /// Construct from a memory area.
     VectorBuffer(const void* data, unsigned size);
     /// Construct from a stream.
     VectorBuffer(Deserializer& source, unsigned size);
 
     /// Read bytes from the buffer. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size) override;
+    unsigned Read(void* dest, unsigned size) override;
     /// Set position from the beginning of the buffer. Return actual new position.
-    virtual unsigned Seek(unsigned position) override;
+    unsigned Seek(unsigned position) override;
     /// Write bytes to the buffer. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size) override;
+    unsigned Write(const void* data, unsigned size) override;
 
     /// Set data from another buffer.
     void SetData(const PODVector<unsigned char>& data);

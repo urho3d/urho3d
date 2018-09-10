@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,16 +64,16 @@ class URHO3D_API CrowdManager : public Component
 
 public:
     /// Construct.
-    CrowdManager(Context* context);
+    explicit CrowdManager(Context* context);
     /// Destruct.
-    virtual ~CrowdManager() override;
+    ~CrowdManager() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Draw the agents' pathing debug data.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
@@ -160,7 +160,7 @@ protected:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Update the crowd simulation.
     void Update(float delta);
     /// Get the detour crowd agent.
@@ -180,21 +180,21 @@ private:
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
 
     /// Internal Detour crowd object.
-    dtCrowd* crowd_;
+    dtCrowd* crowd_{};
     /// NavigationMesh for which the crowd was created.
     WeakPtr<NavigationMesh> navigationMesh_;
     /// The NavigationMesh component Id for pending crowd creation.
-    unsigned navigationMeshId_;
+    unsigned navigationMeshId_{};
     /// The maximum number of agents the crowd can manage.
-    unsigned maxAgents_;
+    unsigned maxAgents_{};
     /// The maximum radius of any agent that will be added to the crowd.
-    float maxAgentRadius_;
+    float maxAgentRadius_{};
     /// Number of query filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
-    unsigned numQueryFilterTypes_;
+    unsigned numQueryFilterTypes_{};
     /// Number of configured area in each filter type. Limit to DT_MAX_AREAS.
     PODVector<unsigned> numAreas_;
     /// Number of obstacle avoidance types configured in the crowd. Limit to DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS.
-    unsigned numObstacleAvoidanceTypes_;
+    unsigned numObstacleAvoidanceTypes_{};
 };
 
 }

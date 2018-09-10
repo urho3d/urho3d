@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,22 +34,22 @@ class URHO3D_API StaticModelGroup : public StaticModel
 
 public:
     /// Construct.
-    StaticModelGroup(Context* context);
+    explicit StaticModelGroup(Context* context);
     /// Destruct.
-    virtual ~StaticModelGroup() override;
+    ~StaticModelGroup() override;
     /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame) override;
+    void UpdateBatches(const FrameInfo& frame) override;
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles() override;
+    unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
-    virtual bool DrawOcclusion(OcclusionBuffer* buffer) override;
+    bool DrawOcclusion(OcclusionBuffer* buffer) override;
 
     /// Add an instance scene node. It does not need any drawable components of its own.
     void AddInstanceNode(Node* node);
@@ -72,9 +72,9 @@ public:
 
 protected:
     /// Handle scene node enabled status changing.
-    virtual void OnNodeSetEnabled(Node* node) override;
+    void OnNodeSetEnabled(Node* node) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
 
 private:
     /// Ensure proper size of world transforms when nodes are added/removed. Also mark node IDs dirty.
@@ -89,11 +89,11 @@ private:
     /// IDs of instance nodes for serialization.
     mutable VariantVector nodeIDsAttr_;
     /// Number of valid instance node transforms.
-    unsigned numWorldTransforms_;
+    unsigned numWorldTransforms_{};
     /// Whether node IDs have been set and nodes should be searched for during ApplyAttributes.
-    mutable bool nodesDirty_;
+    mutable bool nodesDirty_{};
     /// Whether nodes have been manipulated by the API and node ID attribute should be refreshed.
-    mutable bool nodeIDsDirty_;
+    mutable bool nodeIDsDirty_{};
 };
 
 }

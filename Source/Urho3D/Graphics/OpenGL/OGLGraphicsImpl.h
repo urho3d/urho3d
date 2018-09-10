@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,26 +77,16 @@ using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, Share
 /// Cached state of a frame buffer object
 struct FrameBufferObject
 {
-    FrameBufferObject() :
-        fbo_(0),
-        depthAttachment_(nullptr),
-        readBuffers_(M_MAX_UNSIGNED),
-        drawBuffers_(M_MAX_UNSIGNED)
-    {
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-            colorAttachments_[i] = nullptr;
-    }
-
     /// Frame buffer handle.
-    unsigned fbo_;
+    unsigned fbo_{};
     /// Bound color attachment textures.
-    RenderSurface* colorAttachments_[MAX_RENDERTARGETS];
+    RenderSurface* colorAttachments_[MAX_RENDERTARGETS]{};
     /// Bound depth/stencil attachment.
-    RenderSurface* depthAttachment_;
+    RenderSurface* depthAttachment_{};
     /// Read buffer bits.
-    unsigned readBuffers_;
+    unsigned readBuffers_{M_MAX_UNSIGNED};
     /// Draw buffer bits.
-    unsigned drawBuffers_;
+    unsigned drawBuffers_{M_MAX_UNSIGNED};
 };
 
 /// %Graphics subsystem implementation. Holds API-specific objects.
@@ -106,62 +96,62 @@ class URHO3D_API GraphicsImpl
 
 public:
     /// Construct.
-    GraphicsImpl();
+    GraphicsImpl() = default;
 
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
 
 private:
     /// SDL OpenGL context.
-    SDL_GLContext context_;
+    SDL_GLContext context_{};
     /// iOS/tvOS system framebuffer handle.
-    unsigned systemFBO_;
+    unsigned systemFBO_{};
     /// Active texture unit.
-    unsigned activeTexture_;
+    unsigned activeTexture_{};
     /// Enabled vertex attributes bitmask.
-    unsigned enabledVertexAttributes_;
+    unsigned enabledVertexAttributes_{};
     /// Vertex attributes bitmask used by the current shader program.
-    unsigned usedVertexAttributes_;
+    unsigned usedVertexAttributes_{};
     /// Vertex attribute instancing bitmask for keeping track of divisors.
-    unsigned instancingVertexAttributes_;
+    unsigned instancingVertexAttributes_{};
     /// Current mapping of vertex attribute locations by semantic. The map is owned by the shader program, so care must be taken to switch a null shader program when it's destroyed.
-    const HashMap<Pair<unsigned char, unsigned char>, unsigned>* vertexAttributes_;
+    const HashMap<Pair<unsigned char, unsigned char>, unsigned>* vertexAttributes_{};
     /// Currently bound frame buffer object.
-    unsigned boundFBO_;
+    unsigned boundFBO_{};
     /// Currently bound vertex buffer object.
-    unsigned boundVBO_;
+    unsigned boundVBO_{};
     /// Currently bound uniform buffer object.
-    unsigned boundUBO_;
+    unsigned boundUBO_{};
     /// Read frame buffer for multisampled texture resolves.
-    unsigned resolveSrcFBO_;
+    unsigned resolveSrcFBO_{};
     /// Write frame buffer for multisampled texture resolves.
-    unsigned resolveDestFBO_;
+    unsigned resolveDestFBO_{};
     /// Current pixel format.
-    int pixelFormat_;
+    int pixelFormat_{};
     /// Map for FBO's per resolution and format.
     HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
     /// OpenGL texture types in use.
-    unsigned textureTypes_[MAX_TEXTURE_UNITS];
+    unsigned textureTypes_[MAX_TEXTURE_UNITS]{};
     /// Constant buffer search map.
     ConstantBufferMap allConstantBuffers_;
     /// Currently bound constant buffers.
-    ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
+    ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2]{};
     /// Dirty constant buffers.
     PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Last used instance data offset.
-    unsigned lastInstanceOffset_;
+    unsigned lastInstanceOffset_{};
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
-    HashMap<int, SharedPtr<Texture2D> > depthTextures_;
+    HashMap<unsigned, SharedPtr<Texture2D> > depthTextures_;
     /// Shader program in use.
-    ShaderProgram* shaderProgram_;
+    ShaderProgram* shaderProgram_{};
     /// Linked shader programs.
     ShaderProgramMap shaderPrograms_;
     /// Need FBO commit flag.
-    bool fboDirty_;
+    bool fboDirty_{};
     /// Need vertex attribute pointer update flag.
-    bool vertexBuffersDirty_;
+    bool vertexBuffersDirty_{};
     /// sRGB write mode flag.
-    bool sRGBWrite_;
+    bool sRGBWrite_{};
 };
 
 }

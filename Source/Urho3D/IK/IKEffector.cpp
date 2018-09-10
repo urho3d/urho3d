@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -261,7 +261,7 @@ void IKEffector::UpdateTargetNodePosition()
 // ----------------------------------------------------------------------------
 void IKEffector::DrawDebugGeometry(bool depthTest)
 {
-    DebugRenderer* debug = GetScene()->GetComponent<DebugRenderer>();
+    auto* debug = GetScene()->GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, depthTest);
 }

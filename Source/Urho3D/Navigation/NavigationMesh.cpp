@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,13 +88,13 @@ static const int MAX_POLYS = 2048;
 struct FindPathData
 {
     // Polygons.
-    dtPolyRef polys_[MAX_POLYS];
+    dtPolyRef polys_[MAX_POLYS]{};
     // Polygons on the path.
-    dtPolyRef pathPolys_[MAX_POLYS];
+    dtPolyRef pathPolys_[MAX_POLYS]{};
     // Points on the path.
     Vector3 pathPoints_[MAX_POLYS];
     // Flags on the path.
-    unsigned char pathFlags_[MAX_POLYS];
+    unsigned char pathFlags_[MAX_POLYS]{};
 };
 
 NavigationMesh::NavigationMesh(Context* context) :
@@ -200,7 +200,7 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
             for (unsigned i = 0; i < connections.Size(); ++i)
             {
-                OffMeshConnection* connection = connections[i]->GetComponent<OffMeshConnection>();
+                auto* connection = connections[i]->GetComponent<OffMeshConnection>();
                 if (connection && connection->IsEnabledEffective())
                     connection->DrawDebugGeometry(debug, depthTest);
             }
@@ -345,9 +345,9 @@ bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
 
     // Calculate max number of polygons, 22 bits available to identify both tile & polygon within tile
     unsigned tileBits = LogBaseTwo(maxTiles);
-    unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+    unsigned maxPolys = 1u << (22 - tileBits);
 
-    dtNavMeshParams params;
+    dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     rcVcopy(params.orig, &boundingBox_.min_.x_);
     params.tileWidth = tileEdgeLength;
     params.tileHeight = tileEdgeLength;
@@ -421,9 +421,9 @@ bool NavigationMesh::Build()
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
         unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_));
         unsigned tileBits = LogBaseTwo(maxTiles);
-        unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+        unsigned maxPolys = 1u << (22 - tileBits);
 
-        dtNavMeshParams params;
+        dtNavMeshParams params;     // NOLINT(hicpp-member-init)
         rcVcopy(params.orig, &boundingBox_.min_.x_);
         params.tileWidth = tileEdgeLength;
         params.tileHeight = tileEdgeLength;
@@ -852,7 +852,7 @@ void NavigationMesh::DrawDebugGeometry(bool depthTest)
     Scene* scene = GetScene();
     if (scene)
     {
-        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        auto* debug = scene->GetComponent<DebugRenderer>();
         if (debug)
             DrawDebugGeometry(debug, depthTest);
     }
@@ -889,7 +889,7 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
     numTilesX_ = buffer.ReadInt();
     numTilesZ_ = buffer.ReadInt();
 
-    dtNavMeshParams params;
+    dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     rcVcopy(params.orig, &boundingBox_.min_.x_);
     params.tileWidth = buffer.ReadFloat();
     params.tileHeight = buffer.ReadFloat();
@@ -1094,7 +1094,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
 
             if (geometryList[i].component_->GetType() == OffMeshConnection::GetTypeStatic())
             {
-                OffMeshConnection* connection = static_cast<OffMeshConnection*>(geometryList[i].component_);
+                auto* connection = static_cast<OffMeshConnection*>(geometryList[i].component_);
                 Vector3 start = inverse * connection->GetNode()->GetWorldPosition();
                 Vector3 end = inverse * connection->GetEndPoint()->GetWorldPosition();
 
@@ -1108,7 +1108,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
             }
             else if (geometryList[i].component_->GetType() == NavArea::GetTypeStatic())
             {
-                NavArea* area = static_cast<NavArea*>(geometryList[i].component_);
+                auto* area = static_cast<NavArea*>(geometryList[i].component_);
                 NavAreaStub stub;
                 stub.areaID_ = (unsigned char)area->GetAreaID();
                 stub.bounds_ = area->GetWorldBoundingBox();
@@ -1117,7 +1117,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
             }
 
 #ifdef URHO3D_PHYSICS
-            CollisionShape* shape = dynamic_cast<CollisionShape*>(geometryList[i].component_);
+            auto* shape = dynamic_cast<CollisionShape*>(geometryList[i].component_);
             if (shape)
             {
                 switch (shape->GetShapeType())
@@ -1136,7 +1136,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
 
                 case SHAPE_CONVEXHULL:
                     {
-                        ConvexData* data = static_cast<ConvexData*>(shape->GetGeometryData());
+                        auto* data = static_cast<ConvexData*>(shape->GetGeometryData());
                         if (!data)
                             continue;
 
@@ -1170,8 +1170,8 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                             4, 0, 3, 4, 3, 7, 1, 0, 4, 1, 4, 5
                         };
 
-                        for (unsigned j = 0; j < 36; ++j)
-                            build->indices_.Push(indices[j] + destVertexStart);
+                        for (unsigned index : indices)
+                            build->indices_.Push(index + destVertexStart);
                     }
                     break;
 
@@ -1182,7 +1182,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                 continue;
             }
 #endif
-            Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
+            auto* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
             if (drawable)
             {
                 const Vector<SourceBatch>& batches = drawable->GetBatches();
@@ -1271,7 +1271,7 @@ bool NavigationMesh::ReadTile(Deserializer& source, bool silent)
     /*dtTileRef tileRef =*/ source.ReadUInt();
     unsigned navDataSize = source.ReadUInt();
 
-    unsigned char* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
+    auto* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
     if (!navData)
     {
         URHO3D_LOGERROR("Could not allocate data for navigation mesh tile");
@@ -1310,7 +1310,7 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
 
     SimpleNavBuildData build;
 
-    rcConfig cfg;
+    rcConfig cfg;       // NOLINT(hicpp-member-init)
     memset(&cfg, 0, sizeof cfg);
     cfg.cs = cellSize_;
     cfg.ch = cellHeight_;
@@ -1465,7 +1465,7 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     unsigned char* navData = nullptr;
     int navDataSize = 0;
 
-    dtNavMeshCreateParams params;
+    dtNavMeshCreateParams params;       // NOLINT(hicpp-member-init)
     memset(&params, 0, sizeof params);
     params.verts = build.polyMesh_->verts;
     params.vertCount = build.polyMesh_->nverts;
@@ -1579,9 +1579,9 @@ void NavigationMesh::ReleaseNavigationMesh()
     boundingBox_.Clear();
 }
 
-void NavigationMesh::SetPartitionType(NavmeshPartitionType ptype)
+void NavigationMesh::SetPartitionType(NavmeshPartitionType partitionType)
 {
-    partitionType_ = ptype;
+    partitionType_ = partitionType;
     MarkNetworkUpdate();
 }
 

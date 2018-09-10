@@ -81,19 +81,19 @@
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
                     <element type="CheckBox">
-                        <attribute name="Name" value="MouseWheelCameraPositionToggle" />
+                        <attribute name="Name" value="MiddleMousePanToggle" />
                     </element>
                     <element type="Text">
-                        <attribute name="Text" value="Mouse wheel camera position" />
+                        <attribute name="Text" value="Pan using middle mouse button" />
                     </element>
                 </element>
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
                     <element type="CheckBox">
-                        <attribute name="Name" value="MiddleMousePanToggle" />
+                        <attribute name="Name" value="RotateAroundSelectionToggle" />
                     </element>
                     <element type="Text">
-                        <attribute name="Text" value="Pan using middle mouse button" />
+                        <attribute name="Text" value="Rotate Around Selection" />
                     </element>
                 </element>
                 <element style="ListRow">
@@ -165,7 +165,7 @@
                                 <element type="BorderImage" internal="true" style="none">
                                     <element internal="true" style="none">
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="Use distance" />
+                                            <attribute name="Text" value="View center" />
                                         </element>
                                         <element type="Text" style="FileSelectorFilterText">
                                             <attribute name="Text" value="In center" />

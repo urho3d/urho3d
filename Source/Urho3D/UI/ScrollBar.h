@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../UI/UIElement.h"
+#include "../UI/BorderImage.h"
 
 namespace Urho3D
 {
@@ -37,18 +37,18 @@ class URHO3D_API ScrollBar : public BorderImage
 
 public:
     /// Construct.
-    ScrollBar(Context* context);
+    explicit ScrollBar(Context* context);
     /// Destruct.
-    virtual ~ScrollBar() override;
+    ~ScrollBar() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
     /// React to editable status change.
-    virtual void OnSetEditable() override;
+    void OnSetEditable() override;
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
@@ -94,7 +94,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Filter implicit attributes in serialization process for internal button.
     bool FilterButtonImplicitAttributes(XMLElement& dest, const String& name) const;
 

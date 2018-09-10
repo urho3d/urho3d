@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,14 +49,10 @@
 
 #include <Urho3D/DebugNew.h>
 
-static const String INSTRUCTION("instructionText");
-
 URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
-    Sample(context),
-    streamingDistance_(2),
-    drawDebug_(false)
+    Sample(context)
 {
 }
 
@@ -83,7 +79,7 @@ void CrowdNavigation::Start()
 
 void CrowdNavigation::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -95,13 +91,13 @@ void CrowdNavigation::CreateScene()
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
+    auto* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    auto* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
@@ -111,7 +107,7 @@ void CrowdNavigation::CreateScene()
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
@@ -126,7 +122,7 @@ void CrowdNavigation::CreateScene()
         float size = 1.0f + Random(10.0f);
         boxNode->SetPosition(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f));
         boxNode->SetScale(size);
-        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+        auto* boxObject = boxNode->CreateComponent<StaticModel>();
         boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         boxObject->SetCastShadows(true);
@@ -135,7 +131,7 @@ void CrowdNavigation::CreateScene()
     }
 
     // Create a DynamicNavigationMesh component to the scene root
-    DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
+    auto* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
     // Set small tiles to show navigation mesh streaming
     navMesh->SetTileSize(32);
     // Enable drawing debug geometry for obstacles and off-mesh connections
@@ -166,7 +162,7 @@ void CrowdNavigation::CreateScene()
         CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
 
     // Create a CrowdManager component to the scene root
-    CrowdManager* crowdManager = scene_->CreateComponent<CrowdManager>();
+    auto* crowdManager = scene_->CreateComponent<CrowdManager>();
     CrowdObstacleAvoidanceParams params = crowdManager->GetObstacleAvoidanceParams(0);
     // Set the params to "High (66)" setting
     params.velBias = 0.5f;
@@ -184,7 +180,7 @@ void CrowdNavigation::CreateScene()
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside the scene, because
     // we want it to be unaffected by scene load / save
     cameraNode_ = new Node(context_);
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
+    auto* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 
     // Set an initial position for the camera scene node above the plane and looking down
@@ -195,23 +191,23 @@ void CrowdNavigation::CreateScene()
 
 void CrowdNavigation::CreateUI()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
     // control the camera, and when visible, it will point the raycast target
-    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     SharedPtr<Cursor> cursor(new Cursor(context_));
     cursor->SetStyleAuto(style);
     ui->SetCursor(cursor);
 
     // Set starting position of the cursor at the rendering window center
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>(INSTRUCTION);
-    instructionText->SetText(
+    instructionText_ = ui->GetRoot()->CreateChild<Text>();
+    instructionText_->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "MMB or O key to add obstacles or remove obstacles/agents\n"
@@ -220,19 +216,19 @@ void CrowdNavigation::CreateUI()
         "Space to toggle debug geometry\n"
         "F12 to toggle this instruction text"
     );
-    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    instructionText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
-    instructionText->SetTextAlignment(HA_CENTER);
+    instructionText_->SetTextAlignment(HA_CENTER);
 
     // Position the text relative to the screen center
-    instructionText->SetHorizontalAlignment(HA_CENTER);
-    instructionText->SetVerticalAlignment(VA_CENTER);
-    instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+    instructionText_->SetHorizontalAlignment(HA_CENTER);
+    instructionText_->SetVerticalAlignment(VA_CENTER);
+    instructionText_->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
 void CrowdNavigation::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -260,17 +256,17 @@ void CrowdNavigation::SubscribeToEvents()
 
 void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SharedPtr<Node> jackNode(jackGroup->CreateChild("Jack"));
     jackNode->SetPosition(pos);
-    AnimatedModel* modelObject = jackNode->CreateComponent<AnimatedModel>();
+    auto* modelObject = jackNode->CreateComponent<AnimatedModel>();
     modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
     modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
     modelObject->SetCastShadows(true);
     jackNode->CreateComponent<AnimationController>();
 
     // Create a CrowdAgent component and set its height and realistic max speed/acceleration. Use default radius
-    CrowdAgent* agent = jackNode->CreateComponent<CrowdAgent>();
+    auto* agent = jackNode->CreateComponent<CrowdAgent>();
     agent->SetHeight(2.0f);
     agent->SetMaxSpeed(3.0f);
     agent->SetMaxAccel(5.0f);
@@ -278,19 +274,19 @@ void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
 
 void CrowdNavigation::CreateMushroom(const Vector3& pos)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     Node* mushroomNode = scene_->CreateChild("Mushroom");
     mushroomNode->SetPosition(pos);
     mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
     mushroomNode->SetScale(2.0f + Random(0.5f));
-    StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+    auto* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
     mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
     mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
     mushroomObject->SetCastShadows(true);
 
     // Create the navigation Obstacle component and set its height & radius proportional to scale
-    Obstacle* obstacle = mushroomNode->CreateComponent<Obstacle>();
+    auto* obstacle = mushroomNode->CreateComponent<Obstacle>();
     obstacle->SetRadius(mushroomNode->GetScale().x_);
     obstacle->SetHeight(mushroomNode->GetScale().y_);
 }
@@ -311,18 +307,18 @@ void CrowdNavigation::CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh
         connectionEnd->SetWorldPosition(navMesh->FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0))); // Top of box
 
         // Create the OffMeshConnection component to one node and link the other node
-        OffMeshConnection* connection = connectionStart->CreateComponent<OffMeshConnection>();
+        auto* connection = connectionStart->CreateComponent<OffMeshConnection>();
         connection->SetEndPoint(connectionEnd);
     }
 }
 
 void CrowdNavigation::CreateMovingBarrels(DynamicNavigationMesh* navMesh)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     Node* barrel = scene_->CreateChild("Barrel");
-    StaticModel* model = barrel->CreateComponent<StaticModel>();
+    auto* model = barrel->CreateComponent<StaticModel>();
     model->SetModel(cache->GetResource<Model>("Models/Cylinder.mdl"));
-    Material* material = cache->GetResource<Material>("Materials/StoneTiled.xml");
+    auto* material = cache->GetResource<Material>("Materials/StoneTiled.xml");
     model->SetMaterial(material);
     material->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Textures/TerrainDetail2.dds"));
     model->SetCastShadows(true);
@@ -332,7 +328,7 @@ void CrowdNavigation::CreateMovingBarrels(DynamicNavigationMesh* navMesh)
         float size = 0.5f + Random(1.0f);
         clone->SetScale(Vector3(size / 1.5f, size * 2.0f, size / 1.5f));
         clone->SetPosition(navMesh->FindNearestPoint(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f)));
-        CrowdAgent* agent = clone->CreateComponent<CrowdAgent>();
+        auto* agent = clone->CreateComponent<CrowdAgent>();
         agent->SetRadius(clone->GetScale().x_ * 0.5f);
         agent->SetHeight(size);
         agent->SetNavigationQuality(NAVIGATIONQUALITY_LOW);
@@ -347,7 +343,7 @@ void CrowdNavigation::SetPathPoint(bool spawning)
 
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
-        DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+        auto* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
         Vector3 pathPos = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
         Node* jackGroup = scene_->GetChild("Jacks");
         if (spawning)
@@ -383,14 +379,14 @@ bool CrowdNavigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hit
 {
     hitDrawable = nullptr;
 
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     IntVector2 pos = ui->GetCursorPosition();
     // Check the cursor is visible and there is no UI element in front of the cursor
     if (!ui->GetCursor()->IsVisible() || ui->GetElementAt(pos, true))
         return false;
 
-    Graphics* graphics = GetSubsystem<Graphics>();
-    Camera* camera = cameraNode_->GetComponent<Camera>();
+    auto* graphics = GetSubsystem<Graphics>();
+    auto* camera = cameraNode_->GetComponent<Camera>();
     Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
     PODVector<RayQueryResult> results;
@@ -410,8 +406,8 @@ bool CrowdNavigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hit
 void CrowdNavigation::MoveCamera(float timeStep)
 {
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    UI* ui = GetSubsystem<UI>();
-    Input* input = GetSubsystem<Input>();
+    auto* ui = GetSubsystem<UI>();
+    auto* input = GetSubsystem<Input>();
     ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
 
     // Do not move if the UI has a focused element (the console)
@@ -472,14 +468,14 @@ void CrowdNavigation::MoveCamera(float timeStep)
     // Toggle instruction text with F12
     else if (input->GetKeyPress(KEY_F12))
     {
-        UIElement* instruction = ui->GetRoot()->GetChild(INSTRUCTION);
-        instruction->SetVisible(!instruction->IsVisible());
+        if (instructionText_)
+            instructionText_->SetVisible(!instructionText_->IsVisible());
     }
 }
 
 void CrowdNavigation::ToggleStreaming(bool enabled)
 {
-    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    auto* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
     if (enabled)
     {
         int maxTiles = (2 * streamingDistance_ + 1) * (2 * streamingDistance_ + 1);
@@ -504,7 +500,7 @@ void CrowdNavigation::UpdateStreaming()
     }
 
     // Compute currently loaded area
-    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    auto* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
     const IntVector2 jackTile = navMesh->GetTileIndex(averageJackPosition);
     const IntVector2 numTiles = navMesh->GetNumTiles();
     const IntVector2 beginTile = VectorMax(IntVector2::ZERO, jackTile - IntVector2::ONE * streamingDistance_);
@@ -538,7 +534,7 @@ void CrowdNavigation::UpdateStreaming()
 
 void CrowdNavigation::SaveNavigationData()
 {
-    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    auto* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
     tileData_.Clear();
     addedTiles_.Clear();
     const IntVector2 numTiles = navMesh->GetNumTiles();
@@ -561,7 +557,7 @@ void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     // Update streaming
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input->GetKeyPress(KEY_TAB))
     {
         useStreaming_ = !useStreaming_;
@@ -587,8 +583,8 @@ void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& 
 {
     using namespace CrowdAgentFailure;
 
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    CrowdAgentState agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetInt();
+    auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    auto agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetInt();
 
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if (agentState == CA_STATE_INVALID)
@@ -606,13 +602,13 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
 
     using namespace CrowdAgentReposition;
 
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
+    auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    auto* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
     Vector3 velocity = eventData[P_VELOCITY].GetVector3();
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
     // Only Jack agent has animation controller
-    AnimationController* animCtrl = node->GetComponent<AnimationController>();
+    auto* animCtrl = node->GetComponent<AnimationController>();
     if (animCtrl)
     {
         float speed = velocity.Length();
@@ -644,8 +640,8 @@ void CrowdNavigation::HandleCrowdAgentFormation(StringHash eventType, VariantMap
     // The first agent will always move to the exact position, all other agents will select a random point nearby
     if (index)
     {
-        CrowdManager* crowdManager = static_cast<CrowdManager*>(GetEventSender());
-        CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
+        auto* crowdManager = static_cast<CrowdManager*>(GetEventSender());
+        auto* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
         eventData[P_POSITION] = crowdManager->GetRandomPointInCircle(position, agent->GetRadius(), agent->GetQueryFilterType());
     }
 }

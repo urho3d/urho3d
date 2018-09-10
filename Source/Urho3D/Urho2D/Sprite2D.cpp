@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,15 +39,12 @@ Sprite2D::Sprite2D(Context* context) :
     Resource(context),
     hotSpot_(0.5f, 0.5f),
     offset_(0, 0),
-    edgeOffset_(0.0f)
+    edgeOffset_(M_LARGE_EPSILON)
 {
 
 }
 
-Sprite2D::~Sprite2D()
-{
-
-}
+Sprite2D::~Sprite2D() = default;
 
 void Sprite2D::RegisterObject(Context* context)
 {
@@ -208,7 +205,7 @@ Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value
     if (!object)
         return nullptr;
 
-    ResourceCache* cache = object->GetSubsystem<ResourceCache>();
+    auto* cache = object->GetSubsystem<ResourceCache>();
 
     if (value.type_ == Sprite2D::GetTypeStatic())
         return cache->GetResource<Sprite2D>(value.name_);
@@ -223,7 +220,7 @@ Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value
         const String& spriteSheetName = names[0];
         const String& spriteName = names[1];
 
-        SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName);
+        auto* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName);
         if (!spriteSheet)
             return nullptr;
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,11 +45,11 @@ class URHO3D_API PackageFile : public Object
 
 public:
     /// Construct.
-    PackageFile(Context* context);
+    explicit PackageFile(Context* context);
     /// Construct and open.
     PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.
-    virtual ~PackageFile() override;
+    ~PackageFile() override;
 
     /// Open the package file. Return true if successful.
     bool Open(const String& fileName, unsigned startOffset = 0);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +33,9 @@ class URHO3D_API CollisionChain2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionChain2D(Context* context);
+    explicit CollisionChain2D(Context* context);
     /// Destruct.
-    virtual ~CollisionChain2D() override;
+    ~CollisionChain2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -67,7 +67,7 @@ public:
 
 private:
     /// Apply node world scale.
-    virtual void ApplyNodeWorldScale() override;
+    void ApplyNodeWorldScale() override;
     /// Recreate fixture.
     void RecreateFixture();
 

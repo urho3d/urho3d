@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,18 +45,18 @@ class URHO3D_API ParticleEffect2D : public Resource
 
 public:
     /// Construct.
-    ParticleEffect2D(Context* context);
+    explicit ParticleEffect2D(Context* context);
     /// Destruct.
-    virtual ~ParticleEffect2D() override;
+    ~ParticleEffect2D() override;
     /// Register object factory. Drawable2D must be registered first.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
@@ -101,7 +101,7 @@ public:
     /// Set finish particle size.
     void SetFinishParticleSize(float finishParticleSize);
     /// Set finish particle size variance.
-    void SetFinishParticleSizeVariance(float FinishParticleSizeVariance);
+    void SetFinishParticleSizeVariance(float finishParticleSizeVariance);
     /// Set duration.
     void SetDuration(float duration);
     /// Set emitter type.

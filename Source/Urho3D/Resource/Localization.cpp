@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +39,7 @@ Localization::Localization(Context* context) :
 {
 }
 
-Localization::~Localization()
-{
-}
+Localization::~Localization() = default;
 
 int Localization::GetLanguageIndex(const String& language)
 {
@@ -196,8 +194,8 @@ void Localization::LoadJSON(const JSONValue& source)
 
 void Localization::LoadJSONFile(const String& name)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    JSONFile* jsonFile = cache->GetResource<JSONFile>(name);
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* jsonFile = cache->GetResource<JSONFile>(name);
     if (jsonFile)
         LoadJSON(jsonFile->GetRoot());
 }

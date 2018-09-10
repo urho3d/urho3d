@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,40 +47,40 @@ class URHO3D_API DynamicNavigationMesh : public NavigationMesh
 
 public:
     /// Constructor.
-    DynamicNavigationMesh(Context*);
+    explicit DynamicNavigationMesh(Context*);
     /// Destructor.
-    virtual ~DynamicNavigationMesh() override;
+    ~DynamicNavigationMesh() override;
 
     /// Register with engine context.
     static void RegisterObject(Context*);
 
     /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.
-    virtual bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles) override;
+    bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles) override;
     /// Build/rebuild the entire navigation mesh.
-    virtual bool Build() override;
+    bool Build() override;
     /// Build/rebuild a portion of the navigation mesh.
-    virtual bool Build(const BoundingBox& boundingBox) override;
+    bool Build(const BoundingBox& boundingBox) override;
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
-    virtual bool Build(const IntVector2& from, const IntVector2& to) override;
+    bool Build(const IntVector2& from, const IntVector2& to) override;
     /// Return tile data.
-    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const override;
+    PODVector<unsigned char> GetTileData(const IntVector2& tile) const override;
     /// Return whether the Obstacle is touching the given tile.
     bool IsObstacleInTile(Obstacle* obstacle, const IntVector2& tile) const;
     /// Add tile to navigation mesh.
-    virtual bool AddTile(const PODVector<unsigned char>& tileData) override;
+    bool AddTile(const PODVector<unsigned char>& tileData) override;
     /// Remove tile from navigation mesh.
-    virtual void RemoveTile(const IntVector2& tile) override;
+    void RemoveTile(const IntVector2& tile) override;
     /// Remove all tiles from navigation mesh.
-    virtual void RemoveAllTiles() override;
+    void RemoveAllTiles() override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
     /// Set navigation data attribute.
-    virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value) override;
+    void SetNavigationDataAttr(const PODVector<unsigned char>& value) override;
     /// Return navigation data attribute.
-    virtual PODVector<unsigned char> GetNavigationDataAttr() const override;
+    PODVector<unsigned char> GetNavigationDataAttr() const override;
 
     /// Set the maximum number of obstacles allowed.
     void SetMaxObstacles(unsigned maxObstacles) { maxObstacles_ = maxObstacles; }
@@ -102,7 +102,7 @@ protected:
     struct TileCacheData;
 
     /// Subscribe to events when assigned to a scene.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Trigger the tile cache to make updates to the nav mesh if necessary.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
 
@@ -120,7 +120,7 @@ protected:
     /// Off-mesh connections to be rebuilt in the mesh processor.
     PODVector<OffMeshConnection*> CollectOffMeshConnections(const BoundingBox& bounds);
     /// Release the navigation mesh, query, and tile cache.
-    virtual void ReleaseNavigationMesh() override;
+    void ReleaseNavigationMesh() override;
 
 private:
     /// Write tiles data.
@@ -131,7 +131,7 @@ private:
     void ReleaseTileCache();
 
     /// Detour tile cache instance that works with the nav mesh.
-    dtTileCache* tileCache_;
+    dtTileCache* tileCache_{};
     /// Used by dtTileCache to allocate blocks of memory.
     UniquePtr<dtTileCacheAlloc> allocator_;
     /// Used by dtTileCache to compress the original tiles to use when reconstructing for changes.
@@ -139,11 +139,11 @@ private:
     /// Mesh processor used by Detour, in this case a 'pass-through' processor.
     UniquePtr<dtTileCacheMeshProcess> meshProcessor_;
     /// Maximum number of obstacle objects allowed.
-    unsigned maxObstacles_;
+    unsigned maxObstacles_{1024};
     /// Maximum number of layers that are allowed to be constructed.
-    unsigned maxLayers_;
+    unsigned maxLayers_{};
     /// Debug draw Obstacles.
-    bool drawObstacles_;
+    bool drawObstacles_{};
     /// Queue of tiles to be built.
     PODVector<IntVector2> tileQueue_;
 };

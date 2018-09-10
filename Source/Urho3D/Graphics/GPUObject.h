@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ class URHO3D_API GPUObject
 {
 public:
     /// Construct with graphics subsystem pointer.
-    GPUObject(Graphics* graphics);
+    explicit GPUObject(Graphics* graphics);
     /// Destruct. Remove from the Graphics.
     virtual ~GPUObject();
 
@@ -72,11 +72,11 @@ protected:
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Object pointer or name.
-    GPUObjectHandle object_;
+    GPUObjectHandle object_{};
     /// Data lost flag.
-    bool dataLost_;
+    bool dataLost_{};
     /// Data pending flag.
-    bool dataPending_;
+    bool dataPending_{};
 };
 
 }

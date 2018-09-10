@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,10 +45,8 @@ static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, con
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        // Compare either the accessor or offset to avoid name string compare
+        // Compare accessor to avoid name string compare
         if (attr.accessor_.Get() && attr.accessor_.Get() == netAttr.accessor_.Get())
-            return i;
-        else if (!attr.accessor_.Get() && attr.offset_ == netAttr.offset_)
             return i;
     }
 
@@ -57,16 +55,19 @@ static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, con
 
 Serializable::Serializable(Context* context) :
     Object(context),
+    setInstanceDefault_(false),
     temporary_(false)
 {
 }
 
-Serializable::~Serializable()
-{
-}
+Serializable::~Serializable() = default;
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
+    // TODO: may be could use an observer pattern here
+    if (setInstanceDefault_)
+        SetInstanceDefault(attr.name_, src);
+
     // Check for accessor function mode
     if (attr.accessor_)
     {
@@ -74,8 +75,9 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         return;
     }
 
-    // Calculate the destination address
-    void* dest = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
+    // Get the destination address
+    assert(attr.ptr_);
+    void* dest = attr.ptr_;
 
     switch (attr.type_)
     {
@@ -85,6 +87,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
             *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
         else
             *(reinterpret_cast<int*>(dest)) = src.GetInt();
+        break;
+
+    case VAR_INT64:
+        *(reinterpret_cast<long long*>(dest)) = src.GetInt64();
         break;
 
     case VAR_BOOL:
@@ -178,8 +184,9 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         return;
     }
 
-    // Calculate the source address
-    const void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<const unsigned char*>(this) + attr.offset_;
+    // Get the source address
+    assert(attr.ptr_);
+    const void* src = attr.ptr_;
 
     switch (attr.type_)
     {
@@ -189,6 +196,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
             dest = *(reinterpret_cast<const unsigned char*>(src));
         else
             dest = *(reinterpret_cast<const int*>(src));
+        break;
+
+    case VAR_INT64:
+        dest = *(reinterpret_cast<const long long*>(src));
         break;
 
     case VAR_BOOL:
@@ -279,7 +290,7 @@ const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
     return networkState_ ? networkState_->attributes_ : context_->GetNetworkAttributes(GetType());
 }
 
-bool Serializable::Load(Deserializer& source, bool setInstanceDefault)
+bool Serializable::Load(Deserializer& source)
 {
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
@@ -299,9 +310,6 @@ bool Serializable::Load(Deserializer& source, bool setInstanceDefault)
 
         Variant varValue = source.ReadVariant(attr.type_);
         OnSetAttribute(attr, varValue);
-
-        if (setInstanceDefault)
-            SetInstanceDefault(attr.name_, varValue);
     }
 
     return true;
@@ -333,7 +341,7 @@ bool Serializable::Save(Serializer& dest) const
     return true;
 }
 
-bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
+bool Serializable::LoadXML(const XMLElement& source)
 {
     if (source.IsNull())
     {
@@ -387,12 +395,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
                     varValue = attrElem.GetVariantValue(attr.type_);
 
                 if (!varValue.IsEmpty())
-                {
                     OnSetAttribute(attr, varValue);
-
-                    if (setInstanceDefault)
-                        SetInstanceDefault(attr.name_, varValue);
-                }
 
                 startIndex = (i + 1) % attributes->Size();
                 break;
@@ -413,7 +416,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return true;
 }
 
-bool Serializable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+bool Serializable::LoadJSON(const JSONValue& source)
 {
     if (source.IsNull())
     {
@@ -457,7 +460,7 @@ bool Serializable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
                 // If enums specified, do enum lookup ad int assignment. Otherwise assign variant directly
                 if (attr.enumNames_)
                 {
-                    String valueStr = value.GetString();
+                    const String& valueStr = value.GetString();
                     bool enumFound = false;
                     int enumValue = 0;
                     const char** enumPtr = attr.enumNames_;
@@ -480,12 +483,7 @@ bool Serializable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
                     varValue = value.GetVariantValue(attr.type_);
 
                 if (!varValue.IsEmpty())
-                {
                     OnSetAttribute(attr, varValue);
-
-                    if (setInstanceDefault)
-                        SetInstanceDefault(attr.name_, varValue);
-                }
 
                 startIndex = (i + 1) % attributes->Size();
                 break;
@@ -761,7 +759,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeS
 
     // First write the change bitfield, then attribute data for non-default attributes
     dest.WriteUByte(timeStamp);
-    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
+    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
@@ -787,7 +785,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     // First write the change bitfield, then attribute data for changed attributes
     // Note: the attribute bits should not contain LATESTDATA attributes
     dest.WriteUByte(timeStamp);
-    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
+    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
@@ -831,7 +829,7 @@ bool Serializable::ReadDeltaUpdate(Deserializer& source)
 
     unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
     unsigned char timeStamp = source.ReadUByte();
-    source.Read(attributeBits.data_, (numAttributes + 7) >> 3);
+    source.Read(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {

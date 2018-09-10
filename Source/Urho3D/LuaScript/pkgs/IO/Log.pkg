@@ -1,5 +1,6 @@
 $#include "IO/Log.h"
 
+static const int LOG_TRACE;
 static const int LOG_DEBUG;
 static const int LOG_INFO;
 static const int LOG_WARNING;
@@ -13,15 +14,15 @@ class Log : public Object
     void SetLevel(int level);
     void SetTimeStamp(bool enable);
     void SetQuiet(bool quiet);
-    
+
     int GetLevel() const;
     bool GetTimeStamp() const;
     String GetLastMessage() const;
     bool IsQuiet() const;
-    
+
     static void Write(int level, const String message);
     static void WriteRaw(const String message, bool error = false);
-    
+
     tolua_property__get_set int level;
     tolua_property__get_set bool timeStamp;
     tolua_property__is_set bool quiet;

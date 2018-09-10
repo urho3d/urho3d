@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,21 +36,21 @@ class URHO3D_API Menu : public Button
 
 public:
     /// Construct.
-    Menu(Context* context);
+    explicit Menu(Context* context);
     /// Destruct.
-    virtual ~Menu() override;
+    ~Menu() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load from XML data with style. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false) override;
+    bool LoadXML(const XMLElement& source, XMLFile* styleFile) override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const override;
+    bool SaveXML(XMLElement& dest) const override;
 
     /// Perform UI element update.
-    virtual void Update(float timeStep) override;
+    void Update(float timeStep) override;
     /// React to mouse hover.
-    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+    void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to the popup being shown.
     virtual void OnShowPopup();
 
@@ -58,7 +58,7 @@ public:
     virtual void OnHidePopup() { }
 
     /// Set popup element to show on selection.
-    void SetPopup(UIElement* element);
+    void SetPopup(UIElement* popup);
     /// Set popup element offset.
     void SetPopupOffset(const IntVector2& offset);
     /// Set popup element offset.

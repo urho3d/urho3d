@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -306,13 +306,9 @@ CubeMapFace RenderPathCommand::GetOutputFace(unsigned index) const
     return index < outputs_.Size() ? outputs_[index].second_ : FACE_POSITIVE_X;
 }
 
-RenderPath::RenderPath()
-{
-}
+RenderPath::RenderPath() = default;
 
-RenderPath::~RenderPath()
-{
-}
+RenderPath::~RenderPath() = default;
 
 SharedPtr<RenderPath> RenderPath::Clone()
 {
@@ -377,6 +373,40 @@ void RenderPath::SetEnabled(const String& tag, bool active)
         if (!commands_[i].tag_.Compare(tag, false))
             commands_[i].enabled_ = active;
     }
+}
+
+bool RenderPath::IsEnabled(const String& tag) const
+{
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false) && renderTargets_[i].enabled_)
+            return true;
+    }
+
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false) && commands_[i].enabled_)
+            return true;
+    }
+
+    return false;
+}
+
+bool RenderPath::IsAdded(const String& tag) const
+{
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false))
+            return true;
+    }
+
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false))
+            return true;
+    }
+
+    return false;
 }
 
 void RenderPath::ToggleEnabled(const String& tag)

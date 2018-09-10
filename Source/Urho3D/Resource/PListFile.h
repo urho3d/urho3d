@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,17 +56,17 @@ public:
     /// Construct.
     PListValue();
     /// Construct from int.
-    PListValue(int value);
+    explicit PListValue(int value);
     /// Construct from boolean.
-    PListValue(bool value);
+    explicit PListValue(bool value);
     /// Construct from float.
-    PListValue(float value);
+    explicit PListValue(float value);
     /// Construct from string.
-    PListValue(const String& value);
+    explicit PListValue(const String& value);
     /// Construct from value map.
-    PListValue(PListValueMap& valueMap);
+    explicit PListValue(PListValueMap& valueMap);
     /// Construct from value vector.
-    PListValue(PListValueVector& valueVector);
+    explicit PListValue(PListValueVector& valueVector);
     /// Construct from another value.
     PListValue(const PListValue& value);
     /// Destruct.
@@ -76,7 +76,7 @@ public:
     PListValue& operator =(const PListValue& rhs);
 
     /// Return true if is valid.
-    operator bool() const { return type_ != PLVT_NONE; }
+    explicit operator bool() const { return type_ != PLVT_NONE; }
 
     /// Set int.
     void SetInt(int value);
@@ -143,14 +143,14 @@ class URHO3D_API PListFile : public Resource
 
 public:
     /// Construct.
-    PListFile(Context* context);
+    explicit PListFile(Context* context);
     /// Destruct.
-    virtual ~PListFile() override;
+    ~PListFile() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
 
     /// Return root.
     const PListValueMap& GetRoot() const { return root_; }

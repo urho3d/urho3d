@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,8 +51,8 @@ extern const char* SUBSYSTEM_CATEGORY;
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
-    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
-    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    auto** start = reinterpret_cast<Drawable**>(item->start_);
+    auto** end = reinterpret_cast<Drawable**>(item->end_);
 
     while (start != end)
     {
@@ -70,15 +70,11 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
 
 Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index) :
     level_(level),
-    numDrawables_(0),
     parent_(parent),
     root_(root),
     index_(index)
 {
     Initialize(box);
-
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-        children_[i] = nullptr;
 }
 
 Octant::~Octant()
@@ -109,17 +105,17 @@ Octant* Octant::GetOrCreateChild(unsigned index)
     Vector3 newMax = worldBoundingBox_.max_;
     Vector3 oldCenter = worldBoundingBox_.Center();
 
-    if (index & 1)
+    if (index & 1u)
         newMin.x_ = oldCenter.x_;
     else
         newMax.x_ = oldCenter.x_;
 
-    if (index & 2)
+    if (index & 2u)
         newMin.y_ = oldCenter.y_;
     else
         newMax.y_ = oldCenter.y_;
 
-    if (index & 4)
+    if (index & 4u)
         newMin.z_ = oldCenter.z_;
     else
         newMax.z_ = oldCenter.z_;
@@ -201,10 +197,10 @@ void Octant::ResetRoot()
     for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(nullptr);
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto& child : children_)
     {
-        if (children_[i])
-            children_[i]->ResetRoot();
+        if (child)
+            child->ResetRoot();
     }
 }
 
@@ -214,10 +210,10 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
 
-        for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        for (auto& child : children_)
         {
-            if (children_[i])
-                children_[i]->DrawDebugGeometry(debug, depthTest);
+            if (child)
+                child->DrawDebugGeometry(debug, depthTest);
         }
     }
 }
@@ -246,15 +242,15 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
         query.TestDrawables(start, end, inside);
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto child : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query, inside);
+        if (child)
+            child->GetDrawablesInternal(query, inside);
     }
 }
 
@@ -266,7 +262,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
 
         while (start != end)
@@ -278,10 +274,10 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         }
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto child : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query);
+        if (child)
+            child->GetDrawablesInternal(query);
     }
 }
 
@@ -293,7 +289,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
 
         while (start != end)
@@ -305,10 +301,10 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         }
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto child : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesOnlyInternal(query, drawables);
+        if (child)
+            child->GetDrawablesOnlyInternal(query, drawables);
     }
 }
 
@@ -337,16 +333,9 @@ void Octree::RegisterObject(Context* context)
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
 
-    URHO3D_ATTRIBUTE("Bounding Box Min", Vector3, worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bounding Box Max", Vector3, worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Number of Levels", int, numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
-}
-
-void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    // If any of the (size) attributes change, resize the octree
-    Serializable::OnSetAttribute(attr, src);
-    SetSize(worldBoundingBox_, numLevels_);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Min", Vector3, worldBoundingBox_.min_, UpdateOctreeSize, defaultBoundsMin, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Max", Vector3, worldBoundingBox_.max_, UpdateOctreeSize, defaultBoundsMax, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Number of Levels", int, numLevels_, UpdateOctreeSize, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
 void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -388,7 +377,7 @@ void Octree::Update(const FrameInfo& frame)
         // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
         // (for example physics objects) should not perform non-threadsafe work when marked dirty
         Scene* scene = GetScene();
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
         scene->BeginThreadedUpdate();
 
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
@@ -582,7 +571,7 @@ void Octree::CancelUpdate(Drawable* drawable)
 
 void Octree::DrawDebugGeometry(bool depthTest)
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    auto* debug = GetComponent<DebugRenderer>();
     DrawDebugGeometry(debug, depthTest);
 }
 

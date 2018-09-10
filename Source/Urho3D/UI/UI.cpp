@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,15 +62,18 @@
 #include "../UI/View3D.h"
 #include "../UI/UIComponent.h"
 
-#include <assert.h>
+#include <cassert>
 #include <SDL/SDL.h>
 
 #include "../DebugNew.h"
 
-#define TOUCHID_MASK(id) (1 << id)
-
 namespace Urho3D
 {
+
+static MouseButton MakeTouchIDMask(int id)
+{
+    return static_cast<MouseButton>(1u << static_cast<MouseButtonFlags::Integer>(id)); // NOLINT(misc-misplaced-widening-cast)
+}
 
 StringHash VAR_ORIGIN("Origin");
 const StringHash VAR_ORIGINAL_PARENT("OriginalParent");
@@ -95,6 +98,7 @@ UI::UI(Context* context) :
     dragBeginDistance_(DEFAULT_DRAGBEGIN_DISTANCE),
     mouseButtons_(0),
     lastMouseButtons_(0),
+    maxDoubleClickDist_(M_LARGE_VALUE),
     qualifiers_(0),
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
     initialized_(false),
@@ -144,9 +148,7 @@ UI::UI(Context* context) :
     Initialize();
 }
 
-UI::~UI()
-{
-}
+UI::~UI() = default;
 
 void UI::SetCursor(Cursor* cursor)
 {
@@ -249,7 +251,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
         modalElement->SetParent(rootModalElement_);
 
         // If it is a popup element, bring along its top-level parent
-        UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
+        auto* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
         if (originElement)
         {
             UIElement* element = originElement;
@@ -276,15 +278,15 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
         // Revert back to original parent
         modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
             modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
-        VariantMap& vars = const_cast<VariantMap&>(modalElement->GetVars());
+        auto& vars = const_cast<VariantMap&>(modalElement->GetVars());
         vars.Erase(VAR_ORIGINAL_PARENT);
         vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
 
         // If it is a popup element, revert back its top-level parent
-        UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
+        auto* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
         if (originElement)
         {
-            UIElement* element = static_cast<UIElement*>(originElement->GetVar(VAR_PARENT_CHANGED).GetPtr());
+            auto* element = static_cast<UIElement*>(originElement->GetVar(VAR_PARENT_CHANGED).GetPtr());
             if (element)
             {
                 const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
@@ -318,7 +320,7 @@ void UI::Update(float timeStep)
     for (HashMap<WeakPtr<UIElement>, bool>::Iterator i = hoveredElements_.Begin(); i != hoveredElements_.End(); ++i)
         i->second_ = false;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     bool mouseGrabbed = input->IsMouseGrabbed();
 
     IntVector2 cursorPos;
@@ -378,7 +380,7 @@ void UI::Update(float timeStep)
         IntVector2 touchPos = touch->position_;
         touchPos.x_ = (int)(touchPos.x_ / uiScale_);
         touchPos.y_ = (int)(touchPos.y_ / uiScale_);
-        ProcessHover(touchPos, TOUCHID_MASK(touch->touchID_), 0, nullptr);
+        ProcessHover(touchPos, MakeTouchIDMask(touch->touchID_), QUAL_NONE, nullptr);
     }
 
     // End hovers that expired without refreshing
@@ -441,32 +443,36 @@ void UI::RenderUpdate()
     }
 
     // Get batches for UI elements rendered into textures. Each element rendered into texture is treated as root element.
-    for (Vector<WeakPtr<UIComponent> >::Iterator it = renderToTexture_.Begin(); it != renderToTexture_.End();)
+    for (auto it = renderToTexture_.Begin(); it != renderToTexture_.End();)
     {
-        WeakPtr<UIComponent> component = *it;
-        if (component.Null() || !component->IsEnabled())
-            it = renderToTexture_.Erase(it);
-        else if (component->IsEnabled())
+        RenderToTextureData& data = it->second_;
+        if (data.rootElement_.Expired())
         {
-            component->batches_.Clear();
-            component->vertexData_.Clear();
-            UIElement* element = component->GetRoot();
+            it = renderToTexture_.Erase(it);
+            continue;
+        }
+
+        if (data.rootElement_->IsEnabled())
+        {
+            data.batches_.Clear();
+            data.vertexData_.Clear();
+            UIElement* element = data.rootElement_;
             const IntVector2& size = element->GetSize();
             const IntVector2& pos = element->GetPosition();
             // Note: the scissors operate on unscaled coordinates. Scissor scaling is only performed during render
             IntRect scissor = IntRect(pos.x_, pos.y_, pos.x_ + size.x_, pos.y_ + size.y_);
-            GetBatches(component->batches_, component->vertexData_, element, scissor);
+            GetBatches(data.batches_, data.vertexData_, element, scissor);
 
             // UIElement does not have anything to show. Insert dummy batch that will clear the texture.
-            if (component->batches_.Empty())
+            if (data.batches_.Empty())
             {
-                UIBatch batch(element, BLEND_REPLACE, scissor, nullptr, &component->vertexData_);
+                UIBatch batch(element, BLEND_REPLACE, scissor, nullptr, &data.vertexData_);
                 batch.SetColor(Color::BLACK);
                 batch.AddQuad(scissor.left_, scissor.top_, scissor.right_, scissor.bottom_, 0, 0);
-                component->batches_.Push(batch);
+                data.batches_.Push(batch);
             }
-            ++it;
         }
+        ++it;
     }
 }
 
@@ -497,27 +503,28 @@ void UI::Render(bool renderUICommand)
         // Render modal batches
         Render(vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
     }
-    
+
     // Render to UIComponent textures. This is skipped when called from the RENDERUI command
     if (!renderUICommand)
     {
-        for (Vector<WeakPtr<UIComponent> >::ConstIterator it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+        for (auto& item : renderToTexture_)
         {
-            WeakPtr<UIComponent> component = *it;
-            if (component->IsEnabled())
+            RenderToTextureData& data = item.second_;
+            if (data.rootElement_->IsEnabled())
             {
-                SetVertexData(component->vertexBuffer_, component->vertexData_);
-                SetVertexData(component->debugVertexBuffer_, component->debugVertexData_);
-                
-                RenderSurface* surface = component->GetTexture()->GetRenderSurface();
+                SetVertexData(data.vertexBuffer_, data.vertexData_);
+                SetVertexData(data.debugVertexBuffer_, data.debugVertexData_);
+
+                RenderSurface* surface = data.texture_->GetRenderSurface();
+                graphics_->SetDepthStencil(surface->GetLinkedDepthStencil());
                 graphics_->SetRenderTarget(0, surface);
                 graphics_->SetViewport(IntRect(0, 0, surface->GetWidth(), surface->GetHeight()));
                 graphics_->Clear(Urho3D::CLEAR_COLOR);
 
-                Render(component->vertexBuffer_, component->batches_, 0, component->batches_.Size());
-                Render(component->debugVertexBuffer_, component->debugDrawBatches_, 0, component->debugDrawBatches_.Size());
-                component->debugDrawBatches_.Clear();
-                component->debugVertexData_.Clear();
+                Render(data.vertexBuffer_, data.batches_, 0, data.batches_.Size());
+                Render(data.debugVertexBuffer_, data.debugDrawBatches_, 0, data.debugDrawBatches_.Size());
+                data.debugDrawBatches_.Clear();
+                data.debugVertexData_.Clear();
             }
         }
 
@@ -546,12 +553,12 @@ void UI::DebugDraw(UIElement* element)
             element->GetDebugDrawBatches(debugDrawBatches_, debugVertexData_, scissor);
         else
         {
-            for (Vector<WeakPtr<UIComponent> >::Iterator it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+            for (auto& item : renderToTexture_)
             {
-                WeakPtr<UIComponent> component = *it;
-                if (component.NotNull() && component->GetRoot() == root && component->IsEnabled())
+                RenderToTextureData& data = item.second_;
+                if (!data.rootElement_.Expired() && data.rootElement_ == root && data.rootElement_->IsEnabled())
                 {
-                    element->GetDebugDrawBatches(component->debugDrawBatches_, component->debugVertexData_, scissor);
+                    element->GetDebugDrawBatches(data.debugDrawBatches_, data.debugVertexData_, scissor);
                     break;
                 }
             }
@@ -628,6 +635,11 @@ void UI::SetClipboardText(const String& text)
 void UI::SetDoubleClickInterval(float interval)
 {
     doubleClickInterval_ = Max(interval, 0.0f);
+}
+
+void UI::SetMaxDoubleClickDistance(float distPixels)
+{
+    maxDoubleClickDist_ = distPixels;
 }
 
 void UI::SetDragBeginInterval(float interval)
@@ -768,16 +780,16 @@ UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVec
     // Mouse was not hovering UI element. Check elements rendered on 3D objects.
     if (!result && renderToTexture_.Size())
     {
-        for (Vector<WeakPtr<UIComponent> >::Iterator it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+        for (auto& item : renderToTexture_)
         {
-            WeakPtr<UIComponent> component = *it;
-            if (component.Null() || !component->IsEnabled())
+            RenderToTextureData& data = item.second_;
+            if (data.rootElement_.Expired() || !data.rootElement_->IsEnabled())
                 continue;
 
-            IntVector2 screenPosition;
-            if (component->ScreenToUIPosition(position, screenPosition))
+            IntVector2 screenPosition = data.rootElement_->ScreenToElement(position);
+            if (data.rootElement_->GetCombinedScreenRect().IsInside(screenPosition) == INSIDE)
             {
-                result = GetElementAt(component->GetRoot(), screenPosition, enabledOnly);
+                result = GetElementAt(data.rootElement_, screenPosition, enabledOnly);
                 if (result)
                 {
                     if (elementScreenPosition)
@@ -908,7 +920,7 @@ bool UI::HasModalElement() const
 
 void UI::Initialize()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
 
     if (!graphics || !graphics->IsInitialized())
         return;
@@ -1184,7 +1196,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
 
                         if (screenPos < 0 && layoutMaxSize > 0)
                         {
-                            unsigned toSkip = (unsigned)(-screenPos / layoutMaxSize);
+                            auto toSkip = (unsigned)(-screenPos / layoutMaxSize);
                             if (toSkip > 0)
                                 i += (toSkip - 1);
                         }
@@ -1231,7 +1243,7 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
         visible = true;
     else
     {
-        Input* input = GetSubsystem<Input>();
+        auto* input = GetSubsystem<Input>();
         pos = input->GetMousePosition();
         visible = input->IsMouseVisible();
 
@@ -1260,7 +1272,7 @@ void UI::ReleaseFontFaces()
         fonts[i]->ReleaseFaces();
 }
 
-void UI::ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualifiers, Cursor* cursor)
+void UI::ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     IntVector2 cursorPos;
     WeakPtr<UIElement> element(GetElementAt(windowCursorPos, true, &cursorPos));
@@ -1276,8 +1288,8 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualif
             continue;
         }
 
-        bool dragSource = dragElement && (dragElement->GetDragDropMode() & DD_SOURCE) != 0;
-        bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
+        bool dragSource = dragElement && (dragElement->GetDragDropMode() & DD_SOURCE);
+        bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET);
         bool dragDropTest = dragSource && dragTarget && element != dragElement;
         // If drag start event has not been posted yet, do not do drag handling here
         if (dragData->dragBeginPending)
@@ -1349,7 +1361,7 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualif
     }
 }
 
-void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor, bool cursorVisible)
 {
     if (cursorVisible)
     {
@@ -1358,7 +1370,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
 
         bool newButton;
         if (usingTouchInput_)
-            newButton = (button & buttons) == 0;
+            newButton = (buttons & button) == MOUSEB_NONE;
         else
             newButton = true;
         buttons |= button;
@@ -1376,17 +1388,18 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             element->OnClickBegin(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            // Fire double click event if element matches and is in time
+            // Fire double click event if element matches and is in time and is within max distance from the original click
             if (doubleClickElement_ && element == doubleClickElement_ &&
-                clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
+                (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000)) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
+                SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
             }
             else
             {
                 doubleClickElement_ = element;
+                doubleClickFirstPos_ = windowCursorPos;
                 clickTimer_.Reset();
             }
 
@@ -1394,7 +1407,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             bool dragElementsContain = dragElements_.Contains(element);
             if (element && !dragElementsContain)
             {
-                DragData* dragData = new DragData();
+                auto* dragData = new DragData();
                 dragElements_[element] = dragData;
                 dragData->dragBeginPending = true;
                 dragData->sumPos = cursorPos;
@@ -1422,15 +1435,15 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
                 SetFocusElement(nullptr);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
+            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
+                SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;
     }
 }
 
-void UI::ProcessClickEnd(const IntVector2& windowCursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+void UI::ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor, bool cursorVisible)
 {
     WeakPtr<UIElement> element;
     IntVector2 cursorPos = windowCursorPos;
@@ -1464,10 +1477,10 @@ void UI::ProcessClickEnd(const IntVector2& windowCursorPos, int button, int butt
                     cursor);
                 SendDragOrHoverEvent(E_DRAGEND, dragElement, cursorPos, IntVector2::ZERO, dragData);
 
-                bool dragSource = dragElement && (dragElement->GetDragDropMode() & DD_SOURCE) != 0;
+                bool dragSource = dragElement && (dragElement->GetDragDropMode() & DD_SOURCE);
                 if (dragSource)
                 {
-                    bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
+                    bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET);
                     bool dragDropFinish = dragSource && dragTarget && element != dragElement;
 
                     if (dragDropFinish)
@@ -1496,7 +1509,7 @@ void UI::ProcessClickEnd(const IntVector2& windowCursorPos, int button, int butt
     }
 }
 
-void UI::ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor,
+void UI::ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursorDeltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor,
     bool cursorVisible)
 {
     if (cursorVisible && dragElementsCount_ > 0 && buttons)
@@ -1504,7 +1517,7 @@ void UI::ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursor
         IntVector2 cursorPos;
         GetElementAt(windowCursorPos, true, &cursorPos);
 
-        Input* input = GetSubsystem<Input>();
+        auto* input = GetSubsystem<Input>();
         bool mouseGrabbed = input->IsMouseGrabbed();
         for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
         {
@@ -1602,23 +1615,23 @@ void UI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const In
 
     if (dragData)
     {
-        eventData[P_BUTTONS] = dragData->dragButtons;
+        eventData[P_BUTTONS] = (unsigned)dragData->dragButtons;
         eventData[P_NUMBUTTONS] = dragData->numDragButtons;
     }
 
     element->SendEvent(eventType, eventData);
 }
 
-void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button,
-    int buttons, int qualifiers)
+void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, MouseButton button,
+    MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     VariantMap& eventData = GetEventDataMap();
     eventData[UIMouseClick::P_ELEMENT] = endElement;
     eventData[UIMouseClick::P_X] = pos.x_;
     eventData[UIMouseClick::P_Y] = pos.y_;
     eventData[UIMouseClick::P_BUTTON] = button;
-    eventData[UIMouseClick::P_BUTTONS] = buttons;
-    eventData[UIMouseClick::P_QUALIFIERS] = qualifiers;
+    eventData[UIMouseClick::P_BUTTONS] = (unsigned)buttons;
+    eventData[UIMouseClick::P_QUALIFIERS] = (unsigned)qualifiers;
 
     // For click end events, send also the element the click began on
     if (eventType == E_UIMOUSECLICKEND)
@@ -1631,13 +1644,36 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
             endElement->SendEvent(E_CLICK, eventData);
         else if (eventType == E_UIMOUSECLICKEND)
             endElement->SendEvent(E_CLICKEND, eventData);
-        else if (eventType == E_UIMOUSEDOUBLECLICK)
-            endElement->SendEvent(E_DOUBLECLICK, eventData);
     }
 
     // Send the global event from the UI subsystem last
     SendEvent(eventType, eventData);
 }
+
+void UI::SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, MouseButton button,
+    MouseButtonFlags buttons, QualifierFlags qualifiers)
+{
+    VariantMap& eventData = GetEventDataMap();
+    eventData[UIMouseDoubleClick::P_ELEMENT] = endElement;
+    eventData[UIMouseDoubleClick::P_X] = secondPos.x_;
+    eventData[UIMouseDoubleClick::P_Y] = secondPos.y_;
+    eventData[UIMouseDoubleClick::P_XBEGIN] = firstPos.x_;
+    eventData[UIMouseDoubleClick::P_YBEGIN] = firstPos.y_;
+    eventData[UIMouseDoubleClick::P_BUTTON] = button;
+    eventData[UIMouseDoubleClick::P_BUTTONS] = (unsigned)buttons;
+    eventData[UIMouseDoubleClick::P_QUALIFIERS] = (unsigned)qualifiers;
+
+
+    if (endElement)
+    {
+        // Send also element version of the event
+        endElement->SendEvent(E_DOUBLECLICK, eventData);
+    }
+
+    // Send the global event from the UI subsystem last
+    SendEvent(E_UIMOUSEDOUBLECLICK, eventData);
+}
+
 
 void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
@@ -1653,8 +1689,8 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonDown;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
     usingTouchInput_ = false;
 
     IntVector2 cursorPos;
@@ -1664,35 +1700,35 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     // Handle drag cancelling
     ProcessDragCancel();
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     if (!input->IsMouseGrabbed())
-        ProcessClickBegin(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
+        ProcessClickBegin(cursorPos, MouseButton(eventData[P_BUTTON].GetUInt()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonUp;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
 
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    ProcessClickEnd(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
+    ProcessClickEnd(cursorPos, (MouseButton)eventData[P_BUTTON].GetUInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
     usingTouchInput_ = false;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     const IntVector2& rootSize = rootElement_->GetSize();
     const IntVector2& rootPos = rootElement_->GetPosition();
 
@@ -1731,14 +1767,14 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input->IsMouseGrabbed())
         return;
 
     using namespace MouseWheel;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetInt());
     int delta = eventData[P_WHEEL].GetInt();
     usingTouchInput_ = false;
 
@@ -1746,23 +1782,19 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    UIElement* element;
-    if (!nonFocusedMouseWheel_ && (element = focusElement_))
-        element->OnWheel(delta, mouseButtons_, qualifiers_);
+    if (!nonFocusedMouseWheel_ && focusElement_)
+        focusElement_->OnWheel(delta, mouseButtons_, qualifiers_);
     else
     {
         // If no element has actual focus or in non-focused mode, get the element at cursor
         if (cursorVisible)
         {
-            element = GetElementAt(cursorPos);
+            UIElement* element = GetElementAt(cursorPos);
             if (nonFocusedMouseWheel_)
             {
                 // Going up the hierarchy chain to find element that could handle mouse wheel
-                while (element)
+                while (element && !element->IsWheelHandler())
                 {
-                    if (element->GetType() == ListView::GetTypeStatic() ||
-                        element->GetType() == ScrollView::GetTypeStatic())
-                        break;
                     element = element->GetParent();
                 }
             }
@@ -1779,7 +1811,7 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input->IsMouseGrabbed())
         return;
 
@@ -1790,16 +1822,16 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     pos.y_ = int(pos.y_ / uiScale_);
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
     {
-        ProcessClickBegin(pos, touchId, touchDragElements_[element], 0, nullptr, true);
+        ProcessClickBegin(pos, touchId, touchDragElements_[element], QUAL_NONE, nullptr, true);
         touchDragElements_[element] |= touchId;
     }
     else
-        ProcessClickBegin(pos, touchId, touchId, 0, nullptr, true);
+        ProcessClickBegin(pos, touchId, touchId, QUAL_NONE, nullptr, true);
 }
 
 void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
@@ -1811,15 +1843,15 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     pos.y_ = int(pos.y_ / uiScale_);
 
     // Get the touch index
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     // Clear any drag events that were using the touch id
-    for (HashMap<WeakPtr<UIElement>, int>::Iterator i = touchDragElements_.Begin(); i != touchDragElements_.End();)
+    for (auto i = touchDragElements_.Begin(); i != touchDragElements_.End();)
     {
-        int touches = i->second_;
+        const MouseButtonFlags touches = i->second_;
         if (touches & touchId)
             i = touchDragElements_.Erase(i);
         else
@@ -1829,7 +1861,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     if (element && element->IsEnabled())
         element->OnHover(element->ScreenToElement(pos), pos, 0, 0, nullptr);
 
-    ProcessClickEnd(pos, touchId, 0, 0, nullptr, true);
+    ProcessClickEnd(pos, touchId, MOUSEB_NONE, QUAL_NONE, nullptr, true);
 }
 
 void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
@@ -1844,18 +1876,18 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     deltaPos.y_ = int(deltaPos.y_ / uiScale_);
     usingTouchInput_ = true;
 
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
 
-    ProcessMove(pos, deltaPos, touchId, 0, nullptr, true);
+    ProcessMove(pos, deltaPos, touchId, QUAL_NONE, nullptr, true);
 }
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace KeyDown;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
-    int key = eventData[P_KEY].GetInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
+    auto key = (Key)eventData[P_KEY].GetUInt();
 
     // Cancel UI dragging
     if (key == KEY_ESCAPE && dragElementsCount_ > 0)
@@ -1875,7 +1907,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
         {
             // If it is a modal window, by resetting its modal flag
-            Window* window = dynamic_cast<Window*>(element);
+            auto* window = dynamic_cast<Window*>(element);
             if (window && window->GetModalAutoDismiss())
                 window->SetModal(false);
         }
@@ -1955,7 +1987,7 @@ void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Sending the UI variant of the event only makes sense if the OS cursor is visible (not locked to window center)
     if (input->IsMouseVisible())
@@ -2036,12 +2068,13 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
     IntVector2 sendPos = oldSendPos;
     if (usingTouchInput_)
     {
-        int buttons = dragData->dragButtons;
+        MouseButtonFlags buttons = dragData->dragButtons;
         dragData->sumPos = IntVector2::ZERO;
-        Input* input = GetSubsystem<Input>();
-        for (int i = 0; (1 << i) <= buttons; i++)
+        auto* input = GetSubsystem<Input>();
+        for (unsigned i = 0; (1u << i) <= (unsigned)buttons; i++)
         {
-            if ((1 << i) & buttons)
+            auto mouseButton = static_cast<MouseButton>(1u << i); // NOLINT(misc-misplaced-widening-cast)
+            if (buttons & mouseButton)
             {
                 TouchState* ts = input->GetTouch((unsigned)i);
                 if (!ts)
@@ -2073,23 +2106,38 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
 
     if (applyScale)
     {
-        size.x_ = (int)((float)size.x_ / uiScale_ + 0.5f);
-        size.y_ = (int)((float)size.y_ / uiScale_ + 0.5f);
+        size.x_ = RoundToInt((float)size.x_ / uiScale_);
+        size.y_ = RoundToInt((float)size.y_ / uiScale_);
     }
 
     return size;
 }
 
-void UI::SetRenderToTexture(UIComponent* component, bool enable)
+void UI::SetElementRenderTexture(UIElement* element, Texture2D* texture)
 {
-    WeakPtr<UIComponent> weak(component);
-    if (enable)
+    if (element == nullptr)
     {
-        if (!renderToTexture_.Contains(weak))
-            renderToTexture_.Push(weak);
+        URHO3D_LOGERROR("UI::SetElementRenderTexture called with null element.");
+        return;
     }
-    else
-        renderToTexture_.Remove(weak);
+
+    auto it = renderToTexture_.Find(element);
+    if (texture && it == renderToTexture_.End())
+    {
+        RenderToTextureData data;
+        data.texture_ = texture;
+        data.rootElement_ = element;
+        data.vertexBuffer_ = new VertexBuffer(context_);
+        data.debugVertexBuffer_ = new VertexBuffer(context_);
+        renderToTexture_[element] = data;
+    }
+    else if (it != renderToTexture_.End())
+    {
+        if (texture == nullptr)
+            renderToTexture_.Erase(it);
+        else
+            it->second_.texture_ = texture;
+    }
 }
 
 void RegisterUILibrary(Context* context)
@@ -2097,6 +2145,7 @@ void RegisterUILibrary(Context* context)
     Font::RegisterObject(context);
 
     UIElement::RegisterObject(context);
+    UISelectable::RegisterObject(context);
     BorderImage::RegisterObject(context);
     Sprite::RegisterObject(context);
     Button::RegisterObject(context);

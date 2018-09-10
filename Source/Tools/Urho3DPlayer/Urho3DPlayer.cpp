@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ void Urho3DPlayer::Setup()
     // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    auto* filesystem = GetSubsystem<FileSystem>();
     const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
@@ -201,7 +201,7 @@ void Urho3DPlayer::Start()
     {
 #ifdef URHO3D_LUA
         // Instantiate and register the Lua script subsystem
-        LuaScript* luaScript = new LuaScript(context_);
+        auto* luaScript = new LuaScript(context_);
         context_->RegisterSubsystem(luaScript);
 
         // If script loading is successful, proceed to main loop
@@ -238,7 +238,7 @@ void Urho3DPlayer::Stop()
 #ifdef URHO3D_LUA
     else
     {
-        LuaScript* luaScript = GetSubsystem<LuaScript>();
+        auto* luaScript = GetSubsystem<LuaScript>();
         if (luaScript && luaScript->GetFunction("Stop", true))
             luaScript->ExecuteFunction("Stop");
     }

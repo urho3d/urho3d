@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,9 +63,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     batches_[0].geometryType_ = GEOM_STATIC_NOINSTANCING;
 }
 
-TerrainPatch::~TerrainPatch()
-{
-}
+TerrainPatch::~TerrainPatch() = default;
 
 void TerrainPatch::RegisterObject(Context* context)
 {

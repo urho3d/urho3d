@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,9 +54,7 @@ static const unsigned MAX_CASCADE_SPLITS = 1;
 struct URHO3D_API BiasParameters
 {
     /// Construct undefined.
-    BiasParameters()
-    {
-    }
+    BiasParameters() = default;
 
     /// Construct with initial values.
     BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f) :
@@ -81,9 +79,7 @@ struct URHO3D_API BiasParameters
 struct URHO3D_API CascadeParameters
 {
     /// Construct undefined.
-    CascadeParameters()
-    {
-    }
+    CascadeParameters() = default;
 
     /// Construct with initial values.
     CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) :
@@ -110,20 +106,18 @@ struct URHO3D_API CascadeParameters
     }
 
     /// Far clip values of the splits.
-    float splits_[4];
+    Vector4 splits_;
     /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
-    float fadeStart_;
+    float fadeStart_{};
     /// Automatic depth bias adjustment strength.
-    float biasAutoAdjust_;
+    float biasAutoAdjust_{};
 };
 
 /// Shadow map focusing parameters.
 struct URHO3D_API FocusParameters
 {
     /// Construct undefined.
-    FocusParameters()
-    {
-    }
+    FocusParameters() = default;
 
     /// Construct with initial values.
     FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) :
@@ -157,20 +151,18 @@ class URHO3D_API Light : public Drawable
 
 public:
     /// Construct.
-    Light(Context* context);
+    explicit Light(Context* context);
     /// Destruct.
-    virtual ~Light() override;
+    ~Light() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute change.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame) override;
+    void UpdateBatches(const FrameInfo& frame) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set light type.
     void SetLightType(LightType type);
@@ -340,9 +332,15 @@ public:
 
 protected:
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
 
 private:
+    /// Validate shadow focus.
+    void ValidateShadowFocus() { shadowFocus_.Validate(); }
+    /// Validate shadow cascade.
+    void ValidateShadowCascade() { shadowCascade_.Validate(); }
+    /// Validate shadow bias.
+    void ValidateShadowBias() { shadowBias_.Validate(); }
     /// Light type.
     LightType lightType_;
     /// Color.

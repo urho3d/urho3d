@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@
 #cmakedefine URHO3D_DATABASE_SQLITE
 #cmakedefine URHO3D_LUAJIT
 #cmakedefine URHO3D_TESTING
+
+#cmakedefine CLANG_PRE_STANDARD
 
 #ifdef @STATIC_DEFINE@
 #  define @EXPORT_MACRO_NAME@

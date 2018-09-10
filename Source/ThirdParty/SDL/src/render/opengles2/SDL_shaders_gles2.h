@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,8 +22,8 @@
 
 #if SDL_VIDEO_RENDER_OGL_ES2
 
-#ifndef SDL_shaderdata_h_
-#define SDL_shaderdata_h_
+#ifndef SDL_shaders_gles2_h_
+#define SDL_shaders_gles2_h_
 
 typedef struct GLES2_ShaderInstance
 {
@@ -54,9 +54,9 @@ typedef enum
 
 #define GLES2_SOURCE_SHADER (GLenum)-1
 
-const GLES2_Shader *GLES2_GetShader(GLES2_ShaderType type, SDL_BlendMode blendMode);
+const GLES2_Shader *GLES2_GetShader(GLES2_ShaderType type);
 
-#endif /* SDL_shaderdata_h_ */
+#endif /* SDL_shaders_gles2_h_ */
 
 #endif /* SDL_VIDEO_RENDER_OGL_ES2 */
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -131,7 +131,7 @@ void Run(const Vector<String>& arguments)
             {
                 float x = ((float)i) / ((float)(width - 1));
 
-                data[i] = (unsigned char)((1.0f - pow(x, power)) * 255.0f);
+                data[i] = (unsigned char)((1.0f - Pow(x, power)) * 255.0f);
             }
 
             // Ensure start is full bright & end is completely black
@@ -158,7 +158,7 @@ void Run(const Vector<String>& arguments)
                     if (dist > 1.0f)
                         dist = 1.0f;
 
-                    data[i] = (unsigned char)((1.0f - pow(dist, power)) * 255.0f);
+                    data[i] = (unsigned char)((1.0f - Pow(dist, power)) * 255.0f);
                 }
             }
 
@@ -337,12 +337,12 @@ void WriteIES(unsigned char* data, unsigned width, unsigned height, PODVector<fl
     // otherwise the space used would fit the light's traits and potentially incude a lot of wasted black space
     const float angularFactor = 90.0f;
     const float fraction = angularFactor / ((float)width);
-    ::memset(data, 0, width * height);
+    ::memset(data, 0, (size_t)width * height);
 
-    for (unsigned y = 0; y < height; ++y, dirY += stepY)
+    for (unsigned y = 0; y < height; ++y)
     {
         float dirX = -1.0f;
-        for (unsigned x = 0; x < width; ++x, dirX += stepX)
+        for (unsigned x = 0; x < width; ++x)
         {
             Vector3 dirVec(dirX * width, dirY * height, 0);
             const float len = dirVec.Length();
@@ -380,7 +380,11 @@ void WriteIES(unsigned char* data, unsigned width, unsigned height, PODVector<fl
             }
             *data = (unsigned char)(inverseLightValue * value * 255.0f);
             ++data;
+
+            dirX += stepX;
         }
+
+        dirY += stepY;
     }
 }
 

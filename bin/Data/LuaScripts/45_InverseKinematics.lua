@@ -1,5 +1,5 @@
 -- Ribbon trail demo.
--- This sample demonstrates how to use both trail types of RibbonTrail component.
+-- This sample demonstrates how to adjust the position of animated feet so they match the ground's angle using IK.
 
 require "LuaScripts/Utilities/Sample"
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ void RibbonTrailDemo::Start()
 
 void RibbonTrailDemo::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
 
@@ -85,14 +85,14 @@ void RibbonTrailDemo::CreateScene()
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
+    auto* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
     // Create a directional light to the world.
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
-    Light* light = lightNode->CreateComponent<Light>();
+    auto* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.00005f, 0.5f));
@@ -101,10 +101,10 @@ void RibbonTrailDemo::CreateScene()
 
     // Create first box for face camera trail demo with 1 column.
     boxNode1_ = scene_->CreateChild("Box1");
-    StaticModel* box1 = boxNode1_->CreateComponent<StaticModel>();
+    auto* box1 = boxNode1_->CreateComponent<StaticModel>();
     box1->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
     box1->SetCastShadows(true);
-    RibbonTrail* boxTrail1 = boxNode1_->CreateComponent<RibbonTrail>();
+    auto* boxTrail1 = boxNode1_->CreateComponent<RibbonTrail>();
     boxTrail1->SetMaterial(cache->GetResource<Material>("Materials/RibbonTrail.xml"));
     boxTrail1->SetStartColor(Color(1.0f, 0.5f, 0.0f, 1.0f));
     boxTrail1->SetEndColor(Color(1.0f, 1.0f, 0.0f, 0.0f));
@@ -114,10 +114,10 @@ void RibbonTrailDemo::CreateScene()
     // Create second box for face camera trail demo with 4 column.
     // This will produce less distortion than first trail.
     boxNode2_ = scene_->CreateChild("Box2");
-    StaticModel* box2 = boxNode2_->CreateComponent<StaticModel>();
+    auto* box2 = boxNode2_->CreateComponent<StaticModel>();
     box2->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
     box2->SetCastShadows(true);
-    RibbonTrail* boxTrail2 = boxNode2_->CreateComponent<RibbonTrail>();
+    auto* boxTrail2 = boxNode2_->CreateComponent<RibbonTrail>();
     boxTrail2->SetMaterial(cache->GetResource<Material>("Materials/RibbonTrail.xml"));
     boxTrail2->SetStartColor(Color(1.0f, 0.5f, 0.0f, 1.0f));
     boxTrail2->SetEndColor(Color(1.0f, 1.0f, 0.0f, 0.0f));
@@ -129,7 +129,7 @@ void RibbonTrailDemo::CreateScene()
     Node* ninjaNode = scene_->CreateChild("Ninja");
     ninjaNode->SetPosition(Vector3(5.0f, 0.0f, 0.0f));
     ninjaNode->SetRotation(Quaternion(0.0f, 180.0f, 0.0f));
-    AnimatedModel* ninja = ninjaNode->CreateComponent<AnimatedModel>();
+    auto* ninja = ninjaNode->CreateComponent<AnimatedModel>();
     ninja->SetModel(cache->GetResource<Model>("Models/NinjaSnowWar/Ninja.mdl"));
     ninja->SetMaterial(cache->GetResource<Material>("Materials/NinjaSnowWar/Ninja.xml"));
     ninja->SetCastShadows(true);
@@ -154,19 +154,19 @@ void RibbonTrailDemo::CreateScene()
     // Add floating text for info.
     Node* boxTextNode1 = scene_->CreateChild("BoxText1");
     boxTextNode1->SetPosition(Vector3(-1.0f, 2.0f, 0.0f));
-    Text3D* boxText1 = boxTextNode1->CreateComponent<Text3D>();
+    auto* boxText1 = boxTextNode1->CreateComponent<Text3D>();
     boxText1->SetText(String("Face Camera Trail (4 Column)"));
     boxText1->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
 
     Node* boxTextNode2 = scene_->CreateChild("BoxText2");
     boxTextNode2->SetPosition(Vector3(-6.0f, 2.0f, 0.0f));
-    Text3D* boxText2 = boxTextNode2->CreateComponent<Text3D>();
+    auto* boxText2 = boxTextNode2->CreateComponent<Text3D>();
     boxText2->SetText(String("Face Camera Trail (1 Column)"));
     boxText2->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
 
     Node* ninjaTextNode2 = scene_->CreateChild("NinjaText");
     ninjaTextNode2->SetPosition(Vector3(4.0f, 2.5f, 0.0f));
-    Text3D* ninjaText = ninjaTextNode2->CreateComponent<Text3D>();
+    auto* ninjaText = ninjaTextNode2->CreateComponent<Text3D>();
     ninjaText->SetText(String("Bone Trail (4 Column)"));
     ninjaText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
 
@@ -180,11 +180,11 @@ void RibbonTrailDemo::CreateScene()
 
 void RibbonTrailDemo::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys and mouse/touch to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -196,7 +196,7 @@ void RibbonTrailDemo::CreateInstructions()
 
 void RibbonTrailDemo::SetupViewport()
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen. We need to define the scene and the camera
     // at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
@@ -211,7 +211,7 @@ void RibbonTrailDemo::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;

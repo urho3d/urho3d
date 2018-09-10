@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,10 @@ class RigidBody;
 
 using namespace Urho3D;
 
-const int CTRL_FORWARD = 1;
-const int CTRL_BACK = 2;
-const int CTRL_LEFT = 4;
-const int CTRL_RIGHT = 8;
+const unsigned CTRL_FORWARD = 1;
+const unsigned CTRL_BACK = 2;
+const unsigned CTRL_LEFT = 4;
+const unsigned CTRL_RIGHT = 8;
 
 const float YAW_SENSITIVITY = 0.1f;
 const float ENGINE_POWER = 10.0f;
@@ -53,52 +53,62 @@ class Vehicle : public LogicComponent
 
 public:
     /// Construct.
-    Vehicle(Context* context);
-    
+    explicit Vehicle(Context* context);
+
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
-    
+
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle physics world update. Called by LogicComponent base class.
-    virtual void FixedUpdate(float timeStep) override;
-    
+    void FixedUpdate(float timeStep) override;
+
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
     void Init();
-    
+
     /// Movement controls.
     Controls controls_;
-    
+
 private:
     /// Initialize a wheel and remember its scene node and ID.
     void InitWheel(const String& name, const Vector3& offset, WeakPtr<Node>& wheelNode, unsigned& wheelNodeID);
     /// Acquire wheel components from wheel scene nodes.
     void GetWheelComponents();
 
-    
-    // Wheel scene nodes.
+    /// Wheel scene front-left node.
     WeakPtr<Node> frontLeft_;
+    /// Wheel scene front-right node.
     WeakPtr<Node> frontRight_;
+    /// Wheel scene rear-left node.
     WeakPtr<Node> rearLeft_;
+    /// Wheel scene rear-right node.
     WeakPtr<Node> rearRight_;
-    
-    // Steering axle constraints.
+
+    /// Steering front-left axle constraint.
     WeakPtr<Constraint> frontLeftAxis_;
+    /// Steering front-right axle constraint.
     WeakPtr<Constraint> frontRightAxis_;
-    
-    // Hull and wheel rigid bodies.
+
+    /// Hull and wheel hull rigid bodies.
     WeakPtr<RigidBody> hullBody_;
+    /// Hull and wheel front-left rigid bodies.
     WeakPtr<RigidBody> frontLeftBody_;
+    /// Hull and wheel front-right rigid bodies.
     WeakPtr<RigidBody> frontRightBody_;
+    /// Hull and wheel rear-left rigid bodies.
     WeakPtr<RigidBody> rearLeftBody_;
+    /// Hull and wheel rear-right rigid bodies.
     WeakPtr<RigidBody> rearRightBody_;
-    
-    // IDs of the wheel scene nodes for serialization.
-    unsigned frontLeftID_;
-    unsigned frontRightID_;
-    unsigned rearLeftID_;
-    unsigned rearRightID_;
-    
-    /// Current left/right steering amount (-1 to 1.)
-    float steering_;
+
+    /// ID of the front-left wheel scene node for serialization.
+    unsigned frontLeftID_{};
+    /// ID of the front-right wheel scene node for serialization.
+    unsigned frontRightID_{};
+    /// ID of the rear-left wheel scene node for serialization.
+    unsigned rearLeftID_{};
+    /// ID of the rear-right wheel scene node for serialization.
+    unsigned rearRightID_{};
+
+    /// Current left/right steering amount (-1 to 1).
+    float steering_{};
 };

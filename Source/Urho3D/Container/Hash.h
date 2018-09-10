@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,13 +60,13 @@ template <> inline unsigned MakeHash(const void* value)
 /// Long long hash function.
 template <> inline unsigned MakeHash(const long long& value)
 {
-    return (unsigned)((value >> 32) | (value & 0xffffffff));
+    return (unsigned)((value >> 32u) | (value & 0xffffffffu));
 }
 
 /// Unsigned long long hash function.
 template <> inline unsigned MakeHash(const unsigned long long& value)
 {
-    return (unsigned)((value >> 32) | (value & 0xffffffff));
+    return (unsigned)((value >> 32u) | (value & 0xffffffffu));
 }
 
 /// Int hash function.

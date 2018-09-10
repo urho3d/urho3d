@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,9 +38,9 @@ class URHO3D_API Polyhedron
 {
 public:
     /// Construct empty.
-    Polyhedron()
-    {
-    }
+    Polyhedron() noexcept = default;
+    /// Destruct.
+    ~Polyhedron() noexcept = default;
 
     /// Copy-construct from another polyhedron.
     Polyhedron(const Polyhedron& polyhedron) :
@@ -49,25 +49,22 @@ public:
     }
 
     /// Construct from a list of faces.
-    Polyhedron(const Vector<PODVector<Vector3> >& faces) :
+    explicit Polyhedron(const Vector<PODVector<Vector3> >& faces) :
         faces_(faces)
     {
     }
 
     /// Construct from a bounding box.
-    Polyhedron(const BoundingBox& box)
+    explicit Polyhedron(const BoundingBox& box)
     {
         Define(box);
     }
 
     /// Construct from a frustum.
-    Polyhedron(const Frustum& frustum)
+    explicit Polyhedron(const Frustum& frustum)
     {
         Define(frustum);
     }
-
-    /// Destruct.
-    ~Polyhedron();
 
     /// Assign from another polyhedron.
     Polyhedron& operator =(const Polyhedron& rhs)
@@ -91,7 +88,7 @@ public:
     /// Clip with a bounding box.
     void Clip(const BoundingBox& box);
     /// Clip with a frustum.
-    void Clip(const Frustum& box);
+    void Clip(const Frustum& frustum);
     /// Clear all faces.
     void Clear();
     /// Transform with a 3x3 matrix.

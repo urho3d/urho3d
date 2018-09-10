@@ -45,6 +45,14 @@ class Network
     
     bool CheckRemoteEvent(StringHash eventType) const;
     const String GetPackageCacheDir() const;
+
+    void StartNATClient();
+    const String& GetGUID() const;
+    void DiscoverHosts(unsigned port);
+    void SetPassword(const String& password);
+    void SetDiscoveryBeacon(const VariantMap& data);
+    void SetNATServerInfo(const String& address, unsigned short port);
+    void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     
     tolua_property__get_set int updateFps;
     tolua_property__get_set int simulatedLatency;

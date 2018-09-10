@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +39,9 @@ class URHO3D_API RenderSurface : public RefCounted
 
 public:
     /// Construct with parent texture.
-    RenderSurface(Texture* parentTexture);
+    explicit RenderSurface(Texture* parentTexture);
     /// Destruct.
-    virtual ~RenderSurface() override;
+    ~RenderSurface() override;
 
     /// Set number of viewports.
     void SetNumViewports(unsigned num);
@@ -64,10 +64,10 @@ public:
 
     /// Return width.
     int GetWidth() const;
-    
+
     /// Return height.
     int GetHeight() const;
-    
+
     /// Return usage.
     TextureUsage GetUsage() const;
 
@@ -94,7 +94,7 @@ public:
 
     /// Return whether manual update queued. Called internally.
     bool IsUpdateQueued() const { return updateQueued_; }
-    
+
     /// Reset update queued flag. Called internally.
     void ResetUpdateQueued();
 
@@ -151,11 +151,11 @@ private:
     /// Linked depth buffer.
     WeakPtr<RenderSurface> linkedDepthStencil_;
     /// Update mode for viewports.
-    RenderSurfaceUpdateMode updateMode_;
+    RenderSurfaceUpdateMode updateMode_{SURFACE_UPDATEVISIBLE};
     /// Update queued flag.
-    bool updateQueued_;
+    bool updateQueued_{};
     /// Multisampled resolve dirty flag.
-    bool resolveDirty_;
+    bool resolveDirty_{};
 };
 
 }

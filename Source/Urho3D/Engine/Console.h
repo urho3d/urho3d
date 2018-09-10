@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,9 +45,9 @@ class URHO3D_API Console : public Object
 
 public:
     /// Construct.
-    Console(Context* context);
+    explicit Console(Context* context);
     /// Destruct.
-    virtual ~Console() override;
+    ~Console() override;
 
     /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);
@@ -163,7 +163,7 @@ private:
     /// Current row being edited.
     String currentRow_;
     /// Maximum displayed rows.
-    unsigned displayedRows_;
+    unsigned displayedRows_{};
     /// Command history maximum rows.
     unsigned historyRows_;
     /// Command history current position.

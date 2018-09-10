@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,7 @@ struct SimpleNavBuildData : public NavBuildData
     /// Constructor.
     SimpleNavBuildData();
     /// Descturctor.
-    virtual ~SimpleNavBuildData() override;
+    ~SimpleNavBuildData() override;
 
     /// Recast contour set.
     rcContourSet* contourSet_;
@@ -102,9 +102,9 @@ struct SimpleNavBuildData : public NavBuildData
 struct DynamicNavBuildData : public NavBuildData
 {
     /// Constructor.
-    DynamicNavBuildData(dtTileCacheAlloc* alloc);
+    explicit DynamicNavBuildData(dtTileCacheAlloc* allocator);
     /// Destructor.
-    virtual ~DynamicNavBuildData() override;
+    ~DynamicNavBuildData() override;
 
     /// TileCache specific recast contour set.
     dtTileCacheContourSet* contourSet_;

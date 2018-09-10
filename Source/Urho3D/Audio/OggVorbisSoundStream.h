@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,15 +35,15 @@ class URHO3D_API OggVorbisSoundStream : public SoundStream
 {
 public:
     /// Construct from an Ogg Vorbis compressed sound.
-    OggVorbisSoundStream(const Sound* sound);
+    explicit OggVorbisSoundStream(const Sound* sound);
     /// Destruct.
-    virtual ~OggVorbisSoundStream() override;
+    ~OggVorbisSoundStream() override;
 
     /// Seek to sample number. Return true on success.
-    virtual bool Seek(unsigned sample_number) override;
+    bool Seek(unsigned sample_number) override;
 
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
-    virtual unsigned GetData(signed char* dest, unsigned numBytes) override;
+    unsigned GetData(signed char* dest, unsigned numBytes) override;
 
 protected:
     /// Decoder state.

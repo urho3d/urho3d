@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,17 +38,17 @@ public:
     /// Construct.
     BufferedSoundStream();
     /// Destruct.
-    virtual ~BufferedSoundStream() override;
+    ~BufferedSoundStream() override;
 
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
-    virtual unsigned GetData(signed char* dest, unsigned numBytes) override;
+    unsigned GetData(signed char* dest, unsigned numBytes) override;
 
     /// Buffer sound data. Makes a copy of it.
     void AddData(void* data, unsigned numBytes);
     /// Buffer sound data by taking ownership of it.
-    void AddData(SharedArrayPtr<signed char> data, unsigned numBytes);
+    void AddData(const SharedArrayPtr<signed char>& data, unsigned numBytes);
     /// Buffer sound data by taking ownership of it.
-    void AddData(SharedArrayPtr<signed short> data, unsigned numBytes);
+    void AddData(const SharedArrayPtr<signed short>& data, unsigned numBytes);
     /// Remove all buffered audio data.
     void Clear();
 

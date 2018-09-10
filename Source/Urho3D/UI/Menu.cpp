@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ void Menu::Update(float timeStep)
         const Vector<SharedPtr<UIElement> >& children = popup_->GetChildren();
         for (unsigned i = 0; i < children.Size(); ++i)
         {
-            Menu* menu = dynamic_cast<Menu*>(children[i].Get());
+            auto* menu = dynamic_cast<Menu*>(children[i].Get());
             if (menu && !menu->autoPopup_ && !menu->IsHovering())
                 menu->autoPopup_ = true;
         }
@@ -92,7 +92,7 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
 {
     Button::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 
-    Menu* sibling = parent_->GetChildStaticCast<Menu>(VAR_SHOW_POPUP, true);
+    auto* sibling = parent_->GetChildStaticCast<Menu>(VAR_SHOW_POPUP, true);
     if (popup_ && !showPopup_)
     {
         // Check if popup is shown by one of the siblings
@@ -107,7 +107,7 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
         if (autoPopup_)
         {
             // Show popup when parent menu has its popup shown
-            Menu* parentMenu = static_cast<Menu*>(parent_->GetVar(VAR_ORIGIN).GetPtr());
+            auto* parentMenu = static_cast<Menu*>(parent_->GetVar(VAR_ORIGIN).GetPtr());
             if (parentMenu && parentMenu->showPopup_)
                 ShowPopup(true);
         }
@@ -124,7 +124,7 @@ void Menu::OnShowPopup()
 {
 }
 
-bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault)
+bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
 {
     // Get style override if defined
     String styleName = source.GetAttribute("style");
@@ -154,7 +154,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
     }
 
     // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source, setInstanceDefault))
+    if (!Serializable::LoadXML(source))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -220,7 +220,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
             if (popupElem)
                 child->SetDefaultStyle(styleFile);
 
-            if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
+            if (!child->LoadXML(childElem, styleFile))
                 return false;
         }
 
@@ -315,7 +315,7 @@ void Menu::ShowPopup(bool enable)
         popup_->GetChildren(children, true);
         for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         {
-            Menu* menu = dynamic_cast<Menu*>(*i);
+            auto* menu = dynamic_cast<Menu*>(*i);
             if (menu)
                 menu->ShowPopup(false);
         }
@@ -390,7 +390,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 
     using namespace FocusChanged;
 
-    UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
+    auto* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
     UIElement* root = GetRoot();
 
     // If another element was focused due to the menu button being clicked, do not hide the popup
@@ -432,7 +432,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         eventData[P_REPEAT].GetBool() == false)
     {
         // Ignore if UI has modal element or focused LineEdit
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         UIElement* focusElement = ui->GetFocusElement();
         if (ui->HasModalElement() || (focusElement && focusElement->GetType() == LineEdit::GetTypeStatic()))
             return;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -685,7 +685,7 @@ SDL_CalculateBlendLineFunc(const SDL_PixelFormat * fmt)
         } else {
             return SDL_BlendLine_RGB2;
         }
-        break;
+        /* break; -Wunreachable-code-break */
     case 4:
         if (fmt->Rmask == 0x00FF0000) {
             if (fmt->Amask) {

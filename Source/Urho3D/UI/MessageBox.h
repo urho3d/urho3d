@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,10 @@ class URHO3D_API MessageBox : public Object
 
 public:
     /// Construct. If layout file is not given, use the default message box layout. If style file is not given, use the default style file from root UI element.
-    MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY,
+    explicit MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY,
         XMLFile* layoutFile = nullptr, XMLFile* styleFile = nullptr);
     /// Destruct.
-    virtual ~MessageBox() override;
+    ~MessageBox() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

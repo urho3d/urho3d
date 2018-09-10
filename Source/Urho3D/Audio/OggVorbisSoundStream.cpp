@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ OggVorbisSoundStream::~OggVorbisSoundStream()
     // Close decoder
     if (decoder_)
     {
-        stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+        auto* vorbis = static_cast<stb_vorbis*>(decoder_);
 
         stb_vorbis_close(vorbis);
         decoder_ = nullptr;
@@ -63,9 +63,9 @@ bool OggVorbisSoundStream::Seek(unsigned sample_number)
 {
     if (!decoder_)
         return false;
-    
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
-    
+
+    auto* vorbis = static_cast<stb_vorbis*>(decoder_);
+
     return stb_vorbis_seek(vorbis, sample_number) == 1;
 }
 
@@ -74,11 +74,11 @@ unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)
     if (!decoder_)
         return 0;
 
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+    auto* vorbis = static_cast<stb_vorbis*>(decoder_);
 
     unsigned channels = stereo_ ? 2 : 1;
-    unsigned outSamples = (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)dest, numBytes >> 1);
-    unsigned outBytes = (outSamples * channels) << 1;
+    auto outSamples = (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)dest, numBytes >> 1u);
+    unsigned outBytes = (outSamples * channels) << 1u;
 
     // Rewind and retry if is looping and produced less output than should have
     if (outBytes < numBytes && !stopAtEnd_)
@@ -86,8 +86,8 @@ unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)
         numBytes -= outBytes;
         stb_vorbis_seek_start(vorbis);
         outSamples =
-            (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)(dest + outBytes), numBytes >> 1);
-        outBytes += (outSamples * channels) << 1;
+            (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)(dest + outBytes), numBytes >> 1u);
+        outBytes += (outSamples * channels) << 1u;
     }
 
     return outBytes;

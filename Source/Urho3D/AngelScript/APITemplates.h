@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ class Camera;
 template <class T, class U> U* RefCast(T* t)
 {
     if (!t)
-        return 0;
+        return nullptr;
 
     return dynamic_cast<U*>(t);
 }
@@ -380,14 +380,14 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
 
 template <class T> T* ConstructObject()
 {
-    T* object = new T(GetScriptContext());
+    auto* object = new T(GetScriptContext());
     object->AddRef();
     return object;
 }
 
 template <class T> T* ConstructNamedObject(const String& name)
 {
-    T* object = new T(GetScriptContext());
+    auto* object = new T(GetScriptContext());
     object->AddRef();
     object->SetName(name);
     return object;
@@ -407,9 +407,9 @@ template <class T> void RegisterNamedObjectConstructor(asIScriptEngine* engine, 
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.CString(), asFUNCTION(ConstructNamedObject<T>), asCALL_CDECL);
 }
 
-static const AttributeInfo noAttributeInfo;
+static const AttributeInfo noAttributeInfo{};
 
-// To keep Xcode LLVM/Clang happy - it erroneosly warns on unused functions defined below which are actually being referenced in the code
+// To keep Xcode LLVM/Clang happy - it erroneously warns on unused functions defined below which are actually being referenced in the code
 #if __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
@@ -427,14 +427,14 @@ static const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Seriali
         return attributes->At(index);
 }
 
-static bool SerializableLoad(File* file, bool setInstanceDefault, Serializable* ptr)
+static bool SerializableLoad(File* file, Serializable* ptr)
 {
-    return file && ptr->Load(*file, setInstanceDefault);
+    return file && ptr->Load(*file);
 }
 
-static bool SerializableLoadVectorBuffer(VectorBuffer& buffer, bool setInstanceDefault, Serializable* ptr)
+static bool SerializableLoadVectorBuffer(VectorBuffer& buffer, Serializable* ptr)
 {
-    return ptr->Load(buffer, setInstanceDefault);
+    return ptr->Load(buffer);
 }
 
 static bool SerializableSave(File* file, Serializable* ptr)
@@ -451,13 +451,13 @@ static bool SerializableSaveVectorBuffer(VectorBuffer& buffer, Serializable* ptr
 template <class T> void RegisterSerializable(asIScriptEngine* engine, const char* className)
 {
     RegisterObject<T>(engine, className);
-    engine->RegisterObjectMethod(className, "bool Load(File@+, bool setInstanceDefault = false)", asFUNCTION(SerializableLoad), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&, bool setInstanceDefault = false)", asFUNCTION(SerializableLoadVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Load(File@+)", asFUNCTION(SerializableLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&)", asFUNCTION(SerializableLoadVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(SerializableSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(SerializableSaveVectorBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&, bool setInstanceDefault = false)", asMETHODPR(T, LoadXML, (const XMLElement&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&)", asMETHODPR(T, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", asMETHODPR(T, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&, bool setInstanceDefault = false)", asMETHODPR(T, LoadJSON, (const JSONValue&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&)", asMETHODPR(T, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveJSON(JSONValue&) const", asMETHODPR(T, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ApplyAttributes()", asMETHODPR(T, ApplyAttributes, (), void), asCALL_THISCALL);
@@ -504,6 +504,7 @@ template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* 
 /// Template function for registering a class derived from Component.
 template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className, bool nodeRegistered = true, bool debugRendererRegistered = true)
 {
+    // Note: cannot use asMETHOD() here to keep VS happy
     RegisterAnimatable<T>(engine, className);
     RegisterSubclass<Component, T>(engine, "Component", className);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHODPR(T, Remove, (), void), asCALL_THISCALL);
@@ -511,6 +512,7 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHODPR(T, IsEnabled, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_enabledEffective() const", asMETHODPR(T, IsEnabledEffective, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHODPR(T, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_replicated()", asMETHODPR(T, IsReplicated, () const, bool), asCALL_THISCALL);
     if (nodeRegistered)
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
     if (debugRendererRegistered)
@@ -653,9 +655,8 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
         const Vector<SharedPtr<Component> >& components = node->GetComponents();
         for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
         {
-            if ((*j)->IsInstanceOf<ScriptInstance>())
+            if (auto* instance = (*j)->Cast<ScriptInstance>())
             {
-                ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
                 if (instance->IsA(className))
                     result.Push(node);
             }
@@ -784,6 +785,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const Matrix3x4& get_worldTransform() const", asMETHOD(T, GetWorldTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_id(uint)", asMETHOD(T, SetID), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHOD(T, GetID), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_replicated()", asMETHOD(T, IsReplicated), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(NodeGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(NodeGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ get_children(uint) const", asFUNCTION(NodeGetChild), asCALL_CDECL_OBJLAST);
@@ -834,7 +836,7 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     RegisterObject<T>(engine, className);
     RegisterSubclass<Resource, T>(engine, "Resource", className);
     // Do not register factory for the base class
-    if (strcmp("Resource", className))
+    if (strcmp("Resource", className) != 0)
     {
         RegisterObjectConstructor<T>(engine, className);
         RegisterNamedObjectConstructor<T>(engine, className);
@@ -986,7 +988,8 @@ template <class T> void RegisterStaticModel(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "Model@+ get_model() const", asMETHOD(T, GetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHODPR(T, SetMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool set_materials(uint, Material@+)", asMETHODPR(T, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Material@+ get_materials(uint) const", asMETHOD(T, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Material@+ get_material() const", asMETHODPR(T, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Material@+ get_materials(uint) const", asMETHODPR(T, GetMaterial, (unsigned) const, Material*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numGeometries() const", asMETHOD(T, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Zone@+ get_zone() const", asMETHOD(T, GetZone), asCALL_THISCALL);
 }
@@ -1112,12 +1115,12 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     RegisterObjectConstructor<T>(engine, className);
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(VectorBuffer&)", asFUNCTIONPR(UIElementLoadXMLVectorBuffer, (VectorBuffer&, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "UIElement@+ LoadChildXML(const XMLElement&in, XMLFile@+ arg1 = null, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ LoadChildXML(XMLFile@+, XMLFile@+ arg1 = null)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "UIElement@+ LoadChildXML(const XMLElement&in, XMLFile@+)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ LoadChildXML(XMLFile@+, XMLFile@+)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+, const String&in indentation = \"\t\")", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(UIElementSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), bool), asCALL_THISCALL);
@@ -1155,6 +1158,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const StringHash&in, const Variant&in value = Variant(), bool recursive = false) const", asMETHODPR(T, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool IsChildOf(UIElement@+) const", asMETHOD(T, IsChildOf), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool recursive = false) const", asFUNCTION(UIElementGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "UIElement@+ GetElementEventSender() const", asMETHOD(T, GetElementEventSender), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Variant& GetVar(const StringHash&in)", asMETHOD(T, GetVar), asCALL_THISCALL);
@@ -1286,6 +1290,16 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "float get_derivedOpacity()", asMETHOD(T, GetDerivedOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(UIElementGetVars), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<String>@ get_tags() const", asFUNCTION(UIElementGetTags), asCALL_CDECL_OBJLAST);
+}
+
+/// Template function for registering a class derived from UISelectable.
+template <class T> void RegisterUISelectable(asIScriptEngine* engine, const char* className)
+{
+    RegisterUIElement<T>(engine, className);
+    engine->RegisterObjectMethod(className, "void set_selectionColor(const Color&in)", asMETHOD(T, SetSelectionColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Color& get_selectionColor() const", asMETHOD(T, GetSelectionColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_hoverColor(const Color&in)", asMETHOD(T, SetHoverColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Color& get_hoverColor() const", asMETHOD(T, GetHoverColor), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from BorderImage.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,7 @@ Geometry::Geometry(Context* context) :
     SetNumVertexBuffers(1);
 }
 
-Geometry::~Geometry()
-{
-}
+Geometry::~Geometry() = default;
 
 bool Geometry::SetNumVertexBuffers(unsigned num)
 {
@@ -119,7 +117,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     return true;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
+bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount,
     bool checkIllegal)
 {
     if (indexBuffer_)
@@ -141,7 +139,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     primitiveType_ = type;
     indexStart_ = indexStart;
     indexCount_ = indexCount;
-    vertexStart_ = minVertex;
+    vertexStart_ = vertexStart;
     vertexCount_ = vertexCount;
 
     return true;
@@ -155,21 +153,21 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, const PODVector<VertexElement>& elements)
+void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
     rawElements_ = elements;
 }
 
-void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned elementMask)
+void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elementMask);
     rawElements_ = VertexBuffer::GetElements(elementMask);
 }
 
-void Geometry::SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize)
+void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize)
 {
     rawIndexData_ = data;
     rawIndexSize_ = indexSize;
@@ -310,12 +308,12 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
     const PODVector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
-    
+
     if (!vertexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
         return M_INFINITY;
 
     unsigned uvOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD);
-    
+
     if (outUV && uvOffset == M_MAX_UNSIGNED)
     {
         // requested UV output, but no texture data in vertex buffer

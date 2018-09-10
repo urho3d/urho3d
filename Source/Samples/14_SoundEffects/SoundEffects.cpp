@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,13 @@
 static const StringHash VAR_SOUNDRESOURCE("SoundResource");
 static const unsigned NUM_SOUNDS = 3;
 
-static String soundNames[] = {
+static const char* soundNames[] = {
     "Fist",
     "Explosion",
     "Power-up"
 };
 
-static String soundResourceNames[] = {
+static const char* soundResourceNames[] = {
     "Sounds/PlayerFistHit.wav",
     "Sounds/BigExplosion.wav",
     "Sounds/Powerup.wav"
@@ -97,8 +97,8 @@ void SoundEffects::Start()
 void SoundEffects::CreateUI()
 {
     UIElement* root = GetSubsystem<UI>()->GetRoot();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     // Set style to the UI root so that elements will inherit it
     root->SetDefaultStyle(uiStyle);
 
@@ -118,7 +118,7 @@ void SoundEffects::CreateUI()
     button = CreateButton(160, 80, 120, 40, "Stop Music");
     SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SoundEffects, HandleStopMusic));
 
-    Audio* audio = GetSubsystem<Audio>();
+    auto* audio = GetSubsystem<Audio>();
 
     // Create sliders for controlling sound and music master volume
     Slider* slider = CreateSlider(20, 140, 200, 20, "Sound Volume");
@@ -133,16 +133,16 @@ void SoundEffects::CreateUI()
 Button* SoundEffects::CreateButton(int x, int y, int xSize, int ySize, const String& text)
 {
     UIElement* root = GetSubsystem<UI>()->GetRoot();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
 
     // Create the button and center the text onto it
-    Button* button = root->CreateChild<Button>();
+    auto* button = root->CreateChild<Button>();
     button->SetStyleAuto();
     button->SetPosition(x, y);
     button->SetSize(xSize, ySize);
 
-    Text* buttonText = button->CreateChild<Text>();
+    auto* buttonText = button->CreateChild<Text>();
     buttonText->SetAlignment(HA_CENTER, VA_CENTER);
     buttonText->SetFont(font, 12);
     buttonText->SetText(text);
@@ -153,16 +153,16 @@ Button* SoundEffects::CreateButton(int x, int y, int xSize, int ySize, const Str
 Slider* SoundEffects::CreateSlider(int x, int y, int xSize, int ySize, const String& text)
 {
     UIElement* root = GetSubsystem<UI>()->GetRoot();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
 
     // Create text and slider below it
-    Text* sliderText = root->CreateChild<Text>();
+    auto* sliderText = root->CreateChild<Text>();
     sliderText->SetPosition(x, y);
     sliderText->SetFont(font, 12);
     sliderText->SetText(text);
 
-    Slider* slider = root->CreateChild<Slider>();
+    auto* slider = root->CreateChild<Slider>();
     slider->SetStyleAuto();
     slider->SetPosition(x, y + 20);
     slider->SetSize(xSize, ySize);
@@ -174,19 +174,19 @@ Slider* SoundEffects::CreateSlider(int x, int y, int xSize, int ySize, const Str
 
 void SoundEffects::HandlePlaySound(StringHash eventType, VariantMap& eventData)
 {
-    Button* button = static_cast<Button*>(GetEventSender());
+    auto* button = static_cast<Button*>(GetEventSender());
     const String& soundResourceName = button->GetVar(VAR_SOUNDRESOURCE).GetString();
 
     // Get the sound resource
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Sound* sound = cache->GetResource<Sound>(soundResourceName);
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* sound = cache->GetResource<Sound>(soundResourceName);
 
     if (sound)
     {
         // Create a SoundSource component for playing the sound. The SoundSource component plays
         // non-positional audio, so its 3D position in the scene does not matter. For positional sounds the
         // SoundSource3D component would be used instead
-        SoundSource* soundSource = scene_->CreateComponent<SoundSource>();
+        auto* soundSource = scene_->CreateComponent<SoundSource>();
         // Component will automatically remove itself when the sound finished playing
         soundSource->SetAutoRemoveMode(REMOVE_COMPONENT);
         soundSource->Play(sound);
@@ -197,8 +197,8 @@ void SoundEffects::HandlePlaySound(StringHash eventType, VariantMap& eventData)
 
 void SoundEffects::HandlePlayMusic(StringHash eventType, VariantMap& eventData)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Sound* music = cache->GetResource<Sound>("Music/Ninja Gods.ogg");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* music = cache->GetResource<Sound>("Music/Ninja Gods.ogg");
     // Set the song to loop
     music->SetLooped(true);
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2018 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,14 +36,14 @@ class URHO3D_API SoundSource3D : public SoundSource
 
 public:
     /// Construct.
-    SoundSource3D(Context* context);
+    explicit SoundSource3D(Context* context);
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Update sound source.
-    virtual void Update(float timeStep) override;
+    void Update(float timeStep) override;
 
     /// Set attenuation parameters.
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
