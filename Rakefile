@@ -353,9 +353,9 @@ task :ci do
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
   # LuaJIT on Web platform is not possible
   jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
-  system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if ENV['OSX'] && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
+  system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
   system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
-  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null" if ENV['OSX'] && ENV['CI']
+  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
