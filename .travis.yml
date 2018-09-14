@@ -509,6 +509,7 @@ data:
     '#4': &shortlisted
       - 01_HelloWorld
       - 02_HelloGUI
+      - 03_Sprites
       - 26_ConsoleInput
       - 29_SoundSynthesis
       - 38_SceneAndUILoad
