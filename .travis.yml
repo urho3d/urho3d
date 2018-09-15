@@ -68,7 +68,7 @@ before_script:
   - if [[ ! -f $HOME/cmake-3.9.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.9.2-Linux-x86_64/bin:$PATH
   - rake ci_setup_cache
-script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ $LINUX ]] && [[ ! "$URHO3D_64BIT" == "0" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
+script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script:
   - rake ci_teardown_cache
   - if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
@@ -442,7 +442,7 @@ before_script:
   - if [[ ! -f $HOME/cmake-3.9.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.9.2-Linux-x86_64/bin:$PATH
   - rake ci_setup_cache
-script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ "$SYSROOT" == "arm64-sysroot" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 matrix:
   fast_finish: true

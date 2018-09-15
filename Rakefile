@@ -332,7 +332,7 @@ task :ci do
   end
   # Unshallow the clone's history when necessary
   if ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
-    system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
+    system 'git fetch --tags --unshallow' or abort 'Failed to unshallow cloned repository'
     puts; $stdout.flush
   end
   # CMake/Emscripten toolchain file does not show this information yet
@@ -373,7 +373,8 @@ task :ci do
     success = false
     if ENV['TRAVIS'] && !ENV['XCODE'] && !already_timeup && !timeup(true, 10)
       # The build cache could be corrupted, so clear the cache and retry one more time
-      system "cd #{ENV['build_tree']}/Source/Urho3D/tolua++-prefix/src/tolua++-build && make clean"
+      system "cd #{ENV['build_tree']}/Source/Urho3D/tolua++-prefix/src/tolua++-build && make clean >/dev/null 2>&1"
+      system "cd #{ENV['build_tree']}/Source/ThirdParty/LuaJIT/buildvm-prefix/src/buildvm-build && make clean >/dev/null 2>&1" if jit != ''
       success = system "ccache -Cz && rake make clean_first #{redirect}"
     end
     unless success
@@ -699,7 +700,7 @@ EOF'" } or abort 'Failed to create release directory remotely'
     File.open('.site_updated', 'w') {}
   end
   # Upload the binary package
-  retry_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } or abort 'Failed to upload binary package'
+  retry_block { wait_for_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } } or abort 'Failed to upload binary package'
   if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
     retry_block { system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten } or abort 'Failed to set binary tarball/zip as default download'
@@ -884,11 +885,7 @@ end
 # Usage: wait_for_block('This is a long function call...') { call_a_func } or abort
 #        wait_for_block('This is a long system call...') { system 'do_something' } or abort
 def wait_for_block comment = '', retries = -1, retry_interval = 60
-  # When not using Xcode, execute the code block in full speed
-  unless ENV['XCODE']
-    puts comment; $stdout.flush
-    return yield
-  end
+  return nil if timeup(true)
 
   # Wait until the code block is completed or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
   thread = Thread.new { rc = yield; Thread.main.wakeup; rc }
