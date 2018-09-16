@@ -778,14 +778,6 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         packetHandled = true;
     }
-    else if (packetID == ID_CONNECTION_LOST) // We've lost connection with the other side
-    {
-        if (isServer)
-        {
-            ClientDisconnected(packet->systemAddress);
-        }
-        packetHandled = true;
-    }
     else if (packetID == ID_CONNECTION_ATTEMPT_FAILED) // We've failed to connect to the server/peer
     {
         if (natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
