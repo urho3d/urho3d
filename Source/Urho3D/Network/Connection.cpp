@@ -288,7 +288,7 @@ void Connection::SendRemoteEvents()
     {
         statsTimer_.Reset();
         char statsBuffer[256];
-        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", peer_->GetAveragePing(*address_),
+        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", GetRoundTripTime(),
             (int)0, //TODO: Packets in per second
             (int)0, //TODO: Packets out per second
             0.0f, //TODO: Bytes in per second

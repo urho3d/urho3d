@@ -68,7 +68,7 @@ before_script:
   - if [[ ! -f $HOME/cmake-3.9.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.9.2-Linux-x86_64/bin:$PATH
   - rake ci_setup_cache
-script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ $LINUX ]] && [[ ! "$URHO3D_64BIT" == "0" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
+script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script:
   - rake ci_teardown_cache
   - if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
@@ -442,7 +442,7 @@ before_script:
   - if [[ ! -f $HOME/cmake-3.9.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.9.2-Linux-x86_64/bin:$PATH
   - rake ci_setup_cache
-script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ "$SYSROOT" == "arm64-sysroot" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 matrix:
   fast_finish: true
@@ -459,6 +459,7 @@ cache:
   directories:
     - $HOME/cmake-3.9.2-Linux-x86_64/bin
     - $HOME/cmake-3.9.2-Linux-x86_64/share
+    - $HOME/initial-build-tree
 dist: trusty
 sudo: false
 addons: {apt: {packages: [doxygen, graphviz]}}
@@ -489,7 +490,7 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - if [[ "$URHO3D_LIB_TYPE" != "MODULE" ]] && (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export URHO3D_SAMPLES=0; fi; touch $HOT
+  - if [[ "$URHO3D_LIB_TYPE" != "MODULE" ]] && (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
   - if [[ ! $EMSCRIPTEN_WASM ]]; then export BINARYEN=binaryen-master-64bit; fi
   - git clone --depth 1 --branch $BRANCH https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-${BRANCH}-64bit $BINARYEN && source emscripten-sdk/emsdk_env.sh
   - for compiler in $EMSCRIPTEN/{emcc,em++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
@@ -501,6 +502,18 @@ after_script: rake ci_teardown_cache
 matrix:
   fast_finish: true
   include: [stage: housekeep]
+
+# Below samples are excluded from build due to build time constraint
+data:
+  excluded_sample:
+    '#4': &shortlisted
+      - 01_HelloWorld
+      - 02_HelloGUI
+      - 03_Sprites
+      - 26_ConsoleInput
+      - 29_SoundSynthesis
+      - 38_SceneAndUILoad
+    '#5': *shortlisted
 
 ---
 
