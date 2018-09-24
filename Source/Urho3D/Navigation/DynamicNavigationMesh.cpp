@@ -191,7 +191,7 @@ struct LinearAllocator : public dtTileCacheAlloc
         top = 0;
     }
 
-    void* alloc(const int size) override
+    void* alloc(const size_t size) override
     {
         if (!buffer)
             return nullptr;
