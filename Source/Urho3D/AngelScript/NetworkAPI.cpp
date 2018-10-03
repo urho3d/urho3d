@@ -74,7 +74,7 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_roundTripTime() const", asMETHOD(Connection, GetRoundTripTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "float get_lastHeardTime() const", asMETHOD(Connection, GetLastHeardTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "float get_lastHeardTime()", asMETHOD(Connection, GetLastHeardTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_bytesInPerSec() const", asMETHOD(Connection, GetBytesInPerSec), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_bytesOutPerSec() const", asMETHOD(Connection, GetBytesOutPerSec), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_packetsInPerSec() const", asMETHOD(Connection, GetPacketsInPerSec), asCALL_THISCALL);

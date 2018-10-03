@@ -200,8 +200,8 @@ public:
     /// Return the connection's round trip time in milliseconds.
     float GetRoundTripTime() const;
 
-    /// Return the time since last received data from the remote host in miliseconds.
-    unsigned GetLastHeardTime() const;
+    /// Return the time since last received data from the remote host in milliseconds.
+    unsigned GetLastHeardTime();
 
     /// Return bytes received per second.
     float GetBytesInPerSec() const;
