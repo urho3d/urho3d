@@ -1023,9 +1023,9 @@ float Connection::GetRoundTripTime() const
     return 0.0f;
 }
 
-unsigned Connection::GetLastHeardTime()
+unsigned Connection::GetLastHeardTime() const
 {
-    return lastHeardTimer_.GetMSec(false);
+    return const_cast<Timer&>(lastHeardTimer_).GetMSec(false);
 }
 
 float Connection::GetBytesInPerSec() const

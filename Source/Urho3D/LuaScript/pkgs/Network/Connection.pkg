@@ -43,7 +43,7 @@ class Connection : public Object
     String GetAddress() const;
     unsigned short GetPort() const;
     float GetRoundTripTime() const;
-    unsigned GetLastHeardTime();
+    unsigned GetLastHeardTime() const;
     float GetBytesInPerSec() const;
     float GetBytesOutPerSec() const;
     int GetPacketsInPerSec() const;
