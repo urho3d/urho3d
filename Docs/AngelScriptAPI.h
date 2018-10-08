@@ -2454,14 +2454,14 @@ String downloadName;
 float downloadProgress;
 VariantMap identity;
 /* readonly */
-float lastHeardTime;
+uint lastHeardTime;
 bool logStatistics;
 /* readonly */
 uint numDownloads;
 /* readonly */
-float packetsInPerSec;
+int packetsInPerSec;
 /* readonly */
-float packetsOutPerSec;
+int packetsOutPerSec;
 /* readonly */
 uint16 port;
 Vector3 position;

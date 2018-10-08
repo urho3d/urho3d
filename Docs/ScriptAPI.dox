@@ -5067,11 +5067,11 @@ Properties:
 - String downloadName // readonly
 - float downloadProgress // readonly
 - VariantMap identity
-- float lastHeardTime // readonly
+- uint lastHeardTime // readonly
 - bool logStatistics
 - uint numDownloads // readonly
-- float packetsInPerSec // readonly
-- float packetsOutPerSec // readonly
+- int packetsInPerSec // readonly
+- int packetsOutPerSec // readonly
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
