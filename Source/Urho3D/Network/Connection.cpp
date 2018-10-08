@@ -118,8 +118,10 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     buffer.WriteUByte((unsigned char)msgID);
     buffer.Write(data, numBytes);
     PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
-    if (peer_)
-        peer_->Send((const char*)buffer.GetData(), (int)buffer.GetSize(), HIGH_PRIORITY, reliability, (char)0, *address_, false);
+    if (peer_) {
+        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0, *address_, false);
+        tempPacketCounter_.y_++;
+    }
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -288,14 +290,22 @@ void Connection::SendRemoteEvents()
     {
         statsTimer_.Reset();
         char statsBuffer[256];
-        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", GetRoundTripTime(),
-            (int)0, //TODO: Packets in per second
-            (int)0, //TODO: Packets out per second
-            0.0f, //TODO: Bytes in per second
-            0.0f); // TODO: Bytes out per second
+        sprintf(statsBuffer, "RTT %.3f ms Pkt in %i Pkt out %i Data in %.3f KB/s Data out %.3f KB/s, Last heard %u", GetRoundTripTime(),
+            GetPacketsInPerSec(),
+            GetPacketsOutPerSec(),
+            GetBytesInPerSec(),
+            GetBytesOutPerSec(),
+            GetLastHeardTime());
         URHO3D_LOGINFO(statsBuffer);
     }
 #endif
+
+    if (packetCounterTimer_.GetMSec(false) > 1000)
+    {
+        packetCounterTimer_.Reset();
+        packetCounter_ = tempPacketCounter_;
+        tempPacketCounter_ = IntVector2::ZERO;
+    }
 
     if (remoteEvents_.Empty())
         return;
@@ -389,6 +399,9 @@ void Connection::ProcessPendingLatestData()
 
 bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
 {
+    // New incomming message, reset last heard timer
+    lastHeardTimer_.Reset();
+    tempPacketCounter_.x_++;
     bool processed = true;
 
     switch (msgID)
@@ -1010,10 +1023,9 @@ float Connection::GetRoundTripTime() const
     return 0.0f;
 }
 
-float Connection::GetLastHeardTime() const
+unsigned Connection::GetLastHeardTime() const
 {
-    //TODO
-    return 0.0f;
+    return const_cast<Timer&>(lastHeardTimer_).GetMSec(false);
 }
 
 float Connection::GetBytesInPerSec() const
@@ -1038,16 +1050,14 @@ float Connection::GetBytesOutPerSec() const
     return 0.0f;
 }
 
-float Connection::GetPacketsInPerSec() const
+int Connection::GetPacketsInPerSec() const
 {
-    //TODO
-    return 0.0f;
+    return packetCounter_.x_;
 }
 
-float Connection::GetPacketsOutPerSec() const
+int Connection::GetPacketsOutPerSec() const
 {
-    //TODO
-    return 0.0f;
+    return packetCounter_.y_;
 }
 
 String Connection::ToString() const

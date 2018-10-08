@@ -201,7 +201,7 @@ public:
     float GetRoundTripTime() const;
 
     /// Return the time since last received data from the remote host in milliseconds.
-    float GetLastHeardTime() const;
+    unsigned GetLastHeardTime() const;
 
     /// Return bytes received per second.
     float GetBytesInPerSec() const;
@@ -210,10 +210,10 @@ public:
     float GetBytesOutPerSec() const;
 
     /// Return packets received per second.
-    float GetPacketsInPerSec() const;
+    int GetPacketsInPerSec() const;
 
     /// Return packets sent per second.
-    float GetPacketsOutPerSec() const;
+    int GetPacketsOutPerSec() const;
 
     /// Return an address:port string.
     String ToString() const;
@@ -318,6 +318,14 @@ private:
     SLNet::AddressOrGUID* address_;
     /// Raknet peer object.
     SLNet::RakPeerInterface* peer_;
+    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out
+    IntVector2 tempPacketCounter_;
+    /// Packet count in the last second, x - packets in, y - packets out
+    IntVector2 packetCounter_;
+    /// Packet count timer which resets every 1s
+    Timer packetCounterTimer_;
+    /// Last heard timer, resets when new packet is incoming
+    Timer lastHeardTimer_;
 };
 
 }
