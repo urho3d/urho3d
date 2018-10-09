@@ -532,7 +532,8 @@ task :ci_site_update do
     puts "Updating source tree...\n\n"
     # Supply GIT credentials to push source tree changes to urho3d/Urho3D.git
     system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
-    system "git add Source && git commit -qm 'Travis CI: source tree update at #{Time.now.utc}.' >/dev/null 2>&1"   # Use extra quiet mode as there could be no changes at all
+    system %Q(grep -Pzo '(?s)\|Build Option.*?(?=\n\n)' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >.env-file)
+    system "git add .build-options Source && git commit -qm 'Travis CI: source tree update at #{Time.now.utc}.' >/dev/null 2>&1"   # Use extra quiet mode as there could be no changes at all
     if /2008-([0-9]{4}) the Urho3D project/.match(File.read('Rakefile'))[1].to_i != Time.now.year
       # Automatically bump copyright when crossing a new year and give instruction to clear the cache if so since the cache is of no use anyway because of massive changes
       system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[cache clear]'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
