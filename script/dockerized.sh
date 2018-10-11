@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh native|mingw|android|rpi|arm"; exit 1; fi
+if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh native|mingw|android|rpi|arm|web [command [params]]"; exit 1; fi
 
 PROJECT_DIR=$(cd ${0%/*}/..; pwd)
 PLATFORM=$1; shift
