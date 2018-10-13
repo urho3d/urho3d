@@ -24,14 +24,16 @@
 if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh native|mingw|android|rpi|arm|web [command [params]]"; exit 1; fi
 
 PROJECT_DIR=$(cd ${0%/*}/..; pwd)
-PLATFORM=$1; shift
+
+BuildEnvironment=-$1; shift
+BuildEnvironment=${BuildEnvironment/-base}
 
 docker run -it --rm -h fishtank \
     -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) \
     --env-file $PROJECT_DIR/.env-file \
     --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
     --mount source=ccache_dir,target=/ccache_dir \
-    --name dockerized-$PLATFORM \
-    urho3d/dockerized-$PLATFORM $@
+    --name dockerized$BuildEnvironment \
+    urho3d/dockerized$BuildEnvironment $@
 
 # vi: set ts=4 sw=4 expandtab:
