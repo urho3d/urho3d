@@ -33,6 +33,7 @@ docker run -it --rm -h fishtank \
     --env-file $PROJECT_DIR/.env-file \
     --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
     --mount source=ccache_dir,target=/ccache_dir \
+    --mount source=home_dir,target=/home/urho3d \
     --name dockerized$BuildEnvironment \
     urho3d/dockerized$BuildEnvironment $@
 
