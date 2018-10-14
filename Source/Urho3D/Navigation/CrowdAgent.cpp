@@ -658,7 +658,7 @@ void CrowdAgent::HandleNavigationTileAdded(StringHash eventType, VariantMap& eve
 
     const IntVector2 tile = eventData[NavigationTileRemoved::P_TILE].GetIntVector2();
     const IntVector2 agentTile = mesh->GetTileIndex(node_->GetWorldPosition());
-    const BoundingBox boundingBox = mesh->GetTileBoudningBox(agentTile);
+    const BoundingBox boundingBox = mesh->GetTileBoundingBox(agentTile);
     if (tile == agentTile && IsInCrowd())
     {
         RemoveAgentFromCrowd();

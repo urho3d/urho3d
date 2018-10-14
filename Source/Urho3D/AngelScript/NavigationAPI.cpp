@@ -125,7 +125,7 @@ template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(name, "void RemoveTile(const IntVector2&)", asMETHOD(T, RemoveTile), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void RemoveAllTiles()", asMETHOD(T, RemoveAllTiles), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool HasTile(const IntVector2&) const", asMETHOD(T, HasTile), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "BoundingBox GetTileBoudningBox(const IntVector2&) const", asMETHOD(T, GetTileBoudningBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "BoundingBox GetTileBoundingBox(const IntVector2&) const", asMETHOD(T, GetTileBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "IntVector2 GetTileIndex(const Vector3&) const", asMETHOD(T, GetTileIndex), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "float GetAreaCost(uint) const", asMETHOD(T, GetAreaCost), asCALL_THISCALL);

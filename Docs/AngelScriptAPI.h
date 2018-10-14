@@ -4971,7 +4971,7 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
-BoundingBox GetTileBoudningBox(const IntVector2&) const;
+BoundingBox GetTileBoundingBox(const IntVector2&) const;
 VectorBuffer GetTileData(const IntVector2&) const;
 IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -7689,7 +7689,7 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
-BoundingBox GetTileBoudningBox(const IntVector2&) const;
+BoundingBox GetTileBoundingBox(const IntVector2&) const;
 VectorBuffer GetTileData(const IntVector2&) const;
 IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
