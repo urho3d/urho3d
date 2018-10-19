@@ -38,8 +38,15 @@ if [[ $(docker version -f {{.Client.Version}}) =~ ^([0-9]+)\.0*([0-9]+)\. ]] && 
         --name dockerized$BuildEnvironment \
         urho3d/dockerized$BuildEnvironment $@
 else
-    echo "Error: Docker CLI version is too old, minimum required version is 18.09.x"
-    exit 2;
+    # Fallback workaround on older Docker CLI version
+    docker run -it --rm -h fishtank \
+        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) \
+        --env-file <(perl -ne 'chomp; print "$_=$ENV{$_}\n" if defined $ENV{$_}' $PROJECT_DIR/.env-file) \
+        --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
+        --mount source=ccache_dir,target=/ccache_dir \
+        --mount source=home_dir,target=/home/urho3d \
+        --name dockerized$BuildEnvironment \
+        urho3d/dockerized$BuildEnvironment $@
 fi
 
 # vi: set ts=4 sw=4 expandtab:
