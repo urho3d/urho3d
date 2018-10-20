@@ -33,8 +33,7 @@ if [[ $(docker version -f {{.Client.Version}}) =~ ^([0-9]+)\.0*([0-9]+)\. ]] && 
         -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) \
         --env-file $PROJECT_DIR/.env-file \
         --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
-        --mount source=ccache_dir,target=/ccache_dir \
-        --mount source=home_dir,target=/home/urho3d \
+        --mount source=urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
         urho3d/dockerized$BuildEnvironment $@
 else
@@ -43,8 +42,7 @@ else
         -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) \
         --env-file <(perl -ne 'chomp; print "$_=$ENV{$_}\n" if defined $ENV{$_}' $PROJECT_DIR/.env-file) \
         --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
-        --mount source=ccache_dir,target=/ccache_dir \
-        --mount source=home_dir,target=/home/urho3d \
+        --mount source=urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
         urho3d/dockerized$BuildEnvironment $@
 fi
