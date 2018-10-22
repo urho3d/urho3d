@@ -54,10 +54,12 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AN
     endif ()
     # Library location relative to the executable in the build tree
     set (CMAKE_INSTALL_RPATH ${ORIGIN}/../lib)
+    # Library location relative to the executable in the tool directory in the build tree
+    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib)                               # The tools are installed one directory further down from normal executable
     # Library location relative to the executable in the install destination
     list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../lib${LIB_SUFFIX}/${PATH_SUFFIX})      # The library location is based on SDK install destination
-    # Library location relative to the executable in the tool directory
-    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib${LIB_SUFFIX}/${PATH_SUFFIX})   # The tools are installed one directory further down from normal executable
+    # Library location relative to the executable in the tool directory in the install destination
+    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib${LIB_SUFFIX}/${PATH_SUFFIX})
     # The last entry to the install destination of the library, if the destination location is not in the system default search path, e.g. /usr/local/lib
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
     if (isSystemDir STREQUAL -1)
