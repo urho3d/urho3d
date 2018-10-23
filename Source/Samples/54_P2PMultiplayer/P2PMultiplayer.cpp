@@ -24,7 +24,10 @@
 #include <Urho3D/Audio/Sound.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/IOEvents.h>
 #include <Urho3D/IO/Log.h>
@@ -32,6 +35,10 @@
 #include <Urho3D/IO/VectorBuffer.h>
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
@@ -69,6 +76,10 @@ void P2PMultiplayer::Start()
     // Create the user interface
     CreateUI();
 
+    CreateScene();
+
+    SetupViewport();
+
     // Subscribe to UI and network events
     SubscribeToEvents();
 
@@ -89,10 +100,13 @@ void P2PMultiplayer::CreateUI()
     // Set style to the UI root so that elements will inherit it
     root->SetDefaultStyle(uiStyle);
 //
-//    int marginTop = 20;
+    int marginTop = 20;
 //    CreateLabel("1. Start server", IntVector2(20, marginTop-20));
-//    startServer_ = CreateButton("Start server", 160, IntVector2(20, marginTop));
-//    stopServer_ = CreateButton("Stop server", 160, IntVector2(20, marginTop));
+    startSession_ = CreateButton("Start session", 160, IntVector2(20, marginTop));
+    marginTop += 40;
+    guid_ = CreateLineEdit("1234", 200, IntVector2(20, marginTop));
+    marginTop += 40;
+    joinSession_ = CreateButton("Join session", 160, IntVector2(20, marginTop));
 //	stopServer_->SetVisible(false);
 //
 //    // Create client connection related fields
@@ -105,7 +119,7 @@ void P2PMultiplayer::CreateUI()
 //	serverList_ = CreateLabel("", IntVector2(20, marginTop));
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
-    GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
+    //GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
 }
 
 void P2PMultiplayer::SubscribeToEvents()
@@ -113,55 +127,85 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(E_SERVERCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleServerConnected));
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(P2PMultiplayer, HandleUpdate));
 //
-//    SubscribeToEvent(startServer_, "Released", URHO3D_HANDLER(LANDiscovery, HandleStartServer));
-//    SubscribeToEvent(stopServer_, "Released", URHO3D_HANDLER(LANDiscovery, HandleStopServer));
+    SubscribeToEvent(startSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleStartP2PSession));
+    SubscribeToEvent(joinSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleJoinP2PSession));
+
+    SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
+    SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
 //    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
 }
 
 void P2PMultiplayer::HandleServerConnected(StringHash eventType, VariantMap& eventData)
 {
-    URHO3D_LOGINFO("Start P2P Session");
-    GetSubsystem<Network>()->StartP2PSession();
+    URHO3D_LOGINFO("HandleServerConnected");
+}
 
+void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
+{
+    URHO3D_LOGINFO("HandleStartP2PSession");
+    GetSubsystem<Network>()->StartP2PSession(scene_);
+}
+
+void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
+{
+    URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
+    GetSubsystem<Network>()->JoinP2PSession(guid_->GetText(), scene_);
 }
 
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (timer_.GetMSec(false) > 2000) {
+    static int i = 0;
+    if (timer_.GetMSec(false) > 10000) {
+        i++;
         timer_.Reset();
-        URHO3D_LOGINFO("-----");
+        URHO3D_LOGINFO(" ");
+        URHO3D_LOGINFO(" " + String(i));
         URHO3D_LOGINFO("Participats: " + String(GetSubsystem<Network>()->GetP2PParticipantCount()));
         URHO3D_LOGINFO("P2PIsConnectedHost: " + String(GetSubsystem<Network>()->P2PIsConnectedHost()));
         URHO3D_LOGINFO("P2PIsHostSystem: " + String(GetSubsystem<Network>()->P2PIsHostSystem()));
         URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
+        URHO3D_LOGINFO("");
     }
 }
 
 void P2PMultiplayer::Init()
 {
 //    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
+    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->Connect("frameskippers.com", 61111, nullptr);
 }
 
 //
-//Button* LANDiscovery::CreateButton(const String& text, int width, IntVector2 position)
-//{
-//    auto* cache = GetSubsystem<ResourceCache>();
-//    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
-//
-//    auto* button = GetSubsystem<UI>()->GetRoot()->CreateChild<Button>();
-//    button->SetStyleAuto();
-//    button->SetFixedWidth(width);
-//    button->SetFixedHeight(30);
-//    button->SetPosition(position);
-//
-//    auto* buttonText = button->CreateChild<Text>();
-//    buttonText->SetFont(font, 12);
-//    buttonText->SetAlignment(HA_CENTER, VA_CENTER);
-//    buttonText->SetText(text);
-//
-//    return button;
-//}
+Button* P2PMultiplayer::CreateButton(const String& text, int width, IntVector2 position)
+{
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+
+    auto* button = GetSubsystem<UI>()->GetRoot()->CreateChild<Button>();
+    button->SetStyleAuto();
+    button->SetFixedWidth(width);
+    button->SetFixedHeight(30);
+    button->SetPosition(position);
+
+    auto* buttonText = button->CreateChild<Text>();
+    buttonText->SetFont(font, 12);
+    buttonText->SetAlignment(HA_CENTER, VA_CENTER);
+    buttonText->SetText(text);
+
+    return button;
+}
+
+LineEdit* P2PMultiplayer::CreateLineEdit(const String& placeholder, int width, IntVector2 pos)
+{
+    auto* textEdit = GetSubsystem<UI>()->GetRoot()->CreateChild<LineEdit>("");
+    textEdit->SetStyleAuto();
+    textEdit->SetFixedWidth(width);
+    textEdit->SetFixedHeight(30);
+    textEdit->SetText(placeholder);
+    textEdit->SetPosition(pos);
+    return textEdit;
+}
+
 //
 //Text* LANDiscovery::CreateLabel(const String& text, IntVector2 pos)
 //{
@@ -212,3 +256,133 @@ void P2PMultiplayer::Init()
 //	GetSubsystem<Network>()->DiscoverHosts(SERVER_PORT);
 //	serverList_->SetText("");
 //}
+
+void P2PMultiplayer::CreateScene()
+{
+    scene_ = new Scene(context_);
+
+    auto* cache = GetSubsystem<ResourceCache>();
+
+    // Create octree and physics world with default settings. Create them as local so that they are not needlessly replicated
+    // when a client connects
+    scene_->CreateComponent<Octree>(LOCAL);
+    scene_->CreateComponent<PhysicsWorld>(LOCAL);
+
+    // All static scene content and the camera are also created as local, so that they are unaffected by scene replication and are
+    // not removed from the client upon connection. Create a Zone component first for ambient lighting & fog control.
+    Node* zoneNode = scene_->CreateChild("Zone", LOCAL);
+    auto* zone = zoneNode->CreateComponent<Zone>();
+    zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
+    zone->SetAmbientColor(Color(0.1f, 0.1f, 0.1f));
+    zone->SetFogStart(100.0f);
+    zone->SetFogEnd(300.0f);
+
+    // Create a directional light without shadows
+    Node* lightNode = scene_->CreateChild("DirectionalLight", LOCAL);
+    lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
+    auto* light = lightNode->CreateComponent<Light>();
+    light->SetLightType(LIGHT_DIRECTIONAL);
+    light->SetColor(Color(0.2f, 0.2f, 0.2f));
+    light->SetSpecularIntensity(1.0f);
+
+    // Create a "floor" consisting of several tiles. Make the tiles physical but leave small cracks between them
+    for (int y = -20; y <= 20; ++y)
+    {
+        for (int x = -20; x <= 20; ++x)
+        {
+            Node* floorNode = scene_->CreateChild("FloorTile", LOCAL);
+            floorNode->SetPosition(Vector3(x * 20.2f, -0.5f, y * 20.2f));
+            floorNode->SetScale(Vector3(20.0f, 1.0f, 20.0f));
+            auto* floorObject = floorNode->CreateComponent<StaticModel>();
+            floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+            floorObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+
+            auto* body = floorNode->CreateComponent<RigidBody>();
+            body->SetFriction(1.0f);
+            auto* shape = floorNode->CreateComponent<CollisionShape>();
+            shape->SetBox(Vector3::ONE);
+        }
+    }
+
+    // Create the camera. Limit far clip distance to match the fog
+    // The camera needs to be created into a local node so that each client can retain its own camera, that is unaffected by
+    // network messages. Furthermore, because the client removes all replicated scene nodes when connecting to a server scene,
+    // the screen would become blank if the camera node was replicated (as only the locally created camera is assigned to a
+    // viewport in SetupViewports() below)
+    cameraNode_ = scene_->CreateChild("Camera", LOCAL);
+    auto* camera = cameraNode_->CreateComponent<Camera>();
+    camera->SetFarClip(300.0f);
+
+    // Set an initial position for the camera scene node above the plane
+    cameraNode_->SetPosition(Vector3(-10.0f, 10.0f, 10.0f));
+    cameraNode_->LookAt(Vector3(0, 0, 0));
+}
+
+void P2PMultiplayer::SetupViewport()
+{
+    auto* renderer = GetSubsystem<Renderer>();
+
+    // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
+    SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
+    renderer->SetViewport(0, viewport);
+}
+
+
+
+void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientConnected;
+
+    // When a client connects, assign to scene to begin scene replication
+    auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    newConnection->SetScene(scene_);
+
+    // Then create a controllable object for that client
+//    Node* newObject = CreateControllableObject();
+//    serverObjects_[newConnection] = newObject;
+
+    // Finally send the object's node ID using a remote event
+//    VariantMap remoteEventData;
+//    remoteEventData[P_ID] = newObject->GetID();
+//    newConnection->SendRemoteEvent(E_CLIENTOBJECTID, true, remoteEventData);
+    auto* cache = GetSubsystem<ResourceCache>();
+
+    // Create the scene node & visual representation. This will be a replicated object
+    Node* ballNode = scene_->CreateChild(newConnection->GetAddress());
+    ballNode->SetPosition(Vector3(0, 10, 0));
+    ballNode->SetScale(0.5f);
+    auto* ballObject = ballNode->CreateComponent<StaticModel>();
+    ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
+    ballObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
+
+    // Create the physics components
+    auto* body = ballNode->CreateComponent<RigidBody>();
+    body->SetMass(1.0f);
+    body->SetFriction(1.0f);
+    // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
+    body->SetLinearDamping(0.5f);
+    body->SetAngularDamping(0.5f);
+    auto* shape = ballNode->CreateComponent<CollisionShape>();
+    shape->SetSphere(1.0f);
+
+    // Create a random colored point light at the ball so that can see better where is going
+    auto* light = ballNode->CreateComponent<Light>();
+    light->SetRange(3.0f);
+    light->SetColor(
+            Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
+}
+
+void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientConnected;
+//
+//    // When a client disconnects, remove the controlled object
+    auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    Node* node = scene_->GetChild(connection->GetAddress());
+    node->Remove();
+//    Node* object = serverObjects_[connection];
+//    if (object)
+//        object->Remove();
+//
+//    serverObjects_.Erase(connection);
+}

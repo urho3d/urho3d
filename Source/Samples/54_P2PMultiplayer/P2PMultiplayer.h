@@ -73,8 +73,19 @@ private:
     //
     void Init();
 
+    void CreateScene();
+
+    /// Set up viewport.
+    void SetupViewport();
+
+    /// Handle a client connecting to the server.
+    void HandleClientConnected(StringHash eventType, VariantMap& eventData);
+    /// Handle a client disconnecting from the server.
+    void HandleClientDisconnected(StringHash eventType, VariantMap& eventData);
+
     /// Create a button to the button container.
-//    Button* CreateButton(const String& text, int width, IntVector2 position);
+    Button* CreateButton(const String& text, int width, IntVector2 position);
+    LineEdit* CreateLineEdit(const String& placeholder, int width, IntVector2 pos);
 //    /// Create label
 //    Text* CreateLabel(const String& text, IntVector2 pos);
 //
@@ -83,6 +94,9 @@ private:
 //    /// Start server
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
+    void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
+    void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
+
     Timer timer_;
 //    /// Stop server
 //	void HandleStopServer(StringHash eventType, VariantMap& eventData);
@@ -90,10 +104,11 @@ private:
 //	void HandleDoNetworkDiscovery(StringHash eventType, VariantMap& eventData);
 //    /// Start server
 //    SharedPtr<Button> startServer_;
-//    /// Stop server
-//    SharedPtr<Button> stopServer_;
-//    /// Redo LAN discovery
-//    SharedPtr<Button> refreshServerList_;
+    /// Start P2P Session
+    SharedPtr<Button> startSession_;
+    /// Join P2P Session
+    SharedPtr<Button> joinSession_;
+    SharedPtr<LineEdit> guid_;
 //    /// Found server list
 //	SharedPtr<Text> serverList_;
 };

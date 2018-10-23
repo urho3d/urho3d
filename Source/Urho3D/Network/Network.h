@@ -70,7 +70,8 @@ public:
     bool StartServer(unsigned short port);
 #if NETWORK_P2P
     /// Start P2P session
-    bool StartP2PSession();
+    bool StartP2PSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    void JoinP2PSession(String guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     int GetP2PParticipantCount();
     bool P2PIsConnectedHost();
     bool P2PIsHostSystem();

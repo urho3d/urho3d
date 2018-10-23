@@ -63,6 +63,8 @@ static const int MSG_REMOTEEVENT = 0x96;
 static const int MSG_REMOTENODEEVENT = 0x97;
 /// Server->client: info about package.
 static const int MSG_PACKAGEINFO = 0x98;
+static const int MSG_P2P_REQUEST = 0x99;
+static const int MSG_P2P_DENY = 0x9A;
 
 /// Fixed content ID for client controls update.
 static const unsigned CONTROLS_CONTENT_ID = 1;
