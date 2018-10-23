@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3Dproject.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -142,12 +142,12 @@ if (URHO3D_CLANG_TOOLS)
 endif ()
 
 # Urho3D tools
-add_subdirectory (Tools)
+#add_subdirectory (Tools)
 
 # Urho3D samples
 add_subdirectory (Samples)
 
 # Urho3D extras
 if (URHO3D_EXTRAS)
-    add_subdirectory (Extras)
+#    add_subdirectory (Extras)
 endif ()

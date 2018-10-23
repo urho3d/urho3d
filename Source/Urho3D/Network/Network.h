@@ -27,6 +27,8 @@
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
 
+#define NETWORK_P2P true
+
 namespace Urho3D
 {
 
@@ -66,6 +68,14 @@ public:
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
     bool StartServer(unsigned short port);
+#if NETWORK_P2P
+    /// Start P2P session
+    bool StartP2PSession();
+    int GetP2PParticipantCount();
+    bool P2PIsConnectedHost();
+    bool P2PIsHostSystem();
+    String P2PGetGUID();
+#endif
     /// Stop the server.
     void StopServer();
     /// Start NAT punchtrough client to allow remote connections.
@@ -150,6 +160,10 @@ private:
     SLNet::RakPeerInterface* rakPeer_;
     /// SLikeNet peer instance for client connection.
     SLNet::RakPeerInterface* rakPeerClient_;
+#if NETWORK_P2P
+    /// P2P functionality
+    SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
+#endif
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
@@ -190,6 +204,8 @@ private:
     SLNet::RakNetGUID* remoteGUID_;
     /// Local server GUID.
     String guid_;
+    /// Attempting NAT punchtrough
+    bool natPunchtroughAttempt_;
 };
 
 /// Register Network library objects.

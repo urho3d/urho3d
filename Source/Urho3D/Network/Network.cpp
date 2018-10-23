@@ -42,6 +42,8 @@
 #include <SLikeNet/NatPunchthroughClient.h>
 #include <SLikeNet/peerinterface.h>
 #include <SLikeNet/statistics.h>
+#include <SLikeNet/FullyConnectedMesh2.h>
+#include <SLikeNet/DS_List.h>
 
 #ifdef SendMessage
 #undef SendMessage
@@ -203,10 +205,18 @@ Network::Network(Context* context) :
     isServer_(false),
     scene_(nullptr),
     natPunchServerAddress_(nullptr),
-    remoteGUID_(nullptr)
+    remoteGUID_(nullptr),
+    natPunchtroughAttempt_(false)
 {
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
+
+#if NETWORK_P2P
+    fullyConnectedMesh2_ = SLNet::FullyConnectedMesh2::GetInstance();
+    rakPeerClient_->AttachPlugin(fullyConnectedMesh2_);
+    fullyConnectedMesh2_->SetAutoparticipateConnections(true);
+#endif
+
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     SetPassword("");
     SetDiscoveryBeacon(VariantMap());
@@ -287,6 +297,9 @@ Network::~Network()
 
     SLNet::RakPeerInterface::DestroyInstance(rakPeer_);
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
+#if NETWORK_P2P
+    SLNet::FullyConnectedMesh2::DestroyInstance(fullyConnectedMesh2_);
+#endif
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
 }
@@ -492,6 +505,7 @@ void Network::StartNATClient()
 
 void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity)
 {
+    natPunchtroughAttempt_ = true;
     scene_ = scene;
     identity_ = identity;
     if (!remoteGUID_)
@@ -732,7 +746,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         packetHandled = true;
     }
-    else if (packetID == ID_CONNECTION_REQUEST_ACCEPTED) // We're a client, our connection as been accepted
+    else if (packetID == ID_CONNECTION_REQUEST_ACCEPTED) // We're a client, our connection has been accepted
     {
         if(natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
             URHO3D_LOGINFO("Succesfully connected to NAT punchtrough server! ");
@@ -797,7 +811,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     {
         SLNet::SystemAddress remotePeer = packet->systemAddress;
         URHO3D_LOGINFO("NAT punchtrough succeeded! Remote peer: " + String(remotePeer.ToString()));
-        if (!isServer)
+        if (!isServer && natPunchtroughAttempt_)
         {
             using namespace NetworkNatPunchtroughSucceeded;
             VariantMap eventMap;
@@ -809,7 +823,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         packetHandled = true;
     }
-    else if (packetID == ID_NAT_PUNCHTHROUGH_FAILED)
+    else if (packetID == ID_NAT_PUNCHTHROUGH_FAILED || packetID == ID_NAT_TARGET_NOT_CONNECTED || packetID == ID_NAT_TARGET_UNRESPONSIVE || packetID == ID_NAT_CONNECTION_TO_TARGET_LOST)
     {
         URHO3D_LOGERROR("NAT punchtrough failed!");
         SLNet::SystemAddress remotePeer = packet->systemAddress;
@@ -863,7 +877,28 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         packetHandled = true;
     }
-
+#if NETWORK_P2P
+    else if (packetID == ID_FCM2_NEW_HOST)
+    {
+        URHO3D_LOGINFO("ID_FCM2_NEW_HOST");
+    }
+    else if (packetID == ID_FCM2_VERIFIED_JOIN_START)
+    {
+        URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_START");
+    }
+    else if (packetID == ID_FCM2_VERIFIED_JOIN_CAPABLE)
+    {
+        URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_CAPABLE");
+    }
+    else if (packetID == ID_FCM2_VERIFIED_JOIN_ACCEPTED)
+    {
+        URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_ACCEPTED");
+    }
+    else if (packetID == ID_FCM2_VERIFIED_JOIN_REJECTED)
+    {
+        URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_REJECTED");
+    }
+#endif
     // Urho3D messages
     if (packetID >= ID_USER_PACKET_ENUM)
     {
@@ -1029,6 +1064,37 @@ void Network::ConfigureNetworkSimulator()
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }
 
+bool Network::StartP2PSession()
+{
+    fullyConnectedMesh2_->ResetHostCalculation();
+    return true;
+}
+
+int Network::GetP2PParticipantCount()
+{
+    // First time calculated host. Add existing connections to ReplicaManager3
+    DataStructures::List<SLNet::RakNetGUID> participantList;
+    fullyConnectedMesh2_->GetParticipantList(participantList);
+    return participantList.Size();
+//    for (unsigned int i=0; i < participantList.Size(); i++) {
+//
+//    }
+}
+
+bool Network::P2PIsConnectedHost()
+{
+    return fullyConnectedMesh2_->IsConnectedHost();
+}
+
+bool Network::P2PIsHostSystem()
+{
+    return fullyConnectedMesh2_->IsHostSystem();
+}
+
+String Network::P2PGetGUID()
+{
+    return String(rakPeerClient_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+}
 void RegisterNetworkLibrary(Context* context)
 {
     NetworkPriority::RegisterObject(context);

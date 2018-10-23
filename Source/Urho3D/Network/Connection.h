@@ -37,6 +37,7 @@ namespace SLNet
     struct Packet;
     class NatPunchthroughClient;
     class RakPeerInterface;
+    class FullyConnectedMesh2;
 }
 
 namespace Urho3D
