@@ -183,6 +183,12 @@ void P2PMultiplayer::HandleUnready(StringHash eventType, VariantMap& eventData)
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     static int i = 0;
+    auto input = GetSubsystem<Input>();
+    if (input->GetKeyDown(KEY_R) && GetSubsystem<Network>()->P2PIsHostSystem()) {
+        if (body_) {
+            body_->SetLinearVelocity(Vector3(0, 2, 0));
+        }
+    }
     if (timer_.GetMSec(false) > 500) {
         i++;
         timer_.Reset();
@@ -214,7 +220,7 @@ void P2PMultiplayer::Init()
 {
 //    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
-    GetSubsystem<Network>()->Connect("frameskippers.com", 61111, nullptr);
+    GetSubsystem<Network>()->P2PConnectNAT("frameskippers.com", 61111);
 }
 
 //
@@ -359,6 +365,32 @@ void P2PMultiplayer::CreateScene()
     // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(-10.0f, 10.0f, 10.0f));
     cameraNode_->LookAt(Vector3(0, 0, 0));
+
+    // Create the scene node & visual representation. This will be a replicated object
+    Node* ballNode = scene_->CreateChild("Ball");
+    ballNode->SetPosition(Vector3(0, 10, 0));
+    ballNode->SetScale(0.5f);
+    auto* ballObject = ballNode->CreateComponent<StaticModel>();
+    ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
+    ballObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
+
+    // Create the physics components
+    auto* body = ballNode->CreateComponent<RigidBody>();
+    body->SetMass(1.0f);
+    body->SetFriction(1.0f);
+    body_ = body;
+    // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
+//    body->SetLinearDamping(0.5f);
+//    body->SetAngularDamping(0.5f);
+    //body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
+    auto* shape = ballNode->CreateComponent<CollisionShape>();
+    shape->SetSphere(1.0f);
+
+    // Create a random colored point light at the ball so that can see better where is going
+    auto* light2 = ballNode->CreateComponent<Light>();
+    light2->SetRange(3.0f);
+    light2->SetColor(
+        Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
 }
 
 void P2PMultiplayer::SetupViewport()
@@ -382,6 +414,7 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
 
+    return;
     // Then create a controllable object for that client
 //    Node* newObject = CreateControllableObject();
 //    serverObjects_[newConnection] = newObject;
@@ -404,10 +437,11 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* body = ballNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
+    body_ = body;
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
 //    body->SetLinearDamping(0.5f);
 //    body->SetAngularDamping(0.5f);
-    body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
+    //body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
     auto* shape = ballNode->CreateComponent<CollisionShape>();
     shape->SetSphere(1.0f);
 
@@ -422,6 +456,7 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
 {
 //    return;
     using namespace ClientConnected;
+    return;
 //
 //    // When a client disconnects, remove the controlled object
     auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());

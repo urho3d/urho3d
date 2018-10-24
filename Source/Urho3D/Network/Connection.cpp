@@ -399,6 +399,7 @@ void Connection::ProcessPendingLatestData()
 
 bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
 {
+    URHO3D_LOGINFO("Process message " + String(msgID));
     // New incomming message, reset last heard timer
     lastHeardTimer_.Reset();
     tempPacketCounter_.x_++;

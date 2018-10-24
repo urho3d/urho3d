@@ -209,6 +209,8 @@ void Sample::CreateConsoleAndDebugHud()
     Console* console = engine_->CreateConsole();
     console->SetDefaultStyle(xmlFile);
     console->GetBackground()->SetOpacity(0.8f);
+    console->SetNumHistoryRows(1000);
+    console->SetNumBufferedRows(100);
 
     // Create debug HUD.
     DebugHud* debugHud = engine_->CreateDebugHud();

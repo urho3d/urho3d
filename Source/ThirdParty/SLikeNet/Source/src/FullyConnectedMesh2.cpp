@@ -1113,7 +1113,7 @@ PluginReceiveResult FullyConnectedMesh2::OnVerifiedJoinCapable(Packet *packet)
 	DecomposeJoinCapable(packet, &vjip);
 
 	// If this assert hits, AddParticipant() was called on this system, or another system, which it should not have been.
-	RakAssert(HasParticipant(packet->guid)==false);
+	//RakAssert(HasParticipant(packet->guid)==false);
 
 	DataStructures::List<RakNetGUID> participatingMembersOnClientSucceeded;
 	DataStructures::List<RakNetGUID> participatingMembersOnClientFailed;

@@ -121,4 +121,5 @@ private:
 	SharedPtr<Text> clientCount_;
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
+    SharedPtr<RigidBody> body_;
 };

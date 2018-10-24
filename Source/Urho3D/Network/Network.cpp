@@ -214,17 +214,16 @@ Network::Network(Context* context) :
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
 
-#if NETWORK_P2P
     fullyConnectedMesh2_ = SLNet::FullyConnectedMesh2::GetInstance();
-    rakPeerClient_->AttachPlugin(fullyConnectedMesh2_);
+    rakPeer_->AttachPlugin(fullyConnectedMesh2_);
     fullyConnectedMesh2_->SetAutoparticipateConnections(false);
     readyEvent_ = SLNet::ReadyEvent::GetInstance();
-    rakPeerClient_->AttachPlugin(readyEvent_);
+    rakPeer_->AttachPlugin(readyEvent_);
     connectionGraph2_ = SLNet::ConnectionGraph2::GetInstance();
-    rakPeerClient_->AttachPlugin(connectionGraph2_);
-#endif
+    rakPeer_->AttachPlugin(connectionGraph2_);
 
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+    rakPeerClient_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     SetPassword("");
     SetDiscoveryBeacon(VariantMap());
 
@@ -287,6 +286,9 @@ Network::~Network()
 {
     rakPeer_->DetachPlugin(natPunchthroughServerClient_);
     rakPeerClient_->DetachPlugin(natPunchthroughClient_);
+    rakPeer_->DetachPlugin(fullyConnectedMesh2_);
+    rakPeer_->DetachPlugin(connectionGraph2_);
+    rakPeer_->DetachPlugin(readyEvent_);
     // If server connection exists, disconnect, but do not send an event because we are shutting down
     Disconnect(100);
     serverConnection_.Reset();
@@ -304,11 +306,11 @@ Network::~Network()
 
     SLNet::RakPeerInterface::DestroyInstance(rakPeer_);
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
-#if NETWORK_P2P
+
     SLNet::FullyConnectedMesh2::DestroyInstance(fullyConnectedMesh2_);
     SLNet::ReadyEvent::DestroyInstance(readyEvent_);
     SLNet::ConnectionGraph2::DestroyInstance(connectionGraph2_);
-#endif
+
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
 }
@@ -340,7 +342,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     URHO3D_LOGINFO("NewConnectionEstablished ---------------------------");
     // Create a new client connection corresponding to this MessageConnection
-    SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeerClient_));
+    SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     clientConnections_[connection] = newConnection;
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
@@ -431,6 +433,38 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 
         URHO3D_LOGINFO("Connecting to server " + address + ":" + String(port) + ", Client: " + serverConnection_->ToString());
+        return true;
+    }
+}
+
+bool Network::P2PConnectNAT(const String& address, unsigned short port)
+{
+    URHO3D_PROFILE(P2PConnectNAT);
+
+    if (!rakPeer_->IsActive())
+    {
+        URHO3D_LOGINFO("Initializing client connection...");
+        SLNet::SocketDescriptor socket;
+        // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
+        rakPeer_->Startup(32, &socket, 1);
+        rakPeer_->SetMaximumIncomingConnections(32);
+    }
+    else {
+        OnServerDisconnected();
+    }
+
+    //isServer_ = false;
+    SLNet::ConnectionAttemptResult connectResult = rakPeer_->Connect(address.CString(), port, password_.CString(), password_.Length());
+    if (connectResult != SLNet::CONNECTION_ATTEMPT_STARTED)
+    {
+        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
+        SendEvent(E_CONNECTFAILED);
+        return false;
+    }
+    else
+    {
+
+        URHO3D_LOGINFO("Connecting to server " + address + ":" + String(port));
         return true;
     }
 }
@@ -765,7 +799,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         URHO3D_LOGINFOF("ID_REMOTE_NEW_INCOMING_CONNECTION from %s. guid=%s.", packet->systemAddress.ToString(true), packet->guid.ToString());
         if (isServer)
         {
-            NewConnectionEstablished(packet->systemAddress);
+            //NewConnectionEstablished(packet->systemAddress);
         }
 //        fullyConnectedMesh2_->ResetHostCalculation();
         packetHandled = true;
@@ -801,7 +835,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 //                OnServerConnected(packet->systemAddress);
             SLNet::BitStream bsOut;
             bsOut.Write((unsigned char)MSG_P2P_REQUEST);
-            rakPeerClient_->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
+            rakPeer_->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
             URHO3D_LOGINFO("ID_CONNECTION_REQUEST_ACCEPTED");
         }
         packetHandled = true;
@@ -864,7 +898,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             URHO3D_LOGINFO("Connecting to server behind NAT: " + String(remotePeer.ToString()));
             Connect(String(remotePeer.ToString(false)), remotePeer.GetPort(), scene_, identity_);
         } else {
-            SLNet::ConnectionAttemptResult car = rakPeerClient_->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
+            SLNet::ConnectionAttemptResult car = rakPeer_->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
         }
         packetHandled = true;
     }
@@ -947,7 +981,6 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         packetHandled = true;
     }
-#if NETWORK_P2P
     else if (packetID == ID_FCM2_NEW_HOST)
     {
         URHO3D_LOGINFO("");
@@ -957,7 +990,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         SLNet::RakNetGUID oldHost;
         bs.Read(oldHost);
 
-        if (packet->guid == rakPeerClient_->GetMyGUID())
+        if (packet->guid == rakPeer_->GetMyGUID())
         {
             if (oldHost != SLNet::UNASSIGNED_RAKNET_GUID)
             {
@@ -1002,14 +1035,14 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     else if (packetID == ID_FCM2_VERIFIED_JOIN_START) {
 
         URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_START");
-        DataStructures::List <SLNet::SystemAddress> addresses;
-        DataStructures::List <SLNet::RakNetGUID> guids;
-        DataStructures::List < SLNet::BitStream * > userData;
-        fullyConnectedMesh2_->GetVerifiedJoinRequiredProcessingList(packet->guid, addresses, guids, userData);
-        for (unsigned int i = 0; i < guids.Size(); i++)
-        {
-            natPunchthroughClient_->OpenNAT(guids[i], *natPunchServerAddress_);
-        }
+        //DataStructures::List <SLNet::SystemAddress> addresses;
+        //DataStructures::List <SLNet::RakNetGUID> guids;
+        //DataStructures::List < SLNet::BitStream * > userData;
+        //fullyConnectedMesh2_->GetVerifiedJoinRequiredProcessingList(packet->guid, addresses, guids, userData);
+        //for (unsigned int i = 0; i < guids.Size(); i++)
+        //{
+        //    //natPunchthroughServerClient_->OpenNAT(guids[i], *natPunchServerAddress_);
+        //}
 
     }
     else if (packetID == ID_FCM2_VERIFIED_JOIN_CAPABLE)
@@ -1053,8 +1086,6 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     {
         URHO3D_LOGINFO("ID_FCM2_UPDATE_USER_CONTEXT");
     }
-
-#endif
     // Urho3D messages
     if (packetID >= ID_USER_PACKET_ENUM)
     {
@@ -1065,7 +1096,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             fullyConnectedMesh2_->StartVerifiedJoin(packet->guid);
         } else if (packetID == MSG_P2P_DENY) {
             URHO3D_LOGERROR("MSG_P2P_DENY");
-        } else if (isServer)
+        } else if (1 == 1 || isServer)
         {
             HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
         }
@@ -1097,7 +1128,12 @@ void Network::Update(float timeStep)
     {
         while (SLNet::Packet* packet = rakPeer_->Receive())
         {
-            HandleIncomingPacket(packet, true);
+            if (P2PIsHostSystem()) {
+                HandleIncomingPacket(packet, true);
+            }
+            else {
+                HandleIncomingPacket(packet, false);
+            }
             rakPeer_->DeallocatePacket(packet);
         }
     }
@@ -1105,11 +1141,11 @@ void Network::Update(float timeStep)
     // Process all incoming messages for the client
     if (rakPeerClient_->IsActive())
     {
-        bool isHost = P2PIsHostSystem();
+        //bool isHost = P2PIsHostSystem();
         while (SLNet::Packet* packet = rakPeerClient_->Receive())
         {
-            HandleIncomingPacket(packet, isHost);
-//            HandleIncomingPacket(packet, false);
+//            HandleIncomingPacket(packet, isHost);
+            HandleIncomingPacket(packet, false);
             rakPeerClient_->DeallocatePacket(packet);
         }
     }
@@ -1232,13 +1268,13 @@ void Network::ConfigureNetworkSimulator()
 bool Network::StartP2PSession(Scene* scene, const VariantMap& identity)
 {
     if (!serverConnection_) {
-        serverConnection_ = new Connection(context_, false, rakPeerClient_->GetMyBoundAddress(), rakPeerClient_);
+        serverConnection_ = new Connection(context_, false, rakPeer_->GetMyBoundAddress(), rakPeer_);
         serverConnection_->SetScene(scene);
         serverConnection_->SetIdentity(identity);
         serverConnection_->SetConnectPending(true);
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     }
-    rakPeerClient_->AttachPlugin(natPunchthroughClient_);
+    rakPeer_->AttachPlugin(natPunchthroughServerClient_);
     fullyConnectedMesh2_->Clear();
     fullyConnectedMesh2_->ResetHostCalculation();
     P2PSetReady(false);
@@ -1249,21 +1285,21 @@ void Network::JoinP2PSession(String guid, Scene* scene, const VariantMap& identi
 {
     P2PSetReady(false);
     if (!serverConnection_) {
-        serverConnection_ = new Connection(context_, false, rakPeerClient_->GetMyBoundAddress(), rakPeerClient_);
+        serverConnection_ = new Connection(context_, false, rakPeer_->GetMyBoundAddress(), rakPeer_);
         serverConnection_->SetScene(scene);
         serverConnection_->SetIdentity(identity);
         serverConnection_->SetConnectPending(true);
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     }
 
-    rakPeerClient_->AttachPlugin(natPunchthroughClient_);
+    rakPeer_->AttachPlugin(natPunchthroughServerClient_);
     fullyConnectedMesh2_->ResetHostCalculation();
     fullyConnectedMesh2_->Clear();
     SLNet::RakNetGUID remoteGUID;
 
     remoteGUID.FromString(guid.CString());
     URHO3D_LOGINFO("Attempting to Join P2P Session : " + guid);
-    natPunchthroughClient_->OpenNAT(remoteGUID, *natPunchServerAddress_);
+    natPunchthroughServerClient_->OpenNAT(remoteGUID, *natPunchServerAddress_);
 }
 
 int Network::GetP2PParticipantCount()
@@ -1296,7 +1332,7 @@ String Network::P2PGetGUID()
 {
 //    URHO3D_LOGINFO("HOST GUID: " + String(fullyConnectedMesh2_->GetHostSystem().ToString()));
 //    URHO3D_LOGINFO("MY GUID: " + String(rakPeerClient_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString()));
-    return String(rakPeerClient_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+    return String(rakPeer_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 }
 
 void Network::P2PShowReadyStatus()
@@ -1304,7 +1340,7 @@ void Network::P2PShowReadyStatus()
     DataStructures::List<SLNet::RakNetGUID> participantList;
     fullyConnectedMesh2_->GetParticipantList(participantList);
     for (unsigned int i = 0; i < participantList.Size(); i++) {
-        if (participantList[i] != rakPeerClient_->GetMyGUID()) {
+        if (participantList[i] != rakPeer_->GetMyGUID()) {
             bool ready = readyEvent_->GetReadyStatus(0, participantList[i]) == SLNet::RES_READY;
             URHO3D_LOGINFO( String(participantList[i].ToString()) + " Ready: " + String(ready));
         }
