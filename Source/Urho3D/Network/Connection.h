@@ -38,6 +38,8 @@ namespace SLNet
     class NatPunchthroughClient;
     class RakPeerInterface;
     class FullyConnectedMesh2;
+    class ReadyEvent;
+    class ConnectionGraph2;
 }
 
 namespace Urho3D

@@ -107,6 +107,11 @@ void P2PMultiplayer::CreateUI()
     guid_ = CreateLineEdit("1234", 200, IntVector2(20, marginTop));
     marginTop += 40;
     joinSession_ = CreateButton("Join session", 160, IntVector2(20, marginTop));
+
+    marginTop += 100;
+    readyButton_ = CreateButton("Ready", 160, IntVector2(20, marginTop));
+    marginTop += 40;
+    unreadyButton_ = CreateButton("Unready", 160, IntVector2(20, marginTop));
 //	stopServer_->SetVisible(false);
 //
 //    // Create client connection related fields
@@ -114,9 +119,15 @@ void P2PMultiplayer::CreateUI()
 //    CreateLabel("2. Discover LAN servers", IntVector2(20, marginTop-20));
 //    refreshServerList_ = CreateButton("Search...", 160, IntVector2(20, marginTop));
 //
-//	marginTop += 80;
-//	CreateLabel("Local servers:", IntVector2(20, marginTop - 20));
-//	serverList_ = CreateLabel("", IntVector2(20, marginTop));
+	marginTop += 80;
+    clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));
+    marginTop += 40;
+    myGuid_ = CreateLabel("My GUID: ", IntVector2(20, marginTop));
+    marginTop += 40;
+    hostGuid_ = CreateLabel("HOST GUID:", IntVector2(20, marginTop));
+
+    marginTop += 40;
+    resetHostButton_ = CreateButton("Reset host", 160, IntVector2(20, marginTop));
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     //GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -129,6 +140,11 @@ void P2PMultiplayer::SubscribeToEvents()
 //
     SubscribeToEvent(startSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleStartP2PSession));
     SubscribeToEvent(joinSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleJoinP2PSession));
+
+    SubscribeToEvent(readyButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleReady));
+    SubscribeToEvent(unreadyButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleUnready));
+
+    SubscribeToEvent(resetHostButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleResetHost));
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
@@ -152,19 +168,45 @@ void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& even
     GetSubsystem<Network>()->JoinP2PSession(guid_->GetText(), scene_);
 }
 
+void P2PMultiplayer::HandleReady(StringHash eventType, VariantMap& eventData)
+{
+    URHO3D_LOGINFO("Ready");
+    GetSubsystem<Network>()->P2PSetReady(true);
+}
+
+void P2PMultiplayer::HandleUnready(StringHash eventType, VariantMap& eventData)
+{
+    URHO3D_LOGINFO("Unready");
+    GetSubsystem<Network>()->P2PSetReady(false);
+}
+
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     static int i = 0;
-    if (timer_.GetMSec(false) > 10000) {
+    if (timer_.GetMSec(false) > 500) {
         i++;
         timer_.Reset();
-        URHO3D_LOGINFO(" ");
-        URHO3D_LOGINFO(" " + String(i));
-        URHO3D_LOGINFO("Participats: " + String(GetSubsystem<Network>()->GetP2PParticipantCount()));
-        URHO3D_LOGINFO("P2PIsConnectedHost: " + String(GetSubsystem<Network>()->P2PIsConnectedHost()));
-        URHO3D_LOGINFO("P2PIsHostSystem: " + String(GetSubsystem<Network>()->P2PIsHostSystem()));
-        URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
-        URHO3D_LOGINFO("");
+//        URHO3D_LOGINFO(" ");
+//        URHO3D_LOGINFO(" " + String(i));
+        clientCount_->SetText("Connections: " + String(GetSubsystem<Network>()->GetP2PParticipantCount()));
+//        URHO3D_LOGINFO("Participats: " + String(GetSubsystem<Network>()->GetP2PParticipantCount()));
+//        URHO3D_LOGINFO("P2PIsConnectedHost: " + String(GetSubsystem<Network>()->P2PIsConnectedHost()));
+//        URHO3D_LOGINFO("P2PIsHostSystem: " + String(GetSubsystem<Network>()->P2PIsHostSystem()));
+        myGuid_->SetText("My GUID: " + GetSubsystem<Network>()->P2PGetGUID());
+        hostGuid_->SetText("Host GUID: " + GetSubsystem<Network>()->P2PGetHostAddress());
+
+        if (GetSubsystem<Network>()->P2PGetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
+            hostGuid_->SetColor(Color::RED);
+            myGuid_->SetColor(Color::RED);
+        } else {
+            myGuid_->SetColor(Color::GREEN);
+            hostGuid_->SetColor(Color::GREEN);
+        }
+//        URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
+//        URHO3D_LOGINFO("P2PGetHostAddress: " + GetSubsystem<Network>()->P2PGetHostAddress());
+//        URHO3D_LOGINFO("--------");
+//        GetSubsystem<Network>()->P2PShowReadyStatus();
+//        URHO3D_LOGINFO("");
     }
 }
 
@@ -207,18 +249,18 @@ LineEdit* P2PMultiplayer::CreateLineEdit(const String& placeholder, int width, I
 }
 
 //
-//Text* LANDiscovery::CreateLabel(const String& text, IntVector2 pos)
-//{
-//    auto* cache = GetSubsystem<ResourceCache>();
-//    // Create log element to view latest logs from the system
-//    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
-//    auto* label = GetSubsystem<UI>()->GetRoot()->CreateChild<Text>();
-//    label->SetFont(font, 12);
-//    label->SetColor(Color(0.0f, 1.0f, 0.0f));
-//    label->SetPosition(pos);
-//    label->SetText(text);
-//	return label;
-//}
+Text* P2PMultiplayer::CreateLabel(const String& text, IntVector2 pos)
+{
+    auto* cache = GetSubsystem<ResourceCache>();
+    // Create log element to view latest logs from the system
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* label = GetSubsystem<UI>()->GetRoot()->CreateChild<Text>();
+    label->SetFont(font, 12);
+    label->SetColor(Color(0.0f, 1.0f, 0.0f));
+    label->SetPosition(pos);
+    label->SetText(text);
+	return label;
+}
 //
 //void LANDiscovery::HandleNetworkHostDiscovered(StringHash eventType, VariantMap& eventData)
 //{
@@ -259,6 +301,7 @@ LineEdit* P2PMultiplayer::CreateLineEdit(const String& placeholder, int width, I
 
 void P2PMultiplayer::CreateScene()
 {
+//    return;
     scene_ = new Scene(context_);
 
     auto* cache = GetSubsystem<ResourceCache>();
@@ -320,6 +363,7 @@ void P2PMultiplayer::CreateScene()
 
 void P2PMultiplayer::SetupViewport()
 {
+//    return;
     auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
@@ -331,6 +375,7 @@ void P2PMultiplayer::SetupViewport()
 
 void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eventData)
 {
+//    return;
     using namespace ClientConnected;
 
     // When a client connects, assign to scene to begin scene replication
@@ -360,8 +405,9 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
-    body->SetLinearDamping(0.5f);
-    body->SetAngularDamping(0.5f);
+//    body->SetLinearDamping(0.5f);
+//    body->SetAngularDamping(0.5f);
+    body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
     auto* shape = ballNode->CreateComponent<CollisionShape>();
     shape->SetSphere(1.0f);
 
@@ -374,6 +420,7 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
 
 void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 {
+//    return;
     using namespace ClientConnected;
 //
 //    // When a client disconnects, remove the controlled object
@@ -385,4 +432,9 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
 //        object->Remove();
 //
 //    serverObjects_.Erase(connection);
+}
+
+void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Network>()->P2PResetHost();
 }

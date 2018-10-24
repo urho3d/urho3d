@@ -75,7 +75,11 @@ public:
     int GetP2PParticipantCount();
     bool P2PIsConnectedHost();
     bool P2PIsHostSystem();
+    String P2PGetHostAddress();
     String P2PGetGUID();
+    void P2PSetReady(bool value);
+    void P2PShowReadyStatus();
+    void P2PResetHost();
 #endif
     /// Stop the server.
     void StopServer();
@@ -207,6 +211,8 @@ private:
     String guid_;
     /// Attempting NAT punchtrough
     bool natPunchtroughAttempt_;
+    SLNet::ReadyEvent *readyEvent_;
+    SLNet::ConnectionGraph2 *connectionGraph2_;
 };
 
 /// Register Network library objects.

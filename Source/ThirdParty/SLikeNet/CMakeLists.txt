@@ -21,13 +21,15 @@ add_definitions (-D_RAKNET_SUPPORT_EmailSender=0 -D_RAKNET_SUPPORT_UDPProxyClien
 add_definitions (-D_RAKNET_SUPPORT_NatTypeDetectionClient=0 -D_RAKNET_SUPPORT_ConnectionGraph2=0 -D_RAKNET_SUPPORT_FullyConnectedMesh=0 -D_RAKNET_SUPPORT_TelnetTransport=0)
 add_definitions (-D_RAKNET_SUPPORT_DirectoryDeltaTransfer=0 -D_RAKNET_SUPPORT_FileOperations=0 -D_RAKNET_SUPPORT_UDPProxyServer=0)
 add_definitions (-D_RAKNET_SUPPORT_ConsoleServer=0 -D_RAKNET_SUPPORT_RakNetTransport=0 -D_RAKNET_SUPPORT_TCPInterface=0 -D_RAKNET_SUPPORT_LogCommandParser=0 -D_RAKNET_SUPPORT_RakNetCommandParser=0)
-add_definitions (-D_RAKNET_SUPPORT_Rackspace=0 -D_RAKNET_SUPPORT_PacketizedTCP=0 -D_RAKNET_SUPPORT_RPC4Plugin=0 -D_RAKNET_SUPPORT_Router2=0 -D_RAKNET_SUPPORT_ReplicaManager3=0)
-add_definitions (-D_RAKNET_SUPPORT_ReadyEvent=0 -D_RAKNET_SUPPORT_MessageFilter=0 -D_RAKNET_SUPPORT_FileListTransfer=0)
+add_definitions (-D_RAKNET_SUPPORT_Rackspace=0 -D_RAKNET_SUPPORT_PacketizedTCP=0 -D_RAKNET_SUPPORT_RPC4Plugin=0 -D_RAKNET_SUPPORT_Router2=0)
+add_definitions (-D_RAKNET_SUPPORT_MessageFilter=0 -D_RAKNET_SUPPORT_FileListTransfer=0)
 
 # Enable the ones we actually need
 # P2P Multiplayer
 add_definitions (-D_RAKNET_SUPPORT_FullyConnectedMesh2=1)
 add_definitions (-D_RAKNET_SUPPORT_PacketLogger=1)
+add_definitions (-D_RAKNET_SUPPORT_ReplicaManager3=1)
+add_definitions (-D_RAKNET_SUPPORT_ReadyEvent=1)
 
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions(-D_RAKNET_DLL=1)

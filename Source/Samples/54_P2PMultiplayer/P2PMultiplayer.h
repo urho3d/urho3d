@@ -87,7 +87,7 @@ private:
     Button* CreateButton(const String& text, int width, IntVector2 position);
     LineEdit* CreateLineEdit(const String& placeholder, int width, IntVector2 pos);
 //    /// Create label
-//    Text* CreateLabel(const String& text, IntVector2 pos);
+    Text* CreateLabel(const String& text, IntVector2 pos);
 //
 //    /// Handle found LAN server
     void HandleServerConnected(StringHash eventType, VariantMap& eventData);
@@ -96,6 +96,11 @@ private:
 
     void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
     void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
+
+    void HandleReady(StringHash eventType, VariantMap& eventData);
+    void HandleUnready(StringHash eventType, VariantMap& eventData);
+
+    void HandleResetHost(StringHash eventType, VariantMap& eventData);
 
     Timer timer_;
 //    /// Stop server
@@ -108,7 +113,12 @@ private:
     SharedPtr<Button> startSession_;
     /// Join P2P Session
     SharedPtr<Button> joinSession_;
+    SharedPtr<Button> readyButton_;
+    SharedPtr<Button> unreadyButton_;
+    SharedPtr<Button> resetHostButton_;
     SharedPtr<LineEdit> guid_;
 //    /// Found server list
-//	SharedPtr<Text> serverList_;
+	SharedPtr<Text> clientCount_;
+    SharedPtr<Text> myGuid_;
+    SharedPtr<Text> hostGuid_;
 };
