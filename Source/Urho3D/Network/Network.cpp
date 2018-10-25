@@ -291,14 +291,17 @@ Network::Network(Context* context) :
 
 Network::~Network()
 {
+    // If server connection exists, disconnect, but do not send an event because we are shutting down
+    Disconnect(1000);
+
     fullyConnectedMesh2_->ResetHostCalculation();
+    
     rakPeer_->DetachPlugin(natPunchthroughServerClient_);
     rakPeerClient_->DetachPlugin(natPunchthroughClient_);
     rakPeer_->DetachPlugin(fullyConnectedMesh2_);
     rakPeer_->DetachPlugin(connectionGraph2_);
     rakPeer_->DetachPlugin(readyEvent_);
-    // If server connection exists, disconnect, but do not send an event because we are shutting down
-    Disconnect(100);
+
     serverConnection_.Reset();
 
     clientConnections_.Clear();
@@ -343,14 +346,16 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
-    else
-        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
+    else {
+     //   URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
+    }
 }
 
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     if (clientConnections_[connection]) {
         URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
+        //TODO proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
         return;
     }
@@ -836,7 +841,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_REMOTE_CONNECTION_LOST)
     {
-        ClientDisconnected(packet->guid);
+        //TODO find out who's really sending out this message
+        URHO3D_LOGWARNING("ID_REMOTE_CONNECTION_LOST");
+        //ClientDisconnected(packet->guid);
         packetHandled = true;
     }
     else if (packetID == ID_ALREADY_CONNECTED)
@@ -1448,7 +1455,6 @@ void Network::HandleTcpResponse()
                 data[HttpRequestFinished::P_ADDRESS] = "123";
                 data[HttpRequestFinished::P_RESPONSE] = String(responseReceived.C_String() + contentOffset);
                 SendEvent(E_HTTPREQUESTFINISHED, data);
-                URHO3D_LOGINFO("Response got: " + String(responseReceived.C_String() + contentOffset));
             }
         }
     }

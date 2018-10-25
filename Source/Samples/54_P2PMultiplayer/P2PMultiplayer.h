@@ -121,6 +121,7 @@ private:
     SharedPtr<LineEdit> guid_;
 //    /// Found server list
 	SharedPtr<Text> clientCount_;
+    SharedPtr<Text> roleTitle_;
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
     SharedPtr<RigidBody> body_;

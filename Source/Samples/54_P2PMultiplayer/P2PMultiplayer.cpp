@@ -113,6 +113,12 @@ void P2PMultiplayer::CreateUI()
     readyButton_ = CreateButton("Ready", 160, IntVector2(20, marginTop));
     marginTop += 40;
     unreadyButton_ = CreateButton("Unready", 160, IntVector2(20, marginTop));
+
+    roleTitle_ = CreateLabel("", IntVector2(GetSubsystem<Graphics>()->GetWidth() / 2, GetSubsystem<Graphics>()->GetHeight() / 2));
+    roleTitle_->SetTextAlignment(HA_CENTER);
+    roleTitle_->SetColor(Color::GREEN);
+    roleTitle_->SetFontSize(40);
+    
 //	stopServer_->SetVisible(false);
 //
 //    // Create client connection related fields
@@ -203,7 +209,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         body_->SetLinearVelocity(Vector3(0, 0, 0));
     }
 
-    if (timer_.GetMSec(false) > 2000) {
+    if (timer_.GetMSec(false) > 500) {
         i++;
         timer_.Reset();
 //        URHO3D_LOGINFO(" ");
@@ -218,9 +224,13 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (GetSubsystem<Network>()->P2PGetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
             hostGuid_->SetColor(Color::RED);
             myGuid_->SetColor(Color::RED);
+            roleTitle_->SetText("HOST");
+            roleTitle_->SetColor(Color::RED);
         } else {
             myGuid_->SetColor(Color::GREEN);
             hostGuid_->SetColor(Color::GREEN);
+            roleTitle_->SetText("PEER");
+            roleTitle_->SetColor(Color::GREEN);
         }
 //        URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
 //        URHO3D_LOGINFO("P2PGetHostAddress: " + GetSubsystem<Network>()->P2PGetHostAddress());
@@ -283,6 +293,7 @@ Text* P2PMultiplayer::CreateLabel(const String& text, IntVector2 pos)
     label->SetColor(Color(0.0f, 1.0f, 0.0f));
     label->SetPosition(pos);
     label->SetText(text);
+    label->SetTextEffect(TextEffect::TE_STROKE);
 	return label;
 }
 //
