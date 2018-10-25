@@ -350,6 +350,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
     SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     newConnection->SetScene(serverConnection_->GetScene());
+    newConnection->SetSceneLoaded(true);
     clientConnections_[connection] = newConnection;
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
 
@@ -819,6 +820,11 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             //NewConnectionEstablished(packet->systemAddress);
         }
 //        fullyConnectedMesh2_->ResetHostCalculation();
+        packetHandled = true;
+    }
+    else if (packetID == ID_REMOTE_CONNECTION_LOST)
+    {
+        ClientDisconnected(packet->guid);
         packetHandled = true;
     }
     else if (packetID == ID_ALREADY_CONNECTED)
