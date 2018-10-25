@@ -343,6 +343,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     if (clientConnections_[connection]) {
         URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
+        clientConnections_[connection]->SetSceneLoaded(true);
         return;
     }
     URHO3D_LOGINFOF("NewConnectionEstablished ---------------------------", connection.rakNetGuid.ToString());
@@ -773,9 +774,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 {
     unsigned char packetID = packet->data[0];
 
-    if (packetID < sizeof(RAKNET_MESSAGEID_STRINGS)) {
-        URHO3D_LOGERROR("-------------------------------- HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
-    }
+//    if (packetID < sizeof(RAKNET_MESSAGEID_STRINGS)) {
+//        URHO3D_LOGERROR("-------------------------------- HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
+//    }
 
     bool packetHandled = false;
 
@@ -1124,7 +1125,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     // Urho3D messages
     if (packetID >= ID_USER_PACKET_ENUM)
     {
-        URHO3D_LOGINFOF("ID_USER_PACKET_ENUM %i", packetID);
+        //URHO3D_LOGINFOF("ID_USER_PACKET_ENUM %i", packetID);
         if (packetID == MSG_P2P_REQUEST) {
             URHO3D_LOGINFO("MSG_P2P_REQUEST");
             URHO3D_LOGINFO("Got request from client to join session. Executing StartVerifiedJoin()");
@@ -1133,12 +1134,12 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             URHO3D_LOGERROR("MSG_P2P_DENY");
         } else if (P2PIsHostSystem())
         {
-            URHO3D_LOGINFO("Host system handler " + String(packet->guid.ToString()));
+//            URHO3D_LOGINFO("Host system handler " + String(packet->guid.ToString()));
             HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
         }
         else
         {
-            URHO3D_LOGINFO("Client system handler");
+//            URHO3D_LOGINFO("Client system handler");
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
             bool processed = serverConnection_->ProcessMessage(packetID, buffer);
             if (!processed)
@@ -1236,7 +1237,6 @@ void Network::PostUpdate(float timeStep)
 
         if (serverConnection_ && !isServer_)
         {
-            URHO3D_LOGINFO("Sending client update");
             // Send the client update
             serverConnection_->SendClientUpdate();
             serverConnection_->SendRemoteEvents();
