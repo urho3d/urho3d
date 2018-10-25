@@ -102,6 +102,8 @@ private:
 
     void HandleResetHost(StringHash eventType, VariantMap& eventData);
 
+    void HandleHttpResponse(StringHash eventType, VariantMap& eventData);
+
     Timer timer_;
 //    /// Stop server
 //	void HandleStopServer(StringHash eventType, VariantMap& eventData);
@@ -122,4 +124,5 @@ private:
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
     SharedPtr<RigidBody> body_;
+    SharedPtr<Node> ball_;
 };
