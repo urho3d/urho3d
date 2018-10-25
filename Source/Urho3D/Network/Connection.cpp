@@ -198,8 +198,17 @@ void Connection::SetScene(Scene* newScene)
     {
         // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
-        SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, URHO3D_HANDLER(Connection, HandleAsyncLoadFinished));
+        if (scene_->IsAsyncLoading()) {
+            SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, URHO3D_HANDLER(Connection, HandleAsyncLoadFinished));
+        } else {
+            sceneLoaded_ = true;
+        }
     }
+}
+
+void Connection::SetSceneLoaded(bool value)
+{
+    sceneLoaded_ = value;
 }
 
 void Connection::SetIdentity(const VariantMap& identity)
@@ -243,8 +252,10 @@ void Connection::Disconnect(int waitMSec)
 
 void Connection::SendServerUpdate()
 {
-    if (!scene_ || !sceneLoaded_)
+    if (!scene_ || !sceneLoaded_) {
+        URHO3D_LOGERROR("Server update failed " + String(sceneLoaded_));
         return;
+    }
 
     // Always check the root node (scene) first so that the scene-wide components get sent first,
     // and all other replicated nodes get added to the dirty set for sending the initial state
@@ -265,8 +276,10 @@ void Connection::SendServerUpdate()
 
 void Connection::SendClientUpdate()
 {
-    if (!scene_ || !sceneLoaded_)
+    if (!scene_ || !sceneLoaded_) {
+        URHO3D_LOGERROR("No scene, not sending client update " + String(sceneLoaded_));
         return;
+    }
 
     msg_.Clear();
     msg_.WriteUInt(controls_.buttons_);
@@ -399,7 +412,7 @@ void Connection::ProcessPendingLatestData()
 
 bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
 {
-    URHO3D_LOGINFO("Process message " + String(msgID));
+    //URHO3D_LOGINFO("Process message " + String(msgID));
     // New incomming message, reset last heard timer
     lastHeardTimer_.Reset();
     tempPacketCounter_.x_++;
@@ -472,7 +485,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 {
     if (IsClient())
     {
-        URHO3D_LOGWARNING("Received unexpected LoadScene message from client " + ToString());
+        URHO3D_LOGWARNING("Received unexpected LoadScene message from client " + ToString() + " => " + String(peer_->GetMyGUID()));
         return;
     }
 
@@ -1584,7 +1597,8 @@ String Connection::GetAddress() const {
 }
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
-{ 
+{
+    URHO3D_LOGINFO("SetAddressOrGUID " + String(addr.rakNetGuid.ToString()));
     delete address_;
     address_ = nullptr;
     address_ = new SLNet::AddressOrGUID(addr);

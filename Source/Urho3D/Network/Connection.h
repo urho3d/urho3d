@@ -128,6 +128,7 @@ public:
     void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Assign scene. On the server, this will cause the client to load it.
     void SetScene(Scene* newScene);
+    void SetSceneLoaded(bool value);
     /// Assign identity. Called by Network.
     void SetIdentity(const VariantMap& identity);
     /// Set new controls.

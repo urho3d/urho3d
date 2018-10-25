@@ -212,6 +212,7 @@ private:
     bool natPunchtroughAttempt_;
     SLNet::ReadyEvent *readyEvent_;
     SLNet::ConnectionGraph2 *connectionGraph2_;
+    String hostGuid_;
 };
 
 /// Register Network library objects.
