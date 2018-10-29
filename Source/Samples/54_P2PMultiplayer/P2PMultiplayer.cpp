@@ -35,6 +35,7 @@
 #include <Urho3D/IO/VectorBuffer.h>
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
+#include <Urho3D/Network/HttpRequest.h>
 #include <Urho3D/Physics/CollisionShape.h>
 #include <Urho3D/Physics/PhysicsEvents.h>
 #include <Urho3D/Physics/PhysicsWorld.h>
@@ -112,6 +113,12 @@ void P2PMultiplayer::CreateUI()
     readyButton_ = CreateButton("Ready", 160, IntVector2(20, marginTop));
     marginTop += 40;
     unreadyButton_ = CreateButton("Unready", 160, IntVector2(20, marginTop));
+
+    roleTitle_ = CreateLabel("", IntVector2(GetSubsystem<Graphics>()->GetWidth() / 2, GetSubsystem<Graphics>()->GetHeight() / 2));
+    roleTitle_->SetTextAlignment(HA_CENTER);
+    roleTitle_->SetColor(Color::GREEN);
+    roleTitle_->SetFontSize(40);
+    
 //	stopServer_->SetVisible(false);
 //
 //    // Create client connection related fields
@@ -148,6 +155,7 @@ void P2PMultiplayer::SubscribeToEvents()
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
+    SubscribeToEvent(E_HTTPREQUESTFINISHED, URHO3D_HANDLER(P2PMultiplayer, HandleHttpResponse));
 //    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
 }
 
@@ -160,6 +168,7 @@ void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eve
 {
     URHO3D_LOGINFO("HandleStartP2PSession");
     GetSubsystem<Network>()->StartP2PSession(scene_);
+    GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
 }
 
 void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
@@ -182,13 +191,24 @@ void P2PMultiplayer::HandleUnready(StringHash eventType, VariantMap& eventData)
 
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (cameraNode_) {
+        cameraNode_->LookAt(ball_->GetPosition());
+    }
+    using namespace Update;
     static int i = 0;
     auto input = GetSubsystem<Input>();
-    if (input->GetKeyDown(KEY_R) && GetSubsystem<Network>()->P2PIsHostSystem()) {
-        if (body_) {
-            body_->SetLinearVelocity(Vector3(0, 2, 0));
-        }
+    float timestep = eventData[P_TIMESTEP].GetFloat();
+    static float gametime;
+    gametime += timestep * 10;
+
+    if (GetSubsystem<Network>()->P2PIsHostSystem()) {
+        //if (body_) {
+        //    body_->ApplyImpulse(Vector3(0, 10, 0));
+        //}
+        ball_->SetWorldPosition(Vector3(0, Sin(gametime) * 5 + 6, 0));
+        body_->SetLinearVelocity(Vector3(0, 0, 0));
     }
+
     if (timer_.GetMSec(false) > 500) {
         i++;
         timer_.Reset();
@@ -204,15 +224,22 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (GetSubsystem<Network>()->P2PGetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
             hostGuid_->SetColor(Color::RED);
             myGuid_->SetColor(Color::RED);
+            roleTitle_->SetText("HOST");
+            roleTitle_->SetColor(Color::RED);
         } else {
             myGuid_->SetColor(Color::GREEN);
             hostGuid_->SetColor(Color::GREEN);
+            roleTitle_->SetText("PEER");
+            roleTitle_->SetColor(Color::GREEN);
         }
 //        URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
 //        URHO3D_LOGINFO("P2PGetHostAddress: " + GetSubsystem<Network>()->P2PGetHostAddress());
 //        URHO3D_LOGINFO("--------");
 //        GetSubsystem<Network>()->P2PShowReadyStatus();
 //        URHO3D_LOGINFO("");
+
+        // Just query for the newer P2P session
+        GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
     }
 }
 
@@ -221,6 +248,7 @@ void P2PMultiplayer::Init()
 //    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->P2PConnectNAT("frameskippers.com", 61111);
+    GetSubsystem<Network>()->SetUpdateFps(30);
 }
 
 //
@@ -265,6 +293,7 @@ Text* P2PMultiplayer::CreateLabel(const String& text, IntVector2 pos)
     label->SetColor(Color(0.0f, 1.0f, 0.0f));
     label->SetPosition(pos);
     label->SetText(text);
+    label->SetTextEffect(TextEffect::TE_STROKE);
 	return label;
 }
 //
@@ -348,6 +377,7 @@ void P2PMultiplayer::CreateScene()
 
             auto* body = floorNode->CreateComponent<RigidBody>();
             body->SetFriction(1.0f);
+            body->SetRestitution(0.5);
             auto* shape = floorNode->CreateComponent<CollisionShape>();
             shape->SetBox(Vector3::ONE);
         }
@@ -368,6 +398,7 @@ void P2PMultiplayer::CreateScene()
 
     // Create the scene node & visual representation. This will be a replicated object
     Node* ballNode = scene_->CreateChild("Ball");
+    ball_ = ballNode;
     ballNode->SetPosition(Vector3(0, 10, 0));
     ballNode->SetScale(0.5f);
     auto* ballObject = ballNode->CreateComponent<StaticModel>();
@@ -378,6 +409,7 @@ void P2PMultiplayer::CreateScene()
     auto* body = ballNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
+    body->SetRestitution(1);
     body_ = body;
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
 //    body->SetLinearDamping(0.5f);
@@ -472,4 +504,11 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
 void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
 {
     GetSubsystem<Network>()->P2PResetHost();
+}
+
+void P2PMultiplayer::HandleHttpResponse(StringHash eventType, VariantMap& eventData)
+{
+    using namespace HttpRequestFinished;
+    //URHO3D_LOGINFO("Response got: " + eventData[P_ADDRESS].GetString() + " => " + eventData[P_RESPONSE].GetString());
+    guid_->SetText(eventData[P_RESPONSE].GetString());
 }

@@ -40,6 +40,8 @@ namespace SLNet
     class FullyConnectedMesh2;
     class ReadyEvent;
     class ConnectionGraph2;
+    class HTTPConnection2;
+    class TCPInterface;
 }
 
 namespace Urho3D

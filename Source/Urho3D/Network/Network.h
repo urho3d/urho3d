@@ -160,6 +160,8 @@ private:
     /// All incoming packages are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
 
+    void HandleTcpResponse();
+
     /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
     /// SLikeNet peer instance for client connection.
@@ -212,6 +214,8 @@ private:
     bool natPunchtroughAttempt_;
     SLNet::ReadyEvent *readyEvent_;
     SLNet::ConnectionGraph2 *connectionGraph2_;
+    SLNet::HTTPConnection2 *httpConnection2_;
+    SLNet::TCPInterface *tcp_;
     String hostGuid_;
 };
 

@@ -143,4 +143,10 @@ URHO3D_EVENT(E_NATMASTERCONNECTIONSUCCEEDED, NetworkNatMasterConnectionSucceeded
     URHO3D_PARAM(P_PORT, Port);         // int
 }
 
+URHO3D_EVENT(E_HTTPREQUESTFINISHED, HttpRequestFinished)
+{
+    URHO3D_PARAM(P_ADDRESS, Address);   // String
+    URHO3D_PARAM(P_RESPONSE, Response);         // int
+}
+
 }

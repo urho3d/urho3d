@@ -47,6 +47,8 @@
 #include <SLikeNet/BitStream.h>
 #include <SLikeNet/ReadyEvent.h>
 #include <SLikeNet/ConnectionGraph2.h>
+#include "SLikeNet/HTTPConnection2.h"
+#include "SLikeNet/TCPInterface.h"
 
 #ifdef SendMessage
 #undef SendMessage
@@ -221,6 +223,11 @@ Network::Network(Context* context) :
     rakPeer_->AttachPlugin(readyEvent_);
     connectionGraph2_ = SLNet::ConnectionGraph2::GetInstance();
     rakPeer_->AttachPlugin(connectionGraph2_);
+    httpConnection2_ = SLNet::HTTPConnection2::GetInstance();
+    tcp_ = SLNet::TCPInterface::GetInstance();
+    tcp_->AttachPlugin(httpConnection2_);
+
+    tcp_->Start(0, 0, 1);
 
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     rakPeerClient_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
@@ -284,14 +291,17 @@ Network::Network(Context* context) :
 
 Network::~Network()
 {
+    // If server connection exists, disconnect, but do not send an event because we are shutting down
+    Disconnect(1000);
+
     fullyConnectedMesh2_->ResetHostCalculation();
+    
     rakPeer_->DetachPlugin(natPunchthroughServerClient_);
     rakPeerClient_->DetachPlugin(natPunchthroughClient_);
     rakPeer_->DetachPlugin(fullyConnectedMesh2_);
     rakPeer_->DetachPlugin(connectionGraph2_);
     rakPeer_->DetachPlugin(readyEvent_);
-    // If server connection exists, disconnect, but do not send an event because we are shutting down
-    Disconnect(100);
+
     serverConnection_.Reset();
 
     clientConnections_.Clear();
@@ -311,6 +321,7 @@ Network::~Network()
     SLNet::FullyConnectedMesh2::DestroyInstance(fullyConnectedMesh2_);
     SLNet::ReadyEvent::DestroyInstance(readyEvent_);
     SLNet::ConnectionGraph2::DestroyInstance(connectionGraph2_);
+    SLNet::HTTPConnection2::DestroyInstance(httpConnection2_);
 
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
@@ -335,14 +346,16 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
-    else
-        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
+    else {
+     //   URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
+    }
 }
 
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     if (clientConnections_[connection]) {
         URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
+        //TODO proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
         return;
     }
@@ -720,8 +733,11 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
     URHO3D_PROFILE(MakeHttpRequest);
 
     // The initialization of the request will take time, can not know at this point if it has an error or not
-    SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
-    return request;
+    //SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
+    //return request;
+    SLNet::RakString rsRequest = SLNet::RakString::FormatForGET(url.CString());
+    httpConnection2_->TransmitRequest(rsRequest, "frameskippers.com", 82, true);
+    return nullptr;
 }
 
 void Network::BanAddress(const String& address)
@@ -825,7 +841,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_REMOTE_CONNECTION_LOST)
     {
-        ClientDisconnected(packet->guid);
+        //TODO find out who's really sending out this message
+        URHO3D_LOGWARNING("ID_REMOTE_CONNECTION_LOST");
+        //ClientDisconnected(packet->guid);
         packetHandled = true;
     }
     else if (packetID == ID_ALREADY_CONNECTED)
@@ -1187,6 +1205,8 @@ void Network::Update(float timeStep)
             rakPeerClient_->DeallocatePacket(packet);
         }
     }
+
+    HandleTcpResponse();
 }
 
 void Network::PostUpdate(float timeStep)
@@ -1277,6 +1297,8 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
 
 void Network::OnServerDisconnected()
 {
+    // TODO dont destroy server connection when one of the peers disconnects
+    return;
     // Differentiate between failed connection, and disconnection
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
     serverConnection_.Reset();
@@ -1399,6 +1421,43 @@ void Network::P2PShowReadyStatus()
 void Network::P2PResetHost()
 {
     fullyConnectedMesh2_->ResetHostCalculation();
+}
+
+void Network::HandleTcpResponse()
+{
+    // The following code is TCP operations for talking to the master server, and parsing the reply
+    SLNet::SystemAddress sa;
+    // This is kind of crappy, but for TCP plugins, always do HasCompletedConnectionAttempt, then Receive(), then HasFailedConnectionAttempt(),HasLostConnection()
+    sa = tcp_->HasCompletedConnectionAttempt();
+    SLNet::Packet* packet;
+    for (packet = tcp_->Receive(); packet; tcp_->DeallocatePacket(packet), packet = tcp_->Receive())
+        ;
+    sa = tcp_->HasFailedConnectionAttempt();
+    sa = tcp_->HasLostConnection();
+
+    SLNet::RakString stringTransmitted;
+    SLNet::RakString hostTransmitted;
+    SLNet::RakString responseReceived;
+    SLNet::SystemAddress hostReceived;
+    ptrdiff_t contentOffset;
+    if (httpConnection2_->GetResponse(stringTransmitted, hostTransmitted, responseReceived, hostReceived, contentOffset))
+    {
+        if (responseReceived.IsEmpty() == false)
+        {
+            if (contentOffset == -1)
+            {
+                // No content
+                printf(responseReceived.C_String());
+            }
+            else
+            {
+                VariantMap data = GetEventDataMap();
+                data[HttpRequestFinished::P_ADDRESS] = "123";
+                data[HttpRequestFinished::P_RESPONSE] = String(responseReceived.C_String() + contentOffset);
+                SendEvent(E_HTTPREQUESTFINISHED, data);
+            }
+        }
+    }
 }
 
 void RegisterNetworkLibrary(Context* context)
