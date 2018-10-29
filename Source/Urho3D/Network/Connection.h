@@ -234,7 +234,6 @@ public:
 
     /// Set network simulation parameters. Called by Network.
     void ConfigureNetworkSimulator(int latencyMs, float packetLoss);
-
     /// Current controls.
     Controls controls_;
     /// Controls timestamp. Incremented after each sent update.
@@ -281,6 +280,8 @@ private:
     void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
+
+    void ProcessP2PRequest(int msgID);
 
     /// Scene.
     WeakPtr<Scene> scene_;

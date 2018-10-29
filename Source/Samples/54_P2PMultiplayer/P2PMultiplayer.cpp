@@ -109,10 +109,6 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     joinSession_ = CreateButton("Join session", 160, IntVector2(20, marginTop));
 
-    marginTop += 100;
-    readyButton_ = CreateButton("Ready", 160, IntVector2(20, marginTop));
-    marginTop += 40;
-    unreadyButton_ = CreateButton("Unready", 160, IntVector2(20, marginTop));
 
     roleTitle_ = CreateLabel("", IntVector2(GetSubsystem<Graphics>()->GetWidth() / 2, GetSubsystem<Graphics>()->GetHeight() / 2));
     roleTitle_->SetTextAlignment(HA_CENTER);
@@ -136,6 +132,10 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     resetHostButton_ = CreateButton("Reset host", 160, IntVector2(20, marginTop));
 
+    marginTop += 100;
+    readyButton_ = CreateButton("Set ready", 160, IntVector2(20, marginTop));
+    static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
+
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     //GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
 }
@@ -149,13 +149,14 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(joinSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleJoinP2PSession));
 
     SubscribeToEvent(readyButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleReady));
-    SubscribeToEvent(unreadyButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleUnready));
 
     SubscribeToEvent(resetHostButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleResetHost));
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
     SubscribeToEvent(E_HTTPREQUESTFINISHED, URHO3D_HANDLER(P2PMultiplayer, HandleHttpResponse));
+    SubscribeToEvent(E_P2PALLREADYCHANGED, URHO3D_HANDLER(P2PMultiplayer, HandleAllReadyChanged));
+
 //    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
 }
 
@@ -167,26 +168,27 @@ void P2PMultiplayer::HandleServerConnected(StringHash eventType, VariantMap& eve
 void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("HandleStartP2PSession");
-    GetSubsystem<Network>()->StartP2PSession(scene_);
+    GetSubsystem<Network>()->P2PStartSession(scene_);
     GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
 }
 
 void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
-    GetSubsystem<Network>()->JoinP2PSession(guid_->GetText(), scene_);
+    GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_);
 }
 
 void P2PMultiplayer::HandleReady(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("Ready");
-    GetSubsystem<Network>()->P2PSetReady(true);
-}
-
-void P2PMultiplayer::HandleUnready(StringHash eventType, VariantMap& eventData)
-{
-    URHO3D_LOGINFO("Unready");
-    GetSubsystem<Network>()->P2PSetReady(false);
+    GetSubsystem<Network>()->P2PSetReady(!GetSubsystem<Network>()->P2PGetReady());
+    if (GetSubsystem<Network>()->P2PGetReady()) {
+        static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set unready");
+        static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::RED);
+    } else {
+        static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set ready");
+        static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
+    }
 }
 
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -201,7 +203,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     static float gametime;
     gametime += timestep * 10;
 
-    if (GetSubsystem<Network>()->P2PIsHostSystem()) {
+    if (GetSubsystem<Network>()->P2PIsHostSystem() && _allReady) {
         //if (body_) {
         //    body_->ApplyImpulse(Vector3(0, 10, 0));
         //}
@@ -409,10 +411,10 @@ void P2PMultiplayer::CreateScene()
     auto* body = ballNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
-    body->SetRestitution(1);
+    body->SetRestitution(0.0);
     body_ = body;
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
-//    body->SetLinearDamping(0.5f);
+    body->SetLinearDamping(0.5f);
 //    body->SetAngularDamping(0.5f);
     //body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
     auto* shape = ballNode->CreateComponent<CollisionShape>();
@@ -511,4 +513,10 @@ void P2PMultiplayer::HandleHttpResponse(StringHash eventType, VariantMap& eventD
     using namespace HttpRequestFinished;
     //URHO3D_LOGINFO("Response got: " + eventData[P_ADDRESS].GetString() + " => " + eventData[P_RESPONSE].GetString());
     guid_->SetText(eventData[P_RESPONSE].GetString());
+}
+
+void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eventData)
+{
+    using namespace P2PAllReadyChanged;
+    _allReady = eventData[P_READY].GetBool();
 }

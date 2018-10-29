@@ -68,8 +68,9 @@ public:
     bool StartServer(unsigned short port);
 
     /// Start P2P session
-    bool StartP2PSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-    void JoinP2PSession(String guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    bool P2PStartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    void P2PJoinSession(String guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    void P2PSubscribeForReadyEvents();
     int GetP2PParticipantCount();
     bool P2PIsConnectedHost();
     bool P2PConnectNAT(const String& address, unsigned short port);
@@ -77,6 +78,7 @@ public:
     String P2PGetHostAddress();
     String P2PGetGUID();
     void P2PSetReady(bool value);
+    bool P2PGetReady();
     void P2PShowReadyStatus();
     void P2PResetHost();
 
@@ -166,10 +168,6 @@ private:
     SLNet::RakPeerInterface* rakPeer_;
     /// SLikeNet peer instance for client connection.
     SLNet::RakPeerInterface* rakPeerClient_;
-
-    /// P2P functionality
-    SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
-
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
@@ -213,6 +211,8 @@ private:
     /// Attempting NAT punchtrough
     bool natPunchtroughAttempt_;
     SLNet::ReadyEvent *readyEvent_;
+    /// P2P functionality
+    SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
     SLNet::ConnectionGraph2 *connectionGraph2_;
     SLNet::HTTPConnection2 *httpConnection2_;
     SLNet::TCPInterface *tcp_;

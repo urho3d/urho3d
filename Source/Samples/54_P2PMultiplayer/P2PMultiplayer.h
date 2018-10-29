@@ -98,11 +98,12 @@ private:
     void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
 
     void HandleReady(StringHash eventType, VariantMap& eventData);
-    void HandleUnready(StringHash eventType, VariantMap& eventData);
 
     void HandleResetHost(StringHash eventType, VariantMap& eventData);
 
     void HandleHttpResponse(StringHash eventType, VariantMap& eventData);
+
+    void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
 
     Timer timer_;
 //    /// Stop server
@@ -116,7 +117,6 @@ private:
     /// Join P2P Session
     SharedPtr<Button> joinSession_;
     SharedPtr<Button> readyButton_;
-    SharedPtr<Button> unreadyButton_;
     SharedPtr<Button> resetHostButton_;
     SharedPtr<LineEdit> guid_;
 //    /// Found server list
@@ -126,4 +126,5 @@ private:
     SharedPtr<Text> hostGuid_;
     SharedPtr<RigidBody> body_;
     SharedPtr<Node> ball_;
+    bool _allReady;
 };

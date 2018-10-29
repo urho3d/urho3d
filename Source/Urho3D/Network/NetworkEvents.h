@@ -149,4 +149,13 @@ URHO3D_EVENT(E_HTTPREQUESTFINISHED, HttpRequestFinished)
     URHO3D_PARAM(P_RESPONSE, Response);         // int
 }
 
+URHO3D_EVENT(E_P2PJOINREQUESTDENIED, P2PJoinRequestDenied)
+{
+}
+
+URHO3D_EVENT(E_P2PALLREADYCHANGED, P2PAllReadyChanged)
+{
+	URHO3D_PARAM(P_READY, Ready);   // String
+}
+
 }

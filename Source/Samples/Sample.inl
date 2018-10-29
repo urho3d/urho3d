@@ -64,6 +64,7 @@ void Sample::Setup()
     engineParameters_[EP_SOUND]        = false;
     engineParameters_[EP_WINDOW_HEIGHT] = 480;
     engineParameters_[EP_WINDOW_WIDTH] = 640;
+    engineParameters_[EP_LOG_LEVEL] = LOG_INFO;
     engineParameters_[EP_MONITOR] = 1;
 
     // Construct a search path to find the resource prefix with two entries:

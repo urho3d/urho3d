@@ -465,6 +465,10 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
         ProcessPackageInfo(msgID, msg);
         break;
 
+    case MSG_P2P_JOIN_REQUEST_DENIED:
+        ProcessP2PRequest(msgID);
+        break;
+
     default:
         processed = false;
         break;
@@ -1592,13 +1596,18 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
     RequestNeededPackages(1, msg);
 }
 
+void Connection::ProcessP2PRequest(int msgID)
+{
+    URHO3D_LOGERROR("P2P join request denied!");
+}
+
+
 String Connection::GetAddress() const {
     return String(address_->ToString(false /*write port*/)); 
 }
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
 {
-    URHO3D_LOGINFO("SetAddressOrGUID " + String(addr.rakNetGuid.ToString()));
     delete address_;
     address_ = nullptr;
     address_ = new SLNet::AddressOrGUID(addr);
