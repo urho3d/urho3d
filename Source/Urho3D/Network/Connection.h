@@ -280,7 +280,7 @@ private:
     void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
-
+    /// Handle P2P join request messages
     void ProcessP2PRequest(int msgID);
 
     /// Scene.

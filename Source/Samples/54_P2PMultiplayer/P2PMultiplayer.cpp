@@ -242,14 +242,24 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         // Just query for the newer P2P session
         GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
+
+        if (GetSubsystem<Network>()->P2PGetReady()) {
+            static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set unready");
+            static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::RED);
+        } else {
+            static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set ready");
+            static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
+        }
     }
 }
 
 void P2PMultiplayer::Init()
 {
+    GetSubsystem<Network>()->SetMode(NetworkMode::PEER_TO_PEER);
 //    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->P2PConnectNAT("frameskippers.com", 61111);
+//    GetSubsystem<Network>()->BanAddress("192.168.68.*");
     GetSubsystem<Network>()->SetUpdateFps(30);
 }
 

@@ -34,6 +34,12 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
+/// Supported network modes
+enum NetworkMode {
+    PEER_TO_PEER,
+    SERVER_CLIENT
+};
+
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object
 {
@@ -69,17 +75,29 @@ public:
 
     /// Start P2P session
     bool P2PStartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Join existing P2P session
     void P2PJoinSession(String guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Subscribe for peer event handling
     void P2PSubscribeForReadyEvents();
+    /// Current peer count in session
     int GetP2PParticipantCount();
+    /// Is host connected to the P2P session
     bool P2PIsConnectedHost();
+    /// Connect to NAT server which will handle P2P session
     bool P2PConnectNAT(const String& address, unsigned short port);
+    /// Are we the host system in P2P session
     bool P2PIsHostSystem();
+    /// Get host GUID
     String P2PGetHostAddress();
+    /// Get our GUID
     String P2PGetGUID();
+    /// Let other peers know about our readiness
     void P2PSetReady(bool value);
+    /// Get current ready status
     bool P2PGetReady();
-    void P2PShowReadyStatus();
+    /// Handle all peer readiness in session
+    void P2PReadyStatusChanged();
+    /// Reset our P2P session timer, peer with largest timer value becomes the host
     void P2PResetHost();
 
     /// Stop the server.
@@ -147,6 +165,10 @@ public:
     void Update(float timeStep);
     /// Send outgoing messages after frame logic. Called by HandleRenderUpdate.
     void PostUpdate(float timeStep);
+    /// Change network mode
+    void SetMode(NetworkMode mode, bool force = false);
+    /// Get current network mode
+    const NetworkMode  GetMode() const;
 
 private:
     /// Handle begin frame event.
@@ -161,9 +183,8 @@ private:
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
-
+    /// Handle Http request responses
     void HandleTcpResponse();
-
     /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
     /// SLikeNet peer instance for client connection.
@@ -210,13 +231,20 @@ private:
     String guid_;
     /// Attempting NAT punchtrough
     bool natPunchtroughAttempt_;
+    /// Ready event for automated event handling in P2P connections
     SLNet::ReadyEvent *readyEvent_;
     /// P2P functionality
     SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
+    /// Connection graph to automate peer to peer discovery
     SLNet::ConnectionGraph2 *connectionGraph2_;
+    /// Http request interface
     SLNet::HTTPConnection2 *httpConnection2_;
+    /// Support module for Http requests
     SLNet::TCPInterface *tcp_;
+    /// P2P current host guid
     String hostGuid_;
+    /// current network mode - P2P or server-client mode
+    NetworkMode networkMode_;
 };
 
 /// Register Network library objects.

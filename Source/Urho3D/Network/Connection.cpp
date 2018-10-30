@@ -198,11 +198,17 @@ void Connection::SetScene(Scene* newScene)
     {
         // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
-        if (scene_->IsAsyncLoading()) {
+//        if (scene_->IsAsyncLoading()) {
             SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, URHO3D_HANDLER(Connection, HandleAsyncLoadFinished));
-        } else {
-            sceneLoaded_ = true;
-        }
+//        } else {
+//            sceneLoaded_ = true;
+//            // Clear all replicated nodes
+//            scene_->Clear(true, false);
+//
+//            msg_.Clear();
+//            msg_.WriteUInt(scene_->GetChecksum());
+//            SendMessage(MSG_SCENELOADED, true, true, msg_);
+//        }
     }
 }
 
@@ -253,7 +259,7 @@ void Connection::Disconnect(int waitMSec)
 void Connection::SendServerUpdate()
 {
     if (!scene_ || !sceneLoaded_) {
-        URHO3D_LOGERROR("Server update failed " + String(sceneLoaded_));
+//        URHO3D_LOGERROR("Server update failed " + String(sceneLoaded_));
         return;
     }
 
@@ -277,7 +283,7 @@ void Connection::SendServerUpdate()
 void Connection::SendClientUpdate()
 {
     if (!scene_ || !sceneLoaded_) {
-        URHO3D_LOGERROR("No scene, not sending client update " + String(sceneLoaded_));
+        //URHO3D_LOGERROR("No scene, not sending client update " + String(sceneLoaded_));
         return;
     }
 
