@@ -132,9 +132,12 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     resetHostButton_ = CreateButton("Reset host", 160, IntVector2(20, marginTop));
 
-    marginTop += 100;
+    marginTop += 80;
     readyButton_ = CreateButton("Set ready", 160, IntVector2(20, marginTop));
     static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
+
+    marginTop += 40;
+    disconnect_ = CreateButton("Disconnect", 160, IntVector2(20, marginTop));
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     //GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -151,6 +154,7 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(readyButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleReady));
 
     SubscribeToEvent(resetHostButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleResetHost));
+    SubscribeToEvent(disconnect_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleDisconnect));
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
@@ -211,7 +215,8 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         body_->SetLinearVelocity(Vector3(0, 0, 0));
     }
 
-    if (timer_.GetMSec(false) > 500) {
+    if (timer_.GetMSec(false) > 1000) {
+        GetSubsystem<Network>()->DisplayPingTimes();
         i++;
         timer_.Reset();
 //        URHO3D_LOGINFO(" ");
@@ -258,7 +263,6 @@ void P2PMultiplayer::Init()
     GetSubsystem<Network>()->SetMode(NetworkMode::PEER_TO_PEER);
 //    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
-    GetSubsystem<Network>()->P2PConnectNAT("frameskippers.com", 61111);
 //    GetSubsystem<Network>()->BanAddress("192.168.68.*");
     GetSubsystem<Network>()->SetUpdateFps(30);
 }
@@ -458,7 +462,6 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
 
-    return;
     // Then create a controllable object for that client
 //    Node* newObject = CreateControllableObject();
 //    serverObjects_[newConnection] = newObject;
@@ -481,7 +484,6 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* body = ballNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
-    body_ = body;
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
 //    body->SetLinearDamping(0.5f);
 //    body->SetAngularDamping(0.5f);
@@ -492,25 +494,20 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     // Create a random colored point light at the ball so that can see better where is going
     auto* light = ballNode->CreateComponent<Light>();
     light->SetRange(3.0f);
-    light->SetColor(
-            Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
+    light->SetColor(Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
+    playerNodes_[newConnection] = ballNode;
 }
 
 void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 {
-//    return;
     using namespace ClientConnected;
-    return;
 //
 //    // When a client disconnects, remove the controlled object
     auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    Node* node = scene_->GetChild(connection->GetAddress());
-    node->Remove();
-//    Node* object = serverObjects_[connection];
-//    if (object)
-//        object->Remove();
-//
-//    serverObjects_.Erase(connection);
+    if (playerNodes_[connection]) {
+        playerNodes_[connection]->Remove();
+        playerNodes_.Erase(connection);
+    }
 }
 
 void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
@@ -529,4 +526,15 @@ void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eve
 {
     using namespace P2PAllReadyChanged;
     _allReady = eventData[P_READY].GetBool();
+}
+
+void P2PMultiplayer::HandleDisconnect(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Network>()->Disconnect(1000);
+    for (auto it = playerNodes_.Begin(); it != playerNodes_.End(); ++it) {
+        if ((*it).second_) {
+            (*it).second_->Remove();
+        }
+    }
+    playerNodes_.Clear();
 }

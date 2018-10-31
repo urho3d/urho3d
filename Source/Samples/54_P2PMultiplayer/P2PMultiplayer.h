@@ -105,6 +105,8 @@ private:
 
     void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
 
+    void HandleDisconnect(StringHash eventType, VariantMap& eventData);
+
     Timer timer_;
 //    /// Stop server
 //	void HandleStopServer(StringHash eventType, VariantMap& eventData);
@@ -118,6 +120,7 @@ private:
     SharedPtr<Button> joinSession_;
     SharedPtr<Button> readyButton_;
     SharedPtr<Button> resetHostButton_;
+    SharedPtr<Button> disconnect_;
     SharedPtr<LineEdit> guid_;
 //    /// Found server list
 	SharedPtr<Text> clientCount_;
@@ -125,6 +128,8 @@ private:
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
     SharedPtr<RigidBody> body_;
+    HashMap<Connection*, WeakPtr<Node>> playerNodes_;
+
     SharedPtr<Node> ball_;
     bool _allReady;
 };

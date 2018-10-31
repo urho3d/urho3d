@@ -77,8 +77,6 @@ public:
     bool P2PStartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Join existing P2P session
     void P2PJoinSession(String guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-    /// Subscribe for peer event handling
-    void P2PSubscribeForReadyEvents();
     /// Current peer count in session
     int GetP2PParticipantCount();
     /// Is host connected to the P2P session
@@ -170,11 +168,17 @@ public:
     /// Get current network mode
     const NetworkMode  GetMode() const;
 
+    void DisplayPingTimes();
+
 private:
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle render update frame event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Start P2P session when connected to NAT master
+    void HandleNATStartP2PSession(StringHash eventType, VariantMap& eventData);
+    /// Join P2P session when connected to NAT master
+    void HandleNATJoinP2PSession(StringHash eventType, VariantMap& eventData);
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
@@ -229,8 +233,6 @@ private:
     SLNet::RakNetGUID* remoteGUID_;
     /// Local server GUID.
     String guid_;
-    /// Attempting NAT punchtrough
-    bool natPunchtroughAttempt_;
     /// Ready event for automated event handling in P2P connections
     SLNet::ReadyEvent *readyEvent_;
     /// P2P functionality

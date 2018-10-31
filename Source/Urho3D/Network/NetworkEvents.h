@@ -143,16 +143,19 @@ URHO3D_EVENT(E_NATMASTERCONNECTIONSUCCEEDED, NetworkNatMasterConnectionSucceeded
     URHO3D_PARAM(P_PORT, Port);         // int
 }
 
+/// Http request returned response
 URHO3D_EVENT(E_HTTPREQUESTFINISHED, HttpRequestFinished)
 {
     URHO3D_PARAM(P_ADDRESS, Address);   // String
     URHO3D_PARAM(P_RESPONSE, Response);         // int
 }
 
+/// When P2P network declines our connection
 URHO3D_EVENT(E_P2PJOINREQUESTDENIED, P2PJoinRequestDenied)
 {
 }
 
+/// Status of all p2p connection readiness
 URHO3D_EVENT(E_P2PALLREADYCHANGED, P2PAllReadyChanged)
 {
 	URHO3D_PARAM(P_READY, Ready);   // String
