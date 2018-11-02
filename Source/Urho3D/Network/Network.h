@@ -187,8 +187,6 @@ private:
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
-    /// Handle Http request responses
-    void HandleTcpResponse();
     /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
     /// SLikeNet peer instance for client connection.
@@ -239,10 +237,6 @@ private:
     SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
     /// Connection graph to automate peer to peer discovery
     SLNet::ConnectionGraph2 *connectionGraph2_;
-    /// Http request interface
-    SLNet::HTTPConnection2 *httpConnection2_;
-    /// Support module for Http requests
-    SLNet::TCPInterface *tcp_;
     /// P2P current host guid
     String hostGuid_;
     /// current network mode - P2P or server-client mode

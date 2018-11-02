@@ -1619,4 +1619,9 @@ void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
     address_ = new SLNet::AddressOrGUID(addr);
 }
 
+String Connection::GetGUID()
+{
+    return address_->rakNetGuid.ToString();
+}
+
 }

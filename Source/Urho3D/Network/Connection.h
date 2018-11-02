@@ -40,8 +40,6 @@ namespace SLNet
     class FullyConnectedMesh2;
     class ReadyEvent;
     class ConnectionGraph2;
-    class HTTPConnection2;
-    class TCPInterface;
 }
 
 namespace Urho3D
@@ -161,6 +159,8 @@ public:
     void Ban();
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
+
+    String GetGUID();
     /// Set the the RakNet address/guid.
     void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
 

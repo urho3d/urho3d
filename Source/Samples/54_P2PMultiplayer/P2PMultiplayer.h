@@ -100,12 +100,14 @@ private:
     void HandleReady(StringHash eventType, VariantMap& eventData);
 
     void HandleResetHost(StringHash eventType, VariantMap& eventData);
-
-    void HandleHttpResponse(StringHash eventType, VariantMap& eventData);
-
     void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
 
+    void HandleSessionStarted(StringHash eventType, VariantMap& eventData);
+
     void HandleDisconnect(StringHash eventType, VariantMap& eventData);
+
+    void CreatePlayerNode(Connection* connection);
+    void DestroyPlayerNode(Connection* connection);
 
     Timer timer_;
 //    /// Stop server
@@ -129,6 +131,8 @@ private:
     SharedPtr<Text> hostGuid_;
     SharedPtr<RigidBody> body_;
     HashMap<Connection*, WeakPtr<Node>> playerNodes_;
+    String message_;
+    SharedPtr<HttpRequest> httpRequest_;
 
     SharedPtr<Node> ball_;
     bool _allReady;

@@ -158,7 +158,6 @@ void P2PMultiplayer::SubscribeToEvents()
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
-    SubscribeToEvent(E_HTTPREQUESTFINISHED, URHO3D_HANDLER(P2PMultiplayer, HandleHttpResponse));
     SubscribeToEvent(E_P2PALLREADYCHANGED, URHO3D_HANDLER(P2PMultiplayer, HandleAllReadyChanged));
 
 //    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
@@ -173,13 +172,21 @@ void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eve
 {
     URHO3D_LOGINFO("HandleStartP2PSession");
     GetSubsystem<Network>()->P2PStartSession(scene_);
-    GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
+    httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
+
+    SubscribeToEvent(E_P2PSESSIONSTARTED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionStarted));
 }
 
 void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
     GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_);
+}
+
+void P2PMultiplayer::HandleSessionStarted(StringHash eventType, VariantMap& eventData)
+{
+    UnsubscribeFromEvent(E_P2PSESSIONSTARTED);
+    CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
 }
 
 void P2PMultiplayer::HandleReady(StringHash eventType, VariantMap& eventData)
@@ -216,7 +223,14 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (timer_.GetMSec(false) > 1000) {
-        GetSubsystem<Network>()->DisplayPingTimes();
+        PODVector<Node*> nodes;
+        scene_->GetNodesWithTag(nodes, "Player");
+        URHO3D_LOGINFO("-------- NODES " + String(nodes.Size()));
+        for (auto it = nodes.Begin(); it != nodes.End(); ++it) {
+            URHO3D_LOGINFO("Node " + String((*it)->GetID()) + " => " + (*it)->GetVar("GUID").GetString());
+        }
+        URHO3D_LOGINFO("----------------");
+//        GetSubsystem<Network>()->DisplayPingTimes();
         i++;
         timer_.Reset();
 //        URHO3D_LOGINFO(" ");
@@ -245,8 +259,32 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 //        GetSubsystem<Network>()->P2PShowReadyStatus();
 //        URHO3D_LOGINFO("");
 
-        // Just query for the newer P2P session
-        GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
+        if (httpRequest_.Null()) {
+            httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
+            message_.Clear();
+        }
+        else
+        {
+            // Initializing HTTP request
+            if (httpRequest_->GetState() == HTTP_INITIALIZING)
+                return;
+                // An error has occurred
+            else if (httpRequest_->GetState() == HTTP_ERROR)
+            {
+            }
+                // Get message data
+            else
+            {
+                if (httpRequest_->GetAvailableSize() > 0) {
+                    message_ += httpRequest_->ReadLine();
+                }
+                else
+                {
+                    guid_->SetText(message_);
+                    httpRequest_.Reset();
+                }
+            }
+        }
 
         if (GetSubsystem<Network>()->P2PGetReady()) {
             static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set unready");
@@ -265,6 +303,8 @@ void P2PMultiplayer::Init()
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
 //    GetSubsystem<Network>()->BanAddress("192.168.68.*");
     GetSubsystem<Network>()->SetUpdateFps(30);
+
+    httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
 }
 
 //
@@ -462,6 +502,42 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
 
+    CreatePlayerNode(newConnection);
+}
+
+void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientConnected;
+//
+//    // When a client disconnects, remove the controlled object
+    auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    DestroyPlayerNode(connection);
+}
+
+void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Network>()->P2PResetHost();
+}
+
+void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eventData)
+{
+    using namespace P2PAllReadyChanged;
+    _allReady = eventData[P_READY].GetBool();
+}
+
+void P2PMultiplayer::HandleDisconnect(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Network>()->Disconnect(1000);
+    for (auto it = playerNodes_.Begin(); it != playerNodes_.End(); ++it) {
+        if ((*it).second_) {
+            (*it).second_->Remove();
+        }
+    }
+    playerNodes_.Clear();
+}
+
+void P2PMultiplayer::CreatePlayerNode(Connection* connection)
+{
     // Then create a controllable object for that client
 //    Node* newObject = CreateControllableObject();
 //    serverObjects_[newConnection] = newObject;
@@ -473,7 +549,9 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* cache = GetSubsystem<ResourceCache>();
 
     // Create the scene node & visual representation. This will be a replicated object
-    Node* ballNode = scene_->CreateChild(newConnection->GetAddress());
+    Node* ballNode = scene_->CreateChild();
+    ballNode->AddTag("Player");
+    ballNode->SetVar("GUID", connection->GetGUID());
     ballNode->SetPosition(Vector3(0, 10, 0));
     ballNode->SetScale(0.5f);
     auto* ballObject = ballNode->CreateComponent<StaticModel>();
@@ -495,46 +573,13 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* light = ballNode->CreateComponent<Light>();
     light->SetRange(3.0f);
     light->SetColor(Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
-    playerNodes_[newConnection] = ballNode;
+    playerNodes_[connection] = ballNode;
 }
 
-void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
+void P2PMultiplayer::DestroyPlayerNode(Connection* connection)
 {
-    using namespace ClientConnected;
-//
-//    // When a client disconnects, remove the controlled object
-    auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     if (playerNodes_[connection]) {
         playerNodes_[connection]->Remove();
         playerNodes_.Erase(connection);
     }
-}
-
-void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
-{
-    GetSubsystem<Network>()->P2PResetHost();
-}
-
-void P2PMultiplayer::HandleHttpResponse(StringHash eventType, VariantMap& eventData)
-{
-    using namespace HttpRequestFinished;
-    //URHO3D_LOGINFO("Response got: " + eventData[P_ADDRESS].GetString() + " => " + eventData[P_RESPONSE].GetString());
-    guid_->SetText(eventData[P_RESPONSE].GetString());
-}
-
-void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eventData)
-{
-    using namespace P2PAllReadyChanged;
-    _allReady = eventData[P_READY].GetBool();
-}
-
-void P2PMultiplayer::HandleDisconnect(StringHash eventType, VariantMap& eventData)
-{
-    GetSubsystem<Network>()->Disconnect(1000);
-    for (auto it = playerNodes_.Begin(); it != playerNodes_.End(); ++it) {
-        if ((*it).second_) {
-            (*it).second_->Remove();
-        }
-    }
-    playerNodes_.Clear();
 }

@@ -47,8 +47,6 @@
 #include <SLikeNet/BitStream.h>
 #include <SLikeNet/ReadyEvent.h>
 #include <SLikeNet/ConnectionGraph2.h>
-#include "SLikeNet/HTTPConnection2.h"
-#include "SLikeNet/TCPInterface.h"
 
 #ifdef SendMessage
 #undef SendMessage
@@ -223,11 +221,6 @@ Network::Network(Context* context) :
     rakPeer_->AttachPlugin(readyEvent_);
     connectionGraph2_ = SLNet::ConnectionGraph2::GetInstance();
     rakPeer_->AttachPlugin(connectionGraph2_);
-    httpConnection2_ = SLNet::HTTPConnection2::GetInstance();
-    tcp_ = SLNet::TCPInterface::GetInstance();
-    tcp_->AttachPlugin(httpConnection2_);
-
-    tcp_->Start(0, 0, 1);
 
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     rakPeerClient_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
@@ -305,7 +298,7 @@ Network::~Network()
     Disconnect(1000);
 
     fullyConnectedMesh2_->ResetHostCalculation();
-    
+
     rakPeer_->DetachPlugin(natPunchthroughServerClient_);
     rakPeerClient_->DetachPlugin(natPunchthroughClient_);
     rakPeer_->DetachPlugin(fullyConnectedMesh2_);
@@ -331,7 +324,6 @@ Network::~Network()
     SLNet::FullyConnectedMesh2::DestroyInstance(fullyConnectedMesh2_);
     SLNet::ReadyEvent::DestroyInstance(readyEvent_);
     SLNet::ConnectionGraph2::DestroyInstance(connectionGraph2_);
-    SLNet::HTTPConnection2::DestroyInstance(httpConnection2_);
 
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
@@ -494,6 +486,10 @@ bool Network::P2PConnectNAT(const String& address, unsigned short port)
 
     //isServer_ = false;
     SLNet::ConnectionAttemptResult connectResult = rakPeer_->Connect(address.CString(), port, password_.CString(), password_.Length());
+    if (connectResult == SLNet::ALREADY_CONNECTED_TO_ENDPOINT) {
+        URHO3D_LOGWARNING("Already connected to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
+        return false;
+    }
     if (connectResult != SLNet::CONNECTION_ATTEMPT_STARTED)
     {
         URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
@@ -502,7 +498,6 @@ bool Network::P2PConnectNAT(const String& address, unsigned short port)
     }
     else
     {
-
         URHO3D_LOGINFO("Connecting to server " + address + ":" + String(port));
         return true;
     }
@@ -756,11 +751,8 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
     URHO3D_PROFILE(MakeHttpRequest);
 
     // The initialization of the request will take time, can not know at this point if it has an error or not
-    //SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
-    //return request;
-    SLNet::RakString rsRequest = SLNet::RakString::FormatForGET(url.CString());
-    httpConnection2_->TransmitRequest(rsRequest, "frameskippers.com", 82, true);
-    return nullptr;
+    SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
+    return request;
 }
 
 void Network::BanAddress(const String& address)
@@ -1223,8 +1215,6 @@ void Network::Update(float timeStep)
             rakPeerClient_->DeallocatePacket(packet);
         }
     }
-
-    HandleTcpResponse();
 }
 
 void Network::PostUpdate(float timeStep)
@@ -1275,7 +1265,7 @@ void Network::PostUpdate(float timeStep)
 
         if (serverConnection_)
         {
-            if (networkMode_ == PEER_TO_PEER && !isServer_) {
+            if (networkMode_ == PEER_TO_PEER && !isServer_ && serverConnection_->GetGUID() != P2PGetGUID()) {
                 // Send the client update
                 serverConnection_->SendClientUpdate();
                 serverConnection_->SendRemoteEvents();
@@ -1377,7 +1367,7 @@ void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventDa
     URHO3D_LOGINFO("HandleNATStartP2PSession");
     isServer_ = false;
     if (!serverConnection_) {
-        serverConnection_ = new Connection(context_, false, rakPeer_->GetMyBoundAddress(), rakPeer_);
+        serverConnection_ = new Connection(context_, false, rakPeer_->GetMyGUID(), rakPeer_);
         serverConnection_->SetScene(scene_);
         serverConnection_->SetSceneLoaded(true);
         serverConnection_->SetIdentity(identity_);
@@ -1390,6 +1380,8 @@ void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventDa
 
     hostGuid_ = P2PGetGUID();
     P2PSetReady(false);
+
+    SendEvent(E_P2PSESSIONSTARTED);
 }
 
 void Network::P2PJoinSession(String guid, Scene* scene, const VariantMap& identity)
@@ -1545,43 +1537,6 @@ void Network::P2PResetHost()
         return;
     }
     fullyConnectedMesh2_->ResetHostCalculation();
-}
-
-void Network::HandleTcpResponse()
-{
-    // The following code is TCP operations for talking to the master server, and parsing the reply
-    SLNet::SystemAddress sa;
-    // This is kind of crappy, but for TCP plugins, always do HasCompletedConnectionAttempt, then Receive(), then HasFailedConnectionAttempt(),HasLostConnection()
-    sa = tcp_->HasCompletedConnectionAttempt();
-    SLNet::Packet* packet;
-    for (packet = tcp_->Receive(); packet; tcp_->DeallocatePacket(packet), packet = tcp_->Receive())
-        ;
-    sa = tcp_->HasFailedConnectionAttempt();
-    sa = tcp_->HasLostConnection();
-
-    SLNet::RakString stringTransmitted;
-    SLNet::RakString hostTransmitted;
-    SLNet::RakString responseReceived;
-    SLNet::SystemAddress hostReceived;
-    ptrdiff_t contentOffset;
-    if (httpConnection2_->GetResponse(stringTransmitted, hostTransmitted, responseReceived, hostReceived, contentOffset))
-    {
-        if (responseReceived.IsEmpty() == false)
-        {
-            if (contentOffset == -1)
-            {
-                // No content
-                printf(responseReceived.C_String());
-            }
-            else
-            {
-                VariantMap data = GetEventDataMap();
-                data[HttpRequestFinished::P_ADDRESS] = "123";
-                data[HttpRequestFinished::P_RESPONSE] = String(responseReceived.C_String() + contentOffset);
-                SendEvent(E_HTTPREQUESTFINISHED, data);
-            }
-        }
-    }
 }
 
 void Network::SetMode(NetworkMode mode, bool force)
