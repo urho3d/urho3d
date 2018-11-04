@@ -101,7 +101,7 @@ A number of build options can be defined when invoking the build scripts or when
 |Build Option         |Value|Description          |
 |---------------------|-----|---------------------|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
-|WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
+|MINGW                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
 |WEB                  |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |TVOS                 |0|Configure project for targeting tvOS platform (cmake_generic.sh and cmake-gui only)|

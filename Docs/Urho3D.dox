@@ -1380,6 +1380,7 @@ From 1.7 to master:
 - StringHash::Calculate() method is now case-sensitive.
 - Build system - integrate with Gradle build system and migration to use Kotlin for Android platform.
 - Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Also set the default for "EMSCRIPTEN_WASM" build option to TRUE in order to align with the upstream EMCC compiler changes.
+- Build system - the 'WIN32' build option for 'cmake_generic.sh' is renamed to 'MINGW' to be consistent with 'cmake_generic.bat'.
 
 */
 

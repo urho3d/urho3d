@@ -57,7 +57,7 @@ before_script:
       elif [[ ! $PACKAGE_UPLOAD ]]; then
         export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start;
       fi;
-    elif [[ $WIN32 ]]; then
+    elif [[ $MINGW ]]; then
       if [[ "$URHO3D_64BIT" == "0" ]]; then export ARCH=i686; else export ARCH=x86_64; fi;
       export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32 DIRECTX_LIB_SEARCH_PATHS=/usr/${ARCH}-w64-mingw32/lib;
     fi
@@ -117,23 +117,23 @@ matrix:
     - &MinGW-64bit
       compiler: mingw-w64-x86_64
       addons: {apt: {packages: [*default_packages, gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
-      env: WIN32=1 URHO3D_LIB_TYPE=STATIC
+      env: MINGW=1 URHO3D_LIB_TYPE=STATIC
     - <<: *MinGW-64bit
-      env: WIN32=1 URHO3D_LIB_TYPE=SHARED
+      env: MINGW=1 URHO3D_LIB_TYPE=SHARED
     - <<: *MinGW-64bit
-      env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
+      env: MINGW=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
     - <<: *MinGW-64bit
-      env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
+      env: MINGW=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
     - &MinGW-32bit
       compiler: mingw-w64-i686
       addons: {apt: {packages: [*default_packages, gcc-mingw-w64-i686, g++-mingw-w64-i686, binutils-mingw-w64-i686]}}
-      env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+      env: MINGW=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - <<: *MinGW-32bit
-      env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+      env: MINGW=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *MinGW-32bit
-      env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
+      env: MINGW=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
-      env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
+      env: MINGW=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
     - &debug-build-stage
       stage: debug build configuration
       addons: *pulseaudio
