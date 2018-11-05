@@ -313,6 +313,12 @@ task :ci do
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
     next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ (ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']) }.any?
   end
+  # Clear ccache on demand
+  if ENV['USE_CCACHE'] then
+    clear = /\[cache clear\]/ =~ ENV['COMMIT_MESSAGE']
+    system "ccache -z #{clear ? '-C' : ''}"
+    puts; $stdout.flush
+  end
   # Obtain our custom data, if any
   if ENV['APPVEYOR']
     # AppVeyor does not provide job number environment variable in the same semantics as TRAVIS_JOB_NUMBER nor it supports custom data in its .appveyor.yml document
@@ -335,29 +341,28 @@ task :ci do
     system 'git fetch --tags --unshallow' or abort 'Failed to unshallow cloned repository'
     puts; $stdout.flush
   end
-  # CMake/Emscripten toolchain file does not show this information yet
+  # Show the compiler toolchain version because CMake/Emscripten toolchain file does not show this info and also because the build tree on Travis CI is cached and just being reconfigured each time
   if ENV['WEB']
     system 'clang --version && emcc --version' or abort 'Failed to find Emscripten compiler toolchain'
   end
   # Show CMake version
-  system 'cmake --version' or abort 'Failed to find CMake'
+  if ENV['ANDROID']
+    # Android build uses SDK's embedded CMake which is non-vanilla version of CMake
+    system '$ANDROID_HOME/cmake/*/bin/cmake --version' or abort 'Failed to find CMake'
+  else
+    system 'cmake --version' or abort 'Failed to find CMake'
+  end
   puts; $stdout.flush
-  # Ensure '.build-options' and '.env-file' are up-to-date
-  system %Q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=\w+/g) {print "$1\n"}' .travis.yml) |sort |uniq |grep -v ^PATH$ >script/.env-file)
-  # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
-  ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
-  # Always use a same build configuration per build job to keep ccache's cache size small; default to RELEASE unless specifically defined
-  ENV['config'] = 'Release' if ENV['XCODE']
+  # Use out-of-source build tree
+  ENV['build_tree'] = 'build/ci'
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
-  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
+  ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2017') : '')
-  # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
-  # LuaJIT on Web platform is not possible
-  jit = (ENV['MINGW'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
-  system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
-  system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
-  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
+  # Cache the initial build tree for next run on platform that is slow to generate the build tree
+  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
+  system "rake cmake #{generator} URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
+  system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
@@ -376,7 +381,7 @@ task :ci do
     if ENV['TRAVIS'] && !ENV['XCODE'] && !already_timeup && !timeup(true, 10)
       # The build cache could be corrupted, so clear the cache and retry one more time
       system "cd #{ENV['build_tree']}/Source/Urho3D/tolua++-prefix/src/tolua++-build && make clean >/dev/null 2>&1"
-      system "cd #{ENV['build_tree']}/Source/ThirdParty/LuaJIT/buildvm-prefix/src/buildvm-build && make clean >/dev/null 2>&1" if jit != ''
+      system "cd #{ENV['build_tree']}/Source/ThirdParty/LuaJIT/buildvm-prefix/src/buildvm-build && make clean >/dev/null 2>&1"
       success = system "ccache -Cz && rake make clean_first #{redirect}"
     end
     unless success
@@ -396,113 +401,71 @@ task :ci do
       puts; $stdout.flush
       abort 'Failed to pass linter checks'
     end
-    next
-  end
-  if ENV['URHO3D_TESTING'] && !ENV['WEB'] && !timeup
-    # Multi-config CMake generators use different test target name than single-config ones for no good reason
-    test = "rake make target=#{(ENV['OS'] && !ENV['MINGW']) || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
-    system "#{test}" or abort 'Failed to test Urho3D library'
-    test = "&& echo#{ENV['OS'] ? '.' : ''} && #{test}"
   else
-    test = ''
-  end
-  # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform or when the build config may run out of disk space
-  unless ENV['CI'] && ((ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || (ENV['CMAKE_BUILD_TYPE'] == 'Debug' && ENV['URHO3D_LIB_TYPE'] == 'STATIC')) || timeup
-    # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
-    ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
-    if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
-      abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
-      $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
-      next
+    if ENV['URHO3D_TESTING'] && !timeup
+      # Multi-config CMake generators use different test target name than single-config ones for no good reason
+      test = "#{ENV['OSX'] || ENV['APPVEYOR'] ? '' : 'xvfb-run'} rake make target=#{(ENV['OS'] && !ENV['MINGW']) || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
+      system "#{test}" or abort 'Failed to test Urho3D library'
+      test = "&& echo#{ENV['OS'] ? '.' : ''} && #{test}"
+    else
+      test = ''
     end
-    # Alternate to use in-the-source build tree for test coverage
-    ENV['build_tree'] = '.' unless ENV['APPVEYOR']
-    # Ensure the following variables are auto-discovered during scaffolding test
-    ENV['URHO3D_64BIT'] = nil unless ENV['APPVEYOR']    # AppVeyor uses VS generator which always requires URHO3D_64BIT as input variable
-    ['URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
-    # Alternate the scaffolding location between Travis CI and AppVeyor for test coverage; Travis CI uses build tree while AppVeyor using source tree
-    # First scaffolding test uses absolute path while second test uses relative path, also for test converage
-    # First test - create a new project on the fly that uses newly installed Urho3D SDK
-    org = (ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_PROJECT_SLUG']).split('/').first
-    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? "C:/projects/#{org}/" : (ENV['TRAVIS'] ? "#{ENV['HOME']}/build/#{org}/Build/" : '../Build/')}UsingSDK" do   # The last rel path is for non-CI users, just in case
-      puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
-      # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
-      system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+    # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform or when the build config may run out of disk space
+    unless ENV['CI'] && ((ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || (ENV['CMAKE_BUILD_TYPE'] == 'Debug' && ENV['URHO3D_LIB_TYPE'] == 'STATIC')) || timeup
+      # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
+      ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
+      if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
+        abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
+        $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+        next
+      end
+      urho3d_home = "#{Dir.pwd}/#{ENV['build_tree']}"
+      # Use non out-of-source build tree for scaffolding test
+      ENV['build_tree'] = '.'
+      # Ensure the following variables are auto-discovered during scaffolding test
+      ENV['URHO3D_64BIT'] = nil unless ENV['APPVEYOR']    # AppVeyor uses VS generator which always requires URHO3D_64BIT as input variable
+      ['URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
+      # First test - create a new project on the fly that uses newly installed Urho3D SDK
+      Dir.chdir scaffolding 'UsingSDK' do
+        puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
+        # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
+        system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      end
+      next if timeup
+      # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
+      Dir.chdir scaffolding 'UsingBuildTree' do
+        puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
+        system "rake cmake #{generator} URHO3D_HOME=#{urho3d_home} && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      end
+      # Clean up so that these test dirs do not show up in the CI mirror branches
+      require 'fileutils'
+      FileUtils.rm_rf(['UsingSDK', 'UsingBuildTree'])
     end
-    next if timeup
-    # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
-    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
-      puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
-      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? "../../#{ENV['build_tree']}" : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
-    end
-  end
-  # Make, deploy, and test run Android APK in an Android (virtual) device
-  if ENV['AVD'] && !ENV['PACKAGE_UPLOAD'] && !timeup
-    puts "\nTest deploying and running Urho3D Samples APK..."
-    Dir.chdir '../Build' do
-      system 'android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
-      if android_wait_for_device
-        system "ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
-        android_test_run or abort 'Failed to test run Urho3D Samples APK'
-      else
-        puts 'Skipped test running Urho3D Samples APK as emulator failed to start in time'
+    # Make, deploy, and test run Android APK in an Android (virtual) device
+    if ENV['AVD'] && !ENV['PACKAGE_UPLOAD'] && !timeup
+      puts "\nTest deploying and running Urho3D Samples APK..."
+      Dir.chdir '../Build' do
+        system 'android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
+        if android_wait_for_device
+          system "ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
+          android_test_run or abort 'Failed to test run Urho3D Samples APK'
+        else
+          puts 'Skipped test running Urho3D Samples APK as emulator failed to start in time'
+        end
       end
     end
   end
+  system 'ccache -s' if ENV['USE_CCACHE']
 end
 
 # Usage: NOT intended to be used manually
 desc 'Setup build cache'
 task :ci_setup_cache do
-  clear = /\[cache clear\]/ =~ ENV['COMMIT_MESSAGE']
-  # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
-  if ENV['APPVEYOR']
-    system "bash -c 'rm -rf #{ENV['build_tree']}'" if clear
-    if File.exists?("#{ENV['build_tree']}/.commits")
-      # Find the last valid commit SHA because the recorded commit SHAs may no longer be valid due to git reset/forced push
-      last_commit = File.read("#{ENV['build_tree']}/.commits").split.find { |sha| system "git cat-file -e #{sha}" }
-      # AppVeyor prefers CMD's FIND over MSYS's find, so we have to use fully qualified path to the MSYS's find
-      system "bash -c '/c/Program\\ Files/Git/usr/bin/find CMakeLists.txt CMake Docs Source |xargs touch -r #{ENV['build_tree']}/CMakeCache.txt && touch $(git diff --name-only #{last_commit} #{ENV['APPVEYOR_REPO_COMMIT']})'"
-    end
-    next
-  # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
-  elsif ENV['USE_CCACHE'].to_i == 2
-    puts 'Setting up build cache'
-    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
-    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
-    matched = /.*-([^-]+-[^-]+)$/.match(ENV['TRAVIS_BRANCH'])
-    base_mirror = matched ? matched[1] : nil
-    # Do not abort even when it fails here
-    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
-    # Preserving .git directory before clearing the cache on Linux host system (ccache on Mac OSX does not have this problem)
-    `mv ~/.ccache/.git /tmp` if clear && ENV['OSX'].to_i != 1
-  end
-  # Clear ccache on demand
-  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{clear ? '-C' : ''}"
-  # Restoring .git directory if its backup exists
-  `if [ -e /tmp/.git ]; then mv /tmp/.git ~/.ccache; fi`
-end
-
-# Usage: NOT intended to be used manually
-desc 'Teardown build cache'
-task :ci_teardown_cache do
-  # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
-  if ENV['APPVEYOR']
-    # Keep the last 10 commit SHAs
-    commits = (File.exists?("#{ENV['build_tree']}/.commits") ? File.read("#{ENV['build_tree']}/.commits").split : []).unshift(`git rev-parse #{ENV['APPVEYOR_REPO_COMMIT']}`.chomp).take 10
-    File.open("#{ENV['build_tree']}/.commits", 'w') { |file| file.puts commits } if Dir.exist?(ENV['build_tree'])
-    # Exclude build artifacts from being cached due to cache size limitation
-    system "bash -c 'rm -f #{ENV['build_tree']}/bin/*.{exe,dll}'"
-    next
-  # Upload cache to internal cache store if it is our own
-  elsif ENV['USE_CCACHE'].to_i == 2
-    puts 'Storing build cache'
-    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
-    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
-    # Do not abort even when it fails here
-    system "cd ~/.ccache && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/#{repo_slug} && git add -A . && git commit --amend -qm 'Travis CI: cache update at #{Time.now.utc}.' && git push -qf -u origin #{ENV['TRAVIS_BRANCH']}#{job_number} >/dev/null 2>&1"
-  end
-  system 'ccache -s'
+  puts 'Setting up build cache using docker volume...'
+  # This is a hack as it relies on docker volume internal directory structure
+  system 'docker volume create $(id -u).urho3d_home_dir && sudo rm -rf /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data && sudo ln -s $HOME/urho3d_home_dir /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data' or abort 'Failed to setup build cache'
+  # Ensure '.build-options' and '.env-file' are up-to-date
+  system 'bash', '-c', %q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=.+?/g) {print "$1\n"}' .travis.yml) <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file) or abort 'Failed to update .build-options and .env-file'
 end
 
 # Usage: NOT intended to be used manually
