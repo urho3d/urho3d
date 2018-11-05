@@ -196,7 +196,7 @@ static const char* RAKNET_MESSAGEID_STRINGS[] = {
 };
 
 static const int DEFAULT_UPDATE_FPS = 30;
-static const int SERVER_TIMEOUT_TIME = 500;
+static const int SERVER_TIMEOUT_TIME = 5000;
 
 Network::Network(Context* context) :
     Object(context),
@@ -357,7 +357,6 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     P2PReadyStatusChanged();
     if (networkMode_ == PEER_TO_PEER && clientConnections_[connection]) {
-        URHO3D_LOGERROR("3");
         URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
         //TODO proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
@@ -859,7 +858,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         packetHandled = true;
     }
-    else if (packetID == ID_REMOTE_CONNECTION_LOST)
+    else if (packetID == ID_REMOTE_CONNECTION_LOST || packetID == ID_REMOTE_DISCONNECTION_NOTIFICATION)
     {
         //TODO find out who's really sending out this message
         URHO3D_LOGWARNING("ID_REMOTE_CONNECTION_LOST");
@@ -869,7 +868,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     {
         if (natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
             URHO3D_LOGINFO("Already connected to NAT server! ");
-            if (!isServer)
+            if (!isServer && networkMode_ == SERVER_CLIENT)
             {
                 natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
             }
@@ -889,8 +888,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             if (networkMode_ == SERVER_CLIENT) {
                 OnServerConnected(packet->guid);
             } else {
-                URHO3D_LOGINFOF("ID_CONNECTION_REQUEST_ACCEPTED from %s,guid=%s", packet->systemAddress.ToString(true),
-                                packet->guid.ToString());
+                URHO3D_LOGINFOF("ID_CONNECTION_REQUEST_ACCEPTED from %s,guid=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
                 // Assume that we're connecting to the P2P host
 //                serverConnection_->SetAddressOrGUID(packet->guid);
 
@@ -902,6 +900,8 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
                 SLNet::BitStream bsOut;
                 bsOut.Write((unsigned char) MSG_P2P_JOIN_REQUEST);
                 rakPeer_->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
+
+                //TODO send out our identity
             }
         }
         packetHandled = true;
@@ -1379,6 +1379,7 @@ void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventDa
     fullyConnectedMesh2_->ResetHostCalculation();
 
     hostGuid_ = P2PGetGUID();
+    isServer_ = true;
     P2PSetReady(false);
 
     SendEvent(E_P2PSESSIONSTARTED);

@@ -46,6 +46,7 @@
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/LineEdit.h>
 #include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/Core/CoreEvents.h>
@@ -65,6 +66,13 @@ P2PMultiplayer::P2PMultiplayer(Context* context) :
     Sample(context)
 {
 }
+
+// Control bits we define
+static const unsigned CTRL_FORWARD = 1;
+static const unsigned CTRL_BACK = 2;
+static const unsigned CTRL_LEFT = 4;
+static const unsigned CTRL_RIGHT = 8;
+
 
 void P2PMultiplayer::Start()
 {
@@ -114,14 +122,7 @@ void P2PMultiplayer::CreateUI()
     roleTitle_->SetTextAlignment(HA_CENTER);
     roleTitle_->SetColor(Color::GREEN);
     roleTitle_->SetFontSize(40);
-    
-//	stopServer_->SetVisible(false);
-//
-//    // Create client connection related fields
-//    marginTop += 80;
-//    CreateLabel("2. Discover LAN servers", IntVector2(20, marginTop-20));
-//    refreshServerList_ = CreateButton("Search...", 160, IntVector2(20, marginTop));
-//
+
 	marginTop += 80;
     clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));
     marginTop += 40;
@@ -139,14 +140,14 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     disconnect_ = CreateButton("Disconnect", 160, IntVector2(20, marginTop));
 
-    // No viewports or scene is defined. However, the default zone's fog color controls the fill color
-    //GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
+//     No viewports or scene is defined. However, the default zone's fog color controls the fill color
+    GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
 }
 
 void P2PMultiplayer::SubscribeToEvents()
 {
-    SubscribeToEvent(E_SERVERCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleServerConnected));
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(P2PMultiplayer, HandleUpdate));
+    SubscribeToEvent(E_PHYSICSPRESTEP, URHO3D_HANDLER(P2PMultiplayer, HandlePhysicsPrestep));
 //
     SubscribeToEvent(startSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleStartP2PSession));
     SubscribeToEvent(joinSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleJoinP2PSession));
@@ -163,11 +164,6 @@ void P2PMultiplayer::SubscribeToEvents()
 //    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
 }
 
-void P2PMultiplayer::HandleServerConnected(StringHash eventType, VariantMap& eventData)
-{
-    URHO3D_LOGINFO("HandleServerConnected");
-}
-
 void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("HandleStartP2PSession");
@@ -181,6 +177,7 @@ void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& even
 {
     URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
     GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_);
+    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
 }
 
 void P2PMultiplayer::HandleSessionStarted(StringHash eventType, VariantMap& eventData)
@@ -204,9 +201,6 @@ void P2PMultiplayer::HandleReady(StringHash eventType, VariantMap& eventData)
 
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (cameraNode_) {
-        cameraNode_->LookAt(ball_->GetPosition());
-    }
     using namespace Update;
     static int i = 0;
     auto input = GetSubsystem<Input>();
@@ -215,21 +209,45 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     gametime += timestep * 10;
 
     if (GetSubsystem<Network>()->P2PIsHostSystem() && _allReady) {
-        //if (body_) {
-        //    body_->ApplyImpulse(Vector3(0, 10, 0));
-        //}
-        ball_->SetWorldPosition(Vector3(0, Sin(gametime) * 5 + 6, 0));
-        body_->SetLinearVelocity(Vector3(0, 0, 0));
+    }
+
+    // Mouse sensitivity as degrees per pixel
+    const float MOUSE_SENSITIVITY = 0.1f;
+
+    // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch and only move the camera
+    // when the cursor is hidden
+    IntVector2 mouseMove = input->GetMouseMove();
+    yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
+    pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
+    pitch_ = Clamp(pitch_, 1.0f, 90.0f);
+
+    // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
+    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+
+    if (GetSubsystem<Network>()->GetServerConnection()) {
+        Controls controls;
+        // Copy mouse yaw
+        controls.yaw_ = yaw_;
+
+        controls.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+        controls.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+        controls.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+        controls.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
+        GetSubsystem<Network>()->GetServerConnection()->SetControls(controls);
     }
 
     if (timer_.GetMSec(false) > 1000) {
-        PODVector<Node*> nodes;
-        scene_->GetNodesWithTag(nodes, "Player");
-        URHO3D_LOGINFO("-------- NODES " + String(nodes.Size()));
-        for (auto it = nodes.Begin(); it != nodes.End(); ++it) {
-            URHO3D_LOGINFO("Node " + String((*it)->GetID()) + " => " + (*it)->GetVar("GUID").GetString());
+        if (GetSubsystem<Network>()->GetClientConnections().Size() != playerNodes_.Size() - 1) {
+            UpdateClientObjects();
         }
-        URHO3D_LOGINFO("----------------");
+
+//        PODVector<Node*> nodes;
+//        scene_->GetNodesWithTag(nodes, "Player");
+//        URHO3D_LOGINFO("-------- NODES " + String(nodes.Size()));
+//        for (auto it = nodes.Begin(); it != nodes.End(); ++it) {
+//            URHO3D_LOGINFO("Node " + String((*it)->GetID()) + " => " + (*it)->GetVar("GUID").GetString());
+//        }
+//        URHO3D_LOGINFO("----------------");
 //        GetSubsystem<Network>()->DisplayPingTimes();
         i++;
         timer_.Reset();
@@ -294,14 +312,96 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
             static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
         }
     }
+
+    auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
+    if (serverConnection) {
+        if (playerNodes_[serverConnection]) {
+//            GetSubsystem<Input>()->SetMouseVisible(false);
+//            cameraNode_->LookAt(playerNodes_[serverConnection]->GetWorldPosition());
+            const float CAMERA_DISTANCE = 5.0f;
+
+            // Move camera some distance away from the ball
+            cameraNode_->SetPosition(playerNodes_[serverConnection]->GetPosition() + cameraNode_->GetRotation() * Vector3::BACK * CAMERA_DISTANCE);
+        } else {
+            UpdateClientObjects();
+//            GetSubsystem<Input>()->SetMouseVisible(true);
+        }
+    }
+}
+
+void P2PMultiplayer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
+{
+    if (!GetSubsystem<Network>()->P2PIsHostSystem()) {
+        return;
+    }
+
+    // Apply client controls to the nodes only if we're the host
+    using namespace PhysicsPreStep;
+    float timestep = eventData[P_TIMESTEP].GetFloat();
+    auto clients = GetSubsystem<Network>()->GetClientConnections();
+    for (auto it = clients.Begin(); it != clients.End(); ++it) {
+        // Get the last controls sent by the client
+        const Controls& controls = (*it)->GetControls();
+        // Torque is relative to the forward vector
+        Quaternion rotation(0.0f, controls.yaw_, 0.0f);
+
+        const float MOVE_TORQUE = 3.0f;
+
+        if (!playerNodes_[(*it)]) {
+            continue;
+        }
+        RigidBody* body = playerNodes_[(*it)]->GetComponent<RigidBody>();
+        // Movement torque is applied before each simulation step, which happen at 60 FPS. This makes the simulation
+        // independent from rendering framerate. We could also apply forces (which would enable in-air control),
+        // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
+        if (controls.buttons_ & CTRL_FORWARD) {
+            body->ApplyTorque(rotation * Vector3::RIGHT * MOVE_TORQUE);
+        }
+        if (controls.buttons_ & CTRL_BACK) {
+            body->ApplyTorque(rotation * Vector3::LEFT * MOVE_TORQUE);
+        }
+        if (controls.buttons_ & CTRL_LEFT) {
+            body->ApplyTorque(rotation * Vector3::FORWARD * MOVE_TORQUE);
+        }
+        if (controls.buttons_ & CTRL_RIGHT) {
+            body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
+        }
+    }
+
+    auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
+    if (serverConnection) {
+        const Controls& controls = serverConnection->GetControls();
+        // Torque is relative to the forward vector
+        Quaternion rotation(0.0f, controls.yaw_, 0.0f);
+
+        const float MOVE_TORQUE = 3.0f;
+        if (!playerNodes_[serverConnection]) {
+            return;
+        }
+
+        RigidBody* body = playerNodes_[serverConnection]->GetComponent<RigidBody>();
+        // Movement torque is applied before each simulation step, which happen at 60 FPS. This makes the simulation
+        // independent from rendering framerate. We could also apply forces (which would enable in-air control),
+        // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
+        if (controls.buttons_ & CTRL_FORWARD) {
+            body->ApplyTorque(rotation * Vector3::RIGHT * MOVE_TORQUE);
+        }
+        if (controls.buttons_ & CTRL_BACK) {
+            body->ApplyTorque(rotation * Vector3::LEFT * MOVE_TORQUE);
+        }
+        if (controls.buttons_ & CTRL_LEFT) {
+            body->ApplyTorque(rotation * Vector3::FORWARD * MOVE_TORQUE);
+        }
+        if (controls.buttons_ & CTRL_RIGHT) {
+            body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
+        }
+    }
 }
 
 void P2PMultiplayer::Init()
 {
     GetSubsystem<Network>()->SetMode(NetworkMode::PEER_TO_PEER);
-//    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
-//    GetSubsystem<Network>()->BanAddress("192.168.68.*");
     GetSubsystem<Network>()->SetUpdateFps(30);
 
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
@@ -352,43 +452,6 @@ Text* P2PMultiplayer::CreateLabel(const String& text, IntVector2 pos)
     label->SetTextEffect(TextEffect::TE_STROKE);
 	return label;
 }
-//
-//void LANDiscovery::HandleNetworkHostDiscovered(StringHash eventType, VariantMap& eventData)
-//{
-//	using namespace NetworkHostDiscovered;
-//	URHO3D_LOGINFO("Server discovered!");
-//	String text = serverList_->GetText();
-//	VariantMap data = eventData[P_BEACON].GetVariantMap();
-//	text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetInt()) + ")" + eventData[P_ADDRESS].GetString() + ":" + String(eventData[P_PORT].GetInt());
-//	serverList_->SetText(text);
-//}
-//
-//void LANDiscovery::HandleStartServer(StringHash eventType, VariantMap& eventData)
-//{
-//	if (GetSubsystem<Network>()->StartServer(SERVER_PORT)) {
-//		VariantMap data;
-//		data["Name"] = "Test server";
-//		data["Players"] = 100;
-//		/// Set data which will be sent to all who requests LAN network discovery
-//		GetSubsystem<Network>()->SetDiscoveryBeacon(data);
-//		startServer_->SetVisible(false);
-//		stopServer_->SetVisible(true);
-//	}
-//}
-//
-//void LANDiscovery::HandleStopServer(StringHash eventType, VariantMap& eventData)
-//{
-//	GetSubsystem<Network>()->StopServer();
-//	startServer_->SetVisible(true);
-//	stopServer_->SetVisible(false);
-//}
-//
-//void LANDiscovery::HandleDoNetworkDiscovery(StringHash eventType, VariantMap& eventData)
-//{
-//	/// Pass in the port that should be checked
-//	GetSubsystem<Network>()->DiscoverHosts(SERVER_PORT);
-//	serverList_->SetText("");
-//}
 
 void P2PMultiplayer::CreateScene()
 {
@@ -454,7 +517,6 @@ void P2PMultiplayer::CreateScene()
 
     // Create the scene node & visual representation. This will be a replicated object
     Node* ballNode = scene_->CreateChild("Ball");
-    ball_ = ballNode;
     ballNode->SetPosition(Vector3(0, 10, 0));
     ballNode->SetScale(0.5f);
     auto* ballObject = ballNode->CreateComponent<StaticModel>();
@@ -466,7 +528,6 @@ void P2PMultiplayer::CreateScene()
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
     body->SetRestitution(0.0);
-    body_ = body;
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
     body->SetLinearDamping(0.5f);
 //    body->SetAngularDamping(0.5f);
@@ -495,6 +556,7 @@ void P2PMultiplayer::SetupViewport()
 
 void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eventData)
 {
+    URHO3D_LOGERROR("CLIENT CONNECTED!");
 //    return;
     using namespace ClientConnected;
 
@@ -503,15 +565,44 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     newConnection->SetScene(scene_);
 
     CreatePlayerNode(newConnection);
+
+    UpdateClientObjects();
 }
 
 void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 {
+    URHO3D_LOGERROR("CLIENT DISCONNECTED!");
     using namespace ClientConnected;
 //
 //    // When a client disconnects, remove the controlled object
     auto* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     DestroyPlayerNode(connection);
+
+    UpdateClientObjects();
+}
+
+void P2PMultiplayer::UpdateClientObjects()
+{
+    PODVector<Node*> playerNodes;
+    scene_->GetNodesWithTag(playerNodes, "Player");
+    auto clients = GetSubsystem<Network>()->GetClientConnections();
+    for (auto it = clients.Begin(); it != clients.End(); ++it) {
+        for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+            if ((*it2)->GetVar("GUID").GetString() == (*it)->GetGUID()) {
+//                URHO3D_LOGERROR("Found client controlled node");
+                playerNodes_[(*it)] = (*it2);
+            }
+        }
+    }
+    for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+//        URHO3D_LOGERROR("GUID: " + (*it2)->GetVar("GUID").GetString() + " == " + GetSubsystem<Network>()->P2PGetGUID());
+        if ((*it2)->GetVar("GUID").GetString() == GetSubsystem<Network>()->P2PGetGUID()) {
+//            URHO3D_LOGERROR("We found our node with specific GUID!");
+            playerNodes_[GetSubsystem<Network>()->GetServerConnection()] = (*it2);
+        }
+    }
+//    URHO3D_LOGINFOF("Player nodes: %i", playerNodes_.Size());
+
 }
 
 void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
@@ -538,6 +629,13 @@ void P2PMultiplayer::HandleDisconnect(StringHash eventType, VariantMap& eventDat
 
 void P2PMultiplayer::CreatePlayerNode(Connection* connection)
 {
+    if (playerNodes_[connection]) {
+        return;
+    }
+
+    if (GetSubsystem<Network>()->GetClientConnections().Size() != 0 && !GetSubsystem<Network>()->P2PIsHostSystem()) {
+        return;
+    }
     // Then create a controllable object for that client
 //    Node* newObject = CreateControllableObject();
 //    serverObjects_[newConnection] = newObject;
@@ -558,13 +656,18 @@ void P2PMultiplayer::CreatePlayerNode(Connection* connection)
     ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
     ballObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
 
+    auto* titleText = ballNode->CreateComponent<Text3D>(REPLICATED);
+    titleText->SetText(connection->GetGUID());
+    titleText->SetFaceCameraMode(FaceCameraMode::FC_LOOKAT_XYZ);
+    titleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
+
     // Create the physics components
     auto* body = ballNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
     body->SetFriction(1.0f);
     // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
-//    body->SetLinearDamping(0.5f);
-//    body->SetAngularDamping(0.5f);
+    body->SetLinearDamping(0.5f);
+    body->SetAngularDamping(0.5f);
     //body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
     auto* shape = ballNode->CreateComponent<CollisionShape>();
     shape->SetSphere(1.0f);

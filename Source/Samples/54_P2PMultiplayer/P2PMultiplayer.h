@@ -31,6 +31,8 @@ class Button;
 class LineEdit;
 class Text;
 class UIElement;
+class RigidBody;
+class HttpRequest;
 
 }
 
@@ -88,11 +90,9 @@ private:
     LineEdit* CreateLineEdit(const String& placeholder, int width, IntVector2 pos);
 //    /// Create label
     Text* CreateLabel(const String& text, IntVector2 pos);
-//
-//    /// Handle found LAN server
-    void HandleServerConnected(StringHash eventType, VariantMap& eventData);
 //    /// Start server
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData);
 
     void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
     void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
@@ -104,18 +104,14 @@ private:
 
     void HandleSessionStarted(StringHash eventType, VariantMap& eventData);
 
+    void UpdateClientObjects();
+
     void HandleDisconnect(StringHash eventType, VariantMap& eventData);
 
     void CreatePlayerNode(Connection* connection);
     void DestroyPlayerNode(Connection* connection);
 
     Timer timer_;
-//    /// Stop server
-//	void HandleStopServer(StringHash eventType, VariantMap& eventData);
-//	/// Start network discovery
-//	void HandleDoNetworkDiscovery(StringHash eventType, VariantMap& eventData);
-//    /// Start server
-//    SharedPtr<Button> startServer_;
     /// Start P2P Session
     SharedPtr<Button> startSession_;
     /// Join P2P Session
@@ -129,11 +125,8 @@ private:
     SharedPtr<Text> roleTitle_;
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
-    SharedPtr<RigidBody> body_;
     HashMap<Connection*, WeakPtr<Node>> playerNodes_;
     String message_;
     SharedPtr<HttpRequest> httpRequest_;
-
-    SharedPtr<Node> ball_;
     bool _allReady;
 };

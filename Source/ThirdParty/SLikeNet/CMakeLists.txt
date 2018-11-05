@@ -24,11 +24,11 @@ add_definitions (-D_RAKNET_SUPPORT_ConsoleServer=0 -D_RAKNET_SUPPORT_RakNetTrans
 add_definitions (-D_RAKNET_SUPPORT_Rackspace=0 -D_RAKNET_SUPPORT_PacketizedTCP=0 -D_RAKNET_SUPPORT_RPC4Plugin=0 -D_RAKNET_SUPPORT_Router2=0)
 add_definitions (-D_RAKNET_SUPPORT_MessageFilter=0 -D_RAKNET_SUPPORT_FileListTransfer=0)
 add_definitions (-D_RAKNET_SUPPORT_HTTPConnection2=0 -D_RAKNET_SUPPORT_HTTPConnection=0)
+add_definitions (-D_RAKNET_SUPPORT_PacketLogger=0)
 
 # Enable the ones we actually need
 # P2P Multiplayer
 add_definitions (-D_RAKNET_SUPPORT_FullyConnectedMesh2=1)
-add_definitions (-D_RAKNET_SUPPORT_PacketLogger=1)
 add_definitions (-D_RAKNET_SUPPORT_ReplicaManager3=1)
 add_definitions (-D_RAKNET_SUPPORT_ReadyEvent=1)
 
