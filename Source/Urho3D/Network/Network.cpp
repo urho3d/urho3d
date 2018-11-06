@@ -861,7 +861,6 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     else if (packetID == ID_REMOTE_CONNECTION_LOST || packetID == ID_REMOTE_DISCONNECTION_NOTIFICATION)
     {
         //TODO find out who's really sending out this message
-        URHO3D_LOGWARNING("ID_REMOTE_CONNECTION_LOST");
         packetHandled = true;
     }
     else if (packetID == ID_ALREADY_CONNECTED)
@@ -902,6 +901,16 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
                 rakPeer_->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
 
                 //TODO send out our identity
+//                {
+//                    VectorBuffer msg;
+//                    msg.WriteVariantMap(serverConnection_->GetIdentity());
+//
+//                    VectorBuffer buffer;
+//                    buffer.WriteUByte((unsigned char)MSG_IDENTITY);
+//                    buffer.Write(msg.GetData(), msg.GetSize());
+//                    rakPeer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, RELIABLE_ORDERED, (char) 0, packet->guid, false);
+//                }
+
             }
         }
         packetHandled = true;
@@ -1311,8 +1320,9 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
 
 void Network::OnServerDisconnected()
 {
-    // TODO dont destroy server connection when one of the peers disconnects
-    return;
+    if (networkMode_ == PEER_TO_PEER) {
+        return;
+    }
     // Differentiate between failed connection, and disconnection
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
     serverConnection_.Reset();
@@ -1353,8 +1363,6 @@ bool Network::P2PStartSession(Scene* scene, const VariantMap& identity)
 
     UnsubscribeFromEvent(E_NATMASTERCONNECTIONSUCCEEDED);
     SubscribeToEvent(E_NATMASTERCONNECTIONSUCCEEDED, URHO3D_HANDLER(Network, HandleNATStartP2PSession));
-//    SetSimulatedLatency(500);
-//    SetSimulatedPacketLoss(0.3);
     scene_ = scene;
     identity_ = identity;
     return true;
@@ -1364,7 +1372,6 @@ bool Network::P2PStartSession(Scene* scene, const VariantMap& identity)
 void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventData)
 {
     UnsubscribeFromEvent(E_NATMASTERCONNECTIONSUCCEEDED);
-    URHO3D_LOGINFO("HandleNATStartP2PSession");
     isServer_ = false;
     if (!serverConnection_) {
         serverConnection_ = new Connection(context_, false, rakPeer_->GetMyGUID(), rakPeer_);
@@ -1415,8 +1422,6 @@ void Network::P2PJoinSession(String guid, Scene* scene, const VariantMap& identi
 void Network::HandleNATJoinP2PSession(StringHash eventType, VariantMap& eventData)
 {
     UnsubscribeFromEvent(E_NATMASTERCONNECTIONSUCCEEDED);
-//    SetSimulatedLatency(Random(100.0f));
-//    SetSimulatedPacketLoss(0.3);
     P2PSetReady(false);
     if (!serverConnection_) {
         serverConnection_ = new Connection(context_, false, rakPeer_->GetMyBoundAddress(), rakPeer_);
@@ -1562,19 +1567,6 @@ void Network::SetMode(NetworkMode mode, bool force)
 const NetworkMode  Network::GetMode() const
 {
     return networkMode_;
-}
-
-void Network::DisplayPingTimes()
-{
-    if (clientConnections_.Size() > 0) {
-        URHO3D_LOGINFO("-------- PING TIMES --------");
-        for (auto it = clientConnections_.Begin(); it != clientConnections_.End(); ++it) {
-            SLNet::AddressOrGUID address = (*it).second_->GetAddressOrGUID();
-            int ping = rakPeer_->GetLastPing(address);
-            URHO3D_LOGINFO((*it).second_->ToString() + " : " + String(ping));
-        }
-        URHO3D_LOGINFO("----------------------------");
-    }
 }
 
 void RegisterNetworkLibrary(Context* context)

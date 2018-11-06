@@ -97,8 +97,7 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const Vecto
     SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
-    unsigned contentID)
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID)
 {
     /* Make sure not to use SLikeNet(RakNet) internal message ID's
      and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
@@ -113,7 +112,7 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
         URHO3D_LOGERROR("Null pointer supplied for network message data");
         return;
     }
-    
+
     VectorBuffer buffer;
     buffer.WriteUByte((unsigned char)msgID);
     buffer.Write(data, numBytes);
@@ -908,6 +907,8 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
         return;
     }
 
+    URHO3D_LOGERROR("USER IDENTITY");
+
     identity_ = msg.ReadVariantMap();
 
     using namespace ClientIdentity;
@@ -1622,6 +1623,16 @@ void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
 String Connection::GetGUID()
 {
     return address_->rakNetGuid.ToString();
+}
+
+int Connection::GetLastPing()
+{
+    return peer_->GetLastPing(*address_);
+}
+
+int Connection::GetAveragePing()
+{
+    return peer_->GetAveragePing(*address_);
 }
 
 }

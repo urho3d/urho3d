@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Sample.h"
+#include "Peer.h"
 
 namespace Urho3D
 {
@@ -92,7 +93,6 @@ private:
     Text* CreateLabel(const String& text, IntVector2 pos);
 //    /// Start server
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    void HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData);
 
     void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
     void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
@@ -125,8 +125,9 @@ private:
     SharedPtr<Text> roleTitle_;
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
-    HashMap<Connection*, WeakPtr<Node>> playerNodes_;
     String message_;
     SharedPtr<HttpRequest> httpRequest_;
     bool _allReady;
+
+    HashMap<Connection*, SharedPtr<Peer>> peers_;
 };

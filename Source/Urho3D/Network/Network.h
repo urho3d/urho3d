@@ -168,8 +168,6 @@ public:
     /// Get current network mode
     const NetworkMode  GetMode() const;
 
-    void DisplayPingTimes();
-
 private:
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);

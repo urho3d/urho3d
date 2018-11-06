@@ -212,6 +212,9 @@ public:
     /// Return bytes received per second.
     float GetBytesInPerSec() const;
 
+    int GetLastPing();
+    int GetAveragePing();
+
     /// Return bytes sent per second.
     float GetBytesOutPerSec() const;
 
