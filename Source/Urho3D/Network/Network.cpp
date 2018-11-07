@@ -901,15 +901,15 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
                 rakPeer_->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
 
                 //TODO send out our identity
-//                {
-//                    VectorBuffer msg;
-//                    msg.WriteVariantMap(serverConnection_->GetIdentity());
-//
-//                    VectorBuffer buffer;
-//                    buffer.WriteUByte((unsigned char)MSG_IDENTITY);
-//                    buffer.Write(msg.GetData(), msg.GetSize());
-//                    rakPeer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, RELIABLE_ORDERED, (char) 0, packet->guid, false);
-//                }
+                {
+                    VectorBuffer msg;
+                    msg.WriteVariantMap(serverConnection_->GetIdentity());
+
+                    VectorBuffer buffer;
+                    buffer.WriteUByte((unsigned char)MSG_IDENTITY);
+                    buffer.Write(msg.GetData(), msg.GetSize());
+                    rakPeer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, RELIABLE_ORDERED, (char) 0, packet->guid, false);
+                }
 
             }
         }
@@ -968,7 +968,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             URHO3D_LOGINFO("Connecting to server behind NAT: " + String(remotePeer.ToString()));
             Connect(String(remotePeer.ToString(false)), remotePeer.GetPort(), scene_, identity_);
         } else if (networkMode_ == PEER_TO_PEER){
-            SLNet::ConnectionAttemptResult car = rakPeer_->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
+            SLNet::ConnectionAttemptResult car = rakPeer_->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), password_.CString(), password_.Length());
         }
         packetHandled = true;
     }
@@ -1117,14 +1117,14 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     else if (packetID == ID_FCM2_VERIFIED_JOIN_CAPABLE)
     {
         URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_CAPABLE");
-        fullyConnectedMesh2_->RespondOnVerifiedJoinCapable(packet, true, 0);
+        fullyConnectedMesh2_->RespondOnVerifiedJoinCapable(packet, true, nullptr);
         packetHandled = true;
     }
     else if (packetID == ID_FCM2_VERIFIED_JOIN_ACCEPTED)
     {
         DataStructures::List<SLNet::RakNetGUID> systemsAccepted;
         bool thisSystemAccepted;
-        fullyConnectedMesh2_->GetVerifiedJoinAcceptedAdditionalData(packet, &thisSystemAccepted, systemsAccepted, 0);
+        fullyConnectedMesh2_->GetVerifiedJoinAcceptedAdditionalData(packet, &thisSystemAccepted, systemsAccepted, nullptr);
         if (thisSystemAccepted) {
             URHO3D_LOGINFO("Game join request accepted");
         }
@@ -1392,7 +1392,7 @@ void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventDa
     SendEvent(E_P2PSESSIONSTARTED);
 }
 
-void Network::P2PJoinSession(String guid, Scene* scene, const VariantMap& identity)
+void Network::P2PJoinSession(const String guid, Scene* scene, const VariantMap& identity)
 {
     if (!natPunchServerAddress_) {
         URHO3D_LOGERROR("Set the NAT server info first!");

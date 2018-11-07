@@ -127,7 +127,7 @@ private:
     SharedPtr<Text> hostGuid_;
     String message_;
     SharedPtr<HttpRequest> httpRequest_;
-    bool _allReady;
+    bool _allReady{};
 
     HashMap<Connection*, SharedPtr<Peer>> peers_;
 };

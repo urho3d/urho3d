@@ -918,6 +918,8 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
     eventData[P_ALLOW] = true;
     SendEvent(E_CLIENTIDENTITY, eventData);
 
+    URHO3D_LOGERROR("Name: " + identity_["Name"].GetString());
+
     // If connection was denied as a response to the identity event, disconnect now
     if (!eventData[P_ALLOW].GetBool())
         Disconnect();

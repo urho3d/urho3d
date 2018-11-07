@@ -167,7 +167,9 @@ void P2PMultiplayer::SubscribeToEvents()
 void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("HandleStartP2PSession");
-    GetSubsystem<Network>()->P2PStartSession(scene_);
+    VariantMap identity;
+    identity["Name"] = "Initial Host";
+    GetSubsystem<Network>()->P2PStartSession(scene_, identity);
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
 
     SubscribeToEvent(E_P2PSESSIONSTARTED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionStarted));
@@ -176,7 +178,9 @@ void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eve
 void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
 {
     URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
-    GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_);
+    VariantMap identity;
+    identity["Name"] = "Client";
+    GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_, identity);
 //    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
 //    GetSubsystem<Network>()->SetSimulatedLatency(10 + Random(100));
 }
@@ -485,7 +489,6 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
 
 void P2PMultiplayer::UpdateClientObjects()
 {
-    URHO3D_LOGWARNING("UpdateClientObjects");
     PODVector<Node*> playerNodes;
     scene_->GetNodesWithTag(playerNodes, "Player");
     auto clients = GetSubsystem<Network>()->GetClientConnections();

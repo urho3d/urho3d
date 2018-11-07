@@ -85,7 +85,7 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
     }
 
     Quaternion rotation(0.0f, controls_.yaw_, 0.0f);
-    RigidBody* body = node_->GetComponent<RigidBody>();
+    auto body = node_->GetComponent<RigidBody>();
     // Movement torque is applied before each simulation step, which happen at 60 FPS. This makes the simulation
     // independent from rendering framerate. We could also apply forces (which would enable in-air control),
     // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
@@ -102,7 +102,7 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
         body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
     }
 
-    Text3D* text = node_->GetComponent<Text3D>();
+    auto text = node_->GetComponent<Text3D>();
     if (text) {
         text->SetText(connection_->GetGUID() + " [" + String(connection_->GetLastPing()) + "]");
     }
