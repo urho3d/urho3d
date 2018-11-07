@@ -122,6 +122,7 @@ private:
     SharedPtr<Button> resetHostButton_;
     SharedPtr<Button> disconnect_;
     SharedPtr<LineEdit> guid_;
+    SharedPtr<LineEdit> nickname_;
 //    /// Found server list
 	SharedPtr<Text> clientCount_;
     SharedPtr<Text> roleTitle_;

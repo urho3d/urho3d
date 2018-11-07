@@ -289,6 +289,8 @@ Network::Network(Context* context) :
     blacklistedRemoteEvents_.Insert(E_NETWORKHOSTDISCOVERED);
     blacklistedRemoteEvents_.Insert(E_NETWORKINVALIDPASSWORD);
     blacklistedRemoteEvents_.Insert(E_NETWORKBANNED);
+    blacklistedRemoteEvents_.Insert(E_P2PNEWHOST);
+    blacklistedRemoteEvents_.Insert(E_P2PSESSIONSTARTED);
 
 }
 
@@ -484,7 +486,7 @@ bool Network::P2PConnectNAT(const String& address, unsigned short port)
     }
 
     //isServer_ = false;
-    SLNet::ConnectionAttemptResult connectResult = rakPeer_->Connect(address.CString(), port, password_.CString(), password_.Length());
+    SLNet::ConnectionAttemptResult connectResult = rakPeer_->Connect(address.CString(), port, nullptr, 0);
     if (connectResult == SLNet::ALREADY_CONNECTED_TO_ENDPOINT) {
         URHO3D_LOGWARNING("Already connected to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
         return false;
@@ -1346,6 +1348,7 @@ void Network::ConfigureNetworkSimulator()
 
 bool Network::P2PStartSession(Scene* scene, const VariantMap& identity)
 {
+    Disconnect(1000);
     if (!natPunchServerAddress_) {
         URHO3D_LOGERROR("Set the NAT server info first!");
         return false;
@@ -1389,6 +1392,7 @@ void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventDa
 
 void Network::P2PJoinSession(const String& guid, Scene* scene, const VariantMap& identity)
 {
+    Disconnect(1000);
     if (!natPunchServerAddress_) {
         URHO3D_LOGERROR("Set the NAT server info first!");
         return;
@@ -1424,6 +1428,7 @@ void Network::HandleNATJoinP2PSession(StringHash eventType, VariantMap& eventDat
         serverConnection_->SetSceneLoaded(true);
         serverConnection_->SetIdentity(identity_);
         serverConnection_->SetConnectPending(true);
+        serverConnection_->SetAddressOrGUID(*remoteGUID_);
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     }
 
@@ -1452,10 +1457,7 @@ bool Network::P2PIsConnectedHost()
 
 bool Network::P2PIsHostSystem()
 {
-    if (P2PGetGUID() == hostGuid_ && isServer_) {
-        return true;
-    }
-    return false;
+    return fullyConnectedMesh2_->IsHostSystem();
 }
 
 String Network::P2PGetHostAddress()
@@ -1463,7 +1465,7 @@ String Network::P2PGetHostAddress()
     if (networkMode_ == SERVER_CLIENT) {
         return "";
     }
-    return String(fullyConnectedMesh2_->GetConnectedHost().ToString());
+    return hostGuid_;
 }
 
 void Network::P2PSetReady(bool value)

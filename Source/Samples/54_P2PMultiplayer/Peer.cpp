@@ -74,8 +74,14 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
         return;
     }
 
+    bool isHost = false;
+    String nickname = "Unnnamed";
     if (connection_) {
         controls_ = connection_->GetControls();
+        if (connection_->GetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
+            isHost = true;
+        }
+        nickname = connection_->GetIdentity()["Name"].GetString();
     }
 
     const float MOVE_TORQUE = 3.0f;
@@ -103,8 +109,15 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
     }
 
     auto text = node_->GetComponent<Text3D>();
-    if (text) {
-        text->SetText(connection_->GetGUID() + " [" + String(connection_->GetLastPing()) + "]");
+    if (text && updateTimer_.GetMSec(false) > 1000) {
+        if (isHost) {
+            // Since host label almost never changes, we have to add some sort of random value to it so it could be synced between peers
+            text->SetText(connection_->GetGUID() + " [" + nickname + "] [" + String(Random(1, 3)) + "] [HOST]");
+        } else {
+            text->SetText(connection_->GetGUID() + " [" + nickname + "] [" + String(connection_->GetLastPing()) + "]");
+        }
+
+        updateTimer_.Reset();
     }
 }
 
@@ -132,7 +145,7 @@ void Peer::Create(Connection* connection)
     auto* titleText = node_->CreateComponent<Text3D>(REPLICATED);
     titleText->SetText(connection->GetGUID());
     titleText->SetFaceCameraMode(FaceCameraMode::FC_LOOKAT_XYZ);
-    titleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
+    titleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 30);
 
     // Create the physics components
     auto* body = node_->CreateComponent<RigidBody>();

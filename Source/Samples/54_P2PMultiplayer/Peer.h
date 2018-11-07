@@ -49,6 +49,8 @@ private:
     WeakPtr<Connection> connection_;
 
     WeakPtr<Scene> scene_;
+
+    Timer updateTimer_;
 };
 
 

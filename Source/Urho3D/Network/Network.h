@@ -81,8 +81,6 @@ public:
     int GetP2PParticipantCount();
     /// Is host connected to the P2P session
     bool P2PIsConnectedHost();
-    /// Connect to NAT server which will handle P2P session
-    bool P2PConnectNAT(const String& address, unsigned short port);
     /// Are we the host system in P2P session
     bool P2PIsHostSystem();
     /// Get host GUID
@@ -169,6 +167,9 @@ public:
     const NetworkMode  GetMode() const;
 
 private:
+    /// Connect to NAT server which will handle P2P session
+    bool P2PConnectNAT(const String& address, unsigned short port);
+
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle render update frame event.

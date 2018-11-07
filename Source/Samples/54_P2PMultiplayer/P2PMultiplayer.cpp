@@ -113,8 +113,9 @@ void P2PMultiplayer::CreateUI()
     int marginTop = 20;
 //    CreateLabel("1. Start server", IntVector2(20, marginTop-20));
     startSession_ = CreateButton("Start session", 160, IntVector2(20, marginTop));
+    nickname_ = CreateLineEdit("Nickname", 160, IntVector2(200, marginTop));
     marginTop += 40;
-    guid_ = CreateLineEdit("1234", 200, IntVector2(20, marginTop));
+    guid_ = CreateLineEdit("", 200, IntVector2(20, marginTop));
     marginTop += 40;
     joinSession_ = CreateButton("Join session", 160, IntVector2(20, marginTop));
 
@@ -167,9 +168,10 @@ void P2PMultiplayer::SubscribeToEvents()
 
 void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
 {
+    peers_.Clear();
     URHO3D_LOGINFO("HandleStartP2PSession");
     VariantMap identity;
-    identity["Name"] = "Initial Host";
+    identity["Name"] = nickname_->GetText();
     GetSubsystem<Network>()->P2PStartSession(scene_, identity);
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
 
@@ -178,10 +180,11 @@ void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eve
 
 void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
 {
+    peers_.Clear();
     URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
     VariantMap identity;
     SetRandomSeed(Time::GetSystemTime());
-    identity["Name"] = "Client " + String(Random(100));
+    identity["Name"] = nickname_->GetText();
     GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_, identity);
 //    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
 //    GetSubsystem<Network>()->SetSimulatedLatency(10 + Random(100));
@@ -243,6 +246,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (timer_.GetMSec(false) > 1000) {
+        GetSubsystem<Network>()->SetSimulatedLatency(Random(100.0f));
 //        GetSubsystem<Network>()->SetSimulatedLatency(100 + Random(1000));
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
@@ -562,5 +566,6 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
 {
     using namespace P2PNewHost;
     URHO3D_LOGINFOF("Host changed %s, %i => %s", eventData[P_ADDRESS].GetString().CString(), eventData[P_PORT].GetInt(), eventData[P_GUID].GetString().CString());
+    SetRandomSeed(Time::GetSystemTime());
 
 }
