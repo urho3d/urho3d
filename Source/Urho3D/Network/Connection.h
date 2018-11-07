@@ -244,6 +244,9 @@ public:
     /// Identity map.
     VariantMap identity_;
 
+    void SetReady(bool value);
+    const bool GetReady() const { return ready_; }
+
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
@@ -336,6 +339,7 @@ private:
     Timer packetCounterTimer_;
     /// Last heard timer, resets when new packet is incoming
     Timer lastHeardTimer_;
+    bool ready_{};
 };
 
 }

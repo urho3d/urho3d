@@ -119,12 +119,6 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     joinSession_ = CreateButton("Join session", 160, IntVector2(20, marginTop));
 
-
-    roleTitle_ = CreateLabel("", IntVector2(GetSubsystem<Graphics>()->GetWidth() / 2, GetSubsystem<Graphics>()->GetHeight() / 2));
-    roleTitle_->SetTextAlignment(HA_CENTER);
-    roleTitle_->SetColor(Color::GREEN);
-    roleTitle_->SetFontSize(40);
-
 	marginTop += 80;
     clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));
     marginTop += 40;
@@ -132,15 +126,12 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     hostGuid_ = CreateLabel("HOST GUID:", IntVector2(20, marginTop));
 
-    marginTop += 40;
-    resetHostButton_ = CreateButton("Reset host", 160, IntVector2(20, marginTop));
-
-    marginTop += 80;
-    readyButton_ = CreateButton("Set ready", 160, IntVector2(20, marginTop));
-    static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
-
-    marginTop += 40;
-    disconnect_ = CreateButton("Disconnect", 160, IntVector2(20, marginTop));
+    String information = "R - Reset host (if you are the host, \nthis role will be passed to other peers";
+    information += "\nE - Disconnect";
+    information += "\nT - Toggle ready state";
+    information += "\nWASD - move around";
+    info_ = CreateLabel(information, IntVector2(0, 50));
+    info_->SetHorizontalAlignment(HA_RIGHT);
 
 //     No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -152,11 +143,6 @@ void P2PMultiplayer::SubscribeToEvents()
 
     SubscribeToEvent(startSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleStartP2PSession));
     SubscribeToEvent(joinSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleJoinP2PSession));
-
-    SubscribeToEvent(readyButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleReady));
-
-    SubscribeToEvent(resetHostButton_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleResetHost));
-    SubscribeToEvent(disconnect_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleDisconnect));
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
@@ -196,19 +182,6 @@ void P2PMultiplayer::HandleSessionStarted(StringHash eventType, VariantMap& even
     CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
 }
 
-void P2PMultiplayer::HandleReady(StringHash eventType, VariantMap& eventData)
-{
-    URHO3D_LOGINFO("Ready");
-    GetSubsystem<Network>()->P2PSetReady(!GetSubsystem<Network>()->P2PGetReady());
-    if (GetSubsystem<Network>()->P2PGetReady()) {
-        static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set unready");
-        static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::RED);
-    } else {
-        static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set ready");
-        static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
-    }
-}
-
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
@@ -217,6 +190,21 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     static float gametime;
     gametime += timestep * 10;
 
+    if (input->GetKeyPress(KEY_R)) {
+        GetSubsystem<Network>()->P2PResetHost();
+    }
+    if (input->GetKeyPress(KEY_E)) {
+        GetSubsystem<Network>()->Disconnect(1000);
+        peers_.Clear();
+
+        GetSubsystem<Input>()->SetMouseVisible(true);
+        GetSubsystem<Input>()->SetMouseGrabbed(false);
+        GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
+    }
+
+    if (input->GetKeyPress(KEY_T)) {
+        GetSubsystem<Network>()->P2PSetReady(!GetSubsystem<Network>()->P2PGetReady());
+    }
     if (GetSubsystem<Network>()->P2PIsHostSystem() && _allReady) {
     }
 
@@ -246,7 +234,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (timer_.GetMSec(false) > 1000) {
-        GetSubsystem<Network>()->SetSimulatedLatency(Random(100.0f));
+        //GetSubsystem<Network>()->SetSimulatedLatency(Random(100.0f));
 //        GetSubsystem<Network>()->SetSimulatedLatency(100 + Random(1000));
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
@@ -273,13 +261,9 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (GetSubsystem<Network>()->P2PGetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
             hostGuid_->SetColor(Color::RED);
             myGuid_->SetColor(Color::RED);
-            roleTitle_->SetText("HOST");
-            roleTitle_->SetColor(Color::RED);
         } else {
             myGuid_->SetColor(Color::GREEN);
             hostGuid_->SetColor(Color::GREEN);
-            roleTitle_->SetText("PEER");
-            roleTitle_->SetColor(Color::GREEN);
         }
 //        URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
 //        URHO3D_LOGINFO("P2PGetHostAddress: " + GetSubsystem<Network>()->P2PGetHostAddress());
@@ -313,30 +297,24 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 }
             }
         }
-
-        if (GetSubsystem<Network>()->P2PGetReady()) {
-            static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set unready");
-            static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::RED);
-        } else {
-            static_cast<Text*>(readyButton_->GetChild(0))->SetText("Set ready");
-            static_cast<Text*>(readyButton_->GetChild(0))->SetColor(Color::GREEN);
-        }
     }
 
     auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
     if (serverConnection) {
         if (peers_[serverConnection] && peers_[serverConnection]->GetNode()) {
-//            GetSubsystem<Input>()->SetMouseVisible(false);
-//            GetSubsystem<Input>()->SetMouseGrabbed(true);
-//            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_WRAP);
+            GetSubsystem<Input>()->SetMouseVisible(false);
+            GetSubsystem<Input>()->SetMouseGrabbed(true);
+            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_WRAP);
 
-            const float CAMERA_DISTANCE = 7.0f;
+            const float CAMERA_DISTANCE = 4.0f;
 
             // Move camera some distance away from the ball
             cameraNode_->SetPosition(peers_[serverConnection]->GetNode()->GetPosition() + cameraNode_->GetRotation() * Vector3::BACK * CAMERA_DISTANCE);
         } else {
             UpdateClientObjects();
-//            GetSubsystem<Input>()->SetMouseVisible(true);
+            GetSubsystem<Input>()->SetMouseVisible(true);
+            GetSubsystem<Input>()->SetMouseGrabbed(false);
+            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
         }
     }
 }
@@ -522,21 +500,10 @@ void P2PMultiplayer::UpdateClientObjects()
     }
 }
 
-void P2PMultiplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
-{
-    GetSubsystem<Network>()->P2PResetHost();
-}
-
 void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eventData)
 {
     using namespace P2PAllReadyChanged;
     _allReady = eventData[P_READY].GetBool();
-}
-
-void P2PMultiplayer::HandleDisconnect(StringHash eventType, VariantMap& eventData)
-{
-    GetSubsystem<Network>()->Disconnect(1000);
-    peers_.Clear();
 }
 
 void P2PMultiplayer::CreatePlayerNode(Connection* connection)

@@ -97,16 +97,11 @@ private:
     void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
     void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
 
-    void HandleReady(StringHash eventType, VariantMap& eventData);
-
-    void HandleResetHost(StringHash eventType, VariantMap& eventData);
     void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
 
     void HandleSessionStarted(StringHash eventType, VariantMap& eventData);
 
     void UpdateClientObjects();
-
-    void HandleDisconnect(StringHash eventType, VariantMap& eventData);
 
     void HandleNewHost(StringHash eventType, VariantMap& eventData);
 
@@ -118,19 +113,17 @@ private:
     SharedPtr<Button> startSession_;
     /// Join P2P Session
     SharedPtr<Button> joinSession_;
-    SharedPtr<Button> readyButton_;
-    SharedPtr<Button> resetHostButton_;
-    SharedPtr<Button> disconnect_;
     SharedPtr<LineEdit> guid_;
     SharedPtr<LineEdit> nickname_;
 //    /// Found server list
 	SharedPtr<Text> clientCount_;
-    SharedPtr<Text> roleTitle_;
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
+    SharedPtr<Text> info_;
     String message_;
     SharedPtr<HttpRequest> httpRequest_;
     bool _allReady{};
+    Controls controls_;
 
     HashMap<Connection*, SharedPtr<Peer>> peers_;
 };

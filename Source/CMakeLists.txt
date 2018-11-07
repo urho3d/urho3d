@@ -144,7 +144,7 @@ if (URHO3D_CLANG_TOOLS)
 endif ()
 
 # Urho3D tools
-#add_subdirectory (Tools)
+add_subdirectory (Tools)
 
 # Urho3D samples
 add_subdirectory (Samples)

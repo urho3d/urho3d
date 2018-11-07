@@ -1638,4 +1638,8 @@ int Connection::GetAveragePing()
     return peer_->GetAveragePing(*address_);
 }
 
+void Connection::SetReady(bool value)
+{
+    ready_ = value;
+}
 }

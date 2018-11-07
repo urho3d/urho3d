@@ -1473,6 +1473,8 @@ void Network::P2PSetReady(bool value)
     if (networkMode_ == SERVER_CLIENT) {
         return;
     }
+
+    P2PReadyStatusChanged();
 //    readyEvent_->DeleteEvent(0);
     readyEvent_->SetEvent(0, value);
 }
@@ -1516,7 +1518,19 @@ void Network::P2PReadyStatusChanged()
         if (participantList[i] != rakPeer_->GetMyGUID()) {
             int ready = readyEvent_->GetReadyStatus(0, participantList[i]);// == SLNet::RES_READY;
             if (ready != SLNet::RES_ALL_READY && ready != SLNet::RES_READY) {
+                for (auto it = clientConnections_.Begin(); it != clientConnections_.End(); ++it) {
+                    if ((*it).second_->GetGUID() == String(participantList[i].ToString())) {
+                        (*it).second_->SetReady(false);
+                    }
+                }
                 allValid = false;
+            }
+            else {
+                for (auto it = clientConnections_.Begin(); it != clientConnections_.End(); ++it) {
+                    if ((*it).second_->GetGUID() == String(participantList[i].ToString())) {
+                        (*it).second_->SetReady(true);
+                    }
+                }
             }
 //            URHO3D_LOGINFO( String(participantList[i].ToString()) + " Ready: " + String(STATUS_MESSAGES[ready]));
         }
@@ -1524,6 +1538,14 @@ void Network::P2PReadyStatusChanged()
 //    URHO3D_LOGINFO(P2PGetGUID() + " Ready: " + String(STATUS_MESSAGES[readyEvent_->GetEventAtIndex(0)]));
 
     VariantMap data = GetEventDataMap();
+    if (serverConnection_) {
+        if (readyEvent_->IsEventSet(0)) {
+            serverConnection_->SetReady(true);
+        }
+        else {
+            serverConnection_->SetReady(false);
+        }
+    }
     if (allValid && readyEvent_->IsEventSet(0)) {
         data[P2PAllReadyChanged::P_READY] = true;
     } else {

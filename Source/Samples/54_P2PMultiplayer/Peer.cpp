@@ -90,31 +90,43 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
         return;
     }
 
-    Quaternion rotation(0.0f, controls_.yaw_, 0.0f);
+    const bool ready = connection_->GetReady();
+
     auto body = node_->GetComponent<RigidBody>();
-    // Movement torque is applied before each simulation step, which happen at 60 FPS. This makes the simulation
-    // independent from rendering framerate. We could also apply forces (which would enable in-air control),
-    // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
-    if (controls_.buttons_ & CTRL_FORWARD) {
-        body->ApplyTorque(rotation * Vector3::RIGHT * MOVE_TORQUE);
-    }
-    if (controls_.buttons_ & CTRL_BACK) {
-        body->ApplyTorque(rotation * Vector3::LEFT * MOVE_TORQUE);
-    }
-    if (controls_.buttons_ & CTRL_LEFT) {
-        body->ApplyTorque(rotation * Vector3::FORWARD * MOVE_TORQUE);
-    }
-    if (controls_.buttons_ & CTRL_RIGHT) {
-        body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
+
+    if (ready) {
+        Quaternion rotation(0.0f, controls_.yaw_, 0.0f);
+        // Movement torque is applied before each simulation step, which happen at 60 FPS. This makes the simulation
+        // independent from rendering framerate. We could also apply forces (which would enable in-air control),
+        // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
+        if (controls_.buttons_ & CTRL_FORWARD) {
+            body->ApplyTorque(rotation * Vector3::RIGHT * MOVE_TORQUE);
+        }
+        if (controls_.buttons_ & CTRL_BACK) {
+            body->ApplyTorque(rotation * Vector3::LEFT * MOVE_TORQUE);
+        }
+        if (controls_.buttons_ & CTRL_LEFT) {
+            body->ApplyTorque(rotation * Vector3::FORWARD * MOVE_TORQUE);
+        }
+        if (controls_.buttons_ & CTRL_RIGHT) {
+            body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
+        }
     }
 
+    String readyString = "Ready";
+    if (!ready) {
+        readyString = "Not ready";
+    }
     auto text = node_->GetComponent<Text3D>();
     if (text && updateTimer_.GetMSec(false) > 1000) {
         if (isHost) {
             // Since host label almost never changes, we have to add some sort of random value to it so it could be synced between peers
-            text->SetText(connection_->GetGUID() + " [" + nickname + "] [" + String(Random(1, 3)) + "] [HOST]");
+            text->SetText("         [" + readyString + "] " + nickname + " [" + String(Random(1, 3)) + "] [HOST]");
+            // Same for the color
+            text->SetColor(Color(1.0f, 1.0f, Random(0.0f, 0.01f)));
         } else {
-            text->SetText(connection_->GetGUID() + " [" + nickname + "] [" + String(connection_->GetLastPing()) + "]");
+            text->SetText("         [" + readyString + "] " + nickname + " [" + String(connection_->GetLastPing()) + "]");
+            text->SetColor(Color(0.0f, 1.0f, Random(0.0f, 0.01f)));
         }
 
         updateTimer_.Reset();
