@@ -357,13 +357,13 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     P2PReadyStatusChanged();
     if (networkMode_ == PEER_TO_PEER && clientConnections_[connection]) {
-        URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
+//        URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
         //TODO proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
         return;
     }
 
-    URHO3D_LOGINFOF("NewConnectionEstablished ---------------------------", connection.rakNetGuid.ToString());
+//    URHO3D_LOGINFOF("NewConnectionEstablished ---------------------------", connection.rakNetGuid.ToString());
     // Create a new client connection corresponding to this MessageConnection
     SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
@@ -809,9 +809,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 {
     unsigned char packetID = packet->data[0];
 
-    if (packetID < ID_USER_PACKET_ENUM) {
-        URHO3D_LOGERROR(">> " + String((int)packetID) + "  HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
-    }
+//    if (packetID < ID_USER_PACKET_ENUM) {
+//        URHO3D_LOGERROR(">> " + String((int)packetID) + "  HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
+//    }
 
     bool packetHandled = false;
 
@@ -887,29 +887,13 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             if (networkMode_ == SERVER_CLIENT) {
                 OnServerConnected(packet->guid);
             } else {
+                URHO3D_LOGERROR(">>>>>>>>>>>>>>>>>>>.");
                 URHO3D_LOGINFOF("ID_CONNECTION_REQUEST_ACCEPTED from %s,guid=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
                 // Assume that we're connecting to the P2P host
 //                serverConnection_->SetAddressOrGUID(packet->guid);
-
-                // Send out join request to the host
-//                VectorBuffer msg;
-//                msg.WriteBool(true);
-//                serverConnection_->SendMessage(MSG_P2P_JOIN_REQUEST, true, true, msg);
-
                 SLNet::BitStream bsOut;
                 bsOut.Write((unsigned char) MSG_P2P_JOIN_REQUEST);
                 rakPeer_->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
-
-                //TODO send out our identity
-                {
-                    VectorBuffer msg;
-                    msg.WriteVariantMap(serverConnection_->GetIdentity());
-
-                    VectorBuffer buffer;
-                    buffer.WriteUByte((unsigned char)MSG_IDENTITY);
-                    buffer.Write(msg.GetData(), msg.GetSize());
-                    rakPeer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, RELIABLE_ORDERED, (char) 0, packet->guid, false);
-                }
 
             }
         }
@@ -1093,8 +1077,19 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             else {
                 URHO3D_LOGINFOF("ID_FCM2_NEW_HOST: System %s is host, GUID=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
             }
+
+            // Send the identity map now
+            VectorBuffer msg;
+            msg.WriteVariantMap(serverConnection_->GetIdentity());
+            serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg);
         }
 
+        using namespace P2PNewHost;
+        VariantMap data = GetEventDataMap();
+        data[P_ADDRESS] = packet->systemAddress.ToString(false);
+        data[P_PORT] = packet->systemAddress.GetPort();
+        data[P_GUID] = packet->guid.ToString();
+        SendEvent(E_P2PNEWHOST, data);
         P2PReadyStatusChanged();
         URHO3D_LOGINFO("");
 
@@ -1392,7 +1387,7 @@ void Network::HandleNATStartP2PSession(StringHash eventType, VariantMap& eventDa
     SendEvent(E_P2PSESSIONSTARTED);
 }
 
-void Network::P2PJoinSession(const String guid, Scene* scene, const VariantMap& identity)
+void Network::P2PJoinSession(const String& guid, Scene* scene, const VariantMap& identity)
 {
     if (!natPunchServerAddress_) {
         URHO3D_LOGERROR("Set the NAT server info first!");
@@ -1521,10 +1516,10 @@ void Network::P2PReadyStatusChanged()
             if (ready != SLNet::RES_ALL_READY && ready != SLNet::RES_READY) {
                 allValid = false;
             }
-            URHO3D_LOGINFO( String(participantList[i].ToString()) + " Ready: " + String(STATUS_MESSAGES[ready]));
+//            URHO3D_LOGINFO( String(participantList[i].ToString()) + " Ready: " + String(STATUS_MESSAGES[ready]));
         }
     }
-    URHO3D_LOGINFO(P2PGetGUID() + " Ready: " + String(STATUS_MESSAGES[readyEvent_->GetEventAtIndex(0)]));
+//    URHO3D_LOGINFO(P2PGetGUID() + " Ready: " + String(STATUS_MESSAGES[readyEvent_->GetEventAtIndex(0)]));
 
     VariantMap data = GetEventDataMap();
     if (allValid && readyEvent_->IsEventSet(0)) {
@@ -1532,7 +1527,7 @@ void Network::P2PReadyStatusChanged()
     } else {
         data[P2PAllReadyChanged::P_READY] = false;
     }
-    URHO3D_LOGWARNING("All ready " + String(data[P2PAllReadyChanged::P_READY].GetBool()));
+//    URHO3D_LOGWARNING("All ready " + String(data[P2PAllReadyChanged::P_READY].GetBool()));
     SendEvent(E_P2PALLREADYCHANGED, data);
 
 }

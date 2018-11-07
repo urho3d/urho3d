@@ -154,9 +154,17 @@ URHO3D_EVENT(E_P2PALLREADYCHANGED, P2PAllReadyChanged)
 	URHO3D_PARAM(P_READY, Ready);   // String
 }
 
-/// Status of all p2p connection readiness
+/// P2P session was started succesfully
 URHO3D_EVENT(E_P2PSESSIONSTARTED, P2PSessionStarted)
 {
+}
+
+/// When host system is elected
+URHO3D_EVENT(E_P2PNEWHOST, P2PNewHost)
+{
+    URHO3D_PARAM(P_ADDRESS, Address);   // String
+    URHO3D_PARAM(P_PORT, Port);   // int
+    URHO3D_PARAM(P_GUID, GUID);   // String
 }
 
 }

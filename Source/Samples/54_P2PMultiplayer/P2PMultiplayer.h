@@ -108,6 +108,8 @@ private:
 
     void HandleDisconnect(StringHash eventType, VariantMap& eventData);
 
+    void HandleNewHost(StringHash eventType, VariantMap& eventData);
+
     void CreatePlayerNode(Connection* connection);
     void DestroyPlayerNode(Connection* connection);
 

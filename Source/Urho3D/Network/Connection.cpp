@@ -901,6 +901,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
 
 void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
 {
+    URHO3D_LOGERROR("------------ Receiving client identity!");
     if (!IsClient())
     {
         URHO3D_LOGWARNING("Received unexpected Identity message from server");

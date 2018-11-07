@@ -76,7 +76,7 @@ public:
     /// Start P2P session
     bool P2PStartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Join existing P2P session
-    void P2PJoinSession(const String guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    void P2PJoinSession(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Current peer count in session
     int GetP2PParticipantCount();
     /// Is host connected to the P2P session

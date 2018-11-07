@@ -160,6 +160,7 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
     SubscribeToEvent(E_P2PALLREADYCHANGED, URHO3D_HANDLER(P2PMultiplayer, HandleAllReadyChanged));
+    SubscribeToEvent(E_P2PNEWHOST, URHO3D_HANDLER(P2PMultiplayer, HandleNewHost));
 
 //    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
 }
@@ -179,7 +180,8 @@ void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& even
 {
     URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
     VariantMap identity;
-    identity["Name"] = "Client";
+    SetRandomSeed(Time::GetSystemTime());
+    identity["Name"] = "Client " + String(Random(100));
     GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_, identity);
 //    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
 //    GetSubsystem<Network>()->SetSimulatedLatency(10 + Random(100));
@@ -554,4 +556,11 @@ void P2PMultiplayer::DestroyPlayerNode(Connection* connection)
         peers_[connection]->DestroyNode();
         peers_.Erase(connection);
     }
+}
+
+void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
+{
+    using namespace P2PNewHost;
+    URHO3D_LOGINFOF("Host changed %s, %i => %s", eventData[P_ADDRESS].GetString().CString(), eventData[P_PORT].GetInt(), eventData[P_GUID].GetString().CString());
+
 }
