@@ -105,6 +105,8 @@ private:
 
     void HandleNewHost(StringHash eventType, VariantMap& eventData);
 
+    void HandleBanned(StringHash eventType, VariantMap& eventData);
+
     void CreatePlayerNode(Connection* connection);
     void DestroyPlayerNode(Connection* connection);
 

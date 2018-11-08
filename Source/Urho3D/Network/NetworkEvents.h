@@ -97,9 +97,10 @@ URHO3D_EVENT(E_REMOTEEVENTDATA, RemoteEventData)
     URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
-/// Server refuses client connection because of the ban.
+/// Server refuses/disconnects client connection because of the ban.
 URHO3D_EVENT(E_NETWORKBANNED, NetworkBanned)
 {
+	URHO3D_PARAM(P_REASON, Reason);   // String
 }
 
 /// Server refuses connection because of invalid password.

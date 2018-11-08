@@ -156,7 +156,7 @@ public:
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
     /// Ban this connections IP address.
-    void Ban();
+    void Ban(String reason);
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
 
@@ -246,6 +246,11 @@ public:
 
     void SetReady(bool value);
     const bool GetReady() const { return ready_; }
+
+    /// Set the IP address for this connection
+    void SetIP(String ipAddress);
+    /// Retrieve IP address for this connection
+    const String GetIP() const { return ipAddress_; }
 
 private:
     /// Handle scene loaded event.
@@ -339,6 +344,8 @@ private:
     Timer packetCounterTimer_;
     /// Last heard timer, resets when new packet is incoming
     Timer lastHeardTimer_;
+    /// Connection IP address
+    String ipAddress_;
     bool ready_{};
 };
 

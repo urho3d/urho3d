@@ -54,7 +54,7 @@ public:
     /// Handle an inbound message.
     void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
     /// Handle a new client connection.
-    void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+    void NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address = nullptr);
     /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
 
@@ -74,27 +74,29 @@ public:
     bool StartServer(unsigned short port);
 
     /// Start P2P session
-    bool P2PStartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    bool StartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Join existing P2P session
-    void P2PJoinSession(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    void JoinSession(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Current peer count in session
-    int GetP2PParticipantCount();
+    int GetParticipantCount();
     /// Is host connected to the P2P session
-    bool P2PIsConnectedHost();
+    bool IsConnectedHost();
     /// Are we the host system in P2P session
-    bool P2PIsHostSystem();
+    bool IsHostSystem();
     /// Get host GUID
-    String P2PGetHostAddress();
-    /// Get our GUID
-    String P2PGetGUID();
+    String GetHostAddress();
     /// Let other peers know about our readiness
-    void P2PSetReady(bool value);
+    void SetReady(bool value);
     /// Get current ready status
-    bool P2PGetReady();
+    bool GetReady();
     /// Handle all peer readiness in session
-    void P2PReadyStatusChanged();
+    void ReadyStatusChanged();
     /// Reset our P2P session timer, peer with largest timer value becomes the host
-    void P2PResetHost();
+    void ResetHost();
+    /// Set NAT server auto reconnecting when disconnection happens
+    void SetNATAutoReconnect(bool retry);
+    /// Get NAT server auto reconnect
+    const bool GetNATAutoReconnect() const { return natAutoReconnect_; }
 
     /// Stop the server.
     void StopServer();
@@ -134,6 +136,8 @@ public:
     SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
     /// Ban specific IP addresses.
     void BanAddress(const String& address);
+    /// Ban specific connection
+    void BanConnection(Connection* connection, String reason);
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
 
@@ -164,20 +168,20 @@ public:
     /// Change network mode
     void SetMode(NetworkMode mode, bool force = false);
     /// Get current network mode
-    const NetworkMode  GetMode() const;
+    const NetworkMode  GetMode() const { return networkMode_; }
 
 private:
     /// Connect to NAT server which will handle P2P session
-    bool P2PConnectNAT(const String& address, unsigned short port);
+    bool ConnectNAT(const String& address, unsigned short port);
 
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle render update frame event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Start P2P session when connected to NAT master
-    void HandleNATStartP2PSession(StringHash eventType, VariantMap& eventData);
+    void HandleNATStartSession(StringHash eventType, VariantMap& eventData);
     /// Join P2P session when connected to NAT master
-    void HandleNATJoinP2PSession(StringHash eventType, VariantMap& eventData);
+    void HandleNATJoinSession(StringHash eventType, VariantMap& eventData);
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
@@ -232,14 +236,15 @@ private:
     String guid_;
     /// Ready event for automated event handling in P2P connections
     SLNet::ReadyEvent *readyEvent_;
-    /// P2P functionality
+    /// P2P connection mesh, each peer connected to all other peers
     SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
-    /// Connection graph to automate peer to peer discovery
+    /// Connection graph to automate peer to peer discovery and fill fullyConnectedMesh2_
     SLNet::ConnectionGraph2 *connectionGraph2_;
     /// P2P current host guid
     String hostGuid_;
     /// current network mode - P2P or server-client mode
     NetworkMode networkMode_;
+    bool natAutoReconnect_{};
 };
 
 /// Register Network library objects.

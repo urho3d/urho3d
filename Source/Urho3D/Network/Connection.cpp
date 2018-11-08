@@ -482,12 +482,17 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
     return processed;
 }
 
-void Connection::Ban()
+void Connection::Ban(String reason)
 {
-    if (peer_)
+    if (peer_ && !ipAddress_.Empty() && IsClient())
     {
-        peer_->AddToBanList(address_->ToString(false), 0);
+        GetSubsystem<Network>()->BanConnection(this, reason);
     }
+}
+
+void Connection::SetIP(String ipAddress)
+{
+    ipAddress_ = ipAddress;
 }
 
 void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)

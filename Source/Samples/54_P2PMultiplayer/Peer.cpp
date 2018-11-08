@@ -70,7 +70,7 @@ void Peer::RegisterObject(Context* context)
 void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
 {
     // Only allow the host to update the player movements
-    if (!GetSubsystem<Network>()->P2PIsHostSystem()) {
+    if (!GetSubsystem<Network>()->IsHostSystem()) {
         return;
     }
 
@@ -78,7 +78,7 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
     String nickname = "Unnnamed";
     if (connection_) {
         controls_ = connection_->GetControls();
-        if (connection_->GetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
+        if (connection_->GetGUID() == GetSubsystem<Network>()->GetHostAddress()) {
             isHost = true;
         }
         nickname = connection_->GetIdentity()["Name"].GetString();
@@ -86,7 +86,7 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
 
     const float MOVE_TORQUE = 3.0f;
 
-    if (!node_) {
+    if (!node_ || !connection_) {
         return;
     }
 
@@ -118,7 +118,7 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
         readyString = "Not ready";
     }
     auto text = node_->GetComponent<Text3D>();
-    if (text && updateTimer_.GetMSec(false) > 1000) {
+    if (text && updateTimer_.GetMSec(false) > 3000) {
         if (isHost) {
             // Since host label almost never changes, we have to add some sort of random value to it so it could be synced between peers
             text->SetText("         [" + readyString + "] " + nickname + " [" + String(Random(1, 3)) + "] [HOST]");
@@ -130,6 +130,8 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
         }
 
         updateTimer_.Reset();
+
+//        connection_->Ban("I don't like you!");
     }
 }
 

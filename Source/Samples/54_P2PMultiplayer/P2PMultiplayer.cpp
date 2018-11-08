@@ -148,8 +148,7 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(E_CLIENTDISCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientDisconnected));
     SubscribeToEvent(E_P2PALLREADYCHANGED, URHO3D_HANDLER(P2PMultiplayer, HandleAllReadyChanged));
     SubscribeToEvent(E_P2PNEWHOST, URHO3D_HANDLER(P2PMultiplayer, HandleNewHost));
-
-//    SubscribeToEvent(refreshServerList_, "Released", URHO3D_HANDLER(LANDiscovery, HandleDoNetworkDiscovery));
+    SubscribeToEvent(E_NETWORKBANNED, URHO3D_HANDLER(P2PMultiplayer, HandleBanned));
 }
 
 void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
@@ -158,8 +157,8 @@ void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eve
     URHO3D_LOGINFO("HandleStartP2PSession");
     VariantMap identity;
     identity["Name"] = nickname_->GetText();
-    GetSubsystem<Network>()->P2PStartSession(scene_, identity);
-    httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->P2PGetGUID());
+    GetSubsystem<Network>()->StartSession(scene_, identity);
+    httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->GetGUID());
 
     SubscribeToEvent(E_P2PSESSIONSTARTED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionStarted));
 }
@@ -171,7 +170,7 @@ void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& even
     VariantMap identity;
     SetRandomSeed(Time::GetSystemTime());
     identity["Name"] = nickname_->GetText();
-    GetSubsystem<Network>()->P2PJoinSession(guid_->GetText(), scene_, identity);
+    GetSubsystem<Network>()->JoinSession(guid_->GetText(), scene_, identity);
 //    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
 //    GetSubsystem<Network>()->SetSimulatedLatency(10 + Random(100));
 }
@@ -191,7 +190,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     gametime += timestep * 10;
 
     if (input->GetKeyPress(KEY_R)) {
-        GetSubsystem<Network>()->P2PResetHost();
+        GetSubsystem<Network>()->ResetHost();
     }
     if (input->GetKeyPress(KEY_E)) {
         GetSubsystem<Network>()->Disconnect(1000);
@@ -203,9 +202,9 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (input->GetKeyPress(KEY_T)) {
-        GetSubsystem<Network>()->P2PSetReady(!GetSubsystem<Network>()->P2PGetReady());
+        GetSubsystem<Network>()->SetReady(!GetSubsystem<Network>()->GetReady());
     }
-    if (GetSubsystem<Network>()->P2PIsHostSystem() && _allReady) {
+    if (GetSubsystem<Network>()->IsHostSystem() && _allReady) {
     }
 
     // Mouse sensitivity as degrees per pixel
@@ -234,42 +233,23 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (timer_.GetMSec(false) > 1000) {
-        //GetSubsystem<Network>()->SetSimulatedLatency(Random(100.0f));
-//        GetSubsystem<Network>()->SetSimulatedLatency(100 + Random(1000));
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
         }
 
-//        PODVector<Node*> nodes;
-//        scene_->GetNodesWithTag(nodes, "Player");
-//        URHO3D_LOGINFO("-------- NODES " + String(nodes.Size()));
-//        for (auto it = nodes.Begin(); it != nodes.End(); ++it) {
-//            URHO3D_LOGINFO("Node " + String((*it)->GetID()) + " => " + (*it)->GetVar("GUID").GetString());
-//        }
-//        URHO3D_LOGINFO("----------------");
 
         timer_.Reset();
-//        URHO3D_LOGINFO(" ");
-//        URHO3D_LOGINFO(" " + String(i));
-        clientCount_->SetText("Connections: " + String(GetSubsystem<Network>()->GetP2PParticipantCount()));
-//        URHO3D_LOGINFO("Participats: " + String(GetSubsystem<Network>()->GetP2PParticipantCount()));
-//        URHO3D_LOGINFO("P2PIsConnectedHost: " + String(GetSubsystem<Network>()->P2PIsConnectedHost()));
-//        URHO3D_LOGINFO("P2PIsHostSystem: " + String(GetSubsystem<Network>()->P2PIsHostSystem()));
-        myGuid_->SetText("My GUID: " + GetSubsystem<Network>()->P2PGetGUID());
-        hostGuid_->SetText("Host GUID: " + GetSubsystem<Network>()->P2PGetHostAddress());
+        clientCount_->SetText("Connections: " + String(GetSubsystem<Network>()->GetParticipantCount()));
+        myGuid_->SetText("My GUID: " + GetSubsystem<Network>()->GetGUID());
+        hostGuid_->SetText("Host GUID: " + GetSubsystem<Network>()->GetHostAddress());
 
-        if (GetSubsystem<Network>()->P2PGetGUID() == GetSubsystem<Network>()->P2PGetHostAddress()) {
+        if (GetSubsystem<Network>()->GetGUID() == GetSubsystem<Network>()->GetHostAddress()) {
             hostGuid_->SetColor(Color::RED);
             myGuid_->SetColor(Color::RED);
         } else {
             myGuid_->SetColor(Color::GREEN);
             hostGuid_->SetColor(Color::GREEN);
         }
-//        URHO3D_LOGINFO("P2PGetGUID: " + GetSubsystem<Network>()->P2PGetGUID());
-//        URHO3D_LOGINFO("P2PGetHostAddress: " + GetSubsystem<Network>()->P2PGetHostAddress());
-//        URHO3D_LOGINFO("--------");
-//        GetSubsystem<Network>()->P2PShowReadyStatus();
-//        URHO3D_LOGINFO("");
 
         if (httpRequest_.Null()) {
             httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
@@ -304,7 +284,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (peers_[serverConnection] && peers_[serverConnection]->GetNode()) {
             GetSubsystem<Input>()->SetMouseVisible(false);
             GetSubsystem<Input>()->SetMouseGrabbed(true);
-            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_WRAP);
+//            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_WRAP);
 
             const float CAMERA_DISTANCE = 4.0f;
 
@@ -314,7 +294,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
             UpdateClientObjects();
             GetSubsystem<Input>()->SetMouseVisible(true);
             GetSubsystem<Input>()->SetMouseGrabbed(false);
-            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
+//            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
         }
     }
 }
@@ -489,7 +469,7 @@ void P2PMultiplayer::UpdateClientObjects()
         }
     }
     for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
-        if ((*it2)->GetVar("GUID").GetString() == GetSubsystem<Network>()->P2PGetGUID()) {
+        if ((*it2)->GetVar("GUID").GetString() == GetSubsystem<Network>()->GetGUID()) {
             if (!peers_[GetSubsystem<Network>()->GetServerConnection()]) {
                 peers_[GetSubsystem<Network>()->GetServerConnection()] = new Peer(context_);
                 peers_[GetSubsystem<Network>()->GetServerConnection()]->SetConnection(GetSubsystem<Network>()->GetServerConnection());
@@ -512,7 +492,7 @@ void P2PMultiplayer::CreatePlayerNode(Connection* connection)
         return;
     }
 
-    if (GetSubsystem<Network>()->GetClientConnections().Size() != 0 && !GetSubsystem<Network>()->P2PIsHostSystem()) {
+    if (GetSubsystem<Network>()->GetClientConnections().Size() != 0 && !GetSubsystem<Network>()->IsHostSystem()) {
         return;
     }
 
@@ -535,4 +515,21 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
     URHO3D_LOGINFOF("Host changed %s, %i => %s", eventData[P_ADDRESS].GetString().CString(), eventData[P_PORT].GetInt(), eventData[P_GUID].GetString().CString());
     SetRandomSeed(Time::GetSystemTime());
 
+//    if (!GetSubsystem<Network>()->IsHostSystem()) {
+//        // Non-hosts should clear the previous state
+//        peers_.Clear();
+//    }
+}
+
+void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Network>()->Disconnect(1000);
+    peers_.Clear();
+
+    GetSubsystem<Input>()->SetMouseVisible(true);
+    GetSubsystem<Input>()->SetMouseGrabbed(false);
+//    GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
+
+    using namespace NetworkBanned;
+    URHO3D_LOGWARNING("We have been banned, reason: " + eventData[P_REASON].GetString());
 }
