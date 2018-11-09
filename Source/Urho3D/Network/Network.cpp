@@ -1242,7 +1242,11 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             bool processed = serverConnection_->ProcessMessage(packetID, buffer);
             if (!processed)
             {
-                HandleMessageClient(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+                if (networkMode_ == PEER_TO_PEER) {
+                    HandleMessageClient(packet->guid, 0, packetID, (const char *) (packet->data + dataStart), packet->length - dataStart);
+                } else {
+                    HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+                }
             }
         }
         packetHandled = true;
