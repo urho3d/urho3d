@@ -36,6 +36,7 @@
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Network/HttpRequest.h>
+#include <Urho3D/Network/Protocol.h>
 #include <Urho3D/Physics/CollisionShape.h>
 #include <Urho3D/Physics/PhysicsEvents.h>
 #include <Urho3D/Physics/PhysicsWorld.h>
@@ -63,17 +64,11 @@
 URHO3D_DEFINE_APPLICATION_MAIN(P2PMultiplayer)
 
 P2PMultiplayer::P2PMultiplayer(Context* context) :
-    Sample(context)
+    Sample(context),
+    gameState_(GameState::IN_MENU)
 {
     Peer::RegisterObject(context);
 }
-
-// Control bits we define
-static const unsigned CTRL_FORWARD = 1;
-static const unsigned CTRL_BACK = 2;
-static const unsigned CTRL_LEFT = 4;
-static const unsigned CTRL_RIGHT = 8;
-
 
 void P2PMultiplayer::Start()
 {
@@ -126,10 +121,15 @@ void P2PMultiplayer::CreateUI()
     marginTop += 40;
     hostGuid_ = CreateLabel("HOST GUID:", IntVector2(20, marginTop));
 
-    String information = "R - Reset host (if you are the host, \nthis role will be passed to other peers";
+    statusMessage_ = CreateLabel("Status: Started", IntVector2(20, -20));
+    statusMessage_->SetAlignment(HA_LEFT, VA_BOTTOM);
+
+    String information = "R - Reset host, if you are the host, \nthis role will be passed to other peers";
     information += "\nE - Disconnect";
     information += "\nT - Toggle ready state";
     information += "\nWASD - move around";
+    information += "\nH - Toggle mouse visible/hidden";
+
     info_ = CreateLabel(information, IntVector2(0, 50));
     info_->SetHorizontalAlignment(HA_RIGHT);
 
@@ -149,6 +149,10 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(E_P2PALLREADYCHANGED, URHO3D_HANDLER(P2PMultiplayer, HandleAllReadyChanged));
     SubscribeToEvent(E_P2PNEWHOST, URHO3D_HANDLER(P2PMultiplayer, HandleNewHost));
     SubscribeToEvent(E_NETWORKBANNED, URHO3D_HANDLER(P2PMultiplayer, HandleBanned));
+    SubscribeToEvent(E_CLIENTIDENTITY, URHO3D_HANDLER(P2PMultiplayer, HandleClientIdentity));
+
+    GetSubsystem<Network>()->RegisterRemoteEvent("GameStart");
+    SubscribeToEvent("GameStart", URHO3D_HANDLER(P2PMultiplayer, HandleGameState));
 }
 
 void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
@@ -158,9 +162,11 @@ void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eve
     VariantMap identity;
     identity["Name"] = nickname_->GetText();
     GetSubsystem<Network>()->StartSession(scene_, identity);
+    statusMessage_->SetText("Status: Starting P2P session");
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/?guid=" + GetSubsystem<Network>()->GetGUID());
 
     SubscribeToEvent(E_P2PSESSIONSTARTED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionStarted));
+    SubscribeToEvent(E_P2PSESSIONJOINED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionJoined));
 }
 
 void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
@@ -173,12 +179,25 @@ void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& even
     GetSubsystem<Network>()->JoinSession(guid_->GetText(), scene_, identity);
 //    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
 //    GetSubsystem<Network>()->SetSimulatedLatency(10 + Random(100));
+
+    statusMessage_->SetText("Status: Joining " + guid_->GetText() + " P2P session");
 }
 
 void P2PMultiplayer::HandleSessionStarted(StringHash eventType, VariantMap& eventData)
 {
     UnsubscribeFromEvent(E_P2PSESSIONSTARTED);
-    CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
+//    CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
+
+    statusMessage_->SetText("Status: P2P Session started");
+
+    gameState_ = GameState::IN_LOBBY;
+}
+
+void P2PMultiplayer::HandleSessionJoined(StringHash eventType, VariantMap& eventData)
+{
+    statusMessage_->SetText("Status: joined P2P Session");
+
+    gameState_ = GameState::IN_LOBBY;
 }
 
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -199,12 +218,29 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Input>()->SetMouseVisible(true);
         GetSubsystem<Input>()->SetMouseGrabbed(false);
         GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
+
+        statusMessage_->SetText("Status: Disconnected");
+    }
+
+    if (input->GetKeyPress(KEY_H)) {
+        if (input->IsMouseVisible()) {
+            input->SetMouseVisible(false);
+            input->SetMouseGrabbed(true);
+            input->SetMouseMode(MouseMode::MM_WRAP);
+        } else {
+            input->SetMouseVisible(true);
+            input->SetMouseGrabbed(false);
+            input->SetMouseMode(MouseMode::MM_FREE);
+        }
     }
 
     if (input->GetKeyPress(KEY_T)) {
         GetSubsystem<Network>()->SetReady(!GetSubsystem<Network>()->GetReady());
+        statusMessage_->SetText("Status: Ready state changed");
+
     }
-    if (GetSubsystem<Network>()->IsHostSystem() && _allReady) {
+    if (GetSubsystem<Network>()->IsHostSystem() && input->GetKeyPress(KEY_N)) {
+        InitPlayers();
     }
 
     // Mouse sensitivity as degrees per pixel
@@ -233,10 +269,22 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (timer_.GetMSec(false) > 1000) {
+
+
+        //TODO fix this
+        if (GetSubsystem<Network>()->GetServerConnection()) {
+            auto clients = GetSubsystem<Network>()->GetClientConnections();
+            for (auto it = clients.Begin(); it != clients.End(); ++it) {
+                VectorBuffer msg;
+                msg.WriteVariantMap(GetSubsystem<Network>()->GetServerConnection()->GetIdentity());
+                (*it)->SendMessage(MSG_IDENTITY, true, true, msg);
+            }
+        }
+
+        UpdatePlayerList();
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
         }
-
 
         timer_.Reset();
         clientCount_->SetText("Connections: " + String(GetSubsystem<Network>()->GetParticipantCount()));
@@ -279,28 +327,22 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
-    if (serverConnection) {
-        if (peers_[serverConnection] && peers_[serverConnection]->GetNode()) {
-            GetSubsystem<Input>()->SetMouseVisible(false);
-            GetSubsystem<Input>()->SetMouseGrabbed(true);
-//            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_WRAP);
+    if (gameState_ == IN_GAME) {
+        auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
+        if (serverConnection) {
+            if (peers_[serverConnection] && peers_[serverConnection]->GetNode()) {
+                const float CAMERA_DISTANCE = 4.0f;
 
-            const float CAMERA_DISTANCE = 4.0f;
-
-            // Move camera some distance away from the ball
-            cameraNode_->SetPosition(peers_[serverConnection]->GetNode()->GetPosition() + cameraNode_->GetRotation() * Vector3::BACK * CAMERA_DISTANCE);
-        } else {
-            UpdateClientObjects();
-            GetSubsystem<Input>()->SetMouseVisible(true);
-            GetSubsystem<Input>()->SetMouseGrabbed(false);
-//            GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
+                // Move camera some distance away from the ball
+                cameraNode_->SetPosition(peers_[serverConnection]->GetNode()->GetPosition() + cameraNode_->GetRotation() * Vector3::BACK * CAMERA_DISTANCE);
+            } else {
+                UpdateClientObjects();
+            }
         }
     }
 }
 
-void P2PMultiplayer::Init()
-{
+void P2PMultiplayer::Init() {
     GetSubsystem<Network>()->SetMode(NetworkMode::PEER_TO_PEER);
     GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
     GetSubsystem<Network>()->SetUpdateFps(30);
@@ -435,9 +477,11 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
 
-    CreatePlayerNode(newConnection);
+    //CreatePlayerNode(newConnection);
 
-    UpdateClientObjects();
+    //UpdateClientObjects();
+
+    statusMessage_->SetText("Status: Client connected");
 }
 
 void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
@@ -449,6 +493,8 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
     DestroyPlayerNode(connection);
 
     UpdateClientObjects();
+
+    statusMessage_->SetText("Status: Client discconnected");
 }
 
 void P2PMultiplayer::UpdateClientObjects()
@@ -484,15 +530,15 @@ void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eve
 {
     using namespace P2PAllReadyChanged;
     _allReady = eventData[P_READY].GetBool();
+
+    if (_allReady) {
+        statusMessage_->SetText("Status: All players are ready");
+    }
 }
 
 void P2PMultiplayer::CreatePlayerNode(Connection* connection)
 {
     if (peers_[connection]) {
-        return;
-    }
-
-    if (GetSubsystem<Network>()->GetClientConnections().Size() != 0 && !GetSubsystem<Network>()->IsHostSystem()) {
         return;
     }
 
@@ -515,6 +561,7 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
     URHO3D_LOGINFOF("Host changed %s, %i => %s", eventData[P_ADDRESS].GetString().CString(), eventData[P_PORT].GetInt(), eventData[P_GUID].GetString().CString());
     SetRandomSeed(Time::GetSystemTime());
 
+    statusMessage_->SetText("Status: New host elected: " + eventData[P_GUID].GetString());
 //    if (!GetSubsystem<Network>()->IsHostSystem()) {
 //        // Non-hosts should clear the previous state
 //        peers_.Clear();
@@ -532,4 +579,85 @@ void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
 
     using namespace NetworkBanned;
     URHO3D_LOGWARNING("We have been banned, reason: " + eventData[P_REASON].GetString());
+
+    statusMessage_->SetText("Status: You are banned");
+}
+
+void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientIdentity;
+    Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    statusMessage_->SetText("Status: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
+}
+
+void P2PMultiplayer::InitPlayers()
+{
+    if (!_allReady) {
+        statusMessage_->SetText("Status: Can't start, not all players are ready!");
+        return;
+    }
+    auto clients = GetSubsystem<Network>()->GetClientConnections();
+    for (auto it = clients.Begin(); it != clients.End(); ++it) {
+        CreatePlayerNode((*it));
+    }
+
+    CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
+
+    statusMessage_->SetText("Status: Initializing all players");
+
+    gameState_ = IN_GAME;
+    VariantMap data = GetEventDataMap();
+    data["GameState"] = gameState_;
+    GetSubsystem<Network>()->BroadcastRemoteEvent("GameStart", false, data);
+}
+
+void P2PMultiplayer::HandleGameState(StringHash eventType, VariantMap& eventData)
+{
+    if (eventType == "GameStart") {
+        gameState_ = (GameState) eventData["GameState"].GetUInt();
+        statusMessage_->SetText("Status: Game started!");
+    }
+}
+
+void P2PMultiplayer::UpdatePlayerList()
+{
+    if (!GetSubsystem<Network>()->GetServerConnection()) {
+        return;
+    }
+    for (auto it = playerList_.Begin(); it != playerList_.End(); ++it) {
+        if ((*it)) {
+            (*it)->Remove();
+        }
+    }
+    playerList_.Clear();
+
+    int margin = 0;
+    SharedPtr<Text> me(CreateLabel("", IntVector2(0, margin)));
+    me->SetAlignment(HA_RIGHT, VA_BOTTOM);
+    String ready = "READY";
+    if (!GetSubsystem<Network>()->GetServerConnection()->GetReady()) {
+        ready = "NOT READY";
+        me->SetColor(Color::YELLOW);
+    } else {
+        me->SetColor(Color::GREEN);
+    }
+    me->SetText(GetSubsystem<Network>()->GetServerConnection()->GetIdentity()["Name"].GetString() + " [" + ready + "]");
+
+    playerList_.Push(me);
+
+    auto clients = GetSubsystem<Network>()->GetClientConnections();
+    for (auto it = clients.Begin(); it != clients.End(); ++it) {
+        margin -= 20;
+        ready = "READY";
+        SharedPtr<Text> peer(CreateLabel("", IntVector2(0, margin)));
+        if (!(*it)->GetReady()) {
+            ready = "NOT READY";
+            peer->SetColor(Color::YELLOW);
+        } else {
+            peer->SetColor(Color::GREEN);
+        }
+        peer->SetAlignment(HA_RIGHT, VA_BOTTOM);
+        peer->SetText((*it)->GetIdentity()["Name"].GetString() + " [" + ready + "]");
+        playerList_.Push(peer);
+    }
 }

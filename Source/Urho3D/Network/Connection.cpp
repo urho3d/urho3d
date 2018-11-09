@@ -81,6 +81,8 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
     SetAddressOrGUID(address);
+
+    URHO3D_LOGINFO("Creating connection " + String(address_->ToString()));
 }
 
 Connection::~Connection()
@@ -426,7 +428,7 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
     switch (msgID)
     {
     case MSG_IDENTITY:
-        ProcessIdentity(msgID, msg);
+        processed = ProcessIdentity(msgID, msg);
         break;
 
     case MSG_CONTROLS:
@@ -482,7 +484,7 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
     return processed;
 }
 
-void Connection::Ban(String reason)
+void Connection::Ban(const String& reason)
 {
     if (peer_ && !ipAddress_.Empty() && IsClient())
     {
@@ -490,7 +492,7 @@ void Connection::Ban(String reason)
     }
 }
 
-void Connection::SetIP(String ipAddress)
+void Connection::SetIP(const String& ipAddress)
 {
     ipAddress_ = ipAddress;
 }
@@ -904,16 +906,15 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
     }
 }
 
-void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
+bool Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
 {
-    URHO3D_LOGERROR("------------ Receiving client identity!");
     if (!IsClient())
     {
-        URHO3D_LOGWARNING("Received unexpected Identity message from server");
-        return;
+        if (GetSubsystem<Network>()->GetMode() == SERVER_CLIENT) {
+            URHO3D_LOGWARNING("Received unexpected Identity message from server " + GetGUID());
+        }
+        return false;
     }
-
-    URHO3D_LOGERROR("USER IDENTITY");
 
     identity_ = msg.ReadVariantMap();
 
@@ -924,18 +925,18 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
     eventData[P_ALLOW] = true;
     SendEvent(E_CLIENTIDENTITY, eventData);
 
-    URHO3D_LOGERROR("Name: " + identity_["Name"].GetString());
-
     // If connection was denied as a response to the identity event, disconnect now
     if (!eventData[P_ALLOW].GetBool())
         Disconnect();
+
+    return true;
 }
 
 void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        URHO3D_LOGWARNING("Received unexpected Controls message from server");
+        URHO3D_LOGWARNING("Received unexpected Controls message from server " + GetGUID());
         return;
     }
 

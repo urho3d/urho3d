@@ -45,12 +45,6 @@
 
 #include "Peer.h"
 
-// Control bits we define
-static const unsigned CTRL_FORWARD = 1;
-static const unsigned CTRL_BACK = 2;
-static const unsigned CTRL_LEFT = 4;
-static const unsigned CTRL_RIGHT = 8;
-
 Peer::Peer(Context* context) :
         Object(context)
 {
@@ -195,4 +189,16 @@ void Peer::DestroyNode()
     if (node_) {
         node_->Remove();
     }
+}
+
+void Peer::SetIdentity(VariantMap identity)
+{
+//    identity_ = identity;
+//    if (node_) {
+//        for (auto it = identity.Begin(); it != identity.End(); ++it) {
+//            if (node_->SetVar((*it).first_), (*it).second_) {
+//
+//            }
+//        }
+//    }
 }

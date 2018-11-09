@@ -356,19 +356,41 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
     }
 }
 
+void Network::HandleMessageClient(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes)
+{
+    // Only process messages from known sources
+    Connection* connection = GetClientConnection(source);
+    if (connection)
+    {
+        MemoryBuffer msg(data, (unsigned)numBytes);
+        if (connection->ProcessMessage((int)msgID, msg))
+            return;
+
+        // If message was not handled internally, forward as an event
+        using namespace NetworkMessage;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_CONNECTION] = connection;
+        eventData[P_MESSAGEID] = (int)msgID;
+        eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
+        connection->SendEvent(E_NETWORKMESSAGE, eventData);
+    }
+    else {
+        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
+    }
+}
+
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address)
 {
 
-    URHO3D_LOGINFO("NewConnectionEstablished: " + String(address));
+    URHO3D_LOGINFO("NewConnectionEstablished: " + String(connection.ToString()));
     ReadyStatusChanged();
     if (networkMode_ == PEER_TO_PEER && clientConnections_[connection]) {
-//        URHO3D_LOGWARNINGF("Client already in the client list.", connection.rakNetGuid.ToString());
         //TODO proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
         return;
     }
 
-//    URHO3D_LOGINFOF("NewConnectionEstablished ---------------------------", connection.rakNetGuid.ToString());
     // Create a new client connection corresponding to this MessageConnection
     SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
@@ -385,6 +407,19 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, c
     VariantMap& eventData = GetEventDataMap();
     eventData[P_CONNECTION] = newConnection;
     newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
+
+//    if (GetSubsystem<Network>()->GetServerConnection()) {
+//        auto clients = GetSubsystem<Network>()->GetClientConnections();
+//        for (auto it = clients.Begin(); it != clients.End(); ++it) {
+//        if (serverConnection_) {
+//            VectorBuffer msg;
+//            msg.WriteVariantMap(serverConnection_->GetIdentity());
+//            newConnection->SendMessage(MSG_IDENTITY, true, true, msg);
+//        }
+//        }
+//    }
+
+
 }
 
 void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
@@ -638,7 +673,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
     msgData.WriteUByte((unsigned char)msgID);
     msgData.Write(data, numBytes);
 
-    if (isServer_) {
+    if (isServer_ || networkMode_ == PEER_TO_PEER) {
         rakPeer_->Send((const char *) msgData.GetData(), (int) msgData.GetSize(), HIGH_PRIORITY, RELIABLE, (char) 0, SLNet::UNASSIGNED_RAKNET_GUID, true);
     }
     else
@@ -765,7 +800,7 @@ void Network::BanAddress(const String& address)
     rakPeer_->AddToBanList(address.CString(), 0);
 }
 
-void Network::BanConnection(Connection* connection, String reason)
+void Network::BanConnection(Connection* connection, const String& reason)
 {
     using namespace NetworkBanned;
     VariantMap data = GetEventDataMap();
@@ -787,6 +822,15 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
         else
             return nullptr;
     }
+}
+
+Connection* Network::GetClientConnection(const SLNet::AddressOrGUID& connection) const
+{
+    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+    if (i != clientConnections_.End())
+        return i->second_;
+
+    return nullptr;
 }
 
 Connection* Network::GetServerConnection() const
@@ -842,7 +886,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     if (packetID == ID_NEW_INCOMING_CONNECTION)
     {
         URHO3D_LOGINFOF("ID_NEW_INCOMING_CONNECTION from %s. guid=%s.", packet->systemAddress.ToString(true), packet->guid.ToString());
-        if (isServer)
+        if (isServer || networkMode_ == PEER_TO_PEER)
         {
             NewConnectionEstablished(packet->guid, packet->systemAddress.ToString(false));
         }
@@ -860,15 +904,19 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             bsIn.Read(count);
             SLNet::SystemAddress remoteAddress;
             SLNet::RakNetGUID remoteGuid;
+            URHO3D_LOGINFO("AAAA GUID " + String(packet->guid.ToString()));
             NewConnectionEstablished(packet->guid, packet->systemAddress.ToString(false));
-            for (unsigned int i=0; i < count; i++)
-            {
-                bsIn.Read(remoteAddress);
-                bsIn.Read(remoteGuid);
-                if (!remoteAddress.EqualsExcludingPort(*natPunchServerAddress_)) {
-                    NewConnectionEstablished(remoteGuid, remoteAddress.ToString(false));
-                }
-            }
+
+//            for (unsigned int i=0; i < count; i++)
+//            {
+//                bsIn.Read(remoteAddress);
+//                bsIn.Read(remoteGuid);
+//                if (!remoteAddress.EqualsExcludingPort(*natPunchServerAddress_)) {
+//                    URHO3D_LOGINFO("BBBB GUID " + String(remoteGuid.ToString()));
+//                    NewConnectionEstablished(remoteGuid, remoteAddress.ToString(false));
+//
+//                }
+//            }
         } else {
             NewConnectionEstablished(packet->guid, packet->systemAddress.ToString(false));
         }
@@ -1105,7 +1153,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
                 URHO3D_LOGINFOF("ID_FCM2_NEW_HOST: System %s is host, GUID=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
             }
 
-            // Send the identity map now
+//            // Send the identity map now to our new host
             VectorBuffer msg;
             msg.WriteVariantMap(serverConnection_->GetIdentity());
             serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg);
@@ -1194,7 +1242,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             bool processed = serverConnection_->ProcessMessage(packetID, buffer);
             if (!processed)
             {
-                HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+                HandleMessageClient(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
             }
         }
         packetHandled = true;
@@ -1463,6 +1511,10 @@ void Network::HandleNATJoinSession(StringHash eventType, VariantMap& eventData)
 
     URHO3D_LOGINFO("Attempting to Join P2P Session : " + String(remoteGUID_->ToString()));
     natPunchthroughServerClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
+
+    ReadyStatusChanged();
+
+    SendEvent(E_P2PSESSIONJOINED);
 }
 
 int Network::GetParticipantCount()
@@ -1533,15 +1585,16 @@ void Network::ReadyStatusChanged()
     for (unsigned int i = 0; i < participantList.Size(); i++) {
         if (participantList[i] != rakPeer_->GetMyGUID()) {
             int ready = readyEvent_->GetReadyStatus(0, participantList[i]);
-            Connection* connection = GetConnection(participantList[i]);
-            if (ready != SLNet::RES_ALL_READY && ready != SLNet::RES_READY) {
-                if (connection) {
-                    connection->SetReady(false);
-                }
-            }
-            else {
-                if (connection) {
-                    connection->SetReady(true);
+            Connection* connection = GetClientConnection(participantList[i]);
+            if (connection) {
+                if (ready != SLNet::RES_ALL_READY && ready != SLNet::RES_READY) {
+                    if (connection) {
+                        connection->SetReady(false);
+                    }
+                } else {
+                    if (connection) {
+                        connection->SetReady(true);
+                    }
                 }
             }
         }

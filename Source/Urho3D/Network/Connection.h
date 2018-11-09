@@ -156,7 +156,7 @@ public:
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
     /// Ban this connections IP address.
-    void Ban(String reason);
+    void Ban(const String& reason);
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
 
@@ -248,7 +248,7 @@ public:
     const bool GetReady() const { return ready_; }
 
     /// Set the IP address for this connection
-    void SetIP(String ipAddress);
+    void SetIP(const String& ipAddress);
     /// Retrieve IP address for this connection
     const String GetIP() const { return ipAddress_; }
 
@@ -264,7 +264,7 @@ private:
     /// Process package download related messages. Called by Network.
     void ProcessPackageDownload(int msgID, MemoryBuffer& msg);
     /// Process an Identity message from the client. Called by Network.
-    void ProcessIdentity(int msgID, MemoryBuffer& msg);
+    bool ProcessIdentity(int msgID, MemoryBuffer& msg);
     /// Process a Controls message from the client. Called by Network.
     void ProcessControls(int msgID, MemoryBuffer& msg);
     /// Process a SceneLoaded message from the client. Called by Network.

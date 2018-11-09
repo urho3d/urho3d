@@ -39,6 +39,12 @@ class HttpRequest;
 
 const int SERVER_PORT = 54654;
 
+enum GameState {
+    IN_MENU,
+    IN_LOBBY,
+    IN_GAME
+};
+
 /// Chat example
 /// This sample demonstrates:
 ///     - Starting up a network server or connecting to it
@@ -100,6 +106,9 @@ private:
     void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
 
     void HandleSessionStarted(StringHash eventType, VariantMap& eventData);
+    void HandleSessionJoined(StringHash eventType, VariantMap& eventData);
+
+    void HandleGameState(StringHash eventType, VariantMap& eventData);
 
     void UpdateClientObjects();
 
@@ -107,8 +116,14 @@ private:
 
     void HandleBanned(StringHash eventType, VariantMap& eventData);
 
+    void HandleClientIdentity(StringHash eventType, VariantMap& eventData);
+
     void CreatePlayerNode(Connection* connection);
     void DestroyPlayerNode(Connection* connection);
+
+    void InitPlayers();
+
+    void UpdatePlayerList();
 
     Timer timer_;
     /// Start P2P Session
@@ -122,10 +137,14 @@ private:
     SharedPtr<Text> myGuid_;
     SharedPtr<Text> hostGuid_;
     SharedPtr<Text> info_;
+    SharedPtr<Text> statusMessage_;
     String message_;
     SharedPtr<HttpRequest> httpRequest_;
     bool _allReady{};
     Controls controls_;
+    List<SharedPtr<Text>> playerList_;
 
     HashMap<Connection*, SharedPtr<Peer>> peers_;
+
+    GameState gameState_;
 };

@@ -12,6 +12,12 @@
 
 using namespace Urho3D;
 
+// Control bits we define
+static const unsigned CTRL_FORWARD = 1;
+static const unsigned CTRL_BACK = 2;
+static const unsigned CTRL_LEFT = 4;
+static const unsigned CTRL_RIGHT = 8;
+
 class Peer: public Object {
 
     URHO3D_OBJECT(Peer, Object);
@@ -40,6 +46,8 @@ public:
 
     void DestroyNode();
 
+    void SetIdentity(VariantMap identity);
+
 private:
     /// Movement controls. Assigned by the main program each physics update step.
     Controls controls_;
@@ -51,6 +59,8 @@ private:
     WeakPtr<Scene> scene_;
 
     Timer updateTimer_;
+
+    VariantMap  identity_;
 };
 
 

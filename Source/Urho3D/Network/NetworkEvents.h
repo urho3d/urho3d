@@ -160,6 +160,11 @@ URHO3D_EVENT(E_P2PSESSIONSTARTED, P2PSessionStarted)
 {
 }
 
+/// P2P session join succesfull
+URHO3D_EVENT(E_P2PSESSIONJOINED, P2PSessionJoined)
+{
+}
+
 /// When host system is elected
 URHO3D_EVENT(E_P2PNEWHOST, P2PNewHost)
 {

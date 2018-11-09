@@ -53,6 +53,8 @@ public:
 
     /// Handle an inbound message.
     void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
+    /// Handle an inbound message.
+    void HandleMessageClient(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
     /// Handle a new client connection.
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address = nullptr);
     /// Handle a client disconnection.
@@ -134,10 +136,10 @@ public:
     void SendPackageToClients(Scene* scene, PackageFile* package);
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
     SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
-    /// Ban specific IP addresses.
+    /// Ban specific IP addresses. Also supports wildcard addresses like 192.68.1.*
     void BanAddress(const String& address);
     /// Ban specific connection
-    void BanConnection(Connection* connection, String reason);
+    void BanConnection(Connection* connection, const String& reason);
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
 
@@ -149,6 +151,8 @@ public:
 
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
+    /// Return a client or server connection by kNet MessageConnection, or null if none exist.
+    Connection* GetClientConnection(const SLNet::AddressOrGUID& connection) const;
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
