@@ -40,7 +40,7 @@ else
     # Fallback workaround on older Docker CLI version
     docker run -it --rm -h fishtank \
         -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -e PROJECT_DIR=$PROJECT_DIR \
-        --env-file <(perl -ne 'chomp; print "$_=$ENV{$_}\n" if defined $ENV{$_}' $PROJECT_DIR/script/.env-file) \
+        --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' $PROJECT_DIR/script/.env-file) \
         --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
         --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
