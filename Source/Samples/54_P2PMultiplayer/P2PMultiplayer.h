@@ -24,6 +24,7 @@
 
 #include "Sample.h"
 #include "Peer.h"
+#include <Urho3D/UI/Window.h>
 
 namespace Urho3D
 {
@@ -84,6 +85,8 @@ private:
 
     void CreateScene();
 
+    void CreatePlayerListWindow();
+
     /// Set up viewport.
     void SetupViewport();
 
@@ -134,15 +137,13 @@ private:
     SharedPtr<LineEdit> nickname_;
 //    /// Found server list
 	SharedPtr<Text> clientCount_;
-    SharedPtr<Text> myGuid_;
-    SharedPtr<Text> hostGuid_;
     SharedPtr<Text> info_;
     SharedPtr<Text> statusMessage_;
     String message_;
     SharedPtr<HttpRequest> httpRequest_;
     bool _allReady{};
     Controls controls_;
-    List<SharedPtr<Text>> playerList_;
+    SharedPtr<Window> playerList_;
 
     HashMap<Connection*, SharedPtr<Peer>> peers_;
 

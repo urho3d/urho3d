@@ -1631,6 +1631,9 @@ void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
 
 String Connection::GetGUID()
 {
+    if (!IsClient()) {
+        return GetSubsystem<Network>()->GetGUID();
+    }
     return address_->rakNetGuid.ToString();
 }
 

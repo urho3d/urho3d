@@ -1340,7 +1340,7 @@ void Network::PostUpdate(float timeStep)
 
         if (serverConnection_)
         {
-            if (networkMode_ == PEER_TO_PEER && !isServer_ && serverConnection_->GetGUID() != GetGUID()) {
+            if (networkMode_ == PEER_TO_PEER && !IsHostSystem()) {
                 // Send the client update
                 serverConnection_->SendClientUpdate();
                 serverConnection_->SendRemoteEvents();

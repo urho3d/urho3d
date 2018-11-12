@@ -92,6 +92,8 @@ void P2PMultiplayer::Start()
     Sample::InitMouseMode(MM_FREE);
 
     Init();
+
+    CreatePlayerListWindow();
 }
 
 void P2PMultiplayer::CreateUI()
@@ -116,20 +118,15 @@ void P2PMultiplayer::CreateUI()
 
 	marginTop += 80;
     clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));
-    marginTop += 40;
-    myGuid_ = CreateLabel("My GUID: ", IntVector2(20, marginTop));
-    marginTop += 40;
-    hostGuid_ = CreateLabel("HOST GUID:", IntVector2(20, marginTop));
 
     statusMessage_ = CreateLabel("Status: Started", IntVector2(20, -20));
     statusMessage_->SetAlignment(HA_LEFT, VA_BOTTOM);
 
-    String information = "R - Reset host, if you are the host, \nthis role will be passed to other peers";
+    String information = "R - Reset host";
     information += "\nE - Disconnect";
-    information += "\nT - Toggle ready state";
+    information += "\nTAB - Show player list";
     information += "\nWASD - move around";
     information += "\nH - Toggle mouse visible/hidden";
-    information += "\nN - Start game with other peers\n(requires that all peers are ready)";
 
     info_ = CreateLabel(information, IntVector2(0, 50));
     info_->SetHorizontalAlignment(HA_RIGHT);
@@ -212,6 +209,9 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input->GetKeyPress(KEY_R)) {
         GetSubsystem<Network>()->ResetHost();
     }
+    if (input->GetKeyPress(KEY_TAB)) {
+        playerList_->SetVisible(!playerList_->IsVisible());
+    }
     if (input->GetKeyPress(KEY_E)) {
         GetSubsystem<Network>()->Disconnect(1000);
         peers_.Clear();
@@ -221,6 +221,8 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
 
         statusMessage_->SetText("Status: Disconnected");
+
+        UpdatePlayerList();
     }
 
     if (input->GetKeyPress(KEY_H)) {
@@ -232,18 +234,6 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
             input->SetMouseVisible(true);
             input->SetMouseGrabbed(false);
             input->SetMouseMode(MouseMode::MM_FREE);
-        }
-    }
-
-    if (input->GetKeyPress(KEY_T)) {
-        GetSubsystem<Network>()->SetReady(!GetSubsystem<Network>()->GetReady());
-    }
-    if (GetSubsystem<Network>()->IsHostSystem() && input->GetKeyPress(KEY_N)) {
-        if (_allReady) {
-            startGame_ = true;
-            startCountdown_.Reset();
-        } else {
-            statusMessage_->SetText("Status: Can't start game, not all players are ready!");
         }
     }
 
@@ -281,7 +271,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Network>()->GetServerConnection()->SetControls(controls);
     }
 
-    if (timer_.GetMSec(false) > 5000) {
+    if (timer_.GetMSec(false) > 1000) {
         timer_.Reset();
 
         //TODO fix this
@@ -294,22 +284,11 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
             }
         }
 
-        UpdatePlayerList();
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
         }
 
         clientCount_->SetText("Connections: " + String(GetSubsystem<Network>()->GetParticipantCount()));
-        myGuid_->SetText("My GUID: " + GetSubsystem<Network>()->GetGUID());
-        hostGuid_->SetText("Host GUID: " + GetSubsystem<Network>()->GetHostAddress());
-
-        if (GetSubsystem<Network>()->GetGUID() == GetSubsystem<Network>()->GetHostAddress()) {
-            hostGuid_->SetColor(Color::RED);
-            myGuid_->SetColor(Color::RED);
-        } else {
-            myGuid_->SetColor(Color::GREEN);
-            hostGuid_->SetColor(Color::GREEN);
-        }
 
         if (httpRequest_.Null()) {
             httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
@@ -494,6 +473,8 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     //UpdateClientObjects();
 
     statusMessage_->SetText("Status: Client connected");
+
+    UpdatePlayerList();
 }
 
 void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
@@ -507,6 +488,8 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
     UpdateClientObjects();
 
     statusMessage_->SetText("Status: Client discconnected");
+
+    UpdatePlayerList();
 }
 
 void P2PMultiplayer::UpdateClientObjects()
@@ -544,13 +527,16 @@ void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eve
     _allReady = eventData[P_READY].GetBool();
 
     if (_allReady) {
-        statusMessage_->SetText("Status: All players are ready");
+        startGame_ = true;
+        startCountdown_.Reset();
     } else {
         if (startGame_) {
             startGame_ = false;
             statusMessage_->SetText("Status: Countdown stopped! Not all players are ready!");
         }
     }
+
+    UpdatePlayerList();
 }
 
 void P2PMultiplayer::CreatePlayerNode(Connection* connection)
@@ -583,6 +569,8 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
 //        // Non-hosts should clear the previous state
 //        peers_.Clear();
 //    }
+
+    UpdatePlayerList();
 }
 
 void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
@@ -606,10 +594,14 @@ void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& even
     Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     URHO3D_LOGINFO("Client identity: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
     //statusMessage_->SetText("Status: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
+    UpdatePlayerList();
 }
 
 void P2PMultiplayer::InitPlayers()
 {
+    if (!GetSubsystem<Network>()->IsHostSystem()) {
+        return;
+    }
     if (!_allReady) {
         statusMessage_->SetText("Status: Can't start, not all players are ready!");
         return;
@@ -619,7 +611,9 @@ void P2PMultiplayer::InitPlayers()
         CreatePlayerNode((*it));
     }
 
-    CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
+    if (GetSubsystem<Network>()->GetServerConnection()) {
+        CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
+    }
 
     statusMessage_->SetText("Status: Initializing all players");
 
@@ -627,6 +621,7 @@ void P2PMultiplayer::InitPlayers()
     VariantMap data = GetEventDataMap();
     data["GameState"] = gameState_;
     GetSubsystem<Network>()->BroadcastRemoteEvent("GameStart", false, data);
+    playerList_->SetVisible(false);
 }
 
 void P2PMultiplayer::HandleGameState(StringHash eventType, VariantMap& eventData)
@@ -634,48 +629,110 @@ void P2PMultiplayer::HandleGameState(StringHash eventType, VariantMap& eventData
     if (eventType == "GameStart") {
         gameState_ = (GameState) eventData["GameState"].GetUInt();
         statusMessage_->SetText("Status: Game started!");
+        playerList_->SetVisible(false);
     }
 }
 
 void P2PMultiplayer::UpdatePlayerList()
 {
-    if (!GetSubsystem<Network>()->GetServerConnection()) {
-        return;
-    }
-    for (auto it = playerList_.Begin(); it != playerList_.End(); ++it) {
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* label = GetSubsystem<UI>()->GetRoot()->CreateChild<Text>();
+
+    playerList_->RemoveAllChildren();
+
+    Text* playerName = playerList_->CreateChild<Text>();
+    playerName->SetPosition(IntVector2(10, 10));
+    playerName->SetAlignment(HA_LEFT, VA_TOP);
+    playerName->SetText("Nickname");
+    playerName->SetFont(font, 12);
+    playerName->SetFontSize(16);
+    playerName->SetTextEffect(TextEffect::TE_SHADOW);
+    playerName->SetColor(Color::GRAY);
+
+    Text* playerGuid = playerList_->CreateChild<Text>();
+    playerGuid->SetPosition(IntVector2(0, 10));
+    playerGuid->SetAlignment(HA_CENTER, VA_TOP);
+    playerGuid->SetText("GUID");
+    playerGuid->SetFont(font, 12);
+    playerGuid->SetFontSize(16);
+    playerGuid->SetTextEffect(TextEffect::TE_SHADOW);
+    playerGuid->SetColor(Color::GRAY);
+
+    Text* playerStatus = playerList_->CreateChild<Text>();
+    playerStatus->SetPosition(IntVector2(-10, 10));
+    playerStatus->SetAlignment(HA_RIGHT, VA_TOP);
+    playerStatus->SetText("Ready status");
+    playerStatus->SetFont(font, 12);
+    playerStatus->SetFontSize(16);
+    playerStatus->SetTextEffect(TextEffect::TE_SHADOW);
+    playerStatus->SetColor(Color::GRAY);
+
+    int marginTop = 40;
+
+    auto connections = GetSubsystem<Network>()->GetClientConnections();
+    connections.Push(SharedPtr<Connection>(GetSubsystem<Network>()->GetServerConnection()));
+    for (auto it = connections.Begin(); it != connections.End(); ++it) {
         if ((*it)) {
-            (*it)->Remove();
+            Text* playerName = playerList_->CreateChild<Text>();
+            playerName->SetPosition(IntVector2(20, marginTop));
+            playerName->SetAlignment(HA_LEFT, VA_TOP);
+            playerName->SetText((*it)->GetIdentity()["Name"].GetString());
+            playerName->SetFont(font, 12);
+            playerName->SetTextEffect(TextEffect::TE_SHADOW);
+
+            if ((*it)->GetGUID() == GetSubsystem<Network>()->GetHostAddress()) {
+                playerName->SetText(playerName->GetText() + " [HOST]");
+            }
+
+            Text* playerGuid = playerList_->CreateChild<Text>();
+            playerGuid->SetPosition(IntVector2(0, marginTop));
+            playerGuid->SetAlignment(HA_CENTER, VA_TOP);
+            playerGuid->SetText((*it)->GetGUID());
+            playerGuid->SetFont(font, 12);
+            playerGuid->SetTextEffect(TextEffect::TE_SHADOW);
+
+            if ((*it) == GetSubsystem<Network>()->GetServerConnection()) {
+                playerName->SetColor(Color::GREEN);
+
+                Button* readyState = playerList_->CreateChild<Button>();
+                readyState->SetPosition(IntVector2(-20, marginTop - 5));
+                readyState->SetAlignment(HA_RIGHT, VA_TOP);
+                readyState->SetStyleAuto();
+                readyState->SetWidth(100);
+                readyState->SetHeight(30);
+
+                SubscribeToEvent(readyState, "Released", [&](StringHash eventType, VariantMap& eventData) {
+                    GetSubsystem<Network>()->SetReady(!GetSubsystem<Network>()->GetReady());
+                });
+
+                Text* playerStatus = readyState->CreateChild<Text>();
+                playerStatus->SetAlignment(HA_CENTER, VA_CENTER);
+                playerStatus->SetText((*it)->GetReady() ? "Ready" : "Not ready");
+                playerStatus->SetColor((*it)->GetReady() ? Color::GREEN : Color::RED);
+                playerStatus->SetFont(font, 12);
+                playerStatus->SetTextEffect(TextEffect::TE_SHADOW);
+
+            }
+            else {
+                Text* playerStatus = playerList_->CreateChild<Text>();
+                playerStatus->SetPosition(IntVector2(-20, marginTop));
+                playerStatus->SetAlignment(HA_RIGHT, VA_TOP);
+                playerStatus->SetText((*it)->GetReady() ? "Ready" : "Not ready");
+                playerStatus->SetColor((*it)->GetReady() ? Color::GREEN : Color::RED);
+                playerStatus->SetFont(font, 12);
+                playerStatus->SetTextEffect(TextEffect::TE_SHADOW);
+            }
+            marginTop += 25;
         }
     }
-    playerList_.Clear();
+}
 
-    int margin = -10;
-    SharedPtr<Text> me(CreateLabel("", IntVector2(-10, margin)));
-    me->SetAlignment(HA_RIGHT, VA_BOTTOM);
-    String ready = "READY";
-    if (!GetSubsystem<Network>()->GetServerConnection()->GetReady()) {
-        ready = "NOT READY";
-        me->SetColor(Color::YELLOW);
-    } else {
-        me->SetColor(Color::GREEN);
-    }
-    me->SetText(GetSubsystem<Network>()->GetServerConnection()->GetIdentity()["Name"].GetString() + " [" + ready + "]");
-
-    playerList_.Push(me);
-
-    auto clients = GetSubsystem<Network>()->GetClientConnections();
-    for (auto it = clients.Begin(); it != clients.End(); ++it) {
-        margin -= 20;
-        ready = "READY";
-        SharedPtr<Text> peer(CreateLabel("", IntVector2(-10, margin)));
-        if (!(*it)->GetReady()) {
-            ready = "NOT READY";
-            peer->SetColor(Color::YELLOW);
-        } else {
-            peer->SetColor(Color::GREEN);
-        }
-        peer->SetAlignment(HA_RIGHT, VA_BOTTOM);
-        peer->SetText((*it)->GetIdentity()["Name"].GetString() + " [" + ready + "]");
-        playerList_.Push(peer);
-    }
+void P2PMultiplayer::CreatePlayerListWindow()
+{
+    playerList_ = GetSubsystem<UI>()->GetRoot()->CreateChild<Window>();
+    playerList_->SetStyleAuto();
+    playerList_->SetAlignment(HA_CENTER, VA_CENTER);
+    playerList_->SetSize(IntVector2(GetSubsystem<Graphics>()->GetWidth() - 200, GetSubsystem<Graphics>()->GetHeight() - 400));
+    playerList_->BringToFront();
 }

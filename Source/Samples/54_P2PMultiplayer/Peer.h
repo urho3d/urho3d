@@ -40,6 +40,8 @@ public:
 
     void SetConnection(Connection* connection);
 
+    const WeakPtr<Connection> GetConnection() const { return connection_; }
+
     void SetNode(Node* node);
 
     const Node* GetNode() const { return node_; };
