@@ -584,7 +584,7 @@ void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
 void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 {
     using namespace ClientIdentity;
-    Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    auto connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     URHO3D_LOGINFO("Client identity: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
     UpdatePlayerList();
 }
@@ -633,7 +633,7 @@ void P2PMultiplayer::UpdatePlayerList()
 
     playerList_->RemoveAllChildren();
 
-    Text* playerName = playerList_->CreateChild<Text>();
+    auto playerName = playerList_->CreateChild<Text>();
     playerName->SetPosition(IntVector2(10, 10));
     playerName->SetAlignment(HA_LEFT, VA_TOP);
     playerName->SetText("Nickname");
@@ -642,7 +642,7 @@ void P2PMultiplayer::UpdatePlayerList()
     playerName->SetTextEffect(TextEffect::TE_SHADOW);
     playerName->SetColor(Color::GRAY);
 
-    Text* playerGuid = playerList_->CreateChild<Text>();
+    auto playerGuid = playerList_->CreateChild<Text>();
     playerGuid->SetPosition(IntVector2(0, 10));
     playerGuid->SetAlignment(HA_CENTER, VA_TOP);
     playerGuid->SetText("Ping");
@@ -651,7 +651,7 @@ void P2PMultiplayer::UpdatePlayerList()
     playerGuid->SetTextEffect(TextEffect::TE_SHADOW);
     playerGuid->SetColor(Color::GRAY);
 
-    Text* playerStatus = playerList_->CreateChild<Text>();
+    auto playerStatus = playerList_->CreateChild<Text>();
     playerStatus->SetPosition(IntVector2(-10, 10));
     playerStatus->SetAlignment(HA_RIGHT, VA_TOP);
     playerStatus->SetText("Ready status");
@@ -666,7 +666,7 @@ void P2PMultiplayer::UpdatePlayerList()
     connections.Push(SharedPtr<Connection>(GetSubsystem<Network>()->GetServerConnection()));
     for (auto it = connections.Begin(); it != connections.End(); ++it) {
         if ((*it)) {
-            Text* playerName = playerList_->CreateChild<Text>();
+            auto playerName = playerList_->CreateChild<Text>();
             playerName->SetPosition(IntVector2(20, marginTop));
             playerName->SetAlignment(HA_LEFT, VA_TOP);
             playerName->SetText((*it)->GetIdentity()["Name"].GetString());
@@ -677,7 +677,7 @@ void P2PMultiplayer::UpdatePlayerList()
                 playerName->SetText(playerName->GetText() + " [HOST]");
             }
 
-            Text* playerGuid = playerList_->CreateChild<Text>();
+            auto playerGuid = playerList_->CreateChild<Text>();
             playerGuid->SetPosition(IntVector2(0, marginTop));
             playerGuid->SetAlignment(HA_CENTER, VA_TOP);
             playerGuid->SetText(String((*it)->GetLastPing()));
@@ -687,7 +687,7 @@ void P2PMultiplayer::UpdatePlayerList()
             if ((*it) == GetSubsystem<Network>()->GetServerConnection()) {
                 playerName->SetColor(Color::GREEN);
 
-                Button* readyState = playerList_->CreateChild<Button>();
+                auto readyState = playerList_->CreateChild<Button>();
                 readyState->SetPosition(IntVector2(-20, marginTop - 5));
                 readyState->SetAlignment(HA_RIGHT, VA_TOP);
                 readyState->SetStyleAuto();
@@ -698,7 +698,7 @@ void P2PMultiplayer::UpdatePlayerList()
                     GetSubsystem<Network>()->SetReady(!GetSubsystem<Network>()->GetReady());
                 });
 
-                Text* playerStatus = readyState->CreateChild<Text>();
+                auto playerStatus = readyState->CreateChild<Text>();
                 playerStatus->SetAlignment(HA_CENTER, VA_CENTER);
                 playerStatus->SetText((*it)->GetReady() ? "Ready" : "Not ready");
                 playerStatus->SetColor((*it)->GetReady() ? Color::GREEN : Color::RED);
@@ -707,7 +707,7 @@ void P2PMultiplayer::UpdatePlayerList()
 
             }
             else {
-                Text* playerStatus = playerList_->CreateChild<Text>();
+                auto playerStatus = playerList_->CreateChild<Text>();
                 playerStatus->SetPosition(IntVector2(-20, marginTop));
                 playerStatus->SetAlignment(HA_RIGHT, VA_TOP);
                 playerStatus->SetText((*it)->GetReady() ? "Ready" : "Not ready");
