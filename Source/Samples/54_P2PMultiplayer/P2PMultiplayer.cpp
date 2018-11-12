@@ -127,6 +127,7 @@ void P2PMultiplayer::CreateUI()
     information += "\nTAB - Show player list";
     information += "\nWASD - move around";
     information += "\nH - Toggle mouse visible/hidden";
+    information += "\nSpace - Jump";
 
     info_ = CreateLabel(information, IntVector2(0, 50));
     info_->SetHorizontalAlignment(HA_RIGHT);
@@ -268,6 +269,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         controls.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
         controls.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
         controls.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
+        controls.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
         GetSubsystem<Network>()->GetServerConnection()->SetControls(controls);
     }
 
@@ -389,7 +391,6 @@ Text* P2PMultiplayer::CreateLabel(const String& text, IntVector2 pos)
 
 void P2PMultiplayer::CreateScene()
 {
-//    return;
     scene_ = new Scene(context_);
 
     auto* cache = GetSubsystem<ResourceCache>();
@@ -467,10 +468,6 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     // When a client connects, assign to scene to begin scene replication
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
-
-    //CreatePlayerNode(newConnection);
-
-    //UpdateClientObjects();
 
     statusMessage_->SetText("Status: Client connected");
 
@@ -565,10 +562,6 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
     SetRandomSeed(Time::GetSystemTime());
 
     statusMessage_->SetText("Status: New host elected: " + eventData[P_GUID].GetString());
-//    if (!GetSubsystem<Network>()->IsHostSystem()) {
-//        // Non-hosts should clear the previous state
-//        peers_.Clear();
-//    }
 
     UpdatePlayerList();
 }
@@ -593,7 +586,6 @@ void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& even
     using namespace ClientIdentity;
     Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     URHO3D_LOGINFO("Client identity: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
-    //statusMessage_->SetText("Status: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
     UpdatePlayerList();
 }
 
@@ -653,7 +645,7 @@ void P2PMultiplayer::UpdatePlayerList()
     Text* playerGuid = playerList_->CreateChild<Text>();
     playerGuid->SetPosition(IntVector2(0, 10));
     playerGuid->SetAlignment(HA_CENTER, VA_TOP);
-    playerGuid->SetText("GUID");
+    playerGuid->SetText("Ping");
     playerGuid->SetFont(font, 12);
     playerGuid->SetFontSize(16);
     playerGuid->SetTextEffect(TextEffect::TE_SHADOW);
@@ -688,7 +680,7 @@ void P2PMultiplayer::UpdatePlayerList()
             Text* playerGuid = playerList_->CreateChild<Text>();
             playerGuid->SetPosition(IntVector2(0, marginTop));
             playerGuid->SetAlignment(HA_CENTER, VA_TOP);
-            playerGuid->SetText((*it)->GetGUID());
+            playerGuid->SetText(String((*it)->GetLastPing()));
             playerGuid->SetFont(font, 12);
             playerGuid->SetTextEffect(TextEffect::TE_SHADOW);
 

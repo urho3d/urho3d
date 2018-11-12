@@ -70,6 +70,7 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
 
     bool isHost = false;
     String nickname = "Unnnamed";
+    Controls oldControls = controls_;
     if (connection_) {
         controls_ = connection_->GetControls();
         if (connection_->GetGUID() == GetSubsystem<Network>()->GetHostAddress()) {
@@ -104,6 +105,12 @@ void Peer::HandlePhysicsPrestep(StringHash eventType, VariantMap& eventData)
         }
         if (controls_.buttons_ & CTRL_RIGHT) {
             body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
+        }
+
+        if (controls_.IsPressed(CTRL_JUMP, oldControls)) {
+            if (body->GetLinearVelocity().y_ < 1) {
+                body->ApplyForce(Vector3(0, 200, 0));
+            }
         }
     }
 
@@ -189,16 +196,4 @@ void Peer::DestroyNode()
     if (node_) {
         node_->Remove();
     }
-}
-
-void Peer::SetIdentity(VariantMap identity)
-{
-//    identity_ = identity;
-//    if (node_) {
-//        for (auto it = identity.Begin(); it != identity.End(); ++it) {
-//            if (node_->SetVar((*it).first_), (*it).second_) {
-//
-//            }
-//        }
-//    }
 }
