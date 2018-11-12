@@ -129,6 +129,7 @@ void P2PMultiplayer::CreateUI()
     information += "\nT - Toggle ready state";
     information += "\nWASD - move around";
     information += "\nH - Toggle mouse visible/hidden";
+    information += "\nN - Start game with other peers\n(requires that all peers are ready)";
 
     info_ = CreateLabel(information, IntVector2(0, 50));
     info_->SetHorizontalAlignment(HA_RIGHT);
@@ -236,10 +237,22 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (input->GetKeyPress(KEY_T)) {
         GetSubsystem<Network>()->SetReady(!GetSubsystem<Network>()->GetReady());
-        statusMessage_->SetText("Status: Ready state changed");
-
     }
     if (GetSubsystem<Network>()->IsHostSystem() && input->GetKeyPress(KEY_N)) {
+        if (_allReady) {
+            startGame_ = true;
+            startCountdown_.Reset();
+        } else {
+            statusMessage_->SetText("Status: Can't start game, not all players are ready!");
+        }
+    }
+
+    if (startGame_) {
+        int timeRemaining = 5 - (int)(startCountdown_.GetMSec(false) / 1000);
+        statusMessage_->SetText("Status: Countdown till start " + String(timeRemaining));
+    }
+    if (startGame_ && startCountdown_.GetMSec(false) > 5000) {
+        startGame_ = false;
         InitPlayers();
     }
 
@@ -268,8 +281,8 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Network>()->GetServerConnection()->SetControls(controls);
     }
 
-    if (timer_.GetMSec(false) > 1000) {
-
+    if (timer_.GetMSec(false) > 5000) {
+        timer_.Reset();
 
         //TODO fix this
         if (GetSubsystem<Network>()->GetServerConnection()) {
@@ -286,7 +299,6 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
             UpdateClientObjects();
         }
 
-        timer_.Reset();
         clientCount_->SetText("Connections: " + String(GetSubsystem<Network>()->GetParticipantCount()));
         myGuid_->SetText("My GUID: " + GetSubsystem<Network>()->GetGUID());
         hostGuid_->SetText("Host GUID: " + GetSubsystem<Network>()->GetHostAddress());
@@ -533,6 +545,11 @@ void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eve
 
     if (_allReady) {
         statusMessage_->SetText("Status: All players are ready");
+    } else {
+        if (startGame_) {
+            startGame_ = false;
+            statusMessage_->SetText("Status: Countdown stopped! Not all players are ready!");
+        }
     }
 }
 
@@ -587,7 +604,8 @@ void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& even
 {
     using namespace ClientIdentity;
     Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    statusMessage_->SetText("Status: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
+    URHO3D_LOGINFO("Client identity: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
+    //statusMessage_->SetText("Status: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
 }
 
 void P2PMultiplayer::InitPlayers()
@@ -631,8 +649,8 @@ void P2PMultiplayer::UpdatePlayerList()
     }
     playerList_.Clear();
 
-    int margin = 0;
-    SharedPtr<Text> me(CreateLabel("", IntVector2(0, margin)));
+    int margin = -10;
+    SharedPtr<Text> me(CreateLabel("", IntVector2(-10, margin)));
     me->SetAlignment(HA_RIGHT, VA_BOTTOM);
     String ready = "READY";
     if (!GetSubsystem<Network>()->GetServerConnection()->GetReady()) {
@@ -649,7 +667,7 @@ void P2PMultiplayer::UpdatePlayerList()
     for (auto it = clients.Begin(); it != clients.End(); ++it) {
         margin -= 20;
         ready = "READY";
-        SharedPtr<Text> peer(CreateLabel("", IntVector2(0, margin)));
+        SharedPtr<Text> peer(CreateLabel("", IntVector2(-10, margin)));
         if (!(*it)->GetReady()) {
             ready = "NOT READY";
             peer->SetColor(Color::YELLOW);

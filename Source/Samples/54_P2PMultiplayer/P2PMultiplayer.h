@@ -97,7 +97,7 @@ private:
     LineEdit* CreateLineEdit(const String& placeholder, int width, IntVector2 pos);
 //    /// Create label
     Text* CreateLabel(const String& text, IntVector2 pos);
-//    /// Start server
+
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
@@ -147,4 +147,7 @@ private:
     HashMap<Connection*, SharedPtr<Peer>> peers_;
 
     GameState gameState_;
+
+    bool startGame_{};
+    Timer startCountdown_;
 };

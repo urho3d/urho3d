@@ -1585,7 +1585,7 @@ void Network::ReadyStatusChanged()
     }
 
     fullyConnectedMesh2_->GetParticipantList(participantList);
-    bool allValid = true;
+    bool allReady = true;
     for (unsigned int i = 0; i < participantList.Size(); i++) {
         if (participantList[i] != rakPeer_->GetMyGUID()) {
             int ready = readyEvent_->GetReadyStatus(0, participantList[i]);
@@ -1595,6 +1595,7 @@ void Network::ReadyStatusChanged()
                     if (connection) {
                         connection->SetReady(false);
                     }
+                    allReady = false;
                 } else {
                     if (connection) {
                         connection->SetReady(true);
@@ -1613,7 +1614,7 @@ void Network::ReadyStatusChanged()
             serverConnection_->SetReady(false);
         }
     }
-    if (allValid && readyEvent_->IsEventSet(0)) {
+    if (allReady && readyEvent_->IsEventSet(0)) {
         data[P2PAllReadyChanged::P_READY] = true;
     } else {
         data[P2PAllReadyChanged::P_READY] = false;
