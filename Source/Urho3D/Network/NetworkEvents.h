@@ -160,8 +160,18 @@ URHO3D_EVENT(E_P2PSESSIONSTARTED, P2PSessionStarted)
 {
 }
 
-/// P2P session join succesfull
+/// P2P session join successfull
 URHO3D_EVENT(E_P2PSESSIONJOINED, P2PSessionJoined)
+{
+}
+
+/// P2P session join succesfull
+URHO3D_EVENT(E_P2PSESSIONJOINFAILED, P2PSessionJoinFailed)
+{
+}
+
+/// Server/Host doesn't allow any new connections
+URHO3D_EVENT(E_SERVERFULL, ServerFull)
 {
 }
 

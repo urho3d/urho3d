@@ -173,8 +173,12 @@ public:
     void SetMode(NetworkMode mode, bool force = false);
     /// Get current network mode
     const NetworkMode  GetMode() const { return networkMode_; }
+    /// Set incoming connection count. If connectionCount < current connection count, no new connections will be made
+    void SetAllowedConnections(unsigned short connectionCount);
 
 private:
+    /// Send out identity to all connected peers
+    void SendOutIdentityToPeers();
     /// Connect to NAT server which will handle P2P session
     bool ConnectNAT(const String& address, unsigned short port);
 
@@ -248,7 +252,10 @@ private:
     String hostGuid_;
     /// current network mode - P2P or server-client mode
     NetworkMode networkMode_;
+    /// Automatically reconnect to NAT punchtrough master server
     bool natAutoReconnect_{};
+    /// Max allowed connections, if exceeded, no new connections will be made
+    unsigned short allowedConnectionCount_;
 };
 
 /// Register Network library objects.

@@ -106,6 +106,8 @@ private:
     void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
     void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
 
+    void HandleServerFull(StringHash eventType, VariantMap& eventData);
+
     void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
 
     void HandleSessionStarted(StringHash eventType, VariantMap& eventData);

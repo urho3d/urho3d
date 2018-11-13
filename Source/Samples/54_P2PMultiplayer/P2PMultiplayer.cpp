@@ -106,9 +106,8 @@ void P2PMultiplayer::CreateUI()
     auto* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     // Set style to the UI root so that elements will inherit it
     root->SetDefaultStyle(uiStyle);
-//
+
     int marginTop = 20;
-//    CreateLabel("1. Start server", IntVector2(20, marginTop-20));
     startSession_ = CreateButton("Start session", 160, IntVector2(20, marginTop));
     nickname_ = CreateLineEdit("Nickname", 160, IntVector2(200, marginTop));
     marginTop += 40;
@@ -149,6 +148,7 @@ void P2PMultiplayer::SubscribeToEvents()
     SubscribeToEvent(E_P2PNEWHOST, URHO3D_HANDLER(P2PMultiplayer, HandleNewHost));
     SubscribeToEvent(E_NETWORKBANNED, URHO3D_HANDLER(P2PMultiplayer, HandleBanned));
     SubscribeToEvent(E_CLIENTIDENTITY, URHO3D_HANDLER(P2PMultiplayer, HandleClientIdentity));
+    SubscribeToEvent(E_SERVERFULL, URHO3D_HANDLER(P2PMultiplayer, HandleServerFull));
 
     GetSubsystem<Network>()->RegisterRemoteEvent("GameStart");
     SubscribeToEvent("GameStart", URHO3D_HANDLER(P2PMultiplayer, HandleGameState));
@@ -190,6 +190,8 @@ void P2PMultiplayer::HandleSessionStarted(StringHash eventType, VariantMap& even
     statusMessage_->SetText("Status: P2P Session started");
 
     gameState_ = GameState::IN_LOBBY;
+
+    //GetSubsystem<Network>()->SetAllowedConnections(0);
 }
 
 void P2PMultiplayer::HandleSessionJoined(StringHash eventType, VariantMap& eventData)
@@ -224,6 +226,8 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         statusMessage_->SetText("Status: Disconnected");
 
         UpdatePlayerList();
+
+        gameState_ = IN_MENU;
     }
 
     if (input->GetKeyPress(KEY_H)) {
@@ -257,8 +261,10 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
     pitch_ = Clamp(pitch_, 1.0f, 90.0f);
 
-    // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    if (gameState_ == IN_GAME) {
+        // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
+        cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    }
 
     if (GetSubsystem<Network>()->GetServerConnection()) {
         Controls controls;
@@ -277,14 +283,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         timer_.Reset();
 
         //TODO fix this
-        if (GetSubsystem<Network>()->GetServerConnection()) {
-            auto clients = GetSubsystem<Network>()->GetClientConnections();
-            for (auto it = clients.Begin(); it != clients.End(); ++it) {
-                VectorBuffer msg;
-                msg.WriteVariantMap(GetSubsystem<Network>()->GetServerConnection()->GetIdentity());
-                (*it)->SendMessage(MSG_IDENTITY, true, true, msg);
-            }
-        }
+
 
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
@@ -453,7 +452,6 @@ void P2PMultiplayer::CreateScene()
 
 void P2PMultiplayer::SetupViewport()
 {
-//    return;
     auto* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
@@ -573,6 +571,9 @@ void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
 
     GetSubsystem<Input>()->SetMouseVisible(true);
     GetSubsystem<Input>()->SetMouseGrabbed(false);
+
+    gameState_ = IN_MENU;
+
 //    GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
 
     using namespace NetworkBanned;
@@ -585,7 +586,7 @@ void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& even
 {
     using namespace ClientIdentity;
     auto connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    URHO3D_LOGINFO("Client identity: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
+//    URHO3D_LOGINFO("Client identity: Client " + connection->GetGUID() + " => " + connection->GetIdentity()["Name"].GetString());
     UpdatePlayerList();
 }
 
@@ -727,4 +728,9 @@ void P2PMultiplayer::CreatePlayerListWindow()
     playerList_->SetAlignment(HA_CENTER, VA_CENTER);
     playerList_->SetSize(IntVector2(GetSubsystem<Graphics>()->GetWidth() - 200, GetSubsystem<Graphics>()->GetHeight() - 400));
     playerList_->BringToFront();
+}
+
+void P2PMultiplayer::HandleServerFull(StringHash eventType, VariantMap& eventData)
+{
+    UpdatePlayerList();
 }
