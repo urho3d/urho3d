@@ -103,8 +103,8 @@ private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    void HandleStartP2PSession(StringHash eventType, VariantMap& eventData);
-    void HandleJoinP2PSession(StringHash eventType, VariantMap& eventData);
+    void StartSession();
+    void JoinSession(const String& guid);
 
     void HandleServerFull(StringHash eventType, VariantMap& eventData);
 
@@ -135,12 +135,7 @@ private:
     void UpdatePlayerList();
 
     Timer timer_;
-    /// Start P2P Session
-    SharedPtr<Button> startSession_;
-    /// Join P2P Session
-    SharedPtr<Button> joinSession_;
     SharedPtr<Button> searchGame_;
-    SharedPtr<LineEdit> guid_;
     SharedPtr<LineEdit> nickname_;
 //    /// Found server list
 	SharedPtr<Text> clientCount_;
@@ -160,4 +155,6 @@ private:
 
     bool startGame_{};
     Timer startCountdown_;
+
+    List<String> messages_;
 };

@@ -112,19 +112,14 @@ void P2PMultiplayer::CreateUI()
     root->SetDefaultStyle(uiStyle);
 
     int marginTop = 20;
-    startSession_ = CreateButton("Start session", 160, IntVector2(20, marginTop));
-    nickname_ = CreateLineEdit("Nickname", 160, IntVector2(200, marginTop));
-    marginTop += 40;
-    guid_ = CreateLineEdit("", 200, IntVector2(20, marginTop));
-    marginTop += 40;
-    joinSession_ = CreateButton("Join session", 160, IntVector2(20, marginTop));
-    marginTop += 40;
-    searchGame_ = CreateButton("Search for session", 160, IntVector2(20, marginTop));
+    searchGame_ = CreateButton("Search for session", 200, IntVector2(20, marginTop));
+    nickname_ = CreateLineEdit("Nickname", 160, IntVector2(240, marginTop));
 
 	marginTop += 80;
     clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));
 
-    statusMessage_ = CreateLabel("Status: Started", IntVector2(20, -20));
+    statusMessage_ = CreateLabel("", IntVector2(20, -20));
+    SetStatusMessage("Started");
     statusMessage_->SetAlignment(HA_LEFT, VA_BOTTOM);
 
     String information = "R - Reset host";
@@ -144,9 +139,6 @@ void P2PMultiplayer::CreateUI()
 void P2PMultiplayer::SubscribeToEvents()
 {
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(P2PMultiplayer, HandleUpdate));
-
-    SubscribeToEvent(startSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleStartP2PSession));
-    SubscribeToEvent(joinSession_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleJoinP2PSession));
     SubscribeToEvent(searchGame_, "Released", URHO3D_HANDLER(P2PMultiplayer, HandleSearchSession));
 
     SubscribeToEvent(E_CLIENTCONNECTED, URHO3D_HANDLER(P2PMultiplayer, HandleClientConnected));
@@ -166,56 +158,54 @@ void P2PMultiplayer::HandleSearchSession(StringHash eventType, VariantMap& event
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest(API_SEARCH_SESSION);
 }
 
-void P2PMultiplayer::HandleStartP2PSession(StringHash eventType, VariantMap& eventData)
+void P2PMultiplayer::StartSession()
 {
     peers_.Clear();
-    URHO3D_LOGINFO("HandleStartP2PSession");
     VariantMap identity;
     identity["Name"] = nickname_->GetText();
     GetSubsystem<Network>()->StartSession(scene_, identity);
-    SetStatusMessage("Status: Starting P2P session");
+    SetStatusMessage("Starting P2P session");
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest(API_NEW_SESSION + "?guid=" + GetSubsystem<Network>()->GetGUID() + "&state=" + String((int)gameState_) + "&peers=1");
 
     SubscribeToEvent(E_P2PSESSIONSTARTED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionStarted));
     SubscribeToEvent(E_P2PSESSIONJOINED, URHO3D_HANDLER(P2PMultiplayer, HandleSessionJoined));
 }
 
-void P2PMultiplayer::HandleJoinP2PSession(StringHash eventType, VariantMap& eventData)
+void P2PMultiplayer::JoinSession(const String& guid)
 {
     peers_.Clear();
-    URHO3D_LOGINFO("HandleJoinP2PSession " + guid_->GetText());
     VariantMap identity;
     SetRandomSeed(Time::GetSystemTime());
     identity["Name"] = nickname_->GetText();
-    GetSubsystem<Network>()->JoinSession(guid_->GetText(), scene_, identity);
-//    GetSubsystem<Network>()->SetSimulatedLatency(Random(10.0f));
-//    GetSubsystem<Network>()->SetSimulatedLatency(10 + Random(100));
+    GetSubsystem<Network>()->JoinSession(guid, scene_, identity);
 
-    SetStatusMessage("Status: Joining " + guid_->GetText() + " P2P session");
+    SetStatusMessage("Joining " + guid + " P2P session");
 }
 
 void P2PMultiplayer::HandleSessionStarted(StringHash eventType, VariantMap& eventData)
 {
     UnsubscribeFromEvent(E_P2PSESSIONSTARTED);
-//    CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
-
-    SetStatusMessage("Status: P2P Session started");
-
+    SetStatusMessage("P2P Session started");
     gameState_ = GameState::IN_LOBBY;
-
-    //GetSubsystem<Network>()->SetAllowedConnections(0);
 }
 
 void P2PMultiplayer::HandleSessionJoined(StringHash eventType, VariantMap& eventData)
 {
-    statusMessage_->SetText("Status: joined P2P Session");
-
+    SetStatusMessage("Joined P2P Session");
     gameState_ = GameState::IN_LOBBY;
 }
 
 void P2PMultiplayer::SetStatusMessage(const String& message)
 {
-    statusMessage_->SetText(message);
+    String allMessages;
+    for (auto it = messages_.Begin(); it != messages_.End(); ++it) {
+        allMessages += (*it) + "\n";
+    }
+    statusMessage_->SetText("Status: " + allMessages);
+    messages_.Push(message);
+    if (messages_.Size() > 15) {
+        messages_.PopFront();
+    }
 }
 
 void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -240,7 +230,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Input>()->SetMouseGrabbed(false);
         GetSubsystem<Input>()->SetMouseMode(MouseMode::MM_FREE);
 
-        statusMessage_->SetText("Status: Disconnected");
+        SetStatusMessage("Disconnected");
 
         UpdatePlayerList();
 
@@ -259,10 +249,6 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    if (startGame_) {
-        int timeRemaining = 5 - (int)(startCountdown_.GetMSec(false) / 1000);
-        statusMessage_->SetText("Status: Countdown till start " + String(timeRemaining));
-    }
     if (startGame_ && startCountdown_.GetMSec(false) > 5000) {
         startGame_ = false;
         InitPlayers();
@@ -299,6 +285,11 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (timer_.GetMSec(false) > 1000) {
         timer_.Reset();
 
+        if (startGame_) {
+            int timeRemaining = 5 - (int)(startCountdown_.GetMSec(false) / 1000);
+            SetStatusMessage("Countdown till start " + String(timeRemaining));
+        }
+
         if (GetSubsystem<Network>()->GetClientConnections().Size() != peers_.Size() - 1) {
             UpdateClientObjects();
         }
@@ -319,7 +310,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         }
         else if (httpRequest_->GetState() == HTTP_ERROR) {
             URHO3D_LOGERROR("Master server returned error!");
-            SetStatusMessage("Status: Master server returned error!");
+            SetStatusMessage("Master server returned error!");
         }
         else
         {
@@ -341,12 +332,11 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
                     if (val.IsNull()) {
                         URHO3D_LOGWARNING("No active sessions, starting new one");
-                        HandleStartP2PSession("", GetEventDataMap());
+                        StartSession();
                     }
                     else {
                         URHO3D_LOGWARNING("Found incomplete session, joining it");
-                        guid_->SetText(val.GetString());
-                        HandleJoinP2PSession("", GetEventDataMap());
+                        JoinSession(val.GetString());
                     }
                 } else if (url.Contains(API_NEW_SESSION)) {
                 }
@@ -502,7 +492,7 @@ void P2PMultiplayer::HandleClientConnected(StringHash eventType, VariantMap& eve
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     newConnection->SetScene(scene_);
 
-    statusMessage_->SetText("Status: Client connected");
+    SetStatusMessage("Client connected");
 
     UpdatePlayerList();
 }
@@ -517,7 +507,7 @@ void P2PMultiplayer::HandleClientDisconnected(StringHash eventType, VariantMap& 
 
     UpdateClientObjects();
 
-    statusMessage_->SetText("Status: Client discconnected");
+    SetStatusMessage("Client discconnected");
 
     UpdatePlayerList();
 }
@@ -562,7 +552,7 @@ void P2PMultiplayer::HandleAllReadyChanged(StringHash eventType, VariantMap& eve
     } else {
         if (startGame_) {
             startGame_ = false;
-            statusMessage_->SetText("Status: Countdown stopped! Not all players are ready!");
+            SetStatusMessage("Countdown stopped! Not all players are ready!");
         }
     }
 
@@ -595,7 +585,7 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
     SetRandomSeed(Time::GetSystemTime());
 
     String guid = eventData[P_GUID].GetString();
-    SetStatusMessage("Status: New host elected: " + eventData[P_GUID].GetString());
+    SetStatusMessage("New host elected: " + eventData[P_GUID].GetString());
 
     if (guid != GetSubsystem<Network>()->GetGUID()) {
         httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest(API_REMOVE_SESSION + "?guid=" + GetSubsystem<Network>()->GetGUID());
@@ -619,7 +609,7 @@ void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
     using namespace NetworkBanned;
     URHO3D_LOGWARNING("We have been banned, reason: " + eventData[P_REASON].GetString());
 
-    statusMessage_->SetText("Status: You are banned");
+    SetStatusMessage("You are banned");
 }
 
 void P2PMultiplayer::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
@@ -636,7 +626,7 @@ void P2PMultiplayer::InitPlayers()
         return;
     }
     if (!_allReady) {
-        statusMessage_->SetText("Status: Can't start, not all players are ready!");
+        SetStatusMessage("Can't start, not all players are ready!");
         return;
     }
     auto clients = GetSubsystem<Network>()->GetClientConnections();
@@ -648,7 +638,7 @@ void P2PMultiplayer::InitPlayers()
         CreatePlayerNode(GetSubsystem<Network>()->GetServerConnection());
     }
 
-    statusMessage_->SetText("Status: Initializing all players");
+    SetStatusMessage("Initializing all players");
 
     gameState_ = IN_GAME;
     VariantMap data = GetEventDataMap();
@@ -661,7 +651,7 @@ void P2PMultiplayer::HandleGameState(StringHash eventType, VariantMap& eventData
 {
     if (eventType == "GameStart") {
         gameState_ = (GameState) eventData["GameState"].GetUInt();
-        statusMessage_->SetText("Status: Game started!");
+        SetStatusMessage("Game started!");
         playerList_->SetVisible(false);
     }
 }
