@@ -478,8 +478,8 @@ void Network::DiscoverHosts(unsigned port)
     {
         SLNet::SocketDescriptor socket;
         // Startup local connection with max 1 incoming connection(first param) and 1 socket description (third param)
-        rakPeerClient_->Startup(32, &socket, 1);
-        rakPeerClient_->SetMaximumIncomingConnections(allowedConnectionCount_);
+        rakPeerClient_->Startup(2, &socket, 1);
+        rakPeerClient_->SetMaximumIncomingConnections(2);
     }
     rakPeerClient_->Ping("255.255.255.255", port, false);
 }
@@ -498,10 +498,8 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     {
         SLNet::SocketDescriptor socket;
         // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
-        rakPeerClient_->Startup(32, &socket, 1);
-        rakPeerClient_->SetMaximumIncomingConnections(allowedConnectionCount_);
-    } else {
-        OnServerDisconnected();
+        rakPeerClient_->Startup(2, &socket, 1);
+        rakPeerClient_->SetMaximumIncomingConnections(2);
     }
 
     //isServer_ = false;
@@ -570,6 +568,11 @@ void Network::Disconnect(int waitMSec)
         serverConnection_->Disconnect(waitMSec);
         serverConnection_.Reset();
     }
+
+    if (rakPeerClient_->IsActive()) {
+        rakPeerClient_->Shutdown(1000);
+    }
+    natPunchthroughClient_->Clear();
 }
 
 bool Network::StartServer(unsigned short port)
@@ -651,18 +654,20 @@ void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const Vari
         remoteGUID_ = new SLNet::RakNetGUID;
 
     remoteGUID_->FromString(guid.CString());
-    rakPeerClient_->AttachPlugin(natPunchthroughClient_);
-    if (rakPeerClient_->IsActive()) {
-        natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
-    }
-    else {
-        SLNet::SocketDescriptor socket;
-        // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
-        rakPeerClient_->Startup(32, &socket, 1);
-        rakPeerClient_->SetMaximumIncomingConnections(allowedConnectionCount_);
-    }
 
-    rakPeerClient_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
+    if (rakPeerClient_->IsActive()) {
+        rakPeerClient_->Shutdown(1000);
+    }
+    natPunchthroughClient_->Clear();
+    rakPeerClient_->AttachPlugin(natPunchthroughClient_);
+
+    SLNet::SocketDescriptor socket;
+    // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
+    rakPeerClient_->Startup(2, &socket, 1);
+    rakPeerClient_->SetMaximumIncomingConnections(2);
+
+    SLNet::ConnectionAttemptResult connectResult = rakPeerClient_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
+    URHO3D_LOGINFO("AttemptNATPunchtrough status " + String((int) connectResult));
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -882,9 +887,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 {
     unsigned char packetID = packet->data[0];
 
-//    if (packetID < ID_USER_PACKET_ENUM) {
-//        URHO3D_LOGERROR(">> " + String((int)packetID) + "  HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
-//    }
+    if (packetID < ID_USER_PACKET_ENUM) {
+        URHO3D_LOGERROR(">> " + String((int)packetID) + "  HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
+    }
 
     bool packetHandled = false;
 
@@ -930,9 +935,8 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 //
 //                }
 //            }
-        } else {
-            NewConnectionEstablished(packet->guid, packet->systemAddress.ToString(false));
         }
+
         packetHandled = true;
     }
     else if (packetID == ID_REMOTE_CONNECTION_LOST || packetID == ID_REMOTE_DISCONNECTION_NOTIFICATION)
@@ -947,7 +951,10 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             SendEvent(E_NATMASTERCONNECTIONSUCCEEDED);
             if (!isServer && networkMode_ == SERVER_CLIENT)
             {
-                natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
+                bool connecting = natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
+                if (!connecting) {
+                    URHO3D_LOGERROR("Unable to do NAT punchtrough!");
+                }
             }
         }
         packetHandled = true;
@@ -1092,13 +1099,13 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     else if (packetID == ID_READY_EVENT_QUERY)
     {
         ReadyStatusChanged();
-        URHO3D_LOGINFOF("`````````````````````````` Got ID_READY_EVENT_QUERY from %s", packet->guid.ToString());
+        URHO3D_LOGINFOF("Got ID_READY_EVENT_QUERY from %s", packet->guid.ToString());
         packetHandled = true;
     }
     else if (packetID == ID_READY_EVENT_FORCE_ALL_SET)
     {
         ReadyStatusChanged();
-        URHO3D_LOGINFOF("`````````````````````````` Got ID_READY_EVENT_FORCE_ALL_SET from %s", packet->guid.ToString());
+        URHO3D_LOGINFOF("Got ID_READY_EVENT_FORCE_ALL_SET from %s", packet->guid.ToString());
         packetHandled = true;
     }
     else if (packetID == ID_UNCONNECTED_PONG) // Host discovery response
@@ -1123,6 +1130,15 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             SendEvent(E_NETWORKHOSTDISCOVERED, eventMap);
         }
         packetHandled = true;
+    }
+    else if (packetID == ID_FCM2_REQUEST_FCMGUID)
+    {
+        if (networkMode_ == SERVER_CLIENT) {
+            URHO3D_LOGERROR("Network mode mismatch, disconnecting!");
+            OnServerDisconnected();
+            SendEvent(E_NETWORKMODEMISMATCH);
+            packetHandled = true;
+        }
     }
     else if (packetID == ID_FCM2_NEW_HOST)
     {
@@ -1262,8 +1278,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         else {
             // we are client in either P2P or server-client mode
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            bool processed = serverConnection_->ProcessMessage(packetID, buffer);
-            if (!processed)
+            if (serverConnection_ && !serverConnection_->ProcessMessage(packetID, buffer))
             {
                 if (networkMode_ == PEER_TO_PEER) {
                     HandleMessageClient(packet->guid, 0, packetID, (const char *) (packet->data + dataStart), packet->length - dataStart);
@@ -1312,7 +1327,9 @@ void Network::Update(float timeStep)
         while (SLNet::Packet* packet = rakPeerClient_->Receive())
         {
             HandleIncomingPacket(packet, false);
-            rakPeerClient_->DeallocatePacket(packet);
+            if (rakPeerClient_->IsActive()) {
+                rakPeerClient_->DeallocatePacket(packet);
+            }
         }
     }
 }
@@ -1415,6 +1432,11 @@ void Network::OnServerDisconnected()
     if (networkMode_ == PEER_TO_PEER) {
         return;
     }
+
+    if (!serverConnection_) {
+        return;
+    }
+
     // Differentiate between failed connection, and disconnection
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
     serverConnection_.Reset();
@@ -1429,6 +1451,12 @@ void Network::OnServerDisconnected()
         URHO3D_LOGERROR("Failed to connect to server");
         SendEvent(E_CONNECTFAILED);
     }
+
+//    if (rakPeerClient_->IsActive()) {
+        rakPeerClient_->Shutdown(0);
+//    }
+
+    natPunchthroughClient_->Clear();
 }
 
 void Network::ConfigureNetworkSimulator()

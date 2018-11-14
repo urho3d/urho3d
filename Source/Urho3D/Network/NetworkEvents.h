@@ -175,6 +175,11 @@ URHO3D_EVENT(E_SERVERFULL, ServerFull)
 {
 }
 
+/// Server/Host doesn't allow any new connections
+URHO3D_EVENT(E_NETWORKMODEMISMATCH, NetworkModeMismatch)
+{
+}
+
 /// When host system is elected
 URHO3D_EVENT(E_P2PNEWHOST, P2PNewHost)
 {
