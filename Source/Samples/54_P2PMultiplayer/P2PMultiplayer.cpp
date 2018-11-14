@@ -63,9 +63,9 @@
 
 URHO3D_DEFINE_APPLICATION_MAIN(P2PMultiplayer)
 
-static String API_SEARCH_SESSION = "http://localhost:3000/open";
-static String API_NEW_SESSION = "http://localhost:3000/new";
-static String API_REMOVE_SESSION = "http://localhost:3000/delete";
+static String API_SEARCH_SESSION = "http://frameskippers.com:4000/open";
+static String API_NEW_SESSION = "http://frameskippers.com:4000/new";
+static String API_REMOVE_SESSION = "http://frameskippers.com:4000/delete";
 
 P2PMultiplayer::P2PMultiplayer(Context* context) :
     Sample(context),
@@ -314,13 +314,17 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (!httpRequest_.Null()) {
         // Initializing HTTP request
-        if (httpRequest_->GetState() == HTTP_INITIALIZING || httpRequest_->GetState() == HTTP_ERROR) {
+        if (httpRequest_->GetState() == HTTP_INITIALIZING) {
 
+        }
+        else if (httpRequest_->GetState() == HTTP_ERROR) {
+            URHO3D_LOGERROR("Master server returned error!");
+            SetStatusMessage("Status: Master server returned error!");
         }
         else
         {
             if (httpRequest_->GetAvailableSize() > 0) {
-                message_ += httpRequest_->ReadLine();
+                message_ = httpRequest_->ReadString();
             }
             else
             {
@@ -330,6 +334,8 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
                     URHO3D_LOGINFO("Search finished! " + message_);
                     SharedPtr<JSONFile> json(new JSONFile(context_));
                     json->FromString(message_);
+
+                    message_.Clear();
 
                     JSONValue val = json->GetRoot().Get("guid");
 
@@ -343,8 +349,6 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
                         HandleJoinP2PSession("", GetEventDataMap());
                     }
                 } else if (url.Contains(API_NEW_SESSION)) {
-
-                    URHO3D_LOGWARNING("New server info posted!");
                 }
             }
         }
