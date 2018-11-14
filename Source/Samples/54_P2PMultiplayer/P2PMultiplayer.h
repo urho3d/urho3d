@@ -113,6 +113,8 @@ private:
     void HandleSessionStarted(StringHash eventType, VariantMap& eventData);
     void HandleSessionJoined(StringHash eventType, VariantMap& eventData);
 
+    void HandleSearchSession(StringHash eventType, VariantMap& eventData);
+
     void HandleGameState(StringHash eventType, VariantMap& eventData);
 
     void UpdateClientObjects();
@@ -126,6 +128,8 @@ private:
     void CreatePlayerNode(Connection* connection);
     void DestroyPlayerNode(Connection* connection);
 
+    void SetStatusMessage(const String& message);
+
     void InitPlayers();
 
     void UpdatePlayerList();
@@ -135,6 +139,7 @@ private:
     SharedPtr<Button> startSession_;
     /// Join P2P Session
     SharedPtr<Button> joinSession_;
+    SharedPtr<Button> searchGame_;
     SharedPtr<LineEdit> guid_;
     SharedPtr<LineEdit> nickname_;
 //    /// Found server list
@@ -142,7 +147,9 @@ private:
     SharedPtr<Text> info_;
     SharedPtr<Text> statusMessage_;
     String message_;
+
     SharedPtr<HttpRequest> httpRequest_;
+
     bool _allReady{};
     Controls controls_;
     SharedPtr<Window> playerList_;

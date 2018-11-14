@@ -37,6 +37,7 @@
 #include "../Network/NetworkPriority.h"
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
+#include "PacketLogger.h"
 
 #include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/NatPunchthroughClient.h>
@@ -221,6 +222,7 @@ Network::Network(Context* context) :
 
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
     rakPeerClient_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+//    rakPeer_->AttachPlugin(new PacketLogger());
     SetPassword("");
     SetDiscoveryBeacon(VariantMap());
 
@@ -573,6 +575,8 @@ void Network::Disconnect(int waitMSec)
         rakPeerClient_->Shutdown(1000);
     }
     natPunchthroughClient_->Clear();
+
+    isServer_ = false;
 }
 
 bool Network::StartServer(unsigned short port)
