@@ -158,6 +158,9 @@ A number of build options can be defined when invoking the build scripts or when
 |APPLETVOS_DEPLOYMENT_TARGET|-|Specify AppleTV OS deployment target (tvOS platform only); default to latest installed tvOS SDK if not specified, the minimum supported target is 9.0|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
 |MINGW_SYSROOT        |-|Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected|
+|DIRECTX_INC_SEARCH_PATHS|-|Additional search paths to find DirectX headers (MinGW only)|
+|DIRECTX_LIB_SEARCH_PATHS|-|Additional search paths to find DirectX libraries (MinGW only)|
+|DIRECT3D_DLL_REDIST_SEARCH_PATHS|-|Additional search paths to find DirectX runtime DLL (MinGW only); should only be used for older MinGW version that still uses 'd3dcompiler_43.dll' or 'd3dcompiler_42.dll'.|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 |RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|

@@ -30,19 +30,19 @@ BuildEnvironment=${BuildEnvironment/-base}
 
 if [[ $(docker version -f {{.Client.Version}}) =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( ${BASH_REMATCH[1]} * 100 + ${BASH_REMATCH[2]} >= 1809 )); then
     docker run -it --rm -h fishtank \
-        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) \
-        --env-file $PROJECT_DIR/.env-file \
-        --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
-        --mount source=urho3d_home_dir,target=/home/urho3d \
+        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -e PROJECT_DIR=$PROJECT_DIR \
+        --env-file $PROJECT_DIR/script/.env-file \
+        --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
+        --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
         urho3d/dockerized$BuildEnvironment $@
 else
     # Fallback workaround on older Docker CLI version
     docker run -it --rm -h fishtank \
-        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) \
-        --env-file <(perl -ne 'chomp; print "$_=$ENV{$_}\n" if defined $ENV{$_}' $PROJECT_DIR/.env-file) \
-        --mount type=bind,source=$PROJECT_DIR,target=/project_dir \
-        --mount source=urho3d_home_dir,target=/home/urho3d \
+        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -e PROJECT_DIR=$PROJECT_DIR \
+        --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' $PROJECT_DIR/script/.env-file) \
+        --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
+        --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
         urho3d/dockerized$BuildEnvironment $@
 fi
