@@ -86,7 +86,7 @@ public:
     /// Are we the host system in P2P session
     bool IsHostSystem();
     /// Get host GUID
-    String GetHostAddress();
+    const String GetHostAddress();
     /// Let other peers know about our readiness
     void SetReady(bool value);
     /// Get current ready status

@@ -1084,32 +1084,27 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_READY_EVENT_SET)
     {
-        URHO3D_LOGWARNINGF("Got ID_READY_EVENT_SET from %s", packet->guid.ToString());
         ReadyStatusChanged();
         packetHandled = true;
     }
     else if (packetID == ID_READY_EVENT_UNSET)
     {
         ReadyStatusChanged();
-        URHO3D_LOGWARNINGF("Got ID_READY_EVENT_UNSET from %s", packet->guid.ToString());
         packetHandled = true;
     }
     else if (packetID == ID_READY_EVENT_ALL_SET)
     {
         ReadyStatusChanged();
-        URHO3D_LOGWARNINGF("ID_READY_EVENT_ALL_SET from %s", packet->guid.ToString());
         packetHandled = true;
     }
     else if (packetID == ID_READY_EVENT_QUERY)
     {
         ReadyStatusChanged();
-        URHO3D_LOGINFOF("Got ID_READY_EVENT_QUERY from %s", packet->guid.ToString());
         packetHandled = true;
     }
     else if (packetID == ID_READY_EVENT_FORCE_ALL_SET)
     {
         ReadyStatusChanged();
-        URHO3D_LOGINFOF("Got ID_READY_EVENT_FORCE_ALL_SET from %s", packet->guid.ToString());
         packetHandled = true;
     }
     else if (packetID == ID_UNCONNECTED_PONG) // Host discovery response
@@ -1222,12 +1217,12 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_FCM2_VERIFIED_JOIN_ACCEPTED)
     {
-        DataStructures::List<SLNet::RakNetGUID> systemsAccepted;
-        bool thisSystemAccepted;
+//        DataStructures::List<SLNet::RakNetGUID> systemsAccepted;
+//        bool thisSystemAccepted;
 //        fullyConnectedMesh2_->GetVerifiedJoinAcceptedAdditionalData(packet, &thisSystemAccepted, systemsAccepted, nullptr);
-        if (thisSystemAccepted) {
-            URHO3D_LOGINFO("Game join request accepted");
-        }
+//        if (thisSystemAccepted) {
+//            URHO3D_LOGINFO("Game join request accepted");
+//        }
         URHO3D_LOGINFO("ID_FCM2_VERIFIED_JOIN_ACCEPTED");
         packetHandled = true;
     }
@@ -1612,7 +1607,7 @@ bool Network::IsHostSystem()
     return fullyConnectedMesh2_->IsHostSystem();
 }
 
-String Network::GetHostAddress()
+const String Network::GetHostAddress()
 {
     if (networkMode_ == SERVER_CLIENT) {
         return rakPeer_->GetMyGUID().ToString();

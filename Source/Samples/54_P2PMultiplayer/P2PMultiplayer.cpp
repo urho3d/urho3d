@@ -49,6 +49,7 @@
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/MessageBox.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/Core/CoreEvents.h>
 
@@ -332,10 +333,12 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
                     if (val.IsNull()) {
                         URHO3D_LOGWARNING("No active sessions, starting new one");
+                        new MessageBox(context_, "Creating new P2P session", "No active sessions");
                         StartSession();
                     }
                     else {
                         URHO3D_LOGWARNING("Found incomplete session, joining it");
+                        new MessageBox(context_, "Joining other p2p session: " + val.GetString(), "Incomplete session found");
                         JoinSession(val.GetString());
                     }
                 } else if (url.Contains(API_NEW_SESSION)) {
