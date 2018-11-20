@@ -64,9 +64,9 @@
 
 URHO3D_DEFINE_APPLICATION_MAIN(P2PMultiplayer)
 
-static String API_SEARCH_SESSION = "http://frameskippers.com:4000/open";
-static String API_NEW_SESSION = "http://frameskippers.com:4000/new";
-static String API_REMOVE_SESSION = "http://frameskippers.com:4000/delete";
+static String API_SEARCH_SESSION = "http://master.frameskippers.com/open";
+static String API_NEW_SESSION = "http://master.frameskippers.com/new";
+static String API_REMOVE_SESSION = "http://master.frameskippers.com/delete";
 
 P2PMultiplayer::P2PMultiplayer(Context* context) :
     Sample(context),
@@ -114,7 +114,7 @@ void P2PMultiplayer::CreateUI()
 
     int marginTop = 20;
     searchGame_ = CreateButton("Search for session", 200, IntVector2(20, marginTop));
-    nickname_ = CreateLineEdit("Nickname", 160, IntVector2(240, marginTop));
+    nickname_ = CreateLineEdit("Your nickname", 160, IntVector2(240, marginTop));
 
 	marginTop += 80;
     clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));
@@ -156,6 +156,10 @@ void P2PMultiplayer::SubscribeToEvents()
 
 void P2PMultiplayer::HandleSearchSession(StringHash eventType, VariantMap& eventData)
 {
+    if (GetSubsystem<Network>()->IsServerRunning() || GetSubsystem<Network>()->IsConnectedHost()) {
+        URHO3D_LOGERROR("Already connected to session!");
+        return;
+    }
     httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest(API_SEARCH_SESSION);
 }
 
@@ -225,6 +229,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
     if (input->GetKeyPress(KEY_E)) {
         GetSubsystem<Network>()->Disconnect(1000);
+        httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest(API_REMOVE_SESSION + "?guid=" + GetSubsystem<Network>()->GetGUID());
         peers_.Clear();
 
         GetSubsystem<Input>()->SetMouseVisible(true);
@@ -333,12 +338,12 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
                     if (val.IsNull()) {
                         URHO3D_LOGWARNING("No active sessions, starting new one");
-                        new MessageBox(context_, "Creating new P2P session", "No active sessions");
+                        new Urho3D::MessageBox(context_, "Creating new P2P session", "No active sessions");
                         StartSession();
                     }
                     else {
                         URHO3D_LOGWARNING("Found incomplete session, joining it");
-                        new MessageBox(context_, "Joining other p2p session: " + val.GetString(), "Incomplete session found");
+                        new Urho3D::MessageBox(context_, "Joining other p2p session: " + val.GetString(), "Incomplete session found");
                         JoinSession(val.GetString());
                     }
                 } else if (url.Contains(API_NEW_SESSION)) {
@@ -364,7 +369,7 @@ void P2PMultiplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void P2PMultiplayer::Init() {
     GetSubsystem<Network>()->SetMode(NetworkMode::PEER_TO_PEER);
-    GetSubsystem<Network>()->SetNATServerInfo("frameskippers.com", 61111);
+    GetSubsystem<Network>()->SetNATServerInfo("nat.frameskippers.com", 30123);
     GetSubsystem<Network>()->SetUpdateFps(30);
 
     //httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest("http://frameskippers.com:82/guid.txt");
@@ -600,6 +605,7 @@ void P2PMultiplayer::HandleNewHost(StringHash eventType, VariantMap& eventData)
 void P2PMultiplayer::HandleBanned(StringHash eventType, VariantMap& eventData)
 {
     GetSubsystem<Network>()->Disconnect(1000);
+    httpRequest_ = GetSubsystem<Network>()->MakeHttpRequest(API_REMOVE_SESSION + "?guid=" + GetSubsystem<Network>()->GetGUID());
     peers_.Clear();
 
     GetSubsystem<Input>()->SetMouseVisible(true);
