@@ -61,12 +61,12 @@ public:
     /// Destruct. Release the mutex.
     ~MutexLock();
 
-private:
     /// Prevent copy construction.
-    MutexLock(const MutexLock& rhs);
+    MutexLock(const MutexLock& rhs) = delete;
     /// Prevent assignment.
-    MutexLock& operator =(const MutexLock& rhs);
+    MutexLock& operator =(const MutexLock& rhs) = delete;
 
+private:
     /// Mutex reference.
     Mutex& mutex_;
 };
