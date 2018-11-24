@@ -68,7 +68,7 @@ before_script:
   - if [[ $URHO3D_BINDINGS ]]; then git clone --depth 1 https://github.com/urho3d/llvm-clang.git && export LLVM_CLANG_ROOT=$(pwd)/llvm-clang; fi
   - if [[ $LINUX ]]; then export PLATFORM=native; else export PLATFORM=mingw; fi
   - rake ci_setup_cache
-script: script/dockerized.sh $PLATFORM rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: script/dockerized.sh $PLATFORM rake ci && if [[ $SITE_UPDATE ]]; then script/dockerized.sh $PLATFORM rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh $PLATFORM rake ci_package_upload; fi && rake ci_timer
 after_script: if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
@@ -254,7 +254,7 @@ before_script:
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - if [[ "$ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE" == "STATIC" ]]; then export ORG_GRADLE_PROJECT_URHO3D_SAMPLES=0; fi
   - rake ci_setup_cache
-script: script/dockerized.sh android ./gradlew build publishToMavenLocal --console plain && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: script/dockerized.sh android ./gradlew build publishToMavenLocal --console plain && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh android rake ci_package_upload; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
@@ -287,7 +287,7 @@ before_script:
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - rake ci_setup_cache
-script: script/dockerized.sh rpi rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: script/dockerized.sh rpi rake ci && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh rpi rake ci_package_upload; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
@@ -320,7 +320,7 @@ before_script:
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - rake ci_setup_cache
-script: script/dockerized.sh arm rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: script/dockerized.sh arm rake ci && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh arm rake ci_package_upload; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
@@ -360,7 +360,7 @@ before_script:
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - if [[ "$URHO3D_LIB_TYPE" != "MODULE" ]] && (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
   - rake ci_setup_cache
-script: script/dockerized.sh web rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && if [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ ! $EMSCRIPTEN_WASM ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]] && [[ ! $URHO3D_SAMPLES ]]; then rake ci_emscripten_samples_update; fi && rake ci_timer
+script: script/dockerized.sh web rake ci && if [ $PACKAGE_UPLOAD ]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ ! $EMSCRIPTEN_WASM ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]] && [[ ! $URHO3D_SAMPLES ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
