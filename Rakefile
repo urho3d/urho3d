@@ -369,8 +369,8 @@ task :ci do
     else
       test = ''
     end
-    # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform or when the build config may run out of disk space
-    unless ENV['CI'] && ((ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || (ENV['CMAKE_BUILD_TYPE'] == 'Debug' && ENV['URHO3D_LIB_TYPE'] == 'STATIC')) || timeup
+    # Skip scaffolding test when time up or packaging for platform with slow build environment, or when the build config may run out of disk space
+    unless ENV['CI'] && ((ENV['IOS'] || ENV['TVOS'] || ENV['WEB'] || ENV['OS']) && ENV['PACKAGE_UPLOAD'] || (ENV['CMAKE_BUILD_TYPE'] == 'Debug' && ENV['URHO3D_LIB_TYPE'] == 'STATIC')) || timeup
       # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
       ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
       if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
@@ -565,7 +565,7 @@ task :ci_package_upload do
     if ENV['URHO3D_USE_LIB64_RPM']
       system 'rake cmake' or abort 'Failed to reconfigure to generate 64-bit RPM package'
       system "rm #{ENV['build_tree']}/Urho3D-*" or abort 'Failed to remove previously generated artifacts'  # This task can be invoked more than one time
-     end
+    end
     system "#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
@@ -834,7 +834,7 @@ LL+vn21fWvELBWb8ekwZOCSmT7IpaboKn4h5aUmgl4udA/73iC2zVQkQxbWZb5zu
 vEdDk4aOwV5ZBDjecYX01hjjnEOdZHGJlF/H/Xs0hYX6WDG3/r9QCJJ0nfd1/Fk2
 zdbZRtAbyRz6ZHiYKnFQ441qRRaEbzunkvTBEwu9iqzlE0s/g49LJL0mKEp7rt/J
 4iS3LZTQbJNx5J0ti8ZJKHhvoWb5RJxNimwKvVHC0XBZKTiLMrhnADmcpjLz53F8
-$SF_KEY
+#{ENV['SF_KEY']}
 sx27yCaeBeKXV0tFOeZmgK664VM9EgesjIX4sVOJ5mA3xBJBOtz9n66LjoIlIM58
 dvsAnJt7MUBdclL/RBHEjbUxgGBDcazfWSuJe0sGczhnXMN94ox4MSECgYEAx5cv
 cs/2KurjtWPanDGSz71LyGNdL/xQrAud0gi49H0tyYr0XmzNoe2CbZ/T5xGSZB92
