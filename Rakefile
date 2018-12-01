@@ -569,7 +569,7 @@ task :ci_package_upload do
     system "#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
-  puts "Uploading artifacts...\n\n"; $stdout.flush
+  puts "\nUploading artifacts...\n\n"; $stdout.flush
   setup_digital_keys
   repo = ENV[ENV['TRAVIS'] ? 'TRAVIS_REPO_SLUG' : 'APPVEYOR_REPO_NAME']
   unless ENV['RELEASE_TAG']
@@ -611,7 +611,7 @@ EOF'" } or abort 'Failed to create release directory remotely'
     File.open('.site_updated', 'w') {}
   end
   # Upload the binary package
-  retry_block { wait_for_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } } or abort 'Failed to upload binary package'
+  retry_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } or abort 'Failed to upload binary package'
   if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
     retry_block { system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten } or abort 'Failed to set binary tarball/zip as default download'
