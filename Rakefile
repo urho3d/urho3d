@@ -611,7 +611,7 @@ EOF'" } or abort 'Failed to create release directory remotely'
     File.open('.site_updated', 'w') {}
   end
   # Upload the binary package
-  retry_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } or abort 'Failed to upload binary package'
+  retry_block { wait_for_block('', 55) { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } } or abort 'Failed to upload binary package'
   if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
     retry_block { system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten } or abort 'Failed to set binary tarball/zip as default download'
@@ -714,8 +714,8 @@ end
 
 # Usage: wait_for_block('This is a long function call...') { call_a_func } or abort
 #        wait_for_block('This is a long system call...') { system 'do_something' } or abort
-def wait_for_block comment = '', retries = -1, retry_interval = 60
-  return nil if timeup(true)
+def wait_for_block comment = '', cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 45.0, retries = -1, retry_interval = 60
+  return nil if timeup(true, cutoff_time)
 
   # Wait until the code block is completed or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
   thread = Thread.new { rc = yield; Thread.main.wakeup; rc }
@@ -723,7 +723,7 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   str = comment
   retries = retries * 60 / retry_interval unless retries == -1
   until thread.status == false
-    if retries == 0 || timeup(true)
+    if retries == 0 || timeup(true, cutoff_time)
       thread.kill
       # Also kill the child subproceses spawned by the worker thread if specified
       system "killall #{thread[:subcommand_to_kill]}" if thread[:subcommand_to_kill]
