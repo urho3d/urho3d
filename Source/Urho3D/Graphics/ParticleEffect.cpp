@@ -42,6 +42,9 @@ static const char* emitterTypeNames[] =
 {
     "Sphere",
     "Box",
+    "SphereVolume",
+    "Cylinder",
+    "Ring",
     nullptr
 };
 

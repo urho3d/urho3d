@@ -100,8 +100,9 @@ A number of build options can be defined when invoking the build scripts or when
 
 |Build Option         |Value|Description          |
 |---------------------|-----|---------------------|
+|ARM                  |0|Configure project using ARM cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify ARM toolchain file for cross-compiling explicitly|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
-|WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
+|MINGW                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
 |WEB                  |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |TVOS                 |0|Configure project for targeting tvOS platform (cmake_generic.sh and cmake-gui only)|
@@ -109,7 +110,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |1|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
-|URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
+|URHO3D_LUAJIT_AMALG  |*|Enable LuaJIT amalgamated build (LuaJIT only); default to true when LuaJIT is enabled|
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
 |URHO3D_IK            |1|Enable inverse kinematics support|
@@ -377,6 +378,16 @@ Check the Source/Clang-Tools/CMakeLists.txt to get the list of targets currently
 When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "bin" directory so that Urho3D executables will run correctly. When building for Direct3D11, copy d3dcompiler_47.dll from "C:\Program Files (x86)\Windows Kits\8.1\bin\x86" to the "bin" directory. In both cases, if compiling Urho3D as 64-bit, copy from the "bin\x64" directory instead.
 
 OpenGL does not depend on a separate shader compiler DLL.
+
+\section Dockerized_Build_Environment Dockerized build environment (EXPERIMENTAL)
+
+The building prerequisites are understandably different for each target platform. If you want to target multiple platforms with a single build/host system then you have to not only install all of the prequisites in your host system, but also have to be able to configure your build environment properly so that they do not interfere with each other. Rather than configuring the build environment manually, we have now provided a new build mechanism that we called "dockerized build environment" which addresses both hurdles above. Currently the dockerized build environment, or DBE for short, supports the following platforms: native (Linux), MinGW (Windows), Android, Raspberry-Pi, generic ARM, and Web.
+
+The DBE requires Docker-CE to be installed in the host system and that's all it needs. Head to https://docs.docker.com/install/ to get the right download for your own host system and follow its installation instruction.
+
+To use the DBE, execute script/dockerized.sh in the project root directory, specify the platform name (native|mingw|android|rpi|arm|web) as the mandatory parameter, and optionally followed by an alternative command to be invoked in the docker container. By default the command is to generate a build tree for the specified target platform and then build it. The Urho3D build options can be specified by using environment variables in the host system before executing the dockerized.sh. It could be done just in time as well, e.g. "URHO3D_LIB_TYPE=SHARED script/dockerized.sh mingw". The build artifact from DBE can be found in the usual location as the normal build environment. In fact the build artifacts should function and work as if they are built using conventional way too.
+
+The DBE is designed to be used by Urho3D project and its downstream projects which reuse Urho3D build system.
 
 
 \page Running Running Urho3D player application

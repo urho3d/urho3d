@@ -60,7 +60,7 @@ for a in $@; do
         -DARM=1)
             if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Arm.cmake"; fi
             ;;
-        -DWIN32=1)
+        -DMINGW=1)
             OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/MinGW.cmake"
             ;;
         -DWEB=1)

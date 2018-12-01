@@ -32,7 +32,10 @@ namespace Urho3D
 enum EmitterType
 {
     EMITTER_SPHERE = 0,
-    EMITTER_BOX
+    EMITTER_BOX,
+    EMITTER_SPHEREVOLUME,
+    EMITTER_CYLINDER,
+    EMITTER_RING
 };
 
 /// %Color animation frame definition.

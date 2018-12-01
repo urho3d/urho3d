@@ -27,10 +27,6 @@ platform:
   - x64
 clone_depth: 50
 cache:
-  # AppVeyor seems to restore caches based on the job ordering alone, it does not use the env-vars as the key like Travis
-  # Therefore, we are forced to list out all the cache items for our master CI and MinGW CI builds here
-  # Build
-  # mingw-Build
   # Cache the MinGW compiler toolchains so that our CI builds do not chalk up their download stats
   - C:\tools\mingw32
   - C:\tools\mingw64
@@ -48,11 +44,10 @@ environment:
 # VS build actually does not need MinGW compiler toolchains so prevent its restoration and update check
   APPVEYOR_CACHE_SKIP_RESTORE: true
   APPVEYOR_CACHE_SKIP_SAVE: true
-# Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
-  build_tree: Build
   config: Release
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
+  URHO3D_LUAJIT: 1
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
@@ -79,14 +74,10 @@ before_build:
     )
   # Temporarily disable AngelScript as VS 2017 15.8 cannot handle it
   - set "URHO3D_ANGELSCRIPT=0"
-  # rake ci_setup_cache
 build_script:
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
   - rake ci_timer
-#after_build: rake ci_teardown_cache
 test: off
-artifacts:
-  - path: .\*.zip
 deploy: off
 
 # vi: set ts=2 sw=2 expandtab:

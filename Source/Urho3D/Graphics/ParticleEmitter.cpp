@@ -484,6 +484,33 @@ bool ParticleEmitter::EmitNewParticle()
             );
         }
         break;
+
+    case EMITTER_SPHEREVOLUME:
+        {
+            Vector3 dir(
+                Random(2.0f) - 1.0f,
+                Random(2.0f) - 1.0f,
+                Random(2.0f) - 1.0f
+            );
+            dir.Normalize();
+            startPos = effect_->GetEmitterSize() * dir * Pow(Random(), 1.0f / 3.0f) * 0.5f;
+        }
+        break;
+
+    case EMITTER_CYLINDER:
+        {
+            float angle = Random(360.0f);
+            float radius = Sqrt(Random()) * 0.5f;
+            startPos = Vector3(Cos(angle) * radius, Random() - 0.5f, Sin(angle) * radius) * effect_->GetEmitterSize();
+        }
+        break;
+
+    case EMITTER_RING:
+        {
+            float angle = Random(360.0f);
+            startPos = Vector3(Cos(angle), Random(2.0f) - 1.0f, Sin(angle)) * effect_->GetEmitterSize() * 0.5f;
+        }
+        break;
     }
 
     particle.size_ = effect_->GetRandomSize();
