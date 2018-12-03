@@ -8352,6 +8352,9 @@ Properties:
 
 - int EMITTER_SPHERE
 - int EMITTER_BOX
+- int EMITTER_SPHEREVOLUME
+- int EMITTER_CYLINDER
+- int EMITTER_RING
 
 ### EmitterType2D
 

@@ -62,6 +62,10 @@
 #undef SendMessage
 #endif
 
+#ifdef MessageBox
+#undef MessageBox
+#endif
+
 URHO3D_DEFINE_APPLICATION_MAIN(P2PMultiplayer)
 
 static String API_SEARCH_SESSION = "http://master.frameskippers.com/open";
@@ -114,7 +118,9 @@ void P2PMultiplayer::CreateUI()
 
     int marginTop = 20;
     searchGame_ = CreateButton("Search for session", 200, IntVector2(20, marginTop));
-    nickname_ = CreateLineEdit("Your nickname", 160, IntVector2(240, marginTop));
+    nickname_ = CreateLineEdit("User", 160, IntVector2(240, marginTop));
+    SetRandomSeed(Time::GetSystemTime());
+    nickname_->SetText(nickname_->GetText() + "_" + String(Random(1, 1000)));
 
 	marginTop += 80;
     clientCount_ = CreateLabel("Connections: 0", IntVector2(20, marginTop));

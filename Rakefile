@@ -66,7 +66,7 @@ task :cmake do
       script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
-      build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
+      build_options = "#{build_options} -D#{option.upcase}=1" unless script == 'cmake_clean'
       script = 'cmake_xcode' if /(?:i|tv)os/ =~ option && script != 'cmake_clean'
       script = 'cmake_mingw' if option == 'mingw' && ENV['OS'] && script != 'cmake_clean'
     when 'fix_scm'
@@ -179,43 +179,6 @@ task :make do
   system "cd \"#{build_tree}\" && #{ccache_envvar} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
-# Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=21] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
-desc 'Test run APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
-task :android do
-  parameter = ENV['parameter'] || '--es argument NinjaSnowWar.as'
-  intent = ENV['intent'] || '.SampleLauncher'
-  package = ENV['package'] || 'com.github.urho3d'
-  success_indicator = ENV['success_indicator'] || 'Initialized engine'
-  payload = ENV['payload'] || 'sleep 30'
-  api = ENV['api'] || 21
-  abi = ENV['abi'] || 'armeabi-v7a'
-  avd = ENV['avd'] || "test_#{api}_#{abi}"
-  retries = ENV['retries'] || 10 # minutes
-  retry_interval = ENV['retry_interval'] || 10 # seconds
-  build_tree = ENV['android_build_tree'] || ENV['build_tree'] || './android-Build'
-  install = false
-  ARGV.each { |option|
-    task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
-    case option
-    when 'install'
-      install = true
-    end
-  }
-  android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
-  if install
-    system 'rake make android' or abort 'Failed to build shared library using Android NDK'
-    Dir.chdir build_tree do
-      system 'android update project -p .' unless File.exist? 'local.properties'
-      system 'ant debug' or abort 'Failed to generate APK using Android SDK'
-    end
-  end
-  android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
-  if install
-    system "cd \"#{build_tree}\" && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to install APK'
-  end
-  android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}"
-end
-
 ### Tasks for Urho3D maintainers ###
 
 # Usage: rake git remote_add|sync|subtree
@@ -313,6 +276,12 @@ task :ci do
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
     next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ (ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']) }.any?
   end
+  # Clear ccache on demand
+  if ENV['USE_CCACHE'] then
+    clear = /\[cache clear\]/ =~ ENV['COMMIT_MESSAGE']
+    system "ccache -z #{clear ? '-C' : ''}"
+    puts; $stdout.flush
+  end
   # Obtain our custom data, if any
   if ENV['APPVEYOR']
     # AppVeyor does not provide job number environment variable in the same semantics as TRAVIS_JOB_NUMBER nor it supports custom data in its .appveyor.yml document
@@ -335,34 +304,29 @@ task :ci do
     system 'git fetch --tags --unshallow' or abort 'Failed to unshallow cloned repository'
     puts; $stdout.flush
   end
-  # CMake/Emscripten toolchain file does not show this information yet
+  # Show the compiler toolchain version because CMake/Emscripten toolchain file does not show this info and also because the build tree on Travis CI is cached and just being reconfigured each time
   if ENV['WEB']
     system 'clang --version && emcc --version' or abort 'Failed to find Emscripten compiler toolchain'
   end
   # Show CMake version
-  system 'cmake --version' or abort 'Failed to find CMake'
+  if ENV['ANDROID']
+    # Android build uses SDK's embedded CMake which is non-vanilla version of CMake
+    system '$ANDROID_HOME/cmake/*/bin/cmake --version' or abort 'Failed to find CMake'
+  else
+    system 'cmake --version' or abort 'Failed to find CMake'
+  end
   puts; $stdout.flush
-  # Ensure '.build-options' and '.env-file' are up-to-date
-  system %Q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=\w+/g) {print "$1\n"}' .travis.yml) |sort |uniq |grep -v ^PATH$ >script/.env-file)
-  # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
-  ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
-  # Always use a same build configuration per build job to keep ccache's cache size small; default to RELEASE unless specifically defined
-  ENV['config'] = 'Release' if ENV['XCODE']
+  # Use out-of-source build tree
+  ENV['build_tree'] = 'build/ci'
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
-  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
+  ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2017') : '')
-  # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
-  # LuaJIT on Web platform is not possible
-  jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
-  system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
-  system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
-  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
+  # Cache the initial build tree for next run on platform that is slow to generate the build tree
+  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
+  system "rake cmake #{generator} URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
+  system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
-  if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
-    # Prepare a new AVD in another process to avoid busy waiting
-    android_prepare_device ENV['AVD'], ENV['ANDROID_ABI'] or abort 'Failed to prepare Android (virtual) device for test run'
-  end
   # Temporarily put the logic here for clang-tools migration until everything else are in their places
   if ENV['URHO3D_BINDINGS']
     system 'rake make' or abort 'Failed to build or test Urho3D library with annotated source files'
@@ -376,7 +340,7 @@ task :ci do
     if ENV['TRAVIS'] && !ENV['XCODE'] && !already_timeup && !timeup(true, 10)
       # The build cache could be corrupted, so clear the cache and retry one more time
       system "cd #{ENV['build_tree']}/Source/Urho3D/tolua++-prefix/src/tolua++-build && make clean >/dev/null 2>&1"
-      system "cd #{ENV['build_tree']}/Source/ThirdParty/LuaJIT/buildvm-prefix/src/buildvm-build && make clean >/dev/null 2>&1" if jit != ''
+      system "cd #{ENV['build_tree']}/Source/ThirdParty/LuaJIT/buildvm-prefix/src/buildvm-build && make clean >/dev/null 2>&1"
       success = system "ccache -Cz && rake make clean_first #{redirect}"
     end
     unless success
@@ -396,138 +360,84 @@ task :ci do
       puts; $stdout.flush
       abort 'Failed to pass linter checks'
     end
-    next
-  end
-  if ENV['URHO3D_TESTING'] && !ENV['WEB'] && !timeup
-    # Multi-config CMake generators use different test target name than single-config ones for no good reason
-    test = "rake make target=#{(ENV['OS'] && !ENV['MINGW']) || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
-    system "#{test}" or abort 'Failed to test Urho3D library'
-    test = "&& echo#{ENV['OS'] ? '.' : ''} && #{test}"
   else
-    test = ''
-  end
-  # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform or when the build config may run out of disk space
-  unless ENV['CI'] && ((ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || (ENV['CMAKE_BUILD_TYPE'] == 'Debug' && ENV['URHO3D_LIB_TYPE'] == 'STATIC')) || timeup
-    # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
-    ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
-    if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
-      abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
-      $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
-      next
+    if ENV['URHO3D_TESTING'] && !timeup
+      # Multi-config CMake generators use different test target name than single-config ones for no good reason
+      test = "#{ENV['OSX'] || ENV['APPVEYOR'] ? '' : 'xvfb-run'} rake make target=#{(ENV['OS'] && !ENV['MINGW']) || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
+      system "#{test}" or abort 'Failed to test Urho3D library'
+      test = "&& echo#{ENV['OS'] ? '.' : ''} && #{test}"
+    else
+      test = ''
     end
-    # Alternate to use in-the-source build tree for test coverage
-    ENV['build_tree'] = '.' unless ENV['APPVEYOR']
-    # Ensure the following variables are auto-discovered during scaffolding test
-    ENV['URHO3D_64BIT'] = nil unless ENV['APPVEYOR']    # AppVeyor uses VS generator which always requires URHO3D_64BIT as input variable
-    ['URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
-    # Alternate the scaffolding location between Travis CI and AppVeyor for test coverage; Travis CI uses build tree while AppVeyor using source tree
-    # First scaffolding test uses absolute path while second test uses relative path, also for test converage
-    # First test - create a new project on the fly that uses newly installed Urho3D SDK
-    org = (ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_PROJECT_SLUG']).split('/').first
-    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? "C:/projects/#{org}/" : (ENV['TRAVIS'] ? "#{ENV['HOME']}/build/#{org}/Build/" : '../Build/')}UsingSDK" do   # The last rel path is for non-CI users, just in case
-      puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
-      # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
-      system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
-    end
-    next if timeup
-    # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
-    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
-      puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
-      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? "../../#{ENV['build_tree']}" : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
-    end
-  end
-  # Make, deploy, and test run Android APK in an Android (virtual) device
-  if ENV['AVD'] && !ENV['PACKAGE_UPLOAD'] && !timeup
-    puts "\nTest deploying and running Urho3D Samples APK..."
-    Dir.chdir '../Build' do
-      system 'android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
-      if android_wait_for_device
-        system "ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
-        android_test_run or abort 'Failed to test run Urho3D Samples APK'
-      else
-        puts 'Skipped test running Urho3D Samples APK as emulator failed to start in time'
+    # Skip scaffolding test when time up or packaging for platform with slow build environment, or when the build config may run out of disk space
+    unless ENV['CI'] && ((ENV['IOS'] || ENV['TVOS'] || ENV['WEB'] || ENV['OS']) && ENV['PACKAGE_UPLOAD'] || (ENV['CMAKE_BUILD_TYPE'] == 'Debug' && ENV['URHO3D_LIB_TYPE'] == 'STATIC')) || timeup
+      # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
+      ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
+      if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
+        abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
+        $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+        next
       end
+      urho3d_home = "#{Dir.pwd}/#{ENV['build_tree']}"
+      # Use non out-of-source build tree for scaffolding test
+      ENV['build_tree'] = '.'
+      # Ensure the following variables are auto-discovered during scaffolding test
+      ENV['URHO3D_64BIT'] = nil unless ENV['APPVEYOR']    # AppVeyor uses VS generator which always requires URHO3D_64BIT as input variable
+      ['URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
+      # First test - create a new project on the fly that uses newly installed Urho3D SDK
+      Dir.chdir scaffolding 'UsingSDK' do
+        puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
+        # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
+        system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      end
+      next if timeup
+      # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
+      Dir.chdir scaffolding 'UsingBuildTree' do
+        puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
+        system "rake cmake #{generator} URHO3D_HOME=#{urho3d_home} && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      end
+      # Clean up so that these test dirs do not show up in the CI mirror branches
+      require 'fileutils'
+      FileUtils.rm_rf(['UsingSDK', 'UsingBuildTree'])
     end
   end
+  system 'ccache -s' if ENV['USE_CCACHE']
 end
 
 # Usage: NOT intended to be used manually
 desc 'Setup build cache'
 task :ci_setup_cache do
-  clear = /\[cache clear\]/ =~ ENV['COMMIT_MESSAGE']
-  # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
-  if ENV['APPVEYOR']
-    system "bash -c 'rm -rf #{ENV['build_tree']}'" if clear
-    if File.exists?("#{ENV['build_tree']}/.commits")
-      # Find the last valid commit SHA because the recorded commit SHAs may no longer be valid due to git reset/forced push
-      last_commit = File.read("#{ENV['build_tree']}/.commits").split.find { |sha| system "git cat-file -e #{sha}" }
-      # AppVeyor prefers CMD's FIND over MSYS's find, so we have to use fully qualified path to the MSYS's find
-      system "bash -c '/c/Program\\ Files/Git/usr/bin/find CMakeLists.txt CMake Docs Source |xargs touch -r #{ENV['build_tree']}/CMakeCache.txt && touch $(git diff --name-only #{last_commit} #{ENV['APPVEYOR_REPO_COMMIT']})'"
-    end
-    next
-  # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
-  elsif ENV['USE_CCACHE'].to_i == 2
-    puts 'Setting up build cache'
-    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
-    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
-    matched = /.*-([^-]+-[^-]+)$/.match(ENV['TRAVIS_BRANCH'])
-    base_mirror = matched ? matched[1] : nil
-    # Do not abort even when it fails here
-    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
-    # Preserving .git directory before clearing the cache on Linux host system (ccache on Mac OSX does not have this problem)
-    `mv ~/.ccache/.git /tmp` if clear && ENV['OSX'].to_i != 1
-  end
-  # Clear ccache on demand
-  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{clear ? '-C' : ''}"
-  # Restoring .git directory if its backup exists
-  `if [ -e /tmp/.git ]; then mv /tmp/.git ~/.ccache; fi`
-end
-
-# Usage: NOT intended to be used manually
-desc 'Teardown build cache'
-task :ci_teardown_cache do
-  # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
-  if ENV['APPVEYOR']
-    # Keep the last 10 commit SHAs
-    commits = (File.exists?("#{ENV['build_tree']}/.commits") ? File.read("#{ENV['build_tree']}/.commits").split : []).unshift(`git rev-parse #{ENV['APPVEYOR_REPO_COMMIT']}`.chomp).take 10
-    File.open("#{ENV['build_tree']}/.commits", 'w') { |file| file.puts commits } if Dir.exist?(ENV['build_tree'])
-    # Exclude build artifacts from being cached due to cache size limitation
-    system "bash -c 'rm -f #{ENV['build_tree']}/bin/*.{exe,dll}'"
-    next
-  # Upload cache to internal cache store if it is our own
-  elsif ENV['USE_CCACHE'].to_i == 2
-    puts 'Storing build cache'
-    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
-    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
-    # Do not abort even when it fails here
-    system "cd ~/.ccache && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/#{repo_slug} && git add -A . && git commit --amend -qm 'Travis CI: cache update at #{Time.now.utc}.' && git push -qf -u origin #{ENV['TRAVIS_BRANCH']}#{job_number} >/dev/null 2>&1"
-  end
-  system 'ccache -s'
+  puts 'Setting up build cache using docker volume...'
+  # This is a hack as it relies on docker volume internal directory structure
+  system 'docker volume create $(id -u).urho3d_home_dir && sudo rm -rf /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data && sudo ln -s $HOME/urho3d_home_dir /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data' or abort 'Failed to setup build cache'
+  # Ensure '.build-options' and '.env-file' are up-to-date
+  system 'bash', '-c', %q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=.+?/g) {print "$1\n"}' .travis.yml) <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file) or abort 'Failed to update .build-options and .env-file'
 end
 
 # Usage: NOT intended to be used manually
 desc 'Update site on GitHub Pages (and source tree on GitHub while we are at it)'
 task :ci_site_update do
   # Skip when :ci rake task was skipped
-  next unless File.exist?('../Build/CMakeCache.txt')
+  build_tree = 'build/ci'
+  next unless File.exist?("#{build_tree}/CMakeCache.txt")
   next if timeup
   puts "Updating site...\n\n"
-  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ~/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
   # Update credits from README.md to about.yml
-  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' ../urho3d.github.io/_data/about.yml" or abort 'Failed to update credits'
+  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' ~/urho3d.github.io/_data/about.yml" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
-  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}, %q{COLS_IN_ALPHA_INDEX} => 3} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' ../Build/Docs/generated/Doxyfile" or abort 'Failed to setup doxygen configuration file'
-  system 'cp ../urho3d.github.io/_includes/Doxygen/minimal-* ../Build/Docs' or abort 'Failed to copy minimal-themed template'
+  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 40, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}, %q{COLS_IN_ALPHA_INDEX} => 3} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' #{build_tree}/Docs/generated/Doxyfile" or abort 'Failed to setup doxygen configuration file'
+  system "cp ~/urho3d.github.io/_includes/Doxygen/minimal-* #{build_tree}/Docs" or abort 'Failed to copy minimal-themed template'
   release = ENV['RELEASE_TAG'] || 'HEAD'
   unless release == 'HEAD'
-    system "mkdir -p ../urho3d.github.io/documentation/#{release}" or abort 'Failed to create directory for new document version'
-    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' ../Build/Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
+    system "mkdir -p ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to create directory for new document version'
+    system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' #{build_tree}/Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
     append_new_release release or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
-  system "cd ../Build && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ../urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  system "cd #{build_tree} && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials to push site documentation changes to urho3d/urho3d.github.io.git
-  system "cd ../urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
+  system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
   next if timeup
   # Skip detecting source tree changes when HEAD has moved or it is too late already as a release tag has just been pushed
   unless ENV['RELEASE_TAG'] || `git fetch -qf origin #{ENV['TRAVIS_BRANCH']}; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
@@ -536,9 +446,9 @@ task :ci_site_update do
     system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
     system "git add script Source && git commit -qm 'Travis CI: source tree update at #{Time.now.utc}.' >/dev/null 2>&1"   # Use extra quiet mode as there could be no changes at all
     if /2008-([0-9]{4}) the Urho3D project/.match(File.read('Rakefile'))[1].to_i != Time.now.year
-      # Automatically bump copyright when crossing a new year and give instruction to clear the cache if so since the cache is of no use anyway because of massive changes
-      system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[cache clear]'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
-      ['urho3d.github.io master', 'android-ndk ndk-update-trigger', 'armhf-sysroot sysroot-update-trigger', 'arm64-sysroot sysroot-update-trigger', 'rpi-sysroot sysroot-update-trigger', 'emscripten-sdk sdk-update-trigger'].each { |var| pair = var.split; system "if [ ! -d ../#{pair.first} ]; then git clone -q --depth 1 --branch #{pair.last} https://github.com/urho3d/#{pair.first} ../#{pair.first}; fi" or abort "Failed to clone urho3d/#{pair.first}"; system "cd ../#{pair.first} && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/#{pair.first} && git add #{bump_copyright_year("../#{pair.first}").join ' '} 2>/dev/null && git add #{bump_copyright_year("../#{pair.first}", '2014-[0-9]{4} Yao').join ' '} 2>/dev/null && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ci skip]'; then git push -q >/dev/null 2>&1; fi" or abort "Failed to push copyright update for urho3d/#{pair.first}"; }
+      # Automatically bump copyright when crossing a new year
+      system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
+      ['urho3d.github.io master', 'android-ndk ndk-update-trigger', 'armhf-sysroot sysroot-update-trigger', 'arm64-sysroot sysroot-update-trigger', 'rpi-sysroot sysroot-update-trigger', 'emscripten-sdk sdk-update-trigger', 'dockerized master', 'dockerized native', 'dockerized mingw', 'dockerized android', 'dockerized rpi', 'dockerized arm', 'dockerized web'].each { |var| pair = var.split; system "if [ ! -d ~/#{pair.first} ]; then git clone -q --depth 1 --branch #{pair.last} https://github.com/urho3d/#{pair.first} ~/#{pair.first}; fi" or abort "Failed to clone urho3d/#{pair.first}"; system "cd ~/#{pair.first} && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/#{pair.first} && git add #{bump_copyright_year("~/#{pair.first}").join ' '} 2>/dev/null && git add #{bump_copyright_year("~/#{pair.first}", '2014-[0-9]{4} Yao').join ' '} 2>/dev/null && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ci skip]'; then git push -q >/dev/null 2>&1; fi" or abort "Failed to push copyright update for urho3d/#{pair.first}"; }
     elsif system("git add Docs/*API* && git commit -qm 'Test commit to detect API documentation changes'")
       # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
@@ -553,10 +463,11 @@ end
 desc 'Update web samples to GitHub Pages'
 task :ci_emscripten_samples_update do
   next if timeup
+  build_tree = 'build/ci'
   puts 'Updating Web samples in main website...'
-  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
-  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md ../Build/bin/ ../urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
-  Dir.chdir('../urho3d.github.io/samples') {
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ~/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md #{build_tree}/bin/ ~/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  Dir.chdir('~/urho3d.github.io/samples') {
     next unless system 'git diff --quiet Urho3D.js.data'
     uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
     system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js)
@@ -569,7 +480,7 @@ task :ci_emscripten_samples_update do
   }
   update_web_samples_data or abort 'Failed to update Web json data file'
   root_commit, _ = get_root_commit_and_recipients
-  system "cd ../urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
+  system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
 end
 
 # Usage: NOT intended to be used manually
@@ -628,10 +539,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Make binary package and upload it to a designated central hosting server'
 task :ci_package_upload do
-  # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
-  ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
-  # Always use Release build configuration when using Xcode; 'config' environment variable is already set when on AppVeyor
-  ENV['config'] = 'Release' if ENV['XCODE']
+  # Use out-of-source build tree
+  ENV['build_tree'] = 'build/ci'
   # Skip when :ci rake task was skipped
   next unless File.exist?("#{ENV['build_tree']}/CMakeCache.txt")
   next if timeup
@@ -651,16 +560,16 @@ task :ci_package_upload do
   puts "Packaging artifacts...\n\n"; $stdout.flush
   if ENV['IOS'] || ENV['TVOS']
     # TODO: There is a bug in CMake/CPack that causes the 'package' target failed to build for iOS and tvOS platforms, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
-    system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
+    system "cd #{ENV['build_tree']} && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
   else
     if ENV['URHO3D_USE_LIB64_RPM']
       system 'rake cmake' or abort 'Failed to reconfigure to generate 64-bit RPM package'
       system "rm #{ENV['build_tree']}/Urho3D-*" or abort 'Failed to remove previously generated artifacts'  # This task can be invoked more than one time
-     end
+    end
     system "#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
-  puts "Uploading artifacts...\n\n"; $stdout.flush
+  puts "\nUploading artifacts...\n\n"; $stdout.flush
   setup_digital_keys
   repo = ENV[ENV['TRAVIS'] ? 'TRAVIS_REPO_SLUG' : 'APPVEYOR_REPO_NAME']
   unless ENV['RELEASE_TAG']
@@ -702,7 +611,7 @@ EOF'" } or abort 'Failed to create release directory remotely'
     File.open('.site_updated', 'w') {}
   end
   # Upload the binary package
-  retry_block { wait_for_block { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } } or abort 'Failed to upload binary package'
+  retry_block { wait_for_block('', 55) { system "bash -c 'scp #{ENV['build_tree']}/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" } } or abort 'Failed to upload binary package'
   if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
     retry_block { system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten } or abort 'Failed to set binary tarball/zip as default download'
@@ -718,7 +627,7 @@ end
 # Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
 def timeup quiet = false, cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 45.0
   unless File.exists?('start_time.log')
-    system 'touch start_time.log split_time.log'
+    system 'touch start_time.log split_time.log' if ENV['CI']
     return nil
   end
   current_time = Time.now
@@ -803,91 +712,10 @@ def get_root_commit_and_recipients
   return root_commit, recipients
 end
 
-def android_find_device api = nil, abi = nil
-  # Return the previously found matching device or if not found yet then try to find the matching device now
-  return $specific_device if $specific_device
-  $specific_api = api.to_s if api
-  $specific_abi = abi.to_s if abi
-  loop do
-    for i in `adb devices |tail -n +2`.split "\n"
-      device = i.split.first
-      if `adb -s #{device} wait-for-device shell getprop ro.build.version.sdk`.chomp == $specific_api && `adb -s #{device} shell getprop ro.product.cpu.abi`.chomp == $specific_abi
-        return $specific_device = device
-      end
-    end
-    break if api
-  end
-  nil
-end
-
-def android_prepare_device api, abi = 'armeabi-v7a', name = 'test'
-  system 'if ! ps |grep -cq adb; then adb start-server; fi'
-  if !android_find_device api, abi
-    # Don't have any matching (virtual) device attached, try to attach the named device (create the named device as AVD if necessary)
-    if !system "android list avd |grep -cq 'Name: #{name}$'"
-      system "echo 'no' |android create avd -n #{name} -t android-#{api} --abi #{abi}" or abort "Failed to create '#{name}' Android virtual device"
-    end
-    system "if [ $CI ]; then export OPTS='-no-skin -no-audio -no-window -no-boot-anim -gpu off'; else export OPTS='-gpu on'; fi; emulator -avd #{name} $OPTS &"
-  end
-  return 0
-end
-
-def android_wait_for_device retries = -1, retry_interval = 10, package = 'android.process.acore'  # Waiting for HOME by default
-  # Wait until the indicator process is running or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
-  str = "\nWaiting for device..."
-  thread = Thread.new { android_find_device }; sleep 0.5
-  process_ready = false
-  retries = retries * 60 / retry_interval unless retries == -1
-  until retries == 0
-    if thread.status == false
-      thread.join
-      break if process_ready
-      process_ready = thread = Thread.new { `adb -s #{$specific_device} shell 'until ps |grep -c #{package} >/dev/null; do sleep #{retry_interval}; done; while ps |grep -c bootanimation >/dev/null; do sleep 1; done'` }; sleep 0.5
-      next
-    end
-    print str; str = '.'; $stdout.flush   # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
-    sleep retry_interval
-    retries -= 1 if retries > 0
-  end
-  puts "\n\n" if str == '.'; $stdout.flush
-  return retries == 0 ? nil : 0
-end
-
-def android_test_run parameter = '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/', payload = 'sleep 30'
-  # The device should have been found at this point
-  return nil unless $specific_device
-  # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
-  begin
-    IO.popen("adb -s #{$specific_device} shell <<EOF
-# Try to unlock the device just in case it is locked
-input keyevent 82; input keyevent 4
-# Clear the log
-logcat -c
-# Start the app
-am start -a android.intent.action.MAIN -n #{package}/#{intent} #{parameter}
-# Wait until the process is running
-until ps |grep -c #{package} 1>/dev/null; do sleep 1; done
-# Execute the payload
-#{payload}
-# Exit and stop the app
-input keyevent 4 && am force-stop #{package}
-# Dump the log
-logcat -d
-# Bye bye
-exit
-##
-EOF") { |stdout| echo = false; while output = stdout.gets do if echo && /#\s#/ !~ output then puts output else echo = true if /^##/ =~ output end; return nil if /^error/i =~ output end }
-    # Result of the test run is determined based on the presence of the success indicator string in the log
-    system "adb -s #{$specific_device} logcat -d |grep -cq '#{success_indicator}'"
-  rescue
-    nil
-  end
-end
-
 # Usage: wait_for_block('This is a long function call...') { call_a_func } or abort
 #        wait_for_block('This is a long system call...') { system 'do_something' } or abort
-def wait_for_block comment = '', retries = -1, retry_interval = 60
-  return nil if timeup(true)
+def wait_for_block comment = '', cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 45.0, retries = -1, retry_interval = 60
+  return nil if timeup(true, cutoff_time)
 
   # Wait until the code block is completed or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
   thread = Thread.new { rc = yield; Thread.main.wakeup; rc }
@@ -895,7 +723,7 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   str = comment
   retries = retries * 60 / retry_interval unless retries == -1
   until thread.status == false
-    if retries == 0 || timeup(true)
+    if retries == 0 || timeup(true, cutoff_time)
       thread.kill
       # Also kill the child subproceses spawned by the worker thread if specified
       system "killall #{thread[:subcommand_to_kill]}" if thread[:subcommand_to_kill]
@@ -921,7 +749,7 @@ def retry_block retries = 10, retry_interval = 1
     0
 end
 
-def append_new_release release, filename = '../urho3d.github.io/_data/urho3d.json'
+def append_new_release release, filename = '~/urho3d.github.io/_data/urho3d.json'
   begin
     urho3d_hash = JSON.parse File.read filename
     unless urho3d_hash['releases'].last == release
@@ -934,7 +762,7 @@ def append_new_release release, filename = '../urho3d.github.io/_data/urho3d.jso
   end
 end
 
-def update_web_samples_data dir = '../urho3d.github.io/samples', filename = '../urho3d.github.io/_data/web.json'
+def update_web_samples_data dir = '~/urho3d.github.io/samples', filename = '~/urho3d.github.io/_data/web.json'
   begin
     web = { 'samples' => {} }
     Dir.chdir(dir) { web['samples']['Native'] = Dir['*.html'].sort }
@@ -1006,7 +834,7 @@ LL+vn21fWvELBWb8ekwZOCSmT7IpaboKn4h5aUmgl4udA/73iC2zVQkQxbWZb5zu
 vEdDk4aOwV5ZBDjecYX01hjjnEOdZHGJlF/H/Xs0hYX6WDG3/r9QCJJ0nfd1/Fk2
 zdbZRtAbyRz6ZHiYKnFQ441qRRaEbzunkvTBEwu9iqzlE0s/g49LJL0mKEp7rt/J
 4iS3LZTQbJNx5J0ti8ZJKHhvoWb5RJxNimwKvVHC0XBZKTiLMrhnADmcpjLz53F8
-$SF_KEY
+#{ENV['SF_KEY']}
 sx27yCaeBeKXV0tFOeZmgK664VM9EgesjIX4sVOJ5mA3xBJBOtz9n66LjoIlIM58
 dvsAnJt7MUBdclL/RBHEjbUxgGBDcazfWSuJe0sGczhnXMN94ox4MSECgYEAx5cv
 cs/2KurjtWPanDGSz71LyGNdL/xQrAud0gi49H0tyYr0XmzNoe2CbZ/T5xGSZB92

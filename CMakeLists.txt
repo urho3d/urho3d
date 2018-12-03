@@ -104,7 +104,9 @@ elseif (WIN32)
     if (MINGW)
         set (CPACK_SYSTEM_NAME MinGW)   # MinGW implies Windows platform
     endif ()
-    set (CPACK_GENERATOR ZIP)
+    if (CMAKE_HOST_WIN32)
+        set (CPACK_GENERATOR ZIP)       # Differentiate artifacts generated from Windows host system
+    endif ()
 elseif (WEB)
     set (CPACK_SYSTEM_NAME Web)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)

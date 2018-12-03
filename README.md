@@ -72,6 +72,7 @@ Urho3D development, contributions and bugfixes by:
 - Justin Miller
 - Jonne Nauha
 - Huy Nguyen
+- Neal Nicdao
 - Paul Noome
 - David Palacios
 - Alex Parlett
