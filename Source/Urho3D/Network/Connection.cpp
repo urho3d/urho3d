@@ -197,19 +197,8 @@ void Connection::SetScene(Scene* newScene)
     }
     else
     {
-        // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
-//        if (scene_->IsAsyncLoading()) {
-            SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, URHO3D_HANDLER(Connection, HandleAsyncLoadFinished));
-//        } else {
-//            sceneLoaded_ = true;
-//            // Clear all replicated nodes
-//            scene_->Clear(true, false);
-//
-//            msg_.Clear();
-//            msg_.WriteUInt(scene_->GetChecksum());
-//            SendMessage(MSG_SCENELOADED, true, true, msg_);
-//        }
+        SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, URHO3D_HANDLER(Connection, HandleAsyncLoadFinished));
     }
 }
 

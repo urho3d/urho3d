@@ -38,8 +38,6 @@ class HttpRequest;
 
 }
 
-const int SERVER_PORT = 54654;
-
 enum GameState {
     IN_MENU,
     IN_LOBBY,

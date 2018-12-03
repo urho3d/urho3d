@@ -367,30 +367,6 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
     }
 }
 
-void Network::HandleMessageClient(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes)
-{
-    // Only process messages from known sources
-    Connection* connection = GetClientConnection(source);
-    if (connection)
-    {
-        MemoryBuffer msg(data, (unsigned)numBytes);
-        if (connection->ProcessMessage((int)msgID, msg))
-            return;
-
-        // If message was not handled internally, forward as an event
-        using namespace NetworkMessage;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_CONNECTION] = connection;
-        eventData[P_MESSAGEID] = (int)msgID;
-        eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
-        connection->SendEvent(E_NETWORKMESSAGE, eventData);
-    }
-    else {
-        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
-    }
-}
-
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address)
 {
     if (allowedConnectionCount_ == 0 || GetClientConnections().Size() >= allowedConnectionCount_) {
@@ -400,6 +376,8 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, c
     }
 
     ReadyStatusChanged();
+
+    // It is possible that in P2P mode the incomming connection is already registered
     if (networkMode_ == PEER_TO_PEER && clientConnections_[connection]) {
         //TODO proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
@@ -410,10 +388,13 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, c
     // Create a new client connection corresponding to this MessageConnection
     SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
+    // All peers should share the same scene
     if (networkMode_ == PEER_TO_PEER && serverConnection_) {
         newConnection->SetScene(serverConnection_->GetScene());
         newConnection->SetSceneLoaded(true);
     }
+
     newConnection->SetIP(address);
     clientConnections_[connection] = newConnection;
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
@@ -433,7 +414,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, c
 void Network::SendOutIdentityToPeers()
 {
     if (serverConnection_) {
-        URHO3D_LOGINFO("Sending out identity to all peers");
+        // Send our identity to all connected peers
         auto clients = GetClientConnections();
         for (auto it = clients.Begin(); it != clients.End(); ++it) {
             VectorBuffer msg;
@@ -968,7 +949,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         if(natPunchServerAddress_ && packet->systemAddress == *natPunchServerAddress_) {
             URHO3D_LOGINFO("Succesfully connected to NAT punchtrough server! ");
             SendEvent(E_NATMASTERCONNECTIONSUCCEEDED);
-            if (!isServer && remoteGUID_&& networkMode_ == SERVER_CLIENT)
+            if (!isServer && remoteGUID_ && networkMode_ == SERVER_CLIENT)
             {
                 natPunchthroughClient_->OpenNAT(*remoteGUID_, *natPunchServerAddress_);
             }
@@ -1082,27 +1063,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     {
         packetHandled = true;
     }
-    else if (packetID == ID_READY_EVENT_SET)
-    {
-        ReadyStatusChanged();
-        packetHandled = true;
-    }
-    else if (packetID == ID_READY_EVENT_UNSET)
-    {
-        ReadyStatusChanged();
-        packetHandled = true;
-    }
-    else if (packetID == ID_READY_EVENT_ALL_SET)
-    {
-        ReadyStatusChanged();
-        packetHandled = true;
-    }
-    else if (packetID == ID_READY_EVENT_QUERY)
-    {
-        ReadyStatusChanged();
-        packetHandled = true;
-    }
-    else if (packetID == ID_READY_EVENT_FORCE_ALL_SET)
+    else if (packetID == ID_READY_EVENT_SET || packetID == ID_READY_EVENT_UNSET || packetID == ID_READY_EVENT_ALL_SET || packetID == ID_READY_EVENT_QUERY || packetID == ID_READY_EVENT_FORCE_ALL_SET)
     {
         ReadyStatusChanged();
         packetHandled = true;
@@ -1279,11 +1240,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
             if (serverConnection_ && !serverConnection_->ProcessMessage(packetID, buffer))
             {
-                if (networkMode_ == PEER_TO_PEER) {
-                    HandleMessageClient(packet->guid, 0, packetID, (const char *) (packet->data + dataStart), packet->length - dataStart);
-                } else {
-                    HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
-                }
+                HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
             }
         }
         packetHandled = true;

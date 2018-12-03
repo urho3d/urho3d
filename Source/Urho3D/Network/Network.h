@@ -53,8 +53,6 @@ public:
 
     /// Handle an inbound message.
     void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
-    /// Handle an inbound message.
-    void HandleMessageClient(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
     /// Handle a new client connection.
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address = nullptr);
     /// Handle a client disconnection.
