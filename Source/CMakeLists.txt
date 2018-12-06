@@ -151,5 +151,5 @@ add_subdirectory (Samples)
 
 # Urho3D extras
 if (URHO3D_EXTRAS)
-#    add_subdirectory (Extras)
+    add_subdirectory (Extras)
 endif ()
