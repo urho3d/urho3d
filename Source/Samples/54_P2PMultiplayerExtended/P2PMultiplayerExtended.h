@@ -23,6 +23,8 @@
 #pragma once
 
 #include "Sample.h"
+#include "Peer.h"
+#include <Urho3D/UI/Window.h>
 
 namespace Urho3D
 {
@@ -31,20 +33,28 @@ class Button;
 class LineEdit;
 class Text;
 class UIElement;
+class RigidBody;
+class HttpRequest;
 
 }
+
+enum GameState {
+    IN_MENU,
+    IN_LOBBY,
+    IN_GAME
+};
 
 /// Chat example
 /// This sample demonstrates:
 ///     - Starting up a network server or connecting to it
 ///     - Implementing simple chat functionality with network messages
-class P2PMultplayer : public Sample
+class P2PMultiplayer : public Sample
 {
-    URHO3D_OBJECT(P2PMultplayer, Sample);
+    URHO3D_OBJECT(P2PMultiplayer, Sample);
 
 public:
     /// Construct.
-    explicit P2PMultplayer(Context* context);
+    explicit P2PMultiplayer(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;
@@ -67,61 +77,82 @@ private:
     void CreateUI();
     /// Subscribe to log message, UI and network events.
     void SubscribeToEvents();
+
+    //
+    void Init();
+
+    void CreateScene();
+
+    void CreatePlayerListWindow();
+
+    /// Set up viewport.
+    void SetupViewport();
+
+    /// Handle a client connecting to the server.
+    void HandleClientConnected(StringHash eventType, VariantMap& eventData);
+    /// Handle a client disconnecting from the server.
+    void HandleClientDisconnected(StringHash eventType, VariantMap& eventData);
+
     /// Create a button to the button container.
     Button* CreateButton(const String& text, int width, IntVector2 position);
-    /// Create label
-    Text* CreateLabel(const String& text, IntVector2 pos);
-    /// Create input field
     LineEdit* CreateLineEdit(const String& placeholder, int width, IntVector2 pos);
-    /// Print log message.
-    void ShowLogMessage(const String& row);
-    /// Save NAT server config
-    void HandleSaveNatSettings(StringHash eventType, VariantMap& eventData);
-    /// Handle server connection message
-    void HandleServerConnected(StringHash eventType, VariantMap& eventData);
-    /// Handle server disconnect message
-    void HandleServerDisconnected(StringHash eventType, VariantMap& eventData);
-    /// Handle failed connection
-    void HandleConnectFailed(StringHash eventType, VariantMap& eventData);
-    /// Start server
-    void HandleStartServer(StringHash eventType, VariantMap& eventData);
-    /// Attempt connecting using NAT punchtrough
-    void HandleConnect(StringHash eventType, VariantMap& eventData);
-    /// Handle NAT master server failed connection
-    void HandleNatConnectionFailed(StringHash eventType, VariantMap& eventData);
-    /// Handle NAT master server succesfull connection
-    void HandleNatConnectionSucceeded(StringHash eventType, VariantMap& eventData);
-    /// Handle NAT punchtrough success message
-    void HandleNatPunchtroughSucceeded(StringHash eventType, VariantMap& eventData);
-    /// Handle failed NAT punchtrough message
-    void HandleNatPunchtroughFailed(StringHash eventType, VariantMap& eventData);
-    /// Handle client connecting
-    void HandleClientConnected(StringHash eventType, VariantMap& eventData);
-    /// Handle client disconnecting
-    void HandleClientDisconnected(StringHash eventType, VariantMap& eventData);
-    /// Handle update
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Update peer count label
-    void UpdatePeerCount();
+//    /// Create label
+    Text* CreateLabel(const String& text, IntVector2 pos);
 
-    /// NAT master server address
-    SharedPtr<LineEdit> natServerAddress_;
-    /// NAT master server port
-    SharedPtr<LineEdit> natServerPort_;
-    /// Save NAT settings button
-    SharedPtr<Button> saveNatSettingsButton_;
-    /// Start server button
-    SharedPtr<Button> startServerButton_;
-    /// Remote server GUID input field
-    SharedPtr<LineEdit> serverGuid_;
-    /// Connect button
-    SharedPtr<Button> connectButton_;
-    /// Log history text element
-    SharedPtr<Text> logHistoryText_;
-    SharedPtr<Text> peerCount_;
-    /// Log messages
-    Vector<String> logHistory_;
-    /// Created server GUID field
-    SharedPtr<LineEdit> guid_;
-    Timer updateTimer_;
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+    void StartSession();
+    void JoinSession(const String& guid);
+
+    void HandleServerFull(StringHash eventType, VariantMap& eventData);
+
+    void HandleAllReadyChanged(StringHash eventType, VariantMap& eventData);
+
+    void HandleSessionStarted(StringHash eventType, VariantMap& eventData);
+    void HandleSessionJoined(StringHash eventType, VariantMap& eventData);
+
+    void HandleSearchSession(StringHash eventType, VariantMap& eventData);
+
+    void HandleGameState(StringHash eventType, VariantMap& eventData);
+
+    void UpdateClientObjects();
+
+    void HandleNewHost(StringHash eventType, VariantMap& eventData);
+
+    void HandleBanned(StringHash eventType, VariantMap& eventData);
+
+    void HandleClientIdentity(StringHash eventType, VariantMap& eventData);
+
+    void CreatePlayerNode(Connection* connection);
+    void DestroyPlayerNode(Connection* connection);
+
+    void SetStatusMessage(const String& message);
+
+    void InitPlayers();
+
+    void UpdatePlayerList();
+
+    Timer timer_;
+    SharedPtr<Button> searchGame_;
+    SharedPtr<LineEdit> nickname_;
+//    /// Found server list
+	SharedPtr<Text> clientCount_;
+    SharedPtr<Text> info_;
+    SharedPtr<Text> statusMessage_;
+    String message_;
+
+    SharedPtr<HttpRequest> httpRequest_;
+
+    bool _allReady{};
+    Controls controls_;
+    SharedPtr<Window> playerList_;
+
+    HashMap<Connection*, SharedPtr<Peer>> peers_;
+
+    GameState gameState_;
+
+    bool startGame_{};
+    Timer startCountdown_;
+
+    List<String> messages_;
 };

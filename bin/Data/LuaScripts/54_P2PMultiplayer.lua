@@ -17,7 +17,11 @@ local connectButton = nil
 local logHistory = {}
 local logHistoryText = nil
 
+local peerCount = {}
+
 local guid = nil
+
+local timer = 0;
 
 function Start()
     -- Execute the common startup for samples
@@ -69,6 +73,9 @@ function CreateUI()
     serverGuid = CreateLineEdit("Remote server GUID", 200, IntVector2(20, marginTop));
     connectButton = CreateButton("Join session", 160, IntVector2(240, marginTop));
 
+    marginTop = 240;
+    peerCount = CreateLabel("Peers: 0", IntVector2(20, marginTop));
+
     local size = 20
     for i = 1, size do
         table.insert(logHistory, "")
@@ -79,6 +86,7 @@ function CreateUI()
 end
 
 function SubscribeToEvents()
+    SubscribeToEvent("Update", "HandleUpdate");
     SubscribeToEvent("ServerConnected", "HandleServerConnected");
     SubscribeToEvent("ServerDisconnected", "HandleServerDisconnected");
     SubscribeToEvent("ConnectFailed", "HandleConnectFailed");
@@ -124,6 +132,7 @@ function CreateLabel(text, position)
     label.color = Color(0.0, 1.0, 0.0)
     label:SetPosition(position.x, position.y)
     label.text = text
+    return label;
 end
 
 function CreateLineEdit(placeholder, width, position)
@@ -233,6 +242,28 @@ end
 
 function HandleClientDisconnected(eventType, eventData)
     ShowLogMessage("Server: Client disconnected!");
+end
+
+function UpdatePeerCount()
+    local count = 0;
+    if network.clientConnections ~= nil then
+        count = network.clientConnections.length;
+    end
+
+    local serverConnection = network.serverConnection
+    if serverConnection ~= nil then
+        count  = count + 1;
+    end
+    peerCount.text = "Peers: " .. count;
+end
+
+function HandleUpdate(eventType, eventData)
+    local timeStep = eventData["TimeStep"]:GetFloat();
+    timer = timer + timeStep;
+    if timer > 0.5 then
+        timer = 0;
+        UpdatePeerCount();
+    end
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

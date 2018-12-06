@@ -18,7 +18,11 @@ Button@ connectButton;
 Text@ logHistoryText;
 Array<String> logHistory;
 
+Text@ peerCount;
+
 LineEdit@ guid;
+
+Timer timer;
 
 void Start()
 {
@@ -69,11 +73,15 @@ void CreateText()
     CreateLabel("3. Input remote session GUID", IntVector2(20, marginTop-20));
     serverGuid = CreateLineEdit("Remote server GUID", 200, IntVector2(20, marginTop));
     connectButton = CreateButton("Join session", 160, IntVector2(240, marginTop));
+
+    marginTop = 240;
+
+    peerCount = CreateLabel("Peers: 0", IntVector2(20, marginTop));
 }
 
 void SubscribeToEvents()
 {
-    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent("Update", "HandleUpdate");
     SubscribeToEvent("ServerConnected", "HandleServerConnected");
     SubscribeToEvent("ServerDisconnected", "HandleServerDisconnected");
     SubscribeToEvent("ConnectFailed", "HandleConnectFailed");
@@ -94,7 +102,7 @@ void SubscribeToEvents()
     SubscribeToEvent(connectButton, "Released", "HandleConnect");
 }
 
-void CreateLabel(const String&in text, IntVector2 pos)
+Text@ CreateLabel(const String&in text, IntVector2 pos)
 {
     // Create log element to view latest logs from the system
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
@@ -103,6 +111,7 @@ void CreateLabel(const String&in text, IntVector2 pos)
     label.color = Color(0.0f, 1.0f, 0.0f);
     label.SetPosition(pos.x, pos.y);
     label.text = text;
+    return label;
 }
 
 void ShowLogMessage(const String& row)
@@ -217,6 +226,24 @@ void HandleClientConnected(StringHash eventType, VariantMap& eventData)
 void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 {
     ShowLogMessage("Server: Client disconnected!");
+}
+
+void UpdatePeerCount()
+{
+    int count = network.clientConnections.length;
+    if (network.serverConnection !is null) {
+        count++;
+    }
+    peerCount.text = "Peers: " + String(count);
+}
+
+void HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (timer.GetMSec(false) > 500) {
+        timer.Reset();
+        UpdatePeerCount();
+        log.Info("Update");
+    }
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app
