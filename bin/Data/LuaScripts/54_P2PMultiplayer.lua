@@ -17,7 +17,9 @@ local connectButton = nil
 local logHistory = {}
 local logHistoryText = nil
 
-local peerCount = {}
+local peerCount = nil
+local myInfo = nil
+local hostInfo = nil
 
 local guid = nil
 
@@ -75,6 +77,10 @@ function CreateUI()
 
     marginTop = 240;
     peerCount = CreateLabel("Peers: 0", IntVector2(20, marginTop));
+    marginTop = 260;
+    myInfo = CreateLabel("My GUID: ", IntVector2(20, marginTop));
+    marginTop = 280;
+    hostInfo = CreateLabel("Host: ", IntVector2(20, marginTop));
 
     local size = 20
     for i = 1, size do
@@ -244,17 +250,10 @@ function HandleClientDisconnected(eventType, eventData)
     ShowLogMessage("Server: Client disconnected!");
 end
 
-function UpdatePeerCount()
-    local count = 0;
-    if network.clientConnections ~= nil then
-        count = network.clientConnections.length;
-    end
-
-    local serverConnection = network.serverConnection
-    if serverConnection ~= nil then
-        count  = count + 1;
-    end
-    peerCount.text = "Peers: " .. count;
+function UpdateInfo()
+    peerCount.text = "Peers: " .. network:GetParticipantCount();
+    hostInfo.text = "Host: " .. network:GetHostAddress();
+    myInfo.text = "My GUID: " .. network:GetGUID();
 end
 
 function HandleUpdate(eventType, eventData)
@@ -262,7 +261,7 @@ function HandleUpdate(eventType, eventData)
     timer = timer + timeStep;
     if timer > 0.5 then
         timer = 0;
-        UpdatePeerCount();
+        UpdateInfo();
     end
 end
 

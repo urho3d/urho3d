@@ -1545,7 +1545,10 @@ int Network::GetParticipantCount()
     if (networkMode_ == SERVER_CLIENT) {
         return GetClientConnections().Size();
     }
-    return fullyConnectedMesh2_->GetParticipantCount();
+    if (fullyConnectedMesh2_) {
+        return fullyConnectedMesh2_->GetParticipantCount();
+    }
+    return 0;
 }
 
 bool Network::IsConnectedHost()

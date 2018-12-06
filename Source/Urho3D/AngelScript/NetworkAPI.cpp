@@ -179,13 +179,14 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "void JoinSession(const String&guid, Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, JoinSession), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "int get_participantCount()", asMETHOD(Network, GetParticipantCount), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool IsHostSystem()", asMETHOD(Network, IsHostSystem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "const String& get_hostAddress() const", asMETHOD(Network, GetHostAddress), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "const String get_hostAddress()", asMETHOD(Network, GetHostAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetReady(bool)", asMETHOD(Network, SetReady), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool GetReady(bool)", asMETHOD(Network, GetReady), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void ResetHost(bool)", asMETHOD(Network, ResetHost), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetNATAutoReconnect(bool)", asMETHOD(Network, SetNATAutoReconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_natAutoRecconect() const", asMETHOD(Network, GetNATAutoReconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetMode(NetworkMode, bool = false)", asMETHOD(Network, SetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "int get_participantCount() const", asMETHOD(Network, GetParticipantCount), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "NetworkMode GetMode()", asMETHOD(Network, GetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetAllowedConnections(uint16)", asMETHOD(Network, SetAllowedConnections), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool DiscoverHosts(uint16)", asMETHOD(Network, DiscoverHosts), asCALL_THISCALL);

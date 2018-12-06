@@ -102,7 +102,7 @@ private:
     /// Handle update
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Update peer count label
-    void UpdatePeerCount();
+    void UpdateInfo();
 
     /// NAT master server address
     SharedPtr<LineEdit> natServerAddress_;
@@ -118,10 +118,16 @@ private:
     SharedPtr<Button> connectButton_;
     /// Log history text element
     SharedPtr<Text> logHistoryText_;
+    /// Connected peer count
     SharedPtr<Text> peerCount_;
+    /// My GUID
+    SharedPtr<Text> myInfo_;
+    /// Host GUID
+    SharedPtr<Text> hostInfo_;
     /// Log messages
     Vector<String> logHistory_;
     /// Created server GUID field
     SharedPtr<LineEdit> guid_;
+    /// Text update timer
     Timer updateTimer_;
 };

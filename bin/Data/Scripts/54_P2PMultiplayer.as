@@ -19,6 +19,8 @@ Text@ logHistoryText;
 Array<String> logHistory;
 
 Text@ peerCount;
+Text@ myInfo;
+Text@ hostInfo;
 
 LineEdit@ guid;
 
@@ -75,8 +77,11 @@ void CreateText()
     connectButton = CreateButton("Join session", 160, IntVector2(240, marginTop));
 
     marginTop = 240;
-
     peerCount = CreateLabel("Peers: 0", IntVector2(20, marginTop));
+    marginTop = 260;
+    myInfo = CreateLabel("My GUID:", IntVector2(20, marginTop));
+    marginTop = 280;
+    hostInfo = CreateLabel("Host:", IntVector2(20, marginTop));
 }
 
 void SubscribeToEvents()
@@ -228,21 +233,18 @@ void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
     ShowLogMessage("Server: Client disconnected!");
 }
 
-void UpdatePeerCount()
+void UpdateInfo()
 {
-    int count = network.clientConnections.length;
-    if (network.serverConnection !is null) {
-        count++;
-    }
-    peerCount.text = "Peers: " + String(count);
+    peerCount.text = "Peers: " + String(network.participantCount);
+    hostInfo.text = "Host: " + network.hostAddress;
+    myInfo.text = "My GUID: " + network.guid;
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (timer.GetMSec(false) > 500) {
         timer.Reset();
-        UpdatePeerCount();
-        log.Info("Update");
+        UpdateInfo();
     }
 }
 

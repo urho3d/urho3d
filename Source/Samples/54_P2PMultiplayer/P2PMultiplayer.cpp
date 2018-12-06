@@ -115,10 +115,12 @@ void P2PMultplayer::CreateUI()
     connectButton_ = CreateButton("Connect", 160, IntVector2(240, marginTop));
 
     marginTop = 240;
-
     peerCount_ = CreateLabel("Peers: 0", IntVector2(20, marginTop));
+    marginTop = 260;
+    myInfo_ = CreateLabel("My GUID: ", IntVector2(20, marginTop));
+    marginTop = 280;
+    hostInfo_ = CreateLabel("Host: ", IntVector2(20, marginTop));
 
-    UpdatePeerCount();
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
 }
@@ -274,19 +276,17 @@ void P2PMultplayer::HandleClientDisconnected(StringHash eventType, VariantMap& e
     ShowLogMessage("Server: Client disconnected!");
 }
 
-void P2PMultplayer::UpdatePeerCount()
+void P2PMultplayer::UpdateInfo()
 {
-    int count = GetSubsystem<Network>()->GetClientConnections().Size();
-    if (GetSubsystem<Network>()->GetServerConnection()) {
-        count++;
-    }
-    peerCount_->SetText("Peers: " + String(count));
+    peerCount_->SetText("Peers: " + String(GetSubsystem<Network>()->GetParticipantCount()));
+    hostInfo_->SetText("Host: " + GetSubsystem<Network>()->GetHostAddress());
+    myInfo_->SetText("My GUID: " + GetSubsystem<Network>()->GetGUID());
 }
 
 void P2PMultplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (updateTimer_.GetMSec(false) > 500) {
         updateTimer_.Reset();
-        UpdatePeerCount();
+        UpdateInfo();
     }
 }

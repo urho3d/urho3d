@@ -28,6 +28,7 @@ class Network
     void SetMode(NetworkMode mode, bool force = false);
     const NetworkMode  GetMode() const;
     void SetAllowedConnections(unsigned short connectionCount);
+    int GetParticipantCount();
 
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
 
