@@ -37,7 +37,6 @@
 #include "../Network/NetworkPriority.h"
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
-#include "PacketLogger.h"
 
 #include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/NatPunchthroughClient.h>
