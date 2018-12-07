@@ -182,7 +182,7 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "const String get_hostAddress()", asMETHOD(Network, GetHostAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetReady(bool)", asMETHOD(Network, SetReady), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool GetReady(bool)", asMETHOD(Network, GetReady), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void ResetHost(bool)", asMETHOD(Network, ResetHost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void ResetHost()", asMETHOD(Network, ResetHost), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetNATAutoReconnect(bool)", asMETHOD(Network, SetNATAutoReconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_natAutoRecconect() const", asMETHOD(Network, GetNATAutoReconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void SetMode(NetworkMode, bool = false)", asMETHOD(Network, SetMode), asCALL_THISCALL);

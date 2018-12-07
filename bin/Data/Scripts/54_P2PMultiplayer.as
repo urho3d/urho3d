@@ -14,6 +14,7 @@ Button@ startServerButton;
 
 LineEdit@ serverGuid;
 Button@ connectButton;
+Button@ resetHost;
 
 Text@ logHistoryText;
 Array<String> logHistory;
@@ -82,6 +83,11 @@ void CreateText()
     myInfo = CreateLabel("My GUID:", IntVector2(20, marginTop));
     marginTop = 280;
     hostInfo = CreateLabel("Host:", IntVector2(20, marginTop));
+
+    marginTop = 340;
+    CreateLabel("Give the host role to other peers", IntVector2(20, marginTop));
+    marginTop = 360;
+    resetHost = CreateButton("Reset host", 240, IntVector2(20, marginTop));
 }
 
 void SubscribeToEvents()
@@ -105,6 +111,7 @@ void SubscribeToEvents()
     SubscribeToEvent(saveNatSettingsButton, "Released", "HandleSaveNatSettings");
     SubscribeToEvent(startServerButton, "Released", "HandleStartServer");
     SubscribeToEvent(connectButton, "Released", "HandleConnect");
+    SubscribeToEvent(resetHost, "Released", "HandleResetHost");
 }
 
 Text@ CreateLabel(const String&in text, IntVector2 pos)
@@ -246,6 +253,11 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         timer.Reset();
         UpdateInfo();
     }
+}
+
+void HandleResetHost(StringHash eventType, VariantMap& eventData)
+{
+    network.ResetHost();
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app

@@ -103,6 +103,8 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Update peer count label
     void UpdateInfo();
+    /// Handle update
+    void HandleResetHost(StringHash eventType, VariantMap& eventData);
 
     /// NAT master server address
     SharedPtr<LineEdit> natServerAddress_;
@@ -124,6 +126,8 @@ private:
     SharedPtr<Text> myInfo_;
     /// Host GUID
     SharedPtr<Text> hostInfo_;
+    /// Reset host button
+    SharedPtr<Button> resetHost_;
     /// Log messages
     Vector<String> logHistory_;
     /// Created server GUID field

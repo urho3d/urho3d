@@ -13,6 +13,7 @@ local startServerButton = nil
 
 local serverGuid = nil
 local connectButton = nil
+local resetHost = nil
 
 local logHistory = {}
 local logHistoryText = nil
@@ -82,6 +83,11 @@ function CreateUI()
     marginTop = 280;
     hostInfo = CreateLabel("Host: ", IntVector2(20, marginTop));
 
+    marginTop = 340;
+    CreateLabel("Give the host role to other peers", IntVector2(20, marginTop));
+    marginTop = 360;
+    resetHost = CreateButton("Reset host", 240, IntVector2(20, marginTop));
+
     local size = 20
     for i = 1, size do
         table.insert(logHistory, "")
@@ -112,6 +118,7 @@ function SubscribeToEvents()
     SubscribeToEvent(saveNatSettingsButton, "Released", "HandleSaveNatSettings");
     SubscribeToEvent(startServerButton, "Released", "HandleStartServer");
     SubscribeToEvent(connectButton, "Released", "HandleConnect");
+    SubscribeToEvent(resetHost, "Released", "HandleResetHost");
 end
 
 function CreateButton(text, width, position)
@@ -263,6 +270,10 @@ function HandleUpdate(eventType, eventData)
         timer = 0;
         UpdateInfo();
     end
+end
+
+function HandleResetHost(eventType, eventData)
+    network:ResetHost();
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

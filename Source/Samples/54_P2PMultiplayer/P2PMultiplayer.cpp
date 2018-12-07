@@ -121,6 +121,11 @@ void P2PMultplayer::CreateUI()
     marginTop = 280;
     hostInfo_ = CreateLabel("Host: ", IntVector2(20, marginTop));
 
+    marginTop = 340;
+    CreateLabel("Give the host role to other peers", IntVector2(20, marginTop));
+    marginTop = 360;
+    resetHost_ = CreateButton("Reset host", 240, IntVector2(20, marginTop));
+
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
 }
@@ -146,6 +151,7 @@ void P2PMultplayer::SubscribeToEvents()
     SubscribeToEvent(saveNatSettingsButton_, "Released", URHO3D_HANDLER(P2PMultplayer, HandleSaveNatSettings));
     SubscribeToEvent(startServerButton_, "Released", URHO3D_HANDLER(P2PMultplayer, HandleStartServer));
     SubscribeToEvent(connectButton_, "Released", URHO3D_HANDLER(P2PMultplayer, HandleConnect));
+    SubscribeToEvent(resetHost_, "Released", URHO3D_HANDLER(P2PMultplayer, HandleResetHost));
 }
 
 Button* P2PMultplayer::CreateButton(const String& text, int width, IntVector2 position)
@@ -289,4 +295,9 @@ void P2PMultplayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         updateTimer_.Reset();
         UpdateInfo();
     }
+}
+
+void P2PMultplayer::HandleResetHost(StringHash eventType, VariantMap& eventData)
+{
+    GetSubsystem<Network>()->ResetHost();
 }

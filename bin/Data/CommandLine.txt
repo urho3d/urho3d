@@ -1,1 +1,1 @@
-Scripts/NinjaSnowWar.as
+LuaScripts/54_P2PMultiplayer.lua -w -monitor 2
