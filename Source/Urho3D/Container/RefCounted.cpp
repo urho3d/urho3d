@@ -30,50 +30,56 @@ namespace Urho3D
 {
 
 RefCounted::RefCounted() :
-    refCount_(new RefCount())
+    refs_(0),
+    weakRefs_(0)
 {
-    // Hold a weak ref to self to avoid possible double delete of the refcount
-    (refCount_->weakRefs_)++;
 }
 
 RefCounted::~RefCounted()
 {
-    assert(refCount_);
-    assert(refCount_->refs_ == 0);
-    assert(refCount_->weakRefs_ > 0);
+    assert(refs_ == 0);
 
-    // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
-    refCount_->refs_ = -1;
-    (refCount_->weakRefs_)--;
-    if (!refCount_->weakRefs_)
-        delete refCount_;
-
-    refCount_ = nullptr;
+    // Mark object as expired
+    refs_ = -1;
 }
 
 void RefCounted::AddRef()
 {
-    assert(refCount_->refs_ >= 0);
-    (refCount_->refs_)++;
+    assert(refs_ >= 0);
+    refs_++;
 }
 
 void RefCounted::ReleaseRef()
 {
-    assert(refCount_->refs_ > 0);
-    (refCount_->refs_)--;
-    if (!refCount_->refs_)
-        delete this;
+    assert(refs_ > 0);
+    refs_--;
+    if (!refs_)
+    {
+        if (!weakRefs_)
+            delete this;
+        else
+            this->~RefCounted();
+    }
 }
 
-int RefCounted::Refs() const
+void RefCounted::DecrementRef()
 {
-    return refCount_->refs_;
+    assert(refs_ > 0);
+    refs_--;
+    assert(!(refs_ == 0 && weakRefs_ != 0));
 }
 
-int RefCounted::WeakRefs() const
+void RefCounted::AddWeakRef()
 {
-    // Subtract one to not return the internally held reference
-    return refCount_->weakRefs_ - 1;
+    weakRefs_++;
+}
+
+void RefCounted::ReleaseWeakRef()
+{
+    assert(weakRefs_ > 0);
+    weakRefs_--;
+    if (!weakRefs_ && refs_ == -1)
+        operator delete(this);
 }
 
 }

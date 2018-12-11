@@ -25,6 +25,7 @@
 #include "../Container/ArrayPtr.h"
 #include "../Math/BoundingBox.h"
 #include "../Math/Quaternion.h"
+#include "../Physics/PhysicsWorld.h"
 #include "../Scene/Component.h"
 
 class btBvhTriangleMeshShape;
@@ -41,7 +42,6 @@ namespace Urho3D
 class CustomGeometry;
 class Geometry;
 class Model;
-class PhysicsWorld;
 class RigidBody;
 class Terrain;
 class TriangleMeshInterface;

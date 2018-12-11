@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../AngelScript/ScriptEventListener.h"
+#include "../AngelScript/ScriptFile.h"
 #include "../Scene/Component.h"
 
 class asIScriptFunction;
@@ -33,7 +34,6 @@ namespace Urho3D
 {
 
 class Script;
-class ScriptFile;
 
 /// Inbuilt scripted component methods.
 enum ScriptInstanceMethod

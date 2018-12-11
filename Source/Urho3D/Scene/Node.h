@@ -25,11 +25,11 @@
 #include "../IO/VectorBuffer.h"
 #include "../Math/Matrix3x4.h"
 #include "../Scene/Animatable.h"
+#include "../Scene/Component.h"
 
 namespace Urho3D
 {
 
-class Component;
 class Connection;
 class Node;
 class Scene;

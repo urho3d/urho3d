@@ -23,11 +23,11 @@
 #pragma once
 
 #include "../Resource/Resource.h"
+#include "../Urho2D/SpriteSheet2D.h"
 
 namespace Urho3D
 {
 
-class SpriteSheet2D;
 class Texture2D;
 
 /// Sprite.

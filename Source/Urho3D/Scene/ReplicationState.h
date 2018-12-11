@@ -27,6 +27,7 @@
 #include "../Container/HashSet.h"
 #include "../Container/Ptr.h"
 #include "../Math/StringHash.h"
+#include "../Scene/Node.h"
 
 #include <cstring>
 
@@ -37,7 +38,6 @@ static const unsigned MAX_NETWORK_ATTRIBUTES = 64;
 
 class Component;
 class Connection;
-class Node;
 class Scene;
 
 struct ReplicationState;

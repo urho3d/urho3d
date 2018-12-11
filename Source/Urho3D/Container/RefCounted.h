@@ -71,19 +71,25 @@ public:
 
     /// Increment reference count. Can also be called outside of a SharedPtr for traditional reference counting.
     void AddRef();
-    /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
+    /// Decrement reference count and delete/destruct self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
     void ReleaseRef();
+    /// Decrement ref without destroying the object even if the refcount goes zero. To be used for Detach().
+    void DecrementRef();
     /// Return reference count.
-    int Refs() const;
+    int Refs() const { return refs_; }
+    
+    /// Increment weak reference count.
+    void AddWeakRef();
+    /// Decrement weak reference count and free memory if no more references.
+    void ReleaseWeakRef();
     /// Return weak reference count.
-    int WeakRefs() const;
-
-    /// Return pointer to the reference count structure.
-    RefCount* RefCountPtr() { return refCount_; }
+    int WeakRefs() const { return weakRefs_; }
 
 private:
-    /// Pointer to the reference count structure.
-    RefCount* refCount_;
+    /// Reference count. If below zero, the object has been destroyed.
+    int refs_;
+    /// Weak reference count.
+    int weakRefs_;
 };
 
 }
