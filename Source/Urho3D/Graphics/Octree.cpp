@@ -63,6 +63,20 @@ void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
     }
 }
 
+void UpdateDrawablesBBWork(const WorkItem* item, unsigned threadIndex)
+{
+    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
+    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+
+    while (start != end)
+    {
+        Drawable* drawable = *start;
+        if (drawable)
+            drawable->GetWorldBoundingBox();
+        ++start;
+    }
+}
+
 inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {
     return lhs.distance_ < rhs.distance_;
@@ -442,6 +456,30 @@ void Octree::Update(const FrameInfo& frame)
     if (!drawableUpdates_.Empty())
     {
         URHO3D_PROFILE(ReinsertToOctree);
+        
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+        int drawablesPerItem = Max((int)(drawableUpdates_.Size() / numWorkItems), 1);
+        PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
+        // Create a work item for each thread
+        for (int i = 0; i < numWorkItems; ++i)
+        {
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = UpdateDrawablesBBWork;
+            item->aux_ = NULL;
+
+            PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
+            if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                end = start + drawablesPerItem;
+
+            item->start_ = &(*start);
+            item->end_ = &(*end);
+            queue->AddWorkItem(item);
+
+            start = end;
+        }
+        queue->Complete(M_MAX_UNSIGNED);
 
         for (PODVector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
         {
