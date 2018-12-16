@@ -436,6 +436,8 @@ task :ci_site_update do
   end
   # Generate and sync doxygen pages
   system "cd #{build_tree} && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  # TODO: remove below workaround after upgrading to 1.8.14 or greater
+  system "cp ~/urho3d.github.io/documentation/1.7/dynsections.js ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to workaround Doxygen 1.8.13 bug'
   # Supply GIT credentials to push site documentation changes to urho3d/urho3d.github.io.git
   system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
   next if timeup
