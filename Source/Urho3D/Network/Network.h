@@ -147,7 +147,7 @@ public:
     /// Return simulated packet loss probability.
     float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
 
-    /// Return a client or server connection by kNet MessageConnection, or null if none exist.
+    /// Return a client or server connection by RakNet connection address, or null if none exist.
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
     Connection* GetClientConnection(const SLNet::AddressOrGUID& connection) const;

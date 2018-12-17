@@ -798,7 +798,7 @@ The third-party libraries used by Urho3D and their purposes are:
 - Civetweb: HTTP requests, use could be expanded to also provide an embedded web server
 - FreeType: font rendering
 - GLEW: OpenGL extensions handling
-- kNet: UDP networking
+- SLikeNet: UDP networking
 - libcpuid: CPU properties detection
 - Lua, LuaJIT, tolua+: Lua scripting implementation and bindings
 - LZ4: data compression for package files
