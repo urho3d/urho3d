@@ -807,7 +807,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
             ++freeShaderID;
         }
 
-        auto materialID = (unsigned short)(batch->sortKey_ & 0xffff0000);
+        auto materialID = (unsigned short)((batch->sortKey_ & 0xffff0000) >> 16u);
         HashMap<unsigned short, unsigned short>::ConstIterator k = materialRemapping_.Find(materialID);
         if (k != materialRemapping_.End())
             materialID = k->second_;
