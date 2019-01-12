@@ -169,6 +169,7 @@ void Audio::SetMasterGain(const String& type, float gain)
 
 void Audio::PauseSoundType(const String& type)
 {
+    MutexLock lock(audioMutex_);
     pausedSoundTypes_.Insert(type);
 }
 
