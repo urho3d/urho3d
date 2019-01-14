@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,15 +29,12 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
 
-namespace SLNet
-{
-    class SystemAddress;
-    struct AddressOrGUID;
-    struct RakNetGUID;
-    struct Packet;
-    class NatPunchthroughClient;
-    class RakPeerInterface;
-}
+#include <kNet/kNetFwd.h>
+#include <kNet/SharedPtr.h>
+
+#ifdef SendMessage
+#undef SendMessage
+#endif
 
 namespace Urho3D
 {
@@ -110,10 +107,10 @@ class URHO3D_API Connection : public Object
     URHO3D_OBJECT(Connection, Object);
 
 public:
-    /// Construct with context, RakNet connection address and Raknet peer pointer.
-    Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer);
+    /// Construct with context and kNet message connection pointers.
+    Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
     /// Destruct.
-    ~Connection() override;
+    ~Connection();
 
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
@@ -151,12 +148,9 @@ public:
     void ProcessPendingLatestData();
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
-    /// Ban this connections IP address.
-    void Ban();
-    /// Return the RakNet address/guid.
-    const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
-    /// Set the the RakNet address/guid.
-    void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
+
+    /// Return the kNet message connection.
+    kNet::MessageConnection* GetMessageConnection() const;
 
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
@@ -192,7 +186,7 @@ public:
     bool GetLogStatistics() const { return logStatistics_; }
 
     /// Return remote address.
-    String GetAddress() const;
+    String GetAddress() const { return address_; }
 
     /// Return remote port.
     unsigned short GetPort() const { return port_; }
@@ -201,7 +195,7 @@ public:
     float GetRoundTripTime() const;
 
     /// Return the time since last received data from the remote host in milliseconds.
-    unsigned GetLastHeardTime() const;
+    float GetLastHeardTime() const;
 
     /// Return bytes received per second.
     float GetBytesInPerSec() const;
@@ -210,10 +204,10 @@ public:
     float GetBytesOutPerSec() const;
 
     /// Return packets received per second.
-    int GetPacketsInPerSec() const;
+    float GetPacketsInPerSec() const;
 
     /// Return packets sent per second.
-    int GetPacketsOutPerSec() const;
+    float GetPacketsOutPerSec() const;
 
     /// Return an address:port string.
     String ToString() const;
@@ -276,6 +270,8 @@ private:
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
 
+    /// kNet message connection.
+    kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Scene.
     WeakPtr<Scene> scene_;
     /// Network replication state of the scene.
@@ -289,7 +285,7 @@ private:
     /// Pending latest data for not yet received components.
     HashMap<unsigned, PODVector<unsigned char> > componentLatestData_;
     /// Node ID's to process during a replication update.
-    HashSet<unsigned> nodesToProcess_;
+    Vector<unsigned> nodesToProcess_;
     /// Reusable message buffer.
     VectorBuffer msg_;
     /// Queued remote events.
@@ -298,6 +294,8 @@ private:
     String sceneFileName_;
     /// Statistics timer.
     Timer statsTimer_;
+    /// Remote endpoint address.
+    String address_;
     /// Remote endpoint port.
     unsigned short port_;
     /// Observer position for interest management.
@@ -314,18 +312,6 @@ private:
     bool sceneLoaded_;
     /// Show statistics flag.
     bool logStatistics_;
-    /// Address of this connection.
-    SLNet::AddressOrGUID* address_;
-    /// Raknet peer object.
-    SLNet::RakPeerInterface* peer_;
-    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out
-    IntVector2 tempPacketCounter_;
-    /// Packet count in the last second, x - packets in, y - packets out
-    IntVector2 packetCounter_;
-    /// Packet count timer which resets every 1s
-    Timer packetCounterTimer_;
-    /// Last heard timer, resets when new packet is incoming
-    Timer lastHeardTimer_;
 };
 
 }
