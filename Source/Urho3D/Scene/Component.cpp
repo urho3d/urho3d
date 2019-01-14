@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,19 +48,21 @@ const char* autoRemoveModeNames[] = {
     "Disabled",
     "Component",
     "Node",
-    nullptr
+    0
 };
 
 Component::Component(Context* context) :
     Animatable(context),
-    node_(nullptr),
+    node_(0),
     id_(0),
     networkUpdate_(false),
     enabled_(true)
 {
 }
 
-Component::~Component() = default;
+Component::~Component()
+{
+}
 
 bool Component::Save(Serializer& dest) const
 {
@@ -98,7 +100,7 @@ bool Component::SaveJSON(JSONValue& dest) const
 
 void Component::MarkNetworkUpdate()
 {
-    if (!networkUpdate_ && IsReplicated())
+    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
     {
         Scene* scene = GetScene();
         if (scene)
@@ -147,14 +149,9 @@ void Component::Remove()
         node_->RemoveComponent(this);
 }
 
-bool Component::IsReplicated() const
-{
-    return Scene::IsReplicatedID(id_);
-}
-
 Scene* Component::GetScene() const
 {
-    return node_ ? node_->GetScene() : nullptr;
+    return node_ ? node_->GetScene() : 0;
 }
 
 void Component::AddReplicationState(ComponentReplicationState* state)
@@ -194,7 +191,7 @@ void Component::PrepareNetworkUpdate()
             for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
-                auto* compState = static_cast<ComponentReplicationState*>(*j);
+                ComponentReplicationState* compState = static_cast<ComponentReplicationState*>(*j);
                 compState->dirtyAttributes_.Set(i);
 
                 // Add component's parent node to the dirty set if not added yet
@@ -202,7 +199,7 @@ void Component::PrepareNetworkUpdate()
                 if (!nodeState->markedDirty_)
                 {
                     nodeState->markedDirty_ = true;
-                    nodeState->sceneState_->dirtyNodes_.Insert(node_->GetID());
+                    nodeState->sceneState_->dirtyNodes_.Push(node_->GetID());
                 }
             }
         }
@@ -264,7 +261,7 @@ void Component::SetNode(Node* node)
 
 Component* Component::GetComponent(StringHash type) const
 {
-    return node_ ? node_->GetComponent(type) : nullptr;
+    return node_ ? node_->GetComponent(type) : 0;
 }
 
 bool Component::IsEnabledEffective() const
@@ -289,7 +286,7 @@ void Component::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap&
 
 Component* Component::GetFixedUpdateSource()
 {
-    Component* ret = nullptr;
+    Component* ret = 0;
     Scene* scene = GetScene();
 
     if (scene)
