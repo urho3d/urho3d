@@ -337,7 +337,7 @@ asUINT asCObjectType::GetPropertyCount() const
 }
 
 // interface
-int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask) const
+int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask, int *out_compositeOffset, bool *out_isCompositeIndirect) const
 {
 	if( index >= properties.GetLength() )
 		return asINVALID_ARG;
@@ -357,6 +357,10 @@ int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typ
 		*out_isReference = prop->type.IsReference();
 	if( out_accessMask )
 		*out_accessMask = prop->accessMask;
+	if (out_compositeOffset)
+		*out_compositeOffset = prop->compositeOffset;
+	if (out_isCompositeIndirect)
+		*out_isCompositeIndirect = prop->isCompositeIndirect;
 
 	return 0;
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,6 @@
 
 plugins {
     base
-}
-
-buildscript {
-    var kotlinVersion: String by extra
-    kotlinVersion = "1.2.60"
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:3.2.0-beta04")
-        classpath(kotlin("gradle-plugin", kotlinVersion))
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle.kts files
-    }
 }
 
 allprojects {

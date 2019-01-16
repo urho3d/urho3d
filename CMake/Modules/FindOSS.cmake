@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,6 @@ find_library (OSS_LIBRARIES NAMES OSSlib ossaudio DOC "OSS library")
 find_file (OSS_USE_WORKAROUND_HEADER NAMES soundcard.h DOC "OSS use workaround header")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (OSS REQUIRED_VARS OSS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find OSS development library")
+find_package_handle_standard_args (OSS REQUIRED_VARS OSS_LIBRARIES OSS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find OSS development library")
 
 mark_as_advanced (OSS_INCLUDE_DIRS OSS_LIBRARIES OSS_USE_WORKAROUND_HEADER)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,9 @@ elseif (WIN32)
     if (MINGW)
         set (CPACK_SYSTEM_NAME MinGW)   # MinGW implies Windows platform
     endif ()
-    set (CPACK_GENERATOR ZIP)
+    if (CMAKE_HOST_WIN32)
+        set (CPACK_GENERATOR ZIP)       # Differentiate artifacts generated from Windows host system
+    endif ()
 elseif (WEB)
     set (CPACK_SYSTEM_NAME Web)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -122,21 +124,22 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
         set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
         set (CPACK_RPM_PACKAGE_ARCHITECTURE i686)       # The 'package' target should be built with the help of 'setarch i686' command on a 64-bit host system
     endif ()
-    if (NOT URHO3D_64BIT OR HAS_LIB64)
-        list (APPEND CPACK_GENERATOR RPM)
-    endif ()
-    if (NOT URHO3D_64BIT OR NOT HAS_LIB64)
-        list (APPEND CPACK_GENERATOR DEB)
-    endif ()
-    if (URHO3D_64BIT)
-        if (URHO3D_USE_LIB64_RPM AND NOT HAS_LIB64)
-            set (CPACK_GENERATOR RPM)
-        elseif (URHO3D_USE_LIB_DEB AND HAS_LIB64)
-            set (CPACK_GENERATOR DEB)
+    # TODO: Temporary disable RPM and DEB package generation for CI as it has run out of disk space for a few of the target platforms.
+    if (NOT DEFINED ENV{CI})
+        if (NOT URHO3D_64BIT OR HAS_LIB64)
+            list (APPEND CPACK_GENERATOR RPM)
+        endif ()
+        if (NOT URHO3D_64BIT OR NOT HAS_LIB64)
+            list (APPEND CPACK_GENERATOR DEB)
+        endif ()
+        if (URHO3D_64BIT)
+            if (URHO3D_USE_LIB64_RPM AND NOT HAS_LIB64)
+                set (CPACK_GENERATOR RPM)
+            elseif (URHO3D_USE_LIB_DEB AND HAS_LIB64)
+                set (CPACK_GENERATOR DEB)
+            endif ()
         endif ()
     endif ()
-    # Note to package maintainer: comment out below line to revert the prefix from '/usr/local' (default for CMAKE_INSTALL_PREFIX) to '/usr' (default for CPACK_PACKAGING_INSTALL_PREFIX)
-    set (CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 endif ()
 if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
@@ -180,7 +183,7 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2018 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2019 the Urho3D project.")
     endif ()
 endif ()
 

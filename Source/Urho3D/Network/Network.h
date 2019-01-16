@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,7 +113,7 @@ public:
     /// Return simulated packet loss probability.
     float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
 
-    /// Return a client or server connection by kNet MessageConnection, or null if none exist.
+    /// Return a client or server connection by RakNet connection address, or null if none exist.
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;

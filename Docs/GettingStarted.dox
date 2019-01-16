@@ -42,7 +42,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
-- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed. The "ninja" build tool needs to be installed globally for host-tool building such as when building with Lua/LuaJIT subsystem enabled.
+- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed.
 
 - For Web, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
@@ -100,8 +100,9 @@ A number of build options can be defined when invoking the build scripts or when
 
 |Build Option         |Value|Description          |
 |---------------------|-----|---------------------|
+|ARM                  |0|Configure project using ARM cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify ARM toolchain file for cross-compiling explicitly|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
-|WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
+|MINGW                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
 |WEB                  |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |TVOS                 |0|Configure project for targeting tvOS platform (cmake_generic.sh and cmake-gui only)|
@@ -109,7 +110,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |1|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
-|URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
+|URHO3D_LUAJIT_AMALG  |*|Enable LuaJIT amalgamated build (LuaJIT only); default to true when LuaJIT is enabled|
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
 |URHO3D_IK            |1|Enable inverse kinematics support|
@@ -158,6 +159,9 @@ A number of build options can be defined when invoking the build scripts or when
 |APPLETVOS_DEPLOYMENT_TARGET|-|Specify AppleTV OS deployment target (tvOS platform only); default to latest installed tvOS SDK if not specified, the minimum supported target is 9.0|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
 |MINGW_SYSROOT        |-|Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected|
+|DIRECTX_INC_SEARCH_PATHS|-|Additional search paths to find DirectX headers (MinGW only)|
+|DIRECTX_LIB_SEARCH_PATHS|-|Additional search paths to find DirectX libraries (MinGW only)|
+|DIRECT3D_DLL_REDIST_SEARCH_PATHS|-|Additional search paths to find DirectX runtime DLL (MinGW only); should only be used for older MinGW version that still uses 'd3dcompiler_43.dll' or 'd3dcompiler_42.dll'.|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 |RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
@@ -217,7 +221,7 @@ To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to e
 
 First, if you are building under Windows host then after checking out the project you need to prepare the "assets" directory of both the "urho3d-lib" and "launcher-app" modules. Due to a bug in Android plugin of the version we are currently using, where it does not honor custom source set with filter setting, we are forced to use asset symlink with the default source set. So in Windows host system, the asset symlinks must be replaced with an equivalent directory link created with MKLINK command. If your account does not allow you to use MKLINK command then use copy command instead to copy the content of the linked directory directly to the "assets" directory. Ensure you have preserved the directory structure, i.e. "urho3d-lib" assets directory has one subdir called "CoreData", while "launcher-app" assets directory has two subdirs: "Data" and "Autoload".
 
-Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location. Ensure the "ninja" build tool is globally installed when you intend to build Urho3D with subsystems that require host tool building, such as Lua/LuaJIT subsystem.
+Set the ANDROID_CCACHE environment variable to where your "ccache" build tool has been installed. It is highly recommended when it is available for your host system. Set the ANDROID_NDK environment variable to point to your Android NDK, if it is not installed in the default Android SDK location.
 
 For CLI user, build the Gradle modules with the following command:
 
@@ -374,6 +378,16 @@ Check the Source/Clang-Tools/CMakeLists.txt to get the list of targets currently
 When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "bin" directory so that Urho3D executables will run correctly. When building for Direct3D11, copy d3dcompiler_47.dll from "C:\Program Files (x86)\Windows Kits\8.1\bin\x86" to the "bin" directory. In both cases, if compiling Urho3D as 64-bit, copy from the "bin\x64" directory instead.
 
 OpenGL does not depend on a separate shader compiler DLL.
+
+\section Dockerized_Build_Environment Dockerized build environment (EXPERIMENTAL)
+
+The building prerequisites are understandably different for each target platform. If you want to target multiple platforms with a single build/host system then you have to not only install all of the prequisites in your host system, but also have to be able to configure your build environment properly so that they do not interfere with each other. Rather than configuring the build environment manually, we have now provided a new build mechanism that we called "dockerized build environment" which addresses both hurdles above. Currently the dockerized build environment, or DBE for short, supports the following platforms: native (Linux), MinGW (Windows), Android, Raspberry-Pi, generic ARM, and Web.
+
+The DBE requires Docker-CE to be installed in the host system and that's all it needs. Head to https://docs.docker.com/install/ to get the right download for your own host system and follow its installation instruction.
+
+To use the DBE, execute script/dockerized.sh in the project root directory, specify the platform name (native|mingw|android|rpi|arm|web) as the mandatory parameter, and optionally followed by an alternative command to be invoked in the docker container. By default the command is to generate a build tree for the specified target platform and then build it. The Urho3D build options can be specified by using environment variables in the host system before executing the dockerized.sh. It could be done just in time as well, e.g. "URHO3D_LIB_TYPE=SHARED script/dockerized.sh mingw". The build artifact from DBE can be found in the usual location as the normal build environment. In fact the build artifacts should function and work as if they are built using conventional way too.
+
+The DBE is designed to be used by Urho3D project and its downstream projects which reuse Urho3D build system.
 
 
 \page Running Running Urho3D player application
@@ -784,7 +798,7 @@ The third-party libraries used by Urho3D and their purposes are:
 - Civetweb: HTTP requests, use could be expanded to also provide an embedded web server
 - FreeType: font rendering
 - GLEW: OpenGL extensions handling
-- kNet: UDP networking
+- SLikeNet: UDP networking
 - libcpuid: CPU properties detection
 - Lua, LuaJIT, tolua+: Lua scripting implementation and bindings
 - LZ4: data compression for package files

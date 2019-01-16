@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -775,14 +775,6 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         else
         {
             OnServerDisconnected();
-        }
-        packetHandled = true;
-    }
-    else if (packetID == ID_CONNECTION_LOST) // We've lost connection with the other side
-    {
-        if (isServer)
-        {
-            ClientDisconnected(packet->systemAddress);
         }
         packetHandled = true;
     }

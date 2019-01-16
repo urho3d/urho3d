@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,11 @@
 
 import org.gradle.internal.io.NullOutputStream
 import org.gradle.internal.os.OperatingSystem
-import org.jetbrains.kotlin.config.KotlinCompilerVersion
 
 plugins {
     id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
+    kotlin("android")
+    kotlin("android.extensions")
     `maven-publish`
 }
 
@@ -92,17 +91,17 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path = project.file("../../CMakeLists.txt")
+            setPath(project.file("../../CMakeLists.txt"))
         }
     }
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(kotlin("stdlib-jdk8", KotlinCompilerVersion.VERSION))
-    testImplementation("junit:junit:4.12")
-    androidTestImplementation("com.android.support.test:runner:1.0.2")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
+    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    testImplementation("junit:junit:$junitVersion")
+    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
 }
 
 lateinit var docABI: String
@@ -114,7 +113,7 @@ afterEvaluate {
     tasks {
         getByName("clean") {
             doLast {
-                delete(cmakeStagingDir())
+                android.externalNativeBuild.cmake.path?.touch()
             }
         }
     }
@@ -186,6 +185,7 @@ tasks {
 publishing {
     (publications) {
         create<MavenPublication>("mavenAndroid") {
+            artifactId = "${project.name}-${project.libraryType}"
             afterEvaluate {
                 android.buildTypes.forEach {
                     artifact(tasks.getByName("zipBuildTree${it.name.capitalize()}"))
@@ -198,3 +198,6 @@ publishing {
 }
 
 fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".externalNativeBuild")
+
+val Project.libraryType: String
+    get() = if (hasProperty("URHO3D_LIB_TYPE")) property("URHO3D_LIB_TYPE") as String else "STATIC"

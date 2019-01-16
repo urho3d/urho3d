@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     endif ()
     ExternalProject_Add (PackageTool
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
-        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
+        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         ${ALTERNATE_COMMAND})
     add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/PackageTool)
     if (CMAKE_HOST_WIN32 AND NOT HAS_MKLINK)

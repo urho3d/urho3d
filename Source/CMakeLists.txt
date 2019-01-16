@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -44,19 +44,23 @@ endif ()
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT WEB)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
-    # But don't set them yet in the build tree
-    set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    # And set the RPATH entries so that the executable works both in the build tree and install destination
+    set (CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
     if (APPLE)
         set (CMAKE_MACOSX_RPATH TRUE)
         set (ORIGIN @loader_path)
     else ()
         set (ORIGIN $ORIGIN)
     endif ()
-    # When installing/packaging set the first RPATH entry to the library location relative to the executable
-    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../lib${LIB_SUFFIX}/${PATH_SUFFIX})    # The library location is based on SDK install destination
-    # The second entry to the library location relative to the executable in the tool directory
-    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib${LIB_SUFFIX}/${PATH_SUFFIX})    # The tools are installed one directory further down from normal executable
-    # The last entry to the install destination of the library, if the destination location is not in the system default search path
+    # Library location relative to the executable in the build tree
+    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../lib)
+    # Library location relative to the executable in the tool directory in the build tree
+    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib)                               # The tools are installed one directory further down from normal executable
+    # Library location relative to the executable in the install destination
+    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../lib${LIB_SUFFIX}/${PATH_SUFFIX})      # The library location is based on SDK install destination
+    # Library location relative to the executable in the tool directory in the install destination
+    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib${LIB_SUFFIX}/${PATH_SUFFIX})
+    # The last entry to the install destination of the library, if the destination location is not in the system default search path, e.g. /usr/local/lib
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
     if (isSystemDir STREQUAL -1)
         list (APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})

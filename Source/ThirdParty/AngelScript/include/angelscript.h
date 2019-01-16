@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -64,8 +64,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        23200
-#define ANGELSCRIPT_VERSION_STRING "2.32.0 WIP"
+#define ANGELSCRIPT_VERSION        23300
+#define ANGELSCRIPT_VERSION_STRING "2.33.0 WIP"
 
 // Data types
 
@@ -75,15 +75,12 @@ class asIScriptContext;
 class asIScriptGeneric;
 class asIScriptObject;
 class asITypeInfo;
-#ifdef AS_DEPRECATED
-// deprecated since 2.31.0 - 2015/11/18
-typedef asITypeInfo asIObjectType;
-#endif
 class asIScriptFunction;
 class asIBinaryStream;
 class asIJITCompiler;
 class asIThreadManager;
 class asILockableSharedBool;
+class asIStringFactory;
 
 // Enumerations and constants
 
@@ -151,6 +148,7 @@ enum asEEngineProp
 	asEP_ALLOW_UNICODE_IDENTIFIERS          = 25,
 	asEP_HEREDOC_TRIM_MODE                  = 26,
 	asEP_MAX_NESTED_CALLS                   = 27,
+	asEP_GENERIC_CALL_MODE                  = 28,
 
 	asEP_LAST_PROPERTY
 };
@@ -238,14 +236,6 @@ enum asEBehaviours
 	asBEHAVE_GET_WEAKREF_FLAG,
 
 	// Object operators
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.30.0, 2014-10-24
-	asBEHAVE_VALUE_CAST,
-	asBEHAVE_IMPLICIT_VALUE_CAST,
-	// Deprecated since 2.30.0, 2014-12-30
-	asBEHAVE_REF_CAST,
-	asBEHAVE_IMPLICIT_REF_CAST,
-#endif
 	asBEHAVE_TEMPLATE_CALLBACK,
 
 	// Garbage collection behaviours
@@ -369,6 +359,8 @@ enum asEFuncType
 // asQWORD = 64 bits
 // asPWORD = size of pointer
 //
+typedef signed char    asINT8;
+typedef signed short   asINT16;
 typedef unsigned char  asBYTE;
 typedef unsigned short asWORD;
 typedef unsigned int   asUINT;
@@ -411,13 +403,10 @@ typedef void (*asCLEANMODULEFUNC_t)(asIScriptModule *);
 typedef void (*asCLEANCONTEXTFUNC_t)(asIScriptContext *);
 typedef void (*asCLEANFUNCTIONFUNC_t)(asIScriptFunction *);
 typedef void (*asCLEANTYPEINFOFUNC_t)(asITypeInfo *);
-#ifdef AS_DEPRECATED
-// deprecated since 2.31.0 - 2015/11/18
-typedef asCLEANTYPEINFOFUNC_t asCLEANOBJECTTYPEFUNC_t;
-#endif
 typedef void (*asCLEANSCRIPTOBJECTFUNC_t)(asIScriptObject *);
 typedef asIScriptContext *(*asREQUESTCONTEXTFUNC_t)(asIScriptEngine *, void *);
 typedef void (*asRETURNCONTEXTFUNC_t)(asIScriptEngine *, asIScriptContext *, void *);
+typedef void (*asCIRCULARREFFUNC_t)(asITypeInfo *, const void *, void *);
 
 // Check if the compiler can use C++11 features
 #if !defined(_MSC_VER) || _MSC_VER >= 1700   // MSVC 2012
@@ -697,21 +686,16 @@ public:
 
 	// Object types
 	virtual int            RegisterObjectType(const char *obj, int byteSize, asDWORD flags) = 0;
-	virtual int            RegisterObjectProperty(const char *obj, const char *declaration, int byteOffset) = 0;
-	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0) = 0;
-	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0) = 0;
+	virtual int            RegisterObjectProperty(const char *obj, const char *declaration, int byteOffset, int compositeOffset = 0, bool isCompositeIndirect = false) = 0;
+	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false) = 0;
+	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false) = 0;
 	virtual int            RegisterInterface(const char *name) = 0;
 	virtual int            RegisterInterfaceMethod(const char *intf, const char *declaration) = 0;
 	virtual asUINT         GetObjectTypeCount() const = 0;
 	virtual asITypeInfo   *GetObjectTypeByIndex(asUINT index) const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.31.0, 2015-12-06
-	virtual asITypeInfo   *GetObjectTypeByName(const char *name) const = 0;
-	virtual asITypeInfo   *GetObjectTypeByDecl(const char *decl) const = 0;
-#endif
 
 	// String factory
-	virtual int RegisterStringFactory(const char *datatype, const asSFuncPtr &factoryFunc, asDWORD callConv, void *auxiliary = 0) = 0;
+	virtual int RegisterStringFactory(const char *datatype, asIStringFactory *factory) = 0;
 	virtual int GetStringFactoryReturnTypeId(asDWORD *flags = 0) const = 0;
 
 	// Default array type
@@ -723,10 +707,6 @@ public:
 	virtual int          RegisterEnumValue(const char *type, const char *name, int value) = 0;
 	virtual asUINT       GetEnumCount() const = 0;
 	virtual asITypeInfo *GetEnumByIndex(asUINT index) const = 0;
-	// Urho3D: Removed deprecation for ScriptAPIDump
-	// Deprecated since 2.31.0, 2015-12-06
-	virtual int          GetEnumValueCount(int enumTypeId) const = 0;
-	virtual const char * GetEnumValueByIndex(int enumTypeId, asUINT index, int *outValue) const = 0;
 
 	// Funcdefs
 	virtual int          RegisterFuncdef(const char *decl) = 0;
@@ -754,16 +734,8 @@ public:
 
 	// Script functions
 	virtual asIScriptFunction *GetFunctionById(int funcId) const = 0;
-#ifdef AS_DEPRECATED
-	// deprecated since 2.31.0, 2016-01-01
-	virtual asIScriptFunction *GetFuncdefFromTypeId(int typeId) const = 0;
-#endif
 
 	// Type identification
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.31.0, 2015-12-06
-	virtual asITypeInfo   *GetObjectTypeById(int typeId) const = 0;
-#endif
 	virtual int            GetTypeIdByDecl(const char *decl) const = 0;
 	virtual const char    *GetTypeDeclaration(int typeId, bool includeNamespace = false) const = 0;
 	virtual int            GetSizeOfPrimitiveType(int typeId) const = 0;
@@ -781,10 +753,6 @@ public:
 	virtual void                   ReleaseScriptObject(void *obj, const asITypeInfo *type) = 0;
 	virtual void                   AddRefScriptObject(void *obj, const asITypeInfo *type) = 0;
 	virtual int                    RefCastObject(void *obj, asITypeInfo *fromType, asITypeInfo *toType, void **newPtr, bool useOnlyImplicitCast = false) = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.30.0, 2014-11-04
-	virtual bool                   IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const = 0;
-#endif
 	virtual asILockableSharedBool *GetWeakRefFlagOfScriptObject(void *obj, const asITypeInfo *type) const = 0;
 
 	// Context pooling
@@ -801,6 +769,9 @@ public:
 	virtual int  NotifyGarbageCollectorOfNewObject(void *obj, asITypeInfo *type) = 0;
 	virtual int  GetObjectInGC(asUINT idx, asUINT *seqNbr = 0, void **obj = 0, asITypeInfo **type = 0) = 0;
 	virtual void GCEnumCallback(void *reference) = 0;
+	virtual void ForwardGCEnumReferences(void *ref, asITypeInfo *type) = 0;
+	virtual void ForwardGCReleaseReferences(void *ref, asITypeInfo *type) = 0;
+	virtual void SetCircularRefDetectedCallback(asCIRCULARREFFUNC_t callback, void *param = 0) = 0;
 
 	// User data
 	virtual void *SetUserData(void *data, asPWORD type = 0) = 0;
@@ -809,15 +780,25 @@ public:
 	virtual void  SetModuleUserDataCleanupCallback(asCLEANMODULEFUNC_t callback, asPWORD type = 0) = 0;
 	virtual void  SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback, asPWORD type = 0) = 0;
 	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback, asPWORD type = 0) = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.31.0, 2015-12-06
-	virtual void  SetObjectTypeUserDataCleanupCallback(asCLEANTYPEINFOFUNC_t callback, asPWORD type = 0) = 0;
-#endif
 	virtual void  SetTypeInfoUserDataCleanupCallback(asCLEANTYPEINFOFUNC_t callback, asPWORD type = 0) = 0;
 	virtual void  SetScriptObjectUserDataCleanupCallback(asCLEANSCRIPTOBJECTFUNC_t callback, asPWORD type = 0) = 0;
 
+	// Exception handling
+	virtual int SetTranslateAppExceptionCallback(asSFuncPtr callback, void *param, int callConv) = 0;
+
 protected:
 	virtual ~asIScriptEngine() {}
+};
+
+class asIStringFactory
+{
+public:
+	virtual const void *GetStringConstant(const char *data, asUINT length) = 0;
+	virtual int         ReleaseStringConstant(const void *str) = 0;
+	virtual int         GetRawStringData(const void *str, char *data, asUINT *length) const = 0;
+
+protected:
+	virtual ~asIStringFactory() {}
 };
 
 class asIThreadManager
@@ -863,11 +844,6 @@ public:
 	// Type identification
 	virtual asUINT         GetObjectTypeCount() const = 0;
 	virtual asITypeInfo   *GetObjectTypeByIndex(asUINT index) const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.31.0, 2015-12-06
-	virtual asITypeInfo   *GetObjectTypeByName(const char *name) const = 0;
-	virtual asITypeInfo   *GetObjectTypeByDecl(const char *decl) const = 0;
-#endif
 	virtual int            GetTypeIdByDecl(const char *decl) const = 0;
 	virtual asITypeInfo   *GetTypeInfoByName(const char *name) const = 0;
 	virtual asITypeInfo   *GetTypeInfoByDecl(const char *decl) const = 0;
@@ -875,11 +851,6 @@ public:
 	// Enums
 	virtual asUINT       GetEnumCount() const = 0;
 	virtual asITypeInfo *GetEnumByIndex(asUINT index) const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.31.0, 2015-12-06
-	virtual int          GetEnumValueCount(int enumTypeId) const = 0;
-	virtual const char * GetEnumValueByIndex(int enumTypeId, asUINT index, int *outValue) const = 0;
-#endif
 
 	// Typedefs
 	virtual asUINT       GetTypedefCount() const = 0;
@@ -1100,7 +1071,7 @@ public:
 
 	// Properties
 	virtual asUINT      GetPropertyCount() const = 0;
-	virtual int         GetProperty(asUINT index, const char **name, int *typeId = 0, bool *isPrivate = 0, bool *isProtected = 0, int *offset = 0, bool *isReference = 0, asDWORD *accessMask = 0) const = 0;
+	virtual int         GetProperty(asUINT index, const char **name, int *typeId = 0, bool *isPrivate = 0, bool *isProtected = 0, int *offset = 0, bool *isReference = 0, asDWORD *accessMask = 0, int *compositeOffset = 0, bool *isCompositeIndirect = 0) const = 0;
 	virtual const char *GetPropertyDeclaration(asUINT index, bool includeNamespace = false) const = 0;
 
 	// Behaviours
@@ -1163,10 +1134,6 @@ public:
 	virtual bool             IsShared() const = 0;
 	virtual asUINT           GetParamCount() const = 0;
 	virtual int              GetParam(asUINT index, int *typeId, asDWORD *flags = 0, const char **name = 0, const char **defaultArg = 0) const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.29.0, 2014-04-06
-	virtual int              GetParamTypeId(asUINT index, asDWORD *flags = 0) const = 0;
-#endif
 	virtual int              GetReturnTypeId(asDWORD *flags = 0) const = 0;
 
 	// Type id for function pointers
@@ -1198,8 +1165,8 @@ protected:
 class asIBinaryStream
 {
 public:
-	virtual void Read(void *ptr, asUINT size) = 0;
-	virtual void Write(const void *ptr, asUINT size) = 0;
+	virtual int Read(void *ptr, asUINT size) = 0;
+	virtual int Write(const void *ptr, asUINT size) = 0;
 
 public:
 	virtual ~asIBinaryStream() {}

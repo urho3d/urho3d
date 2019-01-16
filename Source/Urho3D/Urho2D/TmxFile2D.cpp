@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -769,7 +769,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         for (int i = 0; i < tileImageInfos.Size(); ++i)
         {
             TileImageInfo& info = tileImageInfos[i];
-            Image* image = info.image;
+            SharedPtr<Image> image = info.image->ConvertToRGBA();
 
             for (int y = 0; y < image->GetHeight(); ++y)
             {
@@ -779,7 +779,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
 
             SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
             sprite->SetTexture(texture);
-            sprite->SetRectangle(IntRect(info.x, info.y, info.x + info.imageWidth, info.y +  + info.imageHeight));
+            sprite->SetRectangle(IntRect(info.x, info.y, info.x + info.imageWidth, info.y + info.imageHeight));
             sprite->SetHotSpot(Vector2::ZERO);
             gidToSpriteMapping_[info.tileGid] = sprite;
         }
