@@ -85,7 +85,7 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     auto* network = GetSubsystem<Network>();
 
     if (httpRequest_.Null())
-        httpRequest_ = network->MakeHttpRequest("http://httpbin.org/ip");
+        httpRequest_ = network->MakeHttpRequest("https://httpbin.org/ip");
     else
     {
         // Initializing HTTP request
@@ -96,6 +96,7 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         {
             text_->SetText("An error has occurred.");
             UnsubscribeFromEvent("Update");
+            URHO3D_LOGERRORF("HttpRequest error: %s", httpRequest_->GetError().CString());
         }
         // Get message data
         else
