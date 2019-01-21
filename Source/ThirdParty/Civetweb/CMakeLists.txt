@@ -30,6 +30,14 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 # Make sure we can import out CMake functions
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+#if (URHO3D_LIB_TYPE STREQUAL SHARED)
+#    set(BUILD_SHARED_LIBS ON)
+#endif()
+
+if (MINGW)
+    unset(__CLOCK_AVAILABILITY)
+endif()
+
 # Set up the project
 # project (civetweb)
 set(CIVETWEB_VERSION "1.11.0" CACHE STRING "The version of the civetweb library")
