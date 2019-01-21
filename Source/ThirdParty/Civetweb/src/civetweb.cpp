@@ -15137,7 +15137,6 @@ sslize(struct mg_connection *conn,
 		timeout = atoi(conn->dom_ctx->config[REQUEST_TIMEOUT]);
 	}
 
-    std::cerr << "AAAA" << std::endl;
 	/* SSL functions may fail and require to be called again:
 	 * see https://www.openssl.org/docs/manmaster/ssl/SSL_get_error.html
 	 * Here "func" could be SSL_connect or SSL_accept. */
@@ -15145,7 +15144,6 @@ sslize(struct mg_connection *conn,
 		ret = func(conn->ssl);
 		if (ret != 1) {
 			err = SSL_get_error(conn->ssl, ret);
-            std::cerr << "ERR: " << err << std::endl;
 			if ((err == SSL_ERROR_WANT_CONNECT)
 			    || (err == SSL_ERROR_WANT_ACCEPT)
 			    || (err == SSL_ERROR_WANT_READ) || (err == SSL_ERROR_WANT_WRITE)
@@ -15186,7 +15184,6 @@ sslize(struct mg_connection *conn,
 			/* success */
 			break;
 
-            printf("AAA");
 		}
 	}
 

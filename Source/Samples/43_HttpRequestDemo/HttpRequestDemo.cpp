@@ -113,7 +113,7 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 JSONValue val = json->GetRoot().Get("origin");
 
                 if (val.IsNull())
-                    text_->SetText("Invalid string.");
+                    text_->SetText("Invalid string: " + message_);
                 else
                     text_->SetText("Your IP is: " + val.GetString());
 
