@@ -20,7 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include <iostream>
+// Modified by cosmy1, Yao Wei Tjong & Lasse Oorni for Urho3D
+
 #include <stdio.h>
 
 #if defined(__GNUC__) || defined(__MINGW32__)
@@ -306,6 +307,50 @@ __cyg_profile_func_exit(void *this_fn, void *call_site)
 #include <mach/mach_time.h>
 #include <sys/errno.h>
 #include <sys/time.h>
+
+// Urho3D - On Apple platform, use its clock_gettime() when it is available
+#ifndef HAVE_CLOCK_GETTIME
+int clock_gettime_impl(int clk_id, struct timespec *t)
+{
+if (clk_id == CLOCK_REALTIME) {
+struct timeval now;
+int rv = gettimeofday(&now, NULL);
+if (rv) {
+return rv;
+}
+t->tv_sec = now.tv_sec;
+t->tv_nsec = now.tv_usec * 1000;
+return 0;
+
+} else if (clk_id == CLOCK_MONOTONIC) {
+static uint64_t start_time = 0;
+static mach_timebase_info_data_t timebase_ifo = {0, 0};
+
+uint64_t now = mach_absolute_time();
+
+if (start_time == 0) {
+kern_return_t mach_status = mach_timebase_info(&timebase_ifo);
+#if defined(DEBUG)
+assert(mach_status == KERN_SUCCESS);
+#else
+/* appease "unused variable" warning for release builds */
+(void)mach_status;
+#endif
+start_time = now;
+}
+
+now =
+(uint64_t)((double)(now - start_time) * (double)timebase_ifo.numer /
+(double)timebase_ifo.denom);
+
+t->tv_sec = now / 1000000000;
+t->tv_nsec = now % 1000000000;
+return 0;
+}
+return -1; /* EINVAL - Clock ID is unknown */
+}
+#define clock_gettime clock_gettime_impl
+#endif  // HAVE_CLOCK_GETTIME
 
 /* clock_gettime is not implemented on OSX prior to 10.12 */
 static int
@@ -605,6 +650,14 @@ typedef DWORD clockid_t;
 #define CLOCK_PROCESS (4)
 #endif
 
+// Urho3D - use CMake auto-detection to avoid hard-coding the exceptional cases
+#ifndef _TIMESPEC_DEFINED
+struct timespec {
+	time_t tv_sec; /* seconds */
+	long tv_nsec;  /* nanoseconds */
+};
+#endif
+
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1900)
 #define _TIMESPEC_DEFINED
@@ -616,7 +669,7 @@ struct timespec {
 };
 #endif
 
-#if !defined(WIN_PTHREADS_TIME_H)
+#if !defined(WIN_PTHREADS_TIME_H) || __MINGW32__
 #define MUST_IMPLEMENT_CLOCK_GETTIME
 #endif
 
@@ -774,6 +827,11 @@ struct mg_pollfd {
 #include <sys/utsname.h>
 #include <sys/wait.h>
 typedef const void *SOCK_OPT_TYPE;
+
+// Urho3D - use __ANDROID__ define emitted by all Android compiler toolchains
+#if defined(__ANDROID__)
+		typedef unsigned short int in_port_t;
+#endif
 
 #if defined(ANDROID)
 typedef unsigned short int in_port_t;
@@ -4914,7 +4972,6 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
 	return (ReleaseMutex(*mutex) == 0) ? -1 : 0;
 }
-
 
 FUNCTION_MAY_BE_UNUSED
 static int
