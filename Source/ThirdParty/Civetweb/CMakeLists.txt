@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@ set (TARGET_NAME Civetweb)
 # Define preprocessor macros
 # Always disable Common Gateway Interface
 add_definitions (-DNO_CGI)
-add_definitions (-DCIVETWEB_ENABLE_WEBSOCKETS)
 
 if (WIN32)
     include (CheckStructHasMember)
@@ -54,10 +53,6 @@ set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()
-
-# We need threading
-find_package(Threads)
-target_link_libraries(Civetweb ${CMAKE_THREAD_LIBS_INIT})
 
 # Install headers for building the Urho3D library
 install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Civetweb FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
