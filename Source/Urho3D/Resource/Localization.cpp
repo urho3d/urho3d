@@ -156,10 +156,12 @@ void Localization::LoadJSONFile(const String& name, const String& language)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* jsonFile = cache->GetResource<JSONFile>(name);
-    if (jsonFile && language.Empty()) {
-        LoadMultipleLanguageJSON(jsonFile->GetRoot());
-    } else {
-        LoadSingleLanguageJSON(jsonFile->GetRoot(), language);
+    if (jsonFile) {
+        if (language.Empty()) {
+            LoadMultipleLanguageJSON(jsonFile->GetRoot());
+        } else {
+            LoadSingleLanguageJSON(jsonFile->GetRoot(), language);
+        }
     }
 }
 
