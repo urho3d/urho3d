@@ -27,6 +27,9 @@ set (TARGET_NAME Civetweb)
 # Always disable Common Gateway Interface
 add_definitions(-DNO_CGI -DNO_FILES -DNO_CACHING)
 
+# Allow debug output to console
+# add_definitions(-DDEBUG)
+
 if (WIN32)
     include (CheckStructHasMember)
     check_struct_has_member (struct\ timespec tv_sec time.h HAVE_STRUCT_TIMESPEC_TV_SEC)
@@ -56,10 +59,12 @@ setup_library ()
 
 # Link OpenSSL libraries
 if (URHO3D_SSL)
-    # Unix systems can define the dynamic library names to load
-    add_definitions(-DCRYPTO_LIB="libcrypto.so")
-    add_definitions(-DSSL_LIB="libssl.so")
     if (URHO3D_SSL_DYNAMIC)
+        # Unix systems can define the dynamic library names to load
+        if (UNIX AND NOT DARWIN)
+            add_definitions(-DCRYPTO_LIB="libcrypto.so")
+            add_definitions(-DSSL_LIB="libssl.so")
+        endif()
         find_path(LIBDL_INCLUDE_DIRS
                 NAMES dlfcn.h
                 PATHS ${LIBDL_ROOT}/include/
