@@ -115,6 +115,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
 |URHO3D_IK            |1|Enable inverse kinematics support|
 |URHO3D_NETWORK       |1|Enable Networking support|
+|URHO3D_SSL           |0|Enable HTTPS support for HttpRequest. Requires URHO3D_NETWORK build option to be enabled|
+|URHO3D_SSL_DYNAMIC   |0|Enables dynamic SSL library loading, requires URHO3D_SSL build option to be enabled|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|

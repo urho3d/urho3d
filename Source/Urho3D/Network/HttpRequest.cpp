@@ -122,7 +122,7 @@ void HttpRequest::ThreadFunction()
             URHO3D_LOGERROR("SSL Initialization failed!");
         }
     } else {
-        URHO3D_LOGERROR("MG_FEATURE_TLS not available!");
+        URHO3D_LOGERROR("MG_FEATURES_SSL not available!");
     }
 #else
     URHO3D_LOGERROR("SSL support is disabled");
