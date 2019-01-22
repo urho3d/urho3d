@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -153,7 +153,7 @@ public:
     /// Return whether the navigation mesh has tile.
     bool HasTile(const IntVector2& tile) const;
     /// Return bounding box of the tile in the node space.
-    BoundingBox GetTileBoudningBox(const IntVector2& tile) const;
+    BoundingBox GetTileBoundingBox(const IntVector2& tile) const;
     /// Return index of the tile at the position.
     IntVector2 GetTileIndex(const Vector3& position) const;
     /// Find the nearest point on the navigation mesh to a given point. Extents specifies how far out from the specified point to check along each axis.

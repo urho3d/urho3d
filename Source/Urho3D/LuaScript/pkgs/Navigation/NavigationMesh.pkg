@@ -41,7 +41,7 @@ class NavigationMesh : public Component
     void RemoveTile(const IntVector2& tile);
     void RemoveAllTiles();
     bool HasTile(const IntVector2& tile) const;
-    BoundingBox GetTileBoudningBox(const IntVector2& tile) const;
+    BoundingBox GetTileBoundingBox(const IntVector2& tile) const;
     IntVector2 GetTileIndex(const Vector3& position) const;
     void SetPartitionType(NavmeshPartitionType aType);
     void SetDrawOffMeshConnections(bool enable);

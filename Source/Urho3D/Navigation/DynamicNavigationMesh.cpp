@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -191,7 +191,7 @@ struct LinearAllocator : public dtTileCacheAlloc
         top = 0;
     }
 
-    void* alloc(const int size) override
+    void* alloc(const size_t size) override
     {
         if (!buffer)
             return nullptr;
@@ -547,7 +547,7 @@ PODVector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& ti
 
 bool DynamicNavigationMesh::IsObstacleInTile(Obstacle* obstacle, const IntVector2& tile) const
 {
-    const BoundingBox tileBoundingBox = GetTileBoudningBox(tile);
+    const BoundingBox tileBoundingBox = GetTileBoundingBox(tile);
     const Vector3 obstaclePosition = obstacle->GetNode()->GetWorldPosition();
     return tileBoundingBox.DistanceToPoint(obstaclePosition) < obstacle->GetRadius();
 }
@@ -823,7 +823,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
 
     tileCache_->removeTile(navMesh_->getTileRefAt(x, z, 0), nullptr, nullptr);
 
-    const BoundingBox tileBoundingBox = GetTileBoudningBox(IntVector2(x, z));
+    const BoundingBox tileBoundingBox = GetTileBoundingBox(IntVector2(x, z));
 
     DynamicNavBuildData build(allocator_.Get());
 

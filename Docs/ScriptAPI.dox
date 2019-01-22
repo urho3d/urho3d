@@ -432,6 +432,31 @@ namespace Urho3D
 ### RemoteEventData
 - %Connection : Connection pointer
 
+### NetworkBanned
+
+### NetworkInvalidPassword
+
+### NetworkHostDiscovered
+- %Address : String
+- %Port : int
+- %Beacon : VariantMap
+
+### NetworkNatPunchtroughSucceeded
+- %Address : String
+- %Port : int
+
+### NetworkNatPunchtroughFailed
+- %Address : String
+- %Port : int
+
+### NetworkNatMasterConnectionFailed
+- %Address : String
+- %Port : int
+
+### NetworkNatMasterConnectionSucceeded
+- %Address : String
+- %Port : int
+
 ## %Physics2D events
 
 ### PhysicsUpdateContact2D
@@ -863,10 +888,10 @@ namespace Urho3D
 ### FileSelected
 - %FileName : String
 - %Filter : String
-- %Ok : bool
+- %OK : bool
 
 ### MessageACK
-- %Ok : bool
+- %OK : bool
 
 ### ElementAdded
 - %Root : UIElement pointer
@@ -5042,11 +5067,11 @@ Properties:
 - String downloadName // readonly
 - float downloadProgress // readonly
 - VariantMap identity
-- float lastHeardTime // readonly
+- uint lastHeardTime // readonly
 - bool logStatistics
 - uint numDownloads // readonly
-- float packetsInPerSec // readonly
-- float packetsOutPerSec // readonly
+- int packetsInPerSec // readonly
+- int packetsOutPerSec // readonly
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
@@ -7197,7 +7222,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
-- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- BoundingBox GetTileBoundingBox(const IntVector2&) const
 - VectorBuffer GetTileData(const IntVector2&) const
 - IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -8120,6 +8145,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- String ToString(const String& = String ( "\t" )) const
 
 Properties:
 
@@ -9478,7 +9504,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
-- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- BoundingBox GetTileBoundingBox(const IntVector2&) const
 - VectorBuffer GetTileData(const IntVector2&) const
 - IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -9559,6 +9585,7 @@ Properties:
 
 Methods:
 
+- bool AttemptNATPunchtrough(const String&, Scene@, const VariantMap& = VariantMap ( ))
 - void BroadcastMessage(int, bool, bool, const VectorBuffer&, uint = 0)
 - void BroadcastRemoteEvent(Node@, const String&, bool, const VariantMap& = VariantMap ( ))
 - void BroadcastRemoteEvent(Scene@, const String&, bool, const VariantMap& = VariantMap ( ))
@@ -9566,12 +9593,17 @@ Methods:
 - bool CheckRemoteEvent(const String&) const
 - bool Connect(const String&, uint16, Scene@, const VariantMap& = VariantMap ( ))
 - void Disconnect(int = 0)
+- bool DiscoverHosts(uint16)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - HttpRequest@ MakeHttpRequest(const String&, const String& = String ( ), String[]@ = null, const String& = String ( ))
 - void RegisterRemoteEvent(const String&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SendPackageToClients(Scene@, PackageFile@)
+- bool SetDiscoveryBeacon(const VariantMap& = VariantMap ( ))
+- void SetNATServerInfo(const String&, uint16)
+- bool SetPassword(const String&)
+- void StartNATClient() const
 - bool StartServer(uint16)
 - void StopServer()
 - void UnregisterAllRemoteEvents()
@@ -9581,12 +9613,14 @@ Properties:
 
 - String category // readonly
 - Connection@[]@ clientConnections // readonly
+- String guid // readonly
 - String packageCacheDir
 - int refs // readonly
 - Connection@ serverConnection // readonly
 - bool serverRunning // readonly
 - int simulatedLatency
 - float simulatedPacketLoss
+- String startNATClient // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - int updateFps
@@ -16688,6 +16722,9 @@ Properties:
 
 - EMITTER_SPHERE
 - EMITTER_BOX
+- EMITTER_SPHEREVOLUME
+- EMITTER_CYLINDER
+- EMITTER_RING
 
 
 ### EmitterType2D

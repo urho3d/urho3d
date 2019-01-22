@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,13 @@
 set (TARGET_NAME DetourCrowd)
 
 # Define source files
-define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h)
+define_source_files (GLOB_CPP_PATTERNS Source/*.cpp GLOB_H_PATTERNS Include/*.h)
 
 # Define dependency libs
-set (INCLUDE_DIRS include ../Detour/include)
+set (INCLUDE_DIRS Include ../Detour/Include)
 
 # Setup target
 setup_library ()
 
 # Install headers for building the Urho3D library
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/DetourCrowd FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
+install_header_files (DIRECTORY Include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/DetourCrowd FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant

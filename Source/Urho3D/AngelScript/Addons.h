@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 
 #include "../Container/HashMap.h"
 #include "../Container/Str.h"
+#include "../Math/StringHash.h"
 
 #include <AngelScript/angelscript.h>
 
@@ -303,6 +304,18 @@ protected:
 
     // TODO: memory: The allocator should use the asAllocMem and asFreeMem
     HashMap<String, CScriptDictValue> dict;
+};
+
+/// %String factory class that manages the string constants the script engine uses.
+class URHO3D_API StringFactory : public asIStringFactory
+{
+public:
+    const void* GetStringConstant(const char* data, asUINT length) override;
+    int ReleaseStringConstant(const void* str) override;
+    int GetRawStringData(const void* str, char* data, asUINT* length) const override;
+
+private:
+    StringMap map_;
 };
 
 /// Register the array type to script.

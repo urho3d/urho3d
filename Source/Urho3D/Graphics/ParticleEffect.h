@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,10 @@ namespace Urho3D
 enum EmitterType
 {
     EMITTER_SPHERE = 0,
-    EMITTER_BOX
+    EMITTER_BOX,
+    EMITTER_SPHEREVOLUME,
+    EMITTER_CYLINDER,
+    EMITTER_RING
 };
 
 /// %Color animation frame definition.

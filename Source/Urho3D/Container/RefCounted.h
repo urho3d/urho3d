@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,6 +64,11 @@ public:
     /// Destruct. Mark as expired and also delete the reference count structure if no outside weak references exist.
     virtual ~RefCounted();
 
+    /// Prevent copy construction.
+    RefCounted(const RefCounted& rhs) = delete;
+    /// Prevent assignment.
+    RefCounted& operator =(const RefCounted& rhs) = delete;
+
     /// Increment reference count. Can also be called outside of a SharedPtr for traditional reference counting.
     void AddRef();
     /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
@@ -77,11 +82,6 @@ public:
     RefCount* RefCountPtr() { return refCount_; }
 
 private:
-    /// Prevent copy construction.
-    RefCounted(const RefCounted& rhs);
-    /// Prevent assignment.
-    RefCounted& operator =(const RefCounted& rhs);
-
     /// Pointer to the reference count structure.
     RefCount* refCount_;
 };

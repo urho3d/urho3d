@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,7 @@ if (WIN32)
 else ()
     set (SCRIPT_EXT .sh)
 endif ()
-if (ANDROID)
-    # For Android platform, install to a path based on the chosen Android ABI, e.g. libs/armeabi-v7a
-    set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
-elseif (URHO3D_64BIT)
+if (URHO3D_64BIT)
     # Install to 'lib64' when one of these conditions is true
     if ((MINGW AND CMAKE_CROSSCOMPILING) OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
         set (LIB_SUFFIX 64)
@@ -75,7 +72,7 @@ install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTI
 # Install CMake modules and toolchains provided by and for Urho3D
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
 # Install CMake build scripts
-file (GLOB CMAKE_SCRIPTS ${CMAKE_SOURCE_DIR}/*${SCRIPT_EXT})
+file (GLOB CMAKE_SCRIPTS ${CMAKE_SOURCE_DIR}/script/*${SCRIPT_EXT})
 install (PROGRAMS ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts)
 
 # Setup package variables
@@ -107,7 +104,9 @@ elseif (WIN32)
     if (MINGW)
         set (CPACK_SYSTEM_NAME MinGW)   # MinGW implies Windows platform
     endif ()
-    set (CPACK_GENERATOR ZIP)
+    if (CMAKE_HOST_WIN32)
+        set (CPACK_GENERATOR ZIP)       # Differentiate artifacts generated from Windows host system
+    endif ()
 elseif (WEB)
     set (CPACK_SYSTEM_NAME Web)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -125,21 +124,22 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
         set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
         set (CPACK_RPM_PACKAGE_ARCHITECTURE i686)       # The 'package' target should be built with the help of 'setarch i686' command on a 64-bit host system
     endif ()
-    if (NOT URHO3D_64BIT OR HAS_LIB64)
-        list (APPEND CPACK_GENERATOR RPM)
-    endif ()
-    if (NOT URHO3D_64BIT OR NOT HAS_LIB64)
-        list (APPEND CPACK_GENERATOR DEB)
-    endif ()
-    if (URHO3D_64BIT)
-        if (URHO3D_USE_LIB64_RPM AND NOT HAS_LIB64)
-            set (CPACK_GENERATOR RPM)
-        elseif (URHO3D_USE_LIB_DEB AND HAS_LIB64)
-            set (CPACK_GENERATOR DEB)
+    # TODO: Temporary disable RPM and DEB package generation for CI as it has run out of disk space for a few of the target platforms.
+    if (NOT DEFINED ENV{CI})
+        if (NOT URHO3D_64BIT OR HAS_LIB64)
+            list (APPEND CPACK_GENERATOR RPM)
+        endif ()
+        if (NOT URHO3D_64BIT OR NOT HAS_LIB64)
+            list (APPEND CPACK_GENERATOR DEB)
+        endif ()
+        if (URHO3D_64BIT)
+            if (URHO3D_USE_LIB64_RPM AND NOT HAS_LIB64)
+                set (CPACK_GENERATOR RPM)
+            elseif (URHO3D_USE_LIB_DEB AND HAS_LIB64)
+                set (CPACK_GENERATOR DEB)
+            endif ()
         endif ()
     endif ()
-    # Note to package maintainer: comment out below line to revert the prefix from '/usr/local' (default for CMAKE_INSTALL_PREFIX) to '/usr' (default for CPACK_PACKAGING_INSTALL_PREFIX)
-    set (CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 endif ()
 if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
@@ -151,8 +151,8 @@ if (WIN32 AND NOT URHO3D_OPENGL)
     else ()
         set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-3D9)
     endif ()
-elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
+elseif (ANDROID)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${ANDROID_ABI})
 elseif (RPI AND RPI_ABI MATCHES ^armeabi-v7a)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-v7a)
 elseif (ARM_ABI_FLAGS)
@@ -183,12 +183,17 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2018 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2019 the Urho3D project.")
     endif ()
 endif ()
 
 # Setup SDK-like include dir in the build tree for building the Urho3D library
-file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+if (ANDROID AND GRADLE_BUILD_DIR)
+    set (THIRD_PARTY_INCLUDE_DIR ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI}/${DEST_INCLUDE_DIR}/ThirdParty)
+else ()
+    set (THIRD_PARTY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+endif ()
+file (MAKE_DIRECTORY ${THIRD_PARTY_INCLUDE_DIR})
 
 # Urho3D source
 add_subdirectory (Source)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,10 +75,7 @@ unsigned StringHash::Calculate(const char* str, unsigned hash)
 
     while (*str)
     {
-        // Perform the actual hashing as case-insensitive
-        char c = *str;
-        hash = SDBMHash(hash, (unsigned char)tolower(c));
-        ++str;
+        hash = SDBMHash(hash, (unsigned char)*str++);
     }
 
     return hash;

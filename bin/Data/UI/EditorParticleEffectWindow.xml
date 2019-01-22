@@ -623,6 +623,15 @@
                                                 <element type="Text" style="FileSelectorFilterText">
                                                     <attribute name="Text" value="Box" />
                                                 </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Sphere Volume" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Cylinder" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Ring" />
+                                                </element>
                                             </element>
                                         </element>
                                     </element>
