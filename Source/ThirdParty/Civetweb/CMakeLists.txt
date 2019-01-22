@@ -25,7 +25,7 @@ set (TARGET_NAME Civetweb)
 
 # Define preprocessor macros
 # Always disable Common Gateway Interface
-add_definitions (-DNO_CGI)
+add_definitions(-DNO_CGI -DNO_FILES -DNO_CACHING)
 
 if (WIN32)
     include (CheckStructHasMember)
@@ -53,6 +53,40 @@ set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()
+
+# Link OpenSSL libraries
+if (URHO3D_SSL)
+    # Unix systems can define the dynamic library names to load
+    add_definitions(-DCRYPTO_LIB="libcrypto.so")
+    add_definitions(-DSSL_LIB="libssl.so")
+    if (URHO3D_SSL_DYNAMIC)
+        find_path(LIBDL_INCLUDE_DIRS
+                NAMES dlfcn.h
+                PATHS ${LIBDL_ROOT}/include/
+                )
+        find_library(LIBDL_LIBRARIES dl)
+        include(FindPackageHandleStandardArgs)
+        find_package_handle_standard_args(LibDl DEFAULT_MSG LIBDL_LIBRARIES LIBDL_INCLUDE_DIRS)
+        mark_as_advanced(LIBDL_INCLUDE_DIRS LIBDL_LIBRARIES)
+
+        if(LIBDL_FOUND)
+            if(NOT TARGET LIBDL::LIBDL)
+                add_library(LIBDL::LIBDL UNKNOWN IMPORTED)
+                set_target_properties(LIBDL::LIBDL PROPERTIES
+                        IMPORTED_LOCATION "${LIBDL_LIBRARIES}"
+                        INTERFACE_INCLUDE_DIRECTORIES "${LIBDL_INCLUDE_DIRS}")
+            endif()
+        endif()
+        if (LIBDL_FOUND)
+            target_link_libraries(Civetweb -ldl)
+        endif()
+    else()
+        find_package(OpenSSL)
+        include_directories(${OPENSSL_INCLUDE_DIR})
+        message(STATUS "OpenSSL include directory: ${OPENSSL_INCLUDE_DIR}")
+        target_link_libraries(Civetweb ${OPENSSL_LIBRARIES})
+    endif()
+endif()
 
 # Install headers for building the Urho3D library
 install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Civetweb FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant

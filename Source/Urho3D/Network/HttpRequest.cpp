@@ -94,7 +94,7 @@ void HttpRequest::ThreadFunction()
     {
         port = ToInt(host.Substring(portStart + 1));
         host = host.Substring(0, portStart);
-    } else if (protocol.Compare("https", false)) {
+    } else if (protocol.Compare("https", false) >= 0) {
         port = 443;
     }
 
@@ -112,10 +112,14 @@ void HttpRequest::ThreadFunction()
 
     // Initiate the connection. This may block due to DNS query
     mg_connection* connection = nullptr;
-    mg_init_library(MG_FEATURES_SSL);
+
+#if URHO3D_SSL
+    mg_init_library(MG_FEATURES_TLS);
+#endif
+
     if (postData_.Empty())
     {
-        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 1 : 0, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) >= 0 ? 1 : 0, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
@@ -123,7 +127,7 @@ void HttpRequest::ThreadFunction()
     }
     else
     {
-        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 1 : 0, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) >= 0 ? 1 : 0, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"

@@ -94,7 +94,7 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // An error has occurred
         else if (httpRequest_->GetState() == HTTP_ERROR)
         {
-            text_->SetText("An error has occurred.");
+            text_->SetText("An error has occurred: " + httpRequest_->GetError());
             UnsubscribeFromEvent("Update");
             URHO3D_LOGERRORF("HttpRequest error: %s", httpRequest_->GetError().CString());
         }
@@ -112,8 +112,10 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
                 JSONValue val = json->GetRoot().Get("origin");
 
-                if (val.IsNull())
-                    text_->SetText("Invalid string: " + message_);
+                if (val.IsNull()) {
+                    text_->SetText("Invalid JSON response retrieved!");
+                    URHO3D_LOGERRORF("Response: %s", message_.CString());
+                }
                 else
                     text_->SetText("Your IP is: " + val.GetString());
 
