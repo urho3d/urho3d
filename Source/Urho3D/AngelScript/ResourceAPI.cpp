@@ -135,7 +135,7 @@ static void RegisterLocalization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Localization", "void Reset()", asMETHOD(Localization, Reset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Localization", "void LoadMultipleLanguageJSON(const JSONValue&in)", asMETHOD(Localization, LoadMultipleLanguageJSON), asCALL_THISCALL);
     engine->RegisterObjectMethod("Localization", "void LoadSingleLanguageJSON(const JSONValue&in, const String&language = String(\"\") const)", asMETHOD(Localization, LoadSingleLanguageJSON), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Localization", "void LoadJSONFile(const String&in, const String&language = String(\"\") const)", asMETHOD(Localization, LoadJSONFile), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void LoadJSONFile(const String&in, const String language = String(\"\") const)", asMETHOD(Localization, LoadJSONFile), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Localization@+ get_localization()", asFUNCTION(GetLocalization), asCALL_CDECL);
 }
 
