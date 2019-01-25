@@ -99,6 +99,7 @@ namespace Urho3D
 
 static const int STREAM_SAFETY_SAMPLES = 4;
 
+// Valid values : 2^n, n = 8 .. 15.
 static const int VOLUME_DENOM = 4096;
 
 extern const char* AUDIO_CATEGORY;
@@ -178,8 +179,6 @@ void SoundSource::Play(Sound* sound)
     if (!audio_)
         return;
 
-    currentVolumeL_ = currentVolumeR_ = 0;
-
     // If no frequency set yet, set from the sound's default
     if (frequency_ == 0.0f && sound)
         SetFrequency(sound->GetFrequency());
@@ -188,10 +187,14 @@ void SoundSource::Play(Sound* sound)
     if (position_)
     {
         MutexLock lock(audio_->GetMutex());
+        currentVolumeL_ = currentVolumeR_ = -1;
         PlayLockless(sound);
     }
     else
+    {
+        currentVolumeL_ = currentVolumeR_ = -1;
         PlayLockless(sound);
+    }
 
     // Forget the Sound & Is Playing attribute previous values so that they will be sent again, triggering
     // the sound correctly on network clients even after the initial playback
@@ -236,8 +239,6 @@ void SoundSource::Play(SoundStream* stream)
     if (!audio_)
         return;
 
-    currentVolumeL_ = currentVolumeR_ = 0;
-
     // If no frequency set yet, set from the stream's default
     if (frequency_ == 0.0f && stream)
         SetFrequency(stream->GetFrequency());
@@ -249,11 +250,13 @@ void SoundSource::Play(SoundStream* stream)
     if (position_)
     {
         MutexLock lock(audio_->GetMutex());
+        currentVolumeL_ = currentVolumeR_ = -1;
         sound_.Reset();
         PlayLockless(streamPtr);
     }
     else
     {
+        currentVolumeL_ = currentVolumeR_ = -1;
         sound_.Reset();
         PlayLockless(streamPtr);
     }
@@ -265,8 +268,6 @@ void SoundSource::Stop()
 {
     if (!audio_)
         return;
-
-    currentVolumeL_ = currentVolumeR_ = 0;
 
     // If sound source is currently playing, have to lock the audio mutex
     if (position_)
@@ -621,6 +622,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
     int& currentVolume = currentVolumeL_;
+    if (currentVolume == -1) currentVolume = vol;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -735,6 +737,11 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
     auto leftVol = RoundToInt((-panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
     auto rightVol = RoundToInt((panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
 
+    if (currentVolumeL_ == -1)
+    {
+        currentVolumeL_ = leftVol;
+        currentVolumeR_ = rightVol;
+    }
     if (!currentVolumeL_ && !currentVolumeR_ && !leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -874,6 +881,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
     int& currentVolume = currentVolumeL_;
+    if (currentVolume == -1) currentVolume = vol;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -989,6 +997,11 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     auto leftVol = RoundToInt((-panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
     auto rightVol = RoundToInt((panning_ + 1.0f) * (float)VOLUME_DENOM * totalGain);
 
+    if (currentVolumeL_ == -1)
+    {
+        currentVolumeL_ = leftVol;
+        currentVolumeR_ = rightVol;
+    }
     if(!currentVolumeL_ && !currentVolumeR_ && !leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1136,6 +1149,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
     int& currentVolume = currentVolumeL_;
+    if (currentVolume == -1) currentVolume = vol;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1259,6 +1273,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
 
     int& currentVolume = currentVolumeL_;
+    if (currentVolume == -1) currentVolume = vol;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1389,6 +1404,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
     int& currentVolume = currentVolumeL_;
+    if (currentVolume == -1) currentVolume = vol;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -1511,6 +1527,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
     float totalGain = masterGain_ * attenuation_ * gain_;
     auto vol = RoundToInt((float)VOLUME_DENOM * totalGain);
     int& currentVolume = currentVolumeL_;
+    if (currentVolume == -1) currentVolume = vol;
     if (!vol && !currentVolume)
     {
         MixZeroVolume(sound, samples, mixRate);

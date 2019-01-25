@@ -192,10 +192,10 @@ private:
     /// Unused stream bytes from previous frame.
     int unusedStreamSize_;
 
-    /// Current volume state of left channel.
-    int currentVolumeL_{};
-    /// Current volume state of right channel.
-    int currentVolumeR_{};
+    /// Current volume state of left channel. Value -1 means not assigned.
+    int currentVolumeL_{-1};
+    /// Current volume state of right channel. Value -1 means not assigned (redundant).
+    int currentVolumeR_{-1};
 };
 
 }
