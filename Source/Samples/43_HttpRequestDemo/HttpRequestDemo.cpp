@@ -85,7 +85,11 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     auto* network = GetSubsystem<Network>();
 
     if (httpRequest_.Null())
-        httpRequest_ = network->MakeHttpRequest("https://httpbin.org/ip");
+#ifdef URHO3D_SSL
+        httpRequest_ = network->MakeHttpRequest("https://api.ipify.org/?format=json");
+#else
+        httpRequest_ = network->MakeHttpRequest("http://httpbin.org/ip");
+#endif
     else
     {
         // Initializing HTTP request
@@ -109,8 +113,11 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
                 SharedPtr<JSONFile> json(new JSONFile(context_));
                 json->FromString(message_);
-
+#ifdef URHO3D_SSL
+                JSONValue val = json->GetRoot().Get("ip");
+#else
                 JSONValue val = json->GetRoot().Get("origin");
+#endif
 
                 if (val.IsNull()) {
                     text_->SetText("Invalid JSON response retrieved!");
