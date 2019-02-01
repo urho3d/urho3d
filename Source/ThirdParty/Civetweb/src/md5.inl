@@ -211,7 +211,7 @@ static void
 md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 {
 	md5_word_t a = pms->abcd[0], b = pms->abcd[1], c = pms->abcd[2],
-	           d = pms->abcd[3];
+			d = pms->abcd[3];
 	md5_word_t t;
 #if BYTE_ORDER > 0
 	/* Define storage only for big-endian CPUs. */
@@ -272,8 +272,8 @@ md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 #endif
 			for (i = 0; i < 16; ++i, xp += 4)
 				xbuf[i] = (md5_word_t)(xp[0]) + (md5_word_t)(xp[1] << 8)
-				          + (md5_word_t)(xp[2] << 16)
-				          + (md5_word_t)(xp[3] << 24);
+						  + (md5_word_t)(xp[2] << 16)
+						  + (md5_word_t)(xp[3] << 24);
 		}
 #endif
 	}
@@ -449,10 +449,10 @@ MD5_STATIC void
 md5_finish(md5_state_t *pms, md5_byte_t digest[16])
 {
 	static const md5_byte_t pad[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	                                   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	                                   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	                                   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	                                   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+									   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	md5_byte_t data[8];
 	int i;
 
