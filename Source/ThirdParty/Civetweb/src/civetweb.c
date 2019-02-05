@@ -357,6 +357,12 @@ return -1; /* EINVAL - Clock ID is unknown */
 #define clock_gettime clock_gettime_impl
 #endif  // HAVE_CLOCK_GETTIME
 
+// Urho3D: Prevent inclusion of pthread_time.h on MinGW, instead prefer own implementation of clock_gettime()
+// to prevent dependency on pthread library which is not needed otherwise
+#ifdef __MINGW32__
+#define WIN_PTHREADS_TIME_H
+#endif
+
 /* clock_gettime is not implemented on OSX prior to 10.12 */
 static int
 _civet_clock_gettime(int clk_id, struct timespec *t)
@@ -4831,6 +4837,45 @@ content_len = strlen(reply);
 }
 
 
+// Urho3D: Prefer own implementation of clock_gettime() to prevent dependency on pthread library which is not needed otherwise
+#ifdef __MINGW32__
+int clock_gettime(clockid_t clk_id, struct timespec *tp)
+{
+	FILETIME ft;
+	ULARGE_INTEGER li;
+	BOOL ok = FALSE;
+	double d;
+	static double perfcnt_per_sec = 0.0;
+
+	if (tp) {
+		if (clk_id == CLOCK_REALTIME) {
+			GetSystemTimeAsFileTime(&ft);
+			li.LowPart = ft.dwLowDateTime;
+			li.HighPart = ft.dwHighDateTime;
+			li.QuadPart -= 116444736000000000; /* 1.1.1970 in filedate */
+			tp->tv_sec = (time_t)(li.QuadPart / 10000000);
+			tp->tv_nsec = (long)(li.QuadPart % 10000000) * 100;
+			ok = TRUE;
+		} else if (clk_id == CLOCK_MONOTONIC) {
+			if (perfcnt_per_sec == 0.0) {
+				QueryPerformanceFrequency((LARGE_INTEGER *)&li);
+				perfcnt_per_sec = 1.0 / li.QuadPart;
+			}
+			if (perfcnt_per_sec != 0.0) {
+				QueryPerformanceCounter((LARGE_INTEGER *)&li);
+				d = li.QuadPart * perfcnt_per_sec;
+				tp->tv_sec = (time_t)d;
+				d -= tp->tv_sec;
+				tp->tv_nsec = (long)(d * 1.0E9);
+				ok = TRUE;
+			}
+		}
+	}
+
+	return ok ? 0 : -1;
+}
+#endif
+
 #if defined(_WIN32)
 /* Create substitutes for POSIX functions in Win32. */
 
@@ -4865,7 +4910,6 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 return (WaitForSingleObject(*mutex, (DWORD)INFINITE) == WAIT_OBJECT_0) ? 0
 : -1;
 }
-
 
 #if defined(ENABLE_UNUSED_PTHREAD_FUNCTIONS)
 FUNCTION_MAY_BE_UNUSED
