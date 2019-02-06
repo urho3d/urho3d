@@ -60,19 +60,20 @@ setup_library ()
 # Link OpenSSL libraries
 if (URHO3D_SSL)
     if (URHO3D_SSL_DYNAMIC)
+        add_definitions(-DNO_SSL_DL)
         # Unix systems can define the dynamic library names to load
         if (UNIX AND NOT DARWIN)
             add_definitions(-DCRYPTO_LIB="libcrypto.so")
             add_definitions(-DSSL_LIB="libssl.so")
         endif()
-        find_path(LIBDL_INCLUDE_DIRS
-                NAMES dlfcn.h
-                PATHS ${LIBDL_ROOT}/include/
-                )
         find_library(LIBDL_LIBRARIES dl)
         include(FindPackageHandleStandardArgs)
         find_package_handle_standard_args(LibDl DEFAULT_MSG LIBDL_LIBRARIES LIBDL_INCLUDE_DIRS)
         mark_as_advanced(LIBDL_INCLUDE_DIRS LIBDL_LIBRARIES)
+        find_path(LIBDL_INCLUDE_DIRS
+                NAMES dlfcn.h
+                PATHS ${LIBDL_ROOT}/include/
+                )
 
         if(LIBDL_FOUND)
             if(NOT TARGET LIBDL::LIBDL)
@@ -90,6 +91,7 @@ if (URHO3D_SSL)
         include_directories(${OPENSSL_INCLUDE_DIR})
         message(STATUS "OpenSSL include directory: ${OPENSSL_INCLUDE_DIR}")
         target_link_libraries(Civetweb ${OPENSSL_LIBRARIES})
+        add_definitions(-DOPENSSL_API_1_1)
     endif()
 endif()
 
