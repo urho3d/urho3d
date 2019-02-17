@@ -156,12 +156,12 @@ void Localization::LoadJSONFile(const String& name, const String language)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* jsonFile = cache->GetResource<JSONFile>(name);
-    if (jsonFile) {
-        if (language.Empty()) {
+    if (jsonFile)
+    {
+        if (language.Empty())
             LoadMultipleLanguageJSON(jsonFile->GetRoot());
-        } else {
+        else
             LoadSingleLanguageJSON(jsonFile->GetRoot(), language);
-        }
     }
 }
 
@@ -177,22 +177,27 @@ void Localization::LoadMultipleLanguageJSON(const JSONValue& source)
             continue;
         }
         const JSONValue& value = i->second_;
-        if (value.IsObject()) {
-            for (JSONObject::ConstIterator j = value.Begin(); j != value.End(); ++j) {
+        if (value.IsObject())
+        {
+            for (JSONObject::ConstIterator j = value.Begin(); j != value.End(); ++j)
+            {
                 const String &lang = j->first_;
-                if (lang.Empty()) {
+                if (lang.Empty())
+                {
                     URHO3D_LOGWARNING(
                             "Localization::LoadMultipleLanguageJSON(source): language name is empty, string ID=\"" + id + "\"");
                     continue;
                 }
                 const String &string = j->second_.GetString();
-                if (string.Empty()) {
+                if (string.Empty())
+                {
                     URHO3D_LOGWARNING(
                             "Localization::LoadMultipleLanguageJSON(source): translation is empty, string ID=\"" + id +
                             "\", language=\"" + lang + "\"");
                     continue;
                 }
-                if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY) {
+                if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY)
+                {
                     URHO3D_LOGWARNING(
                             "Localization::LoadMultipleLanguageJSON(source): override translation, string ID=\"" + id +
                             "\", language=\"" + lang + "\"");
@@ -203,9 +208,9 @@ void Localization::LoadMultipleLanguageJSON(const JSONValue& source)
                 if (languageIndex_ == -1)
                     languageIndex_ = 0;
             }
-        } else {
-            URHO3D_LOGWARNING("Localization::LoadMultipleLanguageJSON(source): failed to load values, string ID=\"" + id + "\"");
         }
+        else
+            URHO3D_LOGWARNING("Localization::LoadMultipleLanguageJSON(source): failed to load values, string ID=\"" + id + "\"");
     }
 }
 
@@ -220,14 +225,17 @@ void Localization::LoadSingleLanguageJSON(const JSONValue& source, const String&
             continue;
         }
         const JSONValue& value = i->second_;
-        if (value.IsString()) {
-            if (value.GetString().Empty()) {
+        if (value.IsString())
+        {
+            if (value.GetString().Empty())
+            {
                 URHO3D_LOGWARNING(
                         "Localization::LoadSingleLanguageJSON(source, language): translation is empty, string ID=\"" + id +
                         "\", language=\"" + language + "\"");
                 continue;
             }
-            if (strings_[StringHash(language)][StringHash(id)] != String::EMPTY) {
+            if (strings_[StringHash(language)][StringHash(id)] != String::EMPTY)
+            {
                 URHO3D_LOGWARNING(
                         "Localization::LoadSingleLanguageJSON(source, language): override translation, string ID=\"" + id +
                         "\", language=\"" + language + "\"");
@@ -235,11 +243,11 @@ void Localization::LoadSingleLanguageJSON(const JSONValue& source, const String&
             strings_[StringHash(language)][StringHash(id)] = value.GetString();
             if (!languages_.Contains(language))
                 languages_.Push(language);
-        } else {
+        }
+        else
             URHO3D_LOGWARNING(
                     "Localization::LoadSingleLanguageJSON(source, language): failed to load value, string ID=\"" + id +
                     "\", language=\"" + language + "\"");
-        }
     }
 }
 
