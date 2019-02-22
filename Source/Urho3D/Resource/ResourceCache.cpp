@@ -70,6 +70,7 @@ static const SharedPtr<Resource> noResource;
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false),
+    watchResouceDirChange_(false),
     returnFailedResources_(false),
     searchPackagesFirst_(true),
     isRouting_(false),
@@ -125,7 +126,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     if (autoReloadResources_)
     {
         SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
-        watcher->StartWatching(fixedPath, true);
+        watcher->StartWatching(fixedPath, true, watchResouceDirChange_);
         fileWatchers_.Push(watcher);
     }
 
@@ -438,23 +439,24 @@ void ResourceCache::SetMemoryBudget(StringHash type, unsigned long long budget)
     resourceGroups_[type].memoryBudget_ = budget;
 }
 
-void ResourceCache::SetAutoReloadResources(bool enable)
+void ResourceCache::SetAutoReloadResources(bool enable, bool watchDirChange)
 {
-    if (enable != autoReloadResources_)
+    if (enable != autoReloadResources_ || watchDirChange != watchResouceDirChange_)
     {
+        fileWatchers_.Clear();
+
         if (enable)
         {
             for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
             {
                 SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
-                watcher->StartWatching(resourceDirs_[i], true);
+                watcher->StartWatching(resourceDirs_[i], true, watchResouceDirChange_);
                 fileWatchers_.Push(watcher);
             }
-        }
-        else
-            fileWatchers_.Clear();
+        }            
 
         autoReloadResources_ = enable;
+        watchResouceDirChange_ = watchDirChange;
     }
 }
 

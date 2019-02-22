@@ -119,7 +119,7 @@ public:
     /// Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(StringHash type, unsigned long long budget);
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
-    void SetAutoReloadResources(bool enable);
+    void SetAutoReloadResources(bool enable, bool watchDirChange);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
     void SetReturnFailedResources(bool enable) { returnFailedResources_ = enable; }
 
@@ -184,6 +184,9 @@ public:
     /// Return whether automatic resource reloading is enabled.
     bool GetAutoReloadResources() const { return autoReloadResources_; }
 
+    /// Return whether file watcher should watch resource directory changes.
+    bool GetWatchResourceDirChange() const { return watchResouceDirChange_; }
+
     /// Return whether resources that failed to load are returned.
     bool GetReturnFailedResources() const { return returnFailedResources_; }
 
@@ -244,6 +247,8 @@ private:
     Vector<SharedPtr<ResourceRouter> > resourceRouters_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
+    /// Watch resource directory event change.
+    bool watchResouceDirChange_;
     /// Return failed resources flag.
     bool returnFailedResources_;
     /// Search priority flag.

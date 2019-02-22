@@ -54,7 +54,7 @@ void Start()
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
-    cache.autoReloadResources = true;
+    cache.SetAutoReloadResources(true, true);
     // Return resources which exist but failed to load due to error, so that we will not lose resource refs
     cache.returnFailedResources = true;
     // Use OS mouse without grabbing it

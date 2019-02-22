@@ -16,7 +16,7 @@ local floorRoll_ = 0.0
 local drawDebug_ = false
 
 function Start()
-    cache.autoReloadResources = true
+    cache.SetAutoReloadResources(true, false)
 
     -- Execute the common startup for samples
     SampleStart()

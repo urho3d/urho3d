@@ -9,7 +9,7 @@ class ResourceCache
     void SetMemoryBudget(StringHash type, unsigned long long budget);
     void SetMemoryBudget(const String type, unsigned long long budget);
     
-    void SetAutoReloadResources(bool enable);
+    void SetAutoReloadResources(bool enable, bool watchDirChange);
     void SetReturnFailedResources(bool enable);
     void SetSearchPackagesFirst(bool value);
     void SetFinishBackgroundResourcesMs(int ms);
@@ -29,6 +29,7 @@ class ResourceCache
     String GetResourceFileName(const String name) const;
 
     bool GetAutoReloadResources() const;
+    bool GetWatchResourceDirChange() const;
     bool GetReturnFailedResources() const;
     bool GetSearchPackagesFirst() const;
     int GetFinishBackgroundResourcesMs() const;

@@ -53,7 +53,8 @@ FileWatcher::FileWatcher(Context* context) :
     Object(context),
     fileSystem_(GetSubsystem<FileSystem>()),
     delay_(1.0f),
-    watchSubDirs_(false)
+    watchSubDirs_(false),
+    watchDirChange_(false)
 {
 #ifdef URHO3D_FILEWATCHER
 #ifdef __linux__
@@ -74,7 +75,7 @@ FileWatcher::~FileWatcher()
 #endif
 }
 
-bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
+bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs, bool watchDirChange)
 {
     if (!fileSystem_)
     {
@@ -102,6 +103,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
+        watchDirChange_ = watchDirChange;
         Run();
 
         URHO3D_LOGDEBUG("Started watching path " + pathName);
@@ -248,7 +250,8 @@ void FileWatcher::ThreadFunction()
             BUFFERSIZE,
             watchSubDirs_,
             FILE_NOTIFY_CHANGE_FILE_NAME |
-            FILE_NOTIFY_CHANGE_LAST_WRITE,
+            FILE_NOTIFY_CHANGE_LAST_WRITE | 
+            (watchDirChange_ ? FILE_NOTIFY_CHANGE_DIR_NAME : 0),
             &bytesFilled,
             nullptr,
             nullptr))
@@ -259,7 +262,8 @@ void FileWatcher::ThreadFunction()
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
 
-                if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME)
+                if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME 
+                    || record->Action == FILE_ACTION_ADDED || record->Action == FILE_ACTION_REMOVED)
                 {
                     String fileName;
                     const wchar_t* src = record->FileName;

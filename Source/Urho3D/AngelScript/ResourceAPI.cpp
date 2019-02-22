@@ -176,8 +176,9 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "Array<PackageFile@>@ get_packageFiles() const", asFUNCTION(ResourceCacheGetPackageFiles), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void set_searchPackagesFirst(bool)", asMETHOD(ResourceCache, SetSearchPackagesFirst), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool get_seachPackagesFirst() const", asMETHOD(ResourceCache, GetSearchPackagesFirst), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void set_autoReloadResources(bool)", asMETHOD(ResourceCache, SetAutoReloadResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void SetAutoReloadResources(bool, bool)", asMETHOD(ResourceCache, SetAutoReloadResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool get_autoReloadResources() const", asMETHOD(ResourceCache, GetAutoReloadResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "bool get_watchResourceDirChange() const", asMETHOD(ResourceCache, GetWatchResourceDirChange), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_returnFailedResources(bool)", asMETHOD(ResourceCache, SetReturnFailedResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool get_returnFailedResources() const", asMETHOD(ResourceCache, GetReturnFailedResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_finishBackgroundResourcesMs(int)", asMETHOD(ResourceCache, SetFinishBackgroundResourcesMs), asCALL_THISCALL);

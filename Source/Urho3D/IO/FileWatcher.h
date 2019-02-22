@@ -48,7 +48,7 @@ public:
     void ThreadFunction() override;
 
     /// Start watching a directory. Return true if successful.
-    bool StartWatching(const String& pathName, bool watchSubDirs);
+    bool StartWatching(const String& pathName, bool watchSubDirs, bool watchDirChange);
     /// Stop watching the directory.
     void StopWatching();
     /// Set the delay in seconds before file changes are notified. This (hopefully) avoids notifying when a file save is still in progress. Default 1 second.
@@ -77,6 +77,8 @@ private:
     float delay_;
     /// Watch subdirectories flag.
     bool watchSubDirs_;
+    /// Watch directory change events.
+    bool watchDirChange_;
 
 #ifdef _WIN32
 
