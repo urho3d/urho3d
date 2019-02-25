@@ -5067,11 +5067,11 @@ Properties:
 - String downloadName // readonly
 - float downloadProgress // readonly
 - VariantMap identity
-- float lastHeardTime // readonly
+- uint lastHeardTime // readonly
 - bool logStatistics
 - uint numDownloads // readonly
-- float packetsInPerSec // readonly
-- float packetsOutPerSec // readonly
+- int packetsInPerSec // readonly
+- int packetsOutPerSec // readonly
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
@@ -7222,7 +7222,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
-- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- BoundingBox GetTileBoundingBox(const IntVector2&) const
 - VectorBuffer GetTileData(const IntVector2&) const
 - IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -8754,8 +8754,9 @@ Methods:
 - int GetLanguageIndex(const String&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
-- void LoadJSON(const JSONValue&)
-- void LoadJSONFile(const String&)
+- void LoadJSONFile(const String&, const String = String ( "" ) const)
+- void LoadMultipleLanguageJSON(const JSONValue&)
+- void LoadSingleLanguageJSON(const JSONValue&, const String& = String ( "" ) const)
 - void Reset()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetLanguage(const String&)
@@ -9504,7 +9505,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
-- BoundingBox GetTileBoudningBox(const IntVector2&) const
+- BoundingBox GetTileBoundingBox(const IntVector2&) const
 - VectorBuffer GetTileData(const IntVector2&) const
 - IntVector2 GetTileIndex(const Vector3&) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -16722,6 +16723,9 @@ Properties:
 
 - EMITTER_SPHERE
 - EMITTER_BOX
+- EMITTER_SPHEREVOLUME
+- EMITTER_CYLINDER
+- EMITTER_RING
 
 
 ### EmitterType2D

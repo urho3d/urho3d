@@ -479,12 +479,17 @@ Before using the subsystem, the localization string collection(s) need to be loa
 
 \code
 Localization* l10n = GetSubsystem<Localization>();
+// 1st JSON file format
 l10n->LoadJSONFile("StringsEnRu.json");
 l10n->LoadJSONFile("StringsDe.json");
+
+// 2nd JSON file format
+l10n->LoadJSONFile("StringsLv.json", "lv");
 \endcode
 
-JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Data directory. The JSON files have the following format:
+JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Data directory. The JSON files must have one of the following formats:
 
+1. `LoadJSONFile("StringsEnRu.json")` method will automatically pick the language from the JSON file
 \code
 {
     "string id 1":{
@@ -499,6 +504,16 @@ JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Dat
     }
 }
 \endcode
+
+2. You must pass 2nd argument to the `LoadJSONFile("StringsLv.json", "lv")` method to tell the parser which language will be loaded
+\code
+{
+    "string id 1": "value 1",
+    "string id 2": "value 2",
+    "string id 3": "value 3"
+}
+\endcode
+
 
 Any number of languages can be defined. Remember that language names and string identifiers are case sensitive. "En" and "en" are considered different languages.
 During the loading process languages are numbered in order of finding. Indexing starts from zero. The first found language is set to be initially active.
@@ -2487,7 +2502,7 @@ tells to instantiate a Button element, and that it should use the style "CloseBu
 
 Instead of loading a %UI element hierarchy from a definition file, it is just as valid (though cumbersome for larger hierarchies) to create the elements in code, which is demonstrated by several of the Urho3D samples.
 
-In this mode of operation, styles are not automatically applied when an element is added or created to the hierarchy, even if a parent element (or the %UI root) has a default style file assigned. This is because applying a style to an element means just setting a number of attributes and has potential to be "destructive" ie. overwrite the already set values. For each created element, you need to manually call either \ref UIElement::SetStyle "SetStyle()" to specify a style name that should be applied, or \ref UIElement::SetStyleAuto "SetStyleAuto()" to use the element's typename as the style name, e.g. the style "Button" for a Button element.
+In this mode of operation, styles are not automatically applied when an element is added or created to the hierarchy, even if a parent element (or the %UI root) has a default style file assigned. This is because applying a style to an element means just setting a number of attributes and has potential to be "destructive" ie. overwrite the already set values. For each created element, you need to manually call either \ref UIElement::SetStyle "SetStyle()" to specify a style name that should be applied, or \ref UIElement::SetStyleAuto "SetStyleAuto()" to use the element's typename as the style name, e.g. the style "Button" for a Button element. In order for this to work, each %UI element should have a style file already effectively assigned either directly or via its parent element. A common mistake made by users is to construct child elements and attempt to style them inside a parent element's constructor but forgetting to explicitly assign a style file first in the constructor.
 
 \section UI_Layouts Child element layouting
 
@@ -3865,7 +3880,7 @@ When contributing code to the Urho3D project, there are a few things to check so
 
 First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
-Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2018 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2019 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
 Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
 

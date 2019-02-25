@@ -22,7 +22,7 @@
 # Modified by Yao Wei Tjong for Urho3D, the modified portion is licensed under below license
 
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -1042,9 +1042,9 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     find_path (DBUS_H_INCLUDE_DIRS NAMES dbus/dbus.h PATH_SUFFIXES dbus-1.0)
     # Cater for both multilib and multiarch, native and cross-compiling build
     if (URHO3D_64BIT)
-      set (DBUS_INC_SEARCH_PATH /usr/lib64/dbus-1.0/include)
+      set (DBUS_INC_SEARCH_PATH /usr/lib64/dbus-1.0/include /usr/lib/x86_64-linux-gnu/dbus-1.0/include)
     else ()
-      set (DBUS_INC_SEARCH_PATH /usr/lib/dbus-1.0/include)
+      set (DBUS_INC_SEARCH_PATH /usr/lib/dbus-1.0/include /usr/lib/i386-linux-gnu/dbus-1.0/include)
     endif ()
     find_path (DBUS_ARCH_DEPS_H_INCLUDE_DIRS NAMES dbus/dbus-arch-deps.h PATHS ${DBUS_INC_SEARCH_PATH} /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/dbus-1.0/include)
     if (DBUS_H_INCLUDE_DIRS AND DBUS_H_INCLUDE_DIRS AND DBUS_ARCH_DEPS_H_INCLUDE_DIRS)
@@ -1057,9 +1057,9 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     find_path (IBUS_H_INCLUDE_DIRS NAMES ibus.h PATH_SUFFIXES ibus-1.0)
     find_path (GLIB_H_INCLUDE_DIRS NAMES glib.h PATH_SUFFIXES glib-2.0)
     if (URHO3D_64BIT)
-      set (GLIB_INC_SEARCH_PATH /usr/lib64/glib-2.0/include)
+      set (GLIB_INC_SEARCH_PATH /usr/lib64/glib-2.0/include /usr/lib/x86_64-linux-gnu/glib-2.0/include)
     else ()
-      set (GLIB_INC_SEARCH_PATH /usr/lib/glib-2.0/include)
+      set (GLIB_INC_SEARCH_PATH /usr/lib/glib-2.0/include /usr/lib/i386-linux-gnu/glib-2.0/include)
     endif ()
     find_path (GLIB_CONFIG_H_INCLUDE_DIRS NAMES glibconfig.h PATHS ${GLIB_INC_SEARCH_PATH} /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/glib-2.0/include)
     if (IBUS_H_INCLUDE_DIRS AND GLIB_H_INCLUDE_DIRS AND GLIB_CONFIG_H_INCLUDE_DIRS)

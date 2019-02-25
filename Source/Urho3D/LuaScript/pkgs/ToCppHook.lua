@@ -1,5 +1,5 @@
 --
--- Copyright (c) 2008-2018 the Urho3D project.
+-- Copyright (c) 2008-2019 the Urho3D project.
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ function post_output_hook(package)
 #include "string.h"
 
 #include "tolua++.h"]], [[//
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -86,8 +86,6 @@ function post_output_hook(package)
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
-#include "Precompiled.h"
 
 #include <toluapp/tolua++.h>
 #include "LuaScript/ToluaUtils.h"

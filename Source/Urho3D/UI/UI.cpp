@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1195,10 +1195,11 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                         int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
                             element->GetScreenPosition().y_;
                         int layoutMaxSize = current->GetLayoutElementMaxSize();
+                        int spacing = current->GetLayoutSpacing();
 
                         if (screenPos < 0 && layoutMaxSize > 0)
                         {
-                            auto toSkip = (unsigned)(-screenPos / layoutMaxSize);
+                            auto toSkip = (unsigned)(-screenPos / (layoutMaxSize + spacing));
                             if (toSkip > 0)
                                 i += (toSkip - 1);
                         }

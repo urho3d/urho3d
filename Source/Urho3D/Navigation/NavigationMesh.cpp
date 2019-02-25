@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -541,7 +541,7 @@ bool NavigationMesh::HasTile(const IntVector2& tile) const
     return false;
 }
 
-BoundingBox NavigationMesh::GetTileBoudningBox(const IntVector2& tile) const
+BoundingBox NavigationMesh::GetTileBoundingBox(const IntVector2& tile) const
 {
     const float tileEdgeLength = (float)tileSize_ * cellSize_;
     return BoundingBox(
@@ -1306,7 +1306,7 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     // Remove previous tile (if any)
     navMesh_->removeTile(navMesh_->getTileRefAt(x, z, 0), nullptr, nullptr);
 
-    const BoundingBox tileBoundingBox = GetTileBoudningBox(IntVector2(x, z));
+    const BoundingBox tileBoundingBox = GetTileBoundingBox(IntVector2(x, z));
 
     SimpleNavBuildData build;
 

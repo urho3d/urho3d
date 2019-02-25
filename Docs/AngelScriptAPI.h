@@ -2454,14 +2454,14 @@ String downloadName;
 float downloadProgress;
 VariantMap identity;
 /* readonly */
-float lastHeardTime;
+uint lastHeardTime;
 bool logStatistics;
 /* readonly */
 uint numDownloads;
 /* readonly */
-float packetsInPerSec;
+int packetsInPerSec;
 /* readonly */
-float packetsOutPerSec;
+int packetsOutPerSec;
 /* readonly */
 uint16 port;
 Vector3 position;
@@ -4971,7 +4971,7 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
-BoundingBox GetTileBoudningBox(const IntVector2&) const;
+BoundingBox GetTileBoundingBox(const IntVector2&) const;
 VectorBuffer GetTileData(const IntVector2&) const;
 IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -6830,8 +6830,9 @@ String GetLanguage(int);
 int GetLanguageIndex(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
-void LoadJSON(const JSONValue&);
-void LoadJSONFile(const String&);
+void LoadJSONFile(const String&, const String = String ( "" ) const);
+void LoadMultipleLanguageJSON(const JSONValue&);
+void LoadSingleLanguageJSON(const JSONValue&, const String& = String ( "" ) const);
 void Reset();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetLanguage(const String&);
@@ -7689,7 +7690,7 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
-BoundingBox GetTileBoudningBox(const IntVector2&) const;
+BoundingBox GetTileBoundingBox(const IntVector2&) const;
 VectorBuffer GetTileData(const IntVector2&) const;
 IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -16179,6 +16180,9 @@ enum EmitterType
 {
 EMITTER_SPHERE,
 EMITTER_BOX,
+EMITTER_SPHEREVOLUME,
+EMITTER_CYLINDER,
+EMITTER_RING,
 };
 
 enum EmitterType2D

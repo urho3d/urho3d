@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,11 +74,11 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_roundTripTime() const", asMETHOD(Connection, GetRoundTripTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "float get_lastHeardTime() const", asMETHOD(Connection, GetLastHeardTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "uint get_lastHeardTime() const", asMETHOD(Connection, GetLastHeardTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_bytesInPerSec() const", asMETHOD(Connection, GetBytesInPerSec), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_bytesOutPerSec() const", asMETHOD(Connection, GetBytesOutPerSec), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "float get_packetsInPerSec() const", asMETHOD(Connection, GetPacketsInPerSec), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "float get_packetsOutPerSec() const", asMETHOD(Connection, GetPacketsOutPerSec), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "int get_packetsInPerSec() const", asMETHOD(Connection, GetPacketsInPerSec), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "int get_packetsOutPerSec() const", asMETHOD(Connection, GetPacketsOutPerSec), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint get_numDownloads() const", asMETHOD(Connection, GetNumDownloads), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const String& get_downloadName() const", asMETHOD(Connection, GetDownloadName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_downloadProgress() const", asMETHOD(Connection, GetDownloadProgress), asCALL_THISCALL);

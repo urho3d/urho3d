@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,9 @@ elseif (WIN32)
     if (MINGW)
         set (CPACK_SYSTEM_NAME MinGW)   # MinGW implies Windows platform
     endif ()
-    set (CPACK_GENERATOR ZIP)
+    if (CMAKE_HOST_WIN32)
+        set (CPACK_GENERATOR ZIP)       # Differentiate artifacts generated from Windows host system
+    endif ()
 elseif (WEB)
     set (CPACK_SYSTEM_NAME Web)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -138,9 +140,6 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
             endif ()
         endif ()
     endif ()
-    # Note to package maintainer: comment out below line to revert the prefix from '/usr/local' (default for CMAKE_INSTALL_PREFIX) to '/usr' (default for CPACK_PACKAGING_INSTALL_PREFIX)
-    # Revisit this later, some users insist it should be '/usr' (see https://github.com/urho3d/Urho3D/issues/2166), even though clearly we are not trying to build "system package" here
-    set (CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 endif ()
 if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
@@ -184,7 +183,7 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2018 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2019 the Urho3D project.")
     endif ()
 endif ()
 

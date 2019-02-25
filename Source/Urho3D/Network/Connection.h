@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,7 @@ class URHO3D_API Connection : public Object
     URHO3D_OBJECT(Connection, Object);
 
 public:
-    /// Construct with context and kNet message connection pointers.
+    /// Construct with context, RakNet connection address and Raknet peer pointer.
     Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer);
     /// Destruct.
     ~Connection() override;
@@ -201,7 +201,7 @@ public:
     float GetRoundTripTime() const;
 
     /// Return the time since last received data from the remote host in milliseconds.
-    float GetLastHeardTime() const;
+    unsigned GetLastHeardTime() const;
 
     /// Return bytes received per second.
     float GetBytesInPerSec() const;
@@ -210,10 +210,10 @@ public:
     float GetBytesOutPerSec() const;
 
     /// Return packets received per second.
-    float GetPacketsInPerSec() const;
+    int GetPacketsInPerSec() const;
 
     /// Return packets sent per second.
-    float GetPacketsOutPerSec() const;
+    int GetPacketsOutPerSec() const;
 
     /// Return an address:port string.
     String ToString() const;
@@ -318,6 +318,14 @@ private:
     SLNet::AddressOrGUID* address_;
     /// Raknet peer object.
     SLNet::RakPeerInterface* peer_;
+    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out
+    IntVector2 tempPacketCounter_;
+    /// Packet count in the last second, x - packets in, y - packets out
+    IntVector2 packetCounter_;
+    /// Packet count timer which resets every 1s
+    Timer packetCounterTimer_;
+    /// Last heard timer, resets when new packet is incoming
+    Timer lastHeardTimer_;
 };
 
 }

@@ -1259,11 +1259,11 @@ Methods:
 - String GetAddress() const
 - short GetPort() const
 - float GetRoundTripTime() const
-- float GetLastHeardTime() const
+- unsigned GetLastHeardTime() const
 - float GetBytesInPerSec() const
 - float GetBytesOutPerSec() const
-- float GetPacketsInPerSec() const
-- float GetPacketsOutPerSec() const
+- int GetPacketsInPerSec() const
+- int GetPacketsOutPerSec() const
 - String ToString() const
 - unsigned GetNumDownloads() const
 - const String GetDownloadName() const
@@ -3425,8 +3425,10 @@ Methods:
 - void SetLanguage(int index)
 - String Get(const String id)
 - void Reset()
-- void LoadJSON(const JSONValue& source)
-- void LoadJSONFile(const String name)
+- void LoadMultipleLanguageJSON(const JSONValue& source)
+- void LoadSingleLanguageJSON(const JSONValue& source)
+- void LoadSingleLanguageJSON(const JSONValue& source, const String language)
+- void LoadJSONFile(const String name, const String language = String::EMPTY)
 
 Properties:
 
@@ -3963,7 +3965,7 @@ Methods:
 - void RemoveTile(const IntVector2& tile)
 - void RemoveAllTiles()
 - bool HasTile(const IntVector2& tile) const
-- BoundingBox GetTileBoudningBox(const IntVector2& tile) const
+- BoundingBox GetTileBoundingBox(const IntVector2& tile) const
 - IntVector2 GetTileIndex(const Vector3& position) const
 - void SetPartitionType(NavmeshPartitionType aType)
 - void SetDrawOffMeshConnections(bool enable)
@@ -8352,6 +8354,9 @@ Properties:
 
 - int EMITTER_SPHERE
 - int EMITTER_BOX
+- int EMITTER_SPHEREVOLUME
+- int EMITTER_CYLINDER
+- int EMITTER_RING
 
 ### EmitterType2D
 
