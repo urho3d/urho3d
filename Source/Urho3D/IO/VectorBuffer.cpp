@@ -54,23 +54,7 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
     unsigned char* srcPtr = &buffer_[position_];
     auto* destPtr = (unsigned char*)dest;
     position_ += size;
-
-    unsigned copySize = size;
-    while (copySize >= sizeof(unsigned))
-    {
-        *((unsigned*)destPtr) = *((unsigned*)srcPtr);
-        srcPtr += sizeof(unsigned);
-        destPtr += sizeof(unsigned);
-        copySize -= sizeof(unsigned);
-    }
-    if (copySize & sizeof(unsigned short))
-    {
-        *((unsigned short*)destPtr) = *((unsigned short*)srcPtr);
-        srcPtr += sizeof(unsigned short);
-        destPtr += sizeof(unsigned short);
-    }
-    if (copySize & 1u)
-        *destPtr = *srcPtr;
+	memcpy(dest, srcPtr, size);
 
     return size;
 }
@@ -88,7 +72,6 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
 {
     if (!size)
         return 0;
-
     if (size + position_ > size_)
     {
         size_ = size + position_;
@@ -99,7 +82,7 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
     unsigned char* destPtr = &buffer_[position_];
     position_ += size;
 
-    unsigned copySize = size;
+    /*unsigned copySize = size;
     while (copySize >= sizeof(unsigned))
     {
         *((unsigned*)destPtr) = *((unsigned*)srcPtr);
@@ -115,6 +98,8 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
     }
     if (copySize & 1u)
         *destPtr = *srcPtr;
+	*/
+	memcpy(destPtr, srcPtr, size);
 
     return size;
 }

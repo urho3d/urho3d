@@ -51,7 +51,7 @@ extern "C" unsigned SDL_TVOS_GetActiveProcessorCount();
 #include <lmcons.h> // For UNLEN. Apparently MSVC defines "<Lmcons.h>" (with an upperscore 'L' but MinGW uses an underscore 'l').
 #include <ntdef.h>
 #endif
-#elif defined(__linux__) && !defined(__ANDROID__)
+#elif defined(__linux__)
 #include <pwd.h>
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
@@ -520,7 +520,7 @@ String GetMiniDumpDir()
 
 unsigned long long GetTotalMemory()
 {
-#if defined(__linux__) && !defined(__ANDROID__)
+#if defined(__linux__) /*&& !defined(__ANDROID__)*/
     struct sysinfo s{};
     if (sysinfo(&s) != -1)
         return s.totalram;

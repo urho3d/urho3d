@@ -1898,6 +1898,11 @@ bool SetSplinePath()
     return SceneSetChildrenSplinePath(menu.name == "Cyclic");
 }
 
+Menu&& setMenuMaterial(Menu&& m, Material&& mat) {
+	m.vars["Material"] = mat;
+	return m;
+}
+
 bool ColorWheelBuildMenuSelectTypeColor()
 {
     if (selectedNodes.empty && selectedComponents.empty) return false;
@@ -1936,14 +1941,28 @@ bool ColorWheelBuildMenuSelectTypeColor()
     }
     else if (coloringComponent.typeName == "StaticModel")
     {
-        actions.Push(CreateContextMenuItem("Diffuse color", "HandleColorWheelMenu", "menuDiffuseColor"));
-        actions.Push(CreateContextMenuItem("Specular color", "HandleColorWheelMenu", "menuSpecularColor"));
-        actions.Push(CreateContextMenuItem("Emissive color", "HandleColorWheelMenu", "menuEmissiveColor"));
-        actions.Push(CreateContextMenuItem("Environment map color", "HandleColorWheelMenu", "menuEnvironmentMapColor"));
-
+		StaticModel&& mdl = cast<StaticModel@>(coloringComponent);
+		for (uint i = 0; i < mdl.numGeometries; i++) {
+			Material&& mat = mdl.materials[i];
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Diffuse color", "HandleColorWheelMenu", "menuDiffuseColor"), mat));
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Specular color", "HandleColorWheelMenu", "menuSpecularColor"), mat));
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Emissive color", "HandleColorWheelMenu", "menuEmissiveColor"), mat));
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Environment map color", "HandleColorWheelMenu", "menuEnvironmentMapColor"), mat));
+		}
         actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
     }
-    else if (coloringComponent.typeName == "Zone")
+	else if (coloringComponent.typeName == "AnimatedModel")
+	{
+		AnimatedModel&& mdl = cast<AnimatedModel@>(coloringComponent);
+		for (uint i = 0; i < mdl.numGeometries; i++) {
+			Material&& mat = mdl.materials[i];
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Diffuse color", "HandleColorWheelMenu", "menuDiffuseColor"), mat));
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Specular color", "HandleColorWheelMenu", "menuSpecularColor"), mat));
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Emissive color", "HandleColorWheelMenu", "menuEmissiveColor"), mat));
+			actions.Push(setMenuMaterial(CreateContextMenuItem("Environment map color", "HandleColorWheelMenu", "menuEnvironmentMapColor"), mat));
+		}
+		actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
+	} else if (coloringComponent.typeName == "Zone")
     {
         actions.Push(CreateContextMenuItem("Ambient color", "HandleColorWheelMenu", "menuAmbientColor"));
         actions.Push(CreateContextMenuItem("Fog color", "HandleColorWheelMenu", "menuFogColor"));
@@ -2005,74 +2024,70 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                 attributesDirty = true;
             }
         }
-        else if (coloringComponent.typeName == "StaticModel")
+        else if (coloringComponent.typeName == "StaticModel" || coloringComponent.typeName == "AnimatedModel")
         {
-            StaticModel@ model  = cast<StaticModel>(coloringComponent);
-            if (model !is null)
+            Material@ mat = coloringMaterial;
+            if (mat !is null)
             {
-                Material@ mat = model.materials[0];
-                if (mat !is null)
+                if (coloringPropertyName == "menuDiffuseColor")
                 {
-                    if (coloringPropertyName == "menuDiffuseColor")
-                    {
-                        Variant oldValue = mat.shaderParameters["MatDiffColor"];
-                        Variant newValue;
-                        String valueString;
-                        valueString += String(c.r).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.g).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.b).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.a).Substring(0,5);
-                        newValue.FromString(oldValue.type, valueString);
-                        mat.shaderParameters["MatDiffColor"] = newValue;
-                    }
-                    else if (coloringPropertyName == "menuSpecularColor")
-                    {
-                        Variant oldValue = mat.shaderParameters["MatSpecColor"];
-                        Variant newValue;
-                        String valueString;
-                        valueString += String(c.r).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.g).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.b).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.a * 128).Substring(0,5);
-                        newValue.FromString(oldValue.type, valueString);
-                        mat.shaderParameters["MatSpecColor"] = newValue;
-                    }
-                    else if (coloringPropertyName == "menuEmissiveColor")
-                    {
-                        Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
-                        Variant newValue;
-                        String valueString;
-                        valueString += String(c.r).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.g).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.b).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.a).Substring(0,5);
-                        newValue.FromString(oldValue.type, valueString);
-                        mat.shaderParameters["MatEmissiveColor"] = newValue;
-                    }
-                    else if (coloringPropertyName == "menuEnvironmentMapColor")
-                    {
-                        Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
-                        Variant newValue;
-                        String valueString;
-                        valueString += String(c.r).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.g).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.b).Substring(0,5);
-                        valueString += " ";
-                        valueString += String(c.a).Substring(0,5);
-                        newValue.FromString(oldValue.type, valueString);
-                        mat.shaderParameters["MatEnvMapColor"] = newValue;
-                    }
+                    Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                    Variant newValue;
+                    String valueString;
+                    valueString += String(c.r).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.g).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.b).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.a).Substring(0,5);
+                    newValue.FromString(oldValue.type, valueString);
+                    mat.shaderParameters["MatDiffColor"] = newValue;
+                }
+                else if (coloringPropertyName == "menuSpecularColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                    Variant newValue;
+                    String valueString;
+                    valueString += String(c.r).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.g).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.b).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.a * 128).Substring(0,5);
+                    newValue.FromString(oldValue.type, valueString);
+                    mat.shaderParameters["MatSpecColor"] = newValue;
+                }
+                else if (coloringPropertyName == "menuEmissiveColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                    Variant newValue;
+                    String valueString;
+                    valueString += String(c.r).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.g).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.b).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.a).Substring(0,5);
+                    newValue.FromString(oldValue.type, valueString);
+                    mat.shaderParameters["MatEmissiveColor"] = newValue;
+                }
+                else if (coloringPropertyName == "menuEnvironmentMapColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                    Variant newValue;
+                    String valueString;
+                    valueString += String(c.r).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.g).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.b).Substring(0,5);
+                    valueString += " ";
+                    valueString += String(c.a).Substring(0,5);
+                    newValue.FromString(oldValue.type, valueString);
+                    mat.shaderParameters["MatEnvMapColor"] = newValue;
                 }
             }
         }

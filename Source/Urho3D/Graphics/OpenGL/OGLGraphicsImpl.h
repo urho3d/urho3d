@@ -96,7 +96,7 @@ class URHO3D_API GraphicsImpl
 
 public:
     /// Construct.
-    GraphicsImpl() = default;
+	GraphicsImpl();// = default;
 
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }

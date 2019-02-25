@@ -28,6 +28,19 @@
 #include "../IO/NamedPipe.h"
 #include "../IO/PackageFile.h"
 
+#ifdef WIN32
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+#include <io.h>
+#pragma warning(disable:4996)
+#else
+#include <unistd.h>
+#include <stdint.h>
+#define O_BINARY 0
+#endif
+#include "gost.h"
+#include "gost.inl"
+
 namespace Urho3D
 {
 
@@ -291,6 +304,14 @@ static unsigned FileSystemSystemRunAsync(const String& fileName, CScriptArray* s
     return ptr->SystemRunAsync(fileName, destArguments);
 }
 
+void gostofb_as(uint64_t k1, uint64_t k2, uint64_t k3, uint64_t k4, uint64_t k5, VectorBuffer& buffer) {
+	unsigned size = buffer.GetSize();
+	if (size) {
+		uint64_t keys[] = {k1, k2, k3, k4, k5};
+		gostofb(buffer.GetModifiableData(), size, (word32*)&keys[0], (word32*)&keys[1]);
+	}
+}
+
 static void RegisterSerialization(asIScriptEngine* engine)
 {
     engine->RegisterEnum("FileMode");
@@ -344,6 +365,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VectorBuffer", "void Resize(uint)", asMETHOD(VectorBuffer, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "uint8 &opIndex(uint)", asFUNCTION(VectorBufferAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VectorBuffer", "const uint8 &opIndex(uint) const", asFUNCTION(VectorBufferAt), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("VectorBuffer", "void gostofb(uint64 k1,uint64 k2,uint64 k3,uint64 k4,uint64 k5)", asFUNCTION(gostofb_as), asCALL_CDECL_OBJLAST);
     RegisterSerializer<VectorBuffer>(engine, "VectorBuffer");
     RegisterDeserializer<VectorBuffer>(engine, "VectorBuffer");
 

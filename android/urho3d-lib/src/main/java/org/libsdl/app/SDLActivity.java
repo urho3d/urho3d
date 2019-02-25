@@ -2,11 +2,16 @@
 
 package org.libsdl.app;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.lang.reflect.Method;
 
 import android.app.*;
 import android.content.*;
@@ -27,8 +32,9 @@ import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.hardware.*;
 import android.content.pm.ActivityInfo;
+import java.io.File;
+import java.util.ArrayList;
 
-import com.github.urho3d.UrhoActivity;
 
 /**
     SDL Activity
@@ -106,6 +112,15 @@ public class SDLActivity extends Activity {
         return new String[]{"app_process"};
     }
 
+    protected void InitializeApp() {
+    }
+    protected void PauseApp() {
+    }
+    protected void ResumeApp() {
+    }
+    protected void DestroyApp() {
+    }
+
     public static void initialize() {
         // The static nature of the singleton and Android quirkyness force us to initialize everything here
         // Otherwise, when exiting the app and returning to it, these variables *keep* their pre exit values
@@ -123,6 +138,32 @@ public class SDLActivity extends Activity {
         mNextNativeState = NativeState.INIT;
         mCurrentNativeState = NativeState.INIT;
     }
+	
+	protected List<String> getLibraryNames() {
+		String libraryPath = getApplicationInfo().nativeLibraryDir;
+		File[] files = new File(libraryPath).listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String filename) {
+				// Only list libraries, i.e. exclude gdbserver when it presents
+				return filename.matches("^lib.*\\.so$");
+			}
+		});
+		if (files != null) {
+			Arrays.sort(files, new Comparator<File>() {
+				@Override
+				public int compare(File lhs, File rhs) {
+					return Long.valueOf(lhs.lastModified()).compareTo(rhs.lastModified());
+				}
+			});
+			ArrayList<String> libraryNames = new ArrayList<String>(files.length);
+			for (final File libraryFilename : files) {
+				String name = libraryFilename.getName().replaceAll("^lib(.*)\\.so$", "$1");
+				libraryNames.add(name);
+			}
+			return libraryNames;
+		}
+		return null;
+	}
 
     // Setup
     @Override
@@ -135,7 +176,7 @@ public class SDLActivity extends Activity {
         // Urho3D: auto load all the shared libraries available in the library path
         String errorMsgBrokenLib = "";
         try {
-            onLoadLibrary(UrhoActivity.getLibraryNames(this));
+            onLoadLibrary(getLibraryNames());
         } catch(Exception e) {
             mBrokenLibraries = true;
             errorMsgBrokenLib = e.getMessage();
@@ -182,13 +223,16 @@ public class SDLActivity extends Activity {
 
         // Set up the surface
         mSurface = new SDLSurface(getApplication());
+        mSurface.setId(1);
 
         mLayout = new RelativeLayout(this);
         mLayout.addView(mSurface);
 
         setContentView(mLayout);
-
-        // Get filename from "Open with" of another application
+		
+		InitializeApp();
+        
+		// Get filename from "Open with" of another application
         Intent intent = getIntent();
         if (intent != null && intent.getData() != null) {
             String filename = intent.getData().getPath();
@@ -206,6 +250,7 @@ public class SDLActivity extends Activity {
         super.onPause();
         mNextNativeState = NativeState.PAUSED;
         mIsResumedCalled = false;
+		PauseApp();
 
         if (SDLActivity.mBrokenLibraries) {
            return;
@@ -220,6 +265,7 @@ public class SDLActivity extends Activity {
         super.onResume();
         mNextNativeState = NativeState.RESUMED;
         mIsResumedCalled = true;
+		ResumeApp();
 
         if (SDLActivity.mBrokenLibraries) {
            return;
@@ -263,6 +309,7 @@ public class SDLActivity extends Activity {
     @Override
     protected void onDestroy() {
         Log.v(TAG, "onDestroy()");
+		DestroyApp();
 
         if (SDLActivity.mBrokenLibraries) {
            super.onDestroy();
@@ -342,7 +389,8 @@ public class SDLActivity extends Activity {
         // Try a transition to paused state
         if (mNextNativeState == NativeState.PAUSED) {
             nativePause();
-            mSurface.handlePause();
+			if (mSurface != null)
+				mSurface.handlePause();
             mCurrentNativeState = mNextNativeState;
             return;
         }
@@ -356,7 +404,8 @@ public class SDLActivity extends Activity {
                     // FIXME: Why aren't we enabling sensor input at start?
 
                     final Thread sdlThread = new Thread(new SDLMain(), "SDLThread");
-                    mSurface.enableSensor(Sensor.TYPE_ACCELEROMETER, true);
+					if (mSurface != null)
+						mSurface.enableSensor(Sensor.TYPE_ACCELEROMETER, true);
                     sdlThread.start();
 
                     // Set up a listener thread to catch when the native thread ends
@@ -380,7 +429,8 @@ public class SDLActivity extends Activity {
                 }
 
                 nativeResume();
-                mSurface.handleResume();
+				if (mSurface != null)
+					mSurface.handleResume();
                 mCurrentNativeState = mNextNativeState;
             }
         }
@@ -389,7 +439,8 @@ public class SDLActivity extends Activity {
     /* The native thread has finished */
     public static void handleNativeExit() {
         SDLActivity.mSDLThread = null;
-        mSingleton.finish();
+		if (mSingleton != null)
+			mSingleton.finish();
     }
 
 
@@ -501,6 +552,7 @@ public class SDLActivity extends Activity {
     public static native void onNativeSurfaceChanged();
     public static native void onNativeSurfaceDestroyed();
     public static native String nativeGetHint(String name);
+	public static native void nativeUserActivityCallback(String json);
 
     /**
      * This method is called by SDL using JNI.
@@ -593,7 +645,12 @@ public class SDLActivity extends Activity {
         }
         return mSingleton.sendCommand(command, Integer.valueOf(param));
     }
-
+    public static boolean sendStrMessage(int command, String param) {
+        if (mSingleton == null) {
+            return false;
+        }
+        return mSingleton.sendCommand(command, param);
+    }
     /**
      * This method is called by SDL using JNI.
      */
@@ -995,14 +1052,17 @@ public class SDLActivity extends Activity {
 class SDLMain implements Runnable {
     @Override
     public void run() {
-        // Runs SDL_main()
-        String library = SDLActivity.mSingleton.getMainSharedObject();
-        String function = SDLActivity.mSingleton.getMainFunction();
-        String[] arguments = SDLActivity.mSingleton.getArguments();
+		if (SDLActivity.mSingleton != null) {
+			// Runs SDL_main()
+			String library = SDLActivity.mSingleton.getMainSharedObject();
+			String function = SDLActivity.mSingleton.getMainFunction();
+			String[] arguments = SDLActivity.mSingleton.getArguments();
 
-        Log.v("SDL", "Running main function " + function + " from library " + library);
-        SDLActivity.nativeRunMain(library, function, arguments);
-
+			Log.v("SDL", "Running main function " + function + " from library " + library);
+			SDLActivity.nativeRunMain(library, function, arguments);
+		} else {
+			Log.v("SDL", "No mSingleton in SDLMain::run");
+		}
         Log.v("SDL", "Finished main function");
     }
 }
@@ -1142,32 +1202,31 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
 
         boolean skip = false;
-        int requestedOrientation = SDLActivity.mSingleton.getRequestedOrientation();
+        if (SDLActivity.mSingleton != null) {
+            int requestedOrientation = SDLActivity.mSingleton.getRequestedOrientation();
 
-        if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-        {
-            // Accept any
-        }
-        else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
-        {
-            if (mWidth > mHeight) {
-               skip = true;
+            if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+                // Accept any
+            } else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) {
+                if (mWidth > mHeight) {
+                    skip = true;
+                }
+            } else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
+                if (mWidth < mHeight) {
+                    skip = true;
+                }
             }
-        } else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
-            if (mWidth < mHeight) {
-               skip = true;
+
+            // Special Patch for Square Resolution: Black Berry Passport
+            if (skip) {
+                double min = Math.min(mWidth, mHeight);
+                double max = Math.max(mWidth, mHeight);
+
+                if (max / min < 1.20) {
+                    Log.v("SDL", "Don't skip on such aspect-ratio. Could be a square resolution.");
+                    skip = false;
+                }
             }
-        }
-
-        // Special Patch for Square Resolution: Black Berry Passport
-        if (skip) {
-           double min = Math.min(mWidth, mHeight);
-           double max = Math.max(mWidth, mHeight);
-
-           if (max / min < 1.20) {
-              Log.v("SDL", "Don't skip on such aspect-ratio. Could be a square resolution.");
-              skip = false;
-           }
         }
 
         if (skip) {
@@ -1249,6 +1308,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         int mouseButton;
         int i = -1;
         float x,y,p;
+		//Log.v("BBR", MotionEvent.actionToString(action) + " x=" + event.getX() + " y=" + event.getY() +
+		//	" pc=" + pointerCount + " hs=" + event.getHistorySize() + " xr=" + event.getRawX() + " yr=" + event.getRawY());
 
         // !!! FIXME: dump this SDK check after 2.0.4 ships and require API14.
         if (event.getSource() == InputDevice.SOURCE_MOUSE && SDLActivity.mSeparateMouseAndTouch) {

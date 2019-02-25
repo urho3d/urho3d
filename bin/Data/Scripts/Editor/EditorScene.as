@@ -1027,8 +1027,8 @@ bool SceneChangeParent(Node@ sourceNode, Node@ targetNode, bool createUndoAction
         action.Define(sourceNode, targetNode);
         SaveEditAction(action);
     }
-
-    sourceNode.parent = targetNode;
+	sourceNode.parent = null;
+	sourceNode.parent = targetNode;
     SetSceneModified();
 
     // Return true if success
@@ -1548,7 +1548,7 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
 
 bool ColorWheelSetupBehaviorForColoring()
 {
-    Menu@ menu = GetEventSender();
+    Menu&& menu = GetEventSender();
     if (menu is null)
         return false;
 
@@ -1582,46 +1582,43 @@ bool ColorWheelSetupBehaviorForColoring()
             }
         }
     }
-    else if (coloringComponent.typeName == "StaticModel")
+    else if (coloringComponent.typeName == "StaticModel" || coloringComponent.typeName == "AnimatedModel")
     {
-        StaticModel@ model  = cast<StaticModel>(coloringComponent);
-        if (model !is null)
+		Material@ mat = menu.vars["Material"].GetPtr();
+        if (mat !is null)
         {
-            Material@ mat = model.materials[0];
-            if (mat !is null)
+			@coloringMaterial = mat;
+            if (coloringPropertyName == "menuDiffuseColor")
             {
-                if (coloringPropertyName == "menuDiffuseColor")
-                {
-                    Variant oldValue = mat.shaderParameters["MatDiffColor"];
-                    Array<String> values = oldValue.ToString().Split(' ');
-                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat()); //RGBA
-                    ShowColorWheelWithColor(coloringOldColor);
-                }
-                else if (coloringPropertyName == "menuSpecularColor")
-                {
-                    Variant oldValue = mat.shaderParameters["MatSpecColor"];
-                    Array<String> values = oldValue.ToString().Split(' ');
-                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat());
-                    coloringOldScalar = values[3].ToFloat();
-                    ShowColorWheelWithColor(Color(coloringOldColor.r, coloringOldColor.g, coloringOldColor.b, coloringOldScalar/128.0f)); //RGB + shine
-                }
-                else if (coloringPropertyName == "menuEmissiveColor")
-                {
-                    Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
-                    Array<String> values = oldValue.ToString().Split(' ');
-                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); // RGB
+                Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                Array<String> values = oldValue.ToString().Split(' ');
+                coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat()); //RGBA
+                ShowColorWheelWithColor(coloringOldColor);
+            }
+            else if (coloringPropertyName == "menuSpecularColor")
+            {
+                Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                Array<String> values = oldValue.ToString().Split(' ');
+                coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat());
+                coloringOldScalar = values[3].ToFloat();
+                ShowColorWheelWithColor(Color(coloringOldColor.r, coloringOldColor.g, coloringOldColor.b, coloringOldScalar/128.0f)); //RGB + shine
+            }
+            else if (coloringPropertyName == "menuEmissiveColor")
+            {
+                Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                Array<String> values = oldValue.ToString().Split(' ');
+                coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); // RGB
 
 
-                    ShowColorWheelWithColor(coloringOldColor);
-                }
-                else if (coloringPropertyName == "menuEnvironmentMapColor")
-                {
-                    Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
-                    Array<String> values = oldValue.ToString().Split(' ');
-                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); //RGB
+                ShowColorWheelWithColor(coloringOldColor);
+            }
+            else if (coloringPropertyName == "menuEnvironmentMapColor")
+            {
+                Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                Array<String> values = oldValue.ToString().Split(' ');
+                coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); //RGB
 
-                    ShowColorWheelWithColor(coloringOldColor);
-                }
+                ShowColorWheelWithColor(coloringOldColor);
             }
         }
     }

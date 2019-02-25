@@ -60,8 +60,8 @@ void CreateHierarchyWindow()
     hierarchyWindow = LoadEditorUI("UI/EditorHierarchyWindow.xml");
     hierarchyList = hierarchyWindow.GetChild("HierarchyList");
     ui.root.AddChild(hierarchyWindow);
-    int height = Min(ui.root.height - 60, 500);
-    hierarchyWindow.SetSize(300, height);
+    int height = Min(ui.root.height - 120, 1000);
+    hierarchyWindow.SetSize(height * 0.4, height);
     hierarchyWindow.SetPosition(35, 100);
     hierarchyWindow.opacity = uiMaxOpacity;
     hierarchyWindow.BringToFront();
@@ -309,6 +309,7 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
 
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
+    SetID(text, component, ITEM_COMPONENT);
 }
 
 int GetType(Serializable@ serializable)
@@ -335,6 +336,8 @@ void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
     // Set node ID as drag and drop content for node ID editing
     if (itemType == ITEM_NODE)
         text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[NODE_ID_VAR].GetUInt());
+    else if (itemType == ITEM_COMPONENT)
+        text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[COMPONENT_ID_VAR].GetUInt());
 
     switch (itemType)
     {
@@ -464,43 +467,58 @@ String GetUIElementTitle(UIElement@ element)
 
     return ret;
 }
+String GetNodeTitle(Node@ node, bool withId) {
+    if (node is null)
+        return "";
 
-String GetNodeTitle(Node@ node)
-{
     String ret;
-
     if (node.name.empty)
         ret = node.typeName;
     else
         ret = node.name;
 
-    if (showID)
-    {
+    if (withId) {
         if (node.replicated)
-            ret += " (" + String(node.id) + ")";
-        else
-            ret += " (Local " + String(node.id) + ")";
-
+            ret += "(R)";
         if (node.temporary)
-            ret += " (Temp)";
+            ret += "(T)";
+        ret += " " + node.id;
+    }
+    return ret;
+}
+
+String GetNodeTitle(Node@ node)
+{
+    return GetNodeTitle(node, showID);
+}
+
+String GetComponentTitle(Component@ component, bool withId) {
+    if (component is null)
+        return "";
+    String ret = component.typeName;
+    ScriptInstance@ si = cast < ScriptInstance@>(component);
+	if (si !is null) {
+		if (!si.className.empty)
+			ret = si.className;
+	} else {
+        Text3D@ txt = cast < Text3D@>(component);
+        if (txt !is null)
+            ret += " " + txt.text.Substring(0, 10);
     }
 
+    if (withId) {
+        if (component.replicated)
+            ret += "(R)";
+        if (component.temporary)
+            ret += "(T)";
+        ret += " " + component.id;
+    }
     return ret;
 }
 
 String GetComponentTitle(Component@ component)
 {
-    String ret = component.typeName;
-
-    if (showID)
-    {
-        if (!component.replicated)
-            ret += " (Local)";
-
-        if (component.temporary)
-            ret += " (Temp)";
-    }
-    return ret;
+    return GetComponentTitle(component, showID);
 }
 
 void SelectNode(Node@ node, bool multiselect)
@@ -813,6 +831,12 @@ void HandleHierarchyListSelectionChange()
         editUIElements.Push(editUIElement);
     else
         editUIElements = selectedUIElements;
+	if (editNode !is null) {
+		UpdateHierarchyItemText(GetListIndex(editNode), editNode.enabled, GetNodeTitle(editNode));
+	}
+	if (editComponents.length == 1) {
+		UpdateHierarchyItemText(GetListIndex(editComponents[0]), editComponents[0].enabled, GetComponentTitle(editComponents[0]));
+	}
 
     PositionGizmo();
     UpdateAttributeInspector();

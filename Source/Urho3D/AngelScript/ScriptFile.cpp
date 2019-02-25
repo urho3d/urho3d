@@ -32,10 +32,21 @@
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/ResourceCache.h"
-
 #include <AngelScript/angelscript.h>
+#include <stdio.h>
 
 #include "../DebugNew.h"
+#ifdef WIN32
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+#include <io.h>
+#pragma warning(disable:4996)
+#else
+#include <unistd.h>
+#include <stdint.h>
+#define O_BINARY 0
+#endif
+#include "gost.h"
 
 namespace Urho3D
 {
@@ -131,13 +142,17 @@ bool ScriptFile::BeginLoad(Deserializer& source)
     }
 
     // Check if this file is precompiled bytecode
-    if (source.ReadFileID() == "ASBC")
-    {
+	String fId = source.ReadFileID();
+	if (fId == "ASBC" || fId == "asbe") {
         // Perform actual parsing in EndLoad(); read data now
         loadByteCodeSize_ = source.GetSize() - source.GetPosition();
         loadByteCode_ = new unsigned char[loadByteCodeSize_];
         source.Read(loadByteCode_.Get(), loadByteCodeSize_);
-        return true;
+		if (fId == "asbe") {
+			uint64_t keys[] = {0x61E16583E06D6386, 0xC15B4C07F34E1C9C, 0x289BF70DE126E5AA, 0xFAE77A74968CD489, 0xC359133C67589D7D};
+			gostofb(loadByteCode_, loadByteCodeSize_, (word32*)&keys[0], (word32*)&keys[1]);
+		}
+		return true;
     }
     else
         source.Seek(0);
@@ -166,6 +181,8 @@ bool ScriptFile::EndLoad()
     }
     else
     {
+		if (onlyCompile_)
+			scriptModule_->GetEngine()->SetEngineProperty(asEP_INIT_GLOBAL_VARS_AFTER_BUILD, 0);
         int result = scriptModule_->Build();
         if (result >= 0)
         {
@@ -584,6 +601,10 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
     }
 }
 
+bool isNameSymbol(char s) {
+	return s >= 'a' && s <= 'z' || s >= 'A' && s <= 'Z' || s >= '0' && s <= '9' || s == '_';
+}
+
 bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
 {
     auto* cache = GetSubsystem<ResourceCache>();
@@ -591,6 +612,20 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     unsigned dataSize = source.GetSize();
     SharedArrayPtr<char> buffer(new char[dataSize]);
     source.Read((void*)buffer.Get(), dataSize);
+	{
+		// in Visual Studio we used '&&' instead of '@', for intellisense worked, replace it back to '@ '
+		// for use '&&' himself, as boolean operator, surround it with spaces.
+		char* b = buffer.Get();
+		for (unsigned k = 1; k < dataSize - 2; k++) {
+			if (b[k] == '&' && b[k + 1] == '&' &&
+				(isNameSymbol(b[k - 1]) || isNameSymbol(b[k + 2]) || b[k + 2] == '&' || b[k - 1] == '>' || b[k - 1] == ']')) {
+				b[k] = '@';
+				b[k + 1] = ' ';
+				k++;
+			}
+		}
+	}
+
 
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
@@ -606,54 +641,113 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             continue;
         }
         // Is this a preprocessor directive?
-        if (buffer[pos] == '#')
-        {
-            int start = pos++;
-            asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
-            if (t == asTC_IDENTIFIER)
-            {
-                String token(&buffer[pos], (unsigned)len);
-                if (token == "include")
-                {
-                    pos += len;
-                    t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
-                    if (t == asTC_WHITESPACE)
-                    {
-                        pos += len;
-                        t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
-                    }
+		if (buffer[pos] == '#') {
+			int start = pos++;
+			asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+			if (t == asTC_IDENTIFIER) {
+				String token(&buffer[pos], (unsigned)len);
+				if (token == "include") {
+					pos += len;
+					t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+					if (t == asTC_WHITESPACE) {
+						pos += len;
+						t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+					}
 
-                    if (t == asTC_VALUE && len > 2 && buffer[pos] == '"')
-                    {
-                        // Get the include file
-                        String includeFile(&buffer[pos + 1], (unsigned)(len - 2));
-                        pos += len;
+					if (t == asTC_VALUE && len > 2 && buffer[pos] == '"') {
+						// included script files ends with ".as", if file name ands on "h"
+						// it just include script api for IDE hints, skip it
+						if (buffer[pos + len - 2] != 'h') {
+							// Get the include file
+							String includeFile(&buffer[pos + 1], (unsigned)(len - 2));
+							pos += len;
 
-                        // If the file is not found as it is, add the path of current file but only if it is found there
-                        if (!cache->Exists(includeFile))
-                        {
-                            String prefixedIncludeFile = GetPath(GetName()) + includeFile;
-                            if (cache->Exists(prefixedIncludeFile))
-                                includeFile = prefixedIncludeFile;
-                        }
+							// If the file is not found as it is, add the path of current file but only if it is found there
+							if (!cache->Exists(includeFile)) {
+								String prefixedIncludeFile = GetPath(GetName()) + includeFile;
+								if (cache->Exists(prefixedIncludeFile))
+									includeFile = prefixedIncludeFile;
+							}
 
-                        String includeFileLower = includeFile.ToLower();
+							String includeFileLower = includeFile.ToLower();
 
-                        // If not included yet, store it for later processing
-                        if (!includeFiles_.Contains(includeFileLower))
-                        {
-                            includeFiles_.Insert(includeFileLower);
-                            includeFiles.Push(includeFile);
-                        }
-
-                        // Overwrite the include directive with space characters to avoid compiler error
-                        memset(&buffer[start], ' ', pos - start);
-                    }
-                }
-            }
-        }
+							// If not included yet, store it for later processing
+							if (!includeFiles_.Contains(includeFileLower)) {
+								includeFiles_.Insert(includeFileLower);
+								includeFiles.Push(includeFile);
+							}
+						} else {
+							pos += len;
+						}
+						// Overwrite the include directive with space characters to avoid compiler error
+						memset(&buffer[start], ' ', pos - start);
+					}
+				} else if (token == "pragma") {
+					// it '#pragma once', just to fool visual studio. Skip it.
+					while (pos < dataSize && buffer[pos] != '\n')
+						pos++;
+					memset(&buffer[start], ' ', pos - start);
+				} else if (token == "ifdef" || token == "ifndef") {
+					// simple realization of conditional preprocess
+					// Support only one identificator. Work for first '#' after new line.
+					// no else.
+					// if environment variable 'urho_' + id is set in any val, id is true.
+					// for example
+					//   #ifdef release
+					//     ....
+					//   # anytext, usually endif
+					// if urho_release environment is set to any value, ifdef inner not  replaced,
+					// otherwise it replaced by spaces.
+					bool ifdef_t;
+					if (token == "ifdef") {
+						ifdef_t = true;
+						pos += sizeof("ifdef") - 1;
+					} else {
+						ifdef_t = false;
+						pos += sizeof("ifndef") - 1;
+					}
+					while (pos < dataSize && buffer[pos] != '\n') {
+						if (buffer[pos] > ' ')
+							break;
+						pos++;
+					}
+					int beginId = pos;
+					while (pos < dataSize && buffer[pos] != '\n')
+						pos++;
+					String id = String("urho_") + String(&buffer[beginId], (unsigned)(pos - beginId)).Trimmed();
+					bool ifdef_v = getenv(id.CString()) != NULL;
+					memset(&buffer[start], ' ', pos - start);
+					start = pos++;
+					int state = 1;
+					while (pos < dataSize) {
+						char s = buffer[pos];
+						if (state == 0) {
+							if (s == '\n')
+								state = 1;
+						} else if (state == 1) {
+							if (s > ' ') {
+								if (s == '#')
+									break;
+								else
+									state = 0;
+							}
+						}
+						if (ifdef_v != ifdef_t && s > ' ')
+							buffer[pos] = ' ';
+						pos++;
+					}
+					start = pos++;
+					while (pos < dataSize && buffer[pos] != '\n')
+						pos++;
+					memset(&buffer[start], ' ', pos - start);
+				}
+			}
+		}
+		else {
+			while (pos < dataSize && buffer[pos++] != '\n');
+		}
         // Don't search includes within statement blocks or between tokens in statements
-        else
+        /*else
         {
             unsigned len;
             // Skip until ; or { whichever comes first
@@ -683,7 +777,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             }
             else
                 ++pos;
-        }
+        }*/
     }
 
     // Process includes first

@@ -62,6 +62,37 @@ static const char* methodDeclarations[] = {
     "void TransformChanged()"
 };
 
+struct EventMapInfo {
+	StringHash eventName;
+	String objName;
+	void* attrOffset;
+	asIScriptFunction* pFunc;
+	enum SubscribeType {
+		sCommon,		// to all sources with this event,  'on_EventName'
+		sNode,			// to events from that node,        'onNode_EventName'
+		sScene,			// to events from scene,            'onScene_EventName'
+		sParent,		// to events from parent node,      'onParent_EventName'
+		sModule,		// to events from script file		'onModule_EventName'
+		sChild,			// to events from child node,       'onChild_ChildName_EventName'
+		sAttr,			// to events from attribute,        'onAttr_AttributeName_EventName'
+		sVar,			// to events from script global var 'onVar_VariableName_EventName'
+		sGlobal,		// to events from context global var'onGlobal_KeyName_EventName'
+	};
+	SubscribeType type;
+	EventMapInfo* next;
+	EventMapInfo(const String& en, asIScriptFunction* fn, SubscribeType t, EventMapInfo* n) : eventName(en), pFunc(fn), type(t), next(n) {}
+	EventMapInfo(const String& en, const String& on, asIScriptFunction* fn, SubscribeType t, EventMapInfo* n) : eventName(en), pFunc(fn), objName(on), type(t), next(n) {}
+	EventMapInfo() : type(sCommon), next(nullptr){}
+	~EventMapInfo() {
+		delete next;
+	}
+};
+
+void CleanupTypeInfoScriptInstance(asITypeInfo *type) {
+	delete reinterpret_cast<EventMapInfo*>(type->GetUserData(eEventMapUserIdx));
+}
+
+
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context)
 {
@@ -219,6 +250,8 @@ void ScriptInstance::ApplyAttributes()
     }
 
     idAttributes_.Clear();
+
+	SubscribeToAutoEvents();
 
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
@@ -575,7 +608,7 @@ void ScriptInstance::CreateObject()
 
         GetScriptMethods();
         GetScriptAttributes();
-        UpdateEventSubscription();
+		UpdateEventSubscription();
 
         if (methods_[METHOD_START])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
@@ -959,6 +992,172 @@ void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, Varian
         CreateObject();
         RestoreScriptAttributes();
     }
+}
+
+static bool isMethodCanBeEventHandler(asIScriptFunction* pFunc) {
+	unsigned pc = pFunc->GetParamCount();
+	return pFunc->GetReturnTypeId() == asTYPEID_VOID &&
+		(pc == 0 || (pc == 2 && String(pFunc->GetDeclaration(false)).EndsWith("(StringHash, VariantMap&inout)")));
+}
+
+static int getAttrOffset(Context* context, asITypeInfo* pTypeInfo, const String& name) {
+	for (unsigned i = 0, c = pTypeInfo->GetPropertyCount(); i < c; i++) {
+		const char* pName;
+		int typeId;
+		int offset;
+		pTypeInfo->GetProperty(i, &pName, &typeId, nullptr, nullptr, &offset);
+		if (typeId & asTYPEID_OBJHANDLE && name.Compare(pName) == 0 &&
+			context->GetObjectFactories().Contains(pTypeInfo->GetEngine()->GetTypeDeclaration(typeId &~asTYPEID_OBJHANDLE)))
+			return offset;
+	}
+	return -1;
+}
+
+static void* getModuleVarAddress(Context* context, asITypeInfo* pTypeInfo, const String& name) {
+	asIScriptModule* pModule = pTypeInfo->GetModule();
+	int varIndex = pModule->GetGlobalVarIndexByName(name.CString());
+	if (varIndex >= 0) {
+		int typeId;
+		pModule->GetGlobalVar(varIndex, nullptr, nullptr, &typeId);
+		if (typeId & asTYPEID_OBJHANDLE) {
+			String typeName = pTypeInfo->GetEngine()->GetTypeDeclaration(typeId &~asTYPEID_OBJHANDLE);
+			const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context->GetObjectFactories();
+			HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeName);
+			if (j != factories.End())
+				return pModule->GetAddressOfGlobalVar(varIndex);
+		}
+	}
+	return nullptr;
+}
+	
+static EventMapInfo* getEventMap(Context* context, asITypeInfo* pTypeInfo) {
+	EventMapInfo* pInfo = (EventMapInfo*)pTypeInfo->GetUserData(eEventMapUserIdx);
+	if (!pInfo) {
+		pInfo = new EventMapInfo;
+		for (unsigned m = 0, mc = pTypeInfo->GetMethodCount(); m < mc; m++) {
+			asIScriptFunction* pFunc = pTypeInfo->GetMethodByIndex(m);
+			if (isMethodCanBeEventHandler(pFunc)) {
+				String name = pFunc->GetName();
+				if (name.Length() > 3 && name.StartsWith("on_")) {
+					pInfo = new EventMapInfo(name.Substring(3), pFunc, EventMapInfo::sCommon, pInfo);
+				} else if (name.Length() > 7 && name.StartsWith("onNode_")) {
+					pInfo = new EventMapInfo(name.Substring(7), pFunc, EventMapInfo::sNode, pInfo);
+				} else if (name.Length() > 8 && name.StartsWith("onScene_")) {
+					pInfo = new EventMapInfo(name.Substring(8), pFunc, EventMapInfo::sScene, pInfo);
+				} else if (name.Length() > 9 && name.StartsWith("onParent_")) {
+					pInfo = new EventMapInfo(name.Substring(9), pFunc, EventMapInfo::sParent, pInfo);
+				} else if (name.Length() > 9 && name.StartsWith("onModule_")) {
+					pInfo = new EventMapInfo(name.Substring(9), pFunc, EventMapInfo::sModule, pInfo);
+				} else if (name.Length() > 8 && name.StartsWith("onChild_")) {
+					String subName = name.Substring(8);
+					int delimeterIndex = subName.Find('_');
+					if (delimeterIndex > 0 && delimeterIndex < subName.Length() - 1) {
+						pInfo = new EventMapInfo(subName.Substring(delimeterIndex + 1), subName.Substring(0, delimeterIndex), pFunc, EventMapInfo::sChild, pInfo);
+					}
+				} else if (name.Length() > 7 && name.StartsWith("onAttr_")) {
+					String subName = name.Substring(7);
+					int delimeterIndex = subName.Find('_');
+					if (delimeterIndex > 0 && delimeterIndex < subName.Length() - 1) {
+						String attrName = subName.Substring(0, delimeterIndex);
+						int offset = getAttrOffset(context, pTypeInfo, attrName);
+						if (offset >= 0) {
+							pInfo = new EventMapInfo(subName.Substring(delimeterIndex + 1), attrName, pFunc, EventMapInfo::sAttr, pInfo);
+							pInfo->attrOffset = (void*)offset;
+						} else {
+							URHO3D_LOGERROR("Autosubscribe to bad Attr " + String(pTypeInfo->GetName()) + "::" + String(name));
+						}
+					}
+				} else if (name.Length() > 6 && name.StartsWith("onVar_")) {
+					String subName = name.Substring(6);
+					int delimeterIndex = subName.Find('_');
+					if (delimeterIndex > 0 && delimeterIndex < subName.Length() - 1) {
+						String varName = subName.Substring(0, delimeterIndex);
+						void* offset = getModuleVarAddress(context, pTypeInfo, varName);
+						if (offset) {
+							pInfo = new EventMapInfo(subName.Substring(delimeterIndex + 1), varName, pFunc, EventMapInfo::sVar, pInfo);
+							pInfo->attrOffset = offset;
+						} else {
+							URHO3D_LOGERROR("Autosubscribe to bad Var " + String(pTypeInfo->GetName()) + "::" + String(name));
+						}
+					}
+				} else if (name.Length() > 9 && name.StartsWith("onGlobal_")) {
+					String subName = name.Substring(9);
+					int delimeterIndex = subName.Find('_');
+					if (delimeterIndex > 0 && delimeterIndex < subName.Length() - 1)
+						pInfo = new EventMapInfo(subName.Substring(delimeterIndex + 1), subName.Substring(0, delimeterIndex), pFunc, EventMapInfo::sGlobal, pInfo);
+				}
+			}
+		}
+		pTypeInfo->SetUserData(pInfo, eEventMapUserIdx);
+	}
+	return pInfo;
+}
+
+void ScriptInstance::SubscribeToAutoEvents() {
+	if (!scriptObject_ || scriptObject_->GetUserData(eEventMapUserIdx))
+		return;
+	EventMapInfo* pInfo = getEventMap(context_, scriptObject_->GetObjectType());
+	Scene* scene = GetScene();
+	Object* object;
+	while (pInfo->next) {
+		switch (pInfo->type) {
+		case EventMapInfo::sCommon:
+			SubscribeToEvent(pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			break;
+		case EventMapInfo::sNode:
+			if (node_)
+				SubscribeToEvent(node_, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null Node for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		case EventMapInfo::sScene:
+			if (scene)
+				SubscribeToEvent(scene, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null Scene for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		case EventMapInfo::sParent:
+			object = node_ ? node_->GetParent() : nullptr;
+			if (object)
+				SubscribeToEvent(object, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null parent for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		case EventMapInfo::sModule:
+			SubscribeToEvent(scriptFile_, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			break;
+		case EventMapInfo::sVar:
+			object = *(Object**) pInfo->attrOffset;
+			if (object)
+				SubscribeToEvent(object, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null module var for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		case EventMapInfo::sGlobal:
+			object = dynamic_cast<Object*>(context_->GetGlobalVar(pInfo->objName).GetPtr());
+			if (object)
+				SubscribeToEvent(object, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null global var for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		case EventMapInfo::sChild:
+			object = node_ ? node_->GetChild(pInfo->objName, true) : nullptr;
+			if (object)
+				SubscribeToEvent(object, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null child for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		case EventMapInfo::sAttr:
+			object = *(Object**) ((char*) scriptObject_ + (int)reinterpret_cast<int64_t>(pInfo->attrOffset));
+			if (object)
+				SubscribeToEvent(object, pInfo->eventName, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) pInfo->pFunc));
+			else
+				URHO3D_LOGERROR("Autosubscribe to null attribute for " + String(scriptObject_->GetObjectType()->GetName()) + "::" + String(pInfo->pFunc->GetName()));
+			break;
+		}
+		pInfo = pInfo->next;
+	}
+	scriptObject_->SetUserData((void*) 1, eEventMapUserIdx);
 }
 
 asIScriptContext* GetActiveASContext()

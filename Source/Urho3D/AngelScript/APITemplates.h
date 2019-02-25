@@ -292,6 +292,11 @@ template <class T> VectorBuffer DeserializerReadVectorBuffer(unsigned size, T* p
     return VectorBuffer(*ptr, size);
 }
 
+template<typename T>
+inline static unsigned _seek(T* t, unsigned s) {
+	return t->Seek(s);
+}
+
 /// Template function for registering a class derived from Deserializer.
 template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char* className)
 {
@@ -329,7 +334,7 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "uint ReadVLE()", asMETHODPR(T, ReadVLE, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint ReadNetID()", asMETHODPR(T, ReadNetID, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "String ReadLine()", asMETHODPR(T, ReadLine, (), String), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint Seek(uint)", asMETHODPR(T, Seek, (unsigned), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint Seek(uint)", asFUNCTION(_seek<T>), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod(className, "uint SeekRelative(int)", asMETHODPR(T, SeekRelative, (int), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint Tell() const", asMETHODPR(T, Tell, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHODPR(T, GetName, () const, const String&), asCALL_THISCALL);

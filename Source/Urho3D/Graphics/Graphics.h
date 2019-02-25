@@ -381,6 +381,10 @@ public:
     /// Return display dpi information: (hdpi, vdpi, ddpi). On failure returns zero vector.
     Vector3 GetDisplayDPI(int monitor=0) const;
 
+	String GetVendorString() const;
+	String GetRendererString() const;
+	String GetExtensionsString() const;
+
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
     /// Return a shader variation by name and defines.

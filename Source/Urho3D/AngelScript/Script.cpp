@@ -21,7 +21,9 @@
 //
 
 #include "../Precompiled.h"
-
+#if WIN32
+#include <windows.h>
+#endif
 #include "../AngelScript/Addons.h"
 #include "../AngelScript/Script.h"
 #include "../AngelScript/ScriptAPI.h"
@@ -35,6 +37,65 @@
 #include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
+
+void registerAInAs(asIScriptEngine* engine);
+using namespace Urho3D;
+#ifdef __ANDROID__
+#include <jni.h>
+#include <SDL/SDL_Log.h>
+#include <SDL/SDL_assert.h>
+#include <SDL/SDL_events.h>
+#include "../Core/CoreEvents.h"
+#include "../Core/Context.h"
+#include "../Engine/Engine.h"
+#include "../Input/InputEvents.h"
+#include "../Scene/Scene.h"
+#include "../Core/Timer.h"
+
+URHO3D_EVENT(E_ANDROID_SERVICE, AndroidService) {
+	URHO3D_PARAM(P_DATA, Data);				   // string
+}
+
+extern "C" {
+	int Android_JNI_SendMessage(int, int);
+	int Android_JNI_SendStrMessage(int, const char*);
+}
+
+static void ActivityCallback(const char *_pstr) {
+	VariantMap* pArgs = new VariantMap;
+	(*pArgs)[AndroidService::P_DATA] = String(_pstr);
+	SDL_Event event;
+	SDL_zero(event);
+	event.type = userEventType;
+	event.user.code = E_ANDROID_SERVICE.Value();
+	event.user.data2 = pArgs;
+	SDL_PushEvent(&event);
+}
+
+static void PostStrToActivity(const String& param) {
+	Android_JNI_SendStrMessage(99, param.CString());
+}
+
+extern "C" {
+	JNIEXPORT void Java_org_libsdl_app_SDLActivity_nativeUserActivityCallback(JNIEnv* env, jclass cls, jstring json) {
+		const char *str = env->GetStringUTFChars(json, 0);
+		ActivityCallback(str);
+		if (str)
+			env->ReleaseStringUTFChars(json, str);
+	}
+}
+#else
+static void PostStrToActivity(const String& param) {
+}
+#endif
+
+void registerAInAs(asIScriptEngine* engine) {
+	engine->RegisterGlobalFunction("void PostCommandToAndroid(const String& param)", asFUNCTION(PostStrToActivity), asCALL_CDECL);
+}
+
+void initAndroidService(asIScriptEngine* engine) {
+	registerAInAs(engine);
+}
 
 namespace Urho3D
 {
@@ -151,6 +212,7 @@ Script::Script(Context* context) :
         router_ = new ScriptResourceRouter(context_);
         cache->AddResourceRouter(router_);
     }
+	initAndroidService(scriptEngine_);
 }
 
 Script::~Script()
@@ -235,9 +297,20 @@ void Script::SetExecuteConsoleCommands(bool enable)
 void Script::MessageCallback(const asSMessageInfo* msg)
 {
     String message;
-    message.AppendWithFormat("%s:%d,%d %s", msg->section, msg->row, msg->col, msg->message);
-
-    switch (msg->type)
+    //message.AppendWithFormat("%s:%d,%d %s", msg->section, msg->row, msg->col, msg->message);
+	char currDir[300] = "";
+#if WIN32
+	int l = GetCurrentDirectoryA(300, currDir);
+	if (currDir[l - 1] != '\\') {
+		currDir[l] = '\\';
+		currDir[l + 1] = 0;
+	}
+#endif
+	//message.AppendWithFormat("e:\\urho3d\\wnd1\\game\\Data\\%s(%i,%i): %s: %s\n", (const char*)msg->section, msg->row,
+	message.AppendWithFormat("%s%s(%i,%i): %s: %s\n", currDir, (const char*)msg->section, msg->row,
+		msg->col, msg->type == asMSGTYPE_ERROR ? "error" : "warning", msg->message);
+	URHO3D_LOGRAW(message);
+	/*switch (msg->type)
     {
     case asMSGTYPE_ERROR:
         URHO3D_LOGERROR(message);
@@ -250,7 +323,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
     default:
         URHO3D_LOGINFO(message);
         break;
-    }
+    }*/
 }
 
 void Script::ExceptionCallback(asIScriptContext* context)

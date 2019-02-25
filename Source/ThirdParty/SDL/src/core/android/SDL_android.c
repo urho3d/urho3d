@@ -1797,6 +1797,24 @@ int Android_JNI_SendMessage(int command, int param)
     return success ? 0 : -1;
 }
 
+int Android_JNI_SendStrMessage(int command, const char *param) {
+	JNIEnv *mEnv = Android_JNI_GetEnv();
+	jmethodID mid;
+	jboolean success;
+	jstring jparam;
+	if (!mEnv) {
+		return -1;
+	}
+	mid = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass, "sendStrMessage", "(ILjava/lang/String;)Z");
+	if (!mid) {
+		return -1;
+	}
+	jparam = (jstring)((*mEnv)->NewStringUTF(mEnv, param));
+	success = (*mEnv)->CallStaticBooleanMethod(mEnv, mActivityClass, mid, command, jparam);
+	(*mEnv)->DeleteLocalRef(mEnv, jparam);
+	return success ? 0 : -1;
+} 
+
 void Android_JNI_SuspendScreenSaver(SDL_bool suspend)
 {
     Android_JNI_SendMessage(COMMAND_SET_KEEP_SCREEN_ON, (suspend == SDL_FALSE) ? 0 : 1);

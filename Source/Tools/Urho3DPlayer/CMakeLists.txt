@@ -26,6 +26,9 @@ endif ()
 
 # Define target name
 set (TARGET_NAME Urho3DPlayer)
+if (ANDROID)
+	string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--version-script=E:/urho3d/my_fork/Source/Tools/Urho3DPlayer/android.ver")
+endif ()
 
 # Define source files
 define_source_files ()

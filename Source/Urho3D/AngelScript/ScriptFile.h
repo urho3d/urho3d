@@ -113,6 +113,8 @@ public:
     /// Clean up an event invoker object when its associated script object no longer exists
     void CleanupEventInvoker(asIScriptObject* object);
 
+	void SetOnlyCompile() { onlyCompile_ = true; }
+
 private:
     /// Add an event handler and create the necessary proxy object.
     void AddEventHandlerInternal(Object* sender, StringHash eventType, const String& handlerName);
@@ -147,6 +149,7 @@ private:
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> > eventInvokers_;
     /// Byte code for asynchronous loading.
     SharedArrayPtr<unsigned char> loadByteCode_;
+	bool onlyCompile_ = false;
     /// Byte code size for asynchronous loading.
     unsigned loadByteCodeSize_{};
 };

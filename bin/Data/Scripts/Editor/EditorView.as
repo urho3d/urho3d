@@ -31,6 +31,7 @@ WeakHandle lastSelectedNode = null;
 WeakHandle lastSelectedDrawable = null;
 WeakHandle lastSelectedComponent = null;
 Component@ coloringComponent = null;
+Material@ coloringMaterial = null;
 String coloringTypeName;
 String coloringPropertyName;
 Color coloringOldColor;
@@ -1008,7 +1009,7 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 // Create a preview viewport if a camera component is selected
 void UpdateCameraPreview()
 {
-    previewCamera = null;
+    //previewCamera = null;
     StringHash cameraType("Camera");
 
     for (uint i = 0; i < selectedComponents.length; ++i)
@@ -1041,10 +1042,14 @@ void UpdateCameraPreview()
     {
         if (renderer.numViewports < viewports.length + 1)
             renderer.numViewports = viewports.length + 1;
-
-        int previewWidth = graphics.width / 4;
-        int previewHeight = previewWidth * 9 / 16;
-        int previewX = graphics.width - 10 - previewWidth;
+		Camera@ cam = previewCamera.Get();
+        int previewWidth = graphics.width / 8;
+        int previewHeight = previewWidth * 16 / 9;
+		if (!cam.autoAspectRatio) {
+			previewWidth = graphics.width / 6;
+			previewHeight = previewWidth / cam.aspectRatio;
+		}
+		int previewX = 20;// graphics.width - 10 - previewWidth;
         int previewY = graphics.height - 30 - previewHeight;
 
         Viewport@ previewView = Viewport();

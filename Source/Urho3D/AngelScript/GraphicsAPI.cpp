@@ -473,9 +473,10 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Viewport", "IntVector2 WorldToScreenPoint(const Vector3&in) const", asMETHOD(Viewport, WorldToScreenPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Vector3 ScreenToWorldPoint(int, int, float) const", asMETHOD(Viewport, ScreenToWorldPoint), asCALL_THISCALL);
 
-    engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, AddRef), asCALL_THISCALL);
-    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_RELEASE, "void f()", asMETHOD(RenderSurface, ReleaseRef), asCALL_THISCALL);
+	RegisterRefCounted<RenderSurface>(engine, "RenderSurface");
+	//engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
+    //engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, AddRef), asCALL_THISCALL);
+    //engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_RELEASE, "void f()", asMETHOD(RenderSurface, ReleaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void QueueUpdate()", asMETHOD(RenderSurface, QueueUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "Texture@+ get_parentTexture() const", asMETHOD(RenderSurface, GetParentTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int get_width() const", asMETHOD(RenderSurface, GetWidth), asCALL_THISCALL);
@@ -1019,6 +1020,8 @@ static void RegisterModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "bool set_geometryCenters(uint, const Vector3&in)", asMETHOD(Model, SetGeometryCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "const Vector3& get_geometryCenters(uint) const", asMETHOD(Model, GetGeometryCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numMorphs() const", asMETHOD(Model, GetNumMorphs), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Model", "uint get_morphsStart(uint geom) const", asMETHOD(Model, GetMorphRangeStart), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Model", "uint get_morphsCount(uint geom) const", asMETHOD(Model, GetMorphRangeCount), asCALL_THISCALL);
 }
 
 static void ConstructAnimationKeyFrame(AnimationKeyFrame* ptr)
@@ -1430,6 +1433,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "const String& get_morphNames(uint) const", asFUNCTION(AnimatedModelGetMorphName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AnimatedModel", "void set_boundingBox(const BoundingBox&in)", asMETHOD(AnimatedModel, SetBoundingBox), asCALL_THISCALL);
 }
 
 static unsigned AnimationControllerGetNumAnimations(AnimationController* controller)
@@ -1942,6 +1946,11 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "int get_currentMonitor() const", asMETHOD(Graphics, GetCurrentMonitor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_maximized() const", asMETHOD(Graphics, GetMaximized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "Vector3 get_displayDPI(int) const", asMETHOD(Graphics, GetDisplayDPI), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Graphics", "String get_strVendor() const", asMETHOD(Graphics, GetVendorString), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Graphics", "String get_strRenderer() const", asMETHOD(Graphics, GetRendererString), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Graphics", "String get_strExtensions() const", asMETHOD(Graphics, GetExtensionsString), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Graphics", "bool get_highDPI() const", asMETHOD(Graphics, GetHighDPI), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Graphics", "int get_refreshRate() const", asMETHOD(Graphics, GetRefreshRate), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Graphics@+ get_graphics()", asFUNCTION(GetGraphics), asCALL_CDECL);
 }
 

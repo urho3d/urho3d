@@ -37,6 +37,8 @@
 #include "../Resource/ResourceCache.h"
 #include "../UI/Text.h"
 #include "../UI/UI.h"
+#include "../UI/UIEvents.h"
+#include "../UI/BorderImage.h"
 
 #ifdef _WIN32
 #include "../Engine/Engine.h"
@@ -66,8 +68,10 @@ const StringHash VAR_BUTTON_KEY_BINDING("VAR_BUTTON_KEY_BINDING");
 const StringHash VAR_BUTTON_MOUSE_BUTTON_BINDING("VAR_BUTTON_MOUSE_BUTTON_BINDING");
 const StringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const StringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
+const StringHash VAR_SCREEN_JOYSTICK_AXIS_ID("VAR_SCREEN_JOYSTICK_AXIS_ID");
 
 const unsigned TOUCHID_MAX = 32;
+int userEventType = 0;
 
 /// Convert SDL keycode if necessary.
 Key ConvertSDLKeyCode(int keySym, int scanCode)
@@ -379,6 +383,7 @@ Input::Input(Context* context) :
     mouseMoveScaled_(false),
     initialized_(false)
 {
+	userEventType = SDL_RegisterEvents(1);
     context_->RequireSDL(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 
     for (int i = 0; i < TOUCHID_MAX; i++)
@@ -1028,12 +1033,12 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
         String name = element->GetName();
         if (name.StartsWith("Button"))
         {
-            ++numButtons;
-
+			bool hasBindings = false;
             // Check whether the button has key binding
             auto* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
+				hasBindings = true;
                 text->SetVisible(false);
                 const String& key = text->GetText();
                 int keyBinding;
@@ -1071,13 +1076,41 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                 else
                     URHO3D_LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
             }
+			if (!hasBindings) {
+				unsigned idx = ToUInt(name.CString() + 6) + 1;
+				if (idx > numButtons)
+					numButtons = idx;
+			}
         }
         else if (name.StartsWith("Axis"))
         {
-            ++numAxes;
+            // each axis has x and y components, hence incr by 2
+            numAxes += 2;
+            state.screenJoystickAxisList_.Resize(state.screenJoystickAxisList_.Size() + 1);
+            ScreenJoystickAxis &screenJoystick = state.screenJoystickAxisList_.At(state.screenJoystickAxisList_.Size() - 1);
+            BorderImage *innerBorderImage = element->GetChildDynamicCast<BorderImage>("InnerButton", true);
 
-            ///\todo Axis emulation for screen joystick is not fully supported yet.
-            URHO3D_LOGWARNING("Axis emulation for screen joystick is not fully supported yet");
+            if (innerBorderImage)
+            {
+                IntVector2 outerSize = element->GetSize();
+                IntVector2 innerSize = innerBorderImage->GetSize();
+
+                screenJoystick.buttonOffset_ = (outerSize - innerSize)/2;
+				if (innerBorderImage->GetVars().Contains("InnerRadius")) {
+					screenJoystick.innerRadius_ = innerBorderImage->GetVars()["InnerRadius"]->GetFloat();
+				} else
+					screenJoystick.innerRadius_ =  (outerSize.x_ - innerSize.x_) / 2.0f;
+                screenJoystick.arrayIdx_ = ToUInt(name.CString() + 4);
+
+                // write vars and sub to events
+                innerBorderImage->SetEnabled(true);
+                innerBorderImage->SetVar(VAR_SCREEN_JOYSTICK_AXIS_ID, state.screenJoystickAxisList_.Size() - 1);
+                innerBorderImage->SetVar(VAR_SCREEN_JOYSTICK_ID, joystickID);
+
+                SubscribeToEvent(innerBorderImage, E_DRAGBEGIN, URHO3D_HANDLER(Input, HandleScreenJoystickDrag));
+                SubscribeToEvent(innerBorderImage, E_DRAGMOVE, URHO3D_HANDLER(Input, HandleScreenJoystickDrag));
+                SubscribeToEvent(innerBorderImage, E_DRAGEND, URHO3D_HANDLER(Input, HandleScreenJoystickDrag));
+            }
         }
         else if (name.StartsWith("Hat"))
         {
@@ -2387,7 +2420,24 @@ void Input::HandleSDLEvent(void* sdlEvent)
         SendEvent(E_EXITREQUESTED);
         break;
 
-    default: break;
+	default:
+		if (evt.type == userEventType) {
+			SDL_Log("Process user event %d\n", evt.user.code);
+			if (evt.user.code) {
+				Object* sender = reinterpret_cast<Object*>(evt.user.data1);
+				if (!sender)
+					sender = this;
+				VariantMap* pMap = reinterpret_cast<VariantMap*>(evt.user.data2);
+				StringHash eventType((unsigned)evt.user.code);
+				if (!pMap) {
+					sender->SendEvent(eventType);
+				} else {
+					sender->SendEvent(eventType, *pMap);
+					delete pMap;
+				}
+			}
+		}
+		break;
     }
 }
 
@@ -2586,6 +2636,76 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
 
     // Handle the fake SDL event to turn it into Urho3D genuine event
     HandleSDLEvent(&evt);
+}
+
+void Input::HandleScreenJoystickDrag(StringHash eventType, VariantMap& eventData)
+{
+    using namespace DragMove;
+    BorderImage *borderImage = (BorderImage*)eventData[P_ELEMENT].GetVoidPtr();
+    int X = eventData[P_X].GetInt();
+    int Y = eventData[P_Y].GetInt();
+
+    // Get stored vars
+    Variant var1 = borderImage->GetVar(VAR_SCREEN_JOYSTICK_ID);
+    Variant var2 = borderImage->GetVar(VAR_SCREEN_JOYSTICK_AXIS_ID);
+
+    if (var1.IsEmpty() || var2.IsEmpty())
+        return;
+
+    SDL_JoystickID joystickID = var1.GetInt();
+    unsigned axisIdx = var2.GetUInt();
+    JoystickState* joystickState = GetJoystick(joystickID);
+
+    if (joystickState)
+    {
+        const IntVector2 &buttonOffset = joystickState->screenJoystickAxisList_[axisIdx].buttonOffset_;
+        const Vector2 centerOffset(buttonOffset);
+        const float innerRadius = joystickState->screenJoystickAxisList_[axisIdx].innerRadius_;
+        Vector2 inputValue;
+
+        if (eventType == E_DRAGBEGIN)
+        {
+            IntVector2 p = borderImage->GetPosition();
+            borderImage->SetVar("DELTA", IntVector2(p.x_ - X, p.y_ - Y));
+        }
+        else if (eventType == E_DRAGMOVE)
+        {
+            IntVector2 d = borderImage->GetVar("DELTA").GetIntVector2();
+            int iX = X + d.x_; 
+            int iY = Y + d.y_;
+
+            IntVector2 iPos(iX, iY);
+            Vector2 fPos = Vector2(iPos);
+            Vector2 seg = fPos - centerOffset;
+
+            if (seg.LengthSquared() > M_EPSILON)
+            {
+                float dist = Min(seg.Length(), innerRadius);
+                Vector2 constrainedPos = centerOffset + seg.Normalized() * dist;
+                iPos = IntVector2((int)constrainedPos.x_, (int)constrainedPos.y_);
+                seg = constrainedPos - centerOffset;
+            }
+
+            borderImage->SetPosition(iPos);
+
+            inputValue.x_ = (seg.x_ / innerRadius);
+            inputValue.y_ = (seg.y_ / innerRadius);
+        }
+        else if (eventType == E_DRAGEND)
+        {
+            borderImage->SetPosition(buttonOffset);
+            inputValue = Vector2::ZERO;
+        }
+
+        // Write axis data
+        unsigned arrayIdx = joystickState->screenJoystickAxisList_[axisIdx].arrayIdx_;
+
+        if (arrayIdx*2 + 1 < joystickState->axes_.Size())
+        {
+            joystickState->axes_[arrayIdx*2]   = inputValue.x_;
+            joystickState->axes_[arrayIdx*2+1] = inputValue.y_;
+        }
+    }
 }
 
 }

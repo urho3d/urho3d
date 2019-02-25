@@ -101,11 +101,11 @@ public:
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
 
+	/// Set local-space bounding box.
+	void SetBoundingBox(const BoundingBox& box);
 protected:
     /// Recalculate the world-space bounding box.
-    void OnWorldBoundingBoxUpdate() override;
-    /// Set local-space bounding box.
-    void SetBoundingBox(const BoundingBox& box);
+    virtual void OnWorldBoundingBoxUpdate() override;
     /// Set number of geometries.
     void SetNumGeometries(unsigned num);
     /// Reset LOD levels.

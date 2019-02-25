@@ -63,4 +63,6 @@ URHO3D_EVENT(E_ENDFRAME, EndFrame)
 {
 }
 
+extern int userEventType;
+
 }

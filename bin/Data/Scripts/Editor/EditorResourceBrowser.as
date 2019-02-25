@@ -224,7 +224,7 @@ void CreateResourceBrowserUI()
     browserSearch = browserWindow.GetChild("Search", true);
     browserStatusMessage = browserWindow.GetChild("StatusMessage", true);
     browserResultsMessage = browserWindow.GetChild("ResultsMessage", true);
-    // browserWindow.visible = false;
+    browserWindow.visible = false;
     browserWindow.opacity = uiMaxOpacity;
 
     browserFilterWindow = LoadEditorUI("UI/EditorResourceFilterWindow.xml");

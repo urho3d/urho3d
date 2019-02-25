@@ -34,6 +34,8 @@ namespace Urho3D
 
 class Script;
 class ScriptFile;
+enum { eEventMapUserIdx = 0x1df4 };
+void CleanupTypeInfoScriptInstance(asITypeInfo *type);
 
 /// Inbuilt scripted component methods.
 enum ScriptInstanceMethod
@@ -187,6 +189,8 @@ private:
     void HandleScriptFileReload(StringHash eventType, VariantMap& eventData);
     /// Handle script file reload finished.
     void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
+
+	void SubscribeToAutoEvents();
 
     /// Script file.
     WeakPtr<ScriptFile> scriptFile_;

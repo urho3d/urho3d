@@ -126,7 +126,8 @@ class TerrainEditor
         SubscribeToEvent(brushSizeSlider, "DragEnd", "UpdateScaledBrush");
 
         LoadBrushes();
-        Show();
+        //Show();
+		Hide();
 
         brushVisualizer.Create();
     }

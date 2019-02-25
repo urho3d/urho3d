@@ -3387,5 +3387,16 @@ void Graphics::SetVertexAttribDivisor(unsigned location, unsigned divisor)
 #endif
 #endif
 }
+String Graphics::GetVendorString() const {
+	return String((const char*)glGetString(GL_VENDOR));
+}
+
+String Graphics::GetRendererString() const {
+	return String((const char*)glGetString(GL_RENDERER));
+}
+
+String Graphics::GetExtensionsString() const {
+	return String((const char*)glGetString(GL_EXTENSIONS));
+}
 
 }

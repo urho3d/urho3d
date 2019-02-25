@@ -131,6 +131,14 @@ if (NOT ANDROID AND NOT ARM AND NOT WEB)
     endif ()
 endif ()
 
+set (ENABLE_PROGRAMS OFF CACHE BOOL "Enable mbedtls samples" FORCE)
+set (ENABLE_TESTING OFF CACHE BOOL "Enable mbedtls testing" FORCE)
+add_subdirectory (ThirdParty/mbedtls)
+list (APPEND LIBS mbedcrypto mbedtls mbedx509)
+set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} mbedcrypto)
+set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} mbedtls)
+set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} mbedx509)
+
 # Urho3D game engine library
 add_subdirectory (Urho3D)
 

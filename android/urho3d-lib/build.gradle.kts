@@ -82,6 +82,11 @@ android {
                         .split(',').toTypedArray())
             }
         }
+		/*ndk {
+		  // Specifies the ABI configurations of your native
+		  // libraries Gradle should build and package with your APK.
+		  abiFilters("armeabi-v7a")
+	    }*/
     }
     buildTypes {
         getByName("release") {

@@ -1582,6 +1582,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
             return false;
     }
 
+	Animatable::ApplyAttributes();
     return true;
 }
 
@@ -1627,6 +1628,8 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
         childElem = childElem.GetNext("node");
     }
 
+	Animatable::ApplyAttributes();
+
     return true;
 }
 
@@ -1671,6 +1674,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
         if (!newNode->LoadJSON(childVal, resolver, loadChildren, rewriteIDs, mode))
             return false;
     }
+	Animatable::ApplyAttributes();
 
     return true;
 }

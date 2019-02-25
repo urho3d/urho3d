@@ -294,7 +294,6 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
     }
-
     return parent;
 }
 
@@ -318,8 +317,12 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         // If the attribute is a node ID, make it a drag/drop target
-        if (info.name.Contains("NodeID", false) || info.name.Contains("Node ID", false) || (info.mode & AM_NODEID) != 0)
+        if (info.name.Contains("NodeID", false) || info.name.Contains("Node ID", false) || (info.mode & AM_NODEID) != 0 || (info.mode & AM_COMPONENTID) != 0)
+        {
             attrEdit.dragDropMode = DD_TARGET;
+            attrEdit.vars["isComponent"] = info.mode & AM_COMPONENTID != 0;
+            createNodeComponentButton(parent);
+        }
     }
     else
     {
@@ -420,6 +423,42 @@ Button@ CreateResourcePickerButton(UIElement@ container, Array<Serializable@>@ s
     buttonText.autoLocalizable = true;
 
     return button;
+}
+
+void createNodeComponentButton(UIElement@ container)
+{
+    Button@ button = Button();
+    container.AddChild(button);
+    button.style = AUTO_STYLE;
+
+    Text@ buttonText = Text();
+    button.AddChild(buttonText);
+    buttonText.style = "EditorAttributeText";
+    buttonText.SetAlignment(HA_CENTER, VA_CENTER);
+    buttonText.autoLocalizable = false;
+    SubscribeToEvent(button, "Pressed", "onButtonNodeComponentsPressed");
+}
+
+void onButtonNodeComponentsPressed(StringHash, VariantMap& data)
+{
+    UIElement@ e = data["Element"].GetPtr();
+    LineEdit@ le = e.parent.children[1];
+    uint id = le.text.ToUInt();
+    if (id == 0)
+        return;
+
+    if (le.vars["isComponent"].GetBool())
+    {
+        Component@ cmp = scene.GetComponent(id);
+        if (cmp !is null)
+            SelectComponent(cmp, false);
+    }
+    else
+    {
+        Node@ nd = scene.GetNode(id);
+        if (nd !is null)
+            SelectNode(nd, false);
+    }
 }
 
 // Use internally for nested variant vector
@@ -659,7 +698,19 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
         if (bitSelectionAttrs.Find(info.name) > -1)
             SetEditable(SetValue(parent.GetChild("LineEdit", true), value.ToString(), sameValue), editable && sameValue);
         else if (info.enumNames is null || info.enumNames.empty)
+        {
+            LineEdit@ edit = parent.children[1];
+            if (edit.vars.Contains("isComponent"))
+            {
+                uint id = value.GetUInt();
+                String title;
+                if (id != 0)
+                    title = edit.vars["isComponent"].GetBool() ? GetComponentTitle(scene.GetComponent(id), false) : GetNodeTitle(scene.GetNode(id), false);
+                Text@ txt = parent.children[2].children[0];
+                txt.text = title;
+            }
             SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
+        }
         else
             SetEditable(SetValue(parent.children[1], value.GetInt(), sameValue), editable && sameValue);
     }

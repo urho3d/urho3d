@@ -26,6 +26,10 @@
 #include "../AngelScript/ScriptAPI.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../Resource/ResourceCache.h"
+#include "ScriptInstance.h"
+#include "../ThirdParty/mbedtls/include/mbedtls/error.h"
+#include "../ThirdParty/mbedtls/include/mbedtls/md.h"
+#include "../ThirdParty/mbedtls/include/mbedtls/pk.h"
 
 namespace Urho3D
 {
@@ -84,6 +88,24 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
     return instance->GetScriptObject();
 }
 
+static int verifySHA1withRSASignature(const String& base64PubKey, const String& data, const String& base64Signature) {
+	PODVector<unsigned char> pubKey = DecodeBase64(base64PubKey);
+	PODVector<unsigned char> signature = DecodeBase64(base64Signature);
+	mbedtls_pk_context pk;
+	mbedtls_pk_init(&pk);
+	unsigned char hash[32];
+	int ret;
+	if (0 == mbedtls_pk_parse_public_key(&pk, pubKey.Buffer(), pubKey.Size())) {
+		if (0 == mbedtls_md(mbedtls_md_info_from_type(MBEDTLS_MD_SHA1), (const unsigned char*) data.CString(), data.Length(), hash)) {
+			ret = 0 == mbedtls_pk_verify(&pk, MBEDTLS_MD_SHA1, hash, 0, signature.Buffer(), signature.Size()) ? 0 : 3;
+		} else
+			ret = 2;
+	} else
+		ret = 1;
+	mbedtls_pk_free(&pk);
+	return ret;
+}
+
 static void RegisterScriptFile(asIScriptEngine* engine)
 {
     RegisterResource<ScriptFile>(engine, "ScriptFile");
@@ -91,6 +113,7 @@ static void RegisterScriptFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptFile", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+ params = null)", asFUNCTION(ScriptFileDelayedExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptFile", "void ClearDelayedExecute(const String&in declaration = String())", asMETHOD(ScriptFile, ClearDelayedExecute), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptFile", "bool get_compiled() const", asMETHOD(ScriptFile, IsCompiled), asCALL_THISCALL);
+	engine->RegisterGlobalFunction("int verifySHA1withRSASignature(const String& base64PubKey, const String& data, const String& base64Signature)", asFUNCTION(verifySHA1withRSASignature), asCALL_CDECL);
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(GetScriptContextFile), asCALL_CDECL);
 }
 
@@ -281,6 +304,7 @@ static void RegisterScript(asIScriptEngine* engine)
 static void RegisterScriptObject(asIScriptEngine* engine)
 {
     engine->RegisterInterface("ScriptObject");
+	engine->SetTypeInfoUserDataCleanupCallback(CleanupTypeInfoScriptInstance, eEventMapUserIdx);
 }
 
 void RegisterScriptInterfaceAPI(asIScriptEngine* engine)

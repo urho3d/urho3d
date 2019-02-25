@@ -150,8 +150,8 @@ bool Scene::Save(Serializer& dest) const
     }
 
     auto* ptr = dynamic_cast<Deserializer*>(&dest);
-    if (ptr)
-        URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
+    //if (ptr)
+    //    URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
     if (Node::Save(dest))
     {
