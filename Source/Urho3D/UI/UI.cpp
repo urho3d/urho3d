@@ -1193,10 +1193,11 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                         int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
                             element->GetScreenPosition().y_;
                         int layoutMaxSize = current->GetLayoutElementMaxSize();
+                        int spacing = current->GetLayoutSpacing();
 
                         if (screenPos < 0 && layoutMaxSize > 0)
                         {
-                            auto toSkip = (unsigned)(-screenPos / layoutMaxSize);
+                            auto toSkip = (unsigned)(-screenPos / (layoutMaxSize + spacing));
                             if (toSkip > 0)
                                 i += (toSkip - 1);
                         }
