@@ -77,6 +77,7 @@ void L10n::InitLocalizationSystem()
     l10n->LoadJSONFile("StringsEnRu.json");
     // You can load multiple files
     l10n->LoadJSONFile("StringsDe.json");
+    l10n->LoadJSONFile("StringsLv.json", "lv");
     // Hook up to the change language
     SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(L10n, HandleChangeLanguage));
 }

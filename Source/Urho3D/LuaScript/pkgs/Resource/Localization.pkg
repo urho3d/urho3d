@@ -11,8 +11,9 @@ class Localization : public Object
     void SetLanguage(int index);
     String Get(const String id);
     void Reset();
-    void LoadJSON(const JSONValue& source);
-    void LoadJSONFile(const String name);
+    void LoadMultipleLanguageJSON(const JSONValue& source);
+    void LoadSingleLanguageJSON(const JSONValue& source, const String& language = String::EMPTY);
+    void LoadJSONFile(const String name, const String language = String::EMPTY);
 
     tolua_readonly tolua_property__get_set int numLanguages;
     tolua_readonly tolua_property__get_set int languageIndex;
