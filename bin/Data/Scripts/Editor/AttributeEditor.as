@@ -1200,7 +1200,7 @@ ResourcePicker@ GetResourcePicker(StringHash resourceType)
 {
     for (uint i = 0; i < resourcePickers.length; ++i)
     {
-        if (resourcePickers[i].type == resourceType)
+        if (resourcePickers[i].type.value == resourceType.value)
             return resourcePickers[i];
     }
     return null;
