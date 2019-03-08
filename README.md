@@ -154,6 +154,7 @@ Urho3D development, contributions and bugfixes by:
 - rikorin
 - skaiware
 - ssinai1
+- sssooonnnggg
 - svifylabs
 - szamq
 - thebluefish
