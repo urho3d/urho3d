@@ -130,7 +130,7 @@ public:
     UIElement* GetSelectedItem() const;
     /// Return all selected items.
     PODVector<UIElement*> GetSelectedItems() const;
-    /// Return whether an item at index is seleccted.
+    /// Return whether an item at index is selected.
     bool IsSelected(unsigned index) const;
     /// Return whether an item at index has its children expanded (in hierarchy mode only).
     bool IsExpanded(unsigned index) const;
