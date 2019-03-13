@@ -122,6 +122,7 @@ Urho3D development, contributions and bugfixes by:
 - TheComet93
 - Y-way
 - 1vanK
+- ab4daa
 - andmar1x
 - amadeus_osa
 - atship
@@ -146,6 +147,7 @@ Urho3D development, contributions and bugfixes by:
 - nemerle
 - ninjastone
 - orefkov
+- pat2nav
 - proller
 - raould
 - rasteron
