@@ -81,14 +81,24 @@ public:
 
     /// Query for a function by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    /// Query for a function by declaration and execute and return result if found.
+    bool Execute(const String& declaration, const VariantVector& parameters, VariantType resultType, Variant&result, 
+        bool unprepare = true);
     /// Execute a function.
     bool Execute(asIScriptFunction* function, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    /// Execute a function and return result.
+    bool Execute(asIScriptFunction* function, const VariantVector& parameters, VariantType resultType, Variant & result, 
+        bool unprepare = true);
     /// Query for an object method by declaration and execute if found.
     bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector,
         bool unprepare = true);
     /// Execute an object method.
     bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector,
         bool unprepare = true);
+    /// Execute an object method and return result.
+    bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, VariantType resultType, 
+        Variant&result, bool unprepare = true);
+
     /// Add a delay-executed function call, optionally repeating.
     void DelayedExecute
         (float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);

@@ -292,6 +292,13 @@ bool ScriptFile::HasEventHandler(Object* sender, StringHash eventType) const
 
 bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
 {
+    Variant result;
+    VariantType resultType = VariantType::VAR_NONE;
+    return Execute(declaration, parameters, resultType, result, unprepare);
+}
+
+bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, VariantType resultType, Variant&result, bool unprepare)
+{
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
     {
@@ -299,10 +306,17 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
         return false;
     }
 
-    return Execute(function, parameters, unprepare);
+    return Execute(function, parameters, resultType, result, unprepare);
 }
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
+{
+    Variant result;
+    VariantType resultType = VariantType::VAR_NONE;
+    return Execute(function, parameters, resultType, result, unprepare);
+}
+
+bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, VariantType resultType, Variant & result, bool unprepare)
 {
     URHO3D_PROFILE(ExecuteFunction);
 
@@ -321,6 +335,78 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
 
     scriptSystem->IncScriptNestingLevel();
     bool success = context->Execute() >= 0;
+    if(success)
+    {
+        switch(resultType)
+        {
+        case VariantType::VAR_NONE:
+            break;
+
+        case VariantType::VAR_INT:
+            result = Variant(static_cast<int>(context->GetReturnDWord())); 
+            break;
+
+        case VariantType::VAR_INT64:
+            result = Variant(static_cast<long long>(context->GetReturnQWord())); 
+            break;
+
+        case VariantType::VAR_BOOL:
+            result = Variant(context->GetReturnByte()>0); 
+            break;
+
+        case VariantType::VAR_FLOAT:
+            result = Variant(context->GetReturnFloat()); 
+            break;
+
+        case VariantType::VAR_DOUBLE:
+            result = Variant(context->GetReturnDouble()); 
+            break;
+
+        case VariantType::VAR_RECT:
+            result = Variant(*(static_cast<Rect*>(context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_VECTOR2:
+            result = Variant(*(static_cast<Vector2*>(context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_VECTOR3:
+            result = Variant(*(static_cast<Vector3*>( context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_VECTOR4:     
+            result = Variant(*(static_cast<Vector4*>( context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_QUATERNION:  
+            result = Variant(*(static_cast<Quaternion*>( context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_INTRECT:     
+            result = Variant(*(static_cast<IntRect*>( context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_INTVECTOR2:  
+            result = Variant(*(static_cast<IntVector2*>( context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_INTVECTOR3:  
+            result = Variant(*(static_cast<IntVector3*>(context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_STRING:      
+            result = Variant(*(static_cast<String*>(context->GetReturnObject()))); 
+            break;
+
+        case VariantType::VAR_PTR:
+            result = Variant(static_cast<RefCounted*>(context->GetReturnObject()));
+            break;
+
+        default:
+            URHO3D_LOGERRORF("Result type is not supported");
+            break;
+        }
+    }
     if (unprepare)
         context->Unprepare();
     scriptSystem->DecScriptNestingLevel();
@@ -344,6 +430,13 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
 }
 
 bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
+{
+    Variant result;
+    VariantType resultType = VariantType::VAR_NONE;
+    return Execute(object, method, parameters, resultType, result, unprepare);
+}
+
+bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, VariantType resultType, Variant&result, bool unprepare)
 {
     URHO3D_PROFILE(ExecuteMethod);
 
