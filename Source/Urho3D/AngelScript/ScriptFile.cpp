@@ -290,14 +290,7 @@ bool ScriptFile::HasEventHandler(Object* sender, StringHash eventType) const
         return false;
 }
 
-bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
-{
-    Variant result;
-    VariantType resultType = VariantType::VAR_NONE;
-    return Execute(declaration, parameters, resultType, result, unprepare);
-}
-
-bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, VariantType resultType, Variant&result, bool unprepare)
+bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
 {
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
@@ -306,17 +299,11 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
         return false;
     }
 
-    return Execute(function, parameters, resultType, result, unprepare);
+    return Execute(function, parameters, functionReturn, unprepare);
 }
 
-bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
-{
-    Variant result;
-    VariantType resultType = VariantType::VAR_NONE;
-    return Execute(function, parameters, resultType, result, unprepare);
-}
-
-bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, VariantType resultType, Variant & result, bool unprepare)
+    /// Execute a function and return result.
+bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
 {
     URHO3D_PROFILE(ExecuteFunction);
 
@@ -334,77 +321,121 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     SetParameters(context, function, parameters);
 
     scriptSystem->IncScriptNestingLevel();
-    bool success = context->Execute() >= 0;
-    if(success)
+    bool success = (context->Execute() == asEXECUTION_FINISHED);
+    if(success && (functionReturn!=nullptr))
     {
-        switch(resultType)
+        const int typeId = function->GetReturnTypeId();
+
+        asIScriptEngine* engine = script_->GetScriptEngine();
+        asITypeInfo  * typeInfo = engine->GetTypeInfoById(typeId);
+
+        // Built-in type
+	    if(typeInfo == nullptr)
         {
-        case VariantType::VAR_NONE:
-            break;
+            switch(typeId)
+            {
+            case asTYPEID_VOID:
+                *functionReturn = Variant();
+                break;
 
-        case VariantType::VAR_INT:
-            result = Variant(static_cast<int>(context->GetReturnDWord())); 
-            break;
+	        case asTYPEID_BOOL:
+                *functionReturn = Variant(context->GetReturnByte()>0); 
+                break;
 
-        case VariantType::VAR_INT64:
-            result = Variant(static_cast<long long>(context->GetReturnQWord())); 
-            break;
+	        case asTYPEID_INT8:
+	        case asTYPEID_UINT8:
+	        case asTYPEID_INT16:
+	        case asTYPEID_UINT16:
+	        case asTYPEID_INT32:
+	        case asTYPEID_UINT32:
+                *functionReturn = Variant(static_cast<int>(context->GetReturnDWord())); 
+                break;
 
-        case VariantType::VAR_BOOL:
-            result = Variant(context->GetReturnByte()>0); 
-            break;
+	        case asTYPEID_INT64:
+	        case asTYPEID_UINT64:
+                *functionReturn = Variant(static_cast<long long>(context->GetReturnQWord())); 
+                break;
 
-        case VariantType::VAR_FLOAT:
-            result = Variant(context->GetReturnFloat()); 
-            break;
+	        case asTYPEID_FLOAT:
+                *functionReturn = Variant(context->GetReturnFloat()); 
+                break;
 
-        case VariantType::VAR_DOUBLE:
-            result = Variant(context->GetReturnDouble()); 
-            break;
+	        case asTYPEID_DOUBLE:
+                *functionReturn = Variant(context->GetReturnDouble()); 
+                break;
+            }
+        }
+        else if(typeInfo->GetFlags() & asOBJ_REF)
+        {
+            *functionReturn = Variant(static_cast<RefCounted*>(context->GetReturnObject()));
+        }
+        else if(typeInfo->GetFlags() & asOBJ_VALUE)
+        {
+            void * returnedObject = context->GetReturnObject();
 
-        case VariantType::VAR_RECT:
-            result = Variant(*(static_cast<Rect*>(context->GetReturnObject()))); 
-            break;
+            const VariantType variantType = Variant::GetTypeFromName(typeInfo->GetName());
+            switch(variantType)
+            {
+            case VAR_STRING:
+                *functionReturn = *static_cast<String*>(returnedObject);
+                break;
 
-        case VariantType::VAR_VECTOR2:
-            result = Variant(*(static_cast<Vector2*>(context->GetReturnObject()))); 
-            break;
+            case VAR_VECTOR2:
+                *functionReturn = *static_cast<Vector2*>(returnedObject);
+                break;
 
-        case VariantType::VAR_VECTOR3:
-            result = Variant(*(static_cast<Vector3*>( context->GetReturnObject()))); 
-            break;
+            case VAR_VECTOR3:
+                *functionReturn = *static_cast<Vector3*>(returnedObject);
+                break;
 
-        case VariantType::VAR_VECTOR4:     
-            result = Variant(*(static_cast<Vector4*>( context->GetReturnObject()))); 
-            break;
+            case VAR_VECTOR4:
+                *functionReturn = *static_cast<Vector4*>(returnedObject);
+                break;
 
-        case VariantType::VAR_QUATERNION:  
-            result = Variant(*(static_cast<Quaternion*>( context->GetReturnObject()))); 
-            break;
+            case VAR_QUATERNION:
+                *functionReturn = *static_cast<Quaternion*>(returnedObject);
+                break;
 
-        case VariantType::VAR_INTRECT:     
-            result = Variant(*(static_cast<IntRect*>( context->GetReturnObject()))); 
-            break;
+            case VAR_COLOR:
+                *functionReturn = *static_cast<Color*>(returnedObject);
+                break;
 
-        case VariantType::VAR_INTVECTOR2:  
-            result = Variant(*(static_cast<IntVector2*>( context->GetReturnObject()))); 
-            break;
+            case VAR_INTRECT:
+                *functionReturn = *static_cast<IntRect*>(returnedObject);
+                break;
 
-        case VariantType::VAR_INTVECTOR3:  
-            result = Variant(*(static_cast<IntVector3*>(context->GetReturnObject()))); 
-            break;
+            case VAR_INTVECTOR2:
+                *functionReturn = *static_cast<IntVector2*>(returnedObject);
+                break;
 
-        case VariantType::VAR_STRING:      
-            result = Variant(*(static_cast<String*>(context->GetReturnObject()))); 
-            break;
+            case VAR_MATRIX3:
+                *functionReturn = *static_cast<Matrix3*>(returnedObject);
+                break;
 
-        case VariantType::VAR_PTR:
-            result = Variant(static_cast<RefCounted*>(context->GetReturnObject()));
-            break;
+            case VAR_MATRIX3X4:
+                *functionReturn = *static_cast<Matrix3x4*>(returnedObject);
+                break;
 
-        default:
-            URHO3D_LOGERRORF("Result type is not supported");
-            break;
+            case VAR_MATRIX4:
+                *functionReturn = *static_cast<Matrix4*>(returnedObject);
+                break;
+
+            case VAR_RECT:
+                *functionReturn = *static_cast<Rect*>(returnedObject);
+                break;
+
+            case VAR_INTVECTOR3:
+                *functionReturn = *static_cast<IntVector3*>(returnedObject);
+                break;
+            
+            default:
+                URHO3D_LOGERROR("Return type is not supported" + String(typeInfo->GetName()));
+                break;
+            }
+        }
+        else
+        {
+            URHO3D_LOGERROR("Return type is not supported" + String(typeInfo->GetName()));
         }
     }
     if (unprepare)
@@ -414,7 +445,7 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     return success;
 }
 
-bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, bool unprepare)
+bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
 {
     if (!object)
         return false;
@@ -426,17 +457,10 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
         return false;
     }
 
-    return Execute(object, method, parameters, unprepare);
+    return Execute(object, method, parameters, functionReturn, unprepare);
 }
 
-bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
-{
-    Variant result;
-    VariantType resultType = VariantType::VAR_NONE;
-    return Execute(object, method, parameters, resultType, result, unprepare);
-}
-
-bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, VariantType resultType, Variant&result, bool unprepare)
+bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
 {
     URHO3D_PROFILE(ExecuteMethod);
 
