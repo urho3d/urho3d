@@ -105,7 +105,7 @@ URHO3D_EVENT(E_DRAGDROPTEST, DragDropTest)
     URHO3D_PARAM(P_SOURCE, Source);                // UIElement pointer
     URHO3D_PARAM(P_TARGET, Target);                // UIElement pointer
     URHO3D_PARAM(P_ACCEPT, Accept);                // bool
-};
+}
 
 /// Drag and drop finish.
 URHO3D_EVENT(E_DRAGDROPFINISH, DragDropFinish)
@@ -113,7 +113,7 @@ URHO3D_EVENT(E_DRAGDROPFINISH, DragDropFinish)
     URHO3D_PARAM(P_SOURCE, Source);                // UIElement pointer
     URHO3D_PARAM(P_TARGET, Target);                // UIElement pointer
     URHO3D_PARAM(P_ACCEPT, Accept);                // bool
-};
+}
 
 /// Focus element changed.
 URHO3D_EVENT(E_FOCUSCHANGED, FocusChanged)

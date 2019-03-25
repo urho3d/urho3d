@@ -64,4 +64,4 @@ unsigned SoundStream::GetSampleSize() const
     return size;
 }
 
-};
+}

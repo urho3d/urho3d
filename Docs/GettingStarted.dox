@@ -40,7 +40,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian) or libevdev (Pidora).
 
-- For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
+- For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed. Homebrew is required to install 'cmake' and some of the optional development packages, such as ccache, doxygen, graphviz, and readline.
 
 - For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed.
 

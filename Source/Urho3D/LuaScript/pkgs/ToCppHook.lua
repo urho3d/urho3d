@@ -104,6 +104,9 @@ function post_output_hook(package)
     result = string.gsub(result, "@1%(", "(\"\",")      -- is_pointer overload uses const char* as signature
     result = string.gsub(result, "@2%(", "(0.f,")       -- is_arithmetic overload uses double as signature
 
+    -- Suppress GCC 'pedantic' warnings due to extra semicolon in the emitted code
+    result = string.gsub(result, "TOLUA_API int luaopen_(.+)};", "TOLUA_API int luaopen_%1}")
+
     WRITE(result)
     WRITE([[
 #if __clang__

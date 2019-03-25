@@ -102,13 +102,13 @@ URHO3D_EVENT(E_ASYNCLOADPROGRESS, AsyncLoadProgress)
     URHO3D_PARAM(P_TOTALNODES, TotalNodes);        // int
     URHO3D_PARAM(P_LOADEDRESOURCES, LoadedResources); // int
     URHO3D_PARAM(P_TOTALRESOURCES, TotalResources);   // int
-};
+}
 
 /// Asynchronous scene loading finished.
 URHO3D_EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
 {
     URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
-};
+}
 
 /// A child node has been added to a parent node.
 URHO3D_EVENT(E_NODEADDED, NodeAdded)
