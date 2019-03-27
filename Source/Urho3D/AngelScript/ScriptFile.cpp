@@ -302,7 +302,6 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
     return Execute(function, parameters, functionReturn, unprepare);
 }
 
-    /// Execute a function and return result.
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
 {
     URHO3D_PROFILE(ExecuteFunction);
@@ -322,59 +321,59 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
 
     scriptSystem->IncScriptNestingLevel();
     bool success = (context->Execute() == asEXECUTION_FINISHED);
-    if(success && (functionReturn!=nullptr))
+    if (success && (functionReturn != nullptr))
     {
         const int typeId = function->GetReturnTypeId();
 
         asIScriptEngine* engine = script_->GetScriptEngine();
-        asITypeInfo  * typeInfo = engine->GetTypeInfoById(typeId);
+        asITypeInfo* typeInfo = engine->GetTypeInfoById(typeId);
 
         // Built-in type
-	    if(typeInfo == nullptr)
+        if (typeInfo == nullptr)
         {
-            switch(typeId)
+            switch (typeId)
             {
             case asTYPEID_VOID:
-                *functionReturn = Variant();
+                *functionReturn = Variant::EMPTY;
                 break;
 
-	        case asTYPEID_BOOL:
-                *functionReturn = Variant(context->GetReturnByte()>0); 
+            case asTYPEID_BOOL:
+                *functionReturn = Variant(context->GetReturnByte() > 0);
                 break;
 
-	        case asTYPEID_INT8:
-	        case asTYPEID_UINT8:
-	        case asTYPEID_INT16:
-	        case asTYPEID_UINT16:
-	        case asTYPEID_INT32:
-	        case asTYPEID_UINT32:
-                *functionReturn = Variant(static_cast<int>(context->GetReturnDWord())); 
+            case asTYPEID_INT8:
+            case asTYPEID_UINT8:
+            case asTYPEID_INT16:
+            case asTYPEID_UINT16:
+            case asTYPEID_INT32:
+            case asTYPEID_UINT32:
+                *functionReturn = Variant(static_cast<int>(context->GetReturnDWord()));
                 break;
 
-	        case asTYPEID_INT64:
-	        case asTYPEID_UINT64:
-                *functionReturn = Variant(static_cast<long long>(context->GetReturnQWord())); 
+            case asTYPEID_INT64:
+            case asTYPEID_UINT64:
+                *functionReturn = Variant(static_cast<long long>(context->GetReturnQWord()));
                 break;
 
-	        case asTYPEID_FLOAT:
-                *functionReturn = Variant(context->GetReturnFloat()); 
+            case asTYPEID_FLOAT:
+                *functionReturn = Variant(context->GetReturnFloat());
                 break;
 
-	        case asTYPEID_DOUBLE:
-                *functionReturn = Variant(context->GetReturnDouble()); 
+            case asTYPEID_DOUBLE:
+                *functionReturn = Variant(context->GetReturnDouble());
                 break;
             }
         }
-        else if(typeInfo->GetFlags() & asOBJ_REF)
+        else if (typeInfo->GetFlags() & asOBJ_REF)
         {
             *functionReturn = Variant(static_cast<RefCounted*>(context->GetReturnObject()));
         }
-        else if(typeInfo->GetFlags() & asOBJ_VALUE)
+        else if (typeInfo->GetFlags() & asOBJ_VALUE)
         {
-            void * returnedObject = context->GetReturnObject();
+            void* returnedObject = context->GetReturnObject();
 
             const VariantType variantType = Variant::GetTypeFromName(typeInfo->GetName());
-            switch(variantType)
+            switch (variantType)
             {
             case VAR_STRING:
                 *functionReturn = *static_cast<String*>(returnedObject);
@@ -427,15 +426,15 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
             case VAR_INTVECTOR3:
                 *functionReturn = *static_cast<IntVector3*>(returnedObject);
                 break;
-            
+
             default:
-                URHO3D_LOGERROR("Return type is not supported" + String(typeInfo->GetName()));
+                URHO3D_LOGERRORF("Return type (%c) is not supported", typeInfo->GetName());
                 break;
             }
         }
         else
         {
-            URHO3D_LOGERROR("Return type is not supported" + String(typeInfo->GetName()));
+            URHO3D_LOGERRORF("Return type (%c)is not supported", typeInfo->GetName());
         }
     }
     if (unprepare)
@@ -445,7 +444,8 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     return success;
 }
 
-bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
+bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, Variant* functionReturn,
+    bool unprepare)
 {
     if (!object)
         return false;
@@ -460,7 +460,8 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
     return Execute(object, method, parameters, functionReturn, unprepare);
 }
 
-bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, Variant* functionReturn, bool unprepare)
+bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, Variant* functionReturn,
+    bool unprepare)
 {
     URHO3D_PROFILE(ExecuteMethod);
 
