@@ -75,7 +75,7 @@
 #define RegisterObjectMethodFasCALL_CDECL_OBJFIRST(clsdcl,decl,fun) RegisterObjectMethod(clsdcl,decl, WRAP_OBJ_FIRST(fun), asCALL_GENERIC); //assert(r >= 0);
 //#define RegisterObjectMethodMasCALL_CDECL_OBJECTFIRST(decl,cls,fun) RegisterObjectMethodMasCALL_THISCALL_ASGLOBAL_2(decl,UNWRAP fun)
 //#define RegisterObjectMethodMasCALL_THISCALL_ASGLOBAL_2(decl, ...) RegisterObjectMethod(decl, WRAP_MFN(__VA_ARGS__), asCALL_GENERIC); //assert(r >= 0);
-#define RegisterObjectMethodFasCALL_GENERIC(clsdcl,decl,fun) RegisterObjectMethod(clsdcl,decl, asMethodPtr(fun), asCALL_GENERIC); //assert(r >= 0);
+#define RegisterObjectMethodFasCALL_GENERIC(clsdcl,decl,fun) RegisterObjectMethod(clsdcl,decl, asFunctionPtr(fun), asCALL_GENERIC); //assert(r >= 0);
 
 ////note:unfortunately, the WrapCon methods are for creating the constructor wrapper, which typically seems to be done anyways, so we should just handle it like Register Object Method with 1 extra parameter
 //#define RegisterObjectBehaviour(...) RegObjectBehaviorIndirect(__VA__ARGS__)
