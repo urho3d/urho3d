@@ -2043,6 +2043,24 @@ void ScriptDictionaryListFactory_Generic(asIScriptGeneric *gen)
     *(CScriptDictionary**)gen->GetAddressOfReturnLocation() = CScriptDictionary::Create(buffer);
 }
 
+void ScriptDictionarySet_Generic(asIScriptGeneric *gen)
+{
+    CScriptDictionary* dict = (CScriptDictionary*)gen->GetObject();
+    String* key = *(String**)gen->GetAddressOfArg(0);
+    void* ref = *(void**)gen->GetAddressOfArg(1);
+    int type_id = gen->GetArgTypeId(1);
+    dict->Set(*key, ref, type_id);
+}
+
+void ScriptDictionaryGet_Generic(asIScriptGeneric *gen)
+{
+    CScriptDictionary* dict = (CScriptDictionary*)gen->GetObject();
+    String* key = *(String**)gen->GetAddressOfArg(0);
+    void* ref = *(void**)gen->GetAddressOfArg(1);
+    int type_id = gen->GetArgTypeId(1);
+    *(bool*)gen->GetAddressOfReturnLocation() = dict->Get(*key, ref, type_id);
+}
+
 CScriptDictValue::CScriptDictValue()    // NOLINT(hicpp-member-init)
 {
     m_valueObj = nullptr;
@@ -2273,8 +2291,8 @@ void RegisterDictionary(asIScriptEngine *engine)
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptDictionary,AddRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptDictionary,Release), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "Dictionary &opAssign(const Dictionary &in)", asMETHODPR(CScriptDictionary, operator=, (const CScriptDictionary &), CScriptDictionary&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asMETHODPR(CScriptDictionary,Set,(const String&,void*,int),void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,void*,int) const,bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asFUNCTION(ScriptDictionarySet_Generic), asCALL_GENERIC);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asFUNCTION(ScriptDictionaryGet_Generic), asCALL_GENERIC);
     engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const int64&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const asINT64&),void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, int64&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,asINT64&) const,bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const double&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const double&),void), asCALL_THISCALL);
