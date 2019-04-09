@@ -270,8 +270,6 @@ end
 desc 'Configure, build, and test Urho3D project'
 task :ci do
   next if timeup    # Measure the VM overhead
-  # Temporarily disable all build artifact uploads due to slow SF.net transfer rate
-  ENV['PACKAGE_UPLOAD'] = nil
   # Skip if only performing CI for selected branches and the current branch is not in the list
   unless ENV['RELEASE_TAG']
     next if ENV['TRAVIS'] && /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]

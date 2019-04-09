@@ -40,4 +40,4 @@ public:
     ~AbstractFile() override = default;
 };
 
-};
+}

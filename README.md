@@ -122,6 +122,7 @@ Urho3D development, contributions and bugfixes by:
 - TheComet93
 - Y-way
 - 1vanK
+- ab4daa
 - andmar1x
 - amadeus_osa
 - atship
@@ -136,6 +137,7 @@ Urho3D development, contributions and bugfixes by:
 - fredakilla
 - gleblebedev
 - hdunderscore
+- holyfight6
 - hsnabn
 - lhinuz
 - lvshiling
@@ -146,6 +148,7 @@ Urho3D development, contributions and bugfixes by:
 - nemerle
 - ninjastone
 - orefkov
+- pat2nav
 - proller
 - raould
 - rasteron
@@ -154,11 +157,13 @@ Urho3D development, contributions and bugfixes by:
 - rikorin
 - skaiware
 - ssinai1
+- sssooonnnggg
 - svifylabs
 - szamq
 - thebluefish
 - tommy3
 - yushli
+- zlum
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:

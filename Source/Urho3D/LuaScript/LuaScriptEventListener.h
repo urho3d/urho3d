@@ -32,7 +32,7 @@ class URHO3D_API LuaScriptEventListener
 {
 public:
     /// Destruct.
-    virtual ~LuaScriptEventListener() = default;;
+    virtual ~LuaScriptEventListener() = default;
 
     /// Add a scripted event handler by function at the given stack index.
     virtual void AddEventHandler(const String& eventName, int index) = 0;
