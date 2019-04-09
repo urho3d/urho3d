@@ -24,6 +24,7 @@ import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 import java.io.File
 
+const val cmakeVersion = "3.10.2"
 const val androidToolsVersion = "3.5.0-alpha10"
 const val kotlinVersion = "1.3.20"
 const val junitVersion = "4.12"
