@@ -79,7 +79,8 @@ android {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
                 include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
-                        .split(',').toTypedArray())
+                        .split(',')
+                        .toTypedArray())
             }
         }
     }
@@ -91,6 +92,7 @@ android {
     }
     externalNativeBuild {
         cmake {
+            setVersion(cmakeVersion)
             setPath(project.file("../../CMakeLists.txt"))
         }
     }
@@ -123,15 +125,15 @@ afterEvaluate {
         val config = buildType.name.capitalize()
         tasks {
             create<Zip>("zipBuildTree$config") {
-                classifier = buildType.name
-                extension = "aar"
+                archiveClassifier.set(buildType.name)
+                archiveExtension.set("aar")
                 dependsOn("zipBuildTreeConfigurer$config", "bundle${config}Aar")
-                from(zipTree(tasks.getByName("bundle${config}Aar").outputs.files.first()))
+                from(zipTree(getByName("bundle${config}Aar").outputs.files.first()))
             }
             create("zipBuildTreeConfigurer$config") {
                 val externalNativeBuildDir = File(buildDir, "tree/$config")
                 doLast {
-                    val zipTask = tasks.getByName<Zip>("zipBuildTree$config")
+                    val zipTask = getByName<Zip>("zipBuildTree$config")
                     externalNativeBuildDir.list()?.forEach { abi ->
                         listOf("include", "lib").forEach {
                             zipTask.from(File(externalNativeBuildDir, "$abi/$it")) {
@@ -150,7 +152,7 @@ afterEvaluate {
 
 tasks {
     create<Jar>("sourcesJar") {
-        classifier = "sources"
+        archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
     create<Exec>("makeDoc") {
@@ -162,18 +164,18 @@ tasks {
         mustRunAfter("zipBuildTreeRelease")
     }
     create<Zip>("documentationZip") {
-        classifier = "documentation"
+        archiveClassifier.set("documentation")
         dependsOn("makeDoc")
     }
     create("makeDocConfigurer") {
         doLast {
             val buildTree = File(cmakeStagingDir(), "cmake/release/$docABI")
-            tasks.getByName<Exec>("makeDoc") {
+            getByName<Exec>("makeDoc") {
                 // This is a hack - expect the first line to contain the path to the embedded CMake executable
                 executable = File(buildTree, "cmake_build_command.txt").readLines().first().split(":").last().trim()
                 workingDir = buildTree
             }
-            tasks.getByName<Zip>("documentationZip") {
+            getByName<Zip>("documentationZip") {
                 from(File(buildTree, "Docs/html")) {
                     into("docs")
                 }
@@ -197,7 +199,7 @@ publishing {
     }
 }
 
-fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".externalNativeBuild")
+fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".cxx")
 
 val Project.libraryType: String
     get() = if (hasProperty("URHO3D_LIB_TYPE")) property("URHO3D_LIB_TYPE") as String else "STATIC"
