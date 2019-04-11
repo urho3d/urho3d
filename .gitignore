@@ -14,7 +14,7 @@ generated/
 /Source/Urho3D/tolua++-prefix/
 build/
 /captures/
-.externalNativeBuild/
+.cxx/
 
 # Output files
 /Source/**/*.a

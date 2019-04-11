@@ -76,6 +76,7 @@ android {
     }
     externalNativeBuild {
         cmake {
+            setVersion(cmakeVersion)
             setPath(project.file("CMakeLists.txt"))
         }
     }
