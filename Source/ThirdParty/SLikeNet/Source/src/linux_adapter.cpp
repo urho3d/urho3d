@@ -8,7 +8,7 @@
  *  This file defines adapters for all MS-specific functions used throughout SLikeNet.
  */
 
-#ifdef __linux__
+#ifdef SPRINTFS_FUNCTION_MISSING
 #include "slikenet/linux_adapter.h"
 
 #include <algorithm>	// for std::max, std::min
@@ -317,7 +317,7 @@ errno_t wcscpy_s(wchar_t* strDestination, size_t numberOfElements, const wchar_t
 #endif
 
 
-#ifdef __MINGW32__
+#ifdef INET_FUNCTIONS_MISSING
 #include <cstdarg>  // for va_start, va_end, va_list
 #include <cstdio>   // for FILE
 #include <ctime>    // for time_t

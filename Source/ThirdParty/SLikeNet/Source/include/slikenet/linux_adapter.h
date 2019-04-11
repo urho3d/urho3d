@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#ifdef __MINGW32__
+#ifdef INET_FUNCTIONS_MISSING
 #include <cstdarg>  // for va_start, va_end, va_list
 #include <cstdio>   // for FILE
 #include <ctime>    // for time_t
@@ -28,7 +28,7 @@ int inet_pton(int af, const char *src, unsigned long *dst);
 
 #endif
 
-#ifdef __linux__
+#ifdef SPRINTFS_FUNCTION_MISSING
 #define _TRUNCATE ((size_t)-1)
 typedef int errno_t;
 
