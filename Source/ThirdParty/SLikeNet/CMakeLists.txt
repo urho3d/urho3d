@@ -33,7 +33,7 @@ endif()
 # Check specific function availability which may be missing from different MinGW versions
 check_cxx_source_compiles ("#include <stdio.h>\nint main() { char s[80];\nint x = 1;\nsprintf_s(s, 80, \"Test:%d\", x); }" SPRINTFS_FUNCTION_EXISTS)
 
-if (NOT SPRINTFS_FUNCTION_MISSING)
+if (NOT SPRINTFS_FUNCTION_EXISTS)
     add_definitions(-DSPRINTFS_FUNCTION_MISSING=1)
 endif()
 
