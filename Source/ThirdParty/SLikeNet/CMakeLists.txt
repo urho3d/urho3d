@@ -44,12 +44,6 @@ if (NOT VSNPRINTFS_FUNCTION_EXISTS)
     add_definitions(-DVSNPRINTFS_FUNCTION_MISSING=1)
 endif()
 
-check_cxx_source_compiles ("#include <stdio.h>\nint main() { char s[80];\nint x = 1;\nvsnprintf_s<1>(s,, 80, \"Test:%d\", x); }" VSNPRINTFS_FUNCTION_TEMPLATE_EXISTS)
-
-if (NOT VSNPRINTFS_FUNCTION_TEMPLATE_EXISTS)
-    add_definitions(-DVSNPRINTFS_FUNCTION_TEMPLATE_MISSING=1)
-endif()
-
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions(-D_RAKNET_DLL=1)
 endif ()

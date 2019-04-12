@@ -8,8 +8,9 @@
  *  This file defines adapters for all MS-specific functions used throughout SLikeNet.
  */
 
-#ifdef SPRINTFS_FUNCTION_MISSING
 #include "slikenet/linux_adapter.h"
+
+#ifdef SPRINTFS_FUNCTION_MISSING
 
 #include <algorithm>	// for std::max, std::min
 #include <cerrno>		// for errno

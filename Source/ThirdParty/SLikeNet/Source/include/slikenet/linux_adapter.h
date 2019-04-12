@@ -28,7 +28,7 @@ int inet_pton(int af, const char *src, unsigned long *dst);
 
 #endif
 
-#if defined(SPRINTFS_FUNCTION_MISSING) || defined(VSNPRINTFS_FUNCTION_EXISTS)
+#if defined(SPRINTFS_FUNCTION_MISSING) || defined(VSNPRINTFS_FUNCTION_MISSING)
 
 #define _TRUNCATE ((size_t)-1)
 typedef int errno_t;
@@ -38,15 +38,15 @@ typedef int errno_t;
 
 #endif
 
+//#ifdef VSNPRINTFS_FUNCTION_TEMPLATE_MISSING
+//template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
+//{
+//    return vsnprintf_s(buffer, BufferSize, count, format, argptr);
+//}
+//#endif
+
 #ifdef VSNPRINTFS_FUNCTION_MISSING
 int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
-#endif
-
-#ifdef VSNPRINTFS_FUNCTION_TEMPLATE_MISSING
-template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
-{
-    return vsnprintf_s(buffer, BufferSize, count, format, argptr);
-}
 #endif
 
 #ifdef SPRINTFS_FUNCTION_MISSING
