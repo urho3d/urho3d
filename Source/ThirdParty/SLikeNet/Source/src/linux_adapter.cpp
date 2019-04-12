@@ -287,7 +287,7 @@ errno_t wcscpy_s(wchar_t* strDestination, size_t numberOfElements, const wchar_t
 
 #endif
 
-#ifdef VSNPRINTFS_FUNCTION_EXISTS
+#ifdef VSNPRINTFS_FUNCTION_MISSING
 int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr)
 {
 	if ((buffer == nullptr) || (format == nullptr) || (sizeOfBuffer == 0)) {
