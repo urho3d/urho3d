@@ -38,15 +38,15 @@ typedef int errno_t;
 
 #endif
 
-//#ifdef VSNPRINTFS_FUNCTION_TEMPLATE_MISSING
-//template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
-//{
-//    return vsnprintf_s(buffer, BufferSize, count, format, argptr);
-//}
-//#endif
-
 #ifdef VSNPRINTFS_FUNCTION_MISSING
 int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
+#endif
+
+#ifdef __linux__
+template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
+{
+    return vsnprintf_s(buffer, BufferSize, count, format, argptr);
+}
 #endif
 
 #ifdef SPRINTFS_FUNCTION_MISSING
