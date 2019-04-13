@@ -25,6 +25,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("com.android.library")
+    id("com.jfrog.bintray")
     kotlin("android")
     kotlin("android.extensions")
     `maven-publish`
@@ -78,9 +79,8 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
-                        .split(',')
-                        .toTypedArray())
+                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
+                        .split(',').toTypedArray())
             }
         }
     }
@@ -94,6 +94,9 @@ android {
         cmake {
             setVersion(cmakeVersion)
             setPath(project.file("../../CMakeLists.txt"))
+
+            // Make it explicit as one of the task needs to know the exact path and derived from it
+            setBuildStagingDirectory(".cxx")
         }
     }
 }
@@ -169,7 +172,7 @@ tasks {
     }
     create("makeDocConfigurer") {
         doLast {
-            val buildTree = File(cmakeStagingDir(), "cmake/release/$docABI")
+            val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
             getByName<Exec>("makeDoc") {
                 // This is a hack - expect the first line to contain the path to the embedded CMake executable
                 executable = File(buildTree, "cmake_build_command.txt").readLines().first().split(":").last().trim()
@@ -185,9 +188,12 @@ tasks {
 }
 
 publishing {
-    (publications) {
+    publications {
         create<MavenPublication>("mavenAndroid") {
             artifactId = "${project.name}-${project.libraryType}"
+            if (project.hasProperty("ANDROID_ABI")) {
+                artifactId = "$artifactId-${(project.property("ANDROID_ABI") as String).replace(',', '-')}"
+            }
             afterEvaluate {
                 android.buildTypes.forEach {
                     artifact(tasks.getByName("zipBuildTree${it.name.capitalize()}"))
@@ -195,11 +201,66 @@ publishing {
             }
             artifact(tasks.getByName("sourcesJar"))
             artifact(tasks.getByName("documentationZip"))
+            pom {
+                @Suppress("UnstableApiUsage")
+                inceptionYear.set("2008")
+                @Suppress("UnstableApiUsage")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://github.com/urho3d/Urho3D/blob/master/LICENSE")
+                    }
+                }
+                @Suppress("UnstableApiUsage")
+                developers {
+                    developer {
+                        name.set("Urho3D contributors")
+                        url.set("https://github.com/urho3d/Urho3D/graphs/contributors")
+                    }
+                }
+                @Suppress("UnstableApiUsage")
+                scm {
+                    url.set("https://github.com/urho3d/Urho3D.git")
+                    connection.set("scm:git:ssh://git@github.com:urho3d/Urho3D.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:urho3d/Urho3D.git")
+                }
+                withXml {
+                    asNode().apply {
+                        appendNode("name", "Urho3D")
+                        appendNode("description", project.description)
+                        appendNode("url", "https://urho3d.github.io/")
+                    }
+                }
+            }
         }
     }
 }
 
-fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".cxx")
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publish = true
+    override = true
+    setPublications("mavenAndroid")
+    with(pkg) {
+        repo = "maven"
+        name = project.name
+        setLicenses("MIT")
+        vcsUrl = "https://github.com/urho3d/Urho3D.git"
+        userOrg = "urho3d"
+        setLabels("android", "game-development", "game-engine", "open-source", "urho3d")
+        websiteUrl = "https://urho3d.github.io/"
+        issueTrackerUrl = "https://github.com/urho3d/Urho3D/issues"
+        githubRepo = "urho3d/Urho3D"
+        publicDownloadNumbers = true
+        desc = description
+        with(version) {
+            name = project.version.toString()
+            desc = "Continuous delivery from Travis-CI."
+            vcsTag = ""
+        }
+    }
+}
 
 val Project.libraryType: String
-    get() = if (hasProperty("URHO3D_LIB_TYPE")) property("URHO3D_LIB_TYPE") as String else "STATIC"
+    get() = findProperty("URHO3D_LIB_TYPE") as String? ?: "STATIC"

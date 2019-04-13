@@ -54,7 +54,7 @@ android {
                     addAll(listOf(
                             "URHO3D_PLAYER",
                             "URHO3D_SAMPLES")
-                            .map { "-D$it=${if (project.hasProperty(it)) project.property(it) else "1"}" }
+                            .map { "-D$it=${project.findProperty(it) ?: "1"}" }
                     )
                 }
             }
@@ -63,7 +63,7 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
+                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
                         .split(',').toTypedArray())
             }
         }

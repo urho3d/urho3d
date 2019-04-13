@@ -22,11 +22,17 @@
 
 plugins {
     base
+    // For some reasons the lint task requires bintray plugin to be declared here too in order to work as expected
+    id("com.jfrog.bintray") apply false
 }
 
 allprojects {
     group = "com.github.urho3d"
-    version = "1.8-SNAPSHOT"
+    version = "1.8-BETA"
+    description = """Urho3D is a free lightweight,
+                    |cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license.
+                    |Greatly inspired by OGRE and Horde3D."""
+            .trimMargin().replace('\n', ' ')
     repositories {
         google()
         jcenter()
