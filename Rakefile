@@ -411,7 +411,7 @@ task :ci_setup_cache do
   # This is a hack as it relies on docker volume internal directory structure
   system 'docker volume create $(id -u).urho3d_home_dir && sudo rm -rf /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data && sudo ln -s $HOME/urho3d_home_dir /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data' or abort 'Failed to setup build cache'
   # Ensure '.build-options' and '.env-file' are up-to-date
-  system 'bash', '-c', %q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=.+?/g) {print "$1\n"}' .travis.yml) <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file) or abort 'Failed to update .build-options and .env-file'
+  system 'bash', '-c', %q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=.+?/g) {print "$1\n"}' .travis.yml) <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file) or abort 'Failed to update .build-options and .env-file'
 end
 
 # Usage: NOT intended to be used manually
