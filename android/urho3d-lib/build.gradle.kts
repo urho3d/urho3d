@@ -116,7 +116,7 @@ afterEvaluate {
     // When the buildDir is cleaned then we need a way to re-configure that part back
     // It is achieved by ensuring that CMake configuration phase is rerun
     tasks {
-        getByName("clean") {
+        named<Task>("clean") {
             doLast {
                 android.externalNativeBuild.cmake.path?.touch()
             }
@@ -127,13 +127,13 @@ afterEvaluate {
     android.buildTypes.forEach { buildType ->
         val config = buildType.name.capitalize()
         tasks {
-            create<Zip>("zipBuildTree$config") {
+            register<Zip>("zipBuildTree$config") {
                 archiveClassifier.set(buildType.name)
                 archiveExtension.set("aar")
                 dependsOn("zipBuildTreeConfigurer$config", "bundle${config}Aar")
                 from(zipTree(getByName("bundle${config}Aar").outputs.files.first()))
             }
-            create("zipBuildTreeConfigurer$config") {
+            register<Task>("zipBuildTreeConfigurer$config") {
                 val externalNativeBuildDir = File(buildDir, "tree/$config")
                 doLast {
                     val zipTask = getByName<Zip>("zipBuildTree$config")
@@ -154,11 +154,11 @@ afterEvaluate {
 }
 
 tasks {
-    create<Jar>("sourcesJar") {
+    register<Jar>("sourcesJar") {
         archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
-    create<Exec>("makeDoc") {
+    register<Exec>("makeDoc") {
         // Ignore the exit status on Windows host system because Doxygen may not return exit status correctly on Windows
         isIgnoreExitValue = OperatingSystem.current().isWindows
         standardOutput = NullOutputStream.INSTANCE
@@ -166,19 +166,19 @@ tasks {
         dependsOn("makeDocConfigurer")
         mustRunAfter("zipBuildTreeRelease")
     }
-    create<Zip>("documentationZip") {
+    register<Zip>("documentationZip") {
         archiveClassifier.set("documentation")
         dependsOn("makeDoc")
     }
-    create("makeDocConfigurer") {
+    register<Task>("makeDocConfigurer") {
         doLast {
             val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
-            getByName<Exec>("makeDoc") {
+            named<Exec>("makeDoc") {
                 // This is a hack - expect the first line to contain the path to the embedded CMake executable
                 executable = File(buildTree, "cmake_build_command.txt").readLines().first().split(":").last().trim()
                 workingDir = buildTree
             }
-            getByName<Zip>("documentationZip") {
+            named<Zip>("documentationZip") {
                 from(File(buildTree, "Docs/html")) {
                     into("docs")
                 }
@@ -189,18 +189,18 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenAndroid") {
+        register<MavenPublication>("mavenAndroid") {
             artifactId = "${project.name}-${project.libraryType}"
             if (project.hasProperty("ANDROID_ABI")) {
                 artifactId = "$artifactId-${(project.property("ANDROID_ABI") as String).replace(',', '-')}"
             }
             afterEvaluate {
                 android.buildTypes.forEach {
-                    artifact(tasks.getByName("zipBuildTree${it.name.capitalize()}"))
+                    artifact(tasks["zipBuildTree${it.name.capitalize()}"])
                 }
             }
-            artifact(tasks.getByName("sourcesJar"))
-            artifact(tasks.getByName("documentationZip"))
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["documentationZip"])
             pom {
                 @Suppress("UnstableApiUsage")
                 inceptionYear.set("2008")
@@ -242,7 +242,7 @@ bintray {
     publish = true
     override = true
     setPublications("mavenAndroid")
-    with(pkg) {
+    pkg.apply {
         repo = "maven"
         name = project.name
         setLicenses("MIT")
@@ -253,11 +253,10 @@ bintray {
         issueTrackerUrl = "https://github.com/urho3d/Urho3D/issues"
         githubRepo = "urho3d/Urho3D"
         publicDownloadNumbers = true
-        desc = description
-        with(version) {
+        desc = project.description
+        version.apply {
             name = project.version.toString()
             desc = "Continuous delivery from Travis-CI."
-            vcsTag = ""
         }
     }
 }

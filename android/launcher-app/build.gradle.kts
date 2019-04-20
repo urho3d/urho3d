@@ -96,7 +96,7 @@ evaluationDependsOn(":android:urho3d-lib")
 
 afterEvaluate {
     tasks {
-        getByName("clean") {
+        named<Task>("clean") {
             doLast {
                 android.externalNativeBuild.cmake.path?.touch()
             }
