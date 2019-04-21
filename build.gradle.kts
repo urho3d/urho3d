@@ -50,8 +50,20 @@ allprojects {
 fun determineVersion(): String {
     // If it is explicitly specified then let return it instead
     System.getenv("GRADLE_PROJECT_VERSION")?.let { return it }
+    // If it is on CI server then unshallow the clone's repo when necessary
+    if (System.getenv("CI") != null && System.getenv("RELEASE_TAG") == null) unshallowClone()
     val desc = describeCommit(System.getenv("TRAVIS_COMMIT") ?: System.getenv("APPVEYOR_REPO_COMMIT"))
     return Regex("^(.+?)-\\d").find(desc)?.destructured?.component1()?.let { "${bumpSemVer(it, 1)}-BETA" } ?: desc
+}
+
+/**
+ * Unshallow the clone's repository and fetch all the tags.
+ */
+fun unshallowClone() = exec {
+    commandLine = listOf("git", "fetch", "--tags", "--unshallow")
+    standardOutput = NullOutputStream.INSTANCE
+    errorOutput = NullOutputStream.INSTANCE
+    isIgnoreExitValue = true
 }
 
 /**
@@ -71,5 +83,11 @@ fun describeCommit(sha: String? = null) = ByteArrayOutputStream().also {
  */
 fun bumpSemVer(version: String, index: Int) = version
         .split('.')
-        .mapIndexed { i: Int, s: String -> if (i == index) (s.toInt() + 1).toString() else s }
+        .mapIndexed { i: Int, s: String ->
+            when {
+                i < index -> s
+                i == index -> (s.toInt() + 1).toString()
+                else -> "0"
+            }
+        }
         .joinToString(".")
