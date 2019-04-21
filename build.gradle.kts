@@ -20,6 +20,9 @@
 // THE SOFTWARE.
 //
 
+import org.gradle.internal.io.NullOutputStream
+import java.io.ByteArrayOutputStream
+
 plugins {
     base
     // For some reasons the lint task requires bintray plugin to be declared here too in order to work as expected
@@ -28,13 +31,45 @@ plugins {
 
 allprojects {
     group = "com.github.urho3d"
-    version = "1.8-BETA"
+    version = determineVersion()
     description = """Urho3D is a free lightweight,
                     |cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license.
-                    |Greatly inspired by OGRE and Horde3D."""
-            .trimMargin().replace('\n', ' ')
+                    |Greatly inspired by OGRE and Horde3D.""".trimMargin().replace('\n', ' ')
     repositories {
         google()
         jcenter()
     }
 }
+
+/**
+ * Find the most recent tag that is reachable from a commit and use that to set the Gradle's project version.
+ *
+ * e.g. commit described as "1.7-664-g34b1" will be mapped to "1.8-BETA" (rolling release for the next version)
+ *      tag "1.8" will be mapped to "1.8" as is (point release version), so does tag "1.8-RC" (release candidate)
+ */
+fun determineVersion(): String {
+    // If it is explicitly specified then let return it instead
+    System.getenv("GRADLE_PROJECT_VERSION")?.let { return it }
+    val desc = describeCommit(System.getenv("TRAVIS_COMMIT") ?: System.getenv("APPVEYOR_REPO_COMMIT"))
+    return Regex("^(.+?)-\\d").find(desc)?.destructured?.component1()?.let { "${bumpSemVer(it, 1)}-BETA" } ?: desc
+}
+
+/**
+ * Find the most recent tag that is reachable from a commit.
+ */
+fun describeCommit(sha: String? = null) = ByteArrayOutputStream().also {
+    exec {
+        commandLine = listOf("git", "describe", "--tags", sha ?: "--dirty")
+        standardOutput = it
+        errorOutput = NullOutputStream.INSTANCE
+        isIgnoreExitValue = true    // In case no GIT command line tool or not a GIT repository
+    }
+}.toString().trim().let { if (it.isBlank()) "Unversioned" else it }
+
+/**
+ * Bump the semantic versioning on the specified index, 0 for major version, 1 for minor version, and so on.
+ */
+fun bumpSemVer(version: String, index: Int) = version
+        .split('.')
+        .mapIndexed { i: Int, s: String -> if (i == index) (s.toInt() + 1).toString() else s }
+        .joinToString(".")

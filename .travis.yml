@@ -248,10 +248,10 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export bintrayUpload=bintrayUpload; fi
   - if [[ "$ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE" == "STATIC" ]]; then export ORG_GRADLE_PROJECT_URHO3D_SAMPLES=0; fi
   - rake ci_setup_cache
-script: script/dockerized.sh android ./gradlew build bintrayUpload --console plain && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh android rake ci_package_upload; fi && rake ci_timer
+script: script/dockerized.sh android ./gradlew build $bintrayUpload --console plain && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
