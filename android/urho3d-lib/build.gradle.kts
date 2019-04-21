@@ -22,6 +22,7 @@
 
 import org.gradle.internal.io.NullOutputStream
 import org.gradle.internal.os.OperatingSystem
+import java.time.Duration
 
 plugins {
     id("com.android.library")
@@ -149,6 +150,12 @@ afterEvaluate {
                     }
                 }
             }
+            if (System.getenv("CI") != null) {
+                named<Task>("externalNativeBuild$config") {
+                    @Suppress("UnstableApiUsage")
+                    timeout.set(Duration.ofMinutes(25))
+                }
+            }
         }
     }
 }
@@ -195,9 +202,11 @@ publishing {
                 artifactId = "$artifactId-${(project.property("ANDROID_ABI") as String).replace(',', '-')}"
             }
             afterEvaluate {
-                android.buildTypes.forEach {
-                    artifact(tasks["zipBuildTree${it.name.capitalize()}"])
-                }
+                // Exclude publishing STATIC-debug AAR because its size exceeds 250MB limit allowed by Bintray
+                android.buildTypes
+                        .map { it.name }
+                        .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
+                        .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
             }
             artifact(tasks["sourcesJar"])
             artifact(tasks["documentationZip"])
