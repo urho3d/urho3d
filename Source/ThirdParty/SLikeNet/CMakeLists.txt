@@ -23,11 +23,13 @@ add_definitions (-D_RAKNET_SUPPORT_ConsoleServer=0 -D_RAKNET_SUPPORT_RakNetTrans
 add_definitions (-D_RAKNET_SUPPORT_Rackspace=0 -D_RAKNET_SUPPORT_PacketizedTCP=0 -D_RAKNET_SUPPORT_RPC4Plugin=0 -D_RAKNET_SUPPORT_Router2=0 -D_RAKNET_SUPPORT_ReplicaManager3=0)
 add_definitions (-D_RAKNET_SUPPORT_ReadyEvent=0 -D_RAKNET_SUPPORT_MessageFilter=0 -D_RAKNET_SUPPORT_FileListTransfer=0)
 
-# Check specific function availability which may be missing from different MinGW versions
-check_cxx_source_compiles ("#include <arpa/inet.h>\nint main() { struct sockaddr_in sa;\nchar str[INET_ADDRSTRLEN];\ninet_pton(AF_INET, \"192.0.2.33\", &(sa.sin_addr));\ninet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN); }" INET_FUNCTIONS_EXISTS)
+if (NOT MSVC)
+	# Check specific function availability which may be missing from different MinGW versions
+	check_cxx_source_compiles ("#include <arpa/inet.h>\nint main() {\n    struct sockaddr_in sa;\n    char str[INET_ADDRSTRLEN];\n    inet_pton(AF_INET, \"192.0.2.33\", &(sa.sin_addr));\n    inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);\n}" INET_FUNCTIONS_EXISTS)
 
-if (NOT INET_FUNCTIONS_EXISTS)
-    add_definitions(-DINET_FUNCTIONS_MISSING=1)
+	if (NOT INET_FUNCTIONS_EXISTS)
+	    add_definitions(-DINET_FUNCTIONS_MISSING=1)
+	endif()
 endif()
 
 # Check specific function availability which may be missing from different MinGW versions
@@ -38,7 +40,7 @@ if (NOT SPRINTFS_FUNCTION_EXISTS)
 endif()
 
 # Check specific function availability which may be missing from different MinGW versions
-check_cxx_source_compiles ("#include <stdio.h>\nint main() { char s[80];\nint x = 1;\nvsnprintf_s(s, 80, \"Test:%d\", x); }" VSNPRINTFS_FUNCTION_EXISTS)
+check_cxx_source_compiles ("#include <stdio.h>\nint main() {\nchar s[80];\nint x = 1;\nva_list args = {};\nvsnprintf_s(s, 80, \"Test:%d\", args);}" VSNPRINTFS_FUNCTION_EXISTS)
 
 if (NOT VSNPRINTFS_FUNCTION_EXISTS)
     add_definitions(-DVSNPRINTFS_FUNCTION_MISSING=1)
