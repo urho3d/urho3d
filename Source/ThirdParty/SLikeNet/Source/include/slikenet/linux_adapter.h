@@ -42,7 +42,7 @@ typedef int errno_t;
 int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
 {
     return vsnprintf_s(buffer, BufferSize, count, format, argptr);
