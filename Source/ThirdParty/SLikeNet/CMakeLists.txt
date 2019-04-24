@@ -27,8 +27,8 @@ if (NOT MSVC)
 	# Check specific function availability which may be missing from different MinGW versions
 	check_cxx_source_compiles ("#include <arpa/inet.h>\nint main() {\n    struct sockaddr_in sa;\n    char str[INET_ADDRSTRLEN];\n    inet_pton(AF_INET, \"192.0.2.33\", &(sa.sin_addr));\n    inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);\n}" INET_FUNCTIONS_EXISTS)
 
-	if (NOT INET_FUNCTIONS_EXISTS)
-	    add_definitions(-DINET_FUNCTIONS_MISSING=1)
+	if (NOT INET_FUNCTIONS_EXISTS AND NOT HAVE_INET_NTOP)
+		add_definitions(-DINET_FUNCTIONS_MISSING=1)
 	endif()
 endif()
 
