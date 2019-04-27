@@ -323,9 +323,9 @@ task :ci do
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2017') : '')
   # Cache the initial build tree for next run on platform that is slow to generate the build tree
-  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
+  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']} && git diff $(cat #{ENV['HOME']}/initial-build-tree/.sha1) $TRAVIS_COMMIT --name-only |grep -i cmake |xargs -r touch" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/.sha1")
   system "rake cmake #{generator} URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
-  system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
+  system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null && echo $TRAVIS_COMMIT >#{ENV['HOME']}/initial-build-tree/.sha1'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   # Temporarily put the logic here for clang-tools migration until everything else are in their places
   if ENV['URHO3D_BINDINGS']
