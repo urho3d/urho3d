@@ -86,7 +86,7 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
+        named("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
@@ -117,7 +117,7 @@ afterEvaluate {
     // When the buildDir is cleaned then we need a way to re-configure that part back
     // It is achieved by ensuring that CMake configuration phase is rerun
     tasks {
-        named<Task>("clean") {
+        "clean" {
             doLast {
                 android.externalNativeBuild.cmake.path?.touch()
             }
@@ -151,7 +151,7 @@ afterEvaluate {
                 }
             }
             if (System.getenv("CI") != null) {
-                named<Task>("externalNativeBuild$config") {
+                "externalNativeBuild$config" {
                     @Suppress("UnstableApiUsage")
                     timeout.set(Duration.ofMinutes(25))
                 }
