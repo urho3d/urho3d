@@ -357,13 +357,14 @@ public:
     {
         this->operator [](key) = value;
         return *this;
-    };
+    }
+
     /// Populate the map using variadic template.
     template <typename... Args> HashMap& Populate(const T& key, const U& value, const Args&... args)
     {
         this->operator [](key) = value;
         return Populate(args...);
-    };
+    }
 
     /// Insert a pair. Return an iterator to it.
     Iterator Insert(const Pair<T, U>& pair)

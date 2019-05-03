@@ -77,7 +77,7 @@ int RunApplication() \
     Urho3D::SharedPtr<className> application(new className(context)); \
     return application->Run(); \
 } \
-URHO3D_DEFINE_MAIN(RunApplication());
+URHO3D_DEFINE_MAIN(RunApplication())
 #else
 // On iOS/tvOS we will let this function exit, so do not hold the context and application in SharedPtr's
 #define URHO3D_DEFINE_APPLICATION_MAIN(className) \

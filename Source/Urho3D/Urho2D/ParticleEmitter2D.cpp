@@ -167,11 +167,13 @@ void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
 
 void ParticleEmitter2D::SetEmitting(bool enable)
 {
-    if (enable != emitting_)
-    {
-        emitting_ = enable;
-        emitParticleTime_ = 0.0f;
-    }
+    if (enable == emitting_)
+        return;
+
+    emitting_ = enable;
+    emitParticleTime_ = 0.0f;
+
+    MarkNetworkUpdate();
 }
 
 ResourceRef ParticleEmitter2D::GetSpriteAttr() const
