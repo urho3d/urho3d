@@ -55,22 +55,7 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
     auto* destPtr = (unsigned char*)dest;
     position_ += size;
 
-    unsigned copySize = size;
-    while (copySize >= sizeof(unsigned))
-    {
-        *((unsigned*)destPtr) = *((unsigned*)srcPtr);
-        srcPtr += sizeof(unsigned);
-        destPtr += sizeof(unsigned);
-        copySize -= sizeof(unsigned);
-    }
-    if (copySize & sizeof(unsigned short))
-    {
-        *((unsigned short*)destPtr) = *((unsigned short*)srcPtr);
-        srcPtr += sizeof(unsigned short);
-        destPtr += sizeof(unsigned short);
-    }
-    if (copySize & 1u)
-        *destPtr = *srcPtr;
+    memcpy(destPtr, srcPtr, size);
 
     return size;
 }
