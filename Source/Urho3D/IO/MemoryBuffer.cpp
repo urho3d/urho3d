@@ -110,7 +110,7 @@ unsigned MemoryBuffer::Write(const void* data, unsigned size)
     unsigned char* destPtr = &buffer_[position_];
     position_ += size;
 
-	memcpy(destPtr, srcPtr, size);
+    memcpy(destPtr, srcPtr, size);
 
     return size;
 }
