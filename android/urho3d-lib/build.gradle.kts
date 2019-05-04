@@ -86,7 +86,7 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
+        named("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
@@ -117,7 +117,7 @@ afterEvaluate {
     // When the buildDir is cleaned then we need a way to re-configure that part back
     // It is achieved by ensuring that CMake configuration phase is rerun
     tasks {
-        named<Task>("clean") {
+        "clean" {
             doLast {
                 android.externalNativeBuild.cmake.path?.touch()
             }
@@ -151,7 +151,7 @@ afterEvaluate {
                 }
             }
             if (System.getenv("CI") != null) {
-                named<Task>("externalNativeBuild$config") {
+                "externalNativeBuild$config" {
                     @Suppress("UnstableApiUsage")
                     timeout.set(Duration.ofMinutes(25))
                 }
@@ -182,7 +182,7 @@ tasks {
             val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
             named<Exec>("makeDoc") {
                 // This is a hack - expect the first line to contain the path to the embedded CMake executable
-                executable = File(buildTree, "cmake_build_command.txt").readLines().first().split(":").last().trim()
+                executable = File(buildTree, "build_command.txt").readLines().first().split(":").last().trim()
                 workingDir = buildTree
             }
             named<Zip>("documentationZip") {

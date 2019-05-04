@@ -27,7 +27,7 @@ import java.io.File
 
 val kotlinVersion = embeddedKotlinVersion
 
-const val androidToolsVersion = "3.5.0-alpha11"
+const val androidToolsVersion = "3.5.0-alpha13"
 const val bintrayVersion = "1.8.4"
 const val cmakeVersion = "3.10.2"
 const val junitVersion = "4.12"
