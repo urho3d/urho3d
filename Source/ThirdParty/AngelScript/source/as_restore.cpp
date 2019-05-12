@@ -1237,6 +1237,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			char bits;
 			ReadData(&bits, 1);
 			func->SetShared((bits & 1) ? true : false);
+			func->SetExplicit((bits & 32) ? true : false);
 			func->dontCleanUpOnException = (bits & 2) ? true : false;
 			if ((bits & 4) && isExternal)
 				*isExternal = true;
@@ -1260,46 +1261,65 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 
 				func->scriptData->variableSpace = ReadEncodedUInt();
 
-				count = ReadEncodedUInt();
-				func->scriptData->objVariablePos.Allocate(count, false);
-				func->scriptData->objVariableTypes.Allocate(count, false);
-				for (i = 0; i < count; ++i)
+				func->scriptData->objVariablesOnHeap = 0;
+				if (bits & 8)
 				{
-					func->scriptData->objVariableTypes.PushLast(ReadTypeInfo());
-					num = ReadEncodedUInt();
-					func->scriptData->objVariablePos.PushLast(num);
-
-					if (error)
+					count = ReadEncodedUInt();
+					func->scriptData->objVariablePos.Allocate(count, false);
+					func->scriptData->objVariableTypes.Allocate(count, false);
+					for (i = 0; i < count; ++i)
 					{
-						// No need to continue (the error has already been reported before)
-						func->DestroyHalfCreated();
-						return 0;
+						func->scriptData->objVariableTypes.PushLast(ReadTypeInfo());
+						num = ReadEncodedUInt();
+						func->scriptData->objVariablePos.PushLast(num);
+
+						if (error)
+						{
+							// No need to continue (the error has already been reported before)
+							func->DestroyHalfCreated();
+							return 0;
+						}
+					}
+					if (count > 0)
+						func->scriptData->objVariablesOnHeap = ReadEncodedUInt();
+
+					int length = ReadEncodedUInt();
+					func->scriptData->objVariableInfo.SetLength(length);
+					for (i = 0; i < length; ++i)
+					{
+						func->scriptData->objVariableInfo[i].programPos = ReadEncodedUInt();
+						func->scriptData->objVariableInfo[i].variableOffset = ReadEncodedUInt();
+						asEObjVarInfoOption option = (asEObjVarInfoOption)ReadEncodedUInt();
+						func->scriptData->objVariableInfo[i].option = option;
+						if (option != asOBJ_INIT && 
+							option != asOBJ_UNINIT && 
+							option != asBLOCK_BEGIN && 
+							option != asBLOCK_END && 
+							option != asOBJ_VARDECL)
+						{
+							error = true;
+							func->DestroyHalfCreated();
+							return 0;
+						}
 					}
 				}
-				if (count > 0)
-					func->scriptData->objVariablesOnHeap = ReadEncodedUInt();
-				else
-					func->scriptData->objVariablesOnHeap = 0;
 
-				int length = ReadEncodedUInt();
-				func->scriptData->objVariableInfo.SetLength(length);
-				for (i = 0; i < length; ++i)
+				if (bits & 16)
 				{
-					func->scriptData->objVariableInfo[i].programPos = ReadEncodedUInt();
-					func->scriptData->objVariableInfo[i].variableOffset = ReadEncodedUInt();
-					asEObjVarInfoOption option = (asEObjVarInfoOption)ReadEncodedUInt();
-					func->scriptData->objVariableInfo[i].option = option;
-					if (option != asOBJ_INIT && option != asOBJ_UNINIT && option != asBLOCK_BEGIN && option != asBLOCK_END)
+					// Read info on try/catch blocks
+					int length = ReadEncodedUInt();
+					func->scriptData->tryCatchInfo.SetLength(length);
+					for (i = 0; i < length; ++i)
 					{
-						error = true;
-						func->DestroyHalfCreated();
-						return 0;
+						// The program position must be adjusted to be in number of instructions
+						func->scriptData->tryCatchInfo[i].tryPos = ReadEncodedUInt();
+						func->scriptData->tryCatchInfo[i].catchPos = ReadEncodedUInt();
 					}
 				}
 
 				if (!noDebugInfo)
 				{
-					length = ReadEncodedUInt();
+					int length = ReadEncodedUInt();
 					func->scriptData->lineNumbers.SetLength(length);
 					if (int(func->scriptData->lineNumbers.GetLength()) != length)
 					{
@@ -1337,7 +1357,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 				// Read the variable information
 				if (!noDebugInfo)
 				{
-					length = ReadEncodedUInt();
+					int length = ReadEncodedUInt();
 					func->scriptData->variables.Allocate(length, false);
 					for (i = 0; i < length; i++)
 					{
@@ -3085,6 +3105,12 @@ void asCReader::TranslateFunction(asCScriptFunction *func)
 		func->scriptData->objVariableInfo[n].variableOffset = AdjustStackPosition(func->scriptData->objVariableInfo[n].variableOffset);
 	}
 
+	for (n = 0; n < func->scriptData->tryCatchInfo.GetLength(); n++)
+	{
+		func->scriptData->tryCatchInfo[n].tryPos = instructionNbrToPos[func->scriptData->tryCatchInfo[n].tryPos];
+		func->scriptData->tryCatchInfo[n].catchPos = instructionNbrToPos[func->scriptData->tryCatchInfo[n].catchPos];
+	}
+
 	// The program position (every even number) needs to be adjusted
 	// for the line numbers to be in number of dwords instead of number of instructions
 	for( n = 0; n < func->scriptData->lineNumbers.GetLength(); n += 2 )
@@ -4144,6 +4170,11 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 		bits += func->dontCleanUpOnException ? 2 : 0;
 		if (module->externalFunctions.IndexOf(func) >= 0)
 			bits += 4;
+		if (func->scriptData->objVariablePos.GetLength() || func->scriptData->objVariableInfo.GetLength())
+			bits += 8;
+		if (func->scriptData->tryCatchInfo.GetLength())
+			bits += 16;
+		bits += func->IsExplicit() ? 32 : 0;
 		WriteData(&bits, 1);
 
 		// For external shared functions the rest is not needed
@@ -4158,23 +4189,38 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 		asDWORD varSpace = AdjustStackPosition(func->scriptData->variableSpace);
 		WriteEncodedInt64(varSpace);
 
-		count = (asUINT)func->scriptData->objVariablePos.GetLength();
-		WriteEncodedInt64(count);
-		for( i = 0; i < count; ++i )
+		if (bits & 8)
 		{
-			WriteTypeInfo(func->scriptData->objVariableTypes[i]);
-			WriteEncodedInt64(AdjustStackPosition(func->scriptData->objVariablePos[i]));
-		}
-		if( count > 0 )
-			WriteEncodedInt64(func->scriptData->objVariablesOnHeap);
+			count = (asUINT)func->scriptData->objVariablePos.GetLength();
+			WriteEncodedInt64(count);
+			for (i = 0; i < count; ++i)
+			{
+				WriteTypeInfo(func->scriptData->objVariableTypes[i]);
+				WriteEncodedInt64(AdjustStackPosition(func->scriptData->objVariablePos[i]));
+			}
+			if (count > 0)
+				WriteEncodedInt64(func->scriptData->objVariablesOnHeap);
 
-		WriteEncodedInt64((asUINT)func->scriptData->objVariableInfo.GetLength());
-		for( i = 0; i < func->scriptData->objVariableInfo.GetLength(); ++i )
+			WriteEncodedInt64((asUINT)func->scriptData->objVariableInfo.GetLength());
+			for (i = 0; i < func->scriptData->objVariableInfo.GetLength(); ++i)
+			{
+				// The program position must be adjusted to be in number of instructions
+				WriteEncodedInt64(bytecodeNbrByPos[func->scriptData->objVariableInfo[i].programPos]);
+				WriteEncodedInt64(AdjustStackPosition(func->scriptData->objVariableInfo[i].variableOffset));
+				WriteEncodedInt64(func->scriptData->objVariableInfo[i].option);
+			}
+		}
+
+		if (bits & 16)
 		{
-			// The program position must be adjusted to be in number of instructions
-			WriteEncodedInt64(bytecodeNbrByPos[func->scriptData->objVariableInfo[i].programPos]);
-			WriteEncodedInt64(AdjustStackPosition(func->scriptData->objVariableInfo[i].variableOffset));
-			WriteEncodedInt64(func->scriptData->objVariableInfo[i].option);
+			// Write info on try/catch blocks
+			WriteEncodedInt64((asUINT)func->scriptData->tryCatchInfo.GetLength());
+			for (i = 0; i < func->scriptData->tryCatchInfo.GetLength(); ++i)
+			{
+				// The program position must be adjusted to be in number of instructions
+				WriteEncodedInt64(bytecodeNbrByPos[func->scriptData->tryCatchInfo[i].tryPos]);
+				WriteEncodedInt64(bytecodeNbrByPos[func->scriptData->tryCatchInfo[i].catchPos]);
+			}
 		}
 
 		// The program position (every even number) needs to be adjusted
