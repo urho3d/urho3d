@@ -1200,7 +1200,8 @@ ResourcePicker@ GetResourcePicker(StringHash resourceType)
 {
     for (uint i = 0; i < resourcePickers.length; ++i)
     {
-        if (resourcePickers[i].type == resourceType)
+        // TODO: refactor to use dictionary instead
+        if (resourceType == resourcePickers[i].type)
             return resourcePickers[i];
     }
     return null;
