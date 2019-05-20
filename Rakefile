@@ -323,9 +323,9 @@ task :ci do
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2017') : '')
   # Cache the initial build tree for next run on platform that is slow to generate the build tree
-  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']}" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
+  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']} && git diff $(cat #{ENV['HOME']}/initial-build-tree/.sha1) $TRAVIS_COMMIT --name-only |grep -i cmake |xargs -r touch" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/.sha1")
   system "rake cmake #{generator} URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
-  system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
+  system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null && echo $TRAVIS_COMMIT >#{ENV['HOME']}/initial-build-tree/.sha1'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   # Temporarily put the logic here for clang-tools migration until everything else are in their places
   if ENV['URHO3D_BINDINGS']
@@ -411,7 +411,7 @@ task :ci_setup_cache do
   # This is a hack as it relies on docker volume internal directory structure
   system 'docker volume create $(id -u).urho3d_home_dir && sudo rm -rf /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data && sudo ln -s $HOME/urho3d_home_dir /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data' or abort 'Failed to setup build cache'
   # Ensure '.build-options' and '.env-file' are up-to-date
-  system 'bash', '-c', %q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=.+?/g) {print "$1\n"}' .travis.yml) <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file) or abort 'Failed to update .build-options and .env-file'
+  system 'bash', '-c', %q(perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && cat script/.build-options <(perl -ne 'while (/(\w+)=.+?/g) {print "$1\n"}' .travis.yml) <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file) or abort 'Failed to update .build-options and .env-file'
 end
 
 # Usage: NOT intended to be used manually
