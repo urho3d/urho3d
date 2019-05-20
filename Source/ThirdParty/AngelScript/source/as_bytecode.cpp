@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1549,7 +1549,20 @@ void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
 		}
 		else if( instr->op == asBC_VarDecl )
 		{
+			// Record the position for debug info
 			outFunc->scriptData->variables[instr->wArg[0]]->declaredAtProgramPos = pos;
+			
+			// Record declaration of object variables for try/catch handling
+			// This is used for identifying if handles and objects on the heap should be cleared upon catching an exception
+			// Only extract this info if there is a try/catch block in the function, so we don't use up unnecessary space
+			if( outFunc->scriptData->tryCatchInfo.GetLength() && outFunc->scriptData->variables[instr->wArg[0]]->type.GetTypeInfo() )
+			{
+				asSObjectVariableInfo info;
+				info.programPos     = pos;
+				info.variableOffset = outFunc->scriptData->variables[instr->wArg[0]]->stackOffset;
+				info.option         = asOBJ_VARDECL;
+				outFunc->scriptData->objVariableInfo.PushLast(info);
+			}
 		}
 		else
 			pos += instr->size;
@@ -1557,6 +1570,27 @@ void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
 		instr = instr->next;
 	}
 	asASSERT( blockLevel == 0 );
+}
+
+void asCByteCode::ExtractTryCatchInfo(asCScriptFunction *outFunc)
+{
+	asASSERT(outFunc->scriptData);
+
+	unsigned int pos = 0;
+	asCByteInstruction *instr = first;
+	while (instr)
+	{
+		if (instr->op == asBC_TryBlock)
+		{
+			asSTryCatchInfo info;
+			info.tryPos    = pos;
+			info.catchPos  = *ARG_DW(instr->arg);
+			outFunc->scriptData->tryCatchInfo.PushLast(info);
+		}
+
+		pos += instr->size;
+		instr = instr->next;
+	}
 }
 
 int asCByteCode::GetSize()
@@ -1776,6 +1810,17 @@ void asCByteCode::Block(bool start)
 	last->wArg[0]  = start ? 1 : 0;
 }
 
+void asCByteCode::TryBlock(short catchLabel)
+{
+	if (AddInstruction() < 0)
+		return;
+
+	last->op = asBC_TryBlock;
+	last->size = 0;
+	last->stackInc = 0;
+	*ARG_DW(last->arg) = catchLabel;
+}
+
 void asCByteCode::VarDecl(int varDeclIdx)
 {
 	if( AddInstruction() < 0 )
@@ -1843,6 +1888,8 @@ int asCByteCode::ResolveJumpAddresses()
 {
 	TimeIt("asCByteCode::ResolveJumpAddresses");
 
+	asUINT currPos = 0;
+
 	asCByteInstruction *instr = first;
 	while( instr )
 	{
@@ -1860,7 +1907,21 @@ int asCByteCode::ResolveJumpAddresses()
 			else
 				return -1;
 		}
+		else if (instr->op == asBC_TryBlock)
+		{
+			int label = *((int*)ARG_DW(instr->arg));
+			int labelPosOffset;
+			int r = FindLabel(label, instr, 0, &labelPosOffset);
+			if (r == 0)
+			{
+				// Should store the absolute address so the exception handler doesn't need to figure it out
+				*((int*)ARG_DW(instr->arg)) = currPos + labelPosOffset;
+			}
+			else
+				return -1;
+		}
 
+		currPos += instr->GetSize();
 		instr = instr->next;
 	}
 
@@ -2006,10 +2067,11 @@ void asCByteCode::PostProcess()
 				AddPath(paths, dest, stackSize);
 				break;
 			}
-			else if( instr->op == asBC_JZ    || instr->op == asBC_JNZ ||
+			else if( instr->op == asBC_JZ    || instr->op == asBC_JNZ    ||
 					 instr->op == asBC_JLowZ || instr->op == asBC_JLowNZ ||
-					 instr->op == asBC_JS    || instr->op == asBC_JNS ||
-					 instr->op == asBC_JP    || instr->op == asBC_JNP )
+					 instr->op == asBC_JS    || instr->op == asBC_JNS    ||
+					 instr->op == asBC_JP    || instr->op == asBC_JNP    ||
+					 instr->op == asBC_TryBlock )
 			{
 				// Find the label that is being jumped to
 				int label = *((int*) ARG_DW(instr->arg));
@@ -2074,7 +2136,10 @@ void asCByteCode::PostProcess()
 #ifdef AS_DEBUG
 void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 {
+#ifndef __MINGW32__
+	// _mkdir is broken on mingw
 	_mkdir("AS_DEBUG");
+#endif
 
 	asCString path = "AS_DEBUG/";
 	path += name;
@@ -2091,7 +2156,9 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 	FILE *file = fopen(path.AddressOf(), "w");
 #endif
 
-#if !defined(AS_XENON) // XBox 360: When running in DVD Emu, no write is allowed
+#if !defined(AS_XENON) && !defined(__MINGW32__)
+	// XBox 360: When running in DVD Emu, no write is allowed
+	// MinGW: As _mkdir is broken, don't assert on file not created if the AS_DEBUG directory doesn't exist
 	asASSERT( file );
 #endif
 

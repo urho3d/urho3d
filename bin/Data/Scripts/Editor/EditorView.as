@@ -318,7 +318,8 @@ class ViewportContext
         cameraRotZ.text = String(Floor(cameraNode.rotation.roll * 1000) / 1000);
         cameraZoom.text = String(Floor(camera.zoom * 1000) / 1000);
         cameraOrthoSize.text = String(Floor(camera.orthoSize * 1000) / 1000);
-        cameraOrthographic.checked = camera.orthographic;
+        // FIXME: this line below appears to be not only redundant but may cause infinite loop as well on Clang build
+        // cameraOrthographic.checked = camera.orthographic;
     }
 
     void HandleOrthographicToggled(StringHash eventType, VariantMap& eventData)

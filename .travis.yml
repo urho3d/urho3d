@@ -234,27 +234,24 @@ env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - secure: S6Vb3QUW8mDLkLrsIRSullTjwHM1ZIeG4rUT1Nwqx4XSovTZDvq9OThrzAvnuA6sYzeyDI2WHCeBUgmiKFyVBiB2NZwZZjRlTTAC2GVyRZKph9ErhJH3O0DfbPErICQAxL+RI6uCU6nSRPzq4L64UbZi5t04n6f95JXWmfeX2oY=
     - ANDROID=1
     - ORG_GRADLE_PROJECT_URHO3D_LUAJIT=1
+    - HOT=$HOME/urho3d_home_dir/.ccache/.hot
   matrix:
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=x86 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=x86 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=x86_64 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=x86_64 ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=armeabi-v7a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=armeabi-v7a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=arm64-v8a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
-    - ORG_GRADLE_PROJECT_ANDROID_ABI=arm64-v8a ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
-stage: split ABI build configuration
+    - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
+    - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
+stage: universal build configuration
 before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export bintrayUpload=bintrayUpload; fi
+  - if (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export ORG_GRADLE_PROJECT_ANDROID_ABI=arm64-v8a,armeabi-v7a; unset bintrayUpload; fi; touch $HOT
   - if [[ "$ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE" == "STATIC" ]]; then export ORG_GRADLE_PROJECT_URHO3D_SAMPLES=0; fi
   - rake ci_setup_cache
-script: script/dockerized.sh android ./gradlew build publishToMavenLocal --console plain && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh android rake ci_package_upload; fi && rake ci_timer
+script: script/dockerized.sh android ./gradlew build $bintrayUpload --console plain && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]

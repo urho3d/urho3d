@@ -91,12 +91,12 @@ protected:
 	asCScriptNode *ParseDataType(bool allowVariableType = false, bool allowAuto = false);
 	asCScriptNode *ParseIdentifier();
 	bool           ParseTemplTypeList(asCScriptNode *node, bool required = true);
+	void           ParseMethodAttributes(asCScriptNode *funcNode);
 
 	asCScriptNode *ParseListPattern();
 
 	bool IsRealType(int tokenType);
 	bool IsDataType(const sToken &token);
-	bool IsType(sToken &nextToken);
 	bool IdentifierIs(const sToken &t, const char *str);
 
 #ifndef AS_NO_COMPILER
@@ -115,6 +115,7 @@ protected:
 	asCScriptNode *ParseReturn();
 	asCScriptNode *ParseBreak();
 	asCScriptNode *ParseContinue();
+	asCScriptNode *ParseTryCatch();
 
 	// Declarations
 	asCScriptNode *ParseDeclaration(bool isClassProp = false, bool isGlobalVar = false);
@@ -131,7 +132,6 @@ protected:
 	asCScriptNode *ParseVirtualPropertyDecl(bool isMethod, bool isInterface);
 	asCScriptNode *ParseEnumeration();
 	asCScriptNode *ParseTypedef();
-	void ParseMethodOverrideBehaviors(asCScriptNode *funcNode);
 	bool IsVarDecl();
 	bool IsVirtualPropertyDecl();
 	bool IsFuncDecl(bool isMethod);
@@ -157,6 +157,7 @@ protected:
 	asCScriptNode *ParseStringConstant();
 	asCScriptNode *ParseLambda();
 
+	bool IsType(sToken &nextToken);
 	bool IsConstant(int tokenType);
 	bool IsOperator(int tokenType);
 	bool IsPreOperator(int tokenType);

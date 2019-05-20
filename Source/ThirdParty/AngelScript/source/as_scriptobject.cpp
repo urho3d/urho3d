@@ -162,7 +162,8 @@ asIScriptObject *ScriptObjectCopyFactory(const asCObjectType *objType, void *ori
 		return 0;
 	}
 
-	ctx->SetArgAddress(0, origObj);
+	// Let the context handle the case for argument by ref (&) or by handle (@)
+	ctx->SetArgObject(0, origObj);
 
 	for (;;)
 	{

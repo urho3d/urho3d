@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -98,7 +98,7 @@ asCCompiler::~asCCompiler()
 		asDELETE(var,asCVariableScope);
 	}
 
-	// Clean up all the string constants that were allocated. By now the script 
+	// Clean up all the string constants that were allocated. By now the script
 	// functions that were compiled successfully already holds their own references
 	for (asUINT n = 0; n < usedStringConstants.GetLength(); n++)
 		engine->stringFactory->ReleaseStringConstant(usedStringConstants[n]);
@@ -269,6 +269,10 @@ void asCCompiler::FinalizeFunction()
 
 	// Finalize the bytecode
 	byteCode.Finalize(tempVariableOffsets);
+
+	// extract the try/catch info before object variable info, as 
+	// some variable info is not needed if there are no try/catch blocks
+	byteCode.ExtractTryCatchInfo(outFunc);
 
 	byteCode.ExtractObjectVariableInfo(outFunc);
 
@@ -1713,7 +1717,7 @@ int asCCompiler::PrepareArgument(asCDataType *paramType, asCExprContext *ctx, as
 			}
 			else
 			{
-				// Null handles and void expressions must be marked as explicit 
+				// Null handles and void expressions must be marked as explicit
 				// handles for correct treatement in MoveArgsToStack
 				if (dt.IsNullHandle())
 					ctx->type.isExplicitHandle = true;
@@ -1773,7 +1777,7 @@ int asCCompiler::PrepareArgument(asCDataType *paramType, asCExprContext *ctx, as
 			}
 
 			// Literal constants cannot be passed to inout ref arguments
-			if( !ctx->type.isVariable && 
+			if( !ctx->type.isVariable &&
 				ctx->type.isConstant &&
 				!ctx->type.dataType.IsEqualExceptRefAndConst(engine->stringType) )
 			{
@@ -1937,7 +1941,7 @@ int asCCompiler::PrepareArgument(asCDataType *paramType, asCExprContext *ctx, as
 	return 0;
 }
 
-void asCCompiler::PrepareFunctionCall(int funcId, asCByteCode *bc, asCArray<asCExprContext *> &args)
+int asCCompiler::PrepareFunctionCall(int funcId, asCByteCode *bc, asCArray<asCExprContext *> &args)
 {
 	// When a match has been found, compile the final byte code using correct parameter types
 	asCScriptFunction *descr = builder->GetFunctionDescription(funcId);
@@ -1963,11 +1967,16 @@ void asCCompiler::PrepareFunctionCall(int funcId, asCByteCode *bc, asCArray<asCE
 		for( int m = n; m >= 0; m-- )
 			args[m]->bc.GetVarsUsed(reservedVariables);
 
-		PrepareArgument2(&e, args[n], &descr->parameterTypes[n], true, descr->inOutFlags[n], makingCopy);
+		int r = PrepareArgument2(&e, args[n], &descr->parameterTypes[n], true, descr->inOutFlags[n], makingCopy);
 		reservedVariables.SetLength(l);
+
+		if (r < 0)
+			return r;
 	}
 
 	bc->AddCode(&e.bc);
+
+	return 0;
 }
 
 void asCCompiler::MoveArgsToStack(int funcId, asCByteCode *bc, asCArray<asCExprContext *> &args, bool addOneToOffset)
@@ -2234,9 +2243,8 @@ int asCCompiler::CompileDefaultAndNamedArgs(asCScriptNode *node, asCArray<asCExp
 
 		// Parse the default arg string
 		asCParser parser(builder);
-		asCScriptCode code;
-		code.SetCode("default arg", func->defaultArgs[n]->AddressOf(), false);
-		int r = parser.ParseExpression(&code);
+		asCScriptCode *code = builder->FindOrAddCode("default arg", func->defaultArgs[n]->AddressOf(), func->defaultArgs[n]->GetLength());
+		int r = parser.ParseExpression(code);
 		if( r < 0 )
 		{
 			asCString msg;
@@ -2250,7 +2258,7 @@ int asCCompiler::CompileDefaultAndNamedArgs(asCScriptNode *node, asCArray<asCExp
 
 		// Temporarily set the script code to the default arg expression
 		asCScriptCode *origScript = script;
-		script = &code;
+		script = code;
 
 		// Don't allow the expression to access local variables
 		isCompilingDefaultArg = true;
@@ -2663,8 +2671,14 @@ bool asCCompiler::CompileAutoType(asCDataType &type, asCExprContext &compiledCtx
 			}
 
 			// Implicit handle types should always be handles
-			if (newType.GetTypeInfo() && 
+			if (newType.GetTypeInfo() &&
 				(newType.GetTypeInfo()->flags & asOBJ_IMPLICIT_HANDLE))
+				newType.MakeHandle(true);
+				
+			// For types that support handles auto should prefer handle 
+			// as it is more efficient than making a copy
+			// TODO: 'auto a = ...;' and 'auto @a = ...;' works the same in this case. Is this what we want?
+			if( newType.SupportHandles() )
 				newType.MakeHandle(true);
 
 			type = newType;
@@ -3244,11 +3258,11 @@ bool asCCompiler::CompileInitialization(asCScriptNode *node, asCByteCode *bc, co
 							useHndlAssign = true;
 
 							// Make sure the right hand expression is treated as a handle
-							if (!expr->type.isExplicitHandle && !expr->type.IsNullConstant())
+							if (!expr->type.isExplicitHandle && !expr->type.IsNullConstant() )
 							{
 								// TODO: Clean-up: This code is from CompileExpressionPreOp. Create a reusable function
 								// Convert the expression to a handle
-								if (!expr->type.dataType.IsObjectHandle() && !(expr->type.dataType.GetTypeInfo()->flags & asOBJ_ASHANDLE))
+								if (!expr->type.dataType.IsObjectHandle() && expr->type.dataType.GetTypeInfo() && !(expr->type.dataType.GetTypeInfo()->flags & asOBJ_ASHANDLE))
 								{
 									asCDataType to = expr->type.dataType;
 									to.MakeHandle(true);
@@ -3258,10 +3272,15 @@ bool asCCompiler::CompileInitialization(asCScriptNode *node, asCByteCode *bc, co
 
 									asASSERT(expr->type.dataType.IsObjectHandle());
 								}
-								else if (expr->type.dataType.GetTypeInfo()->flags & asOBJ_ASHANDLE)
+								else if (expr->type.dataType.GetTypeInfo() && expr->type.dataType.GetTypeInfo()->flags & asOBJ_ASHANDLE)
 								{
 									// For the ASHANDLE type we'll simply set the expression as a handle
 									expr->type.dataType.MakeHandle(true);
+								}
+
+								if( !expr->type.dataType.IsObjectHandle() && !expr->type.dataType.SupportHandles())
+								{
+									Error(TXT_OBJECT_HANDLE_NOT_SUPPORTED, node);
 								}
 								expr->type.isExplicitHandle = true;
 							}
@@ -3915,25 +3934,27 @@ void asCCompiler::CompileStatement(asCScriptNode *statement, bool *hasReturn, as
 	if( statement->nodeType != snExpressionStatement || statement->firstChild )
 		*hasReturn = false;
 
-	if( statement->nodeType == snStatementBlock )
+	if (statement->nodeType == snStatementBlock)
 		CompileStatementBlock(statement, true, hasReturn, bc);
-	else if( statement->nodeType == snIf )
+	else if (statement->nodeType == snIf)
 		CompileIfStatement(statement, hasReturn, bc);
-	else if( statement->nodeType == snFor )
+	else if (statement->nodeType == snFor)
 		CompileForStatement(statement, bc);
-	else if( statement->nodeType == snWhile )
+	else if (statement->nodeType == snWhile)
 		CompileWhileStatement(statement, bc);
-	else if( statement->nodeType == snDoWhile )
+	else if (statement->nodeType == snDoWhile)
 		CompileDoWhileStatement(statement, bc);
-	else if( statement->nodeType == snExpressionStatement )
+	else if (statement->nodeType == snExpressionStatement)
 		CompileExpressionStatement(statement, bc);
-	else if( statement->nodeType == snBreak )
+	else if (statement->nodeType == snBreak)
 		CompileBreakStatement(statement, bc);
-	else if( statement->nodeType == snContinue )
+	else if (statement->nodeType == snContinue)
 		CompileContinueStatement(statement, bc);
-	else if( statement->nodeType == snSwitch )
+	else if (statement->nodeType == snSwitch)
 		CompileSwitchStatement(statement, hasReturn, bc);
-	else if( statement->nodeType == snReturn )
+	else if (statement->nodeType == snTryCatch)
+		CompileTryCatch(statement, hasReturn, bc);
+	else if (statement->nodeType == snReturn)
 	{
 		CompileReturnStatement(statement, bc);
 		*hasReturn = true;
@@ -4269,6 +4290,48 @@ void asCCompiler::CompileCase(asCScriptNode *node, asCByteCode *bc)
 	}
 }
 
+void asCCompiler::CompileTryCatch(asCScriptNode *node, bool *hasReturn, asCByteCode *bc)
+{
+	// We will use one label before and another after the catch statement
+	int beforeCatchLabel = nextLabel++;
+	int afterCatchLabel = nextLabel++;
+
+	// Compile the try block
+	bool hasReturnTry;
+	asCByteCode tryBC(engine);
+	CompileStatement(node->firstChild, &hasReturnTry, &tryBC);
+
+	// Add marker to unwind exception until here, then jump to catch block
+	bc->TryBlock((short)beforeCatchLabel);
+
+	// Add the byte code
+	LineInstr(bc, node->firstChild->tokenPos);
+	bc->AddCode(&tryBC);
+
+	// Add jump to after catch
+	bc->InstrINT(asBC_JMP, afterCatchLabel);
+
+	// Compile the catch block
+	bool hasReturnCatch;
+	asCByteCode catchBC(engine);
+	CompileStatement(node->firstChild->next, &hasReturnCatch, &catchBC);
+
+	// Add marker to tell bytecode optimizer that this is a catch
+	// block so the code is not removed as unreachable code
+	bc->Label((short)beforeCatchLabel);
+
+	// Add the byte code
+	LineInstr(bc, node->firstChild->next->tokenPos);
+	bc->AddCode(&catchBC);
+
+	// Add the label after catch
+	bc->Label((short)afterCatchLabel);
+
+	// The try/catch statement only has return (i.e. no code after
+	// the try/catch block will be executed) if both blocks have
+	*hasReturn = hasReturnTry && hasReturnCatch;
+}
+
 void asCCompiler::CompileIfStatement(asCScriptNode *inode, bool *hasReturn, asCByteCode *bc)
 {
 	// We will use one label for the if statement
@@ -4288,14 +4351,11 @@ void asCCompiler::CompileIfStatement(asCScriptNode *inode, bool *hasReturn, asCB
 			Error(TXT_EXPR_MUST_BE_BOOL, inode->firstChild);
 		else
 		{
-			if( expr.type.dataType.IsReference() ) ConvertToVariable(&expr);
-			ProcessDeferredParams(&expr);
-
 			if( !expr.type.isConstant )
 			{
 				ProcessPropertyGetAccessor(&expr, inode);
-
 				ConvertToVariable(&expr);
+				ProcessDeferredParams(&expr);
 
 				// Add a test
 				expr.bc.InstrSHORT(asBC_CpyVtoR4, expr.type.stackOffset);
@@ -4445,13 +4505,11 @@ void asCCompiler::CompileForStatement(asCScriptNode *fnode, asCByteCode *bc)
 				Error(TXT_EXPR_MUST_BE_BOOL, second);
 			else
 			{
-				if( expr.type.dataType.IsReference() ) ConvertToVariable(&expr);
+				ProcessPropertyGetAccessor(&expr, second);
+				ConvertToVariable(&expr);
 				ProcessDeferredParams(&expr);
 
-				ProcessPropertyGetAccessor(&expr, second);
-
 				// If expression is false exit the loop
-				ConvertToVariable(&expr);
 				expr.bc.InstrSHORT(asBC_CpyVtoR4, expr.type.stackOffset);
 				expr.bc.Instr(asBC_ClrHi);
 				expr.bc.InstrDWORD(asBC_JNZ, insideLabel);
@@ -4559,13 +4617,9 @@ void asCCompiler::CompileWhileStatement(asCScriptNode *wnode, asCByteCode *bc)
 			Error(TXT_EXPR_MUST_BE_BOOL, wnode->firstChild);
 		else
 		{
-			if( expr.type.dataType.IsReference() ) ConvertToVariable(&expr);
-			ProcessDeferredParams(&expr);
-
 			ProcessPropertyGetAccessor(&expr, wnode);
-
-			// Add byte code for the expression
 			ConvertToVariable(&expr);
+			ProcessDeferredParams(&expr);
 
 			// Jump to end of statement if expression is false
 			expr.bc.InstrSHORT(asBC_CpyVtoR4, expr.type.stackOffset);
@@ -4652,14 +4706,10 @@ void asCCompiler::CompileDoWhileStatement(asCScriptNode *wnode, asCByteCode *bc)
 		Error(TXT_EXPR_MUST_BE_BOOL, wnode->firstChild);
 	else
 	{
-		if( expr.type.dataType.IsReference() ) ConvertToVariable(&expr);
-		ProcessDeferredParams(&expr);
-
 		ProcessPropertyGetAccessor(&expr, wnode);
-
-		// Add byte code for the expression
 		ConvertToVariable(&expr);
-
+		ProcessDeferredParams(&expr);
+		
 		// Jump to next iteration if expression is true
 		expr.bc.InstrSHORT(asBC_CpyVtoR4, expr.type.stackOffset);
 		expr.bc.Instr(asBC_ClrHi);
@@ -5153,6 +5203,23 @@ void asCCompiler::PrintMatchingFuncs(asCArray<int> &funcs, asCScriptNode *node, 
 			func = inType->virtualFunctionTable[func->vfTableIdx];
 
 		builder->WriteInfo(script->name, func->GetDeclaration(true, false, true), r, c, false);
+
+		if (func->objectType && (func->objectType->flags & asOBJ_TEMPLATE))
+		{
+			// Check for funcdefs in the arguments that may have been generated by the template instance, so these can be shown to user
+			for (unsigned int p = 0; p < func->GetParamCount(); p++)
+			{
+				int typeId = 0;
+				func->GetParam(p, &typeId);
+				asITypeInfo *ti = engine->GetTypeInfoById(typeId);
+				if (ti && (ti->GetFlags() & asOBJ_FUNCDEF))
+				{
+					asCString msg;
+					msg.Format(TXT_WHERE_s_IS_s, ti->GetName(), ti->GetFuncdefSignature()->GetDeclaration());
+					builder->WriteInfo(script->name, msg.AddressOf(), r, c, false);
+				}
+			}
+		}
 	}
 }
 
@@ -5660,7 +5727,7 @@ bool asCCompiler::CompileRefCast(asCExprContext *ctx, const asCDataType &to, boo
 	// If there is multiple matches, then pick the most appropriate one
 	if (ops.GetLength() > 1)
 	{
-		// This should only happen if an explicit cast is compiled 
+		// This should only happen if an explicit cast is compiled
 		// and the type has both the opCast and opImplCast
 		asASSERT(isExplicit);
 		asASSERT(ops.GetLength() == 2);
@@ -5783,7 +5850,7 @@ bool asCCompiler::CompileRefCast(asCExprContext *ctx, const asCDataType &to, boo
 		// If there is multiple matches, then pick the most appropriate one
 		if (ops.GetLength() > 1)
 		{
-			// This should only happen if an explicit cast is compiled 
+			// This should only happen if an explicit cast is compiled
 			// and the type has both the opCast and opImplCast
 			asASSERT(isExplicit);
 			asASSERT(ops.GetLength() == 2);
@@ -5875,7 +5942,7 @@ bool asCCompiler::CompileRefCast(asCExprContext *ctx, const asCDataType &to, boo
 					ctx->bc.Label((short)endLabel);
 				}
 
-				// If a temporary variable was allocated in the tmp to convert 
+				// If a temporary variable was allocated in the tmp to convert
 				// the input expression to a variable, it must be released here
 				if (releaseTempVariable && tmp.type.isTemporary)
 					ReleaseTemporaryVariable(tmp.type.stackOffset, &ctx->bc);
@@ -6359,8 +6426,8 @@ asUINT asCCompiler::ImplicitConvLambdaToFunc(asCExprContext *ctx, const asCDataT
 			asETypeModifiers inOutFlag;
 			dt = builder->ModifyDataTypeFromNode(dt, argNode->next, script, &inOutFlag, 0);
 
-			if (count >= funcDef->parameterTypes.GetLength() || 
-				funcDef->parameterTypes[count] != dt || 
+			if (count >= funcDef->parameterTypes.GetLength() ||
+				funcDef->parameterTypes[count] != dt ||
 				funcDef->inOutFlags[count] != inOutFlag)
 				return asCC_NO_CONV;
 
@@ -6624,7 +6691,7 @@ asUINT asCCompiler::ImplicitConvObjectToPrimitive(asCExprContext *ctx, const asC
 	// If there are multiple valid value casts, then we must choose the most appropriate one
 	if (funcs.GetLength() > 1)
 	{
-		// This should only happen in case of explicit value cast and 
+		// This should only happen in case of explicit value cast and
 		// the application has registered both opImplConv and opConv
 		asASSERT(convType == asIC_EXPLICIT_VAL_CAST);
 		asASSERT(funcs.GetLength() == 2);
@@ -6846,7 +6913,7 @@ asUINT asCCompiler::ImplicitConvObjectValue(asCExprContext *ctx, const asCDataTy
 		// If there are multiple valid value casts, then we must choose the most appropriate one
 		if (funcs.GetLength() > 1)
 		{
-			// This should only happen in case of explicit value cast and 
+			// This should only happen in case of explicit value cast and
 			// the application has registered both opImplConv and opConv
 			asASSERT(convType == asIC_EXPLICIT_VAL_CAST);
 			asASSERT(funcs.GetLength() == 2);
@@ -6918,7 +6985,7 @@ asUINT asCCompiler::ImplicitConvObjectValue(asCExprContext *ctx, const asCDataTy
 			// If there are multiple valid value casts, then we must choose the most appropriate one
 			if (funcs.GetLength() > 1)
 			{
-				// This should only happen in case of explicit value cast and 
+				// This should only happen in case of explicit value cast and
 				// the application has registered both opImplConv and opConv
 				asASSERT(convType == asIC_EXPLICIT_VAL_CAST);
 				asASSERT(funcs.GetLength() == 2);
@@ -6976,6 +7043,98 @@ asUINT asCCompiler::ImplicitConvObjectValue(asCExprContext *ctx, const asCDataTy
 				{
 					// All casts are legal
 					ctx->type.Set(to);
+				}
+			}
+			else if( CastToObjectType(to.GetTypeInfo()) )
+			{
+				// If no opConv/opImplConv methods were found on the object, then try to find a conversion constructor on the target type
+				if( to.GetTypeInfo()->flags & asOBJ_REF )
+					funcs = CastToObjectType(to.GetTypeInfo())->beh.factories;
+				else
+					funcs = CastToObjectType(to.GetTypeInfo())->beh.constructors;
+
+				// If not explicit cast, remove any explicit conversion constructors
+				for (asUINT n = 0; n < funcs.GetLength(); n++)
+				{
+					asCScriptFunction *f = engine->scriptFunctions[funcs[n]];
+					if( f == 0 || f->parameterTypes.GetLength() != 1 || (convType != asIC_EXPLICIT_VAL_CAST && f->IsExplicit()) )
+						funcs.RemoveIndex(n--);
+				}
+
+				asCArray<asCExprContext *> args;
+				args.PushLast(ctx);
+
+				cost = asCC_TO_OBJECT_CONV + MatchFunctions(funcs, args, node, 0, 0, 0, false, true, false);
+
+				// Did we find a matching constructor?
+				if (funcs.GetLength() == 1)
+				{
+					if (generateCode)
+					{
+						// TODO: This should really reuse the code from CompileConstructCall
+
+						// Allocate the new object
+						asCExprValue tempObj;
+						asCExprContext e(engine);
+						bool onHeap = false;
+						if (to.GetTypeInfo()->flags & asOBJ_VALUE)
+						{
+							tempObj.dataType = to;
+							tempObj.dataType.MakeReference(false);
+							tempObj.stackOffset = (short)AllocateVariable(tempObj.dataType, true);
+							tempObj.dataType.MakeReference(true);
+							tempObj.isTemporary = true;
+							tempObj.isVariable = true;
+
+							onHeap = IsVariableOnHeap(tempObj.stackOffset);
+
+							// Push the address of the object on the stack
+							if (onHeap)
+								e.bc.InstrSHORT(asBC_VAR, tempObj.stackOffset);
+						}
+
+						PrepareFunctionCall(funcs[0], &e.bc, args);
+						MoveArgsToStack(funcs[0], &e.bc, args, false);
+
+						if (to.GetTypeInfo()->flags & asOBJ_VALUE)
+						{
+							// If the object is allocated on the stack, then call the constructor as a normal function
+							if (onHeap)
+							{
+								int offset = 0;
+								asCScriptFunction *descr = builder->GetFunctionDescription(funcs[0]);
+								offset = descr->parameterTypes[0].GetSizeOnStackDWords();
+
+								e.bc.InstrWORD(asBC_GETREF, (asWORD)offset);
+							}
+							else
+								e.bc.InstrSHORT(asBC_PSF, tempObj.stackOffset);
+						}
+
+						PerformFunctionCall(funcs[0], &e, onHeap, &args, CastToObjectType(tempObj.dataType.GetTypeInfo()));
+
+						if (to.GetTypeInfo()->flags & asOBJ_VALUE)
+						{
+							// Add tag that the object has been initialized
+							e.bc.ObjInfo(tempObj.stackOffset, asOBJ_INIT);
+
+							// The constructor doesn't return anything,
+							// so we have to manually inform the type of
+							// the return value
+							e.type = tempObj;
+							if (!onHeap)
+								e.type.dataType.MakeReference(false);
+
+							// Push the address of the object on the stack again
+							e.bc.InstrSHORT(asBC_PSF, tempObj.stackOffset);
+						}
+
+						MergeExprBytecodeAndType(ctx, &e);
+					}
+					else
+					{
+						ctx->type.Set(asCDataType::CreateType(to.GetTypeInfo(), false));
+					}
 				}
 			}
 		}
@@ -7466,25 +7625,42 @@ asUINT asCCompiler::ImplicitConvObjectToObject(asCExprContext *ctx, const asCDat
 	return cost;
 }
 
-asUINT asCCompiler::ImplicitConvPrimitiveToObject(asCExprContext *ctx, const asCDataType &to, asCScriptNode * /*node*/, EImplicitConv /*isExplicit*/, bool generateCode, bool /*allowObjectConstruct*/)
+asUINT asCCompiler::ImplicitConvPrimitiveToObject(asCExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv isExplicit, bool generateCode, bool allowObjectConstruct)
 {
-	// Reference types currently don't allow implicit conversion from primitive to object
-	// TODO: Allow implicit conversion to scoped reference types as they are supposed to appear like ordinary value types
 	asCObjectType *objType = CastToObjectType(to.GetTypeInfo());
 	asASSERT( objType || CastToFuncdefType(to.GetTypeInfo()) );
-	if( !objType || (objType->flags & asOBJ_REF) )
+	if( !objType )
 		return asCC_NO_CONV;
 
-	// For value types the object must have a constructor that takes a single primitive argument either by value or as input reference
 	asCArray<int> funcs;
-	for( asUINT n = 0; n < objType->beh.constructors.GetLength(); n++ )
+	if (objType->flags & asOBJ_VALUE)
 	{
-		asCScriptFunction *func = engine->scriptFunctions[objType->beh.constructors[n]];
-		if( func->parameterTypes.GetLength() == 1 &&
-			func->parameterTypes[0].IsPrimitive() &&
-			!(func->inOutFlags[0] & asTM_OUTREF) )
+		// For value types the object must have a constructor that takes a single primitive argument either by value or as input reference
+		for (asUINT n = 0; n < objType->beh.constructors.GetLength(); n++)
 		{
-			funcs.PushLast(func->id);
+			asCScriptFunction *func = engine->scriptFunctions[objType->beh.constructors[n]];
+			if (func->parameterTypes.GetLength() == 1 &&
+				func->parameterTypes[0].IsPrimitive() &&
+				!(func->inOutFlags[0] & asTM_OUTREF) &&
+				(isExplicit == asIC_EXPLICIT_VAL_CAST || !func->IsExplicit()) )
+			{
+				funcs.PushLast(func->id);
+			}
+		}
+	}
+	else if (objType->flags & asOBJ_REF)
+	{
+		// For ref types the object must have a factory that takes a single primitive argument either by value or as input reference
+		for (asUINT n = 0; n < objType->beh.factories.GetLength(); n++)
+		{
+			asCScriptFunction *func = engine->scriptFunctions[objType->beh.factories[n]];
+			if (func->parameterTypes.GetLength() == 1 &&
+				func->parameterTypes[0].IsPrimitive() &&
+				!(func->inOutFlags[0] & asTM_OUTREF) &&
+				(isExplicit == asIC_EXPLICIT_VAL_CAST || !func->IsExplicit()))
+			{
+				funcs.PushLast(func->id);
+			}
 		}
 	}
 
@@ -7514,17 +7690,22 @@ asUINT asCCompiler::ImplicitConvPrimitiveToObject(asCExprContext *ctx, const asC
 
 	// Value types and script types are allocated through the constructor
 	asCExprValue tempObj;
-	tempObj.dataType = to;
-	tempObj.stackOffset = (short)AllocateVariable(to, true);
-	tempObj.dataType.MakeReference(true);
-	tempObj.isTemporary = true;
-	tempObj.isVariable = true;
+	bool onHeap = false;
 
-	bool onHeap = IsVariableOnHeap(tempObj.stackOffset);
+	if (!(objType->flags & asOBJ_REF))
+	{
+		tempObj.dataType = to;
+		tempObj.stackOffset = (short)AllocateVariable(to, true);
+		tempObj.dataType.MakeReference(true);
+		tempObj.isTemporary = true;
+		tempObj.isVariable = true;
 
-	// Push the address of the object on the stack
-	if( onHeap )
-		ctx->bc.InstrSHORT(asBC_VAR, tempObj.stackOffset);
+		onHeap = IsVariableOnHeap(tempObj.stackOffset);
+
+		// Push the address of the object on the stack
+		if (onHeap)
+			ctx->bc.InstrSHORT(asBC_VAR, tempObj.stackOffset);
+	}
 
 	PrepareFunctionCall(funcs[0], &ctx->bc, args);
 	MoveArgsToStack(funcs[0], &ctx->bc, args, false);
@@ -7561,10 +7742,11 @@ asUINT asCCompiler::ImplicitConvPrimitiveToObject(asCExprContext *ctx, const asC
 	}
 	else
 	{
-		asASSERT( objType->flags & asOBJ_SCOPED );
-
 		// Call the factory to create the reference type
 		PerformFunctionCall(funcs[0], ctx, false, &args);
+
+		// Make another pass to make sure the result has the correct handle and reference settings
+		ImplicitConversion(ctx, to, node, isExplicit, generateCode, allowObjectConstruct);
 	}
 
 	return cost;
@@ -8231,6 +8413,12 @@ int asCCompiler::DoAssignment(asCExprContext *ctx, asCExprContext *lctx, asCExpr
 					}
 				}
 
+				if (!rctx->type.dataType.IsObjectHandle() && !rctx->type.dataType.SupportHandles())
+				{
+					Error(TXT_OBJECT_HANDLE_NOT_SUPPORTED, rexpr);
+					return -1;
+				}
+
 				// Mark the right hand expression as explicit handle even if the user didn't do it, otherwise
 				// the code for moving the argument to the stack may not know to correctly handle the argument type
 				// in case of variable parameter type.
@@ -8334,7 +8522,9 @@ int asCCompiler::DoAssignment(asCExprContext *ctx, asCExprContext *lctx, asCExpr
 		{
 			asCDataType dt = lctx->type.dataType;
 			dt.MakeReference(true);
-			dt.MakeReadOnly(true);
+			// A funcdef can be accessed by ref, but only as read-only
+			if( dt.IsFuncdef() && !dt.IsObjectHandle() )
+				dt.MakeReadOnly(true);
 			int r = PrepareArgument(&dt, rctx, rexpr, true, 1, !needConversion);
 			if( r < 0 )
 				return -1;
@@ -8501,7 +8691,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asCExprContext *ctx)
 				to.MakeReadOnly(false);
 				ImplicitConversion(&re, to, cexpr->next->next, asIC_IMPLICIT_CONV);
 			}
-			
+
 			if (le.IsAnonymousInitList() )
 			{
 				Error(TXT_CANNOT_RESOLVE_AUTO, cexpr->next);
@@ -8879,6 +9069,11 @@ int asCCompiler::CompileAnonymousInitList(asCScriptNode *node, asCExprContext *c
 		Error(msg, node);
 	}
 
+	// If this is compiled from a default arg, then use the script code for the default arg
+	asCScriptCode *origCode = script;
+	if (ctx->origCode)
+		script = ctx->origCode;
+
 	// Allocate and initialize the temporary object
 	int offset = AllocateVariable(dt, true);
 	CompileInitialization(node, &ctx->bc, dt, node, offset, 0, 0);
@@ -8896,6 +9091,9 @@ int asCCompiler::CompileAnonymousInitList(asCScriptNode *node, asCExprContext *c
 	// Clear the flag for anonymous initalization list as it is no
 	// longer true now that the object has been initialized.
 	ctx->isAnonymousInitList = false;
+	ctx->origCode = 0;
+
+	script = origCode;
 
 	return 0;
 }
@@ -8919,7 +9117,7 @@ int asCCompiler::CompileExpressionTerm(asCScriptNode *node, asCExprContext *ctx)
 		{
 			// As the type is not yet known, the init list will be compiled at a
 			// later time when the type can be determined from the destination
-			ctx->SetAnonymousInitList(node->firstChild);
+			ctx->SetAnonymousInitList(node->firstChild, script);
 			return 0;
 		}
 	}
@@ -9440,7 +9638,15 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 
 		if (symbolType == SL_CLASSPROPACCESS)
 		{
-			asASSERT(scope == "");
+			if (scope != "")
+			{
+				// Cannot access non-static members like this
+				asCString msg;
+				msg.Format(TXT_CANNOT_ACCESS_NON_STATIC_MEMBER_s, name.AddressOf());
+				Error(msg, errNode);
+				return -1;
+			}
+
 			// See if there are any matching property accessors
 			asCExprContext access(engine);
 			if (objType)
@@ -9578,8 +9784,16 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 
 		if (symbolType == SL_CLASSMETHOD)
 		{
-			asASSERT(objType || outFunc->objectType);
+			if (scope != "")
+			{
+				// Cannot access non-static members like this
+				asCString msg;
+				msg.Format(TXT_CANNOT_ACCESS_NON_STATIC_MEMBER_s, name.AddressOf());
+				Error(msg, errNode);
+				return -1;
+			}
 
+#if AS_DEBUG
 			// If it is not a property, it may still be the name of a method which can be used to create delegates
 			asCObjectType *ot = outFunc->objectType;
 			asCScriptFunction *func = 0;
@@ -9595,7 +9809,7 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 			}
 
 			asASSERT(func);
-
+#endif
 			// An object method was found. Keep the name of the method in the expression, but
 			// don't actually modify the bytecode at this point since it is not yet known what
 			// the method will be used for, or even what overloaded method should be used.
@@ -9650,7 +9864,7 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 				Error(msg, errNode);
 				return -1;
 			}
-			
+
 			// Prepare the bytecode for the function call
 			MergeExprBytecodeAndType(ctx, &access);
 
@@ -9665,7 +9879,7 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 			asQWORD constantValue = 0;
 			asCGlobalProperty *prop = builder->GetGlobalProperty(name.AddressOf(), ns, &isCompiled, &isPureConstant, &constantValue, &isAppProp);
 			asASSERT(prop);
-		
+
 			// Verify that the global property has been compiled already
 			if (!isCompiled)
 			{
@@ -9782,8 +9996,7 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 			}
 
 			asDWORD value = 0;
-			int r = builder->GetEnumValueFromType(CastToEnumType(lookupResult.type.dataType.GetTypeInfo()), name.AddressOf(), dt, value);
-			asASSERT(r > 0);
+			builder->GetEnumValueFromType(CastToEnumType(lookupResult.type.dataType.GetTypeInfo()), name.AddressOf(), dt, value);
 
 			// Even if the enum type is not shared, and we're compiling a shared object,
 			// the use of the values are still allowed, since they are treated as constants.
@@ -10007,7 +10220,7 @@ int asCCompiler::CompileExpressionValue(asCScriptNode *node, asCExprContext *ctx
 					// Keep the pointer in the list for clean up at exit
 					usedStringConstants.PushLast(strPtr);
 
-					// Push the pointer on the stack. The string factory already guarantees that the 
+					// Push the pointer on the stack. The string factory already guarantees that the
 					// string object is valid throughout the lifetime of the script so no need to add
 					// reference count or make local copy.
 					ctx->bc.InstrPTR(asBC_PGA, strPtr);
@@ -10354,7 +10567,7 @@ int asCCompiler::CompileConversion(asCScriptNode *node, asCExprContext *ctx)
 			expr.type.SetDummy();
 			anyErrors = true;
 		}
-		else if (node->lastChild->firstChild && 
+		else if (node->lastChild->firstChild &&
 			node->lastChild->firstChild->nodeType == snNamedArgument)
 		{
 			Error(TXT_INVALID_USE_OF_NAMED_ARGS, node->lastChild);
@@ -10711,7 +10924,7 @@ int asCCompiler::CompileConstructCall(asCScriptNode *node, asCExprContext *ctx)
 	if( CompileArgumentList(node->lastChild, args, namedArgs) >= 0 )
 	{
 		// Check for a value cast behaviour
-		if( args.GetLength() == 1 && args[0]->type.dataType.GetTypeInfo() )
+		if( args.GetLength() == 1 )
 		{
 			asCExprContext conv(engine);
 			conv.type = args[0]->type;
@@ -11018,6 +11231,8 @@ int asCCompiler::CompileFunctionCall(asCScriptNode *node, asCExprContext *ctx, a
 		// TODO: Take advantage of the known symbol, so it doesn't have to be looked up again
 		localVar = CompileVariableAccess(name, scope, &funcExpr, node, false, objectType);
 		asASSERT(localVar >= 0);
+		if( localVar < 0 )
+			return -1;
 
 		if (funcExpr.type.dataType.IsFuncdef())
 		{
@@ -11104,7 +11319,7 @@ int asCCompiler::CompileFunctionCall(asCScriptNode *node, asCExprContext *ctx, a
 		}
 
 		// If a class method is being called implicitly, then add the this pointer for the call
-		if (funcs.GetLength() && !objectType)
+		if (funcs.GetLength() && !objectType && outFunc->objectType)
 		{
 			// Verify that the identified function is actually part of the class hierarchy
 			if (!outFunc->objectType->DerivesFrom(lookupResult.type.dataType.GetTypeInfo()))
@@ -11122,7 +11337,7 @@ int asCCompiler::CompileFunctionCall(asCScriptNode *node, asCExprContext *ctx, a
 				Error(msg, node);
 				return -1;
 			}
-			
+
 			objectType = outFunc->objectType;
 
 			asCDataType dt = asCDataType::CreateType(objectType, false);
@@ -11134,8 +11349,16 @@ int asCCompiler::CompileFunctionCall(asCScriptNode *node, asCExprContext *ctx, a
 
 			Dereference(ctx, true);
 		}
+		else if (funcs.GetLength() && !objectType && !outFunc->objectType)
+		{
+			// Cannot call class methods directly without the object
+			asCString msg;
+			msg.Format(TXT_CANNOT_ACCESS_NON_STATIC_MEMBER_s, name.AddressOf());
+			Error(msg, node);
+			return -1;
+		}
 	}
-	
+
 	// Is it a global function?
 	if (symbolType == SL_GLOBALFUNC)
 	{
@@ -11828,7 +12051,7 @@ int asCCompiler::FindPropertyAccessor(const asCString &name, asCExprContext *ctx
 				else
 				{
 					if( multipleSetFuncs.GetLength() == 0 )
-						multipleSetFuncs.PushLast(getId);
+						multipleSetFuncs.PushLast(setId);
 
 					multipleSetFuncs.PushLast(funcs[n]);
 				}
@@ -12944,7 +13167,7 @@ int asCCompiler::MatchArgument(asCScriptFunction *desc, const asCExprContext *ar
 	if (argExpr->IsAnonymousInitList())
 	{
 		if ((desc->parameterTypes[paramNum].IsReference() && desc->inOutFlags[paramNum] != asTM_INREF) ||
-			desc->parameterTypes[paramNum].GetTypeInfo() == 0 ||
+			desc->parameterTypes[paramNum].GetBehaviour() == 0 ||
 			desc->parameterTypes[paramNum].GetBehaviour()->listFactory == 0)
 		{
 			return -1;
@@ -13018,7 +13241,7 @@ int asCCompiler::MatchArgument(asCScriptFunction *desc, const asCExprContext *ar
 	return -1;
 }
 
-void asCCompiler::PrepareArgument2(asCExprContext *ctx, asCExprContext *arg, asCDataType *paramType, bool isFunction, int refType, bool isMakingCopy)
+int asCCompiler::PrepareArgument2(asCExprContext *ctx, asCExprContext *arg, asCDataType *paramType, bool isFunction, int refType, bool isMakingCopy)
 {
 	// Reference parameters whose value won't be used don't evaluate the expression
 	// Clean arguments (i.e. default value) will be passed in directly as there is nothing to protect
@@ -13029,16 +13252,20 @@ void asCCompiler::PrepareArgument2(asCExprContext *ctx, asCExprContext *arg, asC
 		if( orig == 0 )
 		{
 			// Out of memory
-			return;
+			return -1;
 		}
 		MergeExprBytecodeAndType(orig, arg);
 		arg->origExpr = orig;
 	}
 
-	PrepareArgument(paramType, arg, arg->exprNode, isFunction, refType, isMakingCopy);
+	int r = PrepareArgument(paramType, arg, arg->exprNode, isFunction, refType, isMakingCopy);
+	if (r < 0)
+		return r;
 
 	// arg still holds the original expression for output parameters
 	ctx->bc.AddCode(&arg->bc);
+
+	return 0;
 }
 
 bool asCCompiler::CompileOverloadedDualOperator(asCScriptNode *node, asCExprContext *lctx, asCExprContext *rctx, bool leftToRight, asCExprContext *ctx, bool isHandle, eTokenType token)
@@ -13354,7 +13581,7 @@ int asCCompiler::CompileOverloadedDualOperator2(asCScriptNode *node, const char 
 
 					if (engine->ep.allowUnsafeReferences && lctx->type.dataType.IsObject() && (lctx->type.dataType.GetTypeInfo()->flags & asOBJ_VALUE))
 					{
-						// If the application allows unsafe references, then it is not necessary to 
+						// If the application allows unsafe references, then it is not necessary to
 						// make a copy of the object, just store the reference as a local variable
 
 						// Allocate a temporary variable as reference to the type
@@ -13468,7 +13695,9 @@ void asCCompiler::MakeFunctionCall(asCExprContext *ctx, int funcId, asCObjectTyp
 	asCByteCode objBC(engine);
 	objBC.AddCode(&ctx->bc);
 
-	PrepareFunctionCall(funcId, &ctx->bc, args);
+	int r = PrepareFunctionCall(funcId, &ctx->bc, args);
+	if (r < 0)
+		return;
 
 	// Verify if any of the args variable offsets are used in the other code.
 	// If they are exchange the offset for a new one
@@ -15674,7 +15903,7 @@ void asCCompiler::FilterConst(asCArray<int> &funcs, bool removeConst)
 
 	// This is only done for object methods
 	asCScriptFunction *desc = builder->GetFunctionDescription(funcs[0]);
-	if( desc->objectType == 0 ) return;
+	if( !desc || desc->objectType == 0 ) return;
 
 	// Check if there are any non-const matches
 	asUINT n;
@@ -15682,7 +15911,7 @@ void asCCompiler::FilterConst(asCArray<int> &funcs, bool removeConst)
 	for( n = 0; n < funcs.GetLength(); n++ )
 	{
 		desc = builder->GetFunctionDescription(funcs[n]);
-		if( desc->IsReadOnly() != removeConst )
+		if( desc && desc->IsReadOnly() != removeConst )
 		{
 			foundNonConst = true;
 			break;
@@ -15695,7 +15924,7 @@ void asCCompiler::FilterConst(asCArray<int> &funcs, bool removeConst)
 		for( n = 0; n < funcs.GetLength(); n++ )
 		{
 			desc = builder->GetFunctionDescription(funcs[n]);
-			if( desc->IsReadOnly() == removeConst )
+			if( desc && desc->IsReadOnly() == removeConst )
 			{
 				if( n == funcs.GetLength() - 1 )
 					funcs.PopLast();
@@ -16001,6 +16230,7 @@ void asCExprContext::Clear()
 	isVoidExpression = false;
 	isCleanArg = false;
 	isAnonymousInitList = false;
+	origCode = 0;
 }
 
 bool asCExprContext::IsClassMethod() const
@@ -16054,10 +16284,11 @@ bool asCExprContext::IsVoidExpression() const
 	return false;
 }
 
-void asCExprContext::SetAnonymousInitList(asCScriptNode *initList)
+void asCExprContext::SetAnonymousInitList(asCScriptNode *initList, asCScriptCode *script)
 {
 	Clear();
 	exprNode = initList;
+	origCode = script;
 	isAnonymousInitList = true;
 }
 
@@ -16084,6 +16315,7 @@ void asCExprContext::Merge(asCExprContext *after)
 	isVoidExpression = after->isVoidExpression;
 	isCleanArg = after->isCleanArg;
 	isAnonymousInitList = after->isAnonymousInitList;
+	origCode = after->origCode;
 
 	after->property_arg = 0;
 

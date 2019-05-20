@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -78,7 +78,10 @@ public:
 		// This code writes out some statistics for the VM.
 		// It's useful for determining what needs to be optimized.
 
+#ifndef __MINGW32__
+		// _mkdir is broken on mingw
 		_mkdir("AS_DEBUG");
+#endif
 		#if _MSC_VER >= 1500 && !defined(AS_MARMALADE)
 			FILE *f;
 			fopen_s(&f, "AS_DEBUG/stats.txt", "wt");
@@ -197,6 +200,7 @@ asCContext::asCContext(asCScriptEngine *engine, bool holdRef)
 	m_doSuspend                 = false;
 	m_userData                  = 0;
 	m_regs.ctx                  = this;
+	m_exceptionWillBeCaught     = false;
 }
 
 asCContext::~asCContext()
@@ -466,6 +470,10 @@ int asCContext::Prepare(asIScriptFunction *func)
 		// Make sure there is enough space on the stack for the arguments and return value
 		if( !ReserveStackSpace(stackSize) )
 			return asOUT_OF_MEMORY;
+
+		// Set up the call stack too
+		if (m_callStack.GetCapacity() < m_engine->ep.initCallStackSize)
+			m_callStack.AllocateNoConstruct(m_engine->ep.initCallStackSize * CALLSTACK_FRAME_SIZE, true);
 	}
 
 	// Reset state
@@ -1314,8 +1322,15 @@ int asCContext::Execute()
 	if( m_engine->ep.autoGarbageCollect )
 		m_engine->gc.GetStatistics(&gcPreObjects, 0, 0, 0, 0);
 
-	while( m_status == asEXECUTION_ACTIVE )
+	while (m_status == asEXECUTION_ACTIVE)
+	{
 		ExecuteNext();
+
+		// If an exception was raised that will be caught, then unwind the stack
+		// and move the program pointer to the catch block before proceeding
+		if (m_status == asEXECUTION_EXCEPTION && m_exceptionWillBeCaught)
+			CleanStack(true);
+	}
 
 	if( m_lineCallback )
 	{
@@ -1382,16 +1397,26 @@ int asCContext::PushState()
 		return asERROR;
 	}
 
+	// Allocate space on the callstack for at least two states
+	if (m_callStack.GetLength() >= m_callStack.GetCapacity() - 2*CALLSTACK_FRAME_SIZE)
+	{
+		if (m_engine->ep.maxCallStackSize > 0 && m_callStack.GetLength() >= m_engine->ep.maxCallStackSize*CALLSTACK_FRAME_SIZE)
+		{
+			// The call stack is too big to grow further
+			// If an error occurs, no change to the context should be done
+			return asOUT_OF_MEMORY;
+		}
+
+		// Allocate space for 10 call states at a time to save time
+		m_callStack.AllocateNoConstruct(m_callStack.GetLength() + 10 * CALLSTACK_FRAME_SIZE, true);
+	}
+
 	// Push the current script function that is calling the system function
+	// This cannot fail, since the memory was already allocated above
 	PushCallState();
 
 	// Push the system function too, which will serve both as a marker and
 	// informing which system function that created the nested call
-	if( m_callStack.GetLength() == m_callStack.GetCapacity() )
-	{
-		// Allocate space for 10 call states at a time to save time
-		m_callStack.AllocateNoConstruct(m_callStack.GetLength() + 10*CALLSTACK_FRAME_SIZE, true);
-	}
 	m_callStack.SetLengthNoConstruct(m_callStack.GetLength() + CALLSTACK_FRAME_SIZE);
 
 	// Need to push m_initialFunction as it must be restored later
@@ -1467,10 +1492,17 @@ int asCContext::PopState()
 	return asSUCCESS;
 }
 
-void asCContext::PushCallState()
+int asCContext::PushCallState()
 {
 	if( m_callStack.GetLength() == m_callStack.GetCapacity() )
 	{
+		if (m_engine->ep.maxCallStackSize > 0 && m_callStack.GetLength() >= m_engine->ep.maxCallStackSize*CALLSTACK_FRAME_SIZE)
+		{
+			// The call stack is too big to grow further
+			SetInternalException(TXT_STACK_OVERFLOW);
+			return asERROR;
+		}
+
 		// Allocate space for 10 call states at a time to save time
 		m_callStack.AllocateNoConstruct(m_callStack.GetLength() + 10*CALLSTACK_FRAME_SIZE, true);
 	}
@@ -1496,6 +1528,8 @@ void asCContext::PushCallState()
 	tmp[2] = s[2];
 	tmp[3] = s[3];
 	tmp[4] = s[4];
+
+	return asSUCCESS;
 }
 
 void asCContext::PopCallState()
@@ -1602,7 +1636,7 @@ bool asCContext::ReserveStackSpace(asUINT size)
 	// Make sure the first stack block is allocated
 	if( m_stackBlocks.GetLength() == 0 )
 	{
-		m_stackBlockSize = m_engine->initialContextStackSize;
+		m_stackBlockSize = m_engine->ep.initContextStackSize;
 		asASSERT( m_stackBlockSize > 0 );
 
 #ifndef WIP_16BYTE_ALIGN
@@ -1639,8 +1673,8 @@ bool asCContext::ReserveStackSpace(asUINT size)
 		// Make sure we don't allocate more space than allowed
 		if( m_engine->ep.maximumContextStackSize )
 		{
-			// This test will only stop growth once it has already crossed the limit
-			if( m_stackBlockSize * ((1 << (m_stackIndex+1)) - 1) > m_engine->ep.maximumContextStackSize )
+			// This test will only stop growth once it is on or already crossed the limit
+			if( m_stackBlockSize * ((1 << (m_stackIndex+1)) - 1) >= m_engine->ep.maximumContextStackSize )
 			{
 				m_isStackMemoryNotAllocated = true;
 
@@ -1705,7 +1739,8 @@ void asCContext::CallScriptFunction(asCScriptFunction *func)
 	asASSERT( func->scriptData );
 
 	// Push the framepointer, function id and programCounter on the stack
-	PushCallState();
+	if (PushCallState() < 0)
+		return;
 
 	// Update the current function and program position before increasing the stack
 	// so the exception handler will know what to do if there is a stack overflow
@@ -4487,17 +4522,18 @@ void asCContext::ExecuteNext()
 	}
 }
 
-int asCContext::SetException(const char *descr)
+// interface
+int asCContext::SetException(const char *descr, bool allowCatch)
 {
 	// Only allow this if we're executing a CALL byte code
 	if( m_callingSystemFunction == 0 ) return asERROR;
 
-	SetInternalException(descr);
+	SetInternalException(descr, allowCatch);
 
 	return 0;
 }
 
-void asCContext::SetInternalException(const char *descr)
+void asCContext::SetInternalException(const char *descr, bool allowCatch)
 {
 	if( m_inExceptionHandler )
 	{
@@ -4524,8 +4560,17 @@ void asCContext::SetInternalException(const char *descr)
 		m_exceptionColumn     = 0;
 	}
 
+	// Recursively search the callstack for try/catch blocks
+	m_exceptionWillBeCaught = allowCatch && FindExceptionTryCatch();
+
 	if( m_exceptionCallback )
 		CallExceptionCallback();
+}
+
+// interface
+bool asCContext::WillExceptionBeCaught()
+{
+	return m_exceptionWillBeCaught;
 }
 
 void asCContext::CleanReturnObject()
@@ -4577,29 +4622,36 @@ void asCContext::CleanReturnObject()
 	}
 }
 
-void asCContext::CleanStack()
+void asCContext::CleanStack(bool catchException)
 {
 	m_inExceptionHandler = true;
 
-	// Run the clean up code for each of the functions called
-	CleanStackFrame();
-
-	// Set the status to exception so that the stack unwind is done correctly.
-	// This shouldn't be done for the current function, which is why we only
-	// do this after the first CleanStackFrame() is done.
-	m_status = asEXECUTION_EXCEPTION;
-
-	while( m_callStack.GetLength() > 0 )
+	// Run the clean up code and move to catch block
+	bool caught = CleanStackFrame(catchException);
+	if( !caught )
 	{
-		// Only clean up until the top most marker for a nested call
-		asPWORD *s = m_callStack.AddressOf() + m_callStack.GetLength() - CALLSTACK_FRAME_SIZE;
-		if( s[0] == 0 )
-			break;
+		// Set the status to exception so that the stack unwind is done correctly.
+		// This shouldn't be done for the current function, which is why we only
+		// do this after the first CleanStackFrame() is done.
+		m_status = asEXECUTION_EXCEPTION;
 
-		PopCallState();
+		while (!caught && m_callStack.GetLength() > 0)
+		{
+			// Only clean up until the top most marker for a nested call
+			asPWORD *s = m_callStack.AddressOf() + m_callStack.GetLength() - CALLSTACK_FRAME_SIZE;
+			if (s[0] == 0)
+				break;
 
-		CleanStackFrame();
+			PopCallState();
+
+			caught = CleanStackFrame(catchException);
+		}
 	}
+
+	// If the exception was caught, then move the status to 
+	// active as is now possible to resume the execution
+	if (caught)
+		m_status = asEXECUTION_ACTIVE;
 
 	m_inExceptionHandler = false;
 }
@@ -4747,7 +4799,7 @@ void asCContext::DetermineLiveObjects(asCArray<int> &liveObjects, asUINT stackLe
 					break;
 				case asBLOCK_BEGIN: // Start block
 					// We should ignore start blocks, since it just means the
-					// program was within the block when the exception ocurred
+					// program was within the block when the exception occurred
 					break;
 				case asBLOCK_END: // End block
 					// We need to skip the entire block, as the objects created
@@ -4884,8 +4936,46 @@ void asCContext::CleanArgsOnStack()
 	m_needToCleanupArgs = false;
 }
 
-void asCContext::CleanStackFrame()
+bool asCContext::FindExceptionTryCatch()
 {
+	// Check each of the script functions on the callstack to see if 
+	// the current program position is within a try/catch block
+	if (m_currentFunction && m_currentFunction->scriptData)
+	{
+		asUINT currPos = asUINT(m_regs.programPointer - m_currentFunction->scriptData->byteCode.AddressOf());
+		for (asUINT n = 0; n < m_currentFunction->scriptData->tryCatchInfo.GetLength(); n++)
+		{
+			if (currPos >= m_currentFunction->scriptData->tryCatchInfo[n].tryPos &&
+				currPos < m_currentFunction->scriptData->tryCatchInfo[n].catchPos)
+				return true;
+		}
+	}
+
+	int stackSize = GetCallstackSize();
+	for (int level = 1; level < stackSize; level++)
+	{
+		asPWORD *s = m_callStack.AddressOf() + (stackSize - level - 1)*CALLSTACK_FRAME_SIZE;
+		asCScriptFunction *func = (asCScriptFunction*)s[1];
+		if (func && func->scriptData)
+		{
+			asUINT currPos = asUINT((asDWORD*)s[2] - func->scriptData->byteCode.AddressOf());
+			for (asUINT n = 0; n < func->scriptData->tryCatchInfo.GetLength(); n++)
+			{
+				if (currPos >= func->scriptData->tryCatchInfo[n].tryPos &&
+					currPos < func->scriptData->tryCatchInfo[n].catchPos)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool asCContext::CleanStackFrame(bool catchException)
+{
+	bool exceptionCaught = false;
+	asSTryCatchInfo *tryCatchInfo = 0;
+
 	// Clean object variables on the stack
 	// If the stack memory is not allocated or the program pointer
 	// is not set, then there is nothing to clean up on the stack frame
@@ -4895,9 +4985,29 @@ void asCContext::CleanStackFrame()
 		// to clean up the arguments that were put on the stack.
 		CleanArgsOnStack();
 
+		// Check if this function will catch the exception
+		// Try blocks can be nested, so use the innermost block
+		asASSERT(m_currentFunction->scriptData);
+		if (catchException && m_currentFunction->scriptData)
+		{
+			asUINT currPos = asUINT(m_regs.programPointer - m_currentFunction->scriptData->byteCode.AddressOf());
+			
+			for (asUINT n = 0; n < m_currentFunction->scriptData->tryCatchInfo.GetLength(); n++)
+			{
+				if (currPos >= m_currentFunction->scriptData->tryCatchInfo[n].tryPos &&
+					currPos < m_currentFunction->scriptData->tryCatchInfo[n].catchPos)
+				{
+					tryCatchInfo = &m_currentFunction->scriptData->tryCatchInfo[n];
+					exceptionCaught = true;
+				}
+				if (currPos < m_currentFunction->scriptData->tryCatchInfo[n].tryPos)
+					break;
+			}
+		}
+
 		// Restore the stack pointer
-		asASSERT( m_currentFunction->scriptData );
-		m_regs.stackPointer += m_currentFunction->scriptData->variableSpace;
+		if( !exceptionCaught )
+			m_regs.stackPointer += m_currentFunction->scriptData->variableSpace;
 
 		// Determine which object variables that are really live ones
 		asCArray<int> liveObjects;
@@ -4906,6 +5016,43 @@ void asCContext::CleanStackFrame()
 		for( asUINT n = 0; n < m_currentFunction->scriptData->objVariablePos.GetLength(); n++ )
 		{
 			int pos = m_currentFunction->scriptData->objVariablePos[n];
+
+			// If the exception was caught, then only clean up objects within the try block
+			if (exceptionCaught)
+			{
+				// Find out where the variable was declared, and skip cleaning of those that were declared before the try catch
+				// Multiple variables in different scopes may occupy the same slot on the stack so it is necessary to search
+				// the entire list to determine which variable occupies the slot now. 
+				int skipClean = 0;
+				for( asUINT p = 0; p < m_currentFunction->scriptData->objVariableInfo.GetLength(); p++ )
+				{
+					asSObjectVariableInfo &info = m_currentFunction->scriptData->objVariableInfo[p];
+					if (info.variableOffset == pos &&
+						info.option == asOBJ_VARDECL )
+					{
+						asUINT progPos = info.programPos;
+						if (progPos < tryCatchInfo->tryPos )
+						{
+							if( skipClean >= 0 )
+								skipClean = 1;
+							break;
+						}
+						else if( progPos < tryCatchInfo->catchPos )
+						{
+							skipClean = -1;
+							break;
+						}
+					}
+				}
+				
+				// Skip only variables that have been declared before the try block. Variables declared 
+				// within the try block and variables whose declaration was not identified (temporary objects)
+				// will not be skipped.
+				// TODO: What if a temporary variable reuses a slot from a declared variable that is no longer in scope?
+				if (skipClean > 0)
+					continue;
+			}
+
 			if( n < m_currentFunction->scriptData->objVariablesOnHeap )
 			{
 				// Check if the pointer is initialized
@@ -4954,9 +5101,16 @@ void asCContext::CleanStackFrame()
 	else
 		m_isStackMemoryNotAllocated = false;
 
+	// If the exception was caught then move the program position to the catch block then stop the unwinding
+	if (exceptionCaught)
+	{
+		m_regs.programPointer = m_currentFunction->scriptData->byteCode.AddressOf() + tryCatchInfo->catchPos;
+		return exceptionCaught;
+	}
+
 	// Functions that do not own the object and parameters shouldn't do any clean up
 	if( m_currentFunction->dontCleanUpOnException )
-		return;
+		return exceptionCaught;
 
 	// Clean object and parameters
 	int offset = 0;
@@ -4997,12 +5151,15 @@ void asCContext::CleanStackFrame()
 
 		offset += m_currentFunction->parameterTypes[n].GetSizeOnStackDWords();
 	}
+
+	return exceptionCaught;
 }
 
 // interface
 int asCContext::GetExceptionLineNumber(int *column, const char **sectionName)
 {
-	if( GetState() != asEXECUTION_EXCEPTION ) return asERROR;
+	// Return the last exception even if the context is no longer in the exception state
+	// if( GetState() != asEXECUTION_EXCEPTION ) return asERROR;
 
 	if( column ) *column = m_exceptionColumn;
 
@@ -5021,7 +5178,8 @@ int asCContext::GetExceptionLineNumber(int *column, const char **sectionName)
 // interface
 asIScriptFunction *asCContext::GetExceptionFunction()
 {
-	if( GetState() != asEXECUTION_EXCEPTION ) return 0;
+	// Return the last exception even if the context is no longer in the exception state
+	// if( GetState() != asEXECUTION_EXCEPTION ) return 0;
 
 	return m_engine->scriptFunctions[m_exceptionFunction];
 }
@@ -5029,7 +5187,8 @@ asIScriptFunction *asCContext::GetExceptionFunction()
 // interface
 const char *asCContext::GetExceptionString()
 {
-	if( GetState() != asEXECUTION_EXCEPTION ) return 0;
+	// Return the last exception even if the context is no longer in the exception state
+	// if( GetState() != asEXECUTION_EXCEPTION ) return 0;
 
 	return m_exceptionString.AddressOf();
 }
@@ -5465,67 +5624,67 @@ const POW_INFO pow_info[] =
 {
 	{          0ULL,          0UL,     0,     0, 0 },  // 0 is a special case
 	{          0ULL,          0UL,     0,     0, 1 },  // 1 is a special case
-    { 3037000499ULL, 2147483647UL, 65535, 46340, 2 },  // 2
-    {    2097152ULL,    1664510UL,  1625,  1290, 2 },  // 3
-    {      55108ULL,      46340UL,   255,   215, 3 },  // 4
-    {       6208ULL,       5404UL,    84,    73, 3 },  // 5
-    {       1448ULL,       1290UL,    40,    35, 3 },  // 6
-    {        511ULL,        463UL,    23,    21, 3 },  // 7
-    {        234ULL,        215UL,    15,    14, 4 },  // 8
-    {        128ULL,        118UL,    11,    10, 4 },  // 9
-    {         78ULL,         73UL,     9,     8, 4 },  // 10
-    {         52ULL,         49UL,     7,     7, 4 },  // 11
-    {         38ULL,         35UL,     6,     5, 4 },  // 12
-    {         28ULL,         27UL,     5,     5, 4 },  // 13
-    {         22ULL,         21UL,     4,     4, 4 },  // 14
-    {         18ULL,         17UL,     4,     4, 4 },  // 15
-    {         15ULL,         14UL,     3,     3, 5 },  // 16
-    {         13ULL,         12UL,     3,     3, 5 },  // 17
-    {         11ULL,         10UL,     3,     3, 5 },  // 18
-    {          9ULL,          9UL,     3,     3, 5 },  // 19
-    {          8ULL,          8UL,     3,     2, 5 },  // 20
-    {          8ULL,          7UL,     2,     2, 5 },  // 21
-    {          7ULL,          7UL,     2,     2, 5 },  // 22
-    {          6ULL,          6UL,     2,     2, 5 },  // 23
-    {          6ULL,          5UL,     2,     2, 5 },  // 24
-    {          5ULL,          5UL,     2,     2, 5 },  // 25
-    {          5ULL,          5UL,     2,     2, 5 },  // 26
-    {          5ULL,          4UL,     2,     2, 5 },  // 27
-    {          4ULL,          4UL,     2,     2, 5 },  // 28
-    {          4ULL,          4UL,     2,     2, 5 },  // 29
-    {          4ULL,          4UL,     2,     2, 5 },  // 30
-    {          4ULL,          4UL,     2,     1, 5 },  // 31
-    {          3ULL,          3UL,     1,     1, 6 },  // 32
-    {          3ULL,          3UL,     1,     1, 6 },  // 33
-    {          3ULL,          3UL,     1,     1, 6 },  // 34
-    {          3ULL,          3UL,     1,     1, 6 },  // 35
-    {          3ULL,          3UL,     1,     1, 6 },  // 36
-    {          3ULL,          3UL,     1,     1, 6 },  // 37
-    {          3ULL,          3UL,     1,     1, 6 },  // 38
-    {          3ULL,          3UL,     1,     1, 6 },  // 39
-    {          2ULL,          2UL,     1,     1, 6 },  // 40
-    {          2ULL,          2UL,     1,     1, 6 },  // 41
-    {          2ULL,          2UL,     1,     1, 6 },  // 42
-    {          2ULL,          2UL,     1,     1, 6 },  // 43
-    {          2ULL,          2UL,     1,     1, 6 },  // 44
-    {          2ULL,          2UL,     1,     1, 6 },  // 45
-    {          2ULL,          2UL,     1,     1, 6 },  // 46
-    {          2ULL,          2UL,     1,     1, 6 },  // 47
-    {          2ULL,          2UL,     1,     1, 6 },  // 48
-    {          2ULL,          2UL,     1,     1, 6 },  // 49
-    {          2ULL,          2UL,     1,     1, 6 },  // 50
-    {          2ULL,          2UL,     1,     1, 6 },  // 51
-    {          2ULL,          2UL,     1,     1, 6 },  // 52
-    {          2ULL,          2UL,     1,     1, 6 },  // 53
-    {          2ULL,          2UL,     1,     1, 6 },  // 54
-    {          2ULL,          2UL,     1,     1, 6 },  // 55
-    {          2ULL,          2UL,     1,     1, 6 },  // 56
-    {          2ULL,          2UL,     1,     1, 6 },  // 57
-    {          2ULL,          2UL,     1,     1, 6 },  // 58
-    {          2ULL,          2UL,     1,     1, 6 },  // 59
-    {          2ULL,          2UL,     1,     1, 6 },  // 60
-    {          2ULL,          2UL,     1,     1, 6 },  // 61
-    {          2ULL,          2UL,     1,     1, 6 },  // 62
+	{ 3037000499ULL, 2147483647UL, 65535, 46340, 2 },  // 2
+	{    2097152ULL,    1664510UL,  1625,  1290, 2 },  // 3
+	{      55108ULL,      46340UL,   255,   215, 3 },  // 4
+	{       6208ULL,       5404UL,    84,    73, 3 },  // 5
+	{       1448ULL,       1290UL,    40,    35, 3 },  // 6
+	{        511ULL,        463UL,    23,    21, 3 },  // 7
+	{        234ULL,        215UL,    15,    14, 4 },  // 8
+	{        128ULL,        118UL,    11,    10, 4 },  // 9
+	{         78ULL,         73UL,     9,     8, 4 },  // 10
+	{         52ULL,         49UL,     7,     7, 4 },  // 11
+	{         38ULL,         35UL,     6,     5, 4 },  // 12
+	{         28ULL,         27UL,     5,     5, 4 },  // 13
+	{         22ULL,         21UL,     4,     4, 4 },  // 14
+	{         18ULL,         17UL,     4,     4, 4 },  // 15
+	{         15ULL,         14UL,     3,     3, 5 },  // 16
+	{         13ULL,         12UL,     3,     3, 5 },  // 17
+	{         11ULL,         10UL,     3,     3, 5 },  // 18
+	{          9ULL,          9UL,     3,     3, 5 },  // 19
+	{          8ULL,          8UL,     3,     2, 5 },  // 20
+	{          8ULL,          7UL,     2,     2, 5 },  // 21
+	{          7ULL,          7UL,     2,     2, 5 },  // 22
+	{          6ULL,          6UL,     2,     2, 5 },  // 23
+	{          6ULL,          5UL,     2,     2, 5 },  // 24
+	{          5ULL,          5UL,     2,     2, 5 },  // 25
+	{          5ULL,          5UL,     2,     2, 5 },  // 26
+	{          5ULL,          4UL,     2,     2, 5 },  // 27
+	{          4ULL,          4UL,     2,     2, 5 },  // 28
+	{          4ULL,          4UL,     2,     2, 5 },  // 29
+	{          4ULL,          4UL,     2,     2, 5 },  // 30
+	{          4ULL,          4UL,     2,     1, 5 },  // 31
+	{          3ULL,          3UL,     1,     1, 6 },  // 32
+	{          3ULL,          3UL,     1,     1, 6 },  // 33
+	{          3ULL,          3UL,     1,     1, 6 },  // 34
+	{          3ULL,          3UL,     1,     1, 6 },  // 35
+	{          3ULL,          3UL,     1,     1, 6 },  // 36
+	{          3ULL,          3UL,     1,     1, 6 },  // 37
+	{          3ULL,          3UL,     1,     1, 6 },  // 38
+	{          3ULL,          3UL,     1,     1, 6 },  // 39
+	{          2ULL,          2UL,     1,     1, 6 },  // 40
+	{          2ULL,          2UL,     1,     1, 6 },  // 41
+	{          2ULL,          2UL,     1,     1, 6 },  // 42
+	{          2ULL,          2UL,     1,     1, 6 },  // 43
+	{          2ULL,          2UL,     1,     1, 6 },  // 44
+	{          2ULL,          2UL,     1,     1, 6 },  // 45
+	{          2ULL,          2UL,     1,     1, 6 },  // 46
+	{          2ULL,          2UL,     1,     1, 6 },  // 47
+	{          2ULL,          2UL,     1,     1, 6 },  // 48
+	{          2ULL,          2UL,     1,     1, 6 },  // 49
+	{          2ULL,          2UL,     1,     1, 6 },  // 50
+	{          2ULL,          2UL,     1,     1, 6 },  // 51
+	{          2ULL,          2UL,     1,     1, 6 },  // 52
+	{          2ULL,          2UL,     1,     1, 6 },  // 53
+	{          2ULL,          2UL,     1,     1, 6 },  // 54
+	{          2ULL,          2UL,     1,     1, 6 },  // 55
+	{          2ULL,          2UL,     1,     1, 6 },  // 56
+	{          2ULL,          2UL,     1,     1, 6 },  // 57
+	{          2ULL,          2UL,     1,     1, 6 },  // 58
+	{          2ULL,          2UL,     1,     1, 6 },  // 59
+	{          2ULL,          2UL,     1,     1, 6 },  // 60
+	{          2ULL,          2UL,     1,     1, 6 },  // 61
+	{          2ULL,          2UL,     1,     1, 6 },  // 62
 	{          2ULL,          1UL,     1,     1, 6 },  // 63
 };
 
