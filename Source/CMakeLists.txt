@@ -86,7 +86,7 @@ endif ()
 
 if (URHO3D_NETWORK)
 #    add_definitions (-DURHO3D_SSL)
-#    add_definitions(-DURHO3D_SSL_DYNAMIC)
+#    add_definitions (-DURHO3D_SSL_DYNAMIC)
     add_subdirectory (ThirdParty/Civetweb)
     add_subdirectory (ThirdParty/SLikeNet)
 endif ()

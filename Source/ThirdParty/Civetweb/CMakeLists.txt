@@ -93,6 +93,8 @@ if (URHO3D_SSL)
         target_link_libraries(Civetweb ${OPENSSL_LIBRARIES})
         add_definitions(-DOPENSSL_API_1_1)
     endif()
+else()
+    add_definitions(-DNO_SSL=1)
 endif()
 
 # Install headers for building the Urho3D library
