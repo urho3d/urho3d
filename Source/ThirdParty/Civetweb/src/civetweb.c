@@ -16422,12 +16422,21 @@ psa = (sa.sa.sa_family == AF_INET)
     }
 
     conn->client.is_ssl = use_ssl ? 1 : 0;
-    if (0 != pthread_mutex_init(&conn->mutex, &pthread_mutex_attr)) {
+
+// Urho3D OSX workaround
+#ifdef __MACH__
+    int res = pthread_mutex_init(&conn->mutex, NULL);
+#else
+    int res = pthread_mutex_init(&conn->mutex, &pthread_mutex_attr);
+#endif
+
+    if (0 != res) {
         mg_snprintf(NULL,
                     NULL, /* No truncation check for ebuf */
                     ebuf,
                     ebuf_len,
-                    "Can not create mutex");
+                    "Cannot create mutex [%s] [%d]", strerror(res), use_ssl);
+
 #if !defined(NO_SSL)
         SSL_CTX_free(conn->client_ssl_ctx);
 #endif
