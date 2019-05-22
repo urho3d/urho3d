@@ -23,6 +23,32 @@ add_definitions (-D_RAKNET_SUPPORT_ConsoleServer=0 -D_RAKNET_SUPPORT_RakNetTrans
 add_definitions (-D_RAKNET_SUPPORT_Rackspace=0 -D_RAKNET_SUPPORT_PacketizedTCP=0 -D_RAKNET_SUPPORT_RPC4Plugin=0 -D_RAKNET_SUPPORT_Router2=0 -D_RAKNET_SUPPORT_ReplicaManager3=0)
 add_definitions (-D_RAKNET_SUPPORT_ReadyEvent=0 -D_RAKNET_SUPPORT_MessageFilter=0 -D_RAKNET_SUPPORT_FileListTransfer=0)
 
+# Check specific function availability which may be missing from different MinGW versions
+check_cxx_source_compiles ("#include <arpa/inet.h>\nint main() {\n    struct sockaddr_in sa;\n    char str[INET_ADDRSTRLEN];\n    inet_pton(AF_INET, \"192.0.2.33\", &(sa.sin_addr));\n    inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);\n}" INET_FUNCTIONS_EXISTS_1)
+
+set (ORIG_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+set (CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ws2_32)
+check_cxx_source_compiles ("#include <winsock2.h>\n#include <ws2tcpip.h>\nint main() {\n    struct sockaddr_in sa;\n    char str[INET_ADDRSTRLEN];\n    inet_pton(AF_INET, \"192.0.2.33\", &(sa.sin_addr));\n    inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);\n}" INET_FUNCTIONS_EXISTS_2)
+set (CMAKE_REQUIRED_LIBRARIES ${ORIG_CMAKE_REQUIRED_LIBRARIES})
+
+if (NOT INET_FUNCTIONS_EXISTS_1 AND NOT INET_FUNCTIONS_EXISTS_2 AND NOT HAVE_INET_NTOP)
+    add_definitions(-DINET_FUNCTIONS_MISSING=1)
+endif()
+
+# Check specific function availability which may be missing from different MinGW versions
+check_cxx_source_compiles ("#include <stdio.h>\nint main() { char s[80];\nint x = 1;\nsprintf_s(s, 80, \"Test:%d\", x); }" SPRINTFS_FUNCTION_EXISTS)
+
+if (NOT SPRINTFS_FUNCTION_EXISTS)
+    add_definitions(-DSPRINTFS_FUNCTION_MISSING=1)
+endif()
+
+# Check specific function availability which may be missing from different MinGW versions
+check_cxx_source_compiles ("#include <stdio.h>\nint main() {\nchar s[80];\nint x = 1;\nva_list args = {};\nvsnprintf_s(s, 80, \"Test:%d\", args);}" VSNPRINTFS_FUNCTION_EXISTS)
+
+if (NOT VSNPRINTFS_FUNCTION_EXISTS)
+    add_definitions(-DVSNPRINTFS_FUNCTION_MISSING=1)
+endif()
+
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions(-D_RAKNET_DLL=1)
 endif ()
