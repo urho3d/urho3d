@@ -38,7 +38,7 @@ if [[ $(docker version -f {{.Client.Version}}) =~ ^([0-9]+)\.0*([0-9]+)\. ]] && 
         --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
         --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
-        urho3d/dockerized$BuildEnvironment $@
+        urho3d/dockerized$BuildEnvironment$DBE_TAG $@
 else
     # Fallback workaround on older Docker CLI version
     docker run -it --rm -h fishtank \
@@ -47,7 +47,7 @@ else
         --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
         --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
         --name dockerized$BuildEnvironment \
-        urho3d/dockerized$BuildEnvironment $@
+        urho3d/dockerized$BuildEnvironment$DBE_TAG $@
 fi
 
 # vi: set ts=4 sw=4 expandtab:

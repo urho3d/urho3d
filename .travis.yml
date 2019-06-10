@@ -66,7 +66,7 @@ before_script:
   # Travis-CI has a special case handling for release tag where it checks out directly from the tag branch instead of the default 'master' branch
   - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]]; then export SITE_UPDATE=1; fi; if [[ ! $CC ]] && [[ ! $CMAKE_BUILD_TYPE ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
   - if [[ $URHO3D_BINDINGS ]]; then git clone --depth 1 https://github.com/urho3d/llvm-clang.git && export LLVM_CLANG_ROOT=$(pwd)/llvm-clang; fi
-  - if [[ $LINUX ]]; then export PLATFORM=native; else export PLATFORM=mingw; fi
+  - if [[ $LINUX ]]; then export PLATFORM=native DBE_TAG=':gcc7.3.0_clang6.0.0'; else export PLATFORM=mingw DBE_TAG=':gcc7.3.0'; fi
   - rake ci_setup_cache
 script: script/dockerized.sh $PLATFORM rake ci && if [[ $SITE_UPDATE ]]; then script/dockerized.sh $PLATFORM rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh $PLATFORM rake ci_package_upload; fi && rake ci_timer
 after_script: if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
@@ -238,6 +238,7 @@ env:
     - ANDROID=1
     - ORG_GRADLE_PROJECT_URHO3D_LUAJIT=1
     - HOT=$HOME/urho3d_home_dir/.ccache/.hot
+    - DBE_TAG=':sdk26.1.1_ndk19.2.5345600'
   matrix:
     - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
     - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
@@ -269,6 +270,7 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=4
     - RPI=1
+    - DBE_TAG=':gcc4.8.3'
   matrix:
     # RPI 1
     - URHO3D_LIB_TYPE=STATIC
@@ -302,6 +304,7 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=4
     - ARM=1
+    - DBE_TAG=':gcc5.5.0'
   matrix:
     # ODROID-C2
     - URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
@@ -341,6 +344,7 @@ env:
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
+    - DBE_TAG=':emcc1.38.4'
   matrix:
     - URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=0 numjobs=4
     - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=0
