@@ -22,7 +22,7 @@
 
 ---
 
-dist: xenial
+dist: trusty
 addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
@@ -166,7 +166,7 @@ branch: {name: Coverity-Scan, active: no}
 language: cpp
 compiler: gcc
 cache: ccache
-dist: xenial
+dist: trusty
 addons:
   apt:
     packages: libpulse-dev
@@ -199,6 +199,7 @@ branch: {name: Annotate, active: no}
 language: cpp
 compiler: gcc
 cache: ccache
+dist: trusty
 addons: {apt: {packages: libpulse-dev}}
 env:
   global:
@@ -218,7 +219,7 @@ after_script: rake ci_delete_mirror
 ---
 
 branch: {name: Android-CI, active: yes}
-dist: xenial
+dist: trusty
 addons: {apt: {packages: docker-ce}}
 cache:
   directories:
@@ -257,7 +258,7 @@ matrix:
 ---
 
 branch: {name: RPI-CI, active: yes}
-dist: xenial
+dist: trusty
 addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
@@ -290,7 +291,7 @@ matrix:
 ---
 
 branch: {name: ARM-CI, active: yes}
-dist: xenial
+dist: trusty
 addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
@@ -323,7 +324,7 @@ matrix:
 ---
 
 branch: {name: Web-CI, active: yes}
-dist: xenial
+dist: trusty
 addons: {apt: {packages: docker-ce}}
 cache:
   directories:
