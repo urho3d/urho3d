@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,10 +35,14 @@ static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_CAMERA_FOV = 45.0f;
 static const float DEFAULT_ORTHOSIZE = 20.0f;
 
-static const unsigned VO_NONE = 0x0;
-static const unsigned VO_LOW_MATERIAL_QUALITY = 0x1;
-static const unsigned VO_DISABLE_SHADOWS = 0x2;
-static const unsigned VO_DISABLE_OCCLUSION = 0x4;
+enum ViewOverride : unsigned
+{
+    VO_NONE = 0x0,
+    VO_LOW_MATERIAL_QUALITY = 0x1,
+    VO_DISABLE_SHADOWS = 0x2,
+    VO_DISABLE_OCCLUSION = 0x4,
+};
+URHO3D_FLAGSET(ViewOverride, ViewOverrideFlags);
 
 /// %Camera component.
 class URHO3D_API Camera : public Component
@@ -47,14 +51,14 @@ class URHO3D_API Camera : public Component
 
 public:
     /// Construct.
-    Camera(Context* context);
+    explicit Camera(Context* context);
     /// Destruct.
-    virtual ~Camera();
+    ~Camera() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set near clip distance.
     void SetNearClip(float nearClip);
@@ -77,7 +81,7 @@ public:
     /// Set view mask. Will be and'ed with object's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
     /// Set view override flags.
-    void SetViewOverrideFlags(unsigned flags);
+    void SetViewOverrideFlags(ViewOverrideFlags flags);
     /// Set orthographic mode enabled/disabled.
     void SetOrthographic(bool enable);
     /// Set automatic aspect ratio based on viewport dimensions. Enabled by default.
@@ -95,7 +99,7 @@ public:
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     /// Set custom projection matrix, which should be specified in D3D convention with depth range 0 - 1. Disables auto aspect ratio.
-    /** Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection. 
+    /** Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection.
         Note that the custom projection is not serialized or replicated through the network.
      */
     void SetProjection(const Matrix4& projection);
@@ -125,7 +129,7 @@ public:
     unsigned GetViewMask() const { return viewMask_; }
 
     /// Return view override flags.
-    unsigned GetViewOverrideFlags() const { return viewOverrideFlags_; }
+    ViewOverrideFlags GetViewOverrideFlags() const { return viewOverrideFlags_; }
 
     /// Return fill mode.
     FillMode GetFillMode() const { return fillMode_; }
@@ -212,9 +216,9 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    void OnNodeSet(Node* node) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    void OnMarkedDirty(Node* node) override;
 
 private:
     /// Recalculate projection matrix.
@@ -235,9 +239,9 @@ private:
     /// Orthographic mode flag.
     bool orthographic_;
     /// Cached actual near clip distance.
-    mutable float projNearClip_;
+    mutable float projNearClip_{};
     /// Cached actual far clip distance.
-    mutable float projFarClip_;
+    mutable float projFarClip_{};
     /// Near clip distance.
     float nearClip_;
     /// Far clip distance.
@@ -255,7 +259,7 @@ private:
     /// View mask.
     unsigned viewMask_;
     /// View override flags.
-    unsigned viewOverrideFlags_;
+    ViewOverrideFlags viewOverrideFlags_;
     /// Fill mode.
     FillMode fillMode_;
     /// Projection offset.

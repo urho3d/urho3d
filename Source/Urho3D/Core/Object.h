@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,10 @@
 #pragma once
 
 #include "../Container/LinkedList.h"
+#include "../Core/StringHashRegister.h"
 #include "../Core/Variant.h"
-#if URHO3D_CXX11
 #include <functional>
-#endif
+#include <utility>
 
 namespace Urho3D
 {
@@ -68,11 +68,11 @@ private:
 
 #define URHO3D_OBJECT(typeName, baseTypeName) \
     public: \
-        typedef typeName ClassName; \
-        typedef baseTypeName BaseClassName; \
-        virtual Urho3D::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
-        virtual const Urho3D::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
+        using ClassName = typeName; \
+        using BaseClassName = baseTypeName; \
+        virtual Urho3D::StringHash GetType() const override { return GetTypeInfoStatic()->GetType(); } \
+        virtual const Urho3D::String& GetTypeName() const override { return GetTypeInfoStatic()->GetTypeName(); } \
+        virtual const Urho3D::TypeInfo* GetTypeInfo() const override { return GetTypeInfoStatic(); } \
         static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
         static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
         static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
@@ -84,9 +84,9 @@ class URHO3D_API Object : public RefCounted
 
 public:
     /// Construct.
-    Object(Context* context);
+    explicit Object(Context* context);
     /// Destruct. Clean up self from event sender & receiver structures.
-    virtual ~Object();
+    ~Object() override;
 
     /// Return type hash.
     virtual StringHash GetType() const = 0;
@@ -98,24 +98,26 @@ public:
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
 
     /// Return type info static.
-    static const TypeInfo* GetTypeInfoStatic() { return 0; }
+    static const TypeInfo* GetTypeInfoStatic() { return nullptr; }
     /// Check current instance is type of specified type.
     bool IsInstanceOf(StringHash type) const;
     /// Check current instance is type of specified type.
     bool IsInstanceOf(const TypeInfo* typeInfo) const;
     /// Check current instance is type of specified class.
     template<typename T> bool IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()); }
+    /// Cast the object to specified most derived class.
+    template<typename T> T* Cast() { return IsInstanceOf<T>() ? static_cast<T*>(this) : nullptr; }
+    /// Cast the object to specified most derived class.
+    template<typename T> const T* Cast() const { return IsInstanceOf<T>() ? static_cast<const T*>(this) : nullptr; }
 
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event.
     void SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler);
-#ifdef URHO3D_CXX11
     /// Subscribe to an event that can be sent by any sender.
-    void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
+    void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr);
     /// Subscribe to a specific sender's event.
-    void SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
-#endif
+    void SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr);
     /// Unsubscribe from an event.
     void UnsubscribeFromEvent(StringHash eventType);
     /// Unsubscribe from a specific sender's event.
@@ -132,13 +134,11 @@ public:
     void SendEvent(StringHash eventType, VariantMap& eventData);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap() const;
-#if URHO3D_CXX11
     /// Send event with variadic parameter pairs to all subscribers. The parameter pairs is a list of paramID and paramValue separated by comma, one pair after another.
     template <typename... Args> void SendEvent(StringHash eventType, Args... args)
     {
         SendEvent(eventType, GetEventDataMap().Populate(args...));
     }
-#endif
 
     /// Return execution context.
     Context* GetContext() const { return context_; }
@@ -167,22 +167,30 @@ public:
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
 
+    /// Block object from sending and receiving events.
+    void SetBlockEvents(bool block) { blockEvents_ = block; }
+    /// Return sending and receiving events blocking status.
+    bool GetBlockEvents() const { return blockEvents_; }
+
 protected:
     /// Execution context.
     Context* context_;
 
 private:
     /// Find the first event handler with no specific sender.
-    EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = 0) const;
+    EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = nullptr) const;
     /// Find the first event handler with specific sender.
-    EventHandler* FindSpecificEventHandler(Object* sender, EventHandler** previous = 0) const;
+    EventHandler* FindSpecificEventHandler(Object* sender, EventHandler** previous = nullptr) const;
     /// Find the first event handler with specific sender and event type.
-    EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = 0) const;
+    EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = nullptr) const;
     /// Remove event handlers related to a specific sender.
     void RemoveEventSender(Object* sender);
 
     /// Event handlers. Sender is null for non-specific handlers.
     LinkedList<EventHandler> eventHandlers_;
+
+    /// Block object from sending and receiving any events.
+    bool blockEvents_;
 };
 
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
@@ -192,7 +200,7 @@ class URHO3D_API ObjectFactory : public RefCounted
 {
 public:
     /// Construct.
-    ObjectFactory(Context* context) :
+    explicit ObjectFactory(Context* context) :
         context_(context)
     {
         assert(context_);
@@ -217,7 +225,7 @@ protected:
     /// Execution context.
     Context* context_;
     /// Type info.
-    const TypeInfo* typeInfo_;
+    const TypeInfo* typeInfo_{};
 };
 
 /// Template implementation of the object factory.
@@ -225,14 +233,14 @@ template <class T> class ObjectFactoryImpl : public ObjectFactory
 {
 public:
     /// Construct.
-    ObjectFactoryImpl(Context* context) :
+    explicit ObjectFactoryImpl(Context* context) :
         ObjectFactory(context)
     {
         typeInfo_ = T::GetTypeInfoStatic();
     }
 
     /// Create an object of the specific type.
-    virtual SharedPtr<Object> CreateObject() { return SharedPtr<Object>(new T(context_)); }
+    SharedPtr<Object> CreateObject() override { return SharedPtr<Object>(new T(context_)); }
 };
 
 /// Internal helper class for invoking event handler functions.
@@ -240,15 +248,15 @@ class URHO3D_API EventHandler : public LinkedListNode
 {
 public:
     /// Construct with specified receiver and userdata.
-    EventHandler(Object* receiver, void* userData = 0) :
+    explicit EventHandler(Object* receiver, void* userData = nullptr) :
         receiver_(receiver),
-        sender_(0),
+        sender_(nullptr),
         userData_(userData)
     {
     }
 
     /// Destruct.
-    virtual ~EventHandler() { }
+    virtual ~EventHandler() = default;
 
     /// Set sender and event type.
     void SetSenderAndEventType(Object* sender, StringHash eventType)
@@ -289,10 +297,10 @@ protected:
 template <class T> class EventHandlerImpl : public EventHandler
 {
 public:
-    typedef void (T::*HandlerFunctionPtr)(StringHash, VariantMap&);
+    using HandlerFunctionPtr = void (T::*)(StringHash, VariantMap&);
 
     /// Construct with receiver and function pointers and userdata.
-    EventHandlerImpl(T* receiver, HandlerFunctionPtr function, void* userData = 0) :
+    EventHandlerImpl(T* receiver, HandlerFunctionPtr function, void* userData = nullptr) :
         EventHandler(receiver, userData),
         function_(function)
     {
@@ -301,14 +309,14 @@ public:
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData)
+    void Invoke(VariantMap& eventData) override
     {
-        T* receiver = static_cast<T*>(receiver_);
+        auto* receiver = static_cast<T*>(receiver_);
         (receiver->*function_)(eventType_, eventData);
     }
 
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const
+    EventHandler* Clone() const override
     {
         return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
     }
@@ -318,27 +326,26 @@ private:
     HandlerFunctionPtr function_;
 };
 
-#if URHO3D_CXX11
 /// Template implementation of the event handler invoke helper (std::function instance).
 class EventHandler11Impl : public EventHandler
 {
 public:
     /// Construct with receiver and function pointers and userdata.
-    EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = 0) :
-        EventHandler(0, userData),
-        function_(function)
+    explicit EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = nullptr) :
+        EventHandler(nullptr, userData),
+        function_(std::move(function))
     {
         assert(function_);
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData)
+    void Invoke(VariantMap& eventData) override
     {
         function_(eventType_, eventData);
     }
 
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const
+    EventHandler* Clone() const override
     {
         return new EventHandler11Impl(function_, userData_);
     }
@@ -347,21 +354,12 @@ private:
     /// Class-specific pointer to handler function.
     std::function<void(StringHash, VariantMap&)> function_;
 };
-#endif
 
-/// Register event names.
-struct URHO3D_API EventNameRegistrar
-{
-    /// Register an event name for hash reverse mapping.
-    static StringHash RegisterEventName(const char* eventName);
-    /// Return Event name or empty string if not found.
-    static const String& GetEventName(StringHash eventID);
-    /// Return Event name map.
-    static HashMap<StringHash, String>& GetEventNameMap();
-};
+/// Get register of event names.
+URHO3D_API StringHashRegister& GetEventNameRegister();
 
 /// Describe an event's hash ID and begin a namespace in which to define its parameters.
-#define URHO3D_EVENT(eventID, eventName) static const Urho3D::StringHash eventID(Urho3D::EventNameRegistrar::RegisterEventName(#eventName)); namespace eventName
+#define URHO3D_EVENT(eventID, eventName) static const Urho3D::StringHash eventID(Urho3D::GetEventNameRegister().RegisterString(#eventName)); namespace eventName
 /// Describe an event's parameter hash ID. Should be used inside an event namespace.
 #define URHO3D_PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function.

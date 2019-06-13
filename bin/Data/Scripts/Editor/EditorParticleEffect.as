@@ -693,6 +693,18 @@ void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
         case 1:
             editParticleEffect.emitterType = EMITTER_BOX;
             break;
+
+        case 2:
+            editParticleEffect.emitterType = EMITTER_SPHEREVOLUME;
+            break;
+
+        case 3:
+            editParticleEffect.emitterType = EMITTER_CYLINDER;
+            break;
+
+        case 4:
+            editParticleEffect.emitterType = EMITTER_RING;
+            break;
     }
 
     EndParticleEffectEdit();
@@ -1474,6 +1486,15 @@ void RefreshParticleEffectBasicAttributes()
             break;
         case EMITTER_BOX:
             cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 1;
+            break;
+        case EMITTER_SPHEREVOLUME:
+            cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 2;
+            break;
+        case EMITTER_CYLINDER:
+            cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 3;
+            break;
+        case EMITTER_RING:
+            cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 4;
             break;
     }
 

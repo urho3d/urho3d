@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,12 +69,12 @@ static const char* textureUnitNames[] =
     "depth",
     "light",
     "zone",
-    0
+    nullptr
 #else
     "lightramp",
     "lightshape",
     "shadowmap",
-    0
+    nullptr
 #endif
 };
 
@@ -83,7 +83,7 @@ const char* cullModeNames[] =
     "none",
     "ccw",
     "cw",
-    0
+    nullptr
 };
 
 static const char* fillModeNames[] =
@@ -91,14 +91,14 @@ static const char* fillModeNames[] =
     "solid",
     "wireframe",
     "point",
-    0
+    nullptr
 };
 
 TextureUnit ParseTextureUnitName(String name)
 {
     name = name.ToLower().Trimmed();
 
-    TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
+    auto unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
     if (unit == MAX_TEXTURE_UNITS)
     {
         // Check also for shorthand names
@@ -123,25 +123,25 @@ TextureUnit ParseTextureUnitName(String name)
     return unit;
 }
 
-StringHash ParseTextureTypeName(String name)
+StringHash ParseTextureTypeName(const String& name)
 {
-    name = name.ToLower().Trimmed();
+    String lowerCaseName = name.ToLower().Trimmed();
 
-    if (name == "texture")
+    if (lowerCaseName == "texture")
         return Texture2D::GetTypeStatic();
-    else if (name == "cubemap")
+    else if (lowerCaseName == "cubemap")
         return TextureCube::GetTypeStatic();
-    else if (name == "texture3d")
+    else if (lowerCaseName == "texture3d")
         return Texture3D::GetTypeStatic();
-    else if (name == "texturearray")
+    else if (lowerCaseName == "texturearray")
         return Texture2DArray::GetTypeStatic();
 
-    return 0;
+    return nullptr;
 }
 
-StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
+StringHash ParseTextureTypeXml(ResourceCache* cache, const String& filename)
 {
-    StringHash type = 0;
+    StringHash type = nullptr;
     if (!cache)
         return type;
 
@@ -165,13 +165,13 @@ bool CompareTechniqueEntries(const TechniqueEntry& lhs, const TechniqueEntry& rh
         return lhs.qualityLevel_ > rhs.qualityLevel_;
 }
 
-TechniqueEntry::TechniqueEntry() :
-    qualityLevel_(0),
+TechniqueEntry::TechniqueEntry() noexcept :
+    qualityLevel_(QUALITY_LOW),
     lodDistance_(0.0f)
 {
 }
 
-TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) :
+TechniqueEntry::TechniqueEntry(Technique* tech, MaterialQuality qualityLevel, float lodDistance) noexcept :
     technique_(tech),
     original_(tech),
     qualityLevel_(qualityLevel),
@@ -179,26 +179,16 @@ TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lod
 {
 }
 
-TechniqueEntry::~TechniqueEntry()
-{
-}
-
-ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* target, const String& name, ValueAnimation* attributeAnimation,
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation,
     WrapMode wrapMode, float speed) :
-    ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
+    ValueAnimationInfo(material, attributeAnimation, wrapMode, speed),
     name_(name)
 {
 }
 
-ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other) :
-    ValueAnimationInfo(other),
-    name_(other.name_)
-{
-}
+ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other) = default;
 
-ShaderParameterAnimationInfo::~ShaderParameterAnimationInfo()
-{
-}
+ShaderParameterAnimationInfo::~ShaderParameterAnimationInfo() = default;
 
 void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 {
@@ -206,22 +196,12 @@ void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 }
 
 Material::Material(Context* context) :
-    Resource(context),
-    auxViewFrameNumber_(0),
-    shaderParameterHash_(0),
-    alphaToCoverage_(false),
-    lineAntiAlias_(false),
-    occlusion_(true),
-    specular_(false),
-    subscribed_(false),
-    batchedParameterUpdate_(false)
+    Resource(context)
 {
     ResetToDefaults();
 }
 
-Material::~Material()
-{
-}
+Material::~Material() = default;
 
 void Material::RegisterObject(Context* context)
 {
@@ -231,7 +211,7 @@ void Material::RegisterObject(Context* context)
 bool Material::BeginLoad(Deserializer& source)
 {
     // In headless mode, do not actually load the material, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
@@ -266,7 +246,7 @@ bool Material::BeginLoad(Deserializer& source)
 bool Material::EndLoad()
 {
     // In headless mode, do not actually load the material, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
@@ -299,7 +279,7 @@ bool Material::BeginLoadXML(Deserializer& source)
         // and request them to also be loaded. Can not do anything else at this point
         if (GetAsyncLoadState() == ASYNC_LOADING)
         {
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            auto* cache = GetSubsystem<ResourceCache>();
             XMLElement rootElem = loadXMLFile_->GetRoot();
             XMLElement techniqueElem = rootElem.GetChild("technique");
             while (techniqueElem)
@@ -358,7 +338,7 @@ bool Material::BeginLoadJSON(Deserializer& source)
         // and request them to also be loaded. Can not do anything else at this point
         if (GetAsyncLoadState() == ASYNC_LOADING)
         {
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            auto* cache = GetSubsystem<ResourceCache>();
             const JSONValue& rootVal = loadJSONFile_->GetRoot();
 
             JSONArray techniqueArray = rootVal.Get("techniques").GetArray();
@@ -424,7 +404,7 @@ bool Material::Load(const XMLElement& source)
         return false;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     XMLElement shaderElem = source.GetChild("shader");
     if (shaderElem)
@@ -438,13 +418,13 @@ bool Material::Load(const XMLElement& source)
 
     while (techniqueElem)
     {
-        Technique* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
+        auto* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
         if (tech)
         {
             TechniqueEntry newTechnique;
             newTechnique.technique_ = newTechnique.original_ = tech;
             if (techniqueElem.HasAttribute("quality"))
-                newTechnique.qualityLevel_ = techniqueElem.GetInt("quality");
+                newTechnique.qualityLevel_ = (MaterialQuality)techniqueElem.GetInt("quality");
             if (techniqueElem.HasAttribute("loddistance"))
                 newTechnique.lodDistance_ = techniqueElem.GetFloat("loddistance");
             techniques_.Push(newTechnique);
@@ -575,7 +555,7 @@ bool Material::Load(const JSONValue& source)
         return false;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     const JSONValue& shaderVal = source.Get("shader");
     if (!shaderVal.IsNull())
@@ -592,14 +572,14 @@ bool Material::Load(const JSONValue& source)
     for (unsigned i = 0; i < techniquesArray.Size(); i++)
     {
         const JSONValue& techVal = techniquesArray[i];
-        Technique* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
+        auto* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
         if (tech)
         {
             TechniqueEntry newTechnique;
             newTechnique.technique_ = newTechnique.original_ = tech;
             JSONValue qualityVal = techVal.Get("quality");
             if (!qualityVal.IsNull())
-                newTechnique.qualityLevel_ = qualityVal.GetInt();
+                newTechnique.qualityLevel_ = (MaterialQuality)qualityVal.GetInt();
             JSONValue lodDistanceVal = techVal.Get("loddistance");
             if (!lodDistanceVal.IsNull())
                 newTechnique.lodDistance_ = lodDistanceVal.GetFloat();
@@ -943,7 +923,7 @@ void Material::SetNumTechniques(unsigned num)
     RefreshMemoryUse();
 }
 
-void Material::SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel, float lodDistance)
+void Material::SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel, float lodDistance)
 {
     if (index >= techniques_.Size())
         return;
@@ -1205,19 +1185,19 @@ const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 
 Technique* Material::GetTechnique(unsigned index) const
 {
-    return index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
+    return index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
 }
 
 Pass* Material::GetPass(unsigned index, const String& passName) const
 {
-    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
-    return tech ? tech->GetPass(passName) : 0;
+    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
+    return tech ? tech->GetPass(passName) : nullptr;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
     HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures_.Find(unit);
-    return i != textures_.End() ? i->second_.Get() : (Texture*)0;
+    return i != textures_.End() ? i->second_.Get() : nullptr;
 }
 
 const Variant& Material::GetShaderParameter(const String& name) const
@@ -1229,19 +1209,19 @@ const Variant& Material::GetShaderParameter(const String& name) const
 ValueAnimation* Material::GetShaderParameterAnimation(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
-    return info == 0 ? 0 : info->GetAnimation();
+    return info == nullptr ? nullptr : info->GetAnimation();
 }
 
 WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
-    return info == 0 ? WM_LOOP : info->GetWrapMode();
+    return info == nullptr ? WM_LOOP : info->GetWrapMode();
 }
 
 float Material::GetShaderParameterAnimationSpeed(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
-    return info == 0 ? 0 : info->GetSpeed();
+    return info == nullptr ? 0 : info->GetSpeed();
 }
 
 Scene* Material::GetScene() const
@@ -1273,7 +1253,7 @@ void Material::ResetToDefaults()
     pixelShaderDefines_.Clear();
 
     SetNumTechniques(1);
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     SetTechnique(0, renderer ? renderer->GetDefaultTechnique() :
         GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 
@@ -1335,7 +1315,7 @@ ShaderParameterAnimationInfo* Material::GetShaderParameterAnimationInfo(const St
     StringHash nameHash(name);
     HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Find(nameHash);
     if (i == shaderParameterAnimationInfos_.End())
-        return 0;
+        return nullptr;
     return i->second_;
 }
 
@@ -1380,7 +1360,7 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
 
     // Remove finished animations
     for (unsigned i = 0; i < finishedNames.Size(); ++i)
-        SetShaderParameterAnimation(finishedNames[i], 0);
+        SetShaderParameterAnimation(finishedNames[i], nullptr);
 }
 
 void Material::ApplyShaderDefines(unsigned index)

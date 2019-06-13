@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -60,9 +60,7 @@ SDL_setenv(const char *name, const char *value, int overwrite)
     }
     
     if (!overwrite) {
-        char ch = 0;
-        const size_t len = GetEnvironmentVariableA(name, &ch, sizeof (ch));
-        if (len > 0) {
+        if (GetEnvironmentVariableA(name, NULL, 0) > 0) {
             return 0;  /* asked not to overwrite existing value. */
         }
     }

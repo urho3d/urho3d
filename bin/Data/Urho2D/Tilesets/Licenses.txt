@@ -1,0 +1,15 @@
+=============================
+Isometric Dungeon (atrium):
+
+Copyright Clint Bellanger
+https://github.com/clintbellanger/flare-game
+
+All of Flare's art and data files are released under CC-BY-SA 3.0. Later versions are permitted.
+
+=============================
+Orthographic tileset:
+
+Copyright Kenney
+www.kenney.nl
+
+Licensed under CC-0.

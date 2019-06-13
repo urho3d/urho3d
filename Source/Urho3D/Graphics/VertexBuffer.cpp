@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +35,7 @@ namespace Urho3D
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
-    vertexCount_(0),
-    elementMask_(0),
-    lockState_(LOCK_NONE),
-    lockStart_(0),
-    lockCount_(0),
-    lockScratchData_(0),
-    shadowed_(false),
-    dynamic_(false),
-    discardLock_(false)
+    GPUObject(forceHeadless ? nullptr : GetSubsystem<Graphics>())
 {
     UpdateOffsets();
 
@@ -102,7 +93,7 @@ void VertexBuffer::UpdateOffsets()
 {
     unsigned elementOffset = 0;
     elementHash_ = 0;
-    elementMask_ = 0;
+    elementMask_ = MASK_NONE;
 
     for (PODVector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
     {
@@ -115,7 +106,7 @@ void VertexBuffer::UpdateOffsets()
         {
             const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
             if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
-                elementMask_ |= (1 << j);
+                elementMask_ |= VertexMaskFlags(1u << j);
         }
     }
 
@@ -130,7 +121,7 @@ const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, un
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
@@ -141,7 +132,7 @@ const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElem
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
@@ -152,12 +143,12 @@ const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& el
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    return GetElement(elements, type, semantic, index) != 0;
+    return GetElement(elements, type, semantic, index) != nullptr;
 }
 
 unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
@@ -172,7 +163,7 @@ PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
 
     for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1 << i))
+        if (elementMask & (1u << i))
             ret.Push(LEGACY_VERTEXELEMENTS[i]);
     }
 
@@ -195,11 +186,22 @@ unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 
     for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1 << i))
+        if (elementMask & (1u << i))
             size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
     }
 
     return size;
+}
+
+void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements)
+{
+    unsigned elementOffset = 0;
+
+    for (PODVector<VertexElement>::Iterator i = elements.Begin(); i != elements.End(); ++i)
+    {
+        i->offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[i->type_];
+    }
 }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,27 +39,27 @@ class URHO3D_API Text3D : public Drawable
 
 public:
     /// Construct.
-    Text3D(Context* context);
+    explicit Text3D(Context* context);
     /// Destruct.
-    ~Text3D();
+    ~Text3D() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
+    void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
+    void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Set font by looking from resource cache by name and font size. Return true if successful.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, float size = DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
-    bool SetFontSize(int size);
+    bool SetFontSize(float size);
     /// Set material.
     void SetMaterial(Material* material);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
@@ -104,7 +104,7 @@ public:
     /// Return font.
     Font* GetFont() const;
     /// Return font size.
-    int GetFontSize() const;
+    float GetFontSize() const;
     /// Return material.
     Material* GetMaterial() const;
     /// Return text.
@@ -144,9 +144,9 @@ public:
     /// Return width of row by index.
     int GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
-    IntVector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
-    IntVector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(unsigned index);
     /// Return corner color.
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
@@ -170,13 +170,13 @@ public:
     String GetTextAttr() const;
 
     /// Get color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return text_.color_[0]; }
+    const Color& GetColorAttr() const { return text_.colors_[0]; }
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    void OnNodeSet(Node* node) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    void OnWorldBoundingBoxUpdate() override;
     /// Mark text & geometry dirty.
     void MarkTextDirty();
     /// Update text %UI batches.
@@ -185,7 +185,7 @@ protected:
     void UpdateTextMaterials(bool forceUpdate = false);
     /// Recalculate camera facing and fixed screen size.
     void CalculateFixedScreenSize(const FrameInfo& frame);
-    
+
     /// Internally used text element.
     Text text_;
     /// Geometries.

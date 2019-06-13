@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,19 +33,12 @@ namespace Urho3D
 
 Vector3 UIBatch::posAdjust(0.0f, 0.0f, 0.0f);
 
-UIBatch::UIBatch() :
-    element_(0),
-    blendMode_(BLEND_REPLACE),
-    texture_(0),
-    invTextureSize_(Vector2::ONE),
-    vertexData_(0),
-    vertexStart_(0),
-    vertexEnd_(0)
+UIBatch::UIBatch()
 {
     SetDefaultColor();
 }
 
-UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
+UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :     // NOLINT(modernize-pass-by-value)
     element_(element),
     blendMode_(blendMode),
     scissor_(scissor),
@@ -82,7 +75,7 @@ void UIBatch::SetDefaultColor()
     }
 }
 
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
@@ -107,10 +100,10 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 
     const IntVector2& screenPos = element_->GetScreenPosition();
 
-    float left = (float)(x + screenPos.x_) - posAdjust.x_;
-    float right = left + (float)width;
-    float top = (float)(y + screenPos.y_) - posAdjust.x_;
-    float bottom = top + (float)height;
+    float left = x + screenPos.x_ - posAdjust.x_;
+    float right = left + width;
+    float top = y + screenPos.y_ - posAdjust.x_;
+    float bottom = top + height;
 
     float leftUV = texOffsetX * invTextureSize_.x_;
     float topUV = texOffsetY * invTextureSize_.y_;
@@ -312,7 +305,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     ((unsigned&)dest[9]) = color_;
     dest[10] = uv2.x_;
     dest[11] = uv2.y_;
-    
+
     dest[12] = v3.x_;
     dest[13] = v3.y_;
     dest[14] = 0.0f;
@@ -379,7 +372,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     ((unsigned&)dest[9]) = c2;
     dest[10] = uv2.x_;
     dest[11] = uv2.y_;
-    
+
     dest[12] = v3.x_;
     dest[13] = v3.y_;
     dest[14] = 0.0f;
@@ -422,14 +415,14 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-unsigned UIBatch::GetInterpolatedColor(int x, int y)
+unsigned UIBatch::GetInterpolatedColor(float x, float y)
 {
     const IntVector2& size = element_->GetSize();
 
     if (size.x_ && size.y_)
     {
-        float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
-        float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);
+        float cLerpX = Clamp(x / (float)size.x_, 0.0f, 1.0f);
+        float cLerpY = Clamp(y / (float)size.y_, 0.0f, 1.0f);
 
         Color topColor = element_->GetColor(C_TOPLEFT).Lerp(element_->GetColor(C_TOPRIGHT), cLerpX);
         Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);

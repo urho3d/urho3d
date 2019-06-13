@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -64,15 +64,15 @@ protected:
 
 	int                ReadInner();
 
-	void               ReadData(void *data, asUINT size);
+	int                ReadData(void *data, asUINT size);
 	void               ReadString(asCString *str);
-	asCScriptFunction *ReadFunction(bool &isNew, bool addToModule = true, bool addToEngine = true, bool addToGC = true);
+	asCScriptFunction *ReadFunction(bool &isNew, bool addToModule = true, bool addToEngine = true, bool addToGC = true, bool *isExternal = 0);
 	void               ReadFunctionSignature(asCScriptFunction *func, asCObjectType **parentClass = 0);
 	void               ReadGlobalProperty();
 	void               ReadObjectProperty(asCObjectType *ot);
 	void               ReadDataType(asCDataType *dt);
 	asCTypeInfo       *ReadTypeInfo();
-	void               ReadTypeDeclaration(asCTypeInfo *ot, int phase);
+	void               ReadTypeDeclaration(asCTypeInfo *ot, int phase, bool *isExternal = 0);
 	void               ReadByteCode(asCScriptFunction *func);
 	asWORD             ReadEncodedUInt16();
 	asUINT             ReadEncodedUInt();
@@ -102,7 +102,7 @@ protected:
 	asCArray<asCTypeInfo*>       usedTypes;
 	asCArray<asCScriptFunction*> usedFunctions;
 	asCArray<void*>              usedGlobalProperties;
-	asCArray<int>                usedStringConstants;
+	asCArray<void*>              usedStringConstants;
 
 	asCArray<asCScriptFunction*>  savedFunctions;
 	asCArray<asCDataType>         savedDataTypes;
@@ -113,8 +113,8 @@ protected:
 
 	struct SObjProp
 	{
-		asCObjectType *objType;
-		int            offset;
+		asCObjectType     *objType;
+		asCObjectProperty *prop;
 	};
 	asCArray<SObjProp> usedObjectProperties;
 
@@ -165,8 +165,12 @@ protected:
 	asIBinaryStream *stream;
 	asCScriptEngine *engine;
 	bool             stripDebugInfo;
+	bool             error;
+	asUINT           bytesWritten;
 
-	void WriteData(const void *data, asUINT size);
+	int              Error(const char *msg);
+
+	int  WriteData(const void *data, asUINT size);
 
 	void WriteString(asCString *str);
 	void WriteFunction(asCScriptFunction *func);
@@ -184,8 +188,8 @@ protected:
 	int FindTypeIdIdx(int typeId);
 	int FindFunctionIndex(asCScriptFunction *func);
 	int FindGlobalPropPtrIndex(void *);
-	int FindStringConstantIndex(int id);
-	int FindObjectPropIndex(short offset, int typeId);
+	int FindStringConstantIndex(void *str);
+	int FindObjectPropIndex(short offset, int typeId, asDWORD *bc);
 
 	void CalculateAdjustmentByPos(asCScriptFunction *func);
 	int  AdjustStackPosition(int pos);
@@ -204,21 +208,21 @@ protected:
 	asCArray<asCTypeInfo*>       usedTypes;
 	asCArray<asCScriptFunction*> usedFunctions;
 	asCArray<void*>              usedGlobalProperties;
-	asCArray<int>                usedStringConstants;
-	asCMap<int, int>             stringIdToIndexMap;
+	asCArray<void*>              usedStringConstants;
+	asCMap<void*, int>           stringToIndexMap;
 
 	asCArray<asCScriptFunction*>  savedFunctions;
 	asCArray<asCDataType>         savedDataTypes;
 	asCArray<asCString>           savedStrings;
-	asCMap<asCStringPointer, int> stringToIdMap;
+	asCMap<asCString, int>        stringToIdMap;
 	asCArray<int>                 adjustStackByPos;
 	asCArray<int>                 adjustNegativeStackByPos;
 	asCArray<int>                 bytecodeNbrByPos;
 
 	struct SObjProp
 	{
-		asCObjectType *objType;
-		int            offset;
+		asCObjectType     *objType;
+		asCObjectProperty *prop;
 	};
 	asCArray<SObjProp>           usedObjectProperties;
 

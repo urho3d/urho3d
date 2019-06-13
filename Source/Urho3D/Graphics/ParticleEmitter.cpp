@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,9 +58,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
 
-ParticleEmitter::~ParticleEmitter()
-{
-}
+ParticleEmitter::~ParticleEmitter() = default;
 
 void ParticleEmitter::RegisterObject(Context* context)
 {
@@ -359,7 +357,7 @@ ParticleEffect* ParticleEmitter::GetEffect() const
 
 void ParticleEmitter::SetEffectAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetEffect(cache->GetResource<ParticleEffect>(value.name_));
 }
 
@@ -484,6 +482,33 @@ bool ParticleEmitter::EmitNewParticle()
                 Random(emitterSize.y_) - emitterSize.y_ * 0.5f,
                 Random(emitterSize.z_) - emitterSize.z_ * 0.5f
             );
+        }
+        break;
+
+    case EMITTER_SPHEREVOLUME:
+        {
+            Vector3 dir(
+                Random(2.0f) - 1.0f,
+                Random(2.0f) - 1.0f,
+                Random(2.0f) - 1.0f
+            );
+            dir.Normalize();
+            startPos = effect_->GetEmitterSize() * dir * Pow(Random(), 1.0f / 3.0f) * 0.5f;
+        }
+        break;
+
+    case EMITTER_CYLINDER:
+        {
+            float angle = Random(360.0f);
+            float radius = Sqrt(Random()) * 0.5f;
+            startPos = Vector3(Cos(angle) * radius, Random() - 0.5f, Sin(angle) * radius) * effect_->GetEmitterSize();
+        }
+        break;
+
+    case EMITTER_RING:
+        {
+            float angle = Random(360.0f);
+            startPos = Vector3(Cos(angle), Random(2.0f) - 1.0f, Sin(angle)) * effect_->GetEmitterSize() * 0.5f;
         }
         break;
     }

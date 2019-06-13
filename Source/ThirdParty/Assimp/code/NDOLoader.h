@@ -44,14 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INCLUDED_AI_NDO_LOADER_H
 #define INCLUDED_AI_NDO_LOADER_H
 
-#include "../include/assimp/vector3.h"
+#include <assimp/vector3.h>
 #include "BaseImporter.h"
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
 #include <string>
 #include <vector>
 

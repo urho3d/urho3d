@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@
 #define RegisterObjectMethodFasCALL_CDECL_OBJFIRST(clsdcl,decl,fun) RegisterObjectMethod(clsdcl,decl, WRAP_OBJ_FIRST(fun), asCALL_GENERIC); //assert(r >= 0);
 //#define RegisterObjectMethodMasCALL_CDECL_OBJECTFIRST(decl,cls,fun) RegisterObjectMethodMasCALL_THISCALL_ASGLOBAL_2(decl,UNWRAP fun)
 //#define RegisterObjectMethodMasCALL_THISCALL_ASGLOBAL_2(decl, ...) RegisterObjectMethod(decl, WRAP_MFN(__VA_ARGS__), asCALL_GENERIC); //assert(r >= 0);
-#define RegisterObjectMethodFasCALL_GENERIC(clsdcl,decl,fun) RegisterObjectMethod(clsdcl,decl, asMethodPtr(fun), asCALL_GENERIC); //assert(r >= 0);
+#define RegisterObjectMethodFasCALL_GENERIC(clsdcl,decl,fun) RegisterObjectMethod(clsdcl,decl, asFunctionPtr(fun), asCALL_GENERIC); //assert(r >= 0);
 
 ////note:unfortunately, the WrapCon methods are for creating the constructor wrapper, which typically seems to be done anyways, so we should just handle it like Register Object Method with 1 extra parameter
 //#define RegisterObjectBehaviour(...) RegObjectBehaviorIndirect(__VA__ARGS__)
@@ -147,8 +147,6 @@
 #define RegisterObjectBehaviorFPRasCALL_GENERIC(clsdcl,behavior,decl,...) RegisterObjectBehaviour(clsdcl,behavior,decl, _asFUNCTIONPR(__VA_ARGS__), asCALL_GENERIC);
 #define RegisterObjectBehaviorFPRasCALL_CDECL(clsdcl,behavior,decl,clsfunc) RegisterObjectBehaviour(clsdcl,behavior,decl, WRAP_FN_PR clsfunc, asCALL_GENERIC);
 
-#define RegisterStringFactory(...) EV(RegisterStringFactory_2(__VA_ARGS__))
-#define RegisterStringFactory_2(str,F,params,kind) RegisterStringFactory(str, WRAP_FN (params), asCALL_GENERIC);
 
 /*#define SetExceptionCallback(...) SetExceptionCallback_2(__VA_ARGS__)
 #define SetExceptionCallback_2(M,params,obj,kind) SetExceptionCallback(WRAP_MFN params, obj, asCALL_GENERIC);

@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -49,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "XFileHelper.h"
 #include "BaseImporter.h"
 
-#include "../include/assimp/types.h"
+#include <assimp/types.h>
 
 struct aiNode;
 
@@ -64,14 +65,11 @@ struct Node;
 /** The XFileImporter is a worker class capable of importing a scene from a
  * DirectX file .x
  */
-class XFileImporter : public BaseImporter
-{
+class XFileImporter : public BaseImporter {
 public:
     XFileImporter();
     ~XFileImporter();
 
-
-public:
     // -------------------------------------------------------------------
     /** Returns whether the class can handle the format of the given file.
      * See BaseImporter::CanRead() for details. */

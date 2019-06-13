@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,42 +33,35 @@
 namespace Urho3D
 {
 
-static const unsigned CLIPMASK_X_POS = 0x1;
-static const unsigned CLIPMASK_X_NEG = 0x2;
-static const unsigned CLIPMASK_Y_POS = 0x4;
-static const unsigned CLIPMASK_Y_NEG = 0x8;
-static const unsigned CLIPMASK_Z_POS = 0x10;
-static const unsigned CLIPMASK_Z_NEG = 0x20;
+enum ClipMask : unsigned
+{
+    CLIPMASK_X_POS = 0x1,
+    CLIPMASK_X_NEG = 0x2,
+    CLIPMASK_Y_POS = 0x4,
+    CLIPMASK_Y_NEG = 0x8,
+    CLIPMASK_Z_POS = 0x10,
+    CLIPMASK_Z_NEG = 0x20,
+};
+URHO3D_FLAGSET(ClipMask, ClipMaskFlags);
 
 void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
 {
-    OcclusionBuffer* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
+    auto* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
     OcclusionBatch& batch = *reinterpret_cast<OcclusionBatch*>(item->start_);
     buffer->DrawBatch(batch, threadIndex);
 }
 
 OcclusionBuffer::OcclusionBuffer(Context* context) :
-    Object(context),
-    width_(0),
-    height_(0),
-    numTriangles_(0),
-    maxTriangles_(OCCLUSION_DEFAULT_MAX_TRIANGLES),
-    cullMode_(CULL_CCW),
-    depthHierarchyDirty_(true),
-    reverseCulling_(false),
-    nearClip_(0.0f),
-    farClip_(0.0f)
+    Object(context)
 {
 }
 
-OcclusionBuffer::~OcclusionBuffer()
-{
-}
+OcclusionBuffer::~OcclusionBuffer() = default;
 
 bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
 {
     // Force the height to an even amount of pixels for better mip generation
-    if (height & 1)
+    if (height & 1u)
         ++height;
 
     if (width == width_ && height == height_)
@@ -177,7 +170,7 @@ bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexDat
     batch.model_ = model;
     batch.vertexData_ = vertexData;
     batch.vertexSize_ = vertexSize;
-    batch.indexData_ = 0;
+    batch.indexData_ = nullptr;
     batch.indexSize_ = 0;
     batch.drawStart_ = vertexStart;
     batch.drawCount_ = vertexCount;
@@ -217,7 +210,7 @@ void OcclusionBuffer::DrawTriangles()
     else if (buffers_.Size() > 1)
     {
         // Threaded
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
 
         for (Vector<OcclusionBatch>::Iterator i = batches_.Begin(); i != batches_.End(); ++i)
         {
@@ -357,8 +350,8 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     vertices[7] = ModelTransform(viewProj_, worldSpaceBox.max_);
 
     // Apply a far clip relative bias
-    for (unsigned i = 0; i < 8; ++i)
-        vertices[i].z_ -= OCCLUSION_RELATIVE_BIAS;
+    for (auto& vertice : vertices)
+        vertice.z_ -= OCCLUSION_RELATIVE_BIAS;
 
     // Transform to screen space. If any of the corners cross the near plane, assume visible
     float minX, maxX, minY, maxY, minZ;
@@ -387,10 +380,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     }
 
     // Expand the bounding box 1 pixel in each direction to be conservative and correct rasterization offset
-    IntRect rect(
-        (int)(minX - 1.5f), (int)(minY - 1.5f),
-        (int)(maxX + 0.5f), (int)(maxY + 0.5f)
-    );
+    IntRect rect((int)(minX - 1.5f), (int)(minY - 1.5f), RoundToInt(maxX), RoundToInt(maxY));
 
     // If the rect is outside, let frustum culling handle
     if (rect.right_ < 0 || rect.bottom_ < 0)
@@ -409,7 +399,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
         rect.bottom_ = height_ - 1;
 
     // Convert depth to integer and apply final bias
-    int z = (int)(minZ + 0.5f) - OCCLUSION_FIXED_BIAS;
+    int z = RoundToInt(minZ) - OCCLUSION_FIXED_BIAS;
 
     if (!depthHierarchyDirty_)
     {
@@ -506,7 +496,7 @@ void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, unsigned threadInde
     }
     else
     {
-        const unsigned char* srcData = (const unsigned char*)batch.vertexData_;
+        const auto* srcData = (const unsigned char*)batch.vertexData_;
 
         // 16-bit indices
         if (batch.indexSize_ == sizeof(unsigned short))
@@ -598,15 +588,15 @@ void OcclusionBuffer::CalculateViewport()
 
 void OcclusionBuffer::DrawTriangle(Vector4* vertices, unsigned threadIndex)
 {
-    unsigned clipMask = 0;
-    unsigned andClipMask = 0;
+    ClipMaskFlags clipMask{};
+    ClipMaskFlags andClipMask{};
     bool drawOk = false;
     Vector3 projected[3];
 
     // Build the clip plane mask for the triangle
     for (unsigned i = 0; i < 3; ++i)
     {
-        unsigned vertexClipMask = 0;
+        ClipMaskFlags vertexClipMask{};
 
         if (vertices[i].x_ > vertices[i].w_)
             vertexClipMask |= CLIPMASK_X_POS;
@@ -769,7 +759,7 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
 struct Gradients
 {
     /// Construct from vertices.
-    Gradients(const Vector3* vertices)
+    explicit Gradients(const Vector3* vertices)
     {
         float invdX = 1.0f / (((vertices[1].x_ - vertices[2].x_) *
                                (vertices[0].y_ - vertices[2].y_)) -
@@ -806,10 +796,10 @@ struct Edge
         float yPreStep = (float)(topY + 1) - top.y_;
         float xPreStep = slope * yPreStep;
 
-        x_ = (int)((xPreStep + top.x_) * OCCLUSION_X_SCALE + 0.5f);
-        xStep_ = (int)(slope * OCCLUSION_X_SCALE + 0.5f);
-        invZ_ = (int)(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_ + 0.5f);
-        invZStep_ = (int)(slope * gradients.dInvZdX_ + gradients.dInvZdY_ + 0.5f);
+        x_ = RoundToInt((xPreStep + top.x_) * OCCLUSION_X_SCALE);
+        xStep_ = RoundToInt(slope * OCCLUSION_X_SCALE);
+        invZ_ = RoundToInt(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_);
+        invZStep_ = RoundToInt(slope * gradients.dInvZdX_ + gradients.dInvZdY_);
     }
 
     /// X coordinate.
@@ -881,9 +871,9 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         }
     }
 
-    int topY = (int)vertices[top].y_;
-    int middleY = (int)vertices[middle].y_;
-    int bottomY = (int)vertices[bottom].y_;
+    auto topY = (int)vertices[top].y_;
+    auto middleY = (int)vertices[middle].y_;
+    auto bottomY = (int)vertices[bottom].y_;
 
     // Check for degenerate triangle
     if (topY == bottomY)
@@ -893,103 +883,120 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
     if (!clockwise)
         middleIsRight = !middleIsRight;
 
+    const bool topDegenerate = topY == middleY;
+    const bool bottomDegenerate = middleY == bottomY;
+
     Gradients gradients(vertices);
-    Edge topToMiddle(gradients, vertices[top], vertices[middle], topY);
     Edge topToBottom(gradients, vertices[top], vertices[bottom], topY);
-    Edge middleToBottom(gradients, vertices[middle], vertices[bottom], middleY);
 
     int* bufferData = buffers_[threadIndex].data_;
 
     if (middleIsRight)
     {
         // Top half
-        int* row = bufferData + topY * width_;
-        int* endRow = bufferData + middleY * width_;
-        while (row < endRow)
+        if (!topDegenerate)
         {
-            int invZ = topToBottom.invZ_;
-            int* dest = row + (topToBottom.x_ >> 16);
-            int* end = row + (topToMiddle.x_ >> 16);
-            while (dest < end)
+            Edge topToMiddle(gradients, vertices[top], vertices[middle], topY);
+            int* row = bufferData + topY * width_;
+            int* endRow = bufferData + middleY * width_;
+            while (row < endRow)
             {
-                if (invZ < *dest)
-                    *dest = invZ;
-                invZ += gradients.dInvZdXInt_;
-                ++dest;
-            }
+                int invZ = topToBottom.invZ_;
+                int* dest = row + (topToBottom.x_ >> 16u);
+                int* end = row + (topToMiddle.x_ >> 16u);
+                while (dest < end)
+                {
+                    if (invZ < *dest)
+                        *dest = invZ;
+                    invZ += gradients.dInvZdXInt_;
+                    ++dest;
+                }
 
-            topToBottom.x_ += topToBottom.xStep_;
-            topToBottom.invZ_ += topToBottom.invZStep_;
-            topToMiddle.x_ += topToMiddle.xStep_;
-            row += width_;
+                topToBottom.x_ += topToBottom.xStep_;
+                topToBottom.invZ_ += topToBottom.invZStep_;
+                topToMiddle.x_ += topToMiddle.xStep_;
+                row += width_;
+            }
         }
 
         // Bottom half
-        row = bufferData + middleY * width_;
-        endRow = bufferData + bottomY * width_;
-        while (row < endRow)
+        if (!bottomDegenerate)
         {
-            int invZ = topToBottom.invZ_;
-            int* dest = row + (topToBottom.x_ >> 16);
-            int* end = row + (middleToBottom.x_ >> 16);
-            while (dest < end)
+            Edge middleToBottom(gradients, vertices[middle], vertices[bottom], middleY);
+            int* row = bufferData + middleY * width_;
+            int* endRow = bufferData + bottomY * width_;
+            while (row < endRow)
             {
-                if (invZ < *dest)
-                    *dest = invZ;
-                invZ += gradients.dInvZdXInt_;
-                ++dest;
-            }
+                int invZ = topToBottom.invZ_;
+                int* dest = row + (topToBottom.x_ >> 16u);
+                int* end = row + (middleToBottom.x_ >> 16u);
+                while (dest < end)
+                {
+                    if (invZ < *dest)
+                        *dest = invZ;
+                    invZ += gradients.dInvZdXInt_;
+                    ++dest;
+                }
 
-            topToBottom.x_ += topToBottom.xStep_;
-            topToBottom.invZ_ += topToBottom.invZStep_;
-            middleToBottom.x_ += middleToBottom.xStep_;
-            row += width_;
+                topToBottom.x_ += topToBottom.xStep_;
+                topToBottom.invZ_ += topToBottom.invZStep_;
+                middleToBottom.x_ += middleToBottom.xStep_;
+                row += width_;
+            }
         }
     }
     else
     {
         // Top half
-        int* row = bufferData + topY * width_;
-        int* endRow = bufferData + middleY * width_;
-        while (row < endRow)
+        if (!topDegenerate)
         {
-            int invZ = topToMiddle.invZ_;
-            int* dest = row + (topToMiddle.x_ >> 16);
-            int* end = row + (topToBottom.x_ >> 16);
-            while (dest < end)
+            Edge topToMiddle(gradients, vertices[top], vertices[middle], topY);
+            int* row = bufferData + topY * width_;
+            int* endRow = bufferData + middleY * width_;
+            while (row < endRow)
             {
-                if (invZ < *dest)
-                    *dest = invZ;
-                invZ += gradients.dInvZdXInt_;
-                ++dest;
-            }
+                int invZ = topToMiddle.invZ_;
+                int* dest = row + (topToMiddle.x_ >> 16u);
+                int* end = row + (topToBottom.x_ >> 16u);
+                while (dest < end)
+                {
+                    if (invZ < *dest)
+                        *dest = invZ;
+                    invZ += gradients.dInvZdXInt_;
+                    ++dest;
+                }
 
-            topToMiddle.x_ += topToMiddle.xStep_;
-            topToMiddle.invZ_ += topToMiddle.invZStep_;
-            topToBottom.x_ += topToBottom.xStep_;
-            row += width_;
+                topToMiddle.x_ += topToMiddle.xStep_;
+                topToMiddle.invZ_ += topToMiddle.invZStep_;
+                topToBottom.x_ += topToBottom.xStep_;
+                row += width_;
+            }
         }
 
         // Bottom half
-        row = bufferData + middleY * width_;
-        endRow = bufferData + bottomY * width_;
-        while (row < endRow)
+        if (!bottomDegenerate)
         {
-            int invZ = middleToBottom.invZ_;
-            int* dest = row + (middleToBottom.x_ >> 16);
-            int* end = row + (topToBottom.x_ >> 16);
-            while (dest < end)
+            Edge middleToBottom(gradients, vertices[middle], vertices[bottom], middleY);
+            int* row = bufferData + middleY * width_;
+            int* endRow = bufferData + bottomY * width_;
+            while (row < endRow)
             {
-                if (invZ < *dest)
-                    *dest = invZ;
-                invZ += gradients.dInvZdXInt_;
-                ++dest;
-            }
+                int invZ = middleToBottom.invZ_;
+                int* dest = row + (middleToBottom.x_ >> 16u);
+                int* end = row + (topToBottom.x_ >> 16u);
+                while (dest < end)
+                {
+                    if (invZ < *dest)
+                        *dest = invZ;
+                    invZ += gradients.dInvZdXInt_;
+                    ++dest;
+                }
 
-            middleToBottom.x_ += middleToBottom.xStep_;
-            middleToBottom.invZ_ += middleToBottom.invZStep_;
-            topToBottom.x_ += topToBottom.xStep_;
-            row += width_;
+                middleToBottom.x_ += middleToBottom.xStep_;
+                middleToBottom.invZ_ += middleToBottom.invZStep_;
+                topToBottom.x_ += topToBottom.xStep_;
+                row += width_;
+            }
         }
     }
 }
@@ -1025,7 +1032,7 @@ void OcclusionBuffer::ClearBuffer(unsigned threadIndex)
 
     int* dest = buffers_[threadIndex].data_;
     int count = width_ * height_;
-    int fillValue = (int)OCCLUSION_Z_SCALE;
+    auto fillValue = (int)OCCLUSION_Z_SCALE;
 
     while (count--)
         *dest++ = fillValue;

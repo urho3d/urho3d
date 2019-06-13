@@ -1,0 +1,30 @@
+$#include "UI/UISelectable.h"
+
+class UISelectable : public UIElement
+{
+    UISelectable();
+    virtual ~UISelectable();
+
+    void SetSelectionColor(const Color& color);
+    void SetHoverColor(const Color& color);
+
+    const Color& GetSelectionColor() const;
+    const Color& GetHoverColor() const;
+
+    tolua_property__get_set Color& selectionColor;
+    tolua_property__get_set Color& hoverColor;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_UISelectable_new00
+static int tolua_UILuaAPI_UISelectable_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<UISelectable>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_UISelectable_new00_local
+static int tolua_UILuaAPI_UISelectable_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<UISelectable>(tolua_S);
+}
+$}

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ static const char* fillModeNames[] =
     "Solid",
     "Wireframe",
     "Point",
-    0
+    nullptr
 };
 
 static const Matrix4 flipMatrix(
@@ -78,9 +78,7 @@ Camera::Camera(Context* context) :
     reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
 }
 
-Camera::~Camera()
-{
-}
+Camera::~Camera() = default;
 
 void Camera::RegisterObject(Context* context)
 {
@@ -98,7 +96,7 @@ void Camera::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Override Flags", int, viewOverrideFlags_, VO_NONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Override Flags", unsigned, viewOverrideFlags_.AsInteger(), VO_NONE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4,
         Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
@@ -182,7 +180,7 @@ void Camera::SetViewMask(unsigned mask)
     MarkNetworkUpdate();
 }
 
-void Camera::SetViewOverrideFlags(unsigned flags)
+void Camera::SetViewOverrideFlags(ViewOverrideFlags flags)
 {
     viewOverrideFlags_ = flags;
     MarkNetworkUpdate();

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,6 +23,7 @@ SDL_PROC(void, glActiveTexture, (GLenum))
 SDL_PROC(void, glAttachShader, (GLuint, GLuint))
 SDL_PROC(void, glBindAttribLocation, (GLuint, GLuint, const char *))
 SDL_PROC(void, glBindTexture, (GLenum, GLuint))
+SDL_PROC(void, glBlendEquationSeparate, (GLenum, GLenum))
 SDL_PROC(void, glBlendFuncSeparate, (GLenum, GLenum, GLenum, GLenum))
 SDL_PROC(void, glClear, (GLbitfield))
 SDL_PROC(void, glClearColor, (GLclampf, GLclampf, GLclampf, GLclampf))
@@ -53,7 +54,11 @@ SDL_PROC(void, glPixelStorei, (GLenum, GLint))
 SDL_PROC(void, glReadPixels, (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, GLvoid*))
 SDL_PROC(void, glScissor, (GLint, GLint, GLsizei, GLsizei))
 SDL_PROC(void, glShaderBinary, (GLsizei, const GLuint *, GLenum, const void *, GLsizei))
+#if __NACL__ || __ANDROID__
+SDL_PROC(void, glShaderSource, (GLuint, GLsizei, const GLchar **, const GLint *))
+#else
 SDL_PROC(void, glShaderSource, (GLuint, GLsizei, const GLchar* const*, const GLint *))
+#endif
 SDL_PROC(void, glTexImage2D, (GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void *))
 SDL_PROC(void, glTexParameteri, (GLenum, GLenum, GLint))
 SDL_PROC(void, glTexSubImage2D, (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const GLvoid *))

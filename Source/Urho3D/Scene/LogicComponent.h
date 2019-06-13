@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,26 @@
 
 #pragma once
 
+#include "../Container/FlagSet.h"
 #include "../Scene/Component.h"
 
 namespace Urho3D
 {
 
-/// Bitmask for using the scene update event.
-static const unsigned char USE_UPDATE = 0x1;
-/// Bitmask for using the scene post-update event.
-static const unsigned char USE_POSTUPDATE = 0x2;
-/// Bitmask for using the physics update event.
-static const unsigned char USE_FIXEDUPDATE = 0x4;
-/// Bitmask for using the physics post-update event.
-static const unsigned char USE_FIXEDPOSTUPDATE = 0x8;
+enum UpdateEvent : unsigned
+{
+    /// Bitmask for not using any events.
+    USE_NO_EVENT = 0x0,
+    /// Bitmask for using the scene update event.
+    USE_UPDATE = 0x1,
+    /// Bitmask for using the scene post-update event.
+    USE_POSTUPDATE = 0x2,
+    /// Bitmask for using the physics update event.
+    USE_FIXEDUPDATE = 0x4,
+    /// Bitmask for using the physics post-update event.
+    USE_FIXEDPOSTUPDATE = 0x8,
+};
+URHO3D_FLAGSET(UpdateEvent, UpdateEventFlags);
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class URHO3D_API LogicComponent : public Component
@@ -42,12 +49,12 @@ class URHO3D_API LogicComponent : public Component
     URHO3D_OBJECT(LogicComponent, Component);
 
     /// Construct.
-    LogicComponent(Context* context);
+    explicit LogicComponent(Context* context);
     /// Destruct.
-    virtual ~LogicComponent();
+    ~LogicComponent() override;
 
     /// Handle enabled/disabled state change. Changes update event subscription.
-    virtual void OnSetEnabled();
+    void OnSetEnabled() override;
 
     /// Called when the component is added to a scene node. Other components may not yet exist.
     virtual void Start() { }
@@ -68,19 +75,19 @@ class URHO3D_API LogicComponent : public Component
     virtual void FixedPostUpdate(float timeStep);
 
     /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
-    void SetUpdateEventMask(unsigned char mask);
+    void SetUpdateEventMask(UpdateEventFlags mask);
 
     /// Return what update events are subscribed to.
-    unsigned char GetUpdateEventMask() const { return updateEventMask_; }
+    UpdateEventFlags GetUpdateEventMask() const { return updateEventMask_; }
 
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
 
 protected:
     /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node);
+    void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    void OnSceneSet(Scene* scene) override;
 
 private:
     /// Subscribe/unsubscribe to update events based on current enabled state and update event mask.
@@ -96,9 +103,9 @@ private:
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
 #endif
     /// Requested event subscription mask.
-    unsigned char updateEventMask_;
+    UpdateEventFlags updateEventMask_;
     /// Current event subscription mask.
-    unsigned char currentEventMask_;
+    UpdateEventFlags currentEventMask_;
     /// Flag for delayed start.
     bool delayedStartCalled_;
 };

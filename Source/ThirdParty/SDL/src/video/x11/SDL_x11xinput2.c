@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -73,6 +73,35 @@ xinput2_version_atleast(const int version, const int wantmajor, const int wantmi
 {
     return ( version >= ((wantmajor * 1000) + wantminor) );
 }
+
+#if SDL_VIDEO_DRIVER_X11_XINPUT2_SUPPORTS_MULTITOUCH
+static void
+xinput2_normalize_touch_coordinates(SDL_VideoData *videodata, Window window,
+    double in_x, double in_y, float *out_x, float *out_y)
+{
+    int i;
+    for (i = 0; i < videodata->numwindows; i++) {
+        SDL_WindowData *d = videodata->windowlist[i];
+        if (d->xwindow == window) {
+            if (d->window->w == 1) {
+                *out_x = 0.5f;
+            } else {
+                *out_x = in_x / (d->window->w - 1);
+            }
+            if (d->window->h == 1) {
+                *out_y = 0.5f;
+            } else {
+                *out_y = in_y / (d->window->h - 1);
+            }
+            return;
+        }
+    }
+    // couldn't find the window...
+    *out_x = in_x;
+    *out_y = in_y;
+}
+#endif /* SDL_VIDEO_DRIVER_X11_XINPUT2_SUPPORTS_MULTITOUCH */
+
 #endif /* SDL_VIDEO_DRIVER_X11_XINPUT2 */
 
 void
@@ -171,22 +200,28 @@ X11_HandleXinput2Event(SDL_VideoData *videodata,XGenericEventCookie *cookie)
 #if SDL_VIDEO_DRIVER_X11_XINPUT2_SUPPORTS_MULTITOUCH
         case XI_TouchBegin: {
             const XIDeviceEvent *xev = (const XIDeviceEvent *) cookie->data;
-            SDL_SendTouch(xev->sourceid,xev->detail,
-                      SDL_TRUE, xev->event_x, xev->event_y, 1.0);
+            float x, y;
+            xinput2_normalize_touch_coordinates(videodata, xev->event,
+                                  xev->event_x, xev->event_y, &x, &y);
+            SDL_SendTouch(xev->sourceid,xev->detail, SDL_TRUE, x, y, 1.0);
             return 1;
             }
             break;
         case XI_TouchEnd: {
             const XIDeviceEvent *xev = (const XIDeviceEvent *) cookie->data;
-            SDL_SendTouch(xev->sourceid,xev->detail,
-                      SDL_FALSE, xev->event_x, xev->event_y, 1.0);
+            float x, y;
+            xinput2_normalize_touch_coordinates(videodata, xev->event,
+                                  xev->event_x, xev->event_y, &x, &y);
+            SDL_SendTouch(xev->sourceid,xev->detail, SDL_FALSE, x, y, 1.0);
             return 1;
             }
             break;
         case XI_TouchUpdate: {
             const XIDeviceEvent *xev = (const XIDeviceEvent *) cookie->data;
-            SDL_SendTouchMotion(xev->sourceid,xev->detail,
-                                xev->event_x, xev->event_y, 1.0);
+            float x, y;
+            xinput2_normalize_touch_coordinates(videodata, xev->event,
+                                  xev->event_x, xev->event_y, &x, &y);
+            SDL_SendTouchMotion(xev->sourceid,xev->detail, x, y, 1.0);
             return 1;
             }
             break;

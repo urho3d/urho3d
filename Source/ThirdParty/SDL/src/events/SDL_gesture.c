@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -73,9 +73,9 @@ typedef struct {
     SDL_bool recording;
 } SDL_GestureTouch;
 
-SDL_GestureTouch *SDL_gestureTouch;
-int SDL_numGestureTouches = 0;
-SDL_bool recordAll;
+static SDL_GestureTouch *SDL_gestureTouch;
+static int SDL_numGestureTouches = 0;
+static SDL_bool recordAll;
 
 #if 0
 static void PrintPath(SDL_FloatPoint *path)
@@ -101,6 +101,12 @@ int SDL_RecordGesture(SDL_TouchID touchId)
         }
     }
     return (touchId < 0);
+}
+
+void SDL_GestureQuit()
+{
+    SDL_free(SDL_gestureTouch);
+    SDL_gestureTouch = NULL;
 }
 
 static unsigned long SDL_HashDollar(SDL_FloatPoint* points)
@@ -424,7 +430,7 @@ static int dollarNormalize(const SDL_DollarPath *path,SDL_FloatPoint *points)
         dist += d;
     }
     if (numPoints < DOLLARNPOINTS-1) {
-        SDL_SetError("ERROR: NumPoints = %i\n",numPoints);
+        SDL_SetError("ERROR: NumPoints = %i", numPoints);
         return 0;
     }
     /* copy the last point */
@@ -507,6 +513,28 @@ int SDL_GestureAddTouch(SDL_TouchID touchId)
     return 0;
 }
 
+int SDL_GestureDelTouch(SDL_TouchID touchId)
+{
+    int i;
+    for (i = 0; i < SDL_numGestureTouches; i++) {
+        if (SDL_gestureTouch[i].id == touchId) {
+            break;
+        }
+    }
+
+    if (i == SDL_numGestureTouches) {
+        /* not found */
+        return -1;
+    }
+
+    SDL_free(SDL_gestureTouch[i].dollarTemplate);
+    SDL_zero(SDL_gestureTouch[i]);
+
+    SDL_numGestureTouches--;
+    SDL_memcpy(&SDL_gestureTouch[i], &SDL_gestureTouch[SDL_numGestureTouches], sizeof(SDL_gestureTouch[i]));
+    return 0;
+}
+
 static SDL_GestureTouch * SDL_GetGestureTouch(SDL_TouchID id)
 {
     int i;
@@ -518,7 +546,7 @@ static SDL_GestureTouch * SDL_GetGestureTouch(SDL_TouchID id)
     return NULL;
 }
 
-int SDL_SendGestureMulti(SDL_GestureTouch* touch,float dTheta,float dDist)
+static int SDL_SendGestureMulti(SDL_GestureTouch* touch,float dTheta,float dDist)
 {
     SDL_Event event;
     event.mgesture.type = SDL_MULTIGESTURE;

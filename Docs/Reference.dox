@@ -186,7 +186,7 @@ The full list of supported parameters, their datatypes and default values: (also
 - LogLevel (int) %Log verbosity level. Default LOG_INFO in release builds and LOG_DEBUG in debug builds.
 - LogQuiet (bool) %Log quiet mode, ie. to not write warning/info/debug log entries into standard output. Default false.
 - LogName (string) %Log filename. Default "Urho3D.log".
-- FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
+- FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS/tvOS). Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
 - %EventProfiler (bool) Whether to create the EventProfiler subsystem. Default true.
 - ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
@@ -203,7 +203,7 @@ The full list of supported parameters, their datatypes and default values: (also
 - FullScreen (bool) Whether to create a full-screen window. Default true.
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - WindowResizable (bool) Whether window is resizable. Default false.
-- HighDPI (bool) Whether window is high DPI. Default true. Currently only supported by Apple platforms (OSX, iOS, and tvOS).
+- HighDPI (bool) Whether window is high DPI. Default true. Currently only supported by Apple platforms (macOS, iOS, and tvOS).
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - FlushGPU (bool) Whether to flush GPU command buffer each frame (Direct3D9) or limit the amount of buffered frames (Direct3D11) for less input latency. Ineffective on OpenGL. Default false.
@@ -259,13 +259,13 @@ The application window's state (has input focus, minimized or not) can be querie
 
 - To avoid spinning the CPU and GPU unnecessarily, it is possible to define a smaller maximum FPS when no input focus. See \ref Engine::SetMaxInactiveFps "SetMaxInactiveFps()"
 
-- It is also possible to automatically pause update events and audio when the window is minimized. Use \ref Engine::SetPauseMinimized "SetPauseMinimized()" to control this behaviour. By default it is not enabled on desktop, and enabled on mobile devices (Android and iOS.) For singleplayer games this is recommended to avoid unwanted progression while away from the program. However in a multiplayer game this should not be used, as the missing scene updates would likely desync the client with the server.
+- It is also possible to automatically pause update events and audio when the window is minimized. Use \ref Engine::SetPauseMinimized "SetPauseMinimized()" to control this behaviour. By default it is not enabled on desktop, and enabled on mobile devices (Android and iOS/tvOS). For singleplayer games this is recommended to avoid unwanted progression while away from the program. However in a multiplayer game this should not be used, as the missing scene updates would likely desync the client with the server.
 
 - On mobile devices the window becoming minimized can mean that it will never become maximized again, in case the OS decides it needs to free memory and kills your program. Therefore you should listen for the E_INPUTFOCUS event from the Input subsystem and immediately save your program state as applicable if the program loses input focus or is minimized.
 
 - On mobile devices it is also unsafe to access or create any graphics resources while the window is minimized (as the graphics context may be destroyed during this time); doing so can crash the program. It is recommended to leave the pause-minimized feature on to ensure you do not have to check for this in your update code.
 
-Note that on iOS calling \ref Engine::Exit "Exit()" is a no-op as there is no officially sanctioned way to manually exit your program. On Android it will cause the activity to manually exit.
+Note that on iOS/tvOS calling \ref Engine::Exit "Exit()" is a no-op as there is no officially sanctioned way to manually exit your program. On Android it will cause the activity to manually exit.
 
 \section MainLoop_ApplicationFramework Application framework
 
@@ -479,12 +479,17 @@ Before using the subsystem, the localization string collection(s) need to be loa
 
 \code
 Localization* l10n = GetSubsystem<Localization>();
+// 1st JSON file format
 l10n->LoadJSONFile("StringsEnRu.json");
 l10n->LoadJSONFile("StringsDe.json");
+
+// 2nd JSON file format
+l10n->LoadJSONFile("StringsLv.json", "lv");
 \endcode
 
-JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Data directory. The JSON files have the following format:
+JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Data directory. The JSON files must have one of the following formats:
 
+1. `LoadJSONFile("StringsEnRu.json")` method will automatically pick the language from the JSON file
 \code
 {
     "string id 1":{
@@ -499,6 +504,16 @@ JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Dat
     }
 }
 \endcode
+
+2. You must pass 2nd argument to the `LoadJSONFile("StringsLv.json", "lv")` method to tell the parser which language will be loaded
+\code
+{
+    "string id 1": "value 1",
+    "string id 2": "value 2",
+    "string id 3": "value 3"
+}
+\endcode
+
 
 Any number of languages can be defined. Remember that language names and string identifiers are case sensitive. "En" and "en" are considered different languages.
 During the loading process languages are numbered in order of finding. Indexing starts from zero. The first found language is set to be initially active.
@@ -1107,7 +1122,7 @@ These differences need to be observed when using the low-level rendering functio
 
 OpenGL ES 2.0 has further limitations:
 
-- Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS) compressed textures are supported through the .ktx and .pvr file formats.
+- Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS/tvOS) compressed textures are supported through the .ktx and .pvr file formats.
 
 - %Texture formats such as 16-bit and 32-bit floating point are not available. Corresponding integer 8-bit formats will be returned instead.
 
@@ -1119,7 +1134,7 @@ OpenGL ES 2.0 has further limitations:
 
 - To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
 
-- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the simple shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS hardware.
+- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the simple shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS/tvOS hardware.
 
 - Custom clip planes are not currently supported.
 
@@ -2010,7 +2025,7 @@ Both a RigidBody and at least one CollisionShape component must exist in a scene
 
 CollisionShape provides two APIs for defining the collision geometry. Either setting individual properties such as the \ref CollisionShape::SetShapeType "shape type" or \ref CollisionShape::SetSize "size", or specifying both the shape type and all its properties at once: see for example \ref CollisionShape::SetBox "SetBox()", \ref CollisionShape::SetCapsule "SetCapsule()" or \ref CollisionShape::SetTriangleMesh "SetTriangleMesh()".
 
-RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0. Note that the triangle mesh collision shape is not supported for moving objects; it will not collide properly due to limitations in the Bullet library. In this case the convex hull shape can be used instead.
+RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0. Note that the triangle mesh collision shape is not supported for moving objects; it will not collide properly due to limitations in the Bullet library. In this case the convex hull or GImpact triangle mesh shape can be used instead.
 
 The collision behaviour of a rigid body is controlled by several variables. First, the collision layer and mask define which other objects to collide with: see \ref RigidBody::SetCollisionLayer "SetCollisionLayer()" and \ref RigidBody::SetCollisionMask "SetCollisionMask()". By default a rigid body is on layer 1; the layer will be ANDed with the other body's collision mask to see if the collision should be reported. A rigid body can also be set to \ref RigidBody::SetTrigger "trigger mode" to only report collisions without actually applying collision forces. This can be used to implement trigger areas. Finally, the \ref RigidBody::SetFriction "friction", \ref RigidBody::SetRollingFriction "rolling friction" and \ref RigidBody::SetRestitution "restitution" coefficients (between 0 - 1) control how kinetic energy is transferred in the collisions. Note that rolling friction is by default zero, and if you want for example a sphere rolling on the floor to eventually stop, you need to set a non-zero rolling friction on both the sphere and floor rigid bodies.
 
@@ -2127,6 +2142,288 @@ CrowdAgents' handle navigation areas differently. The CrowdManager can contains 
 
 See the 39_CrowdNavigation sample application for an example on how to use CrowdAgents and the CrowdManager.
 
+
+\page IK Inverse Kinematics
+
+\section ikoverview Overview
+
+IK  (Inverse kinematics)  can  be  useful  in  many  situations  ranging  from
+procedural animation to small adjustments of animation. Simply put, IK is used
+when  you want to position the tips of a hierarchichal structure  at  a  known
+location and  need  to  calculate all of the rotations of the parent joints to
+achieve this.
+
+Examples include: Moving a hand to pick  up  an object, or adjusting a foot so
+it's  always  touching  the  ground, regardless of incline.
+
+\section ikterminology Terminology
+
+It is helpful to know some of  the terminology used when talking about inverse
+kinematics, so you can better understand what's being said.
+
+  - The upper-most node in a solver's tree is known as the \a base \a node or \a root \a node.
+  - Nodes which need to be moved to a specific target location (example: The hand of a human) are called an \a end \a effector.
+  - Joints from which multiple children branch off from are called a \a sub-base \a node.
+  - IK solvers work most efficiently on single "strings" of nodes, which are referred to as \a chains.
+  - The entire structure (in the case of a human with two hands) is called a \a chain \a tree.
+
+\section ikendeffectors End Effectors
+
+Effectors are used to set the target position and rotation of a  node. You can
+create one by attaching the IKEffector component to a node.
+
+\code{.cpp}
+Node* handNode = modelNode->GetChild("Hand.R", true);
+
+IKEffector* effector = handNode->CreateComponent<IKEffector>();  // C++
+IKEffector@ effector = handNode.CreateComponent("IKEffector");   // AngelScript
+local effector = handNode:CreateComponent("IKEffector")          -- Lua
+\endcode
+
+You can then give the effector a target position (for example, the position of
+an apple) using  IKEffector::SetTargetPosition or you can tell the effector to
+automatically track  the  position  of  a node with IKEffector::SetTargetNode.
+
+\code{.cpp}
+effector->SetTargetPosition(appleNode->GetWorldPosition());  // C++
+effector.targetPosition = appleNode.worldPosition;           // AngelScript
+effector.targetPosition = appleNode.worldPosition            -- Lua
+\endcode
+
+If enabled, you  can also tell the effector to try and match a target rotation
+using IKEffector::SetTargetRotation. This is useful if  you  want your hand to
+point  in  a particular direction in relation to the apple (this feature needs
+to be enabled in the solver, which is discussed futher below).
+
+The target position and rotation are both set in global space.
+
+Another    important    parameter    is    the    \a    chain    \a    length,
+IKEffector::SetChainLength.  A  chain  length of 1 means a single  segment  or
+"bone" is affected. Arms and legs typically use a value of 2 (because you only
+want  to  solve for the arm and not the entire body). The default value is  0,
+which   means  all  nodes  right  down  to  the  base   node   are   affected.
+
+\code{.cpp}
+effector->SetChainLength(2); // Humans have two bones in their arms
+effector.chainLength = 2;    // AngelScript
+effector.chainLength = 2     -- Lua
+\endcode
+
+Effectors have  a  \a  weight parameter (use IKEffector::SetWeight) indicating
+how  much influence they have on the tree to be solved. You can  make  use  of
+this to smoothly transition in and out of IK solutions.  This will be required
+for when your character begins  picking  up an object and you want to smoothly
+switch from animation to IK.
+
+\code{.cpp}
+effector->SetWeight(SomeSplineFunction());  // C++
+effector.weight = SomeSplineFunction();     // AngelScript
+effector.weight = SomeSplineFunction();     -- Lua
+\endcode
+
+If you've played around with the weight parameter, you may  have  noticed that
+it causes a \a linear interpolation of the target  position. This can look bad
+on  organic  creatures,  especially when the solved tree is far apart from the
+original tree.  You  might consider enabling \a nlerp, which causes the weight
+to rotate around the next sub-base  joint.  This  feature  can be enabled with
+IKEffector::SetFeature.
+
+\code{.cpp}
+effector->SetFeature(IKEffector::WEIGHT_NLERP, true);  // C++
+effector.WEIGHT_NLERP = true;                          // AngelScript
+effector.WEIGHT_NLERP = true                           -- Lua
+\endcode
+
+Note that the script  bindings  work  a little differently in this regard. The
+features can be enabled/disabled directly on the effector object as attributes
+rather than  having  to  call  SetFeature. This is for convenience (but may be
+changed in the future due to script API inconsistency).
+
+\section iksolvers Solvers
+
+Solvers  are  responsible  for  calculating  a solution based on the  attached
+effectors and their settings.
+
+Note that solvers will \a only ever affect  nodes  that  are in their subtree.
+This means  that if you attach an IKEffector to a node that is a parent of the
+IKSolver node, then the solver will ignore this effector.
+
+You can create a solver by attaching an IKSolver component to a node:
+
+\code{.cpp}
+IKSolver* solver = modelNode->CreateComponent<IKSolver>();  // C++
+IKSolver@ solver = modelNode.CreateComponent("IKSolver");   // AngelScript
+local solver = modelNode:CreateComponent("IKSolver")        -- Lua
+\endcode
+
+The first thing  you'll  want to do is select the appropriate algorithm. As of
+this writing, there are  3  algorithms  to  choose from, and you should favour
+them in the order listed here.
+
+  - ONE_BONE: A specialized solver designed to point an object at a target position (such as eyes, heads, etc.)
+  - TWO_BONE: A specialized solver that calculates a direct solution using trigonometry, specifically for two-bone structures (arms, legs)
+  - FABRIK: A generic solver capable of solving anything you can throw at it. It uses an iterative algorithm and is thus a bit slower than the two specialized algorithms. Should be used for structures with 3 or more bones, or structures with multiple end effectors.
+
+You can set the algorithm using:
+
+\code{.cpp}
+solver->SetAlgorithm(IKSolver::FABRIK);  // C++
+solver.algorithm = IKAlgorithm::FABRIK;  // AngelScript
+solver.algorithm = IKSolver.FABRIK       -- Lua
+\endcode
+
+If  you chose an iterative algorithm, then you might also want  to  tweak  the
+maximum number of iterations  and the tolerance. FABRIK converges very quickly
+and works well with  20  or  less  iterations. Sometimes you can even get away
+with just 5 iterations. The tolerance  specifies  the  maximum distance an end
+effector is allowed to be from its target. Obviously, the smaller  you set the
+tolerance,  the more iterations will be required.  Good  starting  values  for
+tolerance  are about 100th the size of the chain you're solving (e.g. if  your
+chain is 2 units long, then set the tolerance to 0.02).
+
+\code{.cpp}
+solver->SetMaximumIterations(20); // Good starting value for FABRIK
+solver->SetTolerance(0.02);       // Good value is 100th of your chain length.
+
+solver.maximumIterations = 20;    // AngelScript
+solver.tolerance = 0.02;
+
+solver.maximumIterations = 20     -- Lua
+solver.tolerance = 0.02
+\endcode
+
+Note that these settings do nothing if you have selected a direct solver (such
+as TWO_BONE or ONE_BONE).
+
+\section iksolverfeatures Solver Features
+
+There are a number of features that can be enabled/disabled on the solver, all
+of  which  can  be  toggled  by  using  IKSolver::SetFeature  and checked with
+IKSolver::GetFeature.   You   can   always  look  at  the   documentation   of
+IKSolver::Feature for a detailed description of each feature.
+
+\subsection iksolverautosolve AUTO_SOLVE
+
+By default, the solver will be in \a  auto  \a  solve mode. This means that it
+will  automatically  perform  its  calculations   for   you   in  response  to
+E_SCENEDRAWABLEUPDATEFINISHED. All  you  have  to do is create your effectors,
+set  their  target  positions,  and let the solver handle the  rest.  You  can
+override this behaviour by disabling the AUTO_SOLVE feature, in which case you
+will have to call  IKSolver::Solve manually for it to do anything. This may be
+desired if you want to "hook in" right between when the animation has updated,
+but before inverse kinematics is calculated.
+
+\code{.cpp}
+solver->SetFeature(IKSolver::AUTO_SOLVE, false);  // C++
+solver.AUTO_SOLVE = false;                        // AngelScript
+solver.AUTO_SOLVE = false                         -- Lua
+\endcode
+
+And here's how you manually invoke the solver.
+
+\code{.cpp}
+// C++
+void MyLogic::Setup()
+{
+    SubscribeToEvent(GetScene(), E_SCENEDRAWABLEUPDATEFINISHED, URHO3D_HANDLER(MyLogic, HandleSceneDrawableUpdateFinished));
+}
+void MyLogic::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
+{
+    GetComponent<IKSolver>()->Solve();
+}
+
+// AngelScript
+void Setup()
+{
+    SubscribeToEvent("SceneDrawableUpdateFinished", "HandleSceneDrawableUpdateFinished")
+}
+void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
+{
+    GetComponent("IKSolver").Solve()
+}
+
+// Lua
+function Setup()
+    SubscribeToEvent("SceneDrawableUpdateFinished", "HandleSceneDrawableUpdateFinished")
+end
+function HandleSceneDrawableUpdateFinished(eventType, eventData)
+    GetComponent("IKSolver"):Solve()
+end
+\endcode
+
+\subsection iksolverjointrotations IKSolver::JOINT_ROTATIONS
+
+\code{.cpp}
+solver->SetFeature(IKSolver::JOINT_ROTATIONS, false);  // C++
+solver.JOINT_ROTATIONS = false;                        // AngelScript
+solver.JOINT_ROTATIONS = false                         -- Lua
+\endcode
+
+This is should be enabled if you are using IK on skinned models (or  otherwise
+node structures that  need rotations). If you don't care about node rotations,
+you   can   disable   this   feature   and  get  a  small  performance  boost.
+
+When disabled, all nodes will simply keep their  original  orientation  in the
+world, only their positions will change.
+
+The solver calculates  joint  rotations  after  the  solution has converged by
+comparing the solved tree with the original tree as a  way  to  compute  delta
+angles.  These  are  then  multiplied by the original rotations to obtain  the
+final joint rotations.
+
+\subsection iksolvertargetrotations TARGET_ROTATIONS
+
+\code{.cpp}
+solver->SetFeature(IKSolver::TARGET_ROTATIONS, false);  // C++
+solver.TARGET_ROTATIONS = false;                        // AngelScript
+solver.TARGET_ROTATIONS = false                         -- Lua
+\endcode
+
+Enabling   this   will   cause   the  orientation   of   the   effector   node
+(IKEffector::SetTargetRotation)  to  be  considered during solving. This means
+that the effector node will try to match the rotation of the target as best as
+possible. If the target is out of reach or just within reach, the  chain  will
+reach out and start to ignore  the  target  rotation in favour of reaching its
+target.
+
+Disabling this feature causes IKEffector::SetTargetRotation to have no effect.
+
+\subsection iksolvertrees UPDATE_ORIGINAL_POSE, UPDATE_ACTIVE_POSE, and USE_ORIGINAL_POSE
+
+These options can be quite confusing to understand.
+
+The solver actually stores \a two  \a trees, not one. There is an \a active \a
+tree, which is kind of like the "workbench". The  solver  uses the active tree
+for its initial condition but also writes the solution  back  into  the active
+tree (i.e. the tree is solved in-place, rather than cloning).
+
+Then  there  is the \a original \a tree, which is set once during creation and
+then never changed (at least not by default).
+
+You can control which tree the solver should use for its initial condition. If
+you   enable   USE_ORIGINAL_POSE,  then  the  solver  will  first   copy   all
+positions/rotations  from  the original  tree  into  the  active  tree  before
+solving. Thus,  the  solution  will  tend  to  "snap  back"  into its original
+configuration if it can.
+
+If you disable USE_ORIGINAL_POSE, then  the  solver  will  use the active tree
+instead. The active tree will contain whatever pose was solved last. Thus, the
+solution will tend to be more "continuous".
+
+Very important: Note that the active tree is NOT updated  by Urho3D unless you
+enable  UPDATE_ACTIVE_POSE (this is enabled by default). If UPDATE_ACTIVE_POSE
+is disabled, then any nodes that have moved outside of IKSolver's control will
+effectively be \a ignored.  Thus,  if  your model is animated, you very likely
+want this enabled.
+
+UPDATE_ORIGINAL_POSE  isn't   really  required,  but  is  here  for  debugging
+purposes. You can update the original  pose either by enabling this feature or
+by explicitely calling IKSolver::ApplySceneToOriginalPose.
+
+\subsection iksolverconstraints CONSTRAINTS
+
+This feature is not yet implemented and is planned for a future release.
+
 \page UI User interface
 
 Urho3D implements a simple, hierarchical user interface system based on rectangular elements. The elements provided are:
@@ -2205,7 +2502,7 @@ tells to instantiate a Button element, and that it should use the style "CloseBu
 
 Instead of loading a %UI element hierarchy from a definition file, it is just as valid (though cumbersome for larger hierarchies) to create the elements in code, which is demonstrated by several of the Urho3D samples.
 
-In this mode of operation, styles are not automatically applied when an element is added or created to the hierarchy, even if a parent element (or the %UI root) has a default style file assigned. This is because applying a style to an element means just setting a number of attributes and has potential to be "destructive" ie. overwrite the already set values. For each created element, you need to manually call either \ref UIElement::SetStyle "SetStyle()" to specify a style name that should be applied, or \ref UIElement::SetStyleAuto "SetStyleAuto()" to use the element's typename as the style name, e.g. the style "Button" for a Button element.
+In this mode of operation, styles are not automatically applied when an element is added or created to the hierarchy, even if a parent element (or the %UI root) has a default style file assigned. This is because applying a style to an element means just setting a number of attributes and has potential to be "destructive" ie. overwrite the already set values. For each created element, you need to manually call either \ref UIElement::SetStyle "SetStyle()" to specify a style name that should be applied, or \ref UIElement::SetStyleAuto "SetStyleAuto()" to use the element's typename as the style name, e.g. the style "Button" for a Button element. In order for this to work, each %UI element should have a style file already effectively assigned either directly or via its parent element. A common mistake made by users is to construct child elements and attempt to style them inside a parent element's constructor but forgetting to explicitly assign a style file first in the constructor.
 
 \section UI_Layouts Child element layouting
 
@@ -2233,6 +2530,18 @@ For FreeType fonts, it is possible to adjust the positioning of the font glyphs.
     <scaledoffset x="xFloat" y="yFloat" />
 </font>
 \endcode
+
+The \ref UI "UI" class has various global configuration options for font rendering. The default settings are similar to Windows-style rendering, with crisp characters but uneven spacing. For macOS-style rendering, with accurate spacing but slightly blurrier outlines, call \ref UI::SetFontHintLevel "UI::SetFontHintLevel(FONT_HINT_LEVEL_NONE)". Use the Typography sample to explore these options and find the best configuration for your game.
+
+By default, outline fonts will be hinted (aligned to pixel boundaries), using the font's embedded hints if possible. Call \ref UI::SetForceAutoHint "SetForceAutoHint()" to use FreeType's standard auto-hinter rather than each font's embedded hints.
+
+To adjust hinting, call \ref UI::SetFontHintLevel "SetFontHintLevel()". If the level is set to FONT_HINT_LEVEL_LIGHT, fonts will be aligned to the pixel grid vertically, but not horizontally. At FONT_HINT_LEVEL_NONE, hinting is completely disabled.
+
+Hint levels LIGHT and NONE allow for subpixel glyph positioning, which greatly improves spacing, especially at small font sizes. By default, subpixel positioning is only used at sizes up to 12 points; at larger sizes, each glyph is pixel-aligned. Call \ref UI::SetFontSubpixelThreshold "SetFontSubpixelThreshold" to change this threshold.
+
+When textures aren't pixel-aligned, bilinear texture filtering makes them appear blurry. Therefore, subpixel font textures are oversampled (stretched horizontally) to reduce this blurriness, at the cost of extra memory usage. By default, subpixel fonts use 2x oversampling. Call \ref UI::SetFontOversampling "SetFontOversampling" to change this.
+
+Subpixel positioning only operates horizontally. %Text is always pixel-aligned vertically.
 
 \section UI_Sprites Sprites
 
@@ -2659,26 +2968,42 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers and custom values.
 
-To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
+Attributes can either refer to a member of the object or define setter & getter functions. Member attributes can also have post-set action: member function without arguments that is called every time when value is assigned to the attribute.
+
+Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
+
+The folowing macros can be used to define an attribute:
+
+- `URHO3D_ATTRIBUTE`: Member of the object. Shall be convertible from and to specified type.
+- `URHO3D_ATTRIBUTE_EX`: Member of the object. Post-set member function callback is called when attribute is set.
+- `URHO3D_ACCESSOR_ATTRIBUTE`: Getter and setter member functions. Attribute value of specified type is passed into setter and expected to be returned from getter.
+- `URHO3D_CUSTOM_ATTRIBUTE`: Getter and setter functional objects that are directly working with Variant value. See \ref MakeVariantAttributeAccessor "MakeVariantAttributeAccessor()"
+- `URHO3D_ENUM_ATTRIBUTE`: 32-bit integer zero-based enumeration with human-readable names.
+- `URHO3D_ENUM_ATTRIBUTE_EX`: The same as `URHO3D_ATTRIBUTE_EX`, used for enumerations.
+- `URHO3D_ENUM_ACCESSOR_ATTRIBUTE`: The same as `URHO3D_ACCESSOR_ATTRIBUTE`, used for enumerations.
+- `URHO3D_CUSTOM_ENUM_ATTRIBUTE`: The same as `URHO3D_CUSTOM_ATTRIBUTE`, used for enumerations.
+
+To implement side effects to attributes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
 Each attribute can have a combination of the following flags:
 
-- AM_FILE: Is used for file serialization (load/save.)
-- AM_NET: Is used for network replication.
-- AM_LATESTDATA: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
-- AM_NOEDIT: Is an internal attribute and is not to be shown for editing.
-- AM_NODEID: Is a node ID and may need rewriting when instantiating scene content.
-- AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
+- `AM_FILE`: Is used for file serialization (load/save.)
+- `AM_NET`: Is used for network replication.
+- `AM_LATESTDATA`: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
+- `AM_NOEDIT`: Is an internal attribute and is not to be shown for editing.
+- `AM_NODEID`: Is a node ID and may need rewriting when instantiating scene content.
+- `AM_COMPONENTID`: Is a component ID and may need rewriting when instantiating scene content.
 
-The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+
+The default flags are `AM_FILE` and `AM_NET`. Note that it is legal to define neither `AM_FILE` or `AM_NET`, meaning the attribute has only run-time significance (perhaps for editing.)
 
 See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
 \page Network Networking
 
-The Network subsystem provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
+The Network subsystem provides reliable and unreliable UDP messaging using SLikeNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
 
 %Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 30 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
@@ -2688,15 +3013,33 @@ Note that if a particular networked application does not need scene replication,
 
 \section Network_Connecting Connecting to a server
 
-Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 1234.
+Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 2345.
 
 Note the scene (to be used for replication) and identity VariantMap supplied as parameters when connecting. The identity data can contain for example the user name or credentials, it is completely application-specified. The identity data is sent right after connecting and causes the E_CLIENTIDENTITY event to be sent on the server when received. By subscribing to this event, server code can examine incoming connections and accept or deny them. The default is to accept all connections.
 
 After connecting successfully, client code can get the Connection object representing the server connection, see \ref Network::GetServerConnection "GetServerConnection()". Likewise, on the server a Connection object will be created for each connected client, and these can be iterated through. This object is used to send network messages or remote events to the remote peer, to assign the client into a scene (on the server only), or to disconnect.
 
+\section Network_NAT_Punchtrough NAT punchtrough
+
+It is possible to use NAT punchtrough functionality with network subsystem. This requires NAT punchtrough master server to be running on a public host. To set it up you first have to tell the networking subsystem the IP address or a domain name to NAT punchtrough master server, to do this, call \ref Network::SetNATServerInfo "SetNATServerInfo()".
+
+Server:
+Server should be started first by calling \ref Network::StartServer "StartServer()" and after that \ref Network::StartNATClient "StartNATClient()". If connection to NAT punchtrough master server succeeds, unique GUID will be generated. Clients should use this generated GUID to connect to this server.
+
+Client:
+When server has been successfully started and connected with NAT punchtrough master server, clients should connect to server by calling \ref Network::AttemptNATPunchtrough "AttemptNATPunchtrough()" and pass in the server generated GUID.
+
+For a demonstration, check example 52_NATPunchtrough.
+
+\section Network_Lan_Discovery Lan Discovery
+
+Network subsystem supports LAN discovery mode to search for running servers. When creating server you can set what data should be sent to the network when someone starts LAN discovery mode, see \ref Network::SetDiscoveryBeacon "SetDiscoveryBeacon()". This data can contain any information about the server. To start LAN discovery mode you should call \ref Network::DiscoverHosts "DiscoverHosts()". When server is found, "NetworkHostDiscovered" event will be sent out.
+
+For a demonstration, check example 53_LANDiscovery.
+
 \section Network_Replication Scene replication
 
-%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have been not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
+%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
 
 The CreateMode translates into two different node and component ID ranges - replicated ID's range from 0x1 to 0xffffff, while local ID's range from 0x1000000 to 0xffffffff. This means there is a maximum of 16777215 replicated nodes or components in a scene.
 
@@ -2768,7 +3111,7 @@ The event includes the attribute name, index, new value as a Variant, and the la
 
 \section Network_Messages Raw network messages
 
-All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+All network messages have an integer ID. The first ID you can use for custom messages is 153 (lower ID's are either reserved for SLikeNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
 
 To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
 
@@ -2778,7 +3121,7 @@ For high performance, consider using unordered messages, because for in-order me
 
 \section Network_RemoteEvents Remote events
 
-A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally set to be originate from a specific Node in the receiver's scene ("remote node event.")
+A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally be set to originate from a specific Node in the receiver's scene ("remote node event.")
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
@@ -3481,17 +3824,23 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Indents use 4 spaces instead of tabs. Indents on empty lines should not be kept.
 
-- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example %DebugRenderer, FreeTypeLibrary, %Graphics.
+- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example \c %DebugRenderer, \c FreeTypeLibrary, \c %Graphics.
 
-- Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
+- Functions are likewise in upper-camelcase. For example \c CreateComponent, \c SetLinearRestThreshold.
 
-- Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
+- Variables are in lower-camelcase. Member variables have an underscore appended. For example \c numContacts, \c randomSeed_.
 
-- Constants and enumerations are in uppercase. For example %Vector3::ZERO or PASS_SHADOW.
+- Constants and enumerations are in uppercase. For example \c %Vector3::ZERO or \c PASS_SHADOW.
 
-- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
+- Pointers and references append the * or & symbol to the type without a space in between. For example \c Drawable* drawable, \c %Serializer& dest.
 
-- The macro NULL should not be used, 0 is used instead.
+- The macro \c NULL and 0 should not be used for null pointers, \c nullptr is used instead.
+
+- \c override is used wherever possible.
+
+- \c using is used instead of \c typedef in type declarations.
+
+- `enum class` is not used because of legacy reasons.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3506,13 +3855,32 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
+It's recommended to follow <a href="https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md">C++ Core Guidelines</a> (except items that contradict Urho legacy, e.g. ES.107, Enum.3, Enum.5)
+
+Use this brief checklist to keep code style consistent among contributions and contributors:
+
+- Prefer inplace member initialization to initializer lists.
+
+- Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
+
+- Avoid \c auto unless it increases code readability. More details <a href="https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html">here</a> and <a href="https://google.github.io/styleguide/cppguide.html#auto">here</a>.
+
+  - Use \c auto for verbose, unknown or redundant types. Example:
+    \code
+    auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
+    for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
+    auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
+    \endcode
+
+  - Use \c auto instead of manual type deduction via \c decltype and \c typename.
+
 \page ContributionChecklist Contribution checklist
 
 When contributing code to the Urho3D project, there are a few things to check so that the process goes smoothly.
 
 First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
-Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2017 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2019 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
 Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
 
@@ -3536,13 +3904,13 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Whenever you are creating a major new feature, its usage should be documented in the .dox pages in addition to the function documentation in the header files. Create a new page if necessary, and link from an appropriate place in the existing documentation. If it's for example a new rendering feature, it could be linked from the \ref Rendering page. If the feature introduces a completely new subsystem, it should be linked from the main page list in Urho3D.dox.
 
+- When you add a new sample application, it should be implemented in all of C++, AngelScript and Lua if possible, to show how all of the APIs are used. Check sample numbering for the next free one available. If a (C++) sample depends on a specific Urho3D build option, for example physics or networking, it can be conditionally disabled in its CMakeLists.txt. See 11_Physics sample for an example.
+
 \section ContributionThirdParty Third party library considerations
 
 - When you add a new third-party library, insert its license statement to the LICENSE in the Source\ThirdParty directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
 - Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
-
-- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
 
 - Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */

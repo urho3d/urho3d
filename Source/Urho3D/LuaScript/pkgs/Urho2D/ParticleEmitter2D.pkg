@@ -6,12 +6,15 @@ public:
     void SetEffect(ParticleEffect2D* effect);
     void SetSprite(Sprite2D* sprite);
     void SetBlendMode(BlendMode blendMode);
+    void SetEmitting(bool emitting);
 
     ParticleEffect2D* GetEffect() const;
     Sprite2D* GetSprite() const;
     BlendMode GetBlendMode() const;
+    bool IsEmitting() const;
 
     tolua_property__get_set ParticleEffect2D* effect;
     tolua_property__get_set Sprite2D* sprite;
     tolua_property__get_set BlendMode blendMode;
+    tolua_property__is_set bool emitting;
 };

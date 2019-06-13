@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         cmake_policy (SET CMP0026 OLD)
         # MACOSX_RPATH is enabled by default
         cmake_policy (SET CMP0042 NEW)
+        # Honor the visibility properties for SHARED target types only
+        cmake_policy (SET CMP0063 OLD)
     endif ()
 
     # Set project name

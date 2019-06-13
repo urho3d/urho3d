@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "../Scene/Node.h"
 #include "../Scene/SceneEvents.h"
 
+#include <ik/constraint.h>
 #include <ik/node.h>
 
 namespace Urho3D
@@ -36,15 +37,14 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKConstraint::IKConstraint(Context* context) :
     Component(context),
+    ikConstraintNode_(nullptr),
     stiffness_(0.0f),
     stretchiness_(0.0f)
 {
 }
 
 // ----------------------------------------------------------------------------
-IKConstraint::~IKConstraint()
-{
-}
+IKConstraint::~IKConstraint() = default;
 
 // ----------------------------------------------------------------------------
 void IKConstraint::RegisterObject(Context* context)
@@ -66,9 +66,9 @@ float IKConstraint::GetStiffness() const
 void IKConstraint::SetStiffness(float stiffness)
 {
     stiffness_ = Clamp(stiffness, 0.0f, 1.0f);
-    if (ikNode_ != NULL)
-        /* TODO ikNode_->stiffness = stiffness_; */
-        ;
+    // TODO
+    //if (ikConstraintNode_ != nullptr)
+    //    ikNode_->stiffness = stiffness_;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,9 +81,9 @@ float IKConstraint::GetStretchiness() const
 void IKConstraint::SetStretchiness(float stretchiness)
 {
     stretchiness_ = Clamp(stretchiness, 0.0f, 1.0f);
-    if (ikNode_)
-        /* TODO ikNode_->stretchiness = stretchiness_;*/
-        ;
+    // TODO
+    //if (ikConstraintNode_)
+    //   ikNode_->stretchiness = stretchiness_;
 }
 
 // ----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ const Vector2& IKConstraint::GetLengthConstraints() const
 void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 {
     lengthConstraints_ = lengthConstraints;
-    if (ikNode_ != NULL)
+    if (ikConstraintNode_ != nullptr)
     {
         /* TODO
         ikNode_->min_length = lengthConstraints_.x_;
@@ -105,10 +105,10 @@ void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 }
 
 // ----------------------------------------------------------------------------
-void IKConstraint::SetIKNode(ik_node_t* node)
+void IKConstraint::SetIKConstraintNode(ik_node_t* constraintNode)
 {
-    ikNode_ = node;
-    if (node)
+    ikConstraintNode_ = constraintNode;
+    if (constraintNode != nullptr)
     {
         /* TODO
         node->stiffness = stiffness_;

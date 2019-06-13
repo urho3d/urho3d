@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_windowswindow_h
-#define _SDL_windowswindow_h
+#ifndef SDL_windowswindow_h_
+#define SDL_windowswindow_h_
 
 #if SDL_VIDEO_OPENGL_EGL   
 #include "../SDL_egl_c.h"
@@ -31,8 +31,10 @@ typedef struct
 {
     SDL_Window *window;
     HWND hwnd;
+    HWND parent;
     HDC hdc;
     HDC mdc;
+    HINSTANCE hinstance;
     HBITMAP hbm;
     WNDPROC wndproc;
     SDL_bool created;
@@ -76,6 +78,6 @@ extern void WIN_OnWindowEnter(_THIS, SDL_Window * window);
 extern void WIN_UpdateClipCursor(SDL_Window *window);
 extern int WIN_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
 
-#endif /* _SDL_windowswindow_h */
+#endif /* SDL_windowswindow_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

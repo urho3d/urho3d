@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,18 +41,16 @@ class URHO3D_API Terrain : public Component
 
 public:
     /// Construct.
-    Terrain(Context* context);
+    explicit Terrain(Context* context);
     /// Destruct.
-    ~Terrain();
+    ~Terrain() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    void OnSetEnabled() override;
 
     /// Set patch quads per side. Must be a power of two.
     void SetPatchSize(int size);
@@ -117,10 +115,10 @@ public:
 
     /// Return maximum number of LOD levels for terrain patches. This can be between 1-4.
     unsigned GetMaxLodLevels() const { return maxLodLevels_; }
-    
+
     /// Return LOD level used for occlusion.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
-    
+
     /// Return whether smoothing is in use.
     bool GetSmoothing() const { return smoothing_; }
 
@@ -140,16 +138,18 @@ public:
     Vector3 GetNormal(const Vector3& worldPosition) const;
     /// Convert world position to heightmap pixel position. Note that the internal height data representation is reversed vertically, but in the heightmap image north is at the top.
     IntVector2 WorldToHeightMap(const Vector3& worldPosition) const;
+    /// Convert heightmap pixel position to world position.
+    Vector3 HeightMapToWorld(const IntVector2& pixelPosition) const;
 
     /// Return north neighbor terrain.
     Terrain* GetNorthNeighbor() const { return north_; }
-    
+
     /// Return south neighbor terrain.
     Terrain* GetSouthNeighbor() const { return south_; }
-    
+
     /// Return west neighbor terrain.
     Terrain* GetWestNeighbor() const { return west_; }
-    
+
     /// Return east neighbor terrain.
     Terrain* GetEastNeighbor() const { return east_; }
 
@@ -236,6 +236,10 @@ private:
     void HandleNeighborTerrainCreated(StringHash eventType, VariantMap& eventData);
     /// Update edge patch neighbors when neighbor terrain(s) change or are recreated.
     void UpdateEdgePatchNeighbors();
+    /// Mark neighbors dirty.
+    void MarkNeighborsDirty() { neighborsDirty_ = true; }
+    /// Mark terrain dirty.
+    void MarkTerrainDirty() { recreateTerrain_ = true; }
 
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

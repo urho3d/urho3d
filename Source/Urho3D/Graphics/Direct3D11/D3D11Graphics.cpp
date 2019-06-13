@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,6 +75,7 @@ static const D3D11_COMPARISON_FUNC d3dCmpFunc[] =
 static const DWORD d3dBlendEnable[] =
 {
     FALSE,
+    TRUE,
     TRUE,
     TRUE,
     TRUE,
@@ -199,36 +200,7 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
-    window_(0),
-    externalWindow_(0),
-    width_(0),
-    height_(0),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
-    multiSample_(1),
-    fullscreen_(false),
-    borderless_(false),
-    resizable_(false),
-    highDPI_(false),
-    vsync_(false),
-    tripleBuffer_(false),
-    flushGPU_(false),
-    forceGL2_(false),
-    sRGB_(false),
-    anisotropySupport_(false),
-    dxtTextureSupport_(false),
-    etcTextureSupport_(false),
-    pvrtcTextureSupport_(false),
-    hardwareShadowSupport_(false),
-    lightPrepassSupport_(false),
-    deferredSupport_(false),
-    instancingSupport_(false),
-    sRGBSupport_(false),
-    sRGBWriteSupport_(false),
-    numPrimitives_(0),
-    numBatches_(0),
-    maxScratchBufferRequest_(0),
-    defaultTextureFilterMode_(FILTER_TRILINEAR),
-    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -288,11 +260,11 @@ Graphics::~Graphics()
     {
         SDL_ShowCursor(SDL_TRUE);
         SDL_DestroyWindow(window_);
-        window_ = 0;
+        window_ = nullptr;
     }
 
     delete impl_;
-    impl_ = 0;
+    impl_ = nullptr;
 
     context_->ReleaseSDL();
 }
@@ -380,6 +352,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     AdjustWindow(width, height, fullscreen, borderless, monitor);
     monitor_ = monitor;
+    refreshRate_ = refreshRate;
 
     if (maximize)
     {
@@ -482,7 +455,7 @@ void Graphics::Close()
     {
         SDL_ShowCursor(SDL_TRUE);
         SDL_DestroyWindow(window_);
-        window_ = 0;
+        window_ = nullptr;
     }
 }
 
@@ -505,8 +478,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
     textureDesc.Usage = D3D11_USAGE_STAGING;
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-    ID3D11Texture2D* stagingTexture = 0;
-    HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    ID3D11Texture2D* stagingTexture = nullptr;
+    HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, nullptr, &stagingTexture);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(stagingTexture);
@@ -514,7 +487,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
         return false;
     }
 
-    ID3D11Resource* source = 0;
+    ID3D11Resource* source = nullptr;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
     if (multiSample_ > 1)
@@ -538,7 +511,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     source->Release();
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
-    mappedData.pData = 0;
+    mappedData.pData = nullptr;
     hr = impl_->deviceContext_->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (FAILED(hr) || !mappedData.pData)
     {
@@ -593,7 +566,7 @@ bool Graphics::BeginFrame()
 
     // Cleanup textures from previous frame
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        SetTexture(i, 0);
+        SetTexture(i, nullptr);
 
     numPrimitives_ = 0;
     numBatches_ = 0;
@@ -618,7 +591,7 @@ void Graphics::EndFrame()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
 {
     IntVector2 rtSize = GetRenderTargetDimensions();
 
@@ -659,13 +632,13 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         model.m23_ = Clamp(depth, 0.0f, 1.0f);
 
         SetBlendMode(BLEND_REPLACE);
-        SetColorWrite((flags & CLEAR_COLOR) != 0);
+        SetColorWrite(flags & CLEAR_COLOR);
         SetCullMode(CULL_NONE);
         SetDepthTest(CMP_ALWAYS);
-        SetDepthWrite((flags & CLEAR_DEPTH) != 0);
+        SetDepthWrite(flags & CLEAR_DEPTH);
         SetFillMode(FILL_SOLID);
         SetScissorTest(false);
-        SetStencilTest((flags & CLEAR_STENCIL) != 0, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, stencil);
+        SetStencilTest(flags & CLEAR_STENCIL, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, stencil);
         SetShaders(GetShader(VS, "ClearFramebuffer"), GetShader(PS, "ClearFramebuffer"));
         SetShaderParameter(VSP_MODEL, model);
         SetShaderParameter(VSP_VIEWPROJ, projection);
@@ -703,7 +676,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     srcBox.front = 0;
     srcBox.back = 1;
 
-    ID3D11Resource* source = 0;
+    ID3D11Resource* source = nullptr;
     bool resolve = multiSample_ > 1;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
@@ -929,10 +902,10 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        VertexBuffer* buffer = 0;
+        VertexBuffer* buffer = nullptr;
         bool changed = false;
 
-        buffer = i < buffers.Size() ? buffers[i] : 0;
+        buffer = i < buffers.Size() ? buffers[i] : nullptr;
         if (buffer)
         {
             const PODVector<VertexElement>& elements = buffer->GetElements();
@@ -951,8 +924,8 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
         }
         else if (vertexBuffers_[i])
         {
-            vertexBuffers_[i] = 0;
-            impl_->vertexBuffers_[i] = 0;
+            vertexBuffers_[i] = nullptr;
+            impl_->vertexBuffers_[i] = nullptr;
             impl_->vertexSizes_[i] = 0;
             impl_->vertexOffsets_[i] = 0;
             changed = true;
@@ -990,7 +963,7 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
             impl_->deviceContext_->IASetIndexBuffer((ID3D11Buffer*)buffer->GetGPUObject(),
                 buffer->GetIndexSize() == sizeof(unsigned short) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
         else
-            impl_->deviceContext_->IASetIndexBuffer(0, DXGI_FORMAT_UNKNOWN, 0);
+            impl_->deviceContext_->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
 
         indexBuffer_ = buffer;
     }
@@ -1023,14 +996,14 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 if (!success)
                 {
                     URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
-                    vs = 0;
+                    vs = nullptr;
                 }
             }
             else
-                vs = 0;
+                vs = nullptr;
         }
 
-        impl_->deviceContext_->VSSetShader((ID3D11VertexShader*)(vs ? vs->GetGPUObject() : 0), 0, 0);
+        impl_->deviceContext_->VSSetShader((ID3D11VertexShader*)(vs ? vs->GetGPUObject() : nullptr), nullptr, 0);
         vertexShader_ = vs;
         impl_->vertexDeclarationDirty_ = true;
     }
@@ -1047,14 +1020,14 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 if (!success)
                 {
                     URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
-                    ps = 0;
+                    ps = nullptr;
                 }
             }
             else
-                ps = 0;
+                ps = nullptr;
         }
 
-        impl_->deviceContext_->PSSetShader((ID3D11PixelShader*)(ps ? ps->GetGPUObject() : 0), 0, 0);
+        impl_->deviceContext_->PSSetShader((ID3D11PixelShader*)(ps ? ps->GetGPUObject() : nullptr), nullptr, 0);
         pixelShader_ = ps;
     }
 
@@ -1077,7 +1050,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         {
             ID3D11Buffer* vsBuffer = impl_->shaderProgram_->vsConstantBuffers_[i] ? (ID3D11Buffer*)impl_->shaderProgram_->vsConstantBuffers_[i]->
-                GetGPUObject() : 0;
+                GetGPUObject() : nullptr;
             if (vsBuffer != impl_->constantBuffers_[VS][i])
             {
                 impl_->constantBuffers_[VS][i] = vsBuffer;
@@ -1086,7 +1059,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             }
 
             ID3D11Buffer* psBuffer = impl_->shaderProgram_->psConstantBuffers_[i] ? (ID3D11Buffer*)impl_->shaderProgram_->psConstantBuffers_[i]->
-                GetGPUObject() : 0;
+                GetGPUObject() : nullptr;
             if (psBuffer != impl_->constantBuffers_[PS][i])
             {
                 impl_->constantBuffers_[PS][i] = psBuffer;
@@ -1101,7 +1074,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             impl_->deviceContext_->PSSetConstantBuffers(0, MAX_SHADER_PARAMETER_GROUPS, &impl_->constantBuffers_[PS][0]);
     }
     else
-        impl_->shaderProgram_ = 0;
+        impl_->shaderProgram_ = nullptr;
 
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
@@ -1304,14 +1277,14 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             }
         }
 
-        if (texture->GetLevelsDirty())
+        if (texture && texture->GetLevelsDirty())
             texture->RegenerateLevels();
     }
 
     if (texture && texture->GetParametersDirty())
     {
         texture->UpdateParameters();
-        textures_[index] = 0; // Force reassign
+        textures_[index] = nullptr; // Force reassign
     }
 
     if (texture != textures_[index])
@@ -1327,8 +1300,8 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         }
 
         textures_[index] = texture;
-        impl_->shaderResourceViews_[index] = texture ? (ID3D11ShaderResourceView*)texture->GetShaderResourceView() : 0;
-        impl_->samplers_[index] = texture ? (ID3D11SamplerState*)texture->GetSampler() : 0;
+        impl_->shaderResourceViews_[index] = texture ? (ID3D11ShaderResourceView*)texture->GetShaderResourceView() : nullptr;
+        impl_->samplers_[index] = texture ? (ID3D11SamplerState*)texture->GetSampler() : nullptr;
         impl_->texturesDirty_ = true;
     }
 }
@@ -1378,19 +1351,19 @@ void Graphics::SetTextureParametersDirty()
 void Graphics::ResetRenderTargets()
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        SetRenderTarget(i, (RenderSurface*)0);
-    SetDepthStencil((RenderSurface*)0);
+        SetRenderTarget(i, (RenderSurface*)nullptr);
+    SetDepthStencil((RenderSurface*)nullptr);
     SetViewport(IntRect(0, 0, width_, height_));
 }
 
 void Graphics::ResetRenderTarget(unsigned index)
 {
-    SetRenderTarget(index, (RenderSurface*)0);
+    SetRenderTarget(index, (RenderSurface*)nullptr);
 }
 
 void Graphics::ResetDepthStencil()
 {
-    SetDepthStencil((RenderSurface*)0);
+    SetDepthStencil((RenderSurface*)nullptr);
 }
 
 void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
@@ -1430,7 +1403,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
 
 void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
 {
-    RenderSurface* renderTarget = 0;
+    RenderSurface* renderTarget = nullptr;
     if (texture)
         renderTarget = texture->GetRenderSurface();
 
@@ -1448,7 +1421,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 
 void Graphics::SetDepthStencil(Texture2D* texture)
 {
-    RenderSurface* depthStencil = 0;
+    RenderSurface* depthStencil = nullptr;
     if (texture)
         depthStencil = texture->GetRenderSurface();
 
@@ -1705,7 +1678,7 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
 
 bool Graphics::IsInitialized() const
 {
-    return window_ != 0 && impl_->GetDevice() != 0;
+    return window_ != nullptr && impl_->GetDevice() != nullptr;
 }
 
 PODVector<int> Graphics::GetMultiSampleLevels() const
@@ -1760,18 +1733,18 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
         String fullShaderName = shaderPath_ + name + shaderExtension_;
         // Try to reduce repeated error log prints because of missing shaders
         if (lastShaderName_ == name && !cache->Exists(fullShaderName))
-            return 0;
+            return nullptr;
 
         lastShader_ = cache->GetResource<Shader>(fullShaderName);
         lastShaderName_ = name;
     }
 
-    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)0;
+    return lastShader_ ? lastShader_->GetVariation(type, defines) : nullptr;
 }
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
-    return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
+    return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : nullptr;
 }
 
 ShaderProgram* Graphics::GetShaderProgram() const
@@ -1800,12 +1773,12 @@ const String& Graphics::GetTextureUnitName(TextureUnit unit)
 
 Texture* Graphics::GetTexture(unsigned index) const
 {
-    return index < MAX_TEXTURE_UNITS ? textures_[index] : 0;
+    return index < MAX_TEXTURE_UNITS ? textures_[index] : nullptr;
 }
 
 RenderSurface* Graphics::GetRenderTarget(unsigned index) const
 {
-    return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
+    return index < MAX_RENDERTARGETS ? renderTargets_[index] : nullptr;
 }
 
 IntVector2 Graphics::GetRenderTargetDimensions() const
@@ -1869,6 +1842,7 @@ void Graphics::OnWindowResized()
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
@@ -1886,7 +1860,7 @@ void Graphics::OnWindowMoved()
     position_.x_ = newX;
     position_.y_ = newY;
 
-    URHO3D_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+    URHO3D_LOGTRACEF("Window was moved to %d,%d", position_.x_, position_.y_);
 
     using namespace WindowPos;
 
@@ -1907,7 +1881,7 @@ void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
     }
 
     if (vertexShader_ == variation || pixelShader_ == variation)
-        impl_->shaderProgram_ = 0;
+        impl_->shaderProgram_ = nullptr;
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)
@@ -2100,15 +2074,17 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_MaximizeWindow(window_);
             SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
-        else 
+        else
         {
-            if (newFullscreen || newBorderless) 
+            SDL_Rect display_rect;
+            SDL_GetDisplayBounds(monitor, &display_rect);
+
+            if (newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h))
             {
-                // Reposition the window on the specified monitor
-                SDL_Rect display_rect;
-                SDL_GetDisplayBounds(monitor, &display_rect);
+                // Reposition the window on the specified monitor if it's supposed to cover the entire monitor
                 SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
             }
+
             SDL_SetWindowSize(window_, newWidth, newHeight);
         }
 
@@ -2132,15 +2108,15 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     if (!impl_->device_)
     {
         HRESULT hr = D3D11CreateDevice(
-            0,
+            nullptr,
             D3D_DRIVER_TYPE_HARDWARE,
+            nullptr,
             0,
-            0,
-            0,
+            nullptr,
             0,
             D3D11_SDK_VERSION,
             &impl_->device_,
-            0,
+            nullptr,
             &impl_->deviceContext_
         );
 
@@ -2166,7 +2142,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     if (impl_->swapChain_)
     {
         impl_->swapChain_->Release();
-        impl_->swapChain_ = 0;
+        impl_->swapChain_ = nullptr;
     }
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -2182,16 +2158,23 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.Windowed = TRUE;
     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    IDXGIDevice* dxgiDevice = 0;
+    IDXGIDevice* dxgiDevice = nullptr;
     impl_->device_->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
-    IDXGIAdapter* dxgiAdapter = 0;
+    IDXGIAdapter* dxgiAdapter = nullptr;
     dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
-    IDXGIFactory* dxgiFactory = 0;
+    IDXGIFactory* dxgiFactory = nullptr;
     dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
     HRESULT hr = dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
     // After creating the swap chain, disable automatic Alt-Enter fullscreen/windowed switching
     // (the application will switch manually if it wants to)
     dxgiFactory->MakeWindowAssociation(GetWindowHandle(window_), DXGI_MWA_NO_ALT_ENTER);
+
+#ifdef URHO3D_LOGGING
+    DXGI_ADAPTER_DESC desc;
+    dxgiAdapter->GetDesc(&desc);
+    String adapterDesc(desc.Description);
+    URHO3D_LOGINFO("Adapter used " + adapterDesc);
+#endif
 
     dxgiFactory->Release();
     dxgiAdapter->Release();
@@ -2212,32 +2195,32 @@ bool Graphics::UpdateSwapChain(int width, int height)
 {
     bool success = true;
 
-    ID3D11RenderTargetView* nullView = 0;
-    impl_->deviceContext_->OMSetRenderTargets(1, &nullView, 0);
+    ID3D11RenderTargetView* nullView = nullptr;
+    impl_->deviceContext_->OMSetRenderTargets(1, &nullView, nullptr);
     if (impl_->defaultRenderTargetView_)
     {
         impl_->defaultRenderTargetView_->Release();
-        impl_->defaultRenderTargetView_ = 0;
+        impl_->defaultRenderTargetView_ = nullptr;
     }
     if (impl_->defaultDepthStencilView_)
     {
         impl_->defaultDepthStencilView_->Release();
-        impl_->defaultDepthStencilView_ = 0;
+        impl_->defaultDepthStencilView_ = nullptr;
     }
     if (impl_->defaultDepthTexture_)
     {
         impl_->defaultDepthTexture_->Release();
-        impl_->defaultDepthTexture_ = 0;
+        impl_->defaultDepthTexture_ = nullptr;
     }
     if (impl_->resolveTexture_)
     {
         impl_->resolveTexture_->Release();
-        impl_->resolveTexture_ = 0;
+        impl_->resolveTexture_ = nullptr;
     }
 
-    impl_->depthStencilView_ = 0;
+    impl_->depthStencilView_ = nullptr;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        impl_->renderTargetViews_[i] = 0;
+        impl_->renderTargetViews_[i] = nullptr;
     impl_->renderTargetsDirty_ = true;
 
     impl_->swapChain_->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
@@ -2253,7 +2236,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     }
     else
     {
-        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, 0, &impl_->defaultRenderTargetView_);
+        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, nullptr, &impl_->defaultRenderTargetView_);
         backbufferTexture->Release();
         if (FAILED(hr))
         {
@@ -2277,7 +2260,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depthDesc.CPUAccessFlags = 0;
     depthDesc.MiscFlags = 0;
-    hr = impl_->device_->CreateTexture2D(&depthDesc, 0, &impl_->defaultDepthTexture_);
+    hr = impl_->device_->CreateTexture2D(&depthDesc, nullptr, &impl_->defaultDepthTexture_);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
@@ -2286,7 +2269,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     }
     else
     {
-        hr = impl_->device_->CreateDepthStencilView(impl_->defaultDepthTexture_, 0, &impl_->defaultDepthStencilView_);
+        hr = impl_->device_->CreateDepthStencilView(impl_->defaultDepthTexture_, nullptr, &impl_->defaultDepthStencilView_);
         if (FAILED(hr))
         {
             URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilView_);
@@ -2322,40 +2305,40 @@ void Graphics::ResetCachedState()
 {
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        vertexBuffers_[i] = 0;
-        impl_->vertexBuffers_[i] = 0;
+        vertexBuffers_[i] = nullptr;
+        impl_->vertexBuffers_[i] = nullptr;
         impl_->vertexSizes_[i] = 0;
         impl_->vertexOffsets_[i] = 0;
     }
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        textures_[i] = 0;
-        impl_->shaderResourceViews_[i] = 0;
-        impl_->samplers_[i] = 0;
+        textures_[i] = nullptr;
+        impl_->shaderResourceViews_[i] = nullptr;
+        impl_->samplers_[i] = nullptr;
     }
 
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
-        renderTargets_[i] = 0;
-        impl_->renderTargetViews_[i] = 0;
+        renderTargets_[i] = nullptr;
+        impl_->renderTargetViews_[i] = nullptr;
     }
 
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
     {
-        impl_->constantBuffers_[VS][i] = 0;
-        impl_->constantBuffers_[PS][i] = 0;
+        impl_->constantBuffers_[VS][i] = nullptr;
+        impl_->constantBuffers_[PS][i] = nullptr;
     }
 
-    depthStencil_ = 0;
-    impl_->depthStencilView_ = 0;
+    depthStencil_ = nullptr;
+    impl_->depthStencilView_ = nullptr;
     viewport_ = IntRect(0, 0, width_, height_);
 
-    indexBuffer_ = 0;
+    indexBuffer_ = nullptr;
     vertexDeclarationHash_ = 0;
     primitiveType_ = 0;
-    vertexShader_ = 0;
-    pixelShader_ = 0;
+    vertexShader_ = nullptr;
+    pixelShader_ = nullptr;
     blendMode_ = BLEND_REPLACE;
     alphaToCoverage_ = false;
     colorWrite_ = true;
@@ -2377,7 +2360,7 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    impl_->shaderProgram_ = 0;
+    impl_->shaderProgram_ = nullptr;
     impl_->renderTargetsDirty_ = true;
     impl_->texturesDirty_ = true;
     impl_->vertexDeclarationDirty_ = true;
@@ -2409,7 +2392,7 @@ void Graphics::PrepareDraw()
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
             impl_->renderTargetViews_[i] =
                 (renderTargets_[i] && renderTargets_[i]->GetUsage() == TEXTURE_RENDERTARGET) ?
-                    (ID3D11RenderTargetView*)renderTargets_[i]->GetRenderTargetView() : 0;
+                    (ID3D11RenderTargetView*)renderTargets_[i]->GetRenderTargetView() : nullptr;
         // If rendertarget 0 is null and not doing depth-only rendering, render to the backbuffer
         // Special case: if rendertarget 0 is null and depth stencil has same size as backbuffer, assume the intention is to do
         // backbuffer rendering with a custom depth stencil
@@ -2498,7 +2481,7 @@ void Graphics::PrepareDraw()
                 stateDesc.RenderTarget[0].BlendOpAlpha = d3dBlendOp[blendMode_];
                 stateDesc.RenderTarget[0].RenderTargetWriteMask = colorWrite_ ? D3D11_COLOR_WRITE_ENABLE_ALL : 0x0;
 
-                ID3D11BlendState* newBlendState = 0;
+                ID3D11BlendState* newBlendState = nullptr;
                 HRESULT hr = impl_->device_->CreateBlendState(&stateDesc, &newBlendState);
                 if (FAILED(hr))
                 {
@@ -2509,7 +2492,7 @@ void Graphics::PrepareDraw()
                 i = impl_->blendStates_.Insert(MakePair(newBlendStateHash, newBlendState));
             }
 
-            impl_->deviceContext_->OMSetBlendState(i->second_, 0, M_MAX_UNSIGNED);
+            impl_->deviceContext_->OMSetBlendState(i->second_, nullptr, M_MAX_UNSIGNED);
             impl_->blendStateHash_ = newBlendStateHash;
         }
 
@@ -2546,7 +2529,7 @@ void Graphics::PrepareDraw()
                 stateDesc.BackFace.StencilPassOp = d3dStencilOp[stencilPass_];
                 stateDesc.BackFace.StencilFunc = d3dCmpFunc[stencilTestMode_];
 
-                ID3D11DepthStencilState* newDepthState = 0;
+                ID3D11DepthStencilState* newDepthState = nullptr;
                 HRESULT hr = impl_->device_->CreateDepthStencilState(&stateDesc, &newDepthState);
                 if (FAILED(hr))
                 {
@@ -2595,7 +2578,7 @@ void Graphics::PrepareDraw()
                 stateDesc.MultisampleEnable = lineAntiAlias_ ? FALSE : TRUE;
                 stateDesc.AntialiasedLineEnable = lineAntiAlias_ ? TRUE : FALSE;
 
-                ID3D11RasterizerState* newRasterizerState = 0;
+                ID3D11RasterizerState* newRasterizerState = nullptr;
                 HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);
                 if (FAILED(hr))
                 {
@@ -2646,7 +2629,7 @@ void Graphics::CreateResolveTexture()
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.CPUAccessFlags = 0;
 
-    HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, 0, &impl_->resolveTexture_);
+    HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, nullptr, &impl_->resolveTexture_);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(impl_->resolveTexture_);

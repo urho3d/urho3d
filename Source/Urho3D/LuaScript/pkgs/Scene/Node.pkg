@@ -128,6 +128,7 @@ class Node : public Animatable
     int GetScriptObject(const String scriptObjectType) const;
 
     unsigned GetID() const;
+    bool IsReplicated() const;
     const String GetName() const;
     StringHash GetNameHash() const;
     Node* GetParent() const;
@@ -205,11 +206,12 @@ class Node : public Animatable
     const StringVector& GetTags() const;
 
     // void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
-    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
+    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     void SetID(unsigned id);
 
     tolua_readonly tolua_property__get_set unsigned ID;
+    tolua_readonly tolua_property__is_set bool replicated;
     tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_property__get_set Node* parent;

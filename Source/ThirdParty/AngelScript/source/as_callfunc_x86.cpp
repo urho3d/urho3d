@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -116,7 +116,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 	int dpos = 1;
 
-	if( isThisCallMethod && 
+	if( isThisCallMethod &&
 		(callConv >= ICC_THISCALL_OBJFIRST &&
 		 callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )
 	{
@@ -143,13 +143,13 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 #endif
 				{
 					// Copy the object's memory to the buffer
-					// TODO: bug: Must call the object's copy constructor instead of doing a memcpy, 
-					//            as the object may hold a pointer to itself. It's not enough to 
+					// TODO: bug: Must call the object's copy constructor instead of doing a memcpy,
+					//            as the object may hold a pointer to itself. It's not enough to
 					//            change only this memcpy as the assembler routine also makes a copy
-					//            of paramBuffer to the final stack location. To avoid the second 
+					//            of paramBuffer to the final stack location. To avoid the second
 					//            copy the C++ routine should point paramBuffer to the final stack
 					//            position and copy the values directly to that location. The assembler
-					//            routines then don't need to copy anything, and will just be 
+					//            routines then don't need to copy anything, and will just be
 					//            responsible for setting up the registers and the stack frame appropriately.
 					memcpy(&paramBuffer[dpos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
 
@@ -173,7 +173,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		args = &paramBuffer[1];
 	}
 
-	if( isThisCallMethod && 
+	if( isThisCallMethod &&
 		(callConv >= ICC_THISCALL_OBJLAST &&
 		 callConv <= ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM) )
 	{
@@ -349,9 +349,9 @@ endcopy:
 
 	asm __volatile__(
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -471,9 +471,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -594,9 +594,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -726,9 +726,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -858,9 +858,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -989,9 +989,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -1111,9 +1111,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -1242,9 +1242,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"
@@ -1389,9 +1389,9 @@ endcopy:
 
 	asm __volatile__ (
 #ifdef __OPTIMIZE__
-		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// When compiled with optimizations the stack unwind doesn't work properly,
 		// causing exceptions to crash the application. By adding this prologue
-		// and the epilogue below, the stack unwind works as it should. 
+		// and the epilogue below, the stack unwind works as it should.
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
 		".cfi_adjust_cfa_offset 4  \n"

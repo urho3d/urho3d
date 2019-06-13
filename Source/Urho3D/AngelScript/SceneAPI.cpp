@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,22 +36,22 @@ namespace Urho3D
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint AM_FILE", (void*)&AM_FILE);
-    engine->RegisterGlobalProperty("const uint AM_NET", (void*)&AM_NET);
-    engine->RegisterGlobalProperty("const uint AM_DEFAULT", (void*)&AM_DEFAULT);
-    engine->RegisterGlobalProperty("const uint AM_LATESTDATA", (void*)&AM_LATESTDATA);
-    engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)&AM_NOEDIT);
-    engine->RegisterGlobalProperty("const uint AM_NODEID", (void*)&AM_NODEID);
-    engine->RegisterGlobalProperty("const uint AM_COMPONENTID", (void*)&AM_COMPONENTID);
-    engine->RegisterGlobalProperty("const uint AM_NODEIDVECTOR", (void*)&AM_NODEIDVECTOR);
+    engine->RegisterEnum("AttributeMode");
+    engine->RegisterEnumValue("AttributeMode", "AM_FILE", AM_FILE);
+    engine->RegisterEnumValue("AttributeMode", "AM_NET", AM_NET);
+    engine->RegisterEnumValue("AttributeMode", "AM_DEFAULT", AM_DEFAULT);
+    engine->RegisterEnumValue("AttributeMode", "AM_LATESTDATA", AM_LATESTDATA);
+    engine->RegisterEnumValue("AttributeMode", "AM_NOEDIT", AM_NOEDIT);
+    engine->RegisterEnumValue("AttributeMode", "AM_NODEID", AM_NODEID);
+    engine->RegisterEnumValue("AttributeMode", "AM_COMPONENTID", AM_COMPONENTID);
+    engine->RegisterEnumValue("AttributeMode", "AM_NODEIDVECTOR", AM_NODEIDVECTOR);
+    engine->RegisterEnumValue("AttributeMode", "AM_FILEREADONLY", AM_FILEREADONLY);
 
     engine->RegisterEnum("AutoRemoveMode");
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_DISABLED", REMOVE_DISABLED);
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_COMPONENT", REMOVE_COMPONENT);
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_NODE", REMOVE_NODE);
 
-    engine->RegisterGlobalProperty("const uint AM_FILEREADONLY", (void*)&AM_FILEREADONLY);
-    
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
 
@@ -212,7 +212,7 @@ static bool SceneSaveJSONVectorBuffer(VectorBuffer& buffer, const String& indent
 
 static Node* SceneInstantiate(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return file ? ptr->Instantiate(*file, position, rotation, mode) : 0;
+    return file ? ptr->Instantiate(*file, position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateVectorBuffer(VectorBuffer& buffer, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
@@ -222,12 +222,12 @@ static Node* SceneInstantiateVectorBuffer(VectorBuffer& buffer, const Vector3& p
 
 static Node* SceneInstantiateXML(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return file ? ptr->InstantiateXML(*file, position, rotation, mode) : 0;
+    return file ? ptr->InstantiateXML(*file, position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateJSON(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return file ? ptr->InstantiateJSON(*file, position, rotation, mode) : 0;
+    return file ? ptr->InstantiateJSON(*file, position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateXMLVectorBuffer(VectorBuffer& buffer, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
@@ -242,12 +242,12 @@ static Node* SceneInstantiateJSONVectorBuffer(VectorBuffer& buffer, const Vector
 
 static Node* SceneInstantiateXMLFile(XMLFile* xml, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return xml ? ptr->InstantiateXML(xml->GetRoot(), position, rotation, mode) : 0;
+    return xml ? ptr->InstantiateXML(xml->GetRoot(), position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateJSONFile(JSONFile* json, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return json ? ptr->InstantiateJSON(json->GetRoot(), position, rotation, mode) : 0;
+    return json ? ptr->InstantiateJSON(json->GetRoot(), position, rotation, mode) : nullptr;
 }
 
 static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
@@ -289,23 +289,8 @@ static CScriptArray* GetObjectsByCategory(const String& category)
 static CScriptArray* GetObjectAttributeInfos(const String& objectType)
 {
     const Vector<AttributeInfo>* attributes = GetScriptContext()->GetAttributes(Urho3D::StringHash(objectType));
-    Vector<AttributeInfo> copiedAttributes;
-    if (attributes)
-        for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
-        {
-            AttributeInfo copy;
-            copy.type_ = i->type_;
-            copy.name_ = i->name_;
-            copy.offset_ = i->offset_;
-            copy.enumNames_ = i->enumNames_;
-            copy.variantStructureElementNames_ = i->variantStructureElementNames_;
-            copy.accessor_ = i->accessor_;
-            copy.defaultValue_ = i->defaultValue_;
-            copy.mode_ = i->mode_;
-            copy.ptr_ = i->ptr_;
-            copiedAttributes.Push(copy);
-        }
-    return VectorToArray<AttributeInfo>(copiedAttributes, "Array<AttributeInfo>");
+    static Vector<AttributeInfo> emptyAttributes;
+    return VectorToArray<AttributeInfo>(attributes ? *attributes : emptyAttributes, "Array<AttributeInfo>");
 }
 
 static void RegisterSmoothedTransform(asIScriptEngine* engine)
@@ -386,7 +371,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void Clear(bool clearReplicated = true, bool clearLocal = true)", asMETHOD(Scene, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHOD(Scene, AddRequiredPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHOD(Scene, ClearRequiredPackageFiles), asCALL_THISCALL);
- 
+
     engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHOD(Scene, RegisterVar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void UnregisterVar(const String&in)", asMETHOD(Scene, UnregisterVar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void UnregisterAllVars(const String&in)", asMETHOD(Scene, UnregisterAllVars), asCALL_THISCALL);
@@ -421,6 +406,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", asFUNCTION(GetObjectAttributeInfos), asCALL_CDECL);
+
+    engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", asFUNCTION(Scene::IsReplicatedID), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)

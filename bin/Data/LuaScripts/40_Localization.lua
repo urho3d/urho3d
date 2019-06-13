@@ -33,6 +33,7 @@ function InitLocalizationSystem()
     localization:LoadJSONFile("StringsEnRu.json")
     -- You can load multiple files
     localization:LoadJSONFile("StringsDe.json")
+    localization:LoadJSONFile("StringsLv.json", "lv")
     -- Hook up to the change language
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage")
 end
@@ -164,7 +165,7 @@ end
 
 -- You can manually change texts, sprites and other aspects of the game when language is changed
 function HandleChangeLanguage(eventType, eventData)
-    local windowTitle = ui.root:GetChild("WindowTitle", true);
+    local windowTitle = ui.root:GetChild("WindowTitle", true)
     windowTitle.text = localization:Get("title") .. " (" ..
                            localization.languageIndex .. " " ..
                            localization.language .. ")"

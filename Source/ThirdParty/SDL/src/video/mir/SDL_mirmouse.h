@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,8 +23,8 @@
   Contributed by Brandon Schaefer, <brandon.schaefer@canonical.com>
 */
 
-#ifndef _SDL_mirmouse_h
-#define _SDL_mirmouse_h
+#ifndef SDL_mirmouse_h_
+#define SDL_mirmouse_h_
 
 extern void
 MIR_InitMouse();
@@ -32,6 +32,6 @@ MIR_InitMouse();
 extern void
 MIR_FiniMouse();
 
-#endif /* _SDL_mirmouse_h */
+#endif /* SDL_mirmouse_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

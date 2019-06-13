@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Lua FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone targets (these targets can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT WEB)
+if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-tolua\\+\\+ AND NOT IOS AND NOT TVOS AND NOT WEB)
     # Define target name for Lua interpreter
     set (TARGET_NAME lua_interpreter)   # Note: intended target name is 'lua' which clashes with 'Lua' library target above for case-insensitive platform
 

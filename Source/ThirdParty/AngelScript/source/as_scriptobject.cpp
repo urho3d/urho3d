@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -114,6 +114,94 @@ asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngi
 	ptr->AddRef();
 
 	if( isNested )
+		ctx->PopState();
+	else
+		engine->ReturnContext(ctx);
+
+	return ptr;
+}
+
+// This helper function will call the copy factory, that is a script function
+// TODO: Clean up: This function is almost identical to ScriptObjectFactory. Should make better use of the identical code.
+asIScriptObject *ScriptObjectCopyFactory(const asCObjectType *objType, void *origObj, asCScriptEngine *engine)
+{
+	asIScriptContext *ctx = 0;
+	int r = 0;
+	bool isNested = false;
+
+	// Use nested call in the context if there is an active context
+	ctx = asGetActiveContext();
+	if (ctx)
+	{
+		// It may not always be possible to reuse the current context, 
+		// in which case we'll have to create a new one any way.
+		if (ctx->GetEngine() == objType->GetEngine() && ctx->PushState() == asSUCCESS)
+			isNested = true;
+		else
+			ctx = 0;
+	}
+
+	if (ctx == 0)
+	{
+		// Request a context from the engine
+		ctx = engine->RequestContext();
+		if (ctx == 0)
+		{
+			// TODO: How to best report this failure?
+			return 0;
+		}
+	}
+
+	r = ctx->Prepare(engine->scriptFunctions[objType->beh.copyfactory]);
+	if (r < 0)
+	{
+		if (isNested)
+			ctx->PopState();
+		else
+			engine->ReturnContext(ctx);
+		return 0;
+	}
+
+	// Let the context handle the case for argument by ref (&) or by handle (@)
+	ctx->SetArgObject(0, origObj);
+
+	for (;;)
+	{
+		r = ctx->Execute();
+
+		// We can't allow this execution to be suspended 
+		// so resume the execution immediately
+		if (r != asEXECUTION_SUSPENDED)
+			break;
+	}
+
+	if (r != asEXECUTION_FINISHED)
+	{
+		if (isNested)
+		{
+			ctx->PopState();
+
+			// If the execution was aborted or an exception occurred,
+			// then we should forward that to the outer execution.
+			if (r == asEXECUTION_EXCEPTION)
+			{
+				// TODO: How to improve this exception
+				ctx->SetException(TXT_EXCEPTION_IN_NESTED_CALL);
+			}
+			else if (r == asEXECUTION_ABORTED)
+				ctx->Abort();
+		}
+		else
+			engine->ReturnContext(ctx);
+		return 0;
+	}
+
+	asIScriptObject *ptr = (asIScriptObject*)ctx->GetReturnAddress();
+
+	// Increase the reference, because the context will release its pointer
+	ptr->AddRef();
+
+	if (isNested)
 		ctx->PopState();
 	else
 		engine->ReturnContext(ctx);
@@ -726,14 +814,19 @@ void asCScriptObject::EnumReferences(asIScriptEngine *engine)
 	{
 		asCObjectProperty *prop = objType->properties[n];
 		void *ptr = 0;
-		if( prop->type.IsObject() )
+		if (prop->type.IsObject())
 		{
-			// TODO: gc: The members of the value type needs to be enumerated
-			//           too, since the value type may be holding a reference.
-			if( prop->type.IsReference() || (prop->type.GetTypeInfo()->flags & asOBJ_REF) )
+			if (prop->type.IsReference() || (prop->type.GetTypeInfo()->flags & asOBJ_REF))
 				ptr = *(void**)(((char*)this) + prop->byteOffset);
 			else
 				ptr = (void*)(((char*)this) + prop->byteOffset);
+
+			// The members of the value type needs to be enumerated
+			// too, since the value type may be holding a reference.
+			if ((prop->type.GetTypeInfo()->flags & asOBJ_VALUE) && (prop->type.GetTypeInfo()->flags & asOBJ_GC))
+			{
+				reinterpret_cast<asCScriptEngine*>(engine)->CallObjectMethod(ptr, engine, CastToObjectType(prop->type.GetTypeInfo())->beh.gcEnumReferences);
+			}
 		}
 		else if (prop->type.IsFuncdef())
 			ptr = *(void**)(((char*)this) + prop->byteOffset);
@@ -749,18 +842,31 @@ void asCScriptObject::ReleaseAllHandles(asIScriptEngine *engine)
 	{
 		asCObjectProperty *prop = objType->properties[n];
 
-		// TODO: gc: The members of the members needs to be released
-		//           too, since they may be holding a reference. Even
-		//           if the member is a value type.
-		if( prop->type.IsObject() && prop->type.IsObjectHandle() )
+		if (prop->type.IsObject())
 		{
-			void **ptr = (void**)(((char*)this) + prop->byteOffset);
-			if( *ptr )
+			if (prop->type.IsObjectHandle())
 			{
-				asASSERT( (prop->type.GetTypeInfo()->flags & asOBJ_NOCOUNT) || prop->type.GetBehaviour()->release );
-				if( prop->type.GetBehaviour()->release )
-					((asCScriptEngine*)engine)->CallObjectMethod(*ptr, prop->type.GetBehaviour()->release);
-				*ptr = 0;
+				void **ptr = (void**)(((char*)this) + prop->byteOffset);
+				if (*ptr)
+				{
+					asASSERT((prop->type.GetTypeInfo()->flags & asOBJ_NOCOUNT) || prop->type.GetBehaviour()->release);
+					if (prop->type.GetBehaviour()->release)
+						((asCScriptEngine*)engine)->CallObjectMethod(*ptr, prop->type.GetBehaviour()->release);
+					*ptr = 0;
+				}
+			}
+			else if ((prop->type.GetTypeInfo()->flags & asOBJ_VALUE) && (prop->type.GetTypeInfo()->flags & asOBJ_GC))
+			{
+				// The members of the members needs to be released
+				// too, since they may be holding a reference. Even
+				// if the member is a value type.
+				void *ptr = 0;
+				if (prop->type.IsReference())
+					ptr = *(void**)(((char*)this) + prop->byteOffset);
+				else
+					ptr = (void*)(((char*)this) + prop->byteOffset);
+
+				reinterpret_cast<asCScriptEngine*>(engine)->CallObjectMethod(ptr, engine, CastToObjectType(prop->type.GetTypeInfo())->beh.gcReleaseAllReferences);
 			}
 		}
 		else if (prop->type.IsFuncdef())

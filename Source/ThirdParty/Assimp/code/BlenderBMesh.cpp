@@ -52,7 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Assimp
 {
-    template< > const std::string LogFunctions< BlenderBMeshConverter >::log_prefix = "BLEND_BMESH: ";
+    template< > const char* LogFunctions< BlenderBMeshConverter >::Prefix()
+    {
+        static auto prefix = "BLEND_BMESH: ";
+        return prefix;
+    }
 }
 
 using namespace Assimp;
@@ -180,7 +184,7 @@ void BlenderBMeshConverter::AddFace( int v1, int v2, int v3, int v4 )
     // TODO - Work out how materials work
     face.mat_nr = 0;
     triMesh->mface.push_back( face );
-    triMesh->totface = triMesh->mface.size( );
+    triMesh->totface = static_cast<int>(triMesh->mface.size( ));
 }
 
 // ------------------------------------------------------------------------------------------------

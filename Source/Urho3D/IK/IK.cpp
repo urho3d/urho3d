@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ const char* IK_CATEGORY = "Inverse Kinematics";
 // ----------------------------------------------------------------------------
 void RegisterIKLibrary(Context* context)
 {
-    IKConstraint::RegisterObject(context);
+    //IKConstraint::RegisterObject(context);
     IKEffector::RegisterObject(context);
     IKSolver::RegisterObject(context);
 }

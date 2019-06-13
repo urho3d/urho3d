@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -105,7 +105,7 @@ public:
 
 	// Properties
 	asUINT      GetPropertyCount() const { return 0; }
-	int         GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, bool *isProtected, int *offset, bool *isReference, asDWORD *accessMask) const;
+	int         GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, bool *isProtected, int *offset, bool *isReference, asDWORD *accessMask, int *compositeOffset, bool *isCompositeIndirect) const;
 	const char *GetPropertyDeclaration(asUINT index, bool includeNamespace = false) const { UNUSED_VAR(index); UNUSED_VAR(includeNamespace); return 0; }
 
 	// Behaviours
@@ -176,6 +176,7 @@ protected:
 	friend class asCScriptEngine;
 	friend class asCConfigGroup;
 	friend class asCModule;
+	friend class asCObjectType;
 	asCTypeInfo();
 
 	mutable asCAtomic externalRefCount;

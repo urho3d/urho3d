@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Container/FlagSet.h"
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
@@ -73,19 +74,13 @@ struct TouchState
 /// %Input state for a joystick.
 struct JoystickState
 {
-    /// Construct with defaults.
-    JoystickState() :
-        joystick_(0), controller_(0), screenJoystick_(0)
-    {
-    }
-
     /// Initialize the number of buttons, axes and hats and set them to neutral state.
     void Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats);
     /// Reset button, axis and hat states to neutral.
     void Reset();
 
     /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
-    bool IsController() const { return controller_ != 0; }
+    bool IsController() const { return controller_ != nullptr; }
 
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
@@ -109,13 +104,13 @@ struct JoystickState
     int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
 
     /// SDL joystick.
-    SDL_Joystick* joystick_;
+    SDL_Joystick* joystick_{};
     /// SDL joystick instance ID.
-    SDL_JoystickID joystickID_;
+    SDL_JoystickID joystickID_{};
     /// SDL game controller.
-    SDL_GameController* controller_;
+    SDL_GameController* controller_{};
     /// UI element containing the screen joystick.
-    UIElement* screenJoystick_;
+    UIElement* screenJoystick_{};
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -143,9 +138,9 @@ class URHO3D_API Input : public Object
 
 public:
     /// Construct.
-    Input(Context* context);
+    explicit Input(Context* context);
     /// Destruct.
-    virtual ~Input();
+    ~Input() override;
 
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
@@ -187,7 +182,7 @@ public:
      *
      *  This method should only be called in main thread.
      */
-    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = nullptr, XMLFile* styleFile = nullptr);
     /// Remove screen joystick by instance ID.
     /** Return true if successful.
      *
@@ -218,35 +213,35 @@ public:
     void CenterMousePosition();
 
     /// Return keycode from key name.
-    int GetKeyFromName(const String& name) const;
+    Key GetKeyFromName(const String& name) const;
     /// Return keycode from scancode.
-    int GetKeyFromScancode(int scancode) const;
+    Key GetKeyFromScancode(Scancode scancode) const;
     /// Return name of key from keycode.
-    String GetKeyName(int key) const;
+    String GetKeyName(Key key) const;
     /// Return scancode from keycode.
-    int GetScancodeFromKey(int key) const;
+    Scancode GetScancodeFromKey(Key key) const;
     /// Return scancode from key name.
-    int GetScancodeFromName(const String& name) const;
+    Scancode GetScancodeFromName(const String& name) const;
     /// Return name of key from scancode.
-    String GetScancodeName(int scancode) const;
+    String GetScancodeName(Scancode scancode) const;
     /// Check if a key is held down.
-    bool GetKeyDown(int key) const;
+    bool GetKeyDown(Key key) const;
     /// Check if a key has been pressed on this frame.
-    bool GetKeyPress(int key) const;
+    bool GetKeyPress(Key key) const;
     /// Check if a key is held down by scancode.
-    bool GetScancodeDown(int scancode) const;
+    bool GetScancodeDown(Scancode scancode) const;
     /// Check if a key has been pressed on this frame by scancode.
-    bool GetScancodePress(int scancode) const;
+    bool GetScancodePress(Scancode scancode) const;
     /// Check if a mouse button is held down.
-    bool GetMouseButtonDown(int button) const;
+    bool GetMouseButtonDown(MouseButtonFlags button) const;
     /// Check if a mouse button has been pressed on this frame.
-    bool GetMouseButtonPress(int button) const;
+    bool GetMouseButtonPress(MouseButtonFlags button) const;
     /// Check if a qualifier key is held down.
-    bool GetQualifierDown(int qualifier) const;
+    bool GetQualifierDown(Qualifier qualifier) const;
     /// Check if a qualifier key has been pressed on this frame.
-    bool GetQualifierPress(int qualifier) const;
+    bool GetQualifierPress(Qualifier qualifier) const;
     /// Return the currently held down qualifiers.
-    int GetQualifiers() const;
+    QualifierFlags GetQualifiers() const;
     /// Return mouse position within window. Should only be used with a visible mouse cursor. Uses the backbuffer (Graphics width/height) coordinates.
     IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
@@ -329,9 +324,9 @@ private:
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
-    void SetMouseButton(int button, bool newState);
+    void SetMouseButton(MouseButton button, bool newState);
     /// Handle a key change.
-    void SetKey(int key, int scancode, bool newState);
+    void SetKey(Key key, Scancode scancode, bool newState);
     /// Handle mouse wheel change.
     void SetMouseWheel(int delta);
     /// Suppress next mouse movement.
@@ -384,9 +379,9 @@ private:
     /// Opened joysticks.
     HashMap<SDL_JoystickID, JoystickState> joysticks_;
     /// Mouse buttons' down state.
-    unsigned mouseButtonDown_;
+    MouseButtonFlags mouseButtonDown_;
     /// Mouse buttons' pressed state.
-    unsigned mouseButtonPress_;
+    MouseButtonFlags mouseButtonPress_;
     /// Last mouse position for calculating movement.
     IntVector2 lastMousePosition_;
     /// Last mouse position before being set to not visible.

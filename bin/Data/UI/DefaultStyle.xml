@@ -107,7 +107,7 @@
         <attribute name="Hover Image Offset" value="0 16" />    <!-- Background color of the hover image IS the hover color of LineEdit -->
         <element type="Text" internal="true">
             <attribute name="Color" value="0.9 1 0.9 1" />
-            <attribute name="Selection Color" value="0.3 0.4 0.7 1" />
+            <attribute name="Selection Color" value="0.3 0.4 0.32 1" />
             <attribute name="Vert Alignment" value="Center" />
         </element>
         <element type="BorderImage" internal="true">
@@ -209,8 +209,8 @@
     </element>
     <element type="DialogWindow" style="Window" auto="false">
         <attribute name="Is Movable" value="true" />
-        <attribute name="Modal Shade Color" value="0.3 0.4 0.7 0.4" />
-        <attribute name="Modal Frame Color" value="0.3 0.4 0.7" />
+        <attribute name="Modal Shade Color" value="0.04 0.07 0.03 0.23" />
+        <attribute name="Modal Frame Color" value="0.4 0.7 0.3 0.7" />
         <attribute name="Modal Frame Size" value="2 2" />
     </element>
     <element type="ListRow">
@@ -249,8 +249,8 @@
         <attribute name="Layout Border" value="4 4 4 4" />
     </element>
     <element type="ConsoleText" style="Text" auto="false">
-        <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
-        <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
+        <attribute name="Hover Color" value="0.3 0.4 0.32 1" />
+        <attribute name="Selection Color" value="0.23 0.3 0.27 1" />
     </element>
     <element type="ConsoleErrorText" style="ConsoleText" auto="false">
         <attribute name="Color" value="1 0 0 1" />
@@ -268,7 +268,7 @@
         <attribute name="Min Size" value="0 17" />
         <attribute name="Max Size" value="2147483647 17" />
         <element type="Text" internal="true">
-            <attribute name="Selection Color" value="0.3 0.4 0.7 0.75" />
+            <attribute name="Selection Color" value="0.3 0.4 0.32 1" />
         </element>
     </element>
     <element type="FileSelector" style="DialogWindow" auto="false">
@@ -298,8 +298,8 @@
     </element>
     <element type="FileSelectorFilterText" style="Text" auto="false">
         <attribute name="Is Enabled" value="true" />
-        <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
-        <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
+        <attribute name="Selection Color" value="0.23 0.3 0.27 1" />
+        <attribute name="Hover Color" value="0.3 0.4 0.32 1" />
     </element>
     <element type="FileSelectorLayout" auto="false">
         <attribute name="Min Size" value="0 17" />
@@ -307,8 +307,8 @@
         <attribute name="Layout Spacing" value="4" />
     </element>
     <element type="FileSelectorListText" style="Text" auto="false">
-        <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
-        <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
+        <attribute name="Hover Color" value="0.3 0.4 0.32 1" />
+        <attribute name="Selection Color" value="0.23 0.3 0.27 1" />
     </element>
     <element type="FileSelectorTitleText" style="Text" auto="false" />
     <element type="EditorDivider" style="BorderImage" auto="false">
@@ -341,8 +341,8 @@
     </element>
     <element type="EditorEnumAttributeText" style="EditorAttributeText" auto="false">
         <attribute name="Is Enabled" value="true" />
-        <attribute name="Selection Color" value="0.2 0.225 0.35 1" />
-        <attribute name="Hover Color" value="0.3 0.4 0.7 1" />
+        <attribute name="Selection Color" value="0.23 0.3 0.27 1" />
+        <attribute name="Hover Color" value="0.3 0.4 0.32 1" />
     </element>
     <element type="EditorToolBar" style="BorderImage">
         <attribute name="Image Rect" value="48 0 64 16" />

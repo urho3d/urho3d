@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -70,12 +70,14 @@ Blit1to1(SDL_BlitInfo * info)
 }
 
 /* This is now endian dependent */
-#if ( SDL_BYTEORDER == SDL_LIL_ENDIAN )
-#define HI	1
-#define LO	0
-#else /* ( SDL_BYTEORDER == SDL_BIG_ENDIAN ) */
-#define HI	0
-#define LO	1
+#ifndef USE_DUFFS_LOOP
+# if ( SDL_BYTEORDER == SDL_LIL_ENDIAN )
+#  define HI	1
+#  define LO	0
+# else /* ( SDL_BYTEORDER == SDL_BIG_ENDIAN ) */
+#  define HI	0
+#  define LO	1
+# endif
 #endif
 static void
 Blit1to2(SDL_BlitInfo * info)

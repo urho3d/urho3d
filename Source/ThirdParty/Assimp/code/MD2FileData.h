@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -45,17 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MD2FILEHELPER_H_INC
 #define AI_MD2FILEHELPER_H_INC
 
-#include "../include/assimp/types.h"
-#include "../include/assimp/mesh.h"
-#include "../include/assimp/anim.h"
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
+#include <assimp/types.h>
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
 
-#include "./../include/assimp/Compiler/pushpack1.h"
+#include <assimp/Compiler/pushpack1.h>
 
 namespace Assimp    {
 namespace MD2   {
@@ -152,7 +146,7 @@ struct Skin
     char name[AI_MD2_MAXQPATH];              /* texture file name */
 } PACK_STRUCT;
 
-#include "./../include/assimp/Compiler/poppack1.h"
+#include <assimp/Compiler/poppack1.h>
 
 
 // ---------------------------------------------------------------------------

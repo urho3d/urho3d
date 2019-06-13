@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,36 +35,40 @@ class URHO3D_API FontFaceFreeType : public FontFace
 {
 public:
     /// Construct.
-    FontFaceFreeType(Font* font);
+    explicit FontFaceFreeType(Font* font);
     /// Destruct.
-    ~FontFaceFreeType();
+    ~FontFaceFreeType() override;
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) override;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    virtual const FontGlyph* GetGlyph(unsigned c);
+    const FontGlyph* GetGlyph(unsigned c) override;
 
     /// Return if font face uses mutable glyphs.
-    virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
+    bool HasMutableGlyphs() const override { return hasMutableGlyph_; }
 
 private:
-    /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
-    bool LoadCharGlyph(unsigned charCode, Image* image = 0);
+    bool LoadCharGlyph(unsigned charCode, Image* image = nullptr);
+    /// Smooth one row of a horizontally oversampled glyph image.
+    void BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize);
 
     /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
     /// FreeType face. Non-null after creation only in dynamic mode.
-    void* face_;
+    void* face_{};
     /// Load mode.
-    int loadMode_;
+    int loadMode_{};
+    /// Use subpixel glyph positioning?
+    bool subpixel_{};
+    /// Oversampling level.
+    int oversampling_{};
     /// Ascender.
-    int ascender_;
+    float ascender_{};
     /// Has mutable glyph.
-    bool hasMutableGlyph_;
+    bool hasMutableGlyph_{};
     /// Glyph area allocator.
     AreaAllocator allocator_;
 };

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -98,6 +98,7 @@ void asCObjectType::DestroyInternal()
 	}
 
 	// Release the object types held by the templateSubTypes
+	bool isTemplateInstance = templateSubTypes.GetLength() > 0;
 	for( asUINT subtypeIndex = 0; subtypeIndex < templateSubTypes.GetLength(); subtypeIndex++ )
 	{
 		if( templateSubTypes[subtypeIndex].GetTypeInfo() )
@@ -108,8 +109,24 @@ void asCObjectType::DestroyInternal()
 	// Clear the child types
 	for (asUINT n = 0; n < childFuncDefs.GetLength(); n++)
 	{
-		if( childFuncDefs[n] )
-			childFuncDefs[n]->parentClass = 0;
+		asCFuncdefType *func = childFuncDefs[n];
+		if (func)
+		{
+			func->parentClass = 0;
+			if (isTemplateInstance)
+			{
+				// Any child funcdefs that have been created as part of the template 
+				// instantiation must be destroyed too
+				// TODO: Before destroying the funcdef, make sure no external references to it is held
+				if (func->externalRefCount.get() == 0)
+				{
+					func->DestroyInternal();
+					engine->RemoveFuncdef(func);
+					func->module = 0;
+					func->ReleaseInternal();
+				}
+			}
+		}
 	}
 	childFuncDefs.SetLength(0);
 
@@ -320,7 +337,7 @@ asUINT asCObjectType::GetPropertyCount() const
 }
 
 // interface
-int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask) const
+int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask, int *out_compositeOffset, bool *out_isCompositeIndirect) const
 {
 	if( index >= properties.GetLength() )
 		return asINVALID_ARG;
@@ -340,6 +357,10 @@ int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typ
 		*out_isReference = prop->type.IsReference();
 	if( out_accessMask )
 		*out_accessMask = prop->accessMask;
+	if (out_compositeOffset)
+		*out_compositeOffset = prop->compositeOffset;
+	if (out_isCompositeIndirect)
+		*out_isCompositeIndirect = prop->isCompositeIndirect;
 
 	return 0;
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_config_psp_h
-#define _SDL_config_psp_h
+#ifndef SDL_config_psp_h_
+#define SDL_config_psp_h_
+#define SDL_config_h_
 
 #include "SDL_platform.h"
 
@@ -32,16 +33,17 @@
 
 #define HAVE_GCC_ATOMICS    1
 
-#define HAVE_ALLOCA_H       1
-#define HAVE_SYS_TYPES_H    1
-#define HAVE_STDIO_H    1
 #define STDC_HEADERS    1
-#define HAVE_STRING_H   1
-#define HAVE_INTTYPES_H 1
-#define HAVE_STDINT_H   1
+#define HAVE_ALLOCA_H       1
 #define HAVE_CTYPE_H    1
+#define HAVE_INTTYPES_H 1
+#define HAVE_LIMITS_H   1
 #define HAVE_MATH_H 1
 #define HAVE_SIGNAL_H   1
+#define HAVE_STDINT_H   1
+#define HAVE_STDIO_H    1
+#define HAVE_STRING_H   1
+#define HAVE_SYS_TYPES_H    1
 
 /* C library functions */
 #define HAVE_MALLOC 1
@@ -64,7 +66,6 @@
 #define HAVE_STRLEN 1
 #define HAVE_STRLCPY    1
 #define HAVE_STRLCAT    1
-#define HAVE_STRDUP 1
 #define HAVE_STRCHR 1
 #define HAVE_STRRCHR    1
 #define HAVE_STRSTR 1
@@ -140,4 +141,4 @@
 #define SDL_LOADSO_DISABLED    1
 
 
-#endif /* _SDL_config_psp_h */
+#endif /* SDL_config_psp_h_ */

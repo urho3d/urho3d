@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ class VertexBuffer;
 struct VertexBufferMorph
 {
     /// Vertex elements.
-    unsigned elementMask_;
+    VertexMaskFlags elementMask_;
     /// Number of vertices.
     unsigned vertexCount_;
     /// Morphed vertices data size as bytes.
@@ -105,24 +105,24 @@ struct GeometryDesc
 };
 
 /// 3D model resource.
-class URHO3D_API Model : public Resource
+class URHO3D_API Model : public ResourceWithMetadata
 {
-    URHO3D_OBJECT(Model, Resource);
+    URHO3D_OBJECT(Model, ResourceWithMetadata);
 
 public:
     /// Construct.
-    Model(Context* context);
+    explicit Model(Context* context);
     /// Destruct.
-    virtual ~Model();
+    ~Model() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    bool EndLoad() override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    bool Save(Serializer& dest) const override;
 
     /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
@@ -142,7 +142,7 @@ public:
     /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
     /// Set bone mappings when model has more bones than the skinning shader can handle.
-    void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
+    void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& geometryBoneMappings);
     /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
     /// Clone the model. The geometry data is deep-copied and can be modified in the clone without affecting the original.

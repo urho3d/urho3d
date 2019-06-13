@@ -3,7 +3,8 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 
 All rights reserved.
 
@@ -47,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "Bitmap.h"
-#include "../include/assimp/texture.h"
-#include "../include/assimp/IOStream.hpp"
+#include <assimp/texture.h>
+#include <assimp/IOStream.hpp>
 #include "ByteSwapper.h"
 
 namespace Assimp {
@@ -84,7 +85,12 @@ namespace Assimp {
 
     template<typename T>
     inline std::size_t Copy(uint8_t* data, T& field) {
+#ifdef AI_BUILD_BIG_ENDIAN
+        T field_swapped=AI_BE(field);
+        std::memcpy(data, &field_swapped, sizeof(field)); return sizeof(field);
+#else
         std::memcpy(data, &AI_BE(field), sizeof(field)); return sizeof(field);
+#endif
     }
 
     void Bitmap::WriteHeader(Header& header, IOStream* file) {
@@ -96,7 +102,7 @@ namespace Assimp {
         offset += Copy(&data[offset], header.size);
         offset += Copy(&data[offset], header.reserved1);
         offset += Copy(&data[offset], header.reserved2);
-        offset += Copy(&data[offset], header.offset);
+                  Copy(&data[offset], header.offset);
 
         file->Write(data, Header::header_size, 1);
     }
@@ -116,7 +122,7 @@ namespace Assimp {
         offset += Copy(&data[offset], dib.x_resolution);
         offset += Copy(&data[offset], dib.y_resolution);
         offset += Copy(&data[offset], dib.nb_colors);
-        offset += Copy(&data[offset], dib.nb_important_colors);
+                  Copy(&data[offset], dib.nb_important_colors);
 
         file->Write(data, DIB::dib_size, 1);
     }

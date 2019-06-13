@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_mirdyn_h
-#define _SDL_mirdyn_h
+#ifndef SDL_mirdyn_h_
+#define SDL_mirdyn_h_
 
 #include "../../SDL_internal.h"
 
@@ -48,6 +48,6 @@ void SDL_MIR_UnloadSymbols(void);
 }
 #endif
 
-#endif /* !defined _SDL_mirdyn_h */
+#endif /* !defined SDL_mirdyn_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

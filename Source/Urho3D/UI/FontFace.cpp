@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,6 @@
 namespace Urho3D
 {
 
-FontGlyph::FontGlyph() :
-    page_(M_MAX_UNSIGNED),
-    used_(false)
-{
-}
-
 FontFace::FontFace(Font* font) :
     font_(font)
 {
@@ -67,10 +61,10 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
         return &glyph;
     }
     else
-        return 0;
+        return nullptr;
 }
 
-short FontFace::GetKerning(unsigned c, unsigned d) const
+float FontFace::GetKerning(unsigned c, unsigned d) const
 {
     if (kerningMapping_.Empty())
         return 0;
@@ -81,9 +75,9 @@ short FontFace::GetKerning(unsigned c, unsigned d) const
     if (c > 0xffff || d > 0xffff)
         return 0;
 
-    unsigned value = (c << 16) + d;
+    unsigned value = (c << 16u) + d;
 
-    HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Find(value);
+    HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Find(value);
     if (i != kerningMapping_.End())
         return i->second_;
 
@@ -112,7 +106,7 @@ SharedPtr<Texture2D> FontFace::CreateFaceTexture()
     return texture;
 }
 
-SharedPtr<Texture2D> FontFace::LoadFaceTexture(SharedPtr<Image> image)
+SharedPtr<Texture2D> FontFace::LoadFaceTexture(const SharedPtr<Image>& image)
 {
     SharedPtr<Texture2D> texture = CreateFaceTexture();
     if (!texture->SetData(image, true))

@@ -1200,7 +1200,8 @@ ResourcePicker@ GetResourcePicker(StringHash resourceType)
 {
     for (uint i = 0; i < resourcePickers.length; ++i)
     {
-        if (resourcePickers[i].type == resourceType)
+        // TODO: refactor to use dictionary instead
+        if (resourceType == resourcePickers[i].type)
             return resourcePickers[i];
     }
     return null;
@@ -1516,9 +1517,9 @@ void InitVectorStructs()
             for (uint attributeIndex = 0; attributeIndex < attributes.length; attributeIndex++)
             {
                 AttributeInfo attribute = attributes[attributeIndex];
-                if (attribute.type == VAR_VARIANTVECTOR and attribute.variantStructureElementNames.length > 0)
+                if (attribute.type == VAR_VARIANTVECTOR and attribute.metadata.Contains("VectorStructElements"))
                 {
-                    Array<String> elementsNames = attribute.variantStructureElementNames;
+                    Array<String>@ elementsNames = attribute.metadata["VectorStructElements"].GetStringVector();
                     vectorStructs.Push(VectorStruct(objectName, attribute.name, elementsNames, 1));
                 }
             }

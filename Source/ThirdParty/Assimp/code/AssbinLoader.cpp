@@ -3,7 +3,8 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 
 All rights reserved.
 
@@ -51,15 +52,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssbinLoader.h"
 #include "assbin_chunks.h"
 #include "MemoryIOWrapper.h"
-#include "../include/assimp/mesh.h"
-#include "../include/assimp/anim.h"
-#include "../include/assimp/scene.h"
-#include <boost/static_assert.hpp>
+#include <assimp/mesh.h>
+#include <assimp/anim.h>
+#include <assimp/scene.h>
+#include <assimp/importerdesc.h>
 
 #ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #   include <zlib.h>
 #else
-#   include "../contrib/zlib/zlib.h"
+#   include <contrib/zlib/zlib.h>
 #endif
 
 using namespace Assimp;
@@ -197,9 +198,9 @@ template <typename T> void ReadBounds( IOStream * stream, T* /*p*/, unsigned int
     stream->Seek( sizeof(T) * n, aiOrigin_CUR );
 }
 
-void AssbinImporter::ReadBinaryNode( IOStream * stream, aiNode** node )
-{
+void AssbinImporter::ReadBinaryNode( IOStream * stream, aiNode** node, aiNode* parent ) {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AINODE);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -209,29 +210,72 @@ void AssbinImporter::ReadBinaryNode( IOStream * stream, aiNode** node )
     (*node)->mTransformation = Read<aiMatrix4x4>(stream);
     (*node)->mNumChildren = Read<unsigned int>(stream);
     (*node)->mNumMeshes = Read<unsigned int>(stream);
+	unsigned int nb_metadata = Read<unsigned int>(stream);
 
-    if ((*node)->mNumMeshes)
-    {
+    if(parent) {
+        (*node)->mParent = parent;
+    }
+
+    if ((*node)->mNumMeshes) {
         (*node)->mMeshes = new unsigned int[(*node)->mNumMeshes];
         for (unsigned int i = 0; i < (*node)->mNumMeshes; ++i) {
             (*node)->mMeshes[i] = Read<unsigned int>(stream);
         }
     }
 
-    if ((*node)->mNumChildren)
-    {
+    if ((*node)->mNumChildren) {
         (*node)->mChildren = new aiNode*[(*node)->mNumChildren];
         for (unsigned int i = 0; i < (*node)->mNumChildren; ++i) {
-            ReadBinaryNode( stream, &(*node)->mChildren[i] );
+            ReadBinaryNode( stream, &(*node)->mChildren[i], *node );
         }
     }
 
+    if ( nb_metadata > 0 ) {
+        (*node)->mMetaData = aiMetadata::Alloc(nb_metadata);
+        for (unsigned int i = 0; i < nb_metadata; ++i) {
+            (*node)->mMetaData->mKeys[i] = Read<aiString>(stream);
+            (*node)->mMetaData->mValues[i].mType = (aiMetadataType) Read<uint16_t>(stream);
+            void* data( nullptr );
+
+            switch ((*node)->mMetaData->mValues[i].mType) {
+                case AI_BOOL:
+                    data = new bool(Read<bool>(stream));
+                    break;
+                case AI_INT32:
+                    data = new int32_t(Read<int32_t>(stream));
+                    break;
+                case AI_UINT64:
+                    data = new uint64_t(Read<uint64_t>(stream));
+                    break;
+                case AI_FLOAT:
+                    data = new float(Read<float>(stream));
+                    break;
+                case AI_DOUBLE:
+                    data = new double(Read<double>(stream));
+                    break;
+                case AI_AISTRING:
+                    data = new aiString(Read<aiString>(stream));
+                    break;
+                case AI_AIVECTOR3D:
+                    data = new aiVector3D(Read<aiVector3D>(stream));
+                    break;
+#ifndef SWIG
+                case FORCE_32BIT:
+#endif // SWIG
+                default:
+                    break;
+            }
+
+			(*node)->mMetaData->mValues[i].mData = data;
+		}
+	}
 }
 
 // -----------------------------------------------------------------------------------
 void AssbinImporter::ReadBinaryBone( IOStream * stream, aiBone* b )
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AIBONE);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -256,6 +300,7 @@ void AssbinImporter::ReadBinaryBone( IOStream * stream, aiBone* b )
 void AssbinImporter::ReadBinaryMesh( IOStream * stream, aiMesh* mesh )
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AIMESH);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -351,7 +396,7 @@ void AssbinImporter::ReadBinaryMesh( IOStream * stream, aiMesh* mesh )
         for (unsigned int i = 0; i < mesh->mNumFaces;++i) {
             aiFace& f = mesh->mFaces[i];
 
-            BOOST_STATIC_ASSERT(AI_MAX_FACE_INDICES <= 0xffff);
+            static_assert(AI_MAX_FACE_INDICES <= 0xffff, "AI_MAX_FACE_INDICES <= 0xffff");
             f.mNumIndices = Read<uint16_t>(stream);
             f.mIndices = new unsigned int[f.mNumIndices];
 
@@ -381,6 +426,7 @@ void AssbinImporter::ReadBinaryMesh( IOStream * stream, aiMesh* mesh )
 void AssbinImporter::ReadBinaryMaterialProperty(IOStream * stream, aiMaterialProperty* prop)
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AIMATERIALPROPERTY);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -398,6 +444,7 @@ void AssbinImporter::ReadBinaryMaterialProperty(IOStream * stream, aiMaterialPro
 void AssbinImporter::ReadBinaryMaterial(IOStream * stream, aiMaterial* mat)
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AIMATERIAL);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -420,6 +467,7 @@ void AssbinImporter::ReadBinaryMaterial(IOStream * stream, aiMaterial* mat)
 void AssbinImporter::ReadBinaryNodeAnim(IOStream * stream, aiNodeAnim* nd)
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AINODEANIM);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -469,6 +517,7 @@ void AssbinImporter::ReadBinaryNodeAnim(IOStream * stream, aiNodeAnim* nd)
 void AssbinImporter::ReadBinaryAnim( IOStream * stream, aiAnimation* anim )
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AIANIMATION);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -490,6 +539,7 @@ void AssbinImporter::ReadBinaryAnim( IOStream * stream, aiAnimation* anim )
 void AssbinImporter::ReadBinaryTexture(IOStream * stream, aiTexture* tex)
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AITEXTURE);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -514,6 +564,7 @@ void AssbinImporter::ReadBinaryTexture(IOStream * stream, aiTexture* tex)
 void AssbinImporter::ReadBinaryLight( IOStream * stream, aiLight* l )
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AILIGHT);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -541,6 +592,7 @@ void AssbinImporter::ReadBinaryLight( IOStream * stream, aiLight* l )
 void AssbinImporter::ReadBinaryCamera( IOStream * stream, aiCamera* cam )
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AICAMERA);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -557,6 +609,7 @@ void AssbinImporter::ReadBinaryCamera( IOStream * stream, aiCamera* cam )
 void AssbinImporter::ReadBinaryScene( IOStream * stream, aiScene* scene )
 {
     uint32_t chunkID = Read<uint32_t>(stream);
+    (void)(chunkID);
     ai_assert(chunkID == ASSBIN_CHUNK_AISCENE);
     /*uint32_t size =*/ Read<uint32_t>(stream);
 
@@ -570,7 +623,7 @@ void AssbinImporter::ReadBinaryScene( IOStream * stream, aiScene* scene )
 
     // Read node graph
     scene->mRootNode = new aiNode[1];
-    ReadBinaryNode( stream, &scene->mRootNode );
+    ReadBinaryNode( stream, &scene->mRootNode, (aiNode*)NULL );
 
     // Read all meshes
     if (scene->mNumMeshes)
@@ -660,7 +713,7 @@ void AssbinImporter::InternReadFile( const std::string& pFile, aiScene* pScene, 
     if (compressed)
     {
         uLongf uncompressedSize = Read<uint32_t>(stream);
-        uLongf compressedSize = stream->FileSize() - stream->Tell();
+        uLongf compressedSize = static_cast<uLongf>(stream->FileSize() - stream->Tell());
 
         unsigned char * compressedData = new unsigned char[ compressedSize ];
         stream->Read( compressedData, 1, compressedSize );

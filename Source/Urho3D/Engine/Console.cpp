@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ Console::Console(Context* context) :
     historyOrAutoCompleteChange_(false),
     printing_(false)
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
 
     // By default prevent the automatic showing of the screen keyboard
@@ -138,8 +138,8 @@ void Console::SetDefaultStyle(XMLFile* style)
 
 void Console::SetVisible(bool enable)
 {
-    Input* input = GetSubsystem<Input>();
-    UI* ui = GetSubsystem<UI>();
+    auto* input = GetSubsystem<Input>();
+    auto* ui = GetSubsystem<UI>();
     Cursor* cursor = ui->GetCursor();
 
     background_->SetVisible(enable);
@@ -206,7 +206,7 @@ void Console::SetNumBufferedRows(unsigned rows)
         // We have less, add more rows at the top
         for (int i = 0; i > delta; --i)
         {
-            Text* text = new Text(context_);
+            auto* text = new Text(context_);
             // If style is already set, apply here to ensure proper height of the console when
             // amount of rows is changed
             if (background_->GetDefaultStyle())
@@ -328,7 +328,7 @@ bool Console::PopulateInterpreter()
         const String& name = names[i];
         if (name == commandInterpreter_)
             selection = i;
-        Text* text = new Text(context_);
+        auto* text = new Text(context_);
         text->SetStyle("ConsoleText");
         text->SetText(name);
         interpreters_->AddItem(text);
@@ -376,14 +376,9 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
-#if URHO3D_CXX11
-        SendEvent(E_CONSOLECOMMAND, P_COMMAND, line, P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
-#else
-        VariantMap& newEventData = GetEventDataMap();
-        newEventData[P_COMMAND] = line;
-        newEventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
-        SendEvent(E_CONSOLECOMMAND, newEventData);
-#endif
+        SendEvent(E_CONSOLECOMMAND,
+            P_COMMAND, line,
+            P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
 
         // Make sure the line isn't the same as the last one
         if (history_.Empty() || line != history_.Back())
@@ -440,7 +435,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
                 historyPosition_ = history_.Size();
             }
         }
-        
+
         // If no more auto complete options and history options left
         if (autoCompletePosition_ == autoComplete_.Size() && historyPosition_ > 0)
         {
@@ -554,7 +549,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     // Ensure UI-elements are not detached
     if (!background_->GetParent())
     {
-        UI* ui = GetSubsystem<UI>();
+        auto* ui = GetSubsystem<UI>();
         UIElement* uiRoot = ui->GetRoot();
         uiRoot->AddChild(background_);
         uiRoot->AddChild(closeButton_);
@@ -566,13 +561,13 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
 
-    Text* text = 0;
+    Text* text = nullptr;
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
         rowContainer_->RemoveItem((unsigned)0);
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
-        
+
         // Highlight console messages based on their type
         text->SetStyle(logStyles[pendingRows_[i].first_]);
 

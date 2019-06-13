@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,17 @@ static void Print(int value, bool error)
     Log::WriteRaw(String(value) + "\n", error);
 }
 
+static void Print(long long value, bool error)
+{
+    Log::WriteRaw(String(value) + "\n", error);
+}
+
 static void Print(unsigned value, bool error)
+{
+    Log::WriteRaw(String(value) + "\n", error);
+}
+
+static void Print(unsigned long long value, bool error)
 {
     Log::WriteRaw(String(value) + "\n", error);
 }
@@ -88,6 +98,11 @@ static void LogWrite(const String& str, bool error, Log* ptr)
     Log::WriteRaw(str + "\n", error);
 }
 
+static void LogTrace(const String& str, Log* ptr)
+{
+    Log::Write(LOG_TRACE, str);
+}
+
 static void LogDebug(const String& str, Log* ptr)
 {
     Log::Write(LOG_DEBUG, str);
@@ -112,12 +127,15 @@ static void LogError(const String& str, Log* ptr)
 
 static void Print(const String& value, bool error) { }
 static void Print(int value, bool error) { }
+static void Print(long long value, bool error) { }
 static void Print(unsigned value, bool error) { }
+static void Print(unsigned long long value, bool error) { }
 static void Print(float value, bool error) { }
 static void Print(bool value, bool error) { }
 static void Print(const Variant& value, bool error) { }
 static void PrintCallStack(bool error) { }
 static void LogWrite(const String& str, bool error, Log* ptr) { }
+static void LogTrace(const String& str, Log* ptr) { }
 static void LogDebug(const String& str, Log* ptr) { }
 static void LogInfo(const String& str, Log* ptr) { }
 static void LogWarning(const String& str, Log* ptr) { }
@@ -127,6 +145,7 @@ static void LogError(const String& str, Log* ptr) { }
 
 static void RegisterLog(asIScriptEngine* engine)
 {
+    engine->RegisterGlobalProperty("const int LOG_TRACE", (void*)&LOG_TRACE);
     engine->RegisterGlobalProperty("const int LOG_DEBUG", (void*)&LOG_DEBUG);
     engine->RegisterGlobalProperty("const int LOG_INFO", (void*)&LOG_INFO);
     engine->RegisterGlobalProperty("const int LOG_WARNING", (void*)&LOG_WARNING);
@@ -137,6 +156,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "void Open(const String&in)", asMETHOD(Log, Open), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void Close()", asMETHOD(Log, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Trace(const String&in)", asFUNCTION(LogTrace), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Warning(const String&in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);
@@ -153,7 +173,9 @@ static void RegisterLog(asIScriptEngine* engine)
     // Register also Print() functions for convenience
     engine->RegisterGlobalFunction("void Print(const String&in, bool error = false)", asFUNCTIONPR(Print, (const String&, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int, bool error = false)", asFUNCTIONPR(Print, (int, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(int64, bool error = false)", asFUNCTIONPR(Print, (long long, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(uint, bool error = false)", asFUNCTIONPR(Print, (unsigned, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(uint64, bool error = false)", asFUNCTIONPR(Print, (unsigned long long, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(float, bool error = false)", asFUNCTIONPR(Print, (float, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool, bool error = false)", asFUNCTIONPR(Print, (bool, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(const Variant&in, bool error = false)", asFUNCTIONPR(Print, (const Variant&, bool), void), asCALL_CDECL);
@@ -214,7 +236,7 @@ static unsigned char* VectorBufferAt(unsigned index, VectorBuffer* ptr)
     if (index >= ptr->GetSize())
     {
         asGetActiveContext()->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
 
     return ptr->GetModifiableData() + index;
@@ -360,6 +382,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "bool get_executeConsoleCommands() const", asMETHOD(FileSystem, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String get_temporaryDir() const", asMETHOD(FileSystem, GetTemporaryDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
 
     engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);

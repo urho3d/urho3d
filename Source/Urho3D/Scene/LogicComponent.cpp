@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,7 @@ LogicComponent::LogicComponent(Context* context) :
 {
 }
 
-LogicComponent::~LogicComponent()
-{
-}
+LogicComponent::~LogicComponent() = default;
 
 void LogicComponent::OnSetEnabled()
 {
@@ -66,7 +64,7 @@ void LogicComponent::FixedPostUpdate(float timeStep)
 {
 }
 
-void LogicComponent::SetUpdateEventMask(unsigned char mask)
+void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
 {
     if (updateEventMask_ != mask)
     {
@@ -101,7 +99,7 @@ void LogicComponent::OnSceneSet(Scene* scene)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
-        currentEventMask_ = 0;
+        currentEventMask_ = USE_NO_EVENT;
     }
 }
 

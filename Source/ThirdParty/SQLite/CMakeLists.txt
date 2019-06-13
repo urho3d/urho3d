@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,9 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SQLite FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
 
 # Setup additional SQLite CLI standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT WEB)
+if (NOT IOS AND NOT TVOS AND NOT WEB)
     # Define target name for SQLite shell
-    set (TARGET_NAME isql)
+    set (TARGET_NAME sqlite3)
 
     # Define source files
     set (SOURCE_FILES src/shell.c src/sqlite3.c src/sqlite3.h)

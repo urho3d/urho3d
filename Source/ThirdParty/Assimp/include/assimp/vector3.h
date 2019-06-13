@@ -3,7 +3,8 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 
 All rights reserved.
 
@@ -41,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @file vector3.h
  *  @brief 3D vector structure, including operators when compiling in C++
  */
+#pragma once
 #ifndef AI_VECTOR3D_H_INC
 #define AI_VECTOR3D_H_INC
 
@@ -50,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #   include <math.h>
 #endif
 
-#include "./Compiler/pushpack1.h"
+#include "defs.h"
 
 #ifdef __cplusplus
 
@@ -63,11 +65,10 @@ template <typename TReal>
 class aiVector3t
 {
 public:
-
-    aiVector3t () : x(), y(), z() {}
-    aiVector3t (TReal _x, TReal _y, TReal _z) : x(_x), y(_y), z(_z) {}
-    explicit aiVector3t (TReal _xyz) : x(_xyz), y(_xyz), z(_xyz) {}
-    aiVector3t (const aiVector3t& o) : x(o.x), y(o.y), z(o.z) {}
+    aiVector3t() : x(), y(), z() {}
+    aiVector3t(TReal _x, TReal _y, TReal _z) : x(_x), y(_y), z(_z) {}
+    explicit aiVector3t (TReal _xyz ) : x(_xyz), y(_xyz), z(_xyz) {}
+    aiVector3t( const aiVector3t& o ) : x(o.x), y(o.y), z(o.z) {}
 
 public:
 
@@ -96,7 +97,6 @@ public:
     operator aiVector3t<TOther> () const;
 
 public:
-
     /** @brief Set the components of a vector
      *  @param pX X component
      *  @param pY Y component
@@ -107,7 +107,6 @@ public:
      *  @return Square length */
     TReal SquareLength() const;
 
-
     /** @brief Get the length of the vector
      *  @return length */
     TReal Length() const;
@@ -116,6 +115,8 @@ public:
     /** @brief Normalize the vector */
     aiVector3t& Normalize();
 
+    /** @brief Normalize the vector with extra check for zero vectors */
+    aiVector3t& NormalizeSafe();
 
     /** @brief Componentwise multiplication of two vectors
      *
@@ -124,25 +125,20 @@ public:
     const aiVector3t SymMul(const aiVector3t& o);
 
     TReal x, y, z;
-} PACK_STRUCT;
+};
 
 
-typedef aiVector3t<float> aiVector3D;
+typedef aiVector3t<ai_real> aiVector3D;
 
 #else
 
 struct aiVector3D {
-
-    float x,y,z;
-} PACK_STRUCT;
+    ai_real x, y, z;
+};
 
 #endif // __cplusplus
 
-#include "./Compiler/poppack1.h"
-
 #ifdef __cplusplus
-
-
 
 #endif // __cplusplus
 

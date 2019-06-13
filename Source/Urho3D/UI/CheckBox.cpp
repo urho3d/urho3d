@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,7 @@ CheckBox::CheckBox(Context* context) :
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 }
 
-CheckBox::~CheckBox()
-{
-}
+CheckBox::~CheckBox() = default;
 
 void CheckBox::RegisterObject(Context* context)
 {
@@ -76,12 +74,12 @@ void CheckBox::OnClickBegin(const IntVector2& position, const IntVector2& screen
         SetChecked(!checked_);
 }
 
-void CheckBox::OnKey(int key, int buttons, int qualifiers)
+void CheckBox::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     if (HasFocus() && key == KEY_SPACE)
     {
         // Simulate LMB click
-        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr);
     }
 }
 

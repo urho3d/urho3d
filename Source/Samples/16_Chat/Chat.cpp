@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@
 #endif
 
 // Identifier for the chat network messages
-const int MSG_CHAT = 32;
+const int MSG_CHAT = 153;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 
@@ -84,14 +84,14 @@ void Chat::CreateUI()
 {
     SetLogoVisible(false); // We need the full rendering window
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     UIElement* root = GetSubsystem<UI>()->GetRoot();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     // Set style to the UI root so that elements will inherit it
     root->SetDefaultStyle(uiStyle);
 
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
     chatHistoryText_ = root->CreateChild<Text>();
     chatHistoryText_->SetFont(font, 12);
 
@@ -110,10 +110,13 @@ void Chat::CreateUI()
 
     UpdateButtons();
 
-    int rowHeight = chatHistoryText_->GetRowHeight();
+    float rowHeight = chatHistoryText_->GetRowHeight();
     // Row height would be zero if the font failed to load
     if (rowHeight)
-        chatHistory_.Resize((graphics->GetHeight() - 20) / rowHeight);
+    {
+        float numberOfRows = (graphics->GetHeight() - 100) / rowHeight;
+        chatHistory_.Resize(static_cast<unsigned int>(numberOfRows));
+    }
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -140,14 +143,14 @@ void Chat::SubscribeToEvents()
 
 Button* Chat::CreateButton(const String& text, int width)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
 
-    Button* button = buttonContainer_->CreateChild<Button>();
+    auto* button = buttonContainer_->CreateChild<Button>();
     button->SetStyleAuto();
     button->SetFixedWidth(width);
 
-    Text* buttonText = button->CreateChild<Text>();
+    auto* buttonText = button->CreateChild<Text>();
     buttonText->SetFont(font, 12);
     buttonText->SetAlignment(HA_CENTER, VA_CENTER);
     buttonText->SetText(text);
@@ -170,31 +173,31 @@ void Chat::ShowChatText(const String& row)
 
 void Chat::UpdateButtons()
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
     bool serverRunning = network->IsServerRunning();
 
     // Show and hide buttons so that eg. Connect and Disconnect are never shown at the same time
-    sendButton_->SetVisible(serverConnection != 0);
+    sendButton_->SetVisible(serverConnection != nullptr);
     connectButton_->SetVisible(!serverConnection && !serverRunning);
     disconnectButton_->SetVisible(serverConnection || serverRunning);
     startServerButton_->SetVisible(!serverConnection && !serverRunning);
 }
 
-void Chat::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+void Chat::HandleLogMessage(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace LogMessage;
 
     ShowChatText(eventData[P_MESSAGE].GetString());
 }
 
-void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
+void Chat::HandleSend(StringHash /*eventType*/, VariantMap& eventData)
 {
     String text = textEdit_->GetText();
     if (text.Empty())
         return; // Do not send an empty message
 
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
 
     if (serverConnection)
@@ -209,9 +212,9 @@ void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
+void Chat::HandleConnect(StringHash /*eventType*/, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     String address = textEdit_->GetText().Trimmed();
     if (address.Empty())
         address = "localhost"; // Use localhost to connect if nothing else specified
@@ -221,14 +224,14 @@ void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
     // Connect to server, do not specify a client scene as we are not using scene replication, just messages.
     // At connect time we could also send identity parameters (such as username) in a VariantMap, but in this
     // case we skip it for simplicity
-    network->Connect(address, CHAT_SERVER_PORT, 0);
+    network->Connect(address, CHAT_SERVER_PORT, nullptr);
 
     UpdateButtons();
 }
 
-void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
+void Chat::HandleDisconnect(StringHash /*eventType*/, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
     // If we were connected to server, disconnect
     if (serverConnection)
@@ -240,17 +243,17 @@ void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
     UpdateButtons();
 }
 
-void Chat::HandleStartServer(StringHash eventType, VariantMap& eventData)
+void Chat::HandleStartServer(StringHash /*eventType*/, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
     network->StartServer(CHAT_SERVER_PORT);
 
     UpdateButtons();
 }
 
-void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
+void Chat::HandleNetworkMessage(StringHash /*eventType*/, VariantMap& eventData)
 {
-    Network* network = GetSubsystem<Network>();
+    auto* network = GetSubsystem<Network>();
 
     using namespace NetworkMessage;
 
@@ -266,7 +269,7 @@ void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
         // If we are a client, just display the message
         if (network->IsServerRunning())
         {
-            Connection* sender = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+            auto* sender = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
 
             text = sender->ToString() + " " + text;
 
@@ -280,7 +283,7 @@ void Chat::HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Chat::HandleConnectionStatus(StringHash eventType, VariantMap& eventData)
+void Chat::HandleConnectionStatus(StringHash /*eventType*/, VariantMap& eventData)
 {
     UpdateButtons();
 }

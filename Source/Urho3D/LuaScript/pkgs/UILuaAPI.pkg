@@ -1,4 +1,5 @@
 $pfile "UI/UIElement.pkg"
+$pfile "UI/UISelectable.pkg"
 $pfile "UI/BorderImage.pkg"
 $pfile "UI/Button.pkg"
 $pfile "UI/CheckBox.pkg"
@@ -21,6 +22,7 @@ $pfile "UI/ToolTip.pkg"
 $pfile "UI/UI.pkg"
 $pfile "UI/Window.pkg"
 $pfile "UI/View3D.pkg"
+$pfile "UI/UIComponent.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)

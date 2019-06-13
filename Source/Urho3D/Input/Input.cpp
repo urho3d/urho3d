@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,11 @@
 #include "../UI/Text.h"
 #include "../UI/UI.h"
 
+#ifdef _WIN32
+#include "../Engine/Engine.h"
+#endif
+
+
 #include <SDL/SDL.h>
 
 #ifdef __EMSCRIPTEN__
@@ -49,8 +54,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-// TODO: For now, in this particular case only, treat all the ARM on Linux as "desktop" (e.g. RPI, odroid, etc), revisit this again when we support "mobile" ARM on Linux
-#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(__ANDROID__))
+#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS) && !defined(TVOS)) || (defined(__linux__) && !defined(__ANDROID__))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
 
@@ -66,12 +70,12 @@ const StringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 const unsigned TOUCHID_MAX = 32;
 
 /// Convert SDL keycode if necessary.
-int ConvertSDLKeyCode(int keySym, int scanCode)
+Key ConvertSDLKeyCode(int keySym, int scanCode)
 {
     if (scanCode == SCANCODE_AC_BACK)
         return KEY_ESCAPE;
     else
-        return SDL_tolower(keySym);
+        return (Key)SDL_tolower(keySym);
 }
 
 UIElement* TouchState::GetTouchedElement()
@@ -142,7 +146,7 @@ MouseMode EmscriptenInput::invalidatedRequestedMouseMode_ = MM_INVALID;
 EmscriptenInput::EmscriptenInput(Input* inputInst) :
     inputInst_(inputInst)
 {
-    void* vInputInst = (void*)inputInst;
+    auto* vInputInst = (void*)inputInst;
 
     // Handle pointer lock
     emscripten_set_pointerlockchange_callback(NULL, vInputInst, false, EmscriptenInput::HandlePointerLockChange);
@@ -196,7 +200,7 @@ bool EmscriptenInput::IsVisible()
 
 EM_BOOL EmscriptenInput::HandlePointerLockChange(int eventType, const EmscriptenPointerlockChangeEvent* keyEvent, void* userData)
 {
-    Input* const inputInst = (Input*)userData;
+    auto* const inputInst = (Input*)userData;
 
     bool invalid = false;
     const bool suppress = suppressMouseModeEvent_;
@@ -252,7 +256,7 @@ EM_BOOL EmscriptenInput::HandlePointerLockChange(int eventType, const Emscripten
 
 EM_BOOL EmscriptenInput::HandleFocusChange(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData)
 {
-    Input* const inputInst = (Input*)userData;
+    auto* const inputInst = (Input*)userData;
 
     inputInst->SuppressNextMouseMove();
 
@@ -267,7 +271,7 @@ EM_BOOL EmscriptenInput::HandleFocusChange(int eventType, const EmscriptenFocusE
 EM_BOOL EmscriptenInput::HandleMouseJump(int eventType, const EmscriptenMouseEvent * mouseEvent, void* userData)
 {
     // Suppress mouse jump on pointer-lock change
-    Input* const inputInst = (Input*)userData;
+    auto* const inputInst = (Input*)userData;
     bool suppress = false;
     if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN && inputInst->emscriptenEnteredPointerLock_)
     {
@@ -287,13 +291,39 @@ EM_BOOL EmscriptenInput::HandleMouseJump(int eventType, const EmscriptenMouseEve
 
 int EmscriptenInput::HandleSDLEvents(void* userData, SDL_Event* event)
 {
-    Input* const inputInst = (Input*)userData;
+    auto* const inputInst = (Input*)userData;
 
     inputInst->HandleSDLEvent(event);
 
     return 0;
 }
 
+#endif
+
+#ifdef _WIN32
+// On Windows repaint while the window is actively being resized.
+int Win32_ResizingEventWatcher(void* data, SDL_Event* event)
+{
+    if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED)
+    {
+        SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+        if (win == (SDL_Window*)data)
+        {
+            if (auto* ctx = (Context*)SDL_GetWindowData(win, "URHO3D_CONTEXT"))
+            {
+                if (auto* graphics = ctx->GetSubsystem<Graphics>())
+                {
+                    if (graphics->IsInitialized())
+                    {
+                        graphics->OnWindowResized();
+                        ctx->GetSubsystem<Engine>()->RunFrame();
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
 #endif
 
 void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
@@ -506,8 +536,8 @@ void Input::Update()
                 eventData[P_Y] = mousePosition.y_;
                 eventData[P_DX] = mouseMove_.x_;
                 eventData[P_DY] = mouseMove_.y_;
-                eventData[P_BUTTONS] = mouseButtonDown_;
-                eventData[P_QUALIFIERS] = GetQualifiers();
+                eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
+                eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
                 SendEvent(E_MOUSEMOVE, eventData);
             }
         }
@@ -580,7 +610,7 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
                     SetMouseModeAbsolute(SDL_FALSE);
 
                 // Update cursor position
-                UI* ui = GetSubsystem<UI>();
+                auto* ui = GetSubsystem<UI>();
                 Cursor* cursor = ui->GetCursor();
                 // If the UI Cursor was visible, use that position instead of last visible OS cursor position
                 if (cursor && cursor->IsVisible())
@@ -829,7 +859,7 @@ void Input::SetMouseMode(MouseMode mode, bool suppressEvent)
             mouseMode_ = mode;
             SDL_Window* const window = graphics_->GetWindow();
 
-            UI* const ui = GetSubsystem<UI>();
+            auto* const ui = GetSubsystem<UI>();
             Cursor* const cursor = ui->GetCursor();
 
             // Handle changing from previous mode
@@ -963,13 +993,13 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     // If layout file is not given, use the default screen joystick layout
     if (!layoutFile)
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         layoutFile = cache->GetResource<XMLFile>("UI/ScreenJoystick.xml");
         if (!layoutFile)    // Error is already logged
             return -1;
     }
 
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     SharedPtr<UIElement> screenJoystick = ui->LoadLayout(layoutFile, styleFile);
     if (!screenJoystick)     // Error is already logged
         return -1;
@@ -1001,7 +1031,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             ++numButtons;
 
             // Check whether the button has key binding
-            Text* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
+            auto* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1053,7 +1083,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
         {
             ++numHats;
 
-            Text* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
+            auto* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1251,9 +1281,9 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     if (SDL_IsGameController(index))
         state.controller_ = SDL_GameControllerOpen(index);
 
-    unsigned numButtons = (unsigned)SDL_JoystickNumButtons(joystick);
-    unsigned numAxes = (unsigned)SDL_JoystickNumAxes(joystick);
-    unsigned numHats = (unsigned)SDL_JoystickNumHats(joystick);
+    auto numButtons = (unsigned)SDL_JoystickNumButtons(joystick);
+    auto numAxes = (unsigned)SDL_JoystickNumAxes(joystick);
+    auto numHats = (unsigned)SDL_JoystickNumHats(joystick);
 
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
@@ -1269,67 +1299,67 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     return joystickID;
 }
 
-int Input::GetKeyFromName(const String& name) const
+Key Input::GetKeyFromName(const String& name) const
 {
-    return SDL_GetKeyFromName(name.CString());
+    return (Key)SDL_GetKeyFromName(name.CString());
 }
 
-int Input::GetKeyFromScancode(int scancode) const
+Key Input::GetKeyFromScancode(Scancode scancode) const
 {
-    return SDL_GetKeyFromScancode((SDL_Scancode)scancode);
+    return (Key)SDL_GetKeyFromScancode((SDL_Scancode)scancode);
 }
 
-String Input::GetKeyName(int key) const
+String Input::GetKeyName(Key key) const
 {
     return String(SDL_GetKeyName(key));
 }
 
-int Input::GetScancodeFromKey(int key) const
+Scancode Input::GetScancodeFromKey(Key key) const
 {
-    return SDL_GetScancodeFromKey(key);
+    return (Scancode)SDL_GetScancodeFromKey(key);
 }
 
-int Input::GetScancodeFromName(const String& name) const
+Scancode Input::GetScancodeFromName(const String& name) const
 {
-    return SDL_GetScancodeFromName(name.CString());
+    return (Scancode)SDL_GetScancodeFromName(name.CString());
 }
 
-String Input::GetScancodeName(int scancode) const
+String Input::GetScancodeName(Scancode scancode) const
 {
     return SDL_GetScancodeName((SDL_Scancode)scancode);
 }
 
-bool Input::GetKeyDown(int key) const
+bool Input::GetKeyDown(Key key) const
 {
     return keyDown_.Contains(SDL_tolower(key));
 }
 
-bool Input::GetKeyPress(int key) const
+bool Input::GetKeyPress(Key key) const
 {
     return keyPress_.Contains(SDL_tolower(key));
 }
 
-bool Input::GetScancodeDown(int scancode) const
+bool Input::GetScancodeDown(Scancode scancode) const
 {
     return scancodeDown_.Contains(scancode);
 }
 
-bool Input::GetScancodePress(int scancode) const
+bool Input::GetScancodePress(Scancode scancode) const
 {
     return scancodePress_.Contains(scancode);
 }
 
-bool Input::GetMouseButtonDown(int button) const
+bool Input::GetMouseButtonDown(MouseButtonFlags button) const
 {
-    return (mouseButtonDown_ & button) != 0;
+    return mouseButtonDown_ & button;
 }
 
-bool Input::GetMouseButtonPress(int button) const
+bool Input::GetMouseButtonPress(MouseButtonFlags button) const
 {
-    return (mouseButtonPress_ & button) != 0;
+    return mouseButtonPress_ & button;
 }
 
-bool Input::GetQualifierDown(int qualifier) const
+bool Input::GetQualifierDown(Qualifier qualifier) const
 {
     if (qualifier == QUAL_SHIFT)
         return GetKeyDown(KEY_LSHIFT) || GetKeyDown(KEY_RSHIFT);
@@ -1341,7 +1371,7 @@ bool Input::GetQualifierDown(int qualifier) const
     return false;
 }
 
-bool Input::GetQualifierPress(int qualifier) const
+bool Input::GetQualifierPress(Qualifier qualifier) const
 {
     if (qualifier == QUAL_SHIFT)
         return GetKeyPress(KEY_LSHIFT) || GetKeyPress(KEY_RSHIFT);
@@ -1353,9 +1383,9 @@ bool Input::GetQualifierPress(int qualifier) const
     return false;
 }
 
-int Input::GetQualifiers() const
+QualifierFlags Input::GetQualifiers() const
 {
-    int ret = 0;
+    QualifierFlags ret;
     if (GetQualifierDown(QUAL_SHIFT))
         ret |= QUAL_SHIFT;
     if (GetQualifierDown(QUAL_CTRL))
@@ -1407,7 +1437,7 @@ int Input::GetMouseMoveY() const
 TouchState* Input::GetTouch(unsigned index) const
 {
     if (index >= touches_.Size())
-        return 0;
+        return nullptr;
 
     HashMap<int, TouchState>::ConstIterator i = touches_.Begin();
     while (index--)
@@ -1425,7 +1455,7 @@ JoystickState* Input::GetJoystickByIndex(unsigned index)
             return &(i->second_);
     }
 
-    return 0;
+    return nullptr;
 }
 
 JoystickState* Input::GetJoystickByName(const String& name)
@@ -1436,13 +1466,13 @@ JoystickState* Input::GetJoystickByName(const String& name)
             return &(i->second_);
     }
 
-    return 0;
+    return nullptr;
 }
 
 JoystickState* Input::GetJoystick(SDL_JoystickID id)
 {
     HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Find(id);
-    return i != joysticks_.End() ? &(i->second_) : 0;
+    return i != joysticks_.End() ? &(i->second_) : nullptr;
 }
 
 bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
@@ -1481,7 +1511,7 @@ bool Input::IsMinimized() const
 
 void Input::Initialize()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics || !graphics->IsInitialized())
         return;
 
@@ -1511,6 +1541,15 @@ void Input::Initialize()
     SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(Input, HandleEndFrame));
 #endif
 
+#ifdef _WIN32
+    // Register callback for resizing in order to repaint.
+    if (SDL_Window* window = graphics_->GetWindow())
+    {
+        SDL_SetWindowData(window, "URHO3D_CONTEXT", GetContext());
+        SDL_AddEventWatch(Win32_ResizingEventWatcher, window);
+    }
+#endif
+
     URHO3D_LOGINFO("Initialized input");
 }
 
@@ -1519,7 +1558,7 @@ void Input::ResetJoysticks()
     joysticks_.Clear();
 
     // Open each detected joystick automatically on startup
-    unsigned size = static_cast<unsigned>(SDL_NumJoysticks());
+    auto size = static_cast<unsigned>(SDL_NumJoysticks());
     for (unsigned i = 0; i < size; ++i)
         OpenJoystick(i);
 }
@@ -1529,7 +1568,7 @@ void Input::ResetInputAccumulation()
     // Reset input accumulation for this frame
     keyPress_.Clear();
     scancodePress_.Clear();
-    mouseButtonPress_ = 0;
+    mouseButtonPress_ = MOUSEB_NONE;
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
@@ -1611,7 +1650,7 @@ void Input::ResetState()
 
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
-    mouseButtonPress_ = 0;
+    mouseButtonPress_ = MOUSEB_NONE;
 }
 
 void Input::ResetTouches()
@@ -1655,7 +1694,7 @@ unsigned Input::PopTouchIndex()
     if (availableTouchIDs_.Empty())
         return 0;
 
-    unsigned index = (unsigned)availableTouchIDs_.Front();
+    auto index = (unsigned)availableTouchIDs_.Front();
     availableTouchIDs_.PopFront();
     return index;
 }
@@ -1703,7 +1742,7 @@ void Input::SendInputFocusEvent()
     SendEvent(E_INPUTFOCUS, eventData);
 }
 
-void Input::SetMouseButton(int button, bool newState)
+void Input::SetMouseButton(MouseButton button, bool newState)
 {
     if (newState)
     {
@@ -1724,12 +1763,12 @@ void Input::SetMouseButton(int button, bool newState)
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_BUTTON] = button;
-    eventData[P_BUTTONS] = mouseButtonDown_;
-    eventData[P_QUALIFIERS] = GetQualifiers();
+    eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
+    eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
-void Input::SetKey(int key, int scancode, bool newState)
+void Input::SetKey(Key key, Scancode scancode, bool newState)
 {
     bool repeat = false;
 
@@ -1759,8 +1798,8 @@ void Input::SetKey(int key, int scancode, bool newState)
     VariantMap& eventData = GetEventDataMap();
     eventData[P_KEY] = key;
     eventData[P_SCANCODE] = scancode;
-    eventData[P_BUTTONS] = mouseButtonDown_;
-    eventData[P_QUALIFIERS] = GetQualifiers();
+    eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
+    eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
     if (newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
@@ -1780,8 +1819,8 @@ void Input::SetMouseWheel(int delta)
 
         VariantMap& eventData = GetEventDataMap();
         eventData[P_WHEEL] = delta;
-        eventData[P_BUTTONS] = mouseButtonDown_;
-        eventData[P_QUALIFIERS] = GetQualifiers();
+        eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
+        eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
         SendEvent(E_MOUSEWHEEL, eventData);
     }
 }
@@ -1860,11 +1899,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
     switch (evt.type)
     {
     case SDL_KEYDOWN:
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), (Scancode)evt.key.keysym.scancode, true);
         break;
 
     case SDL_KEYUP:
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), (Scancode)evt.key.keysym.scancode, false);
         break;
 
     case SDL_TEXTINPUT:
@@ -1891,7 +1930,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_MOUSEBUTTONDOWN:
         if (!touchEmulation_)
-            SetMouseButton(1 << (evt.button.button - 1), true);
+        {
+            const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
+            SetMouseButton(mouseButton, true);
+        }
         else
         {
             int x, y;
@@ -1914,7 +1956,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_MOUSEBUTTONUP:
         if (!touchEmulation_)
-            SetMouseButton(1 << (evt.button.button - 1), false);
+        {
+            const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
+            SetMouseButton(mouseButton, false);
+        }
         else
         {
             int x, y;
@@ -1965,8 +2010,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 // The "on-the-fly" motion data needs to be scaled now, though this may reduce accuracy
                 eventData[P_DX] = (int)(evt.motion.xrel * inputScale_.x_);
                 eventData[P_DY] = (int)(evt.motion.yrel * inputScale_.y_);
-                eventData[P_BUTTONS] = mouseButtonDown_;
-                eventData[P_QUALIFIERS] = GetQualifiers();
+                eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
+                eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
                 SendEvent(E_MOUSEMOVE, eventData);
             }
         }
@@ -1999,7 +2044,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERDOWN:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffffu);
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
             state.lastPosition_ = state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
@@ -2025,7 +2070,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERUP:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffffu);
             TouchState& state = touches_[touchID];
 
             using namespace TouchEnd;
@@ -2039,7 +2084,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             SendEvent(E_TOUCHEND, eventData);
 
             // Add touch index back to list of available touch Ids
-            PushTouchIndex(evt.tfinger.fingerId & 0x7ffffff);
+            PushTouchIndex(evt.tfinger.fingerId & 0x7ffffffu);
 
             touches_.Erase(touchID);
         }
@@ -2048,7 +2093,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERMOTION:
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
-            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
+            int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffffu);
             // We don't want this event to create a new touches_ event if it doesn't exist (touchEmulation)
             if (touchEmulation_ && !touches_.Contains(touchID))
                 break;
@@ -2305,8 +2350,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
-#if defined(IOS) || defined (__ANDROID__)
-                // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
+#if defined(IOS) || defined(TVOS) || defined (__ANDROID__)
+                // On iOS/tvOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
                 graphics_->Restore();
 #endif
@@ -2432,8 +2477,8 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
             return;
 
         // Determine whether to inject a joystick event or keyboard/mouse event
-        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        Variant mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
+        const Variant& keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
+        const Variant& mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
         if (keyBindingVar.IsEmpty() && mouseButtonBindingVar.IsEmpty())
         {
             evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;

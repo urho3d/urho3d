@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,14 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_SAMPLES)
+    return ()
+endif ()
+
 # Set project name
 project (Urho3D-Samples)
+
+setup_lint ()
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)

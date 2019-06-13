@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -38,21 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file Helper class tp perform various byte oder swappings
    (e.g. little to big endian) */
 #ifndef AI_BYTESWAPPER_H_INC
 #define AI_BYTESWAPPER_H_INC
 
-#include "../include/assimp/ai_assert.h"
-#include "../include/assimp/types.h"
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
+#include <assimp/ai_assert.h>
+#include <assimp/types.h>
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
 
 #if _MSC_VER >= 1400
 #include <stdlib.h>

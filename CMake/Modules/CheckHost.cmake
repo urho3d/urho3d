@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2017 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ if (CMAKE_HOST_WIN32)
     set (NULL_DEVICE nul)
     if (NOT DEFINED HAS_MKLINK)
         # Test whether the host system is capable of setting up symbolic link
-        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt WORKING_DIRECTORY ${CMAKE_BINARY_DIR} RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
         if (MKLINK_EXIT_CODE EQUAL 0)
             set (HAS_MKLINK TRUE)
             file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
@@ -79,11 +79,12 @@ else ()
            set (CCACHE_VERSION ${CCACHE_VERSION} CACHE INTERNAL "ccache version")
        endif ()
     endif ()
-    # Temporary workaround - test if PCH could be enabled when using Clang compiler toolchain
-    if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        # Turn off PCH when building on macOS host with ccache 3.3.1+ (the last known bad version) and when targeting Android and Web platforms
-        if ((APPLE AND NOT CCACHE_VERSION VERSION_LESS 3.3.1) OR ANDROID OR WEB)
-            set (URHO3D_PCH FALSE CACHE INTERNAL "" FORCE)
-        endif ()
+endif ()
+
+# Temporary workaround - test if PCH could be enabled when using Clang compiler toolchain
+if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    # Turn off PCH when building on macOS host with ccache 3.3.1+ (the last known bad version) and when targeting Android and Web platforms
+    if ((APPLE AND NOT CCACHE_VERSION VERSION_LESS 3.3.1) OR ANDROID OR WEB)
+        set (URHO3D_PCH FALSE CACHE INTERNAL "" FORCE)
     endif ()
 endif ()

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_XAUDIO2_H
-#define _SDL_XAUDIO2_H
+#ifndef SDL_XAUDIO2_H_
+#define SDL_XAUDIO2_H_
 
 #include <windows.h>
 #include <mmreg.h>
@@ -381,6 +381,6 @@ const struct IXAudio2VoiceCallbackVtbl
 
 #pragma pack(pop)   /* Undo pragma push */
 
-#endif  /* _SDL_XAUDIO2_H */
+#endif  /* SDL_XAUDIO2_H_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

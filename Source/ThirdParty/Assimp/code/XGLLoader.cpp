@@ -3,7 +3,8 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 
 All rights reserved.
 
@@ -50,24 +51,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "StreamReader.h"
 #include "MemoryIOWrapper.h"
-#include <boost/scoped_ptr.hpp>
-#include "../include/assimp/mesh.h"
-#include "../include/assimp/scene.h"
+#include <assimp/mesh.h>
+#include <assimp/scene.h>
+#include <assimp/importerdesc.h>
 #include <cctype>
-
-
+#include <memory>
 
 using namespace Assimp;
 using namespace irr;
 using namespace irr::io;
-
 
 // zlib is needed for compressed XGL files
 #ifndef ASSIMP_BUILD_NO_COMPRESSED_XGL
 #   ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #       include <zlib.h>
 #   else
-#       include "../contrib/zlib/zlib.h"
+#       include <contrib/zlib/zlib.h>
 #   endif
 #endif
 
@@ -84,8 +83,11 @@ struct free_it
 };
 
 namespace Assimp { // this has to be in here because LogFunctions is in ::Assimp
-template<> const std::string LogFunctions<XGLImporter>::log_prefix = "XGL: ";
-
+    template<> const char* LogFunctions<XGLImporter>::Prefix()
+    {
+        static auto prefix = "XGL: ";
+        return prefix;
+    }
 }
 
 static const aiImporterDesc desc = {
@@ -105,12 +107,16 @@ static const aiImporterDesc desc = {
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 XGLImporter::XGLImporter()
-{}
+: m_reader( nullptr )
+, m_scene( nullptr ) {
+    // empty
+}
 
 // ------------------------------------------------------------------------------------------------
 // Destructor, private as well
-XGLImporter::~XGLImporter()
-{}
+XGLImporter::~XGLImporter() {
+    // empty
+}
 
 // ------------------------------------------------------------------------------------------------
 // Returns whether the class can handle the format of the given file.
@@ -152,8 +158,8 @@ void XGLImporter::InternReadFile( const std::string& pFile,
     free_it free_it_really(dest);
 #endif
 
-    scene = pScene;
-    boost::shared_ptr<IOStream> stream( pIOHandler->Open( pFile, "rb"));
+    m_scene = pScene;
+    std::shared_ptr<IOStream> stream( pIOHandler->Open( pFile, "rb"));
 
     // check whether we can read from the file
     if( stream.get() == NULL) {
@@ -165,7 +171,7 @@ void XGLImporter::InternReadFile( const std::string& pFile,
 #ifdef ASSIMP_BUILD_NO_COMPRESSED_XGL
         ThrowException("Cannot read ZGL file since Assimp was built without compression support");
 #else
-        boost::scoped_ptr<StreamReaderLE> raw_reader(new StreamReaderLE(stream));
+        std::unique_ptr<StreamReaderLE> raw_reader(new StreamReaderLE(stream));
 
         // build a zlib stream
         z_stream zstream;
@@ -214,14 +220,13 @@ void XGLImporter::InternReadFile( const std::string& pFile,
 
     // construct the irrXML parser
     CIrrXML_IOStreamReader st(stream.get());
-    boost::scoped_ptr<IrrXMLReader> read( createIrrXMLReader((IFileReadCallBack*) &st) );
-    reader = read.get();
+    m_reader.reset( createIrrXMLReader( ( IFileReadCallBack* ) &st ) );
 
     // parse the XML file
     TempScope scope;
 
     while (ReadElement())   {
-        if (!ASSIMP_stricmp(reader->getNodeName(),"world")) {
+        if (!ASSIMP_stricmp(m_reader->getNodeName(),"world")) {
             ReadWorld(scope);
         }
     }
@@ -234,21 +239,21 @@ void XGLImporter::InternReadFile( const std::string& pFile,
     }
 
     // copy meshes
-    scene->mNumMeshes = static_cast<unsigned int>(meshes.size());
-    scene->mMeshes = new aiMesh*[scene->mNumMeshes]();
-    std::copy(meshes.begin(),meshes.end(),scene->mMeshes);
+    m_scene->mNumMeshes = static_cast<unsigned int>(meshes.size());
+    m_scene->mMeshes = new aiMesh*[m_scene->mNumMeshes]();
+    std::copy(meshes.begin(),meshes.end(),m_scene->mMeshes);
 
     // copy materials
-    scene->mNumMaterials = static_cast<unsigned int>(materials.size());
-    scene->mMaterials = new aiMaterial*[scene->mNumMaterials]();
-    std::copy(materials.begin(),materials.end(),scene->mMaterials);
+    m_scene->mNumMaterials = static_cast<unsigned int>(materials.size());
+    m_scene->mMaterials = new aiMaterial*[m_scene->mNumMaterials]();
+    std::copy(materials.begin(),materials.end(),m_scene->mMaterials);
 
     if (scope.light) {
-        scene->mNumLights = 1;
-        scene->mLights = new aiLight*[1];
-        scene->mLights[0] = scope.light;
+        m_scene->mNumLights = 1;
+        m_scene->mLights = new aiLight*[1];
+        m_scene->mLights[0] = scope.light;
 
-        scope.light->mName = scene->mRootNode->mName;
+        scope.light->mName = m_scene->mRootNode->mName;
     }
 
     scope.dismiss();
@@ -257,8 +262,8 @@ void XGLImporter::InternReadFile( const std::string& pFile,
 // ------------------------------------------------------------------------------------------------
 bool XGLImporter::ReadElement()
 {
-    while(reader->read()) {
-        if (reader->getNodeType() == EXN_ELEMENT) {
+    while(m_reader->read()) {
+        if (m_reader->getNodeType() == EXN_ELEMENT) {
             return true;
         }
     }
@@ -268,11 +273,11 @@ bool XGLImporter::ReadElement()
 // ------------------------------------------------------------------------------------------------
 bool XGLImporter::ReadElementUpToClosing(const char* closetag)
 {
-    while(reader->read()) {
-        if (reader->getNodeType() == EXN_ELEMENT) {
+    while(m_reader->read()) {
+        if (m_reader->getNodeType() == EXN_ELEMENT) {
             return true;
         }
-        else if (reader->getNodeType() == EXN_ELEMENT_END && !ASSIMP_stricmp(reader->getNodeName(),closetag)) {
+        else if (m_reader->getNodeType() == EXN_ELEMENT_END && !ASSIMP_stricmp(m_reader->getNodeName(),closetag)) {
             return false;
         }
     }
@@ -283,11 +288,11 @@ bool XGLImporter::ReadElementUpToClosing(const char* closetag)
 // ------------------------------------------------------------------------------------------------
 bool XGLImporter::SkipToText()
 {
-    while(reader->read()) {
-        if (reader->getNodeType() == EXN_TEXT) {
+    while(m_reader->read()) {
+        if (m_reader->getNodeType() == EXN_TEXT) {
             return true;
         }
-        else if (reader->getNodeType() == EXN_ELEMENT || reader->getNodeType() == EXN_ELEMENT_END) {
+        else if (m_reader->getNodeType() == EXN_ELEMENT || m_reader->getNodeType() == EXN_ELEMENT_END) {
             ThrowException("expected text contents but found another element (or element end)");
         }
     }
@@ -297,7 +302,7 @@ bool XGLImporter::SkipToText()
 // ------------------------------------------------------------------------------------------------
 std::string XGLImporter::GetElementName()
 {
-    const char* s  = reader->getNodeName();
+    const char* s  = m_reader->getNodeName();
     size_t len = strlen(s);
 
     std::string ret;
@@ -331,7 +336,7 @@ void XGLImporter::ReadWorld(TempScope& scope)
         nd->mName.Set("WORLD");
     }
 
-    scene->mRootNode = nd;
+    m_scene->mRootNode = nd;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -354,7 +359,7 @@ void XGLImporter::ReadLighting(TempScope& scope)
 // ------------------------------------------------------------------------------------------------
 aiLight* XGLImporter::ReadDirectionalLight()
 {
-    ScopeGuard<aiLight> l(new aiLight());
+    std::unique_ptr<aiLight> l(new aiLight());
     l->mType = aiLightSource_DIRECTIONAL;
 
     while (ReadElementUpToClosing("directionallight"))  {
@@ -369,13 +374,13 @@ aiLight* XGLImporter::ReadDirectionalLight()
             l->mColorSpecular = ReadCol3();
         }
     }
-    return l.dismiss();
+    return l.release();
 }
 
 // ------------------------------------------------------------------------------------------------
 aiNode* XGLImporter::ReadObject(TempScope& scope, bool skipFirst, const char* closetag)
 {
-    ScopeGuard<aiNode> nd(new aiNode());
+    std::unique_ptr<aiNode> nd(new aiNode());
     std::vector<aiNode*> children;
     std::vector<unsigned int> meshes;
 
@@ -431,7 +436,7 @@ aiNode* XGLImporter::ReadObject(TempScope& scope, bool skipFirst, const char* cl
         }
 
     } catch(...) {
-        BOOST_FOREACH(aiNode* ch, children) {
+        for(aiNode* ch : children) {
             delete ch;
         }
         throw;
@@ -458,11 +463,11 @@ aiNode* XGLImporter::ReadObject(TempScope& scope, bool skipFirst, const char* cl
         nd->mChildren = new aiNode*[nd->mNumChildren]();
         for(unsigned int i = 0; i < nd->mNumChildren; ++i) {
             nd->mChildren[i] = children[i];
-            children[i]->mParent = nd;
+            children[i]->mParent = nd.get();
         }
     }
 
-    return nd.dismiss();
+    return nd.release();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -501,7 +506,7 @@ aiMatrix4x4 XGLImporter::ReadTrafo()
     up.Normalize();
 
     right = forward ^ up;
-    if (fabs(up * forward) > 1e-4) {
+    if (std::fabs(up * forward) > 1e-4) {
         // this is definitely wrong - a degenerate coordinate space ruins everything
         // so subtitute identity transform.
         LogError("<forward> and <up> vectors in <transform> are skewing, ignoring trafo");
@@ -534,7 +539,7 @@ aiMatrix4x4 XGLImporter::ReadTrafo()
 // ------------------------------------------------------------------------------------------------
 aiMesh* XGLImporter::ToOutputMesh(const TempMaterialMesh& m)
 {
-    ScopeGuard<aiMesh> mesh(new aiMesh());
+    std::unique_ptr<aiMesh> mesh(new aiMesh());
 
     mesh->mNumVertices = static_cast<unsigned int>(m.positions.size());
     mesh->mVertices = new aiVector3D[mesh->mNumVertices];
@@ -571,7 +576,7 @@ aiMesh* XGLImporter::ToOutputMesh(const TempMaterialMesh& m)
 
     mesh->mPrimitiveTypes = m.pflags;
     mesh->mMaterialIndex = m.matid;
-    return mesh.dismiss();
+    return mesh.release();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -589,29 +594,29 @@ bool XGLImporter::ReadMesh(TempScope& scope)
             ReadMaterial(scope);
         }
         else if (s == "p") {
-            if (!reader->getAttributeValue("ID")) {
+            if (!m_reader->getAttributeValue("ID")) {
                 LogWarn("no ID attribute on <p>, ignoring");
             }
             else {
-                int id = reader->getAttributeValueAsInt("ID");
+                int id = m_reader->getAttributeValueAsInt("ID");
                 t.points[id] = ReadVec3();
             }
         }
         else if (s == "n") {
-            if (!reader->getAttributeValue("ID")) {
+            if (!m_reader->getAttributeValue("ID")) {
                 LogWarn("no ID attribute on <n>, ignoring");
             }
             else {
-                int id = reader->getAttributeValueAsInt("ID");
+                int id = m_reader->getAttributeValueAsInt("ID");
                 t.normals[id] = ReadVec3();
             }
         }
         else if (s == "tc") {
-            if (!reader->getAttributeValue("ID")) {
+            if (!m_reader->getAttributeValue("ID")) {
                 LogWarn("no ID attribute on <tc>, ignoring");
             }
             else {
-                int id = reader->getAttributeValueAsInt("ID");
+                int id = m_reader->getAttributeValueAsInt("ID");
                 t.uvs[id] = ReadVec2();
             }
         }
@@ -691,7 +696,7 @@ bool XGLImporter::ReadMesh(TempScope& scope)
 
     // finally extract output meshes and add them to the scope
     typedef std::pair<unsigned int, TempMaterialMesh> pairt;
-    BOOST_FOREACH(const pairt& p, bymat) {
+    for(const pairt& p : bymat) {
         aiMesh* const m  = ToOutputMesh(p.second);
         scope.meshes_linear.push_back(m);
 
@@ -711,7 +716,7 @@ unsigned int XGLImporter::ResolveMaterialRef(TempScope& scope)
     const std::string& s = GetElementName();
     if (s == "mat") {
         ReadMaterial(scope);
-        return scope.materials_linear.size()-1;
+        return static_cast<unsigned int>(scope.materials_linear.size()-1);
     }
 
     const int id = ReadIndexFromText();
@@ -740,7 +745,7 @@ void XGLImporter::ReadMaterial(TempScope& scope)
 {
     const unsigned int mat_id = ReadIDAttr();
 
-    ScopeGuard<aiMaterial> mat(new aiMaterial());
+    std::unique_ptr<aiMaterial> mat(new aiMaterial());
     while (ReadElementUpToClosing("mat"))  {
         const std::string& s = GetElementName();
         if (s == "amb") {
@@ -769,8 +774,8 @@ void XGLImporter::ReadMaterial(TempScope& scope)
         }
     }
 
-    scope.materials[mat_id] = mat;
-    scope.materials_linear.push_back(mat.dismiss());
+    scope.materials[mat_id] = mat.get();
+    scope.materials_linear.push_back(mat.release());
 }
 
 
@@ -831,10 +836,10 @@ void XGLImporter::ReadFaceVertex(const TempMesh& t, TempFace& out)
 // ------------------------------------------------------------------------------------------------
 unsigned int XGLImporter::ReadIDAttr()
 {
-    for(int i = 0, e = reader->getAttributeCount(); i < e; ++i) {
+    for(int i = 0, e = m_reader->getAttributeCount(); i < e; ++i) {
 
-        if(!ASSIMP_stricmp(reader->getAttributeName(i),"id")) {
-            return reader->getAttributeValueAsInt(i);
+        if(!ASSIMP_stricmp(m_reader->getAttributeName(i),"id")) {
+            return m_reader->getAttributeValueAsInt(i);
         }
     }
     return ~0u;
@@ -847,7 +852,7 @@ float XGLImporter::ReadFloat()
         LogError("unexpected EOF reading float element contents");
         return 0.f;
     }
-    const char* s = reader->getNodeData(), *se;
+    const char* s = m_reader->getNodeData(), *se;
 
     if(!SkipSpaces(&s)) {
         LogError("unexpected EOL, failed to parse float");
@@ -872,7 +877,7 @@ unsigned int XGLImporter::ReadIndexFromText()
         LogError("unexpected EOF reading index element contents");
         return ~0u;
     }
-    const char* s = reader->getNodeData(), *se;
+    const char* s = m_reader->getNodeData(), *se;
     if(!SkipSpaces(&s)) {
         LogError("unexpected EOL, failed to parse index element");
         return ~0u;
@@ -897,7 +902,7 @@ aiVector2D XGLImporter::ReadVec2()
         LogError("unexpected EOF reading vec2 contents");
         return vec;
     }
-    const char* s = reader->getNodeData();
+    const char* s = m_reader->getNodeData();
 
     for(int i = 0; i < 2; ++i) {
         if(!SkipSpaces(&s)) {
@@ -926,7 +931,7 @@ aiVector3D XGLImporter::ReadVec3()
         LogError("unexpected EOF reading vec3 contents");
         return vec;
     }
-    const char* s = reader->getNodeData();
+    const char* s = m_reader->getNodeData();
 
     for(int i = 0; i < 3; ++i) {
         if(!SkipSpaces(&s)) {

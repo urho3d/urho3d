@@ -1,3 +1,5 @@
+#pragma once
+
 // Copyright (C) 2002-2007 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine" and the "irrXML" project.
 // For conditions of distribution and use, see copyright notice in irrlicht.h and irrXML.h
@@ -11,24 +13,25 @@
 //     to ensure long numbers are handled correctly
 // ------------------------------------------------------------------------------------
 
-// Modified by Lasse Oorni for Urho3D
 
 #ifndef __FAST_A_TO_F_H_INCLUDED__
 #define __FAST_A_TO_F_H_INCLUDED__
 
 #include <cmath>
 #include <limits>
-// Urho3D: added include
-#include <limits.h>
-// Urho3D: VS2008 compatibility
-#if !defined(_MSC_VER) || (_MSC_VER >= 1600)
 #include <stdint.h>
-#else
-#include "../include/assimp/Compiler/pstdint.h"
-#endif
 #include <stdexcept>
+#include <assimp/defs.h>
 
 #include "StringComparison.h"
+#include <assimp/DefaultLogger.hpp>
+
+
+#ifdef _MSC_VER
+#  include <stdint.h>
+#else
+#  include <assimp/Compiler/pstdint.h>
+#endif
 
 namespace Assimp
 {
@@ -192,7 +195,7 @@ inline uint64_t strtoul10_64( const char* in, const char** out=0, unsigned int* 
     uint64_t value = 0;
 
     if ( *in < '0' || *in > '9' )
-            throw std::invalid_argument(std::string("The string \"") + in + "\" cannot be converted into a value.");
+        throw std::invalid_argument(std::string("The string \"") + in + "\" cannot be converted into a value.");
 
     bool running = true;
     while ( running )
@@ -202,8 +205,12 @@ inline uint64_t strtoul10_64( const char* in, const char** out=0, unsigned int* 
 
         const uint64_t new_value = ( value * 10 ) + ( *in - '0' );
 
-        if (new_value < value) /* numeric overflow, we rely on you */
-            throw std::overflow_error(std::string("Converting the string \"") + in + "\" into a value resulted in overflow.");
+        // numeric overflow, we rely on you
+        if ( new_value < value ) {
+            DefaultLogger::get()->warn( std::string( "Converting the string \"" ) + in + "\" into a value resulted in overflow." );
+            return 0;
+        }
+            //throw std::overflow_error();
 
         value = new_value;
 
@@ -351,51 +358,26 @@ inline const char* fast_atoreal_move(const char* c, Real& out, bool check_comma 
 
 // ------------------------------------------------------------------------------------
 // The same but more human.
-inline float fast_atof(const char* c)
+inline ai_real fast_atof(const char* c)
 {
-    float ret;
-    fast_atoreal_move<float>(c, ret);
+    ai_real ret(0.0);
+    fast_atoreal_move<ai_real>(c, ret);
     return ret;
 }
 
 
-inline float fast_atof( const char* c, const char** cout)
+inline ai_real fast_atof( const char* c, const char** cout)
 {
-    float ret;
-    *cout = fast_atoreal_move<float>(c, ret);
+    ai_real ret(0.0);
+    *cout = fast_atoreal_move<ai_real>(c, ret);
 
     return ret;
 }
 
-inline float fast_atof( const char** inout)
+inline ai_real fast_atof( const char** inout)
 {
-    float ret;
-    *inout = fast_atoreal_move<float>(*inout, ret);
-
-    return ret;
-}
-
-
-inline double fast_atod(const char* c)
-{
-    double ret;
-    fast_atoreal_move<double>(c, ret);
-    return ret;
-}
-
-
-inline double fast_atod( const char* c, const char** cout)
-{
-    double ret;
-    *cout = fast_atoreal_move<double>(c, ret);
-
-    return ret;
-}
-
-inline double fast_atod( const char** inout)
-{
-    double ret;
-    *inout = fast_atoreal_move<double>(*inout, ret);
+    ai_real ret(0.0);
+    *inout = fast_atoreal_move<ai_real>(*inout, ret);
 
     return ret;
 }
@@ -403,4 +385,3 @@ inline double fast_atod( const char** inout)
 } // end of namespace Assimp
 
 #endif
-

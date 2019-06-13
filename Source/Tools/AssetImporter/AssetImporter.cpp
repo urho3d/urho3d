@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,15 +60,8 @@ using namespace Urho3D;
 
 struct OutModel
 {
-    OutModel() :
-        rootBone_(0),
-        totalVertices_(0),
-        totalIndices_(0)
-    {
-    }
-
     String outName_;
-    aiNode* rootNode_;
+    aiNode* rootNode_{};
     HashSet<unsigned> meshIndices_;
     PODVector<aiMesh*> meshes_;
     PODVector<aiNode*> meshNodes_;
@@ -77,15 +70,15 @@ struct OutModel
     PODVector<aiAnimation*> animations_;
     PODVector<float> boneRadii_;
     PODVector<BoundingBox> boneHitboxes_;
-    aiNode* rootBone_;
-    unsigned totalVertices_;
-    unsigned totalIndices_;
+    aiNode* rootBone_{};
+    unsigned totalVertices_{};
+    unsigned totalIndices_{};
 };
 
 struct OutScene
 {
     String outName_;
-    aiNode* rootNode_;
+    aiNode* rootNode_{};
     Vector<OutModel> models_;
     PODVector<aiNode*> nodes_;
     PODVector<unsigned> nodeModelIndices_;
@@ -144,8 +137,8 @@ const char *transformSuffix[TransformationComp_MAXIMUM] =
 static const unsigned MAX_CHANNELS = 4;
 
 SharedPtr<Context> context_(new Context());
-const aiScene* scene_ = 0;
-aiNode* rootNode_ = 0;
+const aiScene* scene_ = nullptr;
+aiNode* rootNode_ = nullptr;
 String inputName_;
 String resourcePath_;
 String outPath_;
@@ -193,10 +186,10 @@ void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void MoveToBindPose(OutModel& model, aiNode* current);
-void CollectAnimations(OutModel* model = 0);
+void CollectAnimations(OutModel* model = nullptr);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
-void BuildAndSaveAnimations(OutModel* model = 0);
+void BuildAndSaveAnimations(OutModel* model = nullptr);
 
 void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
@@ -210,7 +203,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 
 void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
 
-void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
+void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& dest, aiNode* node);
 unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
@@ -527,7 +520,7 @@ void Run(const Vector<String>& arguments)
             aiSetImportPropertyInteger(aiprops, AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);                //**false, default = true;
             aiSetImportPropertyInteger(aiprops, AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES, 1);//default = true;
 
-            scene_ = aiImportFileExWithProperties(GetNativePath(inFile).CString(), flags, NULL, aiprops);
+            scene_ = aiImportFileExWithProperties(GetNativePath(inFile).CString(), flags, nullptr, aiprops);
 
             // prevent processing animation suppression, both cannot work simultaneously
             suppressFbxPivotNodes_ = false;
@@ -595,7 +588,7 @@ void Run(const Vector<String>& arguments)
         }
         if (numLodArguments < 4)
             ErrorExit("Must define at least 2 LOD levels");
-        if (!(numLodArguments & 1))
+        if (!(numLodArguments & 1u))
             ErrorExit("No output file defined");
 
         for (unsigned i = 1; i < numLodArguments + 1; ++i)
@@ -604,7 +597,7 @@ void Run(const Vector<String>& arguments)
                 outFile = GetInternalPath(arguments[i]);
             else
             {
-                if (i & 1)
+                if (i & 1u)
                     lodDistances.Push(Max(ToFloat(arguments[i]), 0.0f));
                 else
                     modelNames.Push(GetInternalPath(arguments[i]));
@@ -685,7 +678,7 @@ void ExportAnimation(const String& outName, bool animationOnly)
     if (!noAnimations_)
     {
         // Most fbx animation files contain only a skeleton and no skinned mesh.
-        // Assume the scene node contains the model's bone definition and, 
+        // Assume the scene node contains the model's bone definition and,
         // transfer the info to the model.
         if (suppressFbxPivotNodes_ && model.bones_.Size() == 0)
             CollectSceneNodesAsBones(model, rootNode_);
@@ -744,7 +737,7 @@ void CollectBones(OutModel& model, bool animationOnly)
         aiMesh* mesh = model.meshes_[i];
         aiNode* meshNode = model.meshNodes_[i];
         aiNode* meshParentNode = meshNode->mParent;
-        aiNode* rootNode = 0;
+        aiNode* rootNode = nullptr;
 
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
@@ -1131,7 +1124,7 @@ void BuildAndSaveModel(OutModel& model)
         if (model.bones_.Size())
             GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
-        float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
+        auto* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
             WriteVertex(dest, mesh, j, isSkinned, box, vertexTransform, normalTransform, blendIndices, blendWeights);
 
@@ -1192,8 +1185,9 @@ void BuildAndSaveModel(OutModel& model)
 
             aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
+            // (in case there are nodes between that are not accounted for otherwise)
             if (boneNode == model.rootBone_)
-                transform = GetDerivedTransform(boneNode, model.rootNode_);
+                transform = GetDerivedTransform(boneNode, model.rootNode_, false);
 
             GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
 
@@ -1256,7 +1250,7 @@ void BuildAndSaveAnimations(OutModel* model)
     {
         aiAnimation* anim = animations[i];
 
-        float duration = (float)anim->mDuration;
+        auto duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
         String animOutName;
 
@@ -1274,7 +1268,7 @@ void BuildAndSaveAnimations(OutModel* model)
         else
             animOutName = outPath_ + GetFileName(outName_) + "_" + SanitateAssetName(animName) + ".ani";
 
-        float ticksPerSecond = (float)anim->mTicksPerSecond;
+        auto ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
         if (ticksPerSecond < M_EPSILON)
             ticksPerSecond = defaultTicksPerSecond_;
@@ -1290,7 +1284,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
             if (channel->mNumRotationKeys > 0)
                 startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
-            if (channel->mScalingKeys > 0)
+            if (channel->mNumScalingKeys > 0)
                 startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
         }
         if (startTime > thisImportStartTime)
@@ -1306,8 +1300,7 @@ void BuildAndSaveAnimations(OutModel* model)
         {
             aiNodeAnim* channel = anim->mChannels[j];
             String channelName = FromAIString(channel->mNodeName);
-            aiNode* boneNode = 0;
-            bool isRootBone = false;
+            aiNode* boneNode = nullptr;
 
             if (model)
             {
@@ -1331,7 +1324,7 @@ void BuildAndSaveAnimations(OutModel* model)
 
                     // every first $fbx animation channel for a bone will consolidate other $fbx animation to a single channel
                     // skip subsequent $fbx animation channel for the same bone
-                    if (outAnim->GetTrack(channelName) != NULL)
+                    if (outAnim->GetTrack(channelName) != nullptr)
                         continue;
 
                     boneIndex = GetPivotlessBoneIndex(*model, channelName);
@@ -1344,7 +1337,6 @@ void BuildAndSaveAnimations(OutModel* model)
 
                     boneNode = model->pivotlessBones_[boneIndex];
                 }
-                isRootBone = boneIndex == 0;
             }
             else
             {
@@ -1376,7 +1368,7 @@ void BuildAndSaveAnimations(OutModel* model)
             AnimationTrack* track = outAnim->CreateTrack(channelName);
 
             // Check which channels are used
-            track->channelMask_ = 0;
+            track->channelMask_ = CHANNEL_NONE;
             if (channel->mNumPositionKeys > 1 || !posEqual)
                 track->channelMask_ |= CHANNEL_POSITION;
             if (channel->mNumRotationKeys > 1 || !rotEqual)
@@ -1458,16 +1450,19 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
 
-                // If root bone, transform with the model root node transform
-                if (model && isRootBone)
+                // If root bone, transform with nodes in between model root node (if any)
+                if (model && boneNode == model->rootBone_)
                 {
                     aiMatrix4x4 transMat, scaleMat, rotMat;
                     aiMatrix4x4::Translation(pos, transMat);
                     aiMatrix4x4::Scaling(scale, scaleMat);
                     rotMat = aiMatrix4x4(rot.GetMatrix());
                     aiMatrix4x4 tform = transMat * rotMat * scaleMat;
-                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_);
-                    tform.Decompose(scale, rot, pos);
+                    aiMatrix4x4 tformOld = tform;
+                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_, false);
+                    // Do not decompose if did not actually change
+                    if (tform != tformOld)
+                        tform.Decompose(scale, rot, pos);
                 }
 
                 if (track->channelMask_ & CHANNEL_POSITION)
@@ -1653,7 +1648,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         if (createZone_)
         {
             Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
-            Zone* zone = zoneNode->CreateComponent<Zone>();
+            auto* zone = zoneNode->CreateComponent<Zone>();
             zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
             zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
 
@@ -1661,18 +1656,18 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             if (!scene_->HasLights())
             {
                 Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
-                Light* light = lightNode->CreateComponent<Light>();
+                auto* light = lightNode->CreateComponent<Light>();
                 light->SetLightType(LIGHT_DIRECTIONAL);
                 lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
             }
         }
     }
 
-    ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
+    auto* cache = context_->GetSubsystem<ResourceCache>();
 
     HashMap<aiNode*, Node*> nodeMapping;
 
-    Node* outRootNode = 0;
+    Node* outRootNode = nullptr;
     if (asPrefab)
         outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
     else
@@ -1693,13 +1688,15 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
     {
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
         Node* modelNode = CreateSceneNode(outScene, scene.nodes_[i], nodeMapping);
-        StaticModel* staticModel = model.bones_.Empty() ? modelNode->CreateComponent<StaticModel>() : modelNode->CreateComponent<AnimatedModel>();
+        auto* staticModel =
+            static_cast<StaticModel*>(
+                model.bones_.Empty() ? modelNode->CreateComponent<StaticModel>() : modelNode->CreateComponent<AnimatedModel>());
 
         // Create a dummy model so that the reference can be stored
         String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
         if (!cache->Exists(modelName))
         {
-            Model* dummyModel = new Model(context_);
+            auto* dummyModel = new Model(context_);
             dummyModel->SetName(modelName);
             dummyModel->SetNumGeometries(model.meshes_.Size());
             cache->AddManualResource(dummyModel);
@@ -1713,7 +1710,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             // Create a dummy material so that the reference can be stored
             if (!cache->Exists(matName))
             {
-                Material* dummyMat = new Material(context_);
+                auto* dummyMat = new Material(context_);
                 dummyMat->SetName(matName);
                 cache->AddManualResource(dummyMat);
             }
@@ -1743,7 +1740,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
                 outNode->SetDirection(lightAdjustDirection);
             }
 
-            Light* outLight = outNode->CreateComponent<Light>();
+            auto* outLight = outNode->CreateComponent<Light>();
             outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
 
             switch (light->mType)
@@ -1953,7 +1950,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         shadowCullElem.SetString("value", "none");
     }
 
-    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    auto* fileSystem = context_->GetSubsystem<FileSystem>();
 
     String outFileName = resourcePath_ + (useSubdirs_ ? "Materials/" : "" ) + matName + ".xml";
     if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
@@ -1972,7 +1969,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 
 void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 {
-    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    auto* fileSystem = context_->GetSubsystem<FileSystem>();
 
     if (useSubdirs_)
         fileSystem->CreateDir(resourcePath_ + "Textures");
@@ -2008,7 +2005,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
                     PrintLine("Saving embedded RGBA texture " + GetFileNameAndExtension(fullDestName));
                     Image image(context_);
                     image.SetSize(tex->mWidth, tex->mHeight, 4);
-                    memcpy(image.GetData(), (const void*)tex->pcData, tex->mWidth * tex->mHeight * 4);
+                    memcpy(image.GetData(), (const void*)tex->pcData, (size_t)tex->mWidth * tex->mHeight * 4);
                     image.SavePNG(fullDestName);
                 }
             }
@@ -2179,7 +2176,7 @@ aiBone* GetMeshBone(OutModel& model, const String& boneName)
                 return bone;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
@@ -2449,7 +2446,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
             mesh->mColors[i][index].a).ToUInt();
         ++dest;
     }
-    
+
     for (unsigned i = 0; i < mesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
     {
         Vector3 texCoord = ToVector3(mesh->mTextureCoords[i][index]);
@@ -2482,8 +2479,8 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
             else
                 *dest++ = 0.0f;
         }
-    
-        unsigned char* destBytes = (unsigned char*)dest;
+
+        auto* destBytes = (unsigned char*)dest;
         ++dest;
         for (unsigned i = 0; i < 4; ++i)
         {
@@ -2527,7 +2524,7 @@ PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned)
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
 {
     if (!rootNode)
-        return 0;
+        return nullptr;
     if (!name.Compare(rootNode->mName.data, caseSensitive))
         return rootNode;
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
@@ -2536,7 +2533,7 @@ aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
         if (found)
             return found;
     }
-    return 0;
+    return nullptr;
 }
 
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive)
@@ -2561,7 +2558,7 @@ aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* roo
 aiMatrix4x4 GetMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode)
 {
     if (meshNode == modelRootNode)
-        return aiMatrix4x4();
+        return {};
     else
         return GetDerivedTransform(meshNode, modelRootNode);
 }
@@ -2657,13 +2654,13 @@ void FillChainTransforms(OutModel &model, aiMatrix4x4 *chain, const String& main
     }
 }
 
-void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *channelIndices)
+void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, const int *channelIndices)
 {
     aiNodeAnim* channel = anim->mChannels[mainChannel];
     unsigned int poskeyFrames = channel->mNumPositionKeys;
     unsigned int rotkeyFrames = channel->mNumRotationKeys;
     unsigned int scalekeyFrames = channel->mNumScalingKeys;
-    
+
     // Get max key frames
     for (unsigned i = 0; i < TransformationComp_MAXIMUM; ++i)
     {
@@ -2683,7 +2680,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     // Resize and init vector key array
     if (poskeyFrames > channel->mNumPositionKeys)
     {
-        aiVectorKey* newKeys  = new aiVectorKey[poskeyFrames];
+        auto* newKeys  = new aiVectorKey[poskeyFrames];
         for (unsigned i = 0; i < poskeyFrames; ++i)
         {
             if (i < channel->mNumPositionKeys )
@@ -2697,7 +2694,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     }
     if (rotkeyFrames > channel->mNumRotationKeys)
     {
-        aiQuatKey* newKeys  = new aiQuatKey[rotkeyFrames];
+        auto* newKeys  = new aiQuatKey[rotkeyFrames];
         for (unsigned i = 0; i < rotkeyFrames; ++i)
         {
             if (i < channel->mNumRotationKeys)
@@ -2711,7 +2708,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     }
     if (scalekeyFrames > channel->mNumScalingKeys)
     {
-        aiVectorKey* newKeys  = new aiVectorKey[scalekeyFrames];
+        auto* newKeys  = new aiVectorKey[scalekeyFrames];
         for (unsigned i = 0; i < scalekeyFrames; ++i)
         {
             if ( i < channel->mNumScalingKeys)
@@ -2757,7 +2754,7 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
 {
     // Init
     model.pivotlessBones_.Clear();
-    aiMatrix4x4 chain[TransformationComp_MAXIMUM];
+    aiMatrix4x4 chains[TransformationComp_MAXIMUM];
 
     for (unsigned i = 0; i < model.bones_.Size(); ++i)
     {
@@ -2767,16 +2764,16 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
         if (mainBoneName.Find("$AssimpFbx$") != String::NPOS)
             continue;
 
-        std::fill_n(chain, static_cast<unsigned int>(TransformationComp_MAXIMUM), aiMatrix4x4());
-        FillChainTransforms(model, &chain[0], mainBoneName);
+        std::fill_n(chains, static_cast<unsigned int>(TransformationComp_MAXIMUM), aiMatrix4x4());
+        FillChainTransforms(model, &chains[0], mainBoneName);
 
         // Calculate chained transform
         aiMatrix4x4 finalTransform;
-        for (unsigned j = 0; j < TransformationComp_MAXIMUM; ++j)
-            finalTransform = finalTransform * chain[j];
+        for (const auto& chain : chains)
+            finalTransform = finalTransform * chain;
 
         // New bone node
-        aiNode *pnode = new aiNode;
+        auto*pnode = new aiNode;
         pnode->mName = model.bones_[i]->mName;
         pnode->mTransformation = finalTransform * model.bones_[i]->mTransformation;
 

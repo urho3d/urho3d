@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,16 +31,12 @@
 
 #include <linux/input.h>
 
-#include "SDL.h"
+#include "SDL_assert.h"
+#include "SDL_loadso.h"
+#include "SDL_timer.h"
+#include "../unix/SDL_poll.h"
 
-static const char *SDL_UDEV_LIBS[] = {
-#ifdef SDL_UDEV_DYNAMIC
-	SDL_UDEV_DYNAMIC
-#else
-	"libudev.so.1",
-	"libudev.so.0"
-#endif
-};
+static const char *SDL_UDEV_LIBS[] = { "libudev.so.1", "libudev.so.0" };
 
 #define _THIS SDL_UDEV_PrivateData *_this
 static _THIS = NULL;
@@ -105,14 +101,7 @@ SDL_UDEV_hotplug_update_available(void)
 {
     if (_this->udev_mon != NULL) {
         const int fd = _this->udev_monitor_get_fd(_this->udev_mon);
-        fd_set fds;
-        struct timeval tv;
-
-        FD_ZERO(&fds);
-        FD_SET(fd, &fds);
-        tv.tv_sec = 0;
-        tv.tv_usec = 0;
-        if ((select(fd+1, &fds, NULL, NULL, &tv) > 0) && (FD_ISSET(fd, &fds))) {
+        if (SDL_IOReady(fd, SDL_FALSE, 0)) {
             return SDL_TRUE;
         }
     }
@@ -216,7 +205,7 @@ SDL_UDEV_Scan(void)
     enumerate = _this->udev_enumerate_new(_this->udev);
     if (enumerate == NULL) {
         SDL_UDEV_Quit();
-        SDL_SetError("udev_monitor_new_from_netlink() failed");
+        SDL_SetError("udev_enumerate_new() failed");
         return;
     }
     
@@ -265,6 +254,19 @@ SDL_UDEV_LoadLibrary(void)
         return 0;
     }
 
+#ifdef SDL_UDEV_DYNAMIC
+    /* Check for the build environment's libudev first */
+    if (_this->udev_handle == NULL) {
+        _this->udev_handle = SDL_LoadObject(SDL_UDEV_DYNAMIC);
+        if (_this->udev_handle != NULL) {
+            retval = SDL_UDEV_load_syms();
+            if (retval < 0) {
+                SDL_UDEV_UnloadLibrary();
+            }
+        }
+    }
+#endif
+
     if (_this->udev_handle == NULL) {
         for( i = 0 ; i < SDL_arraysize(SDL_UDEV_LIBS); i++) {
             _this->udev_handle = SDL_LoadObject(SDL_UDEV_LIBS[i]);
@@ -291,7 +293,6 @@ SDL_UDEV_LoadLibrary(void)
 #define BITS_PER_LONG           (sizeof(unsigned long) * 8)
 #define NBITS(x)                ((((x)-1)/BITS_PER_LONG)+1)
 #define OFF(x)                  ((x)%BITS_PER_LONG)
-#define BIT(x)                  (1UL<<OFF(x))
 #define LONG(x)                 ((x)/BITS_PER_LONG)
 #define test_bit(bit, array)    ((array[LONG(bit)] >> OFF(bit)) & 1)
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,9 +64,7 @@ Text3D::Text3D(Context* context) :
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
-Text3D::~Text3D()
-{
-}
+Text3D::~Text3D() = default;
 
 void Text3D::RegisterObject(Context* context)
 {
@@ -76,7 +74,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Font Size", int, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Font Size", float, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Row Spacing", float, text_.rowSpacing_, 1.0f, AM_DEFAULT);
@@ -93,10 +91,10 @@ void Text3D::RegisterObject(Context* context)
         VA_TOP, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Top Left Color", Color, text_.color_[0], Color::WHITE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Top Right Color", Color, text_.color_[1], Color::WHITE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bottom Left Color", Color, text_.color_[2], Color::WHITE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bottom Right Color", Color, text_.color_[3], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Top Left Color", Color, text_.colors_[0], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Top Right Color", Color, text_.colors_[1], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bottom Left Color", Color, text_.colors_[2], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bottom Right Color", Color, text_.colors_[3], Color::WHITE, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, text_.shadowOffset_, IntVector2(1, 1), AM_DEFAULT);
     URHO3D_ATTRIBUTE("Stroke Thickness", int, text_.strokeThickness_, 1, AM_DEFAULT);
@@ -187,7 +185,7 @@ void Text3D::SetMaterial(Material* material)
     UpdateTextMaterials(true);
 }
 
-bool Text3D::SetFont(const String& fontName, int size)
+bool Text3D::SetFont(const String& fontName, float size)
 {
     bool success = text_.SetFont(fontName, size);
 
@@ -200,7 +198,7 @@ bool Text3D::SetFont(const String& fontName, int size)
     return success;
 }
 
-bool Text3D::SetFont(Font* font, int size)
+bool Text3D::SetFont(Font* font, float size)
 {
     bool success = text_.SetFont(font, size);
 
@@ -211,7 +209,7 @@ bool Text3D::SetFont(Font* font, int size)
     return success;
 }
 
-bool Text3D::SetFontSize(int size)
+bool Text3D::SetFontSize(float size)
 {
     bool success = text_.SetFontSize(size);
 
@@ -392,7 +390,7 @@ Font* Text3D::GetFont() const
     return text_.GetFont();
 }
 
-int Text3D::GetFontSize() const
+float Text3D::GetFontSize() const
 {
     return text_.GetFontSize();
 }
@@ -487,12 +485,12 @@ int Text3D::GetRowWidth(unsigned index) const
     return text_.GetRowWidth(index);
 }
 
-IntVector2 Text3D::GetCharPosition(unsigned index)
+Vector2 Text3D::GetCharPosition(unsigned index)
 {
     return text_.GetCharPosition(index);
 }
 
-IntVector2 Text3D::GetCharSize(unsigned index)
+Vector2 Text3D::GetCharSize(unsigned index)
 {
     return text_.GetCharSize(index);
 }
@@ -540,13 +538,13 @@ void Text3D::MarkTextDirty()
 
 void Text3D::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void Text3D::SetFontAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     text_.font_ = cache->GetResource<Font>(value.name_);
 }
 
@@ -639,7 +637,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
     {
         if (!geometries_[i])
         {
-            Geometry* geometry = new Geometry(context_);
+            auto* geometry = new Geometry(context_);
             geometry->SetVertexBuffer(0, vertexBuffer_);
             batches_[i].geometry_ = geometries_[i] = geometry;
         }
@@ -649,8 +647,8 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             // If material not defined, create a reasonable default from scratch
             if (!material_)
             {
-                Material* material = new Material(context_);
-                Technique* tech = new Technique(context_);
+                auto* material = new Material(context_);
+                auto* tech = new Technique(context_);
                 Pass* pass = tech->CreatePass("alpha");
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
@@ -676,7 +674,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             if (!material_)
             {
                 Technique* tech = material->GetTechnique(0);
-                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                Pass* pass = tech ? tech->GetPass("alpha") : nullptr;
                 if (pass)
                 {
                     switch (GetTextEffect())
@@ -721,7 +719,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             if (!material_)
             {
                 Technique* tech = material->GetTechnique(0);
-                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                Pass* pass = tech ? tech->GetPass("alpha") : nullptr;
                 if (pass)
                 {
                     if (texture && texture->GetFormat() == Graphics::GetAlphaFormat())

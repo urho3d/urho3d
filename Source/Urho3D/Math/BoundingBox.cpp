@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -187,13 +187,20 @@ Rect BoundingBox::Projected(const Matrix4& projection) const
     vertices[7] = projMax;
 
     Rect rect;
-    for (unsigned i = 0; i < 8; ++i)
+    for (const auto& vertice : vertices)
     {
-        Vector3 projected = projection * vertices[i];
+        Vector3 projected = projection * vertice;
         rect.Merge(Vector2(projected.x_, projected.y_));
     }
 
     return rect;
+}
+
+float BoundingBox::DistanceToPoint(const Vector3& point) const
+{
+    const Vector3 offset = Center() - point;
+    const Vector3 absOffset(Abs(offset.x_), Abs(offset.y_), Abs(offset.z_));
+    return VectorMax(Vector3::ZERO, absOffset - HalfSize()).Length();
 }
 
 Intersection BoundingBox::IsInside(const Sphere& sphere) const

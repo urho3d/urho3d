@@ -3,7 +3,8 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 
 All rights reserved.
 
@@ -44,13 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #ifndef ASSIMP_BUILD_NO_TERRAGEN_IMPORTER
-#include "TerragenLoader.h"
-#include "../include/assimp/Importer.hpp"
-#include "../include/assimp/IOSystem.hpp"
-#include "StreamReader.h"
-#include "../include/assimp/scene.h"
-#include "../include/assimp/DefaultLogger.hpp"
 
+#include "TerragenLoader.h"
+#include "StreamReader.h"
+#include <assimp/Importer.hpp>
+#include <assimp/IOSystem.hpp>
+#include <assimp/scene.h>
+#include <assimp/DefaultLogger.hpp>
+#include <assimp/importerdesc.h>
 
 using namespace Assimp;
 
@@ -126,7 +128,7 @@ void TerragenImporter::InternReadFile( const std::string& pFile,
     if( file == NULL)
         throw DeadlyImportError( "Failed to open TERRAGEN TERRAIN file " + pFile + ".");
 
-    // Construct a stream reader to read all data in the correct endianess
+    // Construct a stream reader to read all data in the correct endianness
     StreamReaderLE reader(file);
     if(reader.GetRemainingSize() < 16)
         throw DeadlyImportError( "TER: file is too small" );
@@ -139,9 +141,6 @@ void TerragenImporter::InternReadFile( const std::string& pFile,
         throw DeadlyImportError( "TER: Magic string \'TERRAIN\' not found" );
 
     unsigned int x = 0,y = 0,mode = 0;
-    float rad  = 6370.f;
-    (void)rad;
-
 
     aiNode* root = pScene->mRootNode = new aiNode();
     root->mName.Set("<TERRAGEN.TERRAIN>");
@@ -185,7 +184,7 @@ void TerragenImporter::InternReadFile( const std::string& pFile,
         // mapping == 1: earth radius
         else if (!::strncmp(head,AI_TERR_CHUNK_CRAD,4))
         {
-            rad = reader.GetF4();
+            reader.GetF4();
         }
         // mapping mode
         else if (!::strncmp(head,AI_TERR_CHUNK_CRVM,4))

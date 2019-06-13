@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,11 +44,11 @@ FontFaceBitmap::FontFaceBitmap(Font* font) :
 {
 }
 
-FontFaceBitmap::~FontFaceBitmap()
-{
-}
+FontFaceBitmap::~FontFaceBitmap() = default;
 
-bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
+// FIXME: The Load() and Save() should be refactored accordingly after the recent FontGlyph struct changes
+
+bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize)
 {
     Context* context = font_->GetContext();
 
@@ -83,7 +83,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     unsigned pages = commonElem.GetUInt("pages");
     textures_.Reserve(pages);
 
-    ResourceCache* resourceCache = font_->GetSubsystem<ResourceCache>();
+    auto* resourceCache = font_->GetSubsystem<ResourceCache>();
     String fontPath = GetPath(font_->GetName());
     unsigned totalTextureSize = 0;
 
@@ -93,7 +93,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         if (pageElem.IsNull())
         {
             URHO3D_LOGERROR("Could not find Page element for page: " + String(i));
-            return 0;
+            return false;
         }
 
         // Assume the font image is in the same directory as the font description file
@@ -105,11 +105,11 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         if (!fontFile || !fontImage->Load(*fontFile))
         {
             URHO3D_LOGERROR("Failed to load font image file");
-            return 0;
+            return false;
         }
         SharedPtr<Texture2D> texture = LoadFaceTexture(fontImage);
         if (!texture)
-            return 0;
+            return false;
 
         textures_.Push(texture);
 
@@ -133,8 +133,8 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         FontGlyph glyph;
         glyph.x_ = (short)charElem.GetInt("x");
         glyph.y_ = (short)charElem.GetInt("y");
-        glyph.width_ = (short)charElem.GetInt("width");
-        glyph.height_ = (short)charElem.GetInt("height");
+        glyph.width_ = glyph.texWidth_ = (short)charElem.GetInt("width");
+        glyph.height_ = glyph.texHeight_ = (short)charElem.GetInt("height");
         glyph.offsetX_ = (short)charElem.GetInt("xoffset");
         glyph.offsetY_ = (short)charElem.GetInt("yoffset");
         glyph.advanceX_ = (short)charElem.GetInt("xadvance");
@@ -151,9 +151,9 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         XMLElement kerningElem = kerningsElem.GetChild("kerning");
         while (!kerningElem.IsNull())
         {
-            int first = kerningElem.GetInt("first");
-            int second = kerningElem.GetInt("second");
-            unsigned value = (unsigned)((first << 16) + second);
+            unsigned first = kerningElem.GetInt("first");
+            unsigned second = kerningElem.GetInt("second");
+            unsigned value = first << 16u | second;
             kerningMapping_[value] = (short)kerningElem.GetInt("amount");
 
             kerningElem = kerningElem.GetNext("kerning");
@@ -234,7 +234,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
         }
 
         image->SetSize(width, height, components);
-        memset(image->GetData(), 0, width * height * components);
+        memset(image->GetData(), 0, (size_t)width * height * components);
 
         newImages[i] = image;
     }
@@ -251,10 +251,10 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     for (unsigned i = 0; i < newImages.Size(); ++i)
         textures_[i] = LoadFaceTexture(newImages[i]);
 
-    for (HashMap<unsigned, short>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
+    for (HashMap<unsigned, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
     {
-        unsigned first = (i->first_) >> 16;
-        unsigned second = (i->first_) & 0xffff;
+        unsigned first = (i->first_) >> 16u;
+        unsigned second = (i->first_) & 0xffffu;
         if (glyphMapping_.Find(first) != glyphMapping_.End() && glyphMapping_.Find(second) != glyphMapping_.End())
             kerningMapping_[i->first_] = i->second_;
     }
@@ -283,7 +283,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
 
     // Construct the path to store the texture
     String pathName;
-    File* file = dynamic_cast<File*>(&dest);
+    auto* file = dynamic_cast<File*>(&dest);
     if (file)
         // If serialize to file, use the file's path
         pathName = GetPath(file->GetName());
@@ -329,11 +329,11 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     if (!kerningMapping_.Empty())
     {
         XMLElement kerningsElem = rootElem.CreateChild("kernings");
-        for (HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
+        for (HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
             XMLElement kerningElem = kerningsElem.CreateChild("kerning");
-            kerningElem.SetInt("first", i->first_ >> 16);
-            kerningElem.SetInt("second", i->first_ & 0xffff);
+            kerningElem.SetInt("first", i->first_ >> 16u);
+            kerningElem.SetInt("second", i->first_ & 0xffffu);
             kerningElem.SetInt("amount", i->second_);
         }
     }
@@ -377,7 +377,7 @@ void FontFaceBitmap::Blit(Image* dest, int x, int y, int width, int height, Imag
     unsigned char* sourceData = source->GetData() + (sourceY * source->GetWidth() + sourceX) * components;
     for (int i = 0; i < height; ++i)
     {
-        memcpy(destData, sourceData, (size_t)(width * components));
+        memcpy(destData, sourceData, (size_t)width * components);
         destData += dest->GetWidth() * components;
         sourceData += source->GetWidth() * components;
     }

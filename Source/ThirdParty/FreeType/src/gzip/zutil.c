@@ -5,7 +5,7 @@
 
 /* @(#) $Id$ */
 
-// Modified by Yao Wei Tjong for Urho3D
+// Modified by Yao Wei Tjong & Lasse Oorni for Urho3D
 
 #include "zutil.h"
 
@@ -14,7 +14,7 @@ extern void exit OF((int));
 #endif
 
 // Urho3D: quick fix for debug build
-#ifdef DEBUG
+#if 0
 
 #  ifndef verbose
 #    define verbose 0

@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2015, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -53,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // internal headers
 #include "LWOFileData.h"
+#include <assimp/anim.h>
 
 using namespace Assimp;
 using namespace Assimp::LWO;
@@ -160,9 +162,9 @@ void AnimResolver::UpdateAnimRangeSetup()
             case LWO::PrePostBehaviour_Repeat:
             case LWO::PrePostBehaviour_Oscillate:
                 {
-                const double start_time = delta - fmod(my_first-first,delta);
+                const double start_time = delta - std::fmod(my_first-first,delta);
                 std::vector<LWO::Key>::iterator n = std::find_if((*it).keys.begin(),(*it).keys.end(),
-                    std::bind1st(std::greater<double>(),start_time)),m;
+                    [start_time](double t) { return start_time > t; }),m;
 
                 size_t ofs = 0;
                 if (n != (*it).keys.end()) {
@@ -328,7 +330,12 @@ void AnimResolver::DoInterpolation2(std::vector<LWO::Key>::const_iterator beg,
             break;
     }
     // linear interpolation - default
-    fill = (*beg).value + ((*end).value - (*beg).value)*(float)(((time - (*beg).time) / ((*end).time - (*beg).time)));
+    double duration = (*end).time - (*beg).time;
+    if (duration > 0.0) {
+        fill = (*beg).value + ((*end).value - (*beg).value)*(float)(((time - (*beg).time) / duration));
+    } else {
+        fill = (*beg).value;
+    }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -439,8 +446,6 @@ void AnimResolver::GetKeys(std::vector<aiVectorKey>& out,
 
     // Iterate through all three arrays at once - it's tricky, but
     // rather interesting to implement.
-    double lasttime = std::min(envl_x->keys[0].time,std::min(envl_y->keys[0].time,envl_z->keys[0].time));
-
     cur_x = envl_x->keys.begin();
     cur_y = envl_y->keys.begin();
     cur_z = envl_z->keys.begin();
@@ -496,7 +501,7 @@ void AnimResolver::GetKeys(std::vector<aiVectorKey>& out,
                 InterpolateTrack(out,fill,(end_y ? (*cur_x) : (*cur_y)).time);
             }
         }
-        lasttime = fill.mTime;
+        double lasttime = fill.mTime;
         out.push_back(fill);
 
         if (lasttime >= (*cur_x).time) {
@@ -560,7 +565,7 @@ void AnimResolver::ExtractAnimChannel(aiNodeAnim** out, unsigned int flags /*= 0
         std::vector<aiVectorKey> keys;
         GetKeys(keys,trans_x,trans_y,trans_z,flags);
 
-        anim->mPositionKeys = new aiVectorKey[ anim->mNumPositionKeys = keys.size() ];
+        anim->mPositionKeys = new aiVectorKey[ anim->mNumPositionKeys = static_cast<unsigned int>(keys.size()) ];
         std::copy(keys.begin(),keys.end(),anim->mPositionKeys);
     }
 
@@ -569,7 +574,7 @@ void AnimResolver::ExtractAnimChannel(aiNodeAnim** out, unsigned int flags /*= 0
         std::vector<aiVectorKey> keys;
         GetKeys(keys,rotat_x,rotat_y,rotat_z,flags);
 
-        anim->mRotationKeys = new aiQuatKey[ anim->mNumRotationKeys = keys.size() ];
+        anim->mRotationKeys = new aiQuatKey[ anim->mNumRotationKeys = static_cast<unsigned int>(keys.size()) ];
 
         // convert heading, pitch, bank to quaternion
         // mValue.x=Heading=Rot(Y), mValue.y=Pitch=Rot(X), mValue.z=Bank=Rot(Z)
@@ -589,7 +594,7 @@ void AnimResolver::ExtractAnimChannel(aiNodeAnim** out, unsigned int flags /*= 0
         std::vector<aiVectorKey> keys;
         GetKeys(keys,scale_x,scale_y,scale_z,flags);
 
-        anim->mScalingKeys = new aiVectorKey[ anim->mNumScalingKeys = keys.size() ];
+        anim->mScalingKeys = new aiVectorKey[ anim->mNumScalingKeys = static_cast<unsigned int>(keys.size()) ];
         std::copy(keys.begin(),keys.end(),anim->mScalingKeys);
     }
 }

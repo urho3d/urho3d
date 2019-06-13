@@ -1100,9 +1100,30 @@ int cpu_rdmsr_range(struct msr_driver_t* handle, uint32_t msr_index, uint8_t hig
  *           processor model, the respective value is returned.
  *           if no information is available, or the CPU doesn't support
  *           the query, the special value CPU_INVALID_VALUE is returned
+ * @note This function is not MT-safe. If you intend to call it from multiple
+ *       threads, guard it through a mutex or a similar primitive.
  */
 int cpu_msrinfo(struct msr_driver_t* handle, cpu_msrinfo_request_t which);
 #define CPU_INVALID_VALUE 0x3fffffff
+
+/**
+ * @brief Writes the raw MSR data to a text file
+ * @param data - a pointer to msr_driver_t structure
+ * @param filename - the path of the file, where the serialized data should be
+ *                   written. If empty, stdout will be used.
+ * @note This is intended primarily for debugging. On some processor, which is
+ *       not currently supported or not completely recognized by cpu_identify,
+ *       one can still successfully get the raw data and write it to a file.
+ *       libcpuid developers can later import this file and debug the detection
+ *       code as if running on the actual hardware.
+ *       The file is simple text format of "something=value" pairs. Version info
+ *       is also written, but the format is not intended to be neither backward-
+ *       nor forward compatible.
+ * @returns zero if successful, and some negative number on error.
+ *          The error message can be obtained by calling \ref cpuid_error.
+ *          @see cpu_error_t
+ */
+int msr_serialize_raw_data(struct msr_driver_t* handle, const char* filename);
 
 /**
  * @brief Closes an open MSR driver

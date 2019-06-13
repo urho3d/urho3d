@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,15 +36,21 @@ static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
 
+class StringHash;
+template <class T, class U> class HashMap;
+
+/// Map of strings.
+using StringMap = HashMap<StringHash, String>;
+
 /// %String class.
 class URHO3D_API String
 {
 public:
-    typedef RandomAccessIterator<char> Iterator;
-    typedef RandomAccessConstIterator<char> ConstIterator;
+    using Iterator = RandomAccessIterator<char>;
+    using ConstIterator = RandomAccessConstIterator<char>;
 
     /// Construct empty.
-    String() :
+    String() noexcept :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -60,8 +66,17 @@ public:
         *this = str;
     }
 
+    /// Move-construct from another string.
+    String(String && str) noexcept :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        Swap(str);
+    }
+
     /// Construct from a C string.
-    String(const char* str) :
+    String(const char* str) :   // NOLINT(google-explicit-constructor)
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -70,7 +85,7 @@ public:
     }
 
     /// Construct from a C string.
-    String(char* str) :
+    String(char* str) :         // NOLINT(google-explicit-constructor)
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -89,7 +104,7 @@ public:
     }
 
     /// Construct from a null-terminated wide character array.
-    String(const wchar_t* str) :
+    explicit String(const wchar_t* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -98,7 +113,7 @@ public:
     }
 
     /// Construct from a null-terminated wide character array.
-    String(wchar_t* str) :
+    explicit String(wchar_t* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -107,7 +122,7 @@ public:
     }
 
     /// Construct from a wide character string.
-    String(const WString& str);
+    explicit String(const WString& str);
 
     /// Construct from an integer.
     explicit String(int value);
@@ -136,7 +151,7 @@ public:
     /// Construct from a character and fill length.
     explicit String(char value, unsigned length);
 
-    /// Construct from a convertable value.
+    /// Construct from a convertible value.
     template <class T> explicit String(const T& value) :
         length_(0),
         capacity_(0),
@@ -155,9 +170,20 @@ public:
     /// Assign a string.
     String& operator =(const String& rhs)
     {
-        Resize(rhs.length_);
-        CopyChars(buffer_, rhs.buffer_, rhs.length_);
+        if (&rhs != this)
+        {
+            Resize(rhs.length_);
+            CopyChars(buffer_, rhs.buffer_, rhs.length_);
+        }
 
+        return *this;
+    }
+
+    /// Move-assign a string.
+    String& operator =(String && rhs) noexcept
+    {
+        assert(&rhs != this);
+        Swap(rhs);
         return *this;
     }
 
@@ -224,7 +250,7 @@ public:
     String& operator +=(bool rhs);
 
     /// Add-assign (concatenate as string) an arbitrary type.
-    template <class T> String operator +=(const T& rhs) { return *this += rhs.ToString(); }
+    template <class T> String& operator +=(const T& rhs) { return *this += rhs.ToString(); }
 
     /// Add a string.
     String operator +(const String& rhs) const
@@ -446,7 +472,7 @@ public:
         const char* ptr = buffer_;
         while (*ptr)
         {
-            hash = *ptr + (hash << 6) + (hash << 16) - hash;
+            hash = *ptr + (hash << 6u) + (hash << 16u) - hash;
             ++ptr;
         }
 
@@ -477,7 +503,7 @@ public:
     String& AppendWithFormatArgs(const char* formatString, va_list args);
 
     /// Compare two C strings.
-    static int Compare(const char* str1, const char* str2, bool caseSensitive);
+    static int Compare(const char* lhs, const char* rhs, bool caseSensitive);
 
     /// Position for "not found."
     static const unsigned NPOS = 0xffffffff;
@@ -518,7 +544,7 @@ private:
     unsigned length_;
     /// Capacity, zero if buffer not allocated.
     unsigned capacity_;
-    /// String buffer, null if not allocated.
+    /// String buffer, point to &endZero if buffer is not allocated.
     char* buffer_;
 
     /// End zero for empty strings.
@@ -548,7 +574,7 @@ public:
     /// Construct empty.
     WString();
     /// Construct from a string.
-    WString(const String& str);
+    explicit WString(const String& str);
     /// Destruct.
     ~WString();
 

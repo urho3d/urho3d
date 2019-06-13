@@ -37,6 +37,7 @@ class Image : public Resource
     bool SaveTGA(const String fileName) const;
     bool SaveJPG(const String fileName, int quality) const;
     bool SaveDDS(const String fileName) const;
+    bool SaveWEBP(const String fileName, float compression = 0.0f) const;
 
     Color GetPixel(int x, int y) const;
     Color GetPixel(int x, int y, int z) const;
@@ -52,9 +53,11 @@ class Image : public Resource
     CompressedFormat GetCompressedFormat() const;
     unsigned GetNumCompressedLevels() const;
     Image* GetSubimage(const IntRect& rect) const;
+    bool SetSubimage(const Image* image, const IntRect rect);
     bool IsCubemap() const;
     bool IsArray() const;
     bool IsSRGB() const;
+    bool HasAlphaChannel() const;
 
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;

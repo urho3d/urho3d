@@ -10,7 +10,7 @@ local boxNodes = {}
 local animate = false
 local useGroups = false
 
-local animate = true;
+local animate = true
 local animTime = 0.0
 local originalVertexData = VectorBuffer()
 local animatingBuffers = {}
@@ -287,7 +287,7 @@ function MoveCamera(timeStep)
 end
 
 function AnimateObjects(timeStep)
-    animTime = animTime + timeStep * 100.0;
+    animTime = animTime + timeStep * 100.0
 
     -- Repeat for each of the cloned vertex buffers
     for i = 1, table.getn(animatingBuffers) do

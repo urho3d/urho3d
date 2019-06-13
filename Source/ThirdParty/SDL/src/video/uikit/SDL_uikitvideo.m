@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -37,6 +40,9 @@
 #include "SDL_uikitwindow.h"
 #include "SDL_uikitopengles.h"
 #include "SDL_uikitclipboard.h"
+#ifndef TARGET_IPHONE_SIMULATOR
+#include "SDL_uikitvulkan.h"
+#endif
 
 #define UIKITVID_DRIVER_NAME "uikit"
 
@@ -90,7 +96,7 @@ UIKit_CreateDevice(int devindex)
         device->SetDisplayMode = UIKit_SetDisplayMode;
         device->PumpEvents = UIKit_PumpEvents;
         device->SuspendScreenSaver = UIKit_SuspendScreenSaver;
-        device->CreateWindow = UIKit_CreateWindow;
+        device->CreateSDLWindow = UIKit_CreateWindow;
         device->SetWindowTitle = UIKit_SetWindowTitle;
         device->ShowWindow = UIKit_ShowWindow;
         device->HideWindow = UIKit_HideWindow;
@@ -101,13 +107,13 @@ UIKit_CreateDevice(int devindex)
         device->GetWindowWMInfo = UIKit_GetWindowWMInfo;
         device->GetDisplayUsableBounds = UIKit_GetDisplayUsableBounds;
 
-    #if SDL_IPHONE_KEYBOARD
+#if SDL_IPHONE_KEYBOARD
         device->HasScreenKeyboardSupport = UIKit_HasScreenKeyboardSupport;
         device->ShowScreenKeyboard = UIKit_ShowScreenKeyboard;
         device->HideScreenKeyboard = UIKit_HideScreenKeyboard;
         device->IsScreenKeyboardShown = UIKit_IsScreenKeyboardShown;
         device->SetTextInputRect = UIKit_SetTextInputRect;
-    #endif
+#endif
 
         device->SetClipboardText = UIKit_SetClipboardText;
         device->GetClipboardText = UIKit_GetClipboardText;
@@ -122,6 +128,16 @@ UIKit_CreateDevice(int devindex)
         device->GL_GetProcAddress   = UIKit_GL_GetProcAddress;
         device->GL_LoadLibrary      = UIKit_GL_LoadLibrary;
         device->free = UIKit_DeleteDevice;
+
+// Urho3D - iOS/tvOS simulator does not have Metal support
+#if SDL_VIDEO_VULKAN && !defined(TARGET_IPHONE_SIMULATOR)
+        device->Vulkan_LoadLibrary = UIKit_Vulkan_LoadLibrary;
+        device->Vulkan_UnloadLibrary = UIKit_Vulkan_UnloadLibrary;
+        device->Vulkan_GetInstanceExtensions
+                                     = UIKit_Vulkan_GetInstanceExtensions;
+        device->Vulkan_CreateSurface = UIKit_Vulkan_CreateSurface;
+        device->Vulkan_GetDrawableSize = UIKit_Vulkan_GetDrawableSize;
+#endif
 
         device->gl_config.accelerated = 1;
 
@@ -176,18 +192,39 @@ UIKit_IsSystemVersionAtLeast(double version)
 CGRect
 UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen)
 {
+    CGRect frame = screen.bounds;
+
 #if !TARGET_OS_TV && (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0)
     BOOL hasiOS7 = UIKit_IsSystemVersionAtLeast(7.0);
 
-    if (hasiOS7 || (window->flags & (SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN))) {
-        /* The view should always show behind the status bar in iOS 7+. */
-        return screen.bounds;
-    } else {
-        return screen.applicationFrame;
+    /* The view should always show behind the status bar in iOS 7+. */
+    if (!hasiOS7 && !(window->flags & (SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN))) {
+        frame = screen.applicationFrame;
     }
-#else
-    return screen.bounds;
 #endif
+
+#if !TARGET_OS_TV
+    /* iOS 10 seems to have a bug where, in certain conditions, putting the
+     * device to sleep with the a landscape-only app open, re-orienting the
+     * device to portrait, and turning it back on will result in the screen
+     * bounds returning portrait orientation despite the app being in landscape.
+     * This is a workaround until a better solution can be found.
+     * https://bugzilla.libsdl.org/show_bug.cgi?id=3505
+     * https://bugzilla.libsdl.org/show_bug.cgi?id=3465
+     * https://forums.developer.apple.com/thread/65337 */
+    if (UIKit_IsSystemVersionAtLeast(8.0)) {
+        UIInterfaceOrientation orient = [UIApplication sharedApplication].statusBarOrientation;
+        BOOL isLandscape = UIInterfaceOrientationIsLandscape(orient);
+
+        if (isLandscape != (frame.size.width > frame.size.height)) {
+            float height = frame.size.width;
+            frame.size.width = frame.size.height;
+            frame.size.height = height;
+        }
+    }
+#endif
+
+    return frame;
 }
 
 /*

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ class URHO3D_API Application : public Object
 
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.
-    Application(Context* context);
+    explicit Application(Context* context);
 
     /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Call ErrorExit() to terminate without initializing the engine. Called by Application.
     virtual void Setup() { }
@@ -69,7 +69,7 @@ protected:
 };
 
 // Macro for defining a main function which creates a Context and the application, then runs it
-#ifndef IOS
+#if !defined(IOS) && !defined(TVOS)
 #define URHO3D_DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \
@@ -77,9 +77,9 @@ int RunApplication() \
     Urho3D::SharedPtr<className> application(new className(context)); \
     return application->Run(); \
 } \
-URHO3D_DEFINE_MAIN(RunApplication());
+URHO3D_DEFINE_MAIN(RunApplication())
 #else
-// On iOS we will let this function exit, so do not hold the context and application in SharedPtr's
+// On iOS/tvOS we will let this function exit, so do not hold the context and application in SharedPtr's
 #define URHO3D_DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \

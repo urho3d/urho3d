@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -55,6 +55,7 @@ static SDL_Renderer *GL_CreateRenderer(SDL_Window * window, Uint32 flags);
 static void GL_WindowEvent(SDL_Renderer * renderer,
                            const SDL_WindowEvent *event);
 static int GL_GetOutputSize(SDL_Renderer * renderer, int *w, int *h);
+static SDL_bool GL_SupportsBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode);
 static int GL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture);
 static int GL_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
                             const SDL_Rect * rect, const void *pixels,
@@ -126,7 +127,7 @@ typedef struct
     struct {
         GL_Shader shader;
         Uint32 color;
-        int blendMode;
+        SDL_BlendMode blendMode;
     } current;
 
     SDL_bool GL_EXT_framebuffer_object_supported;
@@ -259,7 +260,7 @@ GL_CheckAllErrors (const char *prefix, SDL_Renderer *renderer, const char *file,
 
 #if 0
 #define GL_CheckError(prefix, renderer)
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__WATCOMC__)
 #define GL_CheckError(prefix, renderer) GL_CheckAllErrors(prefix, renderer, __FILE__, __LINE__, __FUNCTION__)
 #else
 #define GL_CheckError(prefix, renderer) GL_CheckAllErrors(prefix, renderer, __FILE__, __LINE__, __PRETTY_FUNCTION__)
@@ -275,7 +276,7 @@ GL_LoadFunctions(GL_RenderData * data)
     do { \
         data->func = SDL_GL_GetProcAddress(#func); \
         if ( ! data->func ) { \
-            return SDL_SetError("Couldn't load GL function %s: %s\n", #func, SDL_GetError()); \
+            return SDL_SetError("Couldn't load GL function %s: %s", #func, SDL_GetError()); \
         } \
     } while ( 0 );
 #endif /* __SDL_NOGETPROCADDR__ */
@@ -320,8 +321,8 @@ GL_ResetState(SDL_Renderer *renderer)
     }
 
     data->current.shader = SHADER_NONE;
-    data->current.color = 0;
-    data->current.blendMode = -1;
+    data->current.color = 0xffffffff;
+    data->current.blendMode = SDL_BLENDMODE_INVALID;
 
     data->glDisable(GL_DEPTH_TEST);
     data->glDisable(GL_CULL_FACE);
@@ -428,6 +429,7 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
 
     renderer->WindowEvent = GL_WindowEvent;
     renderer->GetOutputSize = GL_GetOutputSize;
+    renderer->SupportsBlendMode = GL_SupportsBlendMode;
     renderer->CreateTexture = GL_CreateTexture;
     renderer->UpdateTexture = GL_UpdateTexture;
     renderer->UpdateTextureYUV = GL_UpdateTextureYUV;
@@ -493,7 +495,7 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
         PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARBFunc = (PFNGLDEBUGMESSAGECALLBACKARBPROC) SDL_GL_GetProcAddress("glDebugMessageCallbackARB");
 
         data->GL_ARB_debug_output_supported = SDL_TRUE;
-        data->glGetPointerv(GL_DEBUG_CALLBACK_FUNCTION_ARB, (GLvoid **)&data->next_error_callback);
+        data->glGetPointerv(GL_DEBUG_CALLBACK_FUNCTION_ARB, (GLvoid **)(char *)&data->next_error_callback);
         data->glGetPointerv(GL_DEBUG_CALLBACK_USER_PARAM_ARB, &data->next_error_userparam);
         glDebugMessageCallbackARBFunc(GL_HandleDebugMessage, renderer);
 
@@ -595,6 +597,72 @@ GL_GetOutputSize(SDL_Renderer * renderer, int *w, int *h)
     return 0;
 }
 
+static GLenum GetBlendFunc(SDL_BlendFactor factor)
+{
+    switch (factor) {
+    case SDL_BLENDFACTOR_ZERO:
+        return GL_ZERO;
+    case SDL_BLENDFACTOR_ONE:
+        return GL_ONE;
+    case SDL_BLENDFACTOR_SRC_COLOR:
+        return GL_SRC_COLOR;
+    case SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR:
+        return GL_ONE_MINUS_SRC_COLOR;
+    case SDL_BLENDFACTOR_SRC_ALPHA:
+        return GL_SRC_ALPHA;
+    case SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA:
+        return GL_ONE_MINUS_SRC_ALPHA;
+    case SDL_BLENDFACTOR_DST_COLOR:
+        return GL_DST_COLOR;
+    case SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR:
+        return GL_ONE_MINUS_DST_COLOR;
+    case SDL_BLENDFACTOR_DST_ALPHA:
+        return GL_DST_ALPHA;
+    case SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA:
+        return GL_ONE_MINUS_DST_ALPHA;
+    default:
+        return GL_INVALID_ENUM;
+    }
+}
+
+static GLenum GetBlendEquation(SDL_BlendOperation operation)
+{
+    switch (operation) {
+    case SDL_BLENDOPERATION_ADD:
+        return GL_FUNC_ADD;
+    case SDL_BLENDOPERATION_SUBTRACT:
+        return GL_FUNC_SUBTRACT;
+    case SDL_BLENDOPERATION_REV_SUBTRACT:
+        return GL_FUNC_REVERSE_SUBTRACT;
+    default:
+        return GL_INVALID_ENUM;
+    }
+}
+
+static SDL_bool
+GL_SupportsBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode)
+{
+    SDL_BlendFactor srcColorFactor = SDL_GetBlendModeSrcColorFactor(blendMode);
+    SDL_BlendFactor srcAlphaFactor = SDL_GetBlendModeSrcAlphaFactor(blendMode);
+    SDL_BlendOperation colorOperation = SDL_GetBlendModeColorOperation(blendMode);
+    SDL_BlendFactor dstColorFactor = SDL_GetBlendModeDstColorFactor(blendMode);
+    SDL_BlendFactor dstAlphaFactor = SDL_GetBlendModeDstAlphaFactor(blendMode);
+    SDL_BlendOperation alphaOperation = SDL_GetBlendModeAlphaOperation(blendMode);
+
+    if (GetBlendFunc(srcColorFactor) == GL_INVALID_ENUM ||
+        GetBlendFunc(srcAlphaFactor) == GL_INVALID_ENUM ||
+        GetBlendEquation(colorOperation) == GL_INVALID_ENUM ||
+        GetBlendFunc(dstColorFactor) == GL_INVALID_ENUM ||
+        GetBlendFunc(dstAlphaFactor) == GL_INVALID_ENUM ||
+        GetBlendEquation(alphaOperation) == GL_INVALID_ENUM) {
+        return SDL_FALSE;
+    }
+    if (colorOperation != alphaOperation) {
+        return SDL_FALSE;
+    }
+    return SDL_TRUE;
+}
+
 SDL_FORCE_INLINE int
 power_of_2(int input)
 {
@@ -684,12 +752,12 @@ GL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
         if (texture->format == SDL_PIXELFORMAT_YV12 ||
             texture->format == SDL_PIXELFORMAT_IYUV) {
             /* Need to add size for the U and V planes */
-            size += (2 * (texture->h * data->pitch) / 4);
+            size += 2 * ((texture->h + 1) / 2) * ((data->pitch + 1) / 2);
         }
         if (texture->format == SDL_PIXELFORMAT_NV12 ||
             texture->format == SDL_PIXELFORMAT_NV21) {
             /* Need to add size for the U/V plane */
-            size += ((texture->h * data->pitch) / 2);
+            size += 2 * ((texture->h + 1) / 2) * ((data->pitch + 1) / 2);
         }
         data->pixels = SDL_calloc(1, size);
         if (!data->pixels) {
@@ -807,8 +875,8 @@ GL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
                                     GL_CLAMP_TO_EDGE);
         renderdata->glTexParameteri(data->type, GL_TEXTURE_WRAP_T,
                                     GL_CLAMP_TO_EDGE);
-        renderdata->glTexImage2D(data->type, 0, internalFormat, texture_w/2,
-                                 texture_h/2, 0, format, type, NULL);
+        renderdata->glTexImage2D(data->type, 0, internalFormat, (texture_w+1)/2,
+                                 (texture_h+1)/2, 0, format, type, NULL);
 
         renderdata->glBindTexture(data->type, data->vtexture);
         renderdata->glTexParameteri(data->type, GL_TEXTURE_MIN_FILTER,
@@ -819,8 +887,8 @@ GL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
                                     GL_CLAMP_TO_EDGE);
         renderdata->glTexParameteri(data->type, GL_TEXTURE_WRAP_T,
                                     GL_CLAMP_TO_EDGE);
-        renderdata->glTexImage2D(data->type, 0, internalFormat, texture_w/2,
-                                 texture_h/2, 0, format, type, NULL);
+        renderdata->glTexImage2D(data->type, 0, internalFormat, (texture_w+1)/2,
+                                 (texture_h+1)/2, 0, format, type, NULL);
 
         renderdata->glDisable(data->type);
     }
@@ -841,8 +909,8 @@ GL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
                                     GL_CLAMP_TO_EDGE);
         renderdata->glTexParameteri(data->type, GL_TEXTURE_WRAP_T,
                                     GL_CLAMP_TO_EDGE);
-        renderdata->glTexImage2D(data->type, 0, GL_LUMINANCE_ALPHA, texture_w/2,
-                                 texture_h/2, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, NULL);
+        renderdata->glTexImage2D(data->type, 0, GL_LUMINANCE_ALPHA, (texture_w+1)/2,
+                                 (texture_h+1)/2, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, NULL);
         renderdata->glDisable(data->type);
     }
 
@@ -869,7 +937,7 @@ GL_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
                                 rect->h, data->format, data->formattype,
                                 pixels);
     if (data->yuv) {
-        renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, (pitch / 2));
+        renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, ((pitch + 1) / 2));
 
         /* Skip to the correct offset into the next texture */
         pixels = (const void*)((const Uint8*)pixels + rect->h * pitch);
@@ -879,29 +947,29 @@ GL_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
             renderdata->glBindTexture(data->type, data->utexture);
         }
         renderdata->glTexSubImage2D(data->type, 0, rect->x/2, rect->y/2,
-                                    rect->w/2, rect->h/2,
+                                    (rect->w+1)/2, (rect->h+1)/2,
                                     data->format, data->formattype, pixels);
 
         /* Skip to the correct offset into the next texture */
-        pixels = (const void*)((const Uint8*)pixels + (rect->h * pitch)/4);
+        pixels = (const void*)((const Uint8*)pixels + ((rect->h + 1) / 2) * ((pitch + 1) / 2));
         if (texture->format == SDL_PIXELFORMAT_YV12) {
             renderdata->glBindTexture(data->type, data->utexture);
         } else {
             renderdata->glBindTexture(data->type, data->vtexture);
         }
         renderdata->glTexSubImage2D(data->type, 0, rect->x/2, rect->y/2,
-                                    rect->w/2, rect->h/2,
+                                    (rect->w+1)/2, (rect->h+1)/2,
                                     data->format, data->formattype, pixels);
     }
 
     if (data->nv12) {
-        renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, (pitch / 2));
+        renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, ((pitch + 1) / 2));
 
         /* Skip to the correct offset into the next texture */
         pixels = (const void*)((const Uint8*)pixels + rect->h * pitch);
         renderdata->glBindTexture(data->type, data->utexture);
         renderdata->glTexSubImage2D(data->type, 0, rect->x/2, rect->y/2,
-                                    rect->w/2, rect->h/2,
+                                    (rect->w + 1)/2, (rect->h + 1)/2,
                                     GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, pixels);
     }
     renderdata->glDisable(data->type);
@@ -932,13 +1000,13 @@ GL_UpdateTextureYUV(SDL_Renderer * renderer, SDL_Texture * texture,
     renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, Upitch);
     renderdata->glBindTexture(data->type, data->utexture);
     renderdata->glTexSubImage2D(data->type, 0, rect->x/2, rect->y/2,
-                                rect->w/2, rect->h/2,
+                                (rect->w + 1)/2, (rect->h + 1)/2,
                                 data->format, data->formattype, Uplane);
 
     renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, Vpitch);
     renderdata->glBindTexture(data->type, data->vtexture);
     renderdata->glTexSubImage2D(data->type, 0, rect->x/2, rect->y/2,
-                                rect->w/2, rect->h/2,
+                                (rect->w + 1)/2, (rect->h + 1)/2,
                                 data->format, data->formattype, Vplane);
     renderdata->glDisable(data->type);
 
@@ -1041,6 +1109,8 @@ GL_UpdateViewport(SDL_Renderer * renderer)
                            0.0, 1.0);
         }
     }
+    data->glMatrixMode(GL_MODELVIEW);
+
     return GL_CheckError("", renderer);
 }
 
@@ -1090,25 +1160,18 @@ GL_SetColor(GL_RenderData * data, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 }
 
 static void
-GL_SetBlendMode(GL_RenderData * data, int blendMode)
+GL_SetBlendMode(GL_RenderData * data, SDL_BlendMode blendMode)
 {
     if (blendMode != data->current.blendMode) {
-        switch (blendMode) {
-        case SDL_BLENDMODE_NONE:
+        if (blendMode == SDL_BLENDMODE_NONE) {
             data->glDisable(GL_BLEND);
-            break;
-        case SDL_BLENDMODE_BLEND:
+        } else {
             data->glEnable(GL_BLEND);
-            data->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            break;
-        case SDL_BLENDMODE_ADD:
-            data->glEnable(GL_BLEND);
-            data->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ZERO, GL_ONE);
-            break;
-        case SDL_BLENDMODE_MOD:
-            data->glEnable(GL_BLEND);
-            data->glBlendFuncSeparate(GL_ZERO, GL_SRC_COLOR, GL_ZERO, GL_ONE);
-            break;
+            data->glBlendFuncSeparate(GetBlendFunc(SDL_GetBlendModeSrcColorFactor(blendMode)),
+                                      GetBlendFunc(SDL_GetBlendModeDstColorFactor(blendMode)),
+                                      GetBlendFunc(SDL_GetBlendModeSrcAlphaFactor(blendMode)),
+                                      GetBlendFunc(SDL_GetBlendModeDstAlphaFactor(blendMode)));
+            data->glBlendEquation(GetBlendEquation(SDL_GetBlendModeColorOperation(blendMode)));
         }
         data->current.blendMode = blendMode;
     }
@@ -1430,16 +1493,19 @@ GL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
 
     GL_ActivateRenderer(renderer);
 
+    if (!convert_format(data, temp_format, &internalFormat, &format, &type)) {
+        return SDL_SetError("Texture format %s not supported by OpenGL",
+                            SDL_GetPixelFormatName(temp_format));
+    }
+
+    if (!rect->w || !rect->h) {
+        return 0;  /* nothing to do. */
+    }
+
     temp_pitch = rect->w * SDL_BYTESPERPIXEL(temp_format);
     temp_pixels = SDL_malloc(rect->h * temp_pitch);
     if (!temp_pixels) {
         return SDL_OutOfMemory();
-    }
-
-    if (!convert_format(data, temp_format, &internalFormat, &format, &type)) {
-        SDL_free(temp_pixels);
-        return SDL_SetError("Texture format %s not supported by OpenGL",
-                            SDL_GetPixelFormatName(temp_format));
     }
 
     SDL_GetRendererOutputSize(renderer, &w, &h);
@@ -1518,6 +1584,11 @@ GL_DestroyRenderer(SDL_Renderer * renderer)
     GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
 
     if (data) {
+        if (data->context != NULL) {
+            /* make sure we delete the right resources! */
+            GL_ActivateRenderer(renderer);
+        }
+
         GL_ClearErrors(renderer);
         if (data->GL_ARB_debug_output_supported) {
             PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARBFunc = (PFNGLDEBUGMESSAGECALLBACKARBPROC) SDL_GL_GetProcAddress("glDebugMessageCallbackARB");

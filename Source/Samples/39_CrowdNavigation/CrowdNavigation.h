@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,14 +49,14 @@ class CrowdNavigation : public Sample
 
 public:
     /// Construct.
-    CrowdNavigation(Context* context);
+    explicit CrowdNavigation(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    void Start() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
-    virtual String GetScreenJoystickPatchString() const { return
+    String GetScreenJoystickPatchString() const override { return
         "<patch>"
         "    <add sel=\"/element\">"
         "        <element type=\"Button\">"
@@ -152,6 +152,12 @@ private:
     void CreateMovingBarrels(DynamicNavigationMesh* navMesh);
     /// Utility function to raycast to the cursor position. Return true if hit.
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
+    /// Toggle navigation mesh streaming.
+    void ToggleStreaming(bool enabled);
+    /// Update navigation mesh streaming.
+    void UpdateStreaming();
+    /// Save navigation data for streaming.
+    void SaveNavigationData();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
@@ -163,6 +169,16 @@ private:
     /// Handle crowd agent formation.
     void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData);
 
+    /// Flag for using navigation mesh streaming.
+    bool useStreaming_{};
+    /// Streaming distance.
+    int streamingDistance_{2};
+    /// Tile data.
+    HashMap<IntVector2, PODVector<unsigned char> > tileData_;
+    /// Added tiles.
+    HashSet<IntVector2> addedTiles_;
     /// Flag for drawing debug geometry.
-    bool drawDebug_;
+    bool drawDebug_{};
+    /// Instruction text UI-element.
+    Text* instructionText_{};
 };

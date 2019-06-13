@@ -33,6 +33,9 @@ class Sphere
     Intersection IsInside(const BoundingBox& box) const;
     Intersection IsInsideFast(const BoundingBox& box) const;
     float Distance(const Vector3& point) const;
+    Vector3 GetLocalPoint(float theta, float phi) const;
+    Vector3 GetPoint(float theta, float phi) const;
+
 
     Vector3 center_ @ center;
     float radius_ @ radius;

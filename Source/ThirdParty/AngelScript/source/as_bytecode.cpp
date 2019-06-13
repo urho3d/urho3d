@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1164,6 +1164,12 @@ void asCByteCode::Optimize()
 					DeleteInstruction(instr);
 					instr = GoBack(DeleteInstruction(curr));
 				}
+				// LINE, VarDecl, LINE -> VarDecl, LINE
+				else if (instrOp == asBC_VarDecl && instr->next && instr->next->op == asBC_LINE )
+				{
+					// Delete the first instruction
+					instr = GoBack(DeleteInstruction(curr));
+				}
 				// LINE, LINE -> LINE
 				else if( instrOp == asBC_LINE )
 				{
@@ -1390,6 +1396,7 @@ bool asCByteCode::IsTempRegUsed(asCByteInstruction *curr)
 			curr->op == asBC_PopRPtr   ||
 			curr->op == asBC_CALLSYS   ||
 			curr->op == asBC_CALLBND   ||
+			curr->op == asBC_Thiscall1 ||
 			curr->op == asBC_SUSPEND   ||
 			curr->op == asBC_ALLOC     ||
 			curr->op == asBC_CpyVtoR4  ||
@@ -1444,7 +1451,8 @@ bool asCByteCode::IsSimpleExpression()
 			instr->op == asBC_FREE ||
 			instr->op == asBC_CallPtr ||
 			instr->op == asBC_CALLINTF ||
-			instr->op == asBC_CALLBND )
+			instr->op == asBC_CALLBND || 
+			instr->op == asBC_Thiscall1 )
 			return false;
 
 		instr = instr->next;
@@ -1541,7 +1549,20 @@ void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
 		}
 		else if( instr->op == asBC_VarDecl )
 		{
+			// Record the position for debug info
 			outFunc->scriptData->variables[instr->wArg[0]]->declaredAtProgramPos = pos;
+			
+			// Record declaration of object variables for try/catch handling
+			// This is used for identifying if handles and objects on the heap should be cleared upon catching an exception
+			// Only extract this info if there is a try/catch block in the function, so we don't use up unnecessary space
+			if( outFunc->scriptData->tryCatchInfo.GetLength() && outFunc->scriptData->variables[instr->wArg[0]]->type.GetTypeInfo() )
+			{
+				asSObjectVariableInfo info;
+				info.programPos     = pos;
+				info.variableOffset = outFunc->scriptData->variables[instr->wArg[0]]->stackOffset;
+				info.option         = asOBJ_VARDECL;
+				outFunc->scriptData->objVariableInfo.PushLast(info);
+			}
 		}
 		else
 			pos += instr->size;
@@ -1549,6 +1570,27 @@ void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
 		instr = instr->next;
 	}
 	asASSERT( blockLevel == 0 );
+}
+
+void asCByteCode::ExtractTryCatchInfo(asCScriptFunction *outFunc)
+{
+	asASSERT(outFunc->scriptData);
+
+	unsigned int pos = 0;
+	asCByteInstruction *instr = first;
+	while (instr)
+	{
+		if (instr->op == asBC_TryBlock)
+		{
+			asSTryCatchInfo info;
+			info.tryPos    = pos;
+			info.catchPos  = *ARG_DW(instr->arg);
+			outFunc->scriptData->tryCatchInfo.PushLast(info);
+		}
+
+		pos += instr->size;
+		instr = instr->next;
+	}
 }
 
 int asCByteCode::GetSize()
@@ -1768,6 +1810,17 @@ void asCByteCode::Block(bool start)
 	last->wArg[0]  = start ? 1 : 0;
 }
 
+void asCByteCode::TryBlock(short catchLabel)
+{
+	if (AddInstruction() < 0)
+		return;
+
+	last->op = asBC_TryBlock;
+	last->size = 0;
+	last->stackInc = 0;
+	*ARG_DW(last->arg) = catchLabel;
+}
+
 void asCByteCode::VarDecl(int varDeclIdx)
 {
 	if( AddInstruction() < 0 )
@@ -1835,6 +1888,8 @@ int asCByteCode::ResolveJumpAddresses()
 {
 	TimeIt("asCByteCode::ResolveJumpAddresses");
 
+	asUINT currPos = 0;
+
 	asCByteInstruction *instr = first;
 	while( instr )
 	{
@@ -1852,7 +1907,21 @@ int asCByteCode::ResolveJumpAddresses()
 			else
 				return -1;
 		}
+		else if (instr->op == asBC_TryBlock)
+		{
+			int label = *((int*)ARG_DW(instr->arg));
+			int labelPosOffset;
+			int r = FindLabel(label, instr, 0, &labelPosOffset);
+			if (r == 0)
+			{
+				// Should store the absolute address so the exception handler doesn't need to figure it out
+				*((int*)ARG_DW(instr->arg)) = currPos + labelPosOffset;
+			}
+			else
+				return -1;
+		}
 
+		currPos += instr->GetSize();
 		instr = instr->next;
 	}
 
@@ -1998,10 +2067,11 @@ void asCByteCode::PostProcess()
 				AddPath(paths, dest, stackSize);
 				break;
 			}
-			else if( instr->op == asBC_JZ    || instr->op == asBC_JNZ ||
+			else if( instr->op == asBC_JZ    || instr->op == asBC_JNZ    ||
 					 instr->op == asBC_JLowZ || instr->op == asBC_JLowNZ ||
-					 instr->op == asBC_JS    || instr->op == asBC_JNS ||
-					 instr->op == asBC_JP    || instr->op == asBC_JNP )
+					 instr->op == asBC_JS    || instr->op == asBC_JNS    ||
+					 instr->op == asBC_JP    || instr->op == asBC_JNP    ||
+					 instr->op == asBC_TryBlock )
 			{
 				// Find the label that is being jumped to
 				int label = *((int*) ARG_DW(instr->arg));
@@ -2066,7 +2136,10 @@ void asCByteCode::PostProcess()
 #ifdef AS_DEBUG
 void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 {
+#ifndef __MINGW32__
+	// _mkdir is broken on mingw
 	_mkdir("AS_DEBUG");
+#endif
 
 	asCString path = "AS_DEBUG/";
 	path += name;
@@ -2083,7 +2156,9 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 	FILE *file = fopen(path.AddressOf(), "w");
 #endif
 
-#if !defined(AS_XENON) // XBox 360: When running in DVD Emu, no write is allowed
+#if !defined(AS_XENON) && !defined(__MINGW32__)
+	// XBox 360: When running in DVD Emu, no write is allowed
+	// MinGW: As _mkdir is broken, don't assert on file not created if the AS_DEBUG directory doesn't exist
 	asASSERT( file );
 #endif
 
@@ -2108,7 +2183,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 	{
 		int idx = func->scriptData->objVariablePos.IndexOf(func->scriptData->variables[n]->stackOffset);
 		bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
-		fprintf(file, " %.3d: %s%s %s\n", func->scriptData->variables[n]->stackOffset, isOnHeap ? "(heap) " : "", func->scriptData->variables[n]->type.Format(func->nameSpace).AddressOf(), func->scriptData->variables[n]->name.AddressOf());
+		fprintf(file, " %.3d: %s%s %s\n", func->scriptData->variables[n]->stackOffset, isOnHeap ? "(heap) " : "", func->scriptData->variables[n]->type.Format(func->nameSpace, true).AddressOf(), func->scriptData->variables[n]->name.AddressOf());
 	}
 	asUINT offset = 0;
 	if( func->objectType )
@@ -2131,7 +2206,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 		{
 			int idx = func->scriptData->objVariablePos.IndexOf(offset);
 			bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
-			fprintf(file, " %.3d: %s%s {noname param}\n", offset, isOnHeap ? "(heap) " : "", func->parameterTypes[n].Format(func->nameSpace).AddressOf());
+			fprintf(file, " %.3d: %s%s {noname param}\n", offset, isOnHeap ? "(heap) " : "", func->parameterTypes[n].Format(func->nameSpace, true).AddressOf());
 		}
 
 		offset -= func->parameterTypes[n].GetSizeOnStackDWords();
@@ -2191,14 +2266,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 		switch( asBCInfo[instr->op].type )
 		{
 		case asBCTYPE_W_ARG:
-			if( instr->op == asBC_STR )
-			{
-				int id = asWORD(instr->wArg[0]);
-				const asCString &str = engine->GetConstantString(id);
-				fprintf(file, "   %-8s %d         (l:%ld s:\"%.10s\")\n", asBCInfo[instr->op].name, asWORD(instr->wArg[0]), (long int)str.GetLength(), str.AddressOf());
-			}
-			else
-				fprintf(file, "   %-8s %d\n", asBCInfo[instr->op].name, instr->wArg[0]);
+			fprintf(file, "   %-8s %d\n", asBCInfo[instr->op].name, instr->wArg[0]);
 			break;
 
 		case asBCTYPE_wW_ARG:
@@ -2305,6 +2373,32 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 				{
 					asCScriptFunction *f = *(asCScriptFunction**)ARG_QW(instr->arg);
 					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), f->GetDeclaration());
+				}
+				break;
+
+			case asBC_PGA:
+				{
+					void *ptr = *(void**)ARG_QW(instr->arg);
+					asSMapNode<void*, asCGlobalProperty*> *cursor = 0;
+					if( engine->varAddressMap.MoveTo(&cursor, ptr) )
+					{
+						fprintf(file, "   %-8s 0x%x          (var:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), cursor->value->name.AddressOf());
+					}
+					else
+					{
+						asUINT length;
+						engine->stringFactory->GetRawStringData(ptr, 0, &length);
+						asCString str;
+						str.SetLength(length);
+						engine->stringFactory->GetRawStringData(ptr, str.AddressOf(), &length);
+						if (str.GetLength() > 20)
+						{
+							// TODO: Replace non-visible characters with space or something like it
+							str.SetLength(20);
+							str += "...";
+						}
+						fprintf(file, "   %-8s 0x%x          (str:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), str.AddressOf());
+					}
 				}
 				break;
 	

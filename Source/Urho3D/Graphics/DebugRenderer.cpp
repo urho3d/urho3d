@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,9 +56,7 @@ DebugRenderer::DebugRenderer(Context* context) :
     SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(DebugRenderer, HandleEndFrame));
 }
 
-DebugRenderer::~DebugRenderer()
-{
-}
+DebugRenderer::~DebugRenderer() = default;
 
 void DebugRenderer::RegisterObject(Context* context)
 {
@@ -225,7 +223,6 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     }
 }
 
-
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)
 {
     const Vector3* vertices = frustum.vertices_;
@@ -260,32 +257,77 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
     }
 }
 
-static Vector3 PointOnSphere(const Sphere& sphere, unsigned theta, unsigned phi)
-{
-    return Vector3(
-        sphere.center_.x_ + sphere.radius_ * Sin((float)theta) * Sin((float)phi),
-        sphere.center_.y_ + sphere.radius_ * Cos((float)phi),
-        sphere.center_.z_ + sphere.radius_ * Cos((float)theta) * Sin((float)phi)
-    );
-}
-
 void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool depthTest)
 {
     unsigned uintColor = color.ToUInt();
 
-    for (unsigned j = 0; j < 180; j += 45)
+    for (auto j = 0; j < 180; j += 45)
     {
-        for (unsigned i = 0; i < 360; i += 45)
+        for (auto i = 0; i < 360; i += 45)
         {
-            Vector3 p1 = PointOnSphere(sphere, i, j);
-            Vector3 p2 = PointOnSphere(sphere, i + 45, j);
-            Vector3 p3 = PointOnSphere(sphere, i, j + 45);
-            Vector3 p4 = PointOnSphere(sphere, i + 45, j + 45);
+            Vector3 p1 = sphere.GetPoint(i, j);
+            Vector3 p2 = sphere.GetPoint(i + 45, j);
+            Vector3 p3 = sphere.GetPoint(i, j + 45);
+            Vector3 p4 = sphere.GetPoint(i + 45, j + 45);
 
             AddLine(p1, p2, uintColor, depthTest);
             AddLine(p3, p4, uintColor, depthTest);
             AddLine(p1, p3, uintColor, depthTest);
             AddLine(p2, p4, uintColor, depthTest);
+        }
+    }
+}
+
+void DebugRenderer::AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle,
+    bool drawLines, const Color& color, bool depthTest)
+{
+    if (angle <= 0.0f)
+        return;
+    else if (angle >= 360.0f)
+    {
+        AddSphere(sphere, color, depthTest);
+        return;
+    }
+
+    static const unsigned numCircleSegments = 8;
+    static const unsigned numLines = 4;
+    static const float arcStep = 45.0f;
+
+    const unsigned uintColor = color.ToUInt();
+    const float halfAngle = 0.5f * angle;
+    const unsigned numArcSegments = static_cast<unsigned>(Ceil(halfAngle / arcStep)) + 1;
+
+    // Draw circle
+    for (unsigned j = 0; j < numCircleSegments; ++j)
+    {
+        AddLine(
+            sphere.center_ + rotation * sphere.GetLocalPoint(j * 360.0f / numCircleSegments, halfAngle),
+            sphere.center_ + rotation * sphere.GetLocalPoint((j + 1) * 360.0f / numCircleSegments, halfAngle),
+            uintColor);
+    }
+
+    // Draw arcs
+    const unsigned step = numCircleSegments / numLines;
+    for (unsigned i = 0; i < numArcSegments - 1; ++i)
+    {
+        for (unsigned j = 0; j < numCircleSegments; j += step)
+        {
+            const float nextPhi = i + 1 == numArcSegments - 1 ? halfAngle : (i + 1) * arcStep;
+            AddLine(
+                sphere.center_ + rotation * sphere.GetLocalPoint(j * 360.0f / numCircleSegments, i * arcStep),
+                sphere.center_ + rotation * sphere.GetLocalPoint(j * 360.0f / numCircleSegments, nextPhi),
+                uintColor);
+        }
+    }
+
+    // Draw lines
+    if (drawLines)
+    {
+        for (unsigned j = 0; j < numCircleSegments; j += step)
+        {
+            AddLine(sphere.center_,
+                sphere.center_ + rotation * sphere.GetLocalPoint(j * 360.0f / numCircleSegments, halfAngle),
+                uintColor);
         }
     }
 }
@@ -296,10 +338,10 @@ void DebugRenderer::AddCylinder(const Vector3& position, float radius, float hei
     Vector3 heightVec(0, height, 0);
     Vector3 offsetXVec(radius, 0, 0);
     Vector3 offsetZVec(0, 0, radius);
-    for (unsigned i = 0; i < 360; i += 45)
+    for (auto i = 0; i < 360; i += 45)
     {
-        Vector3 p1 = PointOnSphere(sphere, i, 90);
-        Vector3 p2 = PointOnSphere(sphere, i + 45, 90);
+        Vector3 p1 = sphere.GetPoint(i, 90);
+        Vector3 p2 = sphere.GetPoint(i + 45, 90);
         AddLine(p1, p2, color, depthTest);
         AddLine(p1 + heightVec, p2 + heightVec, color, depthTest);
     }
@@ -343,11 +385,17 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
     }
 }
 
-void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
-    unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)
+void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData,
+    unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)
+{
+    AddTriangleMesh(vertexData, vertexSize, 0, indexData, indexSize, indexStart, indexCount, transform, color, depthTest);
+}
+
+void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, unsigned vertexStart, const void* indexData,
+    unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)
 {
     unsigned uintColor = color.ToUInt();
-    const unsigned char* srcData = (const unsigned char*)vertexData;
+    const auto* srcData = ((const unsigned char*)vertexData) + vertexStart;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
@@ -442,7 +490,7 @@ void DebugRenderer::Render()
     if (!HasContent())
         return;
 
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     // Engine does not render when window is closed or device is lost
     assert(graphics && graphics->IsInitialized() && !graphics->IsDeviceLost());
 
@@ -456,7 +504,7 @@ void DebugRenderer::Render()
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
 
-    float* dest = (float*)vertexBuffer_->Lock(0, numVertices, true);
+    auto* dest = (float*)vertexBuffer_->Lock(0, numVertices, true);
     if (!dest)
         return;
 

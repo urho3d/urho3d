@@ -359,6 +359,9 @@ class TerrainEditor
 
         // We use this when editing the terrain
         Image@ image = cache.GetResource("Image", fileLocation);
+        if (image is null)
+            return null;
+
         image.name = parts[0];
         brushes.Push(image);
 
@@ -385,21 +388,28 @@ class TerrainEditor
     private void LoadBrushes()
     {
         ListView@ terrainBrushes = window.GetChild("BrushesContainer", true);
+        String brushPath = "Textures/Editor/TerrainBrushes/";
 
         Array<String>@ resourceDirs = cache.resourceDirs;
         String brushesFileLocation;
+
         for (uint i = 0; i < resourceDirs.length; ++i)
         {
-            brushesFileLocation = resourceDirs[i] + "Textures/Editor/TerrainBrushes";
+            brushesFileLocation = resourceDirs[i] + brushPath;
             if (fileSystem.DirExists(brushesFileLocation))
                 break;
         }
+
+        if (brushesFileLocation.empty)
+            return;
 
         Array<String> files = fileSystem.ScanDir(brushesFileLocation, "*.*", SCAN_FILES, false);
 
         for (uint i = 0; i < files.length; ++i)
         {
-            terrainBrushes.AddItem(LoadBrush(brushesFileLocation + "/" + files[i]));
+            UIElement@ brush = LoadBrush(brushPath + files[i]);
+            if (brush !is null)
+                terrainBrushes.AddItem(brush);
         }
     }
 
