@@ -1084,6 +1084,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 
 ### Button
 - %Name : String
@@ -1132,6 +1133,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Pressed %Image %Offset : IntVector2
 - %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
@@ -1205,6 +1207,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Is %Checked : bool
 - %Checked %Image %Offset : IntVector2
 
@@ -1467,6 +1470,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Use %System %Shapes : bool
 - %Shapes : VariantVector
 
@@ -1550,6 +1554,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Pressed %Image %Offset : IntVector2
 - %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
@@ -1691,6 +1696,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Max %Length : int
 - %Is %Cursor %Movable : bool
 - %Is %Text %Selectable : bool
@@ -1805,6 +1811,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Pressed %Image %Offset : IntVector2
 - %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
@@ -1971,6 +1978,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -2108,6 +2116,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -2231,6 +2240,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -2654,6 +2664,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Resize %Border : IntRect
 - %Is %Movable : bool
 - %Is %Resizable : bool
@@ -2711,6 +2722,7 @@ namespace Urho3D
 - %Hover %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
+- %Material : ResourceRef
 - %Resize %Border : IntRect
 - %Is %Movable : bool
 - %Is %Resizable : bool
@@ -3833,6 +3845,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -4066,6 +4079,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -4364,6 +4378,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -6354,6 +6369,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -7141,6 +7157,7 @@ Properties:
 - LayoutMode layoutMode
 - int layoutSpacing
 - ListView@ listView // readonly
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -8472,6 +8489,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - uint maxLength
@@ -9142,6 +9160,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -12549,6 +12568,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -15956,6 +15976,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
@@ -16197,6 +16218,7 @@ Properties:
 - Vector2 layoutFlexScale
 - LayoutMode layoutMode
 - int layoutSpacing
+- Material@ material
 - Vector2 maxAnchor
 - int maxHeight
 - IntVector2 maxOffset
