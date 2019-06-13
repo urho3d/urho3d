@@ -1311,6 +1311,8 @@ template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "void SetHoverOffset(int, int)", asMETHODPR(T, SetHoverOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_texture(Texture@+)", asMETHOD(T, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture@+ get_texture() const", asMETHOD(T, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHOD(T, SetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Material@+ get_material() const", asMETHOD(T, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_imageRect(const IntRect&in)", asMETHODPR(T, SetImageRect, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& get_imageRect() const", asMETHOD(T, GetImageRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_border(const IntRect&in)", asMETHODPR(T, SetBorder, (const IntRect&), void), asCALL_THISCALL);
