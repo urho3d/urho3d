@@ -25,6 +25,12 @@ if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh native|mingw|android|rpi|arm|
 
 PROJECT_DIR=$(cd ${0%/*}/..; pwd)
 
+if [[ ! $DBE_TAG ]]; then
+    DBE_TAG=$(git describe --exact-match 2>/dev/null)
+    # If the command failed or not on a tag then use ':master' by default
+    if [[ $? -ne 0 ]]; then DBE_TAG=:master; fi
+fi
+
 BuildEnvironment=-$1; shift
 BuildEnvironment=${BuildEnvironment/-base}
 
