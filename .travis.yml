@@ -336,6 +336,7 @@ env:
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
+    - DBE_TAG=':latest'
   matrix:
     - URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=0 numjobs=4
     - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=0
