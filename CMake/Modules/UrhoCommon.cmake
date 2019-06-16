@@ -1135,7 +1135,7 @@ macro (add_html_shell)
             # Create Urho3D custom HTML shell that also embeds our own project logo
             if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
                 file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html HTML_SHELL)
-                string (REPLACE "<!doctype html>" "#!/usr/bin/env ${EMSCRIPTEN_EMRUN_BROWSER}\n<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" HTML_SHELL "${HTML_SHELL}")     # Stringify to preserve semicolons
+                string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" HTML_SHELL "${HTML_SHELL}")     # Stringify to preserve semicolons
                 string (REPLACE "<body>" "<body>\n<script>document.body.innerHTML=document.body.innerHTML.replace(/^#!.*\\n/, '');</script>\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" HTML_SHELL "${HTML_SHELL}")
                 file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${HTML_SHELL}")
             endif ()
@@ -1778,7 +1778,7 @@ macro (_setup_target)
         if ((URHO3D_LIB_TYPE STREQUAL MODULE AND ${TARGET_NAME} STREQUAL Urho3D) OR (NOT URHO3D_LIB_TYPE STREQUAL MODULE AND NOT LIB_TYPE))
             list (APPEND LINK_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
             if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
-                list (APPEND LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
+                list (APPEND LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 --no-heap-copy")
             endif ()
             if (EMSCRIPTEN_SHARE_DATA)      # MODULE lib type always have this variable enabled
                 list (APPEND LINK_FLAGS "--pre-js \"${CMAKE_BINARY_DIR}/Source/pak-loader.js\"")
