@@ -65,7 +65,7 @@ Font::~Font()
 {
     // To ensure FreeType deallocates properly, first clear all faces, then release the raw font data
     ReleaseFaces();
-    fontData_.Reset();
+    fontData_.reset();
 }
 
 void Font::RegisterObject(Context* context)
@@ -86,13 +86,13 @@ bool Font::BeginLoad(Deserializer& source)
     fontDataSize_ = source.GetSize();
     if (fontDataSize_)
     {
-        fontData_ = new unsigned char[fontDataSize_];
-        if (source.Read(&fontData_[0], fontDataSize_) != fontDataSize_)
+        fontData_.reset(new unsigned char[fontDataSize_]);
+        if (source.Read(fontData_.get(), fontDataSize_) != fontDataSize_)
             return false;
     }
     else
     {
-        fontData_.Reset();
+        fontData_.reset();
         return false;
     }
 

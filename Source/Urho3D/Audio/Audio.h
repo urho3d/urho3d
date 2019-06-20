@@ -23,10 +23,11 @@
 #pragma once
 
 #include "../Audio/AudioDefs.h"
-#include "../Container/ArrayPtr.h"
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
+
+#include <memory>
 
 namespace Urho3D
 {
@@ -124,7 +125,7 @@ private:
     void UpdateInternal(float timeStep);
 
     /// Clipping buffer for mixing.
-    SharedArrayPtr<int> clipBuffer_;
+    std::unique_ptr<int[]> clipBuffer_;
     /// Audio thread mutex.
     Mutex audioMutex_;
     /// SDL audio device ID.

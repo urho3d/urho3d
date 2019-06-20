@@ -390,7 +390,7 @@ bool Image::BeginLoad(Deserializer& source)
 
         for (unsigned faceIndex = 0; faceIndex < imageChainCount; ++faceIndex)
         {
-            currentImage->data_ = new unsigned char[dataSize];
+            currentImage->data_.reset(new unsigned char[dataSize]);
             currentImage->cubemap_ = cubemap_;
             currentImage->array_ = array_;
             currentImage->components_ = components_;
@@ -407,7 +407,7 @@ bool Image::BeginLoad(Deserializer& source)
             // even though it would be more proper for the first image to report the size of all siblings combined
             currentImage->SetMemoryUse(dataSize);
 
-            source.Read(currentImage->data_.Get(), dataSize);
+            source.Read(currentImage->data_.get(), dataSize);
 
             if (faceIndex < imageChainCount - 1)
             {
@@ -453,14 +453,14 @@ bool Image::BeginLoad(Deserializer& source)
                 ADJUSTSHIFT(bMask, bShiftL, bShiftR)
                 ADJUSTSHIFT(aMask, aShiftL, aShiftR)
 
-                SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
+                unsigned char* rgbaData = new unsigned char[numPixels * 4];
 
                 switch (sourcePixelByteSize)
                 {
                 case 4:
                 {
-                    auto* src = (unsigned*)currentImage->data_.Get();
-                    unsigned char* dest = rgbaData.Get();
+                    auto* src = (unsigned*)currentImage->data_.get();
+                    unsigned char* dest = rgbaData;
 
                     while (numPixels--)
                     {
@@ -475,8 +475,8 @@ bool Image::BeginLoad(Deserializer& source)
 
                 case 3:
                 {
-                    unsigned char* src = currentImage->data_.Get();
-                    unsigned char* dest = rgbaData.Get();
+                    unsigned char* src = currentImage->data_.get();
+                    unsigned char* dest = rgbaData;
 
                     while (numPixels--)
                     {
@@ -492,8 +492,8 @@ bool Image::BeginLoad(Deserializer& source)
 
                 default:
                 {
-                    auto* src = (unsigned short*)currentImage->data_.Get();
-                    unsigned char* dest = rgbaData.Get();
+                    auto* src = (unsigned short*)currentImage->data_.get();
+                    unsigned char* dest = rgbaData;
 
                     while (numPixels--)
                     {
@@ -508,7 +508,7 @@ bool Image::BeginLoad(Deserializer& source)
                 }
 
                 // Replace with converted data
-                currentImage->data_ = rgbaData;
+                currentImage->data_.reset(rgbaData);
                 currentImage->SetMemoryUse(numPixels * 4);
                 currentImage = currentImage->GetNextSibling();
             }
@@ -612,7 +612,7 @@ bool Image::BeginLoad(Deserializer& source)
         source.Seek(source.GetPosition() + keyValueBytes);
         auto dataSize = (unsigned)(source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned));
 
-        data_ = new unsigned char[dataSize];
+        data_.reset(new unsigned char[dataSize]);
         width_ = width;
         height_ = height;
         numCompressedLevels_ = mipmaps;
@@ -718,12 +718,12 @@ bool Image::BeginLoad(Deserializer& source)
         source.Seek(source.GetPosition() + metaDataSize);
         unsigned dataSize = source.GetSize() - source.GetPosition();
 
-        data_ = new unsigned char[dataSize];
+        data_.reset(new unsigned char[dataSize]);
         width_ = width;
         height_ = height;
         numCompressedLevels_ = mipmapCount;
 
-        source.Read(data_.Get(), dataSize);
+        source.Read(data_.get(), dataSize);
         SetMemoryUse(dataSize);
     }
 #ifdef URHO3D_WEBP
@@ -832,7 +832,7 @@ bool Image::Save(Serializer& dest) const
     }
 
     int len;
-    unsigned char* png = stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
+    unsigned char* png = stbi_write_png_to_mem(data_.get(), 0, width_, height_, components_, &len);
     bool success = dest.Write(png, (unsigned)len) == (unsigned)len;
     free(png);      // NOLINT(hicpp-no-malloc)
     return success;
@@ -875,7 +875,7 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
         return false;
     }
 
-    data_ = new unsigned char[width * height * depth * components];
+    data_.reset(new unsigned char[width * height * depth * components]);
     width_ = width;
     height_ = height;
     depth_ = depth;
@@ -908,7 +908,7 @@ void Image::SetPixelInt(int x, int y, int z, unsigned uintColor)
     if (!data_ || x < 0 || x >= width_ || y < 0 || y >= height_ || z < 0 || z >= depth_ || IsCompressed())
         return;
 
-    unsigned char* dest = data_ + (z * width_ * height_ + y * width_ + x) * components_;
+    unsigned char* dest = data_.get() + (z * width_ * height_ + y * width_ + x) * components_;
     auto* src = (unsigned char*)&uintColor;
 
     switch (components_)
@@ -941,9 +941,9 @@ void Image::SetData(const unsigned char* pixelData)
 
     auto size = (size_t)width_ * height_ * depth_ * components_;
     if (pixelData)
-        memcpy(data_.Get(), pixelData, size);
+        memcpy(data_.get(), pixelData, size);
     else
-        memset(data_.Get(), 0, size);
+        memset(data_.get(), 0, size);
     nextLevel_.Reset();
 }
 
@@ -1011,7 +1011,7 @@ bool Image::FlipHorizontal()
 
     if (!IsCompressed())
     {
-        SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
+        unsigned char* newData = new unsigned char[width_ * height_ * components_];
         unsigned rowSize = width_ * components_;
 
         for (int y = 0; y < height_; ++y)
@@ -1023,7 +1023,7 @@ bool Image::FlipHorizontal()
             }
         }
 
-        data_ = newData;
+        data_.reset(newData);
     }
     else
     {
@@ -1034,7 +1034,7 @@ bool Image::FlipHorizontal()
         }
 
         // Memory use = combined size of the compressed mip levels
-        SharedArrayPtr<unsigned char> newData(new unsigned char[GetMemoryUse()]);
+        unsigned char* newData = new unsigned char[GetMemoryUse()];
         unsigned dataOffset = 0;
 
         for (unsigned i = 0; i < numCompressedLevels_; ++i)
@@ -1051,7 +1051,7 @@ bool Image::FlipHorizontal()
                 for (unsigned x = 0; x < level.rowSize_; x += level.blockSize_)
                 {
                     unsigned char* src = level.data_ + y * level.rowSize_ + (level.rowSize_ - level.blockSize_ - x);
-                    unsigned char* dest = newData.Get() + y * level.rowSize_ + x;
+                    unsigned char* dest = newData + y * level.rowSize_ + x;
                     FlipBlockHorizontal(dest, src, compressedFormat_);
                 }
             }
@@ -1059,7 +1059,7 @@ bool Image::FlipHorizontal()
             dataOffset += level.dataSize_;
         }
 
-        data_ = newData;
+        data_.reset(newData);
     }
 
     return true;
@@ -1078,13 +1078,13 @@ bool Image::FlipVertical()
 
     if (!IsCompressed())
     {
-        SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
+        unsigned char* newData = new unsigned char[width_ * height_ * components_];
         unsigned rowSize = width_ * components_;
 
         for (int y = 0; y < height_; ++y)
-            memcpy(&newData[(height_ - y - 1) * rowSize], &data_[y * rowSize], rowSize);
+            memcpy(newData + (height_ - y - 1) * rowSize, data_.get() + y * rowSize, rowSize);
 
-        data_ = newData;
+        data_.reset(newData);
     }
     else
     {
@@ -1095,7 +1095,7 @@ bool Image::FlipVertical()
         }
 
         // Memory use = combined size of the compressed mip levels
-        SharedArrayPtr<unsigned char> newData(new unsigned char[GetMemoryUse()]);
+        unsigned char* newData = new unsigned char[GetMemoryUse()];
         unsigned dataOffset = 0;
 
         for (unsigned i = 0; i < numCompressedLevels_; ++i)
@@ -1110,7 +1110,7 @@ bool Image::FlipVertical()
             for (unsigned y = 0; y < level.rows_; ++y)
             {
                 unsigned char* src = level.data_ + y * level.rowSize_;
-                unsigned char* dest = newData.Get() + dataOffset + (level.rows_ - y - 1) * level.rowSize_;
+                unsigned char* dest = newData + dataOffset + (level.rows_ - y - 1) * level.rowSize_;
 
                 for (unsigned x = 0; x < level.rowSize_; x += level.blockSize_)
                     FlipBlockVertical(dest + x, src + x, compressedFormat_);
@@ -1119,7 +1119,7 @@ bool Image::FlipVertical()
             dataOffset += level.dataSize_;
         }
 
-        data_ = newData;
+        data_.reset(newData);
     }
 
     return true;
@@ -1145,7 +1145,7 @@ bool Image::Resize(int width, int height)
         return false;
 
     /// \todo Reducing image size does not sample all needed pixels
-    SharedArrayPtr<unsigned char> newData(new unsigned char[width * height * components_]);
+    unsigned char* newData = new unsigned char[width * height * components_];
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
@@ -1177,7 +1177,7 @@ bool Image::Resize(int width, int height)
 
     width_ = width;
     height_ = height;
-    data_ = newData;
+    data_.reset(newData);
     SetMemoryUse(width * height * depth_ * components_);
     return true;
 }
@@ -1234,7 +1234,7 @@ bool Image::SaveBMP(const String& fileName) const
     }
 
     if (data_)
-        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.Get()) != 0;
+        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.get()) != 0;
     else
         return false;
 }
@@ -1268,7 +1268,7 @@ bool Image::SaveTGA(const String& fileName) const
     }
 
     if (data_)
-        return stbi_write_tga(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get()) != 0;
+        return stbi_write_tga(GetNativePath(fileName).CString(), width_, height_, components_, data_.get()) != 0;
     else
         return false;
 }
@@ -1291,7 +1291,7 @@ bool Image::SaveJPG(const String& fileName, int quality) const
     }
 
     if (data_)
-        return stbi_write_jpg(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), quality) != 0;
+        return stbi_write_jpg(GetNativePath(fileName).CString(), width_, height_, components_, data_.get(), quality) != 0;
     else
         return false;
 }
@@ -1408,9 +1408,9 @@ bool Image::SaveWEBP(const String& fileName, float compression /* = 0.0f */) con
     WebPMemoryWriterInit(&wrt);
 
     if (components_ == 4)
-        importResult = WebPPictureImportRGBA(&pic, data_.Get(), components_ * width_);
+        importResult = WebPPictureImportRGBA(&pic, data_.get(), components_ * width_);
     else if (components_ == 3)
-        importResult = WebPPictureImportRGB(&pic, data_.Get(), components_ * width_);
+        importResult = WebPPictureImportRGB(&pic, data_.get(), components_ * width_);
 
     if (!importResult)
     {
@@ -1454,7 +1454,7 @@ Color Image::GetPixel(int x, int y, int z) const
     x = Clamp(x, 0, width_ - 1);
     y = Clamp(y, 0, height_ - 1);
 
-    unsigned char* src = data_ + (z * width_ * height_ + y * width_ + x) * components_;
+    unsigned char* src = data_.get() + (z * width_ * height_ + y * width_ + x) * components_;
     Color ret;
 
     switch (components_)
@@ -1489,7 +1489,7 @@ unsigned Image::GetPixelInt(int x, int y, int z) const
     x = Clamp(x, 0, width_ - 1);
     y = Clamp(y, 0, height_ - 1);
 
-    unsigned char* src = data_ + (z * width_ * height_ + y * width_ + x) * components_;
+    unsigned char* src = data_.get() + (z * width_ * height_ + y * width_ + x) * components_;
     unsigned ret = 0;
     if (components_ < 4)
         ret |= 0xff000000;
@@ -1594,8 +1594,8 @@ SharedPtr<Image> Image::GetNextLevel() const
     else
         mipImage->SetSize(widthOut, heightOut, components_);
 
-    const unsigned char* pixelDataIn = data_.Get();
-    unsigned char* pixelDataOut = mipImage->data_.Get();
+    const unsigned char* pixelDataIn = data_.get();
+    unsigned char* pixelDataOut = mipImage->data_.get();
 
     // 1D case
     if (depth_ == 1 && (height_ == 1 || width_ == 1))
@@ -1884,7 +1884,7 @@ SharedPtr<Image> Image::ConvertToRGBA() const
     SharedPtr<Image> ret(new Image(context_));
     ret->SetSize(width_, height_, depth_, 4);
 
-    const unsigned char* src = data_;
+    const unsigned char* src = data_.get();
     unsigned char* dest = ret->GetData();
 
     switch (components_)
@@ -1966,7 +1966,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
             level.rowSize_ = level.width_ * level.blockSize_;
             level.rows_ = (unsigned)level.height_;
-            level.data_ = data_.Get() + offset;
+            level.data_ = data_.get() + offset;
             level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
 
             if (offset + level.dataSize_ > GetMemoryUse())
@@ -2004,7 +2004,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
             level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
             level.rows_ = (unsigned)((level.height_ + 3) / 4);
-            level.data_ = data_.Get() + offset;
+            level.data_ = data_.get() + offset;
             level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
 
             if (offset + level.dataSize_ > GetMemoryUse())
@@ -2040,7 +2040,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
             int dataWidth = Max(level.width_, level.blockSize_ == 2 ? 16 : 8);
             int dataHeight = Max(level.height_, 8);
-            level.data_ = data_.Get() + offset;
+            level.data_ = data_.get() + offset;
             level.dataSize_ = (dataWidth * dataHeight * level.blockSize_ + 7) >> 3;
             level.rows_ = (unsigned)dataHeight;
             level.rowSize_ = level.dataSize_ / level.rows_;
@@ -2092,7 +2092,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
         image->SetSize(width, height, components_);
 
         unsigned char* dest = image->GetData();
-        unsigned char* src = data_.Get() + (y * width_ + x) * components_;
+        unsigned char* src = data_.get() + (y * width_ + x) * components_;
         for (int i = 0; i < height; ++i)
         {
             memcpy(dest, src, (size_t)width * components_);
@@ -2164,8 +2164,8 @@ Image* Image::GetSubimage(const IntRect& rect) const
         image->compressedFormat_ = compressedFormat_;
         image->numCompressedLevels_ = subimageLevels;
         image->components_ = components_;
-        image->data_ = new unsigned char[subimageData.Size()];
-        memcpy(image->data_.Get(), &subimageData[0], subimageData.Size());
+        image->data_.reset(new unsigned char[subimageData.Size()]);
+        memcpy(image->data_.get(), &subimageData[0], subimageData.Size());
         image->SetMemoryUse(subimageData.Size());
 
         return image;
@@ -2222,7 +2222,7 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
         SDL_LockSurface(surface);
 
         auto* destination = reinterpret_cast<unsigned char*>(surface->pixels);
-        unsigned char* source = data_ + components_ * (imageWidth * imageRect.top_ + imageRect.left_);
+        unsigned char* source = data_.get() + components_ * (imageWidth * imageRect.top_ + imageRect.left_);
         for (int i = 0; i < height; ++i)
         {
             memcpy(destination, source, (size_t)components_ * width);
@@ -2339,7 +2339,7 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
     if (destWidth == image->GetWidth() && destHeight == image->GetHeight())
     {
         unsigned char* src = image->GetData();
-        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        unsigned char* dest = data_.get() + (rect.top_ * width_ + rect.left_) * components_;
         for (int i = 0; i < destHeight; ++i)
         {
             memcpy(dest, src, (size_t)destWidth * components_);
@@ -2350,7 +2350,7 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
     }
     else
     {
-        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        unsigned char* dest = data_.get() + (rect.top_ * width_ + rect.left_) * components_;
         for (int y = 0; y < destHeight; ++y)
         {
             for (int x = 0; x < destWidth; ++x)
