@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code is licensed under the MIT-style license found in the
@@ -8,8 +8,9 @@
  *  This file defines adapters for all MS-specific functions used throughout SLikeNet.
  */
 
-#ifdef __linux__
 #include "slikenet/linux_adapter.h"
+
+#ifdef SPRINTFS_FUNCTION_MISSING
 
 #include <algorithm>	// for std::max, std::min
 #include <cerrno>		// for errno
@@ -242,35 +243,6 @@ errno_t strncpy_s(char *strDest, size_t numberOfElements, const char *strSource,
 	return truncated ? 80 : 0; // STRUNCATE, if we truncated the string, 0 otherwise
 }
 
-int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr)
-{
-	if ((buffer == nullptr) || (format == nullptr) || (sizeOfBuffer == 0)) {
-		return -1;
-	}
-
-	size_t maxChars = sizeOfBuffer;
-	if (count != _TRUNCATE) {
-		if (count >= sizeOfBuffer) {
-			buffer[0] = '\0'; // ensure trailing \0 is written
-			return -1;
-		}
-		maxChars = count;
-	}
-
-	int numCharsWritten = vsnprintf(buffer, maxChars, format, argptr);
-	if (numCharsWritten >= maxChars) {
-		if (count != _TRUNCATE) {
-			buffer[0] = '\0'; // buffer set to empty string
-			return -1;
-		}
-
-		// truncation occurred, add terminating \0
-		buffer[sizeOfBuffer] = '\0';
-	}
-
-	return numCharsWritten;
-}
-
 errno_t wcscat_s(wchar_t *strDestination, size_t numberOfElements, const wchar_t *strSource)
 {
 	if ((strDestination == nullptr) || (strSource == nullptr)) {
@@ -316,8 +288,38 @@ errno_t wcscpy_s(wchar_t* strDestination, size_t numberOfElements, const wchar_t
 
 #endif
 
+#ifdef VSNPRINTFS_FUNCTION_MISSING
+int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr)
+{
+	if ((buffer == nullptr) || (format == nullptr) || (sizeOfBuffer == 0)) {
+		return -1;
+	}
 
-#ifdef __MINGW32__
+	size_t maxChars = sizeOfBuffer;
+	if (count != _TRUNCATE) {
+		if (count >= sizeOfBuffer) {
+			buffer[0] = '\0'; // ensure trailing \0 is written
+			return -1;
+		}
+		maxChars = count;
+	}
+
+	int numCharsWritten = vsnprintf(buffer, maxChars, format, argptr);
+	if (numCharsWritten >= maxChars) {
+		if (count != _TRUNCATE) {
+			buffer[0] = '\0'; // buffer set to empty string
+			return -1;
+		}
+
+		// truncation occurred, add terminating \0
+		buffer[sizeOfBuffer] = '\0';
+	}
+
+	return numCharsWritten;
+}
+#endif
+
+#ifdef INET_FUNCTIONS_MISSING
 #include <cstdarg>  // for va_start, va_end, va_list
 #include <cstdio>   // for FILE
 #include <ctime>    // for time_t
@@ -989,7 +991,12 @@ static void interpretAddr(struct nlmsghdr *p_hdr, struct ifaddrs **p_links, stru
 		{
 			l_mask[i] = 0xff;
 		}
-		l_mask[i] = 0xff << (8 - (l_prefix % 8));
+
+		// Avoid stack check fail on android device, reference https://github.com/libuv/libuv/blob/e4087dedf837f415056a45a838f639a3d9dc3ced/src/unix/android-ifaddrs.c
+		if (l_prefix % 8)
+		{
+			l_mask[i] = 0xff << (8 - (l_prefix % 8));
+		}
 
 		makeSockaddr(l_entry->ifa_addr->sa_family, (struct sockaddr *)l_addr, l_mask, l_maxPrefix / 8);
 		l_entry->ifa_netmask = (struct sockaddr *)l_addr;

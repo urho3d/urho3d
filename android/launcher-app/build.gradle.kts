@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+import java.time.Duration
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -54,7 +56,7 @@ android {
                     addAll(listOf(
                             "URHO3D_PLAYER",
                             "URHO3D_SAMPLES")
-                            .map { "-D$it=${if (project.hasProperty(it)) project.property(it) else "1"}" }
+                            .map { "-D$it=${project.findProperty(it) ?: "1"}" }
                     )
                 }
             }
@@ -63,19 +65,20 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
+                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
                         .split(',').toTypedArray())
             }
         }
     }
     buildTypes {
-        getByName("release") {
+        named("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
     externalNativeBuild {
         cmake {
+            setVersion(cmakeVersion)
             setPath(project.file("CMakeLists.txt"))
         }
     }
@@ -95,7 +98,7 @@ evaluationDependsOn(":android:urho3d-lib")
 
 afterEvaluate {
     tasks {
-        getByName("clean") {
+        "clean" {
             doLast {
                 android.externalNativeBuild.cmake.path?.touch()
             }
@@ -106,6 +109,10 @@ afterEvaluate {
         tasks {
             "externalNativeBuild$config" {
                 mustRunAfter(":android:urho3d-lib:externalNativeBuild$config")
+                if (System.getenv("CI") != null) {
+                    @Suppress("UnstableApiUsage")
+                    timeout.set(Duration.ofMinutes(15))
+                }
             }
         }
     }

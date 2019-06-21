@@ -22,9 +22,11 @@
 
 import org.gradle.internal.io.NullOutputStream
 import org.gradle.internal.os.OperatingSystem
+import java.time.Duration
 
 plugins {
     id("com.android.library")
+    id("com.jfrog.bintray")
     kotlin("android")
     kotlin("android.extensions")
     `maven-publish`
@@ -78,20 +80,24 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(if (isEnable) project.property("ANDROID_ABI") as String else "")
+                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
                         .split(',').toTypedArray())
             }
         }
     }
     buildTypes {
-        getByName("release") {
+        named("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
     externalNativeBuild {
         cmake {
+            setVersion(cmakeVersion)
             setPath(project.file("../../CMakeLists.txt"))
+
+            // Make it explicit as one of the task needs to know the exact path and derived from it
+            setBuildStagingDirectory(".cxx")
         }
     }
 }
@@ -111,7 +117,7 @@ afterEvaluate {
     // When the buildDir is cleaned then we need a way to re-configure that part back
     // It is achieved by ensuring that CMake configuration phase is rerun
     tasks {
-        getByName("clean") {
+        "clean" {
             doLast {
                 android.externalNativeBuild.cmake.path?.touch()
             }
@@ -122,16 +128,16 @@ afterEvaluate {
     android.buildTypes.forEach { buildType ->
         val config = buildType.name.capitalize()
         tasks {
-            create<Zip>("zipBuildTree$config") {
-                classifier = buildType.name
-                extension = "aar"
+            register<Zip>("zipBuildTree$config") {
+                archiveClassifier.set(buildType.name)
+                archiveExtension.set("aar")
                 dependsOn("zipBuildTreeConfigurer$config", "bundle${config}Aar")
-                from(zipTree(tasks.getByName("bundle${config}Aar").outputs.files.first()))
+                from(zipTree(getByName("bundle${config}Aar").outputs.files.first()))
             }
-            create("zipBuildTreeConfigurer$config") {
+            register<Task>("zipBuildTreeConfigurer$config") {
                 val externalNativeBuildDir = File(buildDir, "tree/$config")
                 doLast {
-                    val zipTask = tasks.getByName<Zip>("zipBuildTree$config")
+                    val zipTask = getByName<Zip>("zipBuildTree$config")
                     externalNativeBuildDir.list()?.forEach { abi ->
                         listOf("include", "lib").forEach {
                             zipTask.from(File(externalNativeBuildDir, "$abi/$it")) {
@@ -144,16 +150,22 @@ afterEvaluate {
                     }
                 }
             }
+            if (System.getenv("CI") != null) {
+                "externalNativeBuild$config" {
+                    @Suppress("UnstableApiUsage")
+                    timeout.set(Duration.ofMinutes(25))
+                }
+            }
         }
     }
 }
 
 tasks {
-    create<Jar>("sourcesJar") {
-        classifier = "sources"
+    register<Jar>("sourcesJar") {
+        archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
-    create<Exec>("makeDoc") {
+    register<Exec>("makeDoc") {
         // Ignore the exit status on Windows host system because Doxygen may not return exit status correctly on Windows
         isIgnoreExitValue = OperatingSystem.current().isWindows
         standardOutput = NullOutputStream.INSTANCE
@@ -161,19 +173,19 @@ tasks {
         dependsOn("makeDocConfigurer")
         mustRunAfter("zipBuildTreeRelease")
     }
-    create<Zip>("documentationZip") {
-        classifier = "documentation"
+    register<Zip>("documentationZip") {
+        archiveClassifier.set("documentation")
         dependsOn("makeDoc")
     }
-    create("makeDocConfigurer") {
+    register<Task>("makeDocConfigurer") {
         doLast {
-            val buildTree = File(cmakeStagingDir(), "cmake/release/$docABI")
-            tasks.getByName<Exec>("makeDoc") {
+            val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
+            named<Exec>("makeDoc") {
                 // This is a hack - expect the first line to contain the path to the embedded CMake executable
-                executable = File(buildTree, "cmake_build_command.txt").readLines().first().split(":").last().trim()
+                executable = File(buildTree, "build_command.txt").readLines().first().split(":").last().trim()
                 workingDir = buildTree
             }
-            tasks.getByName<Zip>("documentationZip") {
+            named<Zip>("documentationZip") {
                 from(File(buildTree, "Docs/html")) {
                     into("docs")
                 }
@@ -183,21 +195,80 @@ tasks {
 }
 
 publishing {
-    (publications) {
-        create<MavenPublication>("mavenAndroid") {
+    publications {
+        register<MavenPublication>("mavenAndroid") {
             artifactId = "${project.name}-${project.libraryType}"
+            if (project.hasProperty("ANDROID_ABI")) {
+                artifactId = "$artifactId-${(project.property("ANDROID_ABI") as String).replace(',', '-')}"
+            }
             afterEvaluate {
-                android.buildTypes.forEach {
-                    artifact(tasks.getByName("zipBuildTree${it.name.capitalize()}"))
+                // Exclude publishing STATIC-debug AAR because its size exceeds 250MB limit allowed by Bintray
+                android.buildTypes
+                        .map { it.name }
+                        .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
+                        .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
+            }
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["documentationZip"])
+            pom {
+                @Suppress("UnstableApiUsage")
+                inceptionYear.set("2008")
+                @Suppress("UnstableApiUsage")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://github.com/urho3d/Urho3D/blob/master/LICENSE")
+                    }
+                }
+                @Suppress("UnstableApiUsage")
+                developers {
+                    developer {
+                        name.set("Urho3D contributors")
+                        url.set("https://github.com/urho3d/Urho3D/graphs/contributors")
+                    }
+                }
+                @Suppress("UnstableApiUsage")
+                scm {
+                    url.set("https://github.com/urho3d/Urho3D.git")
+                    connection.set("scm:git:ssh://git@github.com:urho3d/Urho3D.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:urho3d/Urho3D.git")
+                }
+                withXml {
+                    asNode().apply {
+                        appendNode("name", "Urho3D")
+                        appendNode("description", project.description)
+                        appendNode("url", "https://urho3d.github.io/")
+                    }
                 }
             }
-            artifact(tasks.getByName("sourcesJar"))
-            artifact(tasks.getByName("documentationZip"))
         }
     }
 }
 
-fun cmakeStagingDir() = android.externalNativeBuild.cmake.buildStagingDirectory ?: project.file(".externalNativeBuild")
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publish = true
+    override = true
+    setPublications("mavenAndroid")
+    pkg.apply {
+        repo = "maven"
+        name = project.name
+        setLicenses("MIT")
+        vcsUrl = "https://github.com/urho3d/Urho3D.git"
+        userOrg = "urho3d"
+        setLabels("android", "game-development", "game-engine", "open-source", "urho3d")
+        websiteUrl = "https://urho3d.github.io/"
+        issueTrackerUrl = "https://github.com/urho3d/Urho3D/issues"
+        githubRepo = "urho3d/Urho3D"
+        publicDownloadNumbers = true
+        desc = project.description
+        version.apply {
+            name = project.version.toString()
+            desc = "Continuous delivery from Travis-CI."
+        }
+    }
+}
 
 val Project.libraryType: String
-    get() = if (hasProperty("URHO3D_LIB_TYPE")) property("URHO3D_LIB_TYPE") as String else "STATIC"
+    get() = findProperty("URHO3D_LIB_TYPE") as String? ?: "STATIC"

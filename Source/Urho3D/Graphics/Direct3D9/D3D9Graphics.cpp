@@ -125,6 +125,7 @@ static const DWORD d3dBlendEnable[] =
     TRUE,
     TRUE,
     TRUE,
+    TRUE,
     TRUE
 };
 

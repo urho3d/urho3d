@@ -21,6 +21,7 @@ Urho3D development, contributions and bugfixes by:
 - Wei Tjong Yao
 - Aster Jian
 - Ricardo Abreu
+- Eli Aloni
 - Vivienne Anthony
 - Christopher Augustus
 - Colin Barrett
@@ -122,6 +123,7 @@ Urho3D development, contributions and bugfixes by:
 - TheComet93
 - Y-way
 - 1vanK
+- ab4daa
 - andmar1x
 - amadeus_osa
 - atship
@@ -136,6 +138,7 @@ Urho3D development, contributions and bugfixes by:
 - fredakilla
 - gleblebedev
 - hdunderscore
+- holyfight6
 - hsnabn
 - lhinuz
 - lvshiling
@@ -146,6 +149,7 @@ Urho3D development, contributions and bugfixes by:
 - nemerle
 - ninjastone
 - orefkov
+- pat2nav
 - proller
 - raould
 - rasteron
@@ -154,11 +158,13 @@ Urho3D development, contributions and bugfixes by:
 - rikorin
 - skaiware
 - ssinai1
+- sssooonnnggg
 - svifylabs
 - szamq
 - thebluefish
 - tommy3
 - yushli
+- zlum
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
@@ -183,7 +189,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.33.0 WIP (http://www.angelcode.com/angelscript)
+- AngelScript 2.33.0+ (http://www.angelcode.com/angelscript)
 - Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 2.86.1 (http://www.bulletphysics.org)

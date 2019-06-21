@@ -64,7 +64,7 @@ function CreateScene()
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
 
     -- Create animated models
-    local uint NUM_MODELS = 30
+    local NUM_MODELS = 30
     local MODEL_MOVE_SPEED = 2.0
     local MODEL_ROTATE_SPEED = 100.0
     local bounds = BoundingBox(Vector3(-20.0, 0.0, -20.0), Vector3(20.0, 0.0, 20.0))
