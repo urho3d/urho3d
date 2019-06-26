@@ -387,7 +387,9 @@ Input::Input(Context* context) :
     SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Input, HandleScreenMode));
 
 #if defined(__ANDROID__)
-    SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
+    // Prevent mouse events from being registered as synthetic touch events and vice versa
+    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 #elif defined(__EMSCRIPTEN__)
     emscriptenInput_ = new EmscriptenInput(this);
 #endif
