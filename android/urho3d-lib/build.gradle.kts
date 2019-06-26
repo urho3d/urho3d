@@ -33,10 +33,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(28)
     defaultConfig {
         minSdkVersion(17)
-        targetSdkVersion(27)
+        targetSdkVersion(28)
         versionCode = 1
         versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -100,11 +100,17 @@ android {
             setBuildStagingDirectory(".cxx")
         }
     }
+    sourceSets {
+        getByName("main") {
+            java.srcDir("../../Source/ThirdParty/SDL/android-project/app/src/main/java")
+        }
+    }
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    implementation("com.getkeepsafe.relinker:relinker:$relinkerVersion")
     testImplementation("junit:junit:$junitVersion")
     androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
