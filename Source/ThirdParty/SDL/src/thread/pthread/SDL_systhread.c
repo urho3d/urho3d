@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,7 @@
 */
 
 #include "../../SDL_internal.h"
+#include "SDL_system.h"
 
 #include <pthread.h>
 
@@ -34,6 +35,9 @@
 #include <sys/resource.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+#include <errno.h>
+
+#include "../../core/linux/SDL_dbus.h"
 #endif /* __LINUX__ */
 
 #if defined(__LINUX__) || defined(__MACOSX__) || defined(__IPHONEOS__)
@@ -43,6 +47,7 @@
 #endif
 #endif
 
+#include "SDL_log.h"
 #include "SDL_platform.h"
 #include "SDL_thread.h"
 #include "../SDL_thread_c.h"
@@ -188,43 +193,39 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
     return 0;
 #elif __LINUX__
     int value;
+    pid_t thread = syscall(SYS_gettid);
 
     if (priority == SDL_THREAD_PRIORITY_LOW) {
         value = 19;
     } else if (priority == SDL_THREAD_PRIORITY_HIGH) {
+        value = -10;
+    } else if (priority == SDL_THREAD_PRIORITY_TIME_CRITICAL) {
         value = -20;
     } else {
         value = 0;
     }
-    if (setpriority(PRIO_PROCESS, syscall(SYS_gettid), value) < 0) {
-        /* Note that this fails if you're trying to set high priority
-           and you don't have root permission. BUT DON'T RUN AS ROOT!
-
-           You can grant the ability to increase thread priority by
-           running the following command on your application binary:
-               sudo setcap 'cap_sys_nice=eip' <application>
-         */
-        return SDL_SetError("setpriority() failed");
-    }
-    return 0;
+    return SDL_LinuxSetThreadPriority(thread, value);
 #else
     struct sched_param sched;
     int policy;
     pthread_t thread = pthread_self();
 
-    if (pthread_getschedparam(thread, &policy, &sched) < 0) {
+    if (pthread_getschedparam(thread, &policy, &sched) != 0) {
         return SDL_SetError("pthread_getschedparam() failed");
     }
     if (priority == SDL_THREAD_PRIORITY_LOW) {
         sched.sched_priority = sched_get_priority_min(policy);
-    } else if (priority == SDL_THREAD_PRIORITY_HIGH) {
+    } else if (priority == SDL_THREAD_PRIORITY_TIME_CRITICAL) {
         sched.sched_priority = sched_get_priority_max(policy);
     } else {
         int min_priority = sched_get_priority_min(policy);
         int max_priority = sched_get_priority_max(policy);
         sched.sched_priority = (min_priority + (max_priority - min_priority) / 2);
+        if (priority == SDL_THREAD_PRIORITY_HIGH) {
+            sched.sched_priority += ((max_priority - min_priority) / 4);
+        }
     }
-    if (pthread_setschedparam(thread, policy, &sched) < 0) {
+    if (pthread_setschedparam(thread, policy, &sched) != 0) {
         return SDL_SetError("pthread_setschedparam() failed");
     }
     return 0;

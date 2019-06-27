@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -60,7 +60,9 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
     LOAD_FUNC(eglWaitNative);
     LOAD_FUNC(eglWaitGL);
     LOAD_FUNC(eglBindAPI);
-    
+    LOAD_FUNC(eglQueryString);
+    LOAD_FUNC(eglGetError);
+
     _this->egl_data->egl_display = _this->egl_data->eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (!_this->egl_data->egl_display) {
         return SDL_SetError("Could not get EGL display");
@@ -77,19 +79,6 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
     }
     
     return 0;
-}
-
-void
-Emscripten_GLES_DeleteContext(_THIS, SDL_GLContext context)
-{
-    /*
-    WebGL contexts can't actually be deleted, so we need to reset it.
-    ES2 renderer resets state on init anyway, clearing the canvas should be enough
-    */
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    SDL_EGL_DeleteContext(_this, context);
 }
 
 SDL_EGL_CreateContext_impl(Emscripten)

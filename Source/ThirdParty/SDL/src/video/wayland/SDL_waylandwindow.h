@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,24 +26,61 @@
 
 #include "../SDL_sysvideo.h"
 #include "SDL_syswm.h"
+#include "../../events/SDL_touch_c.h"
 
 #include "SDL_waylandvideo.h"
 
 struct SDL_WaylandInput;
 
 typedef struct {
+    struct zxdg_surface_v6 *surface;
+    union {
+        struct zxdg_toplevel_v6 *toplevel;
+        struct zxdg_popup_v6 *popup;
+    } roleobj;
+    SDL_bool initial_configure_seen;
+} SDL_zxdg_shell_surface;
+
+typedef struct {
+    struct xdg_surface *surface;
+    union {
+        struct xdg_toplevel *toplevel;
+        struct xdg_popup *popup;
+    } roleobj;
+    SDL_bool initial_configure_seen;
+} SDL_xdg_shell_surface;
+
+typedef struct {
     SDL_Window *sdlwindow;
     SDL_VideoData *waylandData;
     struct wl_surface *surface;
-    struct wl_shell_surface *shell_surface;
+    union {
+        SDL_xdg_shell_surface xdg;
+        SDL_zxdg_shell_surface zxdg;
+        struct wl_shell_surface *wl;
+    } shell_surface;
     struct wl_egl_window *egl_window;
     struct SDL_WaylandInput *keyboard_device;
     EGLSurface egl_surface;
     struct zwp_locked_pointer_v1 *locked_pointer;
+    struct zxdg_toplevel_decoration_v1 *server_decoration;
+    struct org_kde_kwin_server_decoration *kwin_server_decoration;
 
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
     struct qt_extended_surface *extended_surface;
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */    
+#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+
+    struct {
+        SDL_bool pending, configure;
+        uint32_t serial;
+        int width, height;
+        float scale_factor;
+    } resize;
+
+    struct wl_output **outputs;
+    int num_outputs;
+
+    float scale_factor;
 } SDL_WindowData;
 
 extern void Wayland_ShowWindow(_THIS, SDL_Window *window);
@@ -52,6 +89,7 @@ extern void Wayland_SetWindowFullscreen(_THIS, SDL_Window * window,
                                         SDL_bool fullscreen);
 extern void Wayland_MaximizeWindow(_THIS, SDL_Window * window);
 extern void Wayland_RestoreWindow(_THIS, SDL_Window * window);
+extern void Wayland_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered);
 extern int Wayland_CreateWindow(_THIS, SDL_Window *window);
 extern void Wayland_SetWindowSize(_THIS, SDL_Window * window);
 extern void Wayland_SetWindowTitle(_THIS, SDL_Window * window);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,6 +25,7 @@
 #if SDL_VIDEO_OPENGL_CGL
 #include "SDL_cocoavideo.h"
 #include "SDL_cocoaopengl.h"
+#include "SDL_cocoaopengles.h"
 
 #include <OpenGL/CGLTypes.h>
 #include <OpenGL/OpenGL.h>
@@ -34,6 +35,12 @@
 #include "SDL_opengl.h"
 
 #define DEFAULT_OPENGL  "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
+
+/* We still support OpenGL as long as Apple offers it, deprecated or not, so disable deprecation warnings about it. */
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 @implementation SDLOpenGLContext : NSOpenGLContext
 
@@ -165,8 +172,27 @@ Cocoa_GL_CreateContext(_THIS, SDL_Window * window)
     int glversion_minor;
 
     if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES) {
-        SDL_SetError ("OpenGL ES is not supported on this platform");
+#if SDL_VIDEO_OPENGL_EGL
+        /* Switch to EGL based functions */
+        Cocoa_GL_UnloadLibrary(_this);
+        _this->GL_LoadLibrary = Cocoa_GLES_LoadLibrary;
+        _this->GL_GetProcAddress = Cocoa_GLES_GetProcAddress;
+        _this->GL_UnloadLibrary = Cocoa_GLES_UnloadLibrary;
+        _this->GL_CreateContext = Cocoa_GLES_CreateContext;
+        _this->GL_MakeCurrent = Cocoa_GLES_MakeCurrent;
+        _this->GL_SetSwapInterval = Cocoa_GLES_SetSwapInterval;
+        _this->GL_GetSwapInterval = Cocoa_GLES_GetSwapInterval;
+        _this->GL_SwapWindow = Cocoa_GLES_SwapWindow;
+        _this->GL_DeleteContext = Cocoa_GLES_DeleteContext;
+        
+        if (Cocoa_GLES_LoadLibrary(_this, NULL) != 0) {
+            return NULL;
+        }
+        return Cocoa_GLES_CreateContext(_this, window);
+#else
+        SDL_SetError("SDL not configured with EGL support");
         return NULL;
+#endif
     }
     if ((_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_CORE) && !lion_or_later) {
         SDL_SetError ("OpenGL Core Profile is not supported on this platform version");
@@ -327,10 +353,12 @@ Cocoa_GL_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h)
     NSView *contentView = [windata->nswindow contentView];
     NSRect viewport = [contentView bounds];
 
-    /* This gives us the correct viewport for a Retina-enabled view, only
-     * supported on 10.7+. */
-    if ([contentView respondsToSelector:@selector(convertRectToBacking:)]) {
-        viewport = [contentView convertRectToBacking:viewport];
+    if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
+        /* This gives us the correct viewport for a Retina-enabled view, only
+         * supported on 10.7+. */
+        if ([contentView respondsToSelector:@selector(convertRectToBacking:)]) {
+            viewport = [contentView convertRectToBacking:viewport];
+        }
     }
 
     if (w) {
@@ -388,8 +416,14 @@ Cocoa_GL_SwapWindow(_THIS, SDL_Window * window)
 { @autoreleasepool
 {
     SDLOpenGLContext* nscontext = (SDLOpenGLContext*)SDL_GL_GetCurrentContext();
+    SDL_VideoData *videodata = (SDL_VideoData *) _this->driverdata;
+
+    /* on 10.14 ("Mojave") and later, this deadlocks if two contexts in two
+       threads try to swap at the same time, so put a mutex around it. */
+    SDL_LockMutex(videodata->swaplock);
     [nscontext flushBuffer];
     [nscontext updateIfNeeded];
+    SDL_UnlockMutex(videodata->swaplock);
     return 0;
 }}
 
@@ -402,6 +436,11 @@ Cocoa_GL_DeleteContext(_THIS, SDL_GLContext context)
     [nscontext setWindow:NULL];
     [nscontext release];
 }}
+
+/* We still support OpenGL as long as Apple offers it, deprecated or not, so disable deprecation warnings about it. */
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif /* SDL_VIDEO_OPENGL_CGL */
 
