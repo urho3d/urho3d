@@ -236,6 +236,7 @@ env:
     - ANDROID=1
     - ORG_GRADLE_PROJECT_URHO3D_LUAJIT=1
     - HOT=$HOME/urho3d_home_dir/.ccache/.hot
+    - DBE_TAG=':latest'
   matrix:
     - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
     - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
