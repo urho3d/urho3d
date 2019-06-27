@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,13 +18,16 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifdef TEST_MAIN
 #include "SDL_config.h"
 #else
 #include "../SDL_internal.h"
 #endif
 
-#if defined(__WIN32__)
+#if defined(__WIN32__) || defined(__WINRT__)
 #include "../core/windows/SDL_windows.h"
 #endif
 #if defined(__OS2__)
@@ -38,6 +41,7 @@
 /* CPU feature detection for SDL */
 
 #include "SDL_cpuinfo.h"
+#include "SDL_assert.h"
 
 #ifdef HAVE_SYSCONF
 #include <unistd.h>
@@ -76,18 +80,25 @@
 #endif
 #endif
 
-#define CPU_HAS_RDTSC   0x00000001
-#define CPU_HAS_ALTIVEC 0x00000002
-#define CPU_HAS_MMX     0x00000004
-#define CPU_HAS_3DNOW   0x00000008
-#define CPU_HAS_SSE     0x00000010
-#define CPU_HAS_SSE2    0x00000020
-#define CPU_HAS_SSE3    0x00000040
-#define CPU_HAS_SSE41   0x00000100
-#define CPU_HAS_SSE42   0x00000200
-#define CPU_HAS_AVX     0x00000400
-#define CPU_HAS_AVX2    0x00000800
-#define CPU_HAS_NEON    0x00001000
+#if defined(__ANDROID__) && defined(__ARM_ARCH) && !defined(HAVE_GETAUXVAL)
+#if __ARM_ARCH < 8
+#include <cpu-features.h>
+#endif
+#endif
+
+#define CPU_HAS_RDTSC   (1 << 0)
+#define CPU_HAS_ALTIVEC (1 << 1)
+#define CPU_HAS_MMX     (1 << 2)
+#define CPU_HAS_3DNOW   (1 << 3)
+#define CPU_HAS_SSE     (1 << 4)
+#define CPU_HAS_SSE2    (1 << 5)
+#define CPU_HAS_SSE3    (1 << 6)
+#define CPU_HAS_SSE41   (1 << 7)
+#define CPU_HAS_SSE42   (1 << 8)
+#define CPU_HAS_AVX     (1 << 9)
+#define CPU_HAS_AVX2    (1 << 10)
+#define CPU_HAS_NEON    (1 << 11)
+#define CPU_HAS_AVX512F (1 << 12)
 
 #if SDL_ALTIVEC_BLITTERS && HAVE_SETJMP && !__MACOSX__ && !__OpenBSD__
 /* This is the brute force way of detecting instruction sets...
@@ -246,6 +257,7 @@ done:
 static int CPU_CPUIDFeatures[4];
 static int CPU_CPUIDMaxFunction = 0;
 static SDL_bool CPU_OSSavesYMM = SDL_FALSE;
+static SDL_bool CPU_OSSavesZMM = SDL_FALSE;
 
 static void
 CPU_calcCPUIDFeatures(void)
@@ -266,7 +278,7 @@ CPU_calcCPUIDFeatures(void)
 
                 /* Check to make sure we can call xgetbv */
                 if (c & 0x08000000) {
-                    /* Call xgetbv to see if YMM register state is saved */
+                    /* Call xgetbv to see if YMM (etc) register state is saved */
 #if defined(__GNUC__) && (defined(i386) || defined(__x86_64__))
                     __asm__(".byte 0x0f, 0x01, 0xd0" : "=a" (a) : "c" (0) : "%edx");
 #elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64)) && (_MSC_FULL_VER >= 160040219) /* VS2010 SP1 */
@@ -280,6 +292,7 @@ CPU_calcCPUIDFeatures(void)
                     }
 #endif
                     CPU_OSSavesYMM = ((a & 6) == 6) ? SDL_TRUE : SDL_FALSE;
+                    CPU_OSSavesZMM = (CPU_OSSavesYMM && ((a & 0xe0) == 0xe0)) ? SDL_TRUE : SDL_FALSE;
                 }
             }
         }
@@ -315,7 +328,7 @@ CPU_haveAltiVec(void)
     return altivec;
 }
 
-#if (defined(__LINUX__) || defined(__ANDROID__)) && defined(__ARM_ARCH) && !defined(HAVE_GETAUXVAL)
+#if defined(__LINUX__) && defined(__ARM_ARCH) && !defined(HAVE_GETAUXVAL)
 static int
 readProcAuxvForNeon(void)
 {
@@ -341,24 +354,43 @@ CPU_haveNEON(void)
 {
 /* The way you detect NEON is a privileged instruction on ARM, so you have
    query the OS kernel in a platform-specific way. :/ */
-#if defined(SDL_CPUINFO_DISABLED) || !defined(__ARM_ARCH)
-    return 0;  /* disabled or not an ARM CPU at all. */
+#if defined(SDL_CPUINFO_DISABLED)
+   return 0; /* disabled */
+#elif (defined(__WINDOWS__) || defined(__WINRT__)) && (defined(_M_ARM) || defined(_M_ARM64))
+/* Visual Studio, for ARM, doesn't define __ARM_ARCH. Handle this first. */
+/* Seems to have been removed */
+#  if !defined(PF_ARM_NEON_INSTRUCTIONS_AVAILABLE)
+#    define PF_ARM_NEON_INSTRUCTIONS_AVAILABLE 19
+#  endif
+/* All WinRT ARM devices are required to support NEON, but just in case. */
+    return IsProcessorFeaturePresent(PF_ARM_NEON_INSTRUCTIONS_AVAILABLE) != 0;
+#elif !defined(__ARM_ARCH)
+    return 0;  /* not an ARM CPU at all. */
 #elif __ARM_ARCH >= 8
     return 1;  /* ARMv8 always has non-optional NEON support. */
 #elif defined(__APPLE__) && (__ARM_ARCH >= 7)
     /* (note that sysctlbyname("hw.optional.neon") doesn't work!) */
     return 1;  /* all Apple ARMv7 chips and later have NEON. */
 #elif defined(__APPLE__)
-    return 0;  /* assune anything else from Apple doesn't have NEON. */
+    return 0;  /* assume anything else from Apple doesn't have NEON. */
 #elif defined(__QNXNTO__)
     return SYSPAGE_ENTRY(cpuinfo)->flags & ARM_CPU_FLAG_NEON;
 #elif (defined(__LINUX__) || defined(__ANDROID__)) && defined(HAVE_GETAUXVAL)
     return ((getauxval(AT_HWCAP) & HWCAP_NEON) == HWCAP_NEON);
-#elif (defined(__LINUX__) || defined(__ANDROID__))
-    return readProcAuxvForNeon();   /* Android offers a static library for this, but it just parses /proc/self/auxv */
-#elif (defined(__WINDOWS__) || defined(__WINRT__)) && defined(_M_ARM)
-    /* All WinRT ARM devices are required to support NEON, but just in case. */
-    return IsProcessorFeaturePresent(PF_ARM_NEON_INSTRUCTIONS_AVAILABLE) != 0;
+#elif defined(__LINUX__)
+    return readProcAuxvForNeon();
+#elif defined(__ANDROID__)
+    /* Use NDK cpufeatures to read either /proc/self/auxv or /proc/cpuinfo */
+    {
+        AndroidCpuFamily cpu_family = android_getCpuFamily();
+        if (cpu_family == ANDROID_CPU_FAMILY_ARM) {
+            uint64_t cpu_features = android_getCpuFeatures();
+            if ((cpu_features & ANDROID_CPU_ARM_FEATURE_NEON) != 0) {
+                return 1;
+            }
+        }
+        return 0;
+    }
 #else
 #warning SDL_HasNEON is not implemented for this ARM platform. Write me.
     return 0;
@@ -396,6 +428,18 @@ CPU_haveAVX2(void)
         (void) a; (void) b; (void) c; (void) d;  /* compiler warnings... */
         cpuid(7, a, b, c, d);
         return (b & 0x00000020);
+    }
+    return 0;
+}
+
+static int
+CPU_haveAVX512F(void)
+{
+    if (CPU_OSSavesZMM && (CPU_CPUIDMaxFunction >= 7)) {
+        int a, b, c, d;
+        (void) a; (void) b; (void) c; (void) d;  /* compiler warnings... */
+        cpuid(7, a, b, c, d);
+        return (b & 0x00010000);
     }
     return 0;
 }
@@ -571,6 +615,7 @@ SDL_GetCPUCacheLineSize(void)
 }
 
 static Uint32 SDL_CPUFeatures = 0xFFFFFFFF;
+static Uint32 SDL_SIMDAlignment = 0xFFFFFFFF;
 
 static Uint32
 SDL_GetCPUFeatures(void)
@@ -578,41 +623,57 @@ SDL_GetCPUFeatures(void)
     if (SDL_CPUFeatures == 0xFFFFFFFF) {
         CPU_calcCPUIDFeatures();
         SDL_CPUFeatures = 0;
+        SDL_SIMDAlignment = 4;  /* a good safe base value */
         if (CPU_haveRDTSC()) {
             SDL_CPUFeatures |= CPU_HAS_RDTSC;
         }
         if (CPU_haveAltiVec()) {
             SDL_CPUFeatures |= CPU_HAS_ALTIVEC;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveMMX()) {
             SDL_CPUFeatures |= CPU_HAS_MMX;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 8);
         }
         if (CPU_have3DNow()) {
             SDL_CPUFeatures |= CPU_HAS_3DNOW;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 8);
         }
         if (CPU_haveSSE()) {
             SDL_CPUFeatures |= CPU_HAS_SSE;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE2()) {
             SDL_CPUFeatures |= CPU_HAS_SSE2;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE3()) {
             SDL_CPUFeatures |= CPU_HAS_SSE3;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE41()) {
             SDL_CPUFeatures |= CPU_HAS_SSE41;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE42()) {
             SDL_CPUFeatures |= CPU_HAS_SSE42;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveAVX()) {
             SDL_CPUFeatures |= CPU_HAS_AVX;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 32);
         }
         if (CPU_haveAVX2()) {
             SDL_CPUFeatures |= CPU_HAS_AVX2;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 32);
+        }
+        if (CPU_haveAVX512F()) {
+            SDL_CPUFeatures |= CPU_HAS_AVX512F;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 64);
         }
         if (CPU_haveNEON()) {
             SDL_CPUFeatures |= CPU_HAS_NEON;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
     }
     return SDL_CPUFeatures;
@@ -686,6 +747,12 @@ SDL_HasAVX2(void)
 }
 
 SDL_bool
+SDL_HasAVX512F(void)
+{
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_AVX512F);
+}
+
+SDL_bool
 SDL_HasNEON(void)
 {
     return CPU_FEATURE_AVAILABLE(CPU_HAS_NEON);
@@ -745,6 +812,54 @@ SDL_GetSystemRAM(void)
 }
 
 
+// Urho3D - bug fix - check if SIMD is supported
+#ifdef __EMSCRIPTEN__
+size_t
+SDL_SIMDGetAlignment(void)
+{
+    SDL_assert(0 && "We should never get here if the platform does not support SIMD");
+    return 4;
+}
+#else
+size_t
+SDL_SIMDGetAlignment(void)
+{
+    if (SDL_SIMDAlignment == 0xFFFFFFFF) {
+        SDL_GetCPUFeatures();  /* make sure this has been calculated */
+    }
+    SDL_assert(SDL_SIMDAlignment != 0);
+    return SDL_SIMDAlignment;
+}
+
+void *
+SDL_SIMDAlloc(const size_t len)
+{
+    const size_t alignment = SDL_SIMDGetAlignment();
+    const size_t padding = alignment - (len % alignment);
+    const size_t padded = (padding != alignment) ? (len + padding) : len;
+    Uint8 *retval = NULL;
+    Uint8 *ptr = (Uint8 *) SDL_malloc(padded + alignment + sizeof (void *));
+    if (ptr) {
+        /* store the actual malloc pointer right before our aligned pointer. */
+        retval = ptr + sizeof (void *);
+        retval += alignment - (((size_t) retval) % alignment);
+        *(((void **) retval) - 1) = ptr;
+    }
+    return retval;
+}
+
+void
+SDL_SIMDFree(void *ptr)
+{
+    if (ptr) {
+        void **realptr = (void **) ptr;
+        realptr--;
+        SDL_free(*(((void **) ptr) - 1));
+    }
+}
+#endif
+
+
 #ifdef TEST_MAIN
 
 #include <stdio.h>
@@ -767,6 +882,7 @@ main()
     printf("SSE4.2: %d\n", SDL_HasSSE42());
     printf("AVX: %d\n", SDL_HasAVX());
     printf("AVX2: %d\n", SDL_HasAVX2());
+    printf("AVX-512F: %d\n", SDL_HasAVX512F());
     printf("NEON: %d\n", SDL_HasNEON());
     printf("RAM: %d MB\n", SDL_GetSystemRAM());
     return 0;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -90,7 +90,10 @@ typedef struct
     float relative_speed_scale;
     float scale_accum_x;
     float scale_accum_y;
+    Uint32 double_click_time;
+    int double_click_radius;
     SDL_bool touch_mouse_events;
+    SDL_bool mouse_touch_events;
 
     /* Data for double-click tracking */
     int num_clickstates;
@@ -111,9 +114,6 @@ extern int SDL_MouseInit(void);
 
 /* Get the mouse state structure */
 SDL_Mouse *SDL_GetMouse(void);
-
-/* Set the default double-click interval */
-extern void SDL_SetDoubleClickTime(Uint32 interval);
 
 /* Set the default mouse cursor */
 extern void SDL_SetDefaultCursor(SDL_Cursor * cursor);

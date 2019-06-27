@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,6 +45,7 @@ typedef struct SDL_VideoData
     struct pollfd drm_pollfd;   /* pollfd containing DRM file desc */
     drmModeCrtc *saved_crtc;    /* Saved CRTC to restore on quit */
     uint32_t saved_conn_id;     /* Saved DRM connector ID */
+    uint32_t crtc_id;           /* CRTC in use */
 } SDL_VideoData;
 
 
@@ -61,8 +62,10 @@ typedef struct SDL_WindowData
     struct gbm_surface *gs;
     struct gbm_bo *current_bo;
     struct gbm_bo *next_bo;
+    struct gbm_bo *crtc_bo;
     SDL_bool waiting_for_flip;
     SDL_bool crtc_ready;
+    SDL_bool double_buffer;
 #if SDL_VIDEO_OPENGL_EGL
     EGLSurface egl_surface;
 #endif

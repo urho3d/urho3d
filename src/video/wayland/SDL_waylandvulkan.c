@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -39,7 +39,7 @@
 int Wayland_Vulkan_LoadLibrary(_THIS, const char *path)
 {
     VkExtensionProperties *extensions = NULL;
-    Uint32 extensionCount = 0;
+    Uint32 i, extensionCount = 0;
     SDL_bool hasSurfaceExtension = SDL_FALSE;
     SDL_bool hasWaylandSurfaceExtension = SDL_FALSE;
     PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = NULL;
@@ -72,7 +72,7 @@ int Wayland_Vulkan_LoadLibrary(_THIS, const char *path)
         &extensionCount);
     if(!extensions)
         goto fail;
-    for(Uint32 i = 0; i < extensionCount; i++)
+    for(i = 0; i < extensionCount; i++)
     {
         if(SDL_strcmp(VK_KHR_SURFACE_EXTENSION_NAME, extensions[i].extensionName) == 0)
             hasSurfaceExtension = SDL_TRUE;
@@ -127,6 +127,22 @@ SDL_bool Wayland_Vulkan_GetInstanceExtensions(_THIS,
             extensionsForWayland);
 }
 
+void Wayland_Vulkan_GetDrawableSize(_THIS, SDL_Window *window, int *w, int *h)
+{
+    SDL_WindowData *data;
+    if (window->driverdata) {
+        data = (SDL_WindowData *) window->driverdata;
+
+        if (w) {
+            *w = window->w * data->scale_factor;
+        }
+
+        if (h) {
+            *h = window->h * data->scale_factor;
+        }
+    }
+}
+
 SDL_bool Wayland_Vulkan_CreateSurface(_THIS,
                                   SDL_Window *window,
                                   VkInstance instance,
@@ -139,7 +155,7 @@ SDL_bool Wayland_Vulkan_CreateSurface(_THIS,
         (PFN_vkCreateWaylandSurfaceKHR)vkGetInstanceProcAddr(
                                             (VkInstance)instance,
                                             "vkCreateWaylandSurfaceKHR");
-    VkWaylandSurfaceCreateInfoKHR createInfo = {};
+    VkWaylandSurfaceCreateInfoKHR createInfo;
     VkResult result;
 
     if(!_this->vulkan_config.loader_handle)
@@ -154,6 +170,7 @@ SDL_bool Wayland_Vulkan_CreateSurface(_THIS,
                      " extension is not enabled in the Vulkan instance.");
         return SDL_FALSE;
     }
+    SDL_zero(createInfo);
     createInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
     createInfo.pNext = NULL;
     createInfo.flags = 0;
