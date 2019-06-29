@@ -44,7 +44,7 @@ allprojects {
 /**
  * Find the most recent tag that is reachable from a commit and use that to set the Gradle's project version.
  *
- * e.g. commit described as "1.7-664-g34b1" will be mapped to "1.8-BETA" (rolling release for the next version)
+ * e.g. commit described as "1.7-664-g34b1" will be mapped to "1.8-ROLLING" (rolling upgrades for the next version)
  *      tag "1.8" will be mapped to "1.8" as is (point release version), so does tag "1.8-RC" (release candidate)
  */
 fun determineVersion(): String {
@@ -53,7 +53,7 @@ fun determineVersion(): String {
     // If it is on CI server then unshallow the clone's repo when necessary
     if (System.getenv("CI") != null && System.getenv("RELEASE_TAG") == null) unshallowClone()
     val desc = describeCommit(System.getenv("TRAVIS_COMMIT") ?: System.getenv("APPVEYOR_REPO_COMMIT"))
-    return Regex("^(.+?)-\\d").find(desc)?.destructured?.component1()?.let { "${bumpSemVer(it, 1)}-BETA" } ?: desc
+    return Regex("^(.+?)-\\d").find(desc)?.destructured?.component1()?.let { "${bumpSemVer(it, 1)}-ROLLING" } ?: desc
 }
 
 /**
