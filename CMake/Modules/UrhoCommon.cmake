@@ -459,7 +459,7 @@ endforeach ()
 # TODO: The logic below is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling, until then ensure the DirectX package is not being searched again in external projects such as when building LuaJIT library
 if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
     set (DIRECTX_REQUIRED_COMPONENTS)
-    set (DIRECTX_OPTIONAL_COMPONENTS DInput DSound XAudio2 XInput)
+    set (DIRECTX_OPTIONAL_COMPONENTS DInput DSound XInput)
     if (NOT URHO3D_OPENGL)
         if (URHO3D_D3D11)
             list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D11)
