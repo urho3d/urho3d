@@ -32,15 +32,11 @@ cache:
   - C:\tools\mingw64
 environment:
   GIT_NAME:
-    secure: JatNbOZZZKMvMHL8sRq9XpHgESzJ13eh9NHbMK99rX8=
+    secure: rUVYYb1+C4EI2xAlvF4pEA==
   GIT_EMAIL:
-    secure: 7EAYZJ5nFqEhMKcPmUvnqPp81XAoJEILzDJJ2qZXrKA=
+    secure: ls0sOtf/IGC0qWsktlmJxEJT+MTUPF2lGg6zq0FBES0=
   GH_TOKEN:
-    secure: xx7og+aLQbdBSsdVo79OTGtdfqedOpYpIJjduNlzjFSXsTkD8NX8fEPq0XE1KT5n
-  SF_KEY:
-    secure: 6Vuo+sNP2YT/iI4ilNDdyJbKpu1AYxSpkdwjJxeZ3BVXM0XQQnG7VS/6IspV9kgWXmYpeVnUTqpoxAg7GDf3MTN9SeXgwHuSsblIAHDaOJk=
-  SF_API:
-    secure: gEDrho4yNr5++SbgkWsxQiFA62GJfTLrZU9Dzjz9HCUcS7XwjTGg3XsFm84w6B1s
+    secure: bqIoUQDNTAO0jqmKFjpqH7JZxcS5MmBuGFUxy7rzOMQ4zABe21p8Hrd+EOL29kn/
 # VS build actually does not need MinGW compiler toolchains so prevent its restoration and update check
   APPVEYOR_CACHE_SKIP_RESTORE: true
   APPVEYOR_CACHE_SKIP_SAVE: true
@@ -55,17 +51,8 @@ before_build:
   - rake ci_timer
   - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) };
         if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE))))
-        {
-          $env:PACKAGE_UPLOAD = "1";
-          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
-          do { "Installing doxygen and graphviz..."; choco install doxygen.install graphviz >$null } until ($?);
-        }
-        else
-        {
-          $env:URHO3D_TOOLS = "0";
-          iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
-        }
+        $env:URHO3D_TOOLS = "0";
+        iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
   - if "%PLATFORM%" == "x64" (
       call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" &&
       set "URHO3D_64BIT=1"

@@ -27,8 +27,7 @@ addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - URHO3D_DEPLOYMENT_TARGET=generic
   matrix:
@@ -63,7 +62,7 @@ before_script:
   - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); fi
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   # Travis-CI has a special case handling for release tag where it checks out directly from the tag branch instead of the default 'master' branch
-  - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]]; then export SITE_UPDATE=1; fi; if [[ ! $CC ]] && [[ ! $CMAKE_BUILD_TYPE ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
+  # if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]]; then export SITE_UPDATE=1; fi; if [[ ! $CC ]] && [[ ! $CMAKE_BUILD_TYPE ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
   - if [[ $URHO3D_BINDINGS ]]; then git clone --depth 1 https://github.com/urho3d/llvm-clang.git && export LLVM_CLANG_ROOT=$(pwd)/llvm-clang; fi
   - if [[ $LINUX ]]; then export PLATFORM=native; else export PLATFORM=mingw; fi
   - rake ci_setup_cache
@@ -115,15 +114,11 @@ cache:
   - C:\tools\mingw64
 environment:
   GIT_NAME:
-    secure: JatNbOZZZKMvMHL8sRq9XpHgESzJ13eh9NHbMK99rX8=
+    secure: rUVYYb1+C4EI2xAlvF4pEA==
   GIT_EMAIL:
-    secure: 7EAYZJ5nFqEhMKcPmUvnqPp81XAoJEILzDJJ2qZXrKA=
+    secure: ls0sOtf/IGC0qWsktlmJxEJT+MTUPF2lGg6zq0FBES0=
   GH_TOKEN:
-    secure: xx7og+aLQbdBSsdVo79OTGtdfqedOpYpIJjduNlzjFSXsTkD8NX8fEPq0XE1KT5n
-  SF_KEY:
-    secure: 6Vuo+sNP2YT/iI4ilNDdyJbKpu1AYxSpkdwjJxeZ3BVXM0XQQnG7VS/6IspV9kgWXmYpeVnUTqpoxAg7GDf3MTN9SeXgwHuSsblIAHDaOJk=
-  SF_API:
-    secure: gEDrho4yNr5++SbgkWsxQiFA62GJfTLrZU9Dzjz9HCUcS7XwjTGg3XsFm84w6B1s
+    secure: bqIoUQDNTAO0jqmKFjpqH7JZxcS5MmBuGFUxy7rzOMQ4zABe21p8Hrd+EOL29kn/
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
   URHO3D_LUAJIT: 1
@@ -139,16 +134,8 @@ before_build:
   - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
   - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT);
         if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -notmatch "[^-]+-[^-]+-CI" -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE)))
-        {
-          $env:PACKAGE_UPLOAD = "1";
-          do { "Installing doxygen and graphviz..."; choco install doxygen.install graphviz >$null } until ($?);
-        }
-        else
-        {
-          $env:URHO3D_TOOLS = "0";
-          iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
-        }
+        $env:URHO3D_TOOLS = "0";
+        iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
   - if "%PLATFORM%" == "x64" (set "URHO3D_64BIT=1" && set "MINGW_URL=%x86_64-posix-seh%" && set "ARCH=64") else (set "MINGW_URL=%i686-posix-dwarf%" && set "ARCH=32")
   - if not exist "C:\tools\mingw%ARCH%" curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
   - set "PATH=C:\tools\mingw%ARCH%\bin;%PATH%"
@@ -180,8 +167,8 @@ addons:
     branch_pattern: .*Coverity-Scan$
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: itgWNvH4Zj0hQpkUctVxMwJwVX3hIluVuvUbzO2XG7dxQaMMfcLGwVKgq8X1HOf4dJCUv5WL0jcSMWXbdc8tvqQJwBb5R2Z2JJYpTTAgtmLy7TNn6zgetZtGrYEJuTlxSItbS/NF4iPDO25ih7j5Ma0ffXRpBnlURQaytfYfFaQ=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
+    - secure: N4zqaSj/QZ2Z2j5hJc1Y2wBls4tvS0u8bFgutG3dEDxX5HF9tj6nw1wykDY3fvkpFP4gLEUJ6wV9HFXTR6PxwtCly9dsy0Bkb9+4CnRLTTeyUdqJA+Ca2bnjFPsYP/p6+kmOOo9rbYXsT5BGXVsm3euqJiKhCDP2CIG/YDvYtdw=
     - LINUX=1
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
@@ -203,7 +190,7 @@ dist: trusty
 addons: {apt: {packages: libpulse-dev}}
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
@@ -230,9 +217,7 @@ cache:
 # before_cache: [] # intentionally leave it blank because for our case cleaning '.gradle' dir is pointless when the '.ccache' dir is guaranteed to be dirtied by our build job
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-    - secure: S6Vb3QUW8mDLkLrsIRSullTjwHM1ZIeG4rUT1Nwqx4XSovTZDvq9OThrzAvnuA6sYzeyDI2WHCeBUgmiKFyVBiB2NZwZZjRlTTAC2GVyRZKph9ErhJH3O0DfbPErICQAxL+RI6uCU6nSRPzq4L64UbZi5t04n6f95JXWmfeX2oY=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - ANDROID=1
     - ORG_GRADLE_PROJECT_URHO3D_LUAJIT=1
     - HOT=$HOME/urho3d_home_dir/.ccache/.hot
@@ -262,8 +247,7 @@ addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - RPI=1
   matrix:
@@ -279,7 +263,7 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  # if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - rake ci_setup_cache
 script: script/dockerized.sh rpi rake ci && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh rpi rake ci_package_upload; fi && rake ci_timer
 matrix:
@@ -294,8 +278,7 @@ addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - ARM=1
   matrix:
@@ -311,7 +294,7 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  # if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - rake ci_setup_cache
 script: script/dockerized.sh arm rake ci && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh arm rake ci_package_upload; fi && rake ci_timer
 matrix:
@@ -330,8 +313,7 @@ cache:
     - $HOME/urho3d_home_dir/initial-build-tree
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=2
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
@@ -349,7 +331,7 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  # if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - if [[ "$URHO3D_LIB_TYPE" != "MODULE" ]] && (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
   - rake ci_setup_cache
 script: script/dockerized.sh web rake ci && if [ $PACKAGE_UPLOAD ]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ ! $EMSCRIPTEN_WASM ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]] && [[ ! $URHO3D_SAMPLES ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi && rake ci_timer
@@ -380,8 +362,7 @@ cache:
 osx_image: xcode10.2
 env:
   global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=3
     - OSX=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
@@ -399,7 +380,7 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  # if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
   - brew update
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [[ $MAKEFILE ]]; then ccache=ccache; fi
