@@ -925,7 +925,7 @@ elseif(APPLE)
   # Urho3d - sync with SDL_config_iphoneos.h
   if (SDL_SENSOR)
     if (IOS)
-      set(SDL_SENSOR_ANDROID 1)
+      set(SDL_SENSOR_COREMOTION 1)
       set(HAVE_SDL_SENSORS TRUE)
       file(GLOB COREMOTION_SOURCES ${SDL2_SOURCE_DIR}/src/sensor/coremotion/*.m)
       set(SOURCE_FILES ${SOURCE_FILES} ${COREMOTION_SOURCES})
