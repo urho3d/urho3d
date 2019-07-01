@@ -172,7 +172,7 @@ addons:
     packages: libpulse-dev
   coverity_scan:
     project:
-      name: urho3d/Urho3D
+      name: $TRAVIS_REPO_SLUG
       description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
     notification_email: urho3d.travis.ci@gmail.com
     build_command_prepend: rake cmake URHO3D_LUA=0 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_DATABASE_SQLITE=1 URHO3D_LIB_TYPE=SHARED
