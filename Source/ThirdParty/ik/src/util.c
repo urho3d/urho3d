@@ -16,7 +16,7 @@ calculate_rotation_weight_decays_recursive(chain_t* chain)
 {
     int average_count;
     int node_idx, node_count;
-    effector_data_t effector_data;
+    effector_data_t effector_data = {0.0, 0.0};
 
     /*
      * Find the rotation weight of this chain's last node by averaging the
