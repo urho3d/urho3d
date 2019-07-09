@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,22 +55,7 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
     auto* destPtr = (unsigned char*)dest;
     position_ += size;
 
-    unsigned copySize = size;
-    while (copySize >= sizeof(unsigned))
-    {
-        *((unsigned*)destPtr) = *((unsigned*)srcPtr);
-        srcPtr += sizeof(unsigned);
-        destPtr += sizeof(unsigned);
-        copySize -= sizeof(unsigned);
-    }
-    if (copySize & sizeof(unsigned short))
-    {
-        *((unsigned short*)destPtr) = *((unsigned short*)srcPtr);
-        srcPtr += sizeof(unsigned short);
-        destPtr += sizeof(unsigned short);
-    }
-    if (copySize & 1u)
-        *destPtr = *srcPtr;
+    memcpy(destPtr, srcPtr, size);
 
     return size;
 }
@@ -99,22 +84,7 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
     unsigned char* destPtr = &buffer_[position_];
     position_ += size;
 
-    unsigned copySize = size;
-    while (copySize >= sizeof(unsigned))
-    {
-        *((unsigned*)destPtr) = *((unsigned*)srcPtr);
-        srcPtr += sizeof(unsigned);
-        destPtr += sizeof(unsigned);
-        copySize -= sizeof(unsigned);
-    }
-    if (copySize & sizeof(unsigned short))
-    {
-        *((unsigned short*)destPtr) = *((unsigned short*)srcPtr);
-        srcPtr += sizeof(unsigned short);
-        destPtr += sizeof(unsigned short);
-    }
-    if (copySize & 1u)
-        *destPtr = *srcPtr;
+    memcpy(destPtr, srcPtr, size);
 
     return size;
 }

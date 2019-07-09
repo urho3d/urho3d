@@ -1763,7 +1763,7 @@ void UpdateDirtyUI()
 
 void HandleMessageAcknowledgement(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData["Ok"].GetBool())
+    if (eventData["OK"].GetBool())
         messageBoxCallback();
     else
         messageBoxCallback = null;

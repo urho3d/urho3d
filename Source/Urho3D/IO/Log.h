@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -150,7 +150,7 @@ private:
 #define URHO3D_LOGWARNING(message) ((void)0)
 #define URHO3D_LOGERROR(message) ((void)0)
 #define URHO3D_LOGRAW(message) ((void)0)
-#define URHO3D_LOGTRACEF(message) ((void)0)
+#define URHO3D_LOGTRACEF(...) ((void)0)
 #define URHO3D_LOGDEBUGF(...) ((void)0)
 #define URHO3D_LOGINFOF(...) ((void)0)
 #define URHO3D_LOGWARNINGF(...) ((void)0)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -167,11 +167,13 @@ void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
 
 void ParticleEmitter2D::SetEmitting(bool enable)
 {
-    if (enable != emitting_)
-    {
-        emitting_ = enable;
-        emitParticleTime_ = 0.0f;
-    }
+    if (enable == emitting_)
+        return;
+
+    emitting_ = enable;
+    emitParticleTime_ = 0.0f;
+
+    MarkNetworkUpdate();
 }
 
 ResourceRef ParticleEmitter2D::GetSpriteAttr() const

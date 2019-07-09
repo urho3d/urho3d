@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -359,11 +359,6 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 	module                 = mod;
 	objectType             = 0;
 	name                   = "";
-	isReadOnly             = false;
-	isPrivate              = false;
-	isProtected            = false;
-	isFinal                = false;
-	isOverride             = false;
 	sysFuncIntf            = 0;
 	signatureId            = 0;
 	dontCleanUpOnException = false;
@@ -372,7 +367,6 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 	userData               = 0;
 	id                     = 0;
 	accessMask             = 0xFFFFFFFF;
-	isShared               = false;
 	nameSpace              = engine->nameSpaces[0];
 	objForDelegate         = 0;
 	funcForDelegate        = 0;
@@ -636,19 +630,19 @@ const char *asCScriptFunction::GetNamespace() const
 // interface
 bool asCScriptFunction::IsReadOnly() const
 {
-	return isReadOnly;
+	return traits.GetTrait(asTRAIT_CONST);
 }
 
 // interface
 bool asCScriptFunction::IsPrivate() const
 {
-	return isPrivate;
+	return traits.GetTrait(asTRAIT_PRIVATE);
 }
 
 // interface
 bool asCScriptFunction::IsProtected() const
 {
-	return isProtected;
+	return traits.GetTrait(asTRAIT_PROTECTED);
 }
 
 // internal
@@ -715,7 +709,7 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName, bool incl
 		else
 			str += "_unnamed_type_::";
 	}
-	else if( includeNamespace && nameSpace->name != "" )
+	else if( includeNamespace && nameSpace->name != "" && !objectType )
 	{
 		str += nameSpace->name + "::";
 	}
@@ -789,7 +783,7 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName, bool incl
 
 	str += ")";
 
-	if( isReadOnly )
+	if( IsReadOnly() )
 		str += " const";
 
 	// Add the declaration of the list pattern
@@ -1038,7 +1032,7 @@ bool asCScriptFunction::IsSignatureEqual(const asCScriptFunction *func) const
 // internal
 bool asCScriptFunction::IsSignatureExceptNameEqual(const asCScriptFunction *func) const
 {
-	return IsSignatureExceptNameEqual(func->returnType, func->parameterTypes, func->inOutFlags, func->objectType, func->isReadOnly);
+	return IsSignatureExceptNameEqual(func->returnType, func->parameterTypes, func->inOutFlags, func->objectType, func->IsReadOnly());
 }
 
 // internal
@@ -1052,19 +1046,19 @@ bool asCScriptFunction::IsSignatureExceptNameEqual(const asCDataType &retType, c
 // internal
 bool asCScriptFunction::IsSignatureExceptNameAndObjectTypeEqual(const asCScriptFunction *func) const
 {
-	return IsSignatureExceptNameEqual(func->returnType, func->parameterTypes, func->inOutFlags, objectType, isReadOnly);
+	return IsSignatureExceptNameEqual(func->returnType, func->parameterTypes, func->inOutFlags, objectType, IsReadOnly());
 }
 
 // internal
 bool asCScriptFunction::IsSignatureExceptNameAndReturnTypeEqual(const asCScriptFunction *func) const
 {
-	return IsSignatureExceptNameAndReturnTypeEqual(func->parameterTypes, func->inOutFlags, func->objectType, func->isReadOnly);
+	return IsSignatureExceptNameAndReturnTypeEqual(func->parameterTypes, func->inOutFlags, func->objectType, func->IsReadOnly());
 }
 
 // internal
 bool asCScriptFunction::IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &paramInOut, const asCObjectType *objType, bool readOnly) const
 {
-	if( this->isReadOnly        != readOnly       ) return false;
+	if( this->IsReadOnly()      != readOnly       ) return false;
 	if( (this->objectType != 0) != (objType != 0) ) return false;
 	if( this->inOutFlags        != paramInOut     ) return false;
 	if( this->parameterTypes    != paramTypes     ) return false;
@@ -1158,7 +1152,31 @@ void asCScriptFunction::AddReferences()
 					void *gvarPtr = (void*)asBC_PTRARG(&bc[n]);
 					if( !gvarPtr ) break;
 					asCGlobalProperty *prop = GetPropertyByGlobalVarPtr(gvarPtr);
-					if( !prop ) break;
+
+					if (!prop)
+					{
+						// The pointer is a string constant. In order to make sure the correct resource
+						// management is maintained we request a new string constant here, so the compiler
+						// or bytecode loader can release its copy afterwards.
+						asCString str;
+						asUINT length;
+						int r = engine->stringFactory->GetRawStringData(gvarPtr, 0, &length);
+						if (r >= 0)
+						{
+							str.SetLength(length);
+							engine->stringFactory->GetRawStringData(gvarPtr, str.AddressOf(), &length);
+
+							// Get a new pointer (depending on the string factory implementation it may actually be the same)
+							gvarPtr = const_cast<void*>(engine->stringFactory->GetStringConstant(str.AddressOf(), length));
+							asBC_PTRARG(&bc[n]) = (asPWORD)gvarPtr;
+						}
+						
+						// If we get an error from the string factory there is not
+						// anything we can do about it, except report a message.
+						// TODO: NEWSTRING: Write a message and then exit gracefully
+						asASSERT(r >= 0);
+						break;
+					}
 
 					// Only addref the properties once
 					if( !ptrs.Exists(gvarPtr) )
@@ -1299,7 +1317,21 @@ void asCScriptFunction::ReleaseReferences()
 					void *gvarPtr = (void*)asBC_PTRARG(&bc[n]);
 					if( !gvarPtr ) break;
 					asCGlobalProperty *prop = GetPropertyByGlobalVarPtr(gvarPtr);
-					if( !prop ) break;
+
+					if (!prop)
+					{
+						// The pointer is a string constant, so it needs to be released by the string factory
+						int r = engine->stringFactory->ReleaseStringConstant(gvarPtr);
+						UNUSED_VAR(r);
+
+						// If we get an error from the string factory there is not
+						// anything we can do about it, except report a message.
+						// TODO: Write a message showing that the string couldn't be 
+						//       released. Include the first 10 characters and the length
+						//       to make it easier to identify which string it was
+						asASSERT(r >= 0);
+						break;
+					}
 
 					// Only release the properties once
 					if( !ptrs.Exists(gvarPtr) )
@@ -1432,23 +1464,6 @@ int asCScriptFunction::GetParam(asUINT index, int *out_typeId, asDWORD *out_flag
 
 	return asSUCCESS;
 }
-
-#ifdef AS_DEPRECATED
-// Deprecated since 2014-04-06, 2.29.0
-int asCScriptFunction::GetParamTypeId(asUINT index, asDWORD *flags) const
-{
-	if( index >= parameterTypes.GetLength() )
-		return asINVALID_ARG;
-
-	if( flags )
-	{
-		*flags = inOutFlags[index];
-		*flags |= parameterTypes[index].IsReadOnly() ? asTM_CONST : 0;
-	}
-
-	return engine->GetTypeIdFromDataType(parameterTypes[index]);
-}
-#endif
 
 // interface
 asIScriptEngine *asCScriptFunction::GetEngine() const
@@ -1668,7 +1683,7 @@ void asCScriptFunction::ReleaseAllHandles(asIScriptEngine *)
 	objForDelegate = 0;
 }
 
-// internal
+// interface
 bool asCScriptFunction::IsShared() const
 {
 	// All system functions are shared
@@ -1682,19 +1697,25 @@ bool asCScriptFunction::IsShared() const
 	if (funcType == asFUNC_FUNCDEF && module == 0) return true;
 
 	// Functions that have been specifically marked as shared are shared
-	return isShared;
+	return traits.GetTrait(asTRAIT_SHARED);
 }
 
-// internal
+// interface
 bool asCScriptFunction::IsFinal() const
 {
-	return isFinal;
+	return traits.GetTrait(asTRAIT_FINAL);
 }
 
-// internal
+// interface
 bool asCScriptFunction::IsOverride() const
 {
-	return isOverride;
+	return traits.GetTrait(asTRAIT_OVERRIDE);
+}
+
+// interface
+bool asCScriptFunction::IsExplicit() const
+{
+	return traits.GetTrait(asTRAIT_EXPLICIT);
 }
 
 END_AS_NAMESPACE

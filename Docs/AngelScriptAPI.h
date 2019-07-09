@@ -1008,6 +1008,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -1279,6 +1280,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -1626,6 +1628,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -2454,14 +2457,14 @@ String downloadName;
 float downloadProgress;
 VariantMap identity;
 /* readonly */
-float lastHeardTime;
+uint lastHeardTime;
 bool logStatistics;
 /* readonly */
 uint numDownloads;
 /* readonly */
-float packetsInPerSec;
+int packetsInPerSec;
 /* readonly */
-float packetsOutPerSec;
+int packetsOutPerSec;
 /* readonly */
 uint16 port;
 Vector3 position;
@@ -3954,6 +3957,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -4875,6 +4879,7 @@ LayoutMode layoutMode;
 int layoutSpacing;
 /* readonly */
 ListView listView;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -4971,7 +4976,7 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
-BoundingBox GetTileBoudningBox(const IntVector2&) const;
+BoundingBox GetTileBoundingBox(const IntVector2&) const;
 VectorBuffer GetTileData(const IntVector2&) const;
 IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -6099,6 +6104,7 @@ bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+String ToString(const String& = String ( "\t" )) const;
 
 // Properties:
 /* readonly */
@@ -6497,6 +6503,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 uint maxLength;
@@ -6829,8 +6836,9 @@ String GetLanguage(int);
 int GetLanguageIndex(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
-void LoadJSON(const JSONValue&);
-void LoadJSONFile(const String&);
+void LoadJSONFile(const String&, const String = String ( "" ) const);
+void LoadMultipleLanguageJSON(const JSONValue&);
+void LoadSingleLanguageJSON(const JSONValue&, const String& = String ( "" ) const);
 void Reset();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetLanguage(const String&);
@@ -7265,6 +7273,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -7688,7 +7697,7 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
-BoundingBox GetTileBoudningBox(const IntVector2&) const;
+BoundingBox GetTileBoundingBox(const IntVector2&) const;
 VectorBuffer GetTileData(const IntVector2&) const;
 IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -7783,6 +7792,7 @@ class Network
 {
 public:
 // Methods:
+bool AttemptNATPunchtrough(const String&, Scene, const VariantMap& = VariantMap ( ));
 void BroadcastMessage(int, bool, bool, const VectorBuffer&, uint = 0);
 void BroadcastRemoteEvent(Node, const String&, bool, const VariantMap& = VariantMap ( ));
 void BroadcastRemoteEvent(Scene, const String&, bool, const VariantMap& = VariantMap ( ));
@@ -7790,12 +7800,17 @@ void BroadcastRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( 
 bool CheckRemoteEvent(const String&) const;
 bool Connect(const String&, uint16, Scene, const VariantMap& = VariantMap ( ));
 void Disconnect(int = 0);
+bool DiscoverHosts(uint16);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 HttpRequest MakeHttpRequest(const String&, const String& = String ( ), Array<String> = null, const String& = String ( ));
 void RegisterRemoteEvent(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SendPackageToClients(Scene, PackageFile);
+bool SetDiscoveryBeacon(const VariantMap& = VariantMap ( ));
+void SetNATServerInfo(const String&, uint16);
+bool SetPassword(const String&);
+void StartNATClient() const;
 bool StartServer(uint16);
 void StopServer();
 void UnregisterAllRemoteEvents();
@@ -7806,6 +7821,8 @@ void UnregisterRemoteEvent(const String&) const;
 String category;
 /* readonly */
 Array<Connection> clientConnections;
+/* readonly */
+String guid;
 String packageCacheDir;
 /* readonly */
 int refs;
@@ -7815,6 +7832,8 @@ Connection serverConnection;
 bool serverRunning;
 int simulatedLatency;
 float simulatedPacketLoss;
+/* readonly */
+String startNATClient;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -11207,6 +11226,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -15307,6 +15327,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -15591,6 +15612,7 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Material material;
 Vector2 maxAnchor;
 int maxHeight;
 IntVector2 maxOffset;
@@ -16168,6 +16190,9 @@ enum EmitterType
 {
 EMITTER_SPHERE,
 EMITTER_BOX,
+EMITTER_SPHEREVOLUME,
+EMITTER_CYLINDER,
+EMITTER_RING,
 };
 
 enum EmitterType2D

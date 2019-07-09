@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,9 @@ public:
     {
     }
 
-    /// Construct from a C string case-insensitively.
+    /// Construct from a C string.
     StringHash(const char* str) noexcept;        // NOLINT(google-explicit-constructor)
-    /// Construct from a string case-insensitively.
+    /// Construct from a string.
     StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
 
     /// Assign from another hash.
@@ -98,7 +98,7 @@ public:
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return value_; }
 
-    /// Calculate hash value case-insensitively from a C string.
+    /// Calculate hash value from a C string.
     static unsigned Calculate(const char* str, unsigned hash = 0);
 
     /// Get global StringHashRegister. Use for debug purposes only. Return nullptr if URHO3D_HASH_DEBUG is off.

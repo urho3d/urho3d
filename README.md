@@ -21,6 +21,7 @@ Urho3D development, contributions and bugfixes by:
 - Wei Tjong Yao
 - Aster Jian
 - Ricardo Abreu
+- Eli Aloni
 - Vivienne Anthony
 - Christopher Augustus
 - Colin Barrett
@@ -72,6 +73,7 @@ Urho3D development, contributions and bugfixes by:
 - Justin Miller
 - Jonne Nauha
 - Huy Nguyen
+- Neal Nicdao
 - Paul Noome
 - David Palacios
 - Alex Parlett
@@ -121,12 +123,14 @@ Urho3D development, contributions and bugfixes by:
 - TheComet93
 - Y-way
 - 1vanK
+- ab4daa
 - andmar1x
 - amadeus_osa
 - atship
 - att
 - att-kin9
 - celeron55
+- chenjie199234
 - cosmy1
 - damu
 - dragonCASTjosh
@@ -134,6 +138,7 @@ Urho3D development, contributions and bugfixes by:
 - fredakilla
 - gleblebedev
 - hdunderscore
+- holyfight6
 - hsnabn
 - lhinuz
 - lvshiling
@@ -144,6 +149,7 @@ Urho3D development, contributions and bugfixes by:
 - nemerle
 - ninjastone
 - orefkov
+- pat2nav
 - proller
 - raould
 - rasteron
@@ -152,11 +158,13 @@ Urho3D development, contributions and bugfixes by:
 - rikorin
 - skaiware
 - ssinai1
+- sssooonnnggg
 - svifylabs
 - szamq
 - thebluefish
 - tommy3
 - yushli
+- zlum
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
@@ -181,14 +189,14 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.32.0 WIP (http://www.angelcode.com/angelscript)
+- AngelScript 2.33.0+ (http://www.angelcode.com/angelscript)
 - Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 2.86.1 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
 - FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
-- kNet (https://github.com/juj/kNet)
+- SLikeNet (https://github.com/SLikeSoft/SLikeNet)
 - libcpuid 0.4.0+ (https://github.com/anrieff/libcpuid)
 - Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
@@ -199,7 +207,7 @@ Urho3D uses the following third-party libraries:
 - Open Asset Import Library 4.1.0 (http://assimp.sourceforge.net)
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
-- Recast/Detour (https://github.com/memononen/recastnavigation)
+- Recast/Detour (https://github.com/recastnavigation/recastnavigation)
 - SDL 2.0.7 (https://www.libsdl.org)
 - SQLite 3.20.1 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,8 @@ public:
     void SetBlendMode(BlendMode mode);
     /// Set tiled mode.
     void SetTiled(bool enable);
+    /// Set material for custom rendering.
+    void SetMaterial(Material* material);
 
     /// Return texture.
     Texture* GetTexture() const { return texture_; }
@@ -87,11 +89,18 @@ public:
     /// Return whether is tiled.
     bool IsTiled() const { return tiled_; }
 
+    /// Get material used for custom rendering.
+    Material* GetMaterial() const;
+
     /// Set texture attribute.
     void SetTextureAttr(const ResourceRef& value);
     /// Return texture attribute.
     ResourceRef GetTextureAttr() const;
 
+    /// Set material attribute.
+    void SetMaterialAttr(const ResourceRef& value);
+    /// Get material attribute.
+    ResourceRef GetMaterialAttr() const;
 protected:
     /// Return UI rendering batches with offset to image rectangle.
     void GetBatches
@@ -111,6 +120,8 @@ protected:
     BlendMode blendMode_;
     /// Tiled flag.
     bool tiled_;
+    /// Material used for custom rendering.
+    SharedPtr<Material> material_;
 };
 
 }

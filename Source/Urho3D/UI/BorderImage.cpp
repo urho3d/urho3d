@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,8 @@ void BorderImage::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Tiled", IsTiled, SetTiled, bool, false, AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+        AM_FILE);
 }
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
@@ -134,6 +136,9 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     UIBatch
         batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
 
+    if (material_)
+        batch.custom_material_ = material_;
+
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     const IntRect& uvBorder = (imageBorder_ == IntRect::ZERO) ? border_ : imageBorder_;
     int x = GetIndentWidth();
@@ -206,6 +211,27 @@ void BorderImage::SetTextureAttr(const ResourceRef& value)
 ResourceRef BorderImage::GetTextureAttr() const
 {
     return GetResourceRef(texture_, Texture2D::GetTypeStatic());
+}
+
+void BorderImage::SetMaterialAttr(const ResourceRef& value)
+{
+    auto* cache = GetSubsystem<ResourceCache>();
+    SetMaterial(cache->GetResource<Material>(value.name_));
+}
+
+ResourceRef BorderImage::GetMaterialAttr() const
+{
+    return GetResourceRef(material_, Material::GetTypeStatic());
+}
+
+void BorderImage::SetMaterial(Material* material)
+{
+    material_ = material;
+}
+
+Material* BorderImage::GetMaterial() const
+{
+    return material_;
 }
 
 }

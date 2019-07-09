@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -357,13 +357,14 @@ public:
     {
         this->operator [](key) = value;
         return *this;
-    };
+    }
+
     /// Populate the map using variadic template.
     template <typename... Args> HashMap& Populate(const T& key, const U& value, const Args&... args)
     {
         this->operator [](key) = value;
         return Populate(args...);
-    };
+    }
 
     /// Insert a pair. Return an iterator to it.
     Iterator Insert(const Pair<T, U>& pair)

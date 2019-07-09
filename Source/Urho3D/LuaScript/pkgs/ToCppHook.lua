@@ -1,5 +1,5 @@
 --
--- Copyright (c) 2008-2018 the Urho3D project.
+-- Copyright (c) 2008-2019 the Urho3D project.
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ function post_output_hook(package)
 #include "string.h"
 
 #include "tolua++.h"]], [[//
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,8 +87,6 @@ function post_output_hook(package)
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #include <toluapp/tolua++.h>
 #include "LuaScript/ToluaUtils.h"
 
@@ -105,6 +103,9 @@ function post_output_hook(package)
     result = string.gsub(result, "ToluaPush(P?O?D?)Vector([^\"]-)\"c?o?n?s?t? ?P?O?D?Vector<([^*>]-)%*?>\"", "ToluaPush%1Vector%2\"%3\"")
     result = string.gsub(result, "@1%(", "(\"\",")      -- is_pointer overload uses const char* as signature
     result = string.gsub(result, "@2%(", "(0.f,")       -- is_arithmetic overload uses double as signature
+
+    -- Suppress GCC 'pedantic' warnings due to extra semicolon in the emitted code
+    result = string.gsub(result, "TOLUA_API int luaopen_(.+)};", "TOLUA_API int luaopen_%1}")
 
     WRITE(result)
     WRITE([[

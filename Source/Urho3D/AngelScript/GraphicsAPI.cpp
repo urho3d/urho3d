@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1556,6 +1556,9 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     engine->RegisterEnum("EmitterType");
     engine->RegisterEnumValue("EmitterType", "EMITTER_SPHERE", EMITTER_SPHERE);
     engine->RegisterEnumValue("EmitterType", "EMITTER_BOX", EMITTER_BOX);
+    engine->RegisterEnumValue("EmitterType", "EMITTER_SPHEREVOLUME", EMITTER_SPHEREVOLUME);
+    engine->RegisterEnumValue("EmitterType", "EMITTER_CYLINDER", EMITTER_CYLINDER);
+    engine->RegisterEnumValue("EmitterType", "EMITTER_RING", EMITTER_RING);
 
     engine->RegisterObjectType("ColorFrame", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);

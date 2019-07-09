@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,7 @@ int RunApplication() \
     Urho3D::SharedPtr<className> application(new className(context)); \
     return application->Run(); \
 } \
-URHO3D_DEFINE_MAIN(RunApplication());
+URHO3D_DEFINE_MAIN(RunApplication())
 #else
 // On iOS/tvOS we will let this function exit, so do not hold the context and application in SharedPtr's
 #define URHO3D_DEFINE_APPLICATION_MAIN(className) \

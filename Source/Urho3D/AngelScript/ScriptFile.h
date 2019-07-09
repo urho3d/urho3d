@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,15 +80,18 @@ public:
     bool HasEventHandler(Object* sender, StringHash eventType) const override;
 
     /// Query for a function by declaration and execute if found.
-    bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector,
+        Variant* functionReturn = nullptr, bool unprepare = true);
     /// Execute a function.
-    bool Execute(asIScriptFunction* function, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    bool Execute(asIScriptFunction* function, const VariantVector& parameters = Variant::emptyVariantVector,
+        Variant* functionReturn = nullptr, bool unprepare = true);
     /// Query for an object method by declaration and execute if found.
     bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector,
-        bool unprepare = true);
+        Variant* functionReturn = nullptr, bool unprepare = true);
     /// Execute an object method.
     bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector,
-        bool unprepare = true);
+        Variant* functionReturn = nullptr, bool unprepare = true);
+
     /// Add a delay-executed function call, optionally repeating.
     void DelayedExecute
         (float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);

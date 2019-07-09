@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -119,6 +119,7 @@ static const D3DTEXTUREADDRESS d3dAddressMode[] =
 static const DWORD d3dBlendEnable[] =
 {
     FALSE,
+    TRUE,
     TRUE,
     TRUE,
     TRUE,
@@ -479,6 +480,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     impl_->device_->Present(nullptr, nullptr, nullptr, nullptr);
 
 #ifdef URHO3D_LOGGING
+    D3DADAPTER_IDENTIFIER9 id = {0};
+    HRESULT hr = impl_->interface_->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &id);
+    if (S_OK == hr)
+      URHO3D_LOGINFOF("Adapter used %s", id.Description);
+
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)

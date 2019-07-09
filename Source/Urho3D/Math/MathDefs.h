@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -168,6 +168,18 @@ template <class T> inline T Round(T x) { return round(x); }
 
 /// Round value to nearest integer.
 template <class T> inline int RoundToInt(T x) { return static_cast<int>(round(x)); }
+
+/// Round value to nearest multiple. 
+template <class T> inline T RoundToNearestMultiple(T x, T multiple)
+{
+    T mag = Abs(x);
+    multiple = Abs(multiple);
+    T remainder = Mod(mag, multiple);
+    if (remainder >= multiple / 2) 
+        return (FloorToInt<T>(mag / multiple) * multiple + multiple)*Sign(x);
+    else
+        return (FloorToInt<T>(mag / multiple) * multiple)*Sign(x);
+}
 
 /// Round value up.
 template <class T> inline T Ceil(T x) { return ceil(x); }

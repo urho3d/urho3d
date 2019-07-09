@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,12 +61,12 @@ public:
     /// Destruct. Release the mutex.
     ~MutexLock();
 
-private:
     /// Prevent copy construction.
-    MutexLock(const MutexLock& rhs);
+    MutexLock(const MutexLock& rhs) = delete;
     /// Prevent assignment.
-    MutexLock& operator =(const MutexLock& rhs);
+    MutexLock& operator =(const MutexLock& rhs) = delete;
 
+private:
     /// Mutex reference.
     Mutex& mutex_;
 };

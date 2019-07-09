@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -807,7 +807,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
             ++freeShaderID;
         }
 
-        auto materialID = (unsigned short)(batch->sortKey_ & 0xffff0000);
+        auto materialID = (unsigned short)((batch->sortKey_ & 0xffff0000) >> 16u);
         HashMap<unsigned short, unsigned short>::ConstIterator k = materialRemapping_.Find(materialID);
         if (k != materialRemapping_.End())
             materialID = k->second_;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -130,7 +130,7 @@ public:
     UIElement* GetSelectedItem() const;
     /// Return all selected items.
     PODVector<UIElement*> GetSelectedItems() const;
-    /// Return whether an item at index is seleccted.
+    /// Return whether an item at index is selected.
     bool IsSelected(unsigned index) const;
     /// Return whether an item at index has its children expanded (in hierarchy mode only).
     bool IsExpanded(unsigned index) const;

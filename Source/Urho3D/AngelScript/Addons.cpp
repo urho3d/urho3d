@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -2043,6 +2043,24 @@ void ScriptDictionaryListFactory_Generic(asIScriptGeneric *gen)
     *(CScriptDictionary**)gen->GetAddressOfReturnLocation() = CScriptDictionary::Create(buffer);
 }
 
+void ScriptDictionarySet_Generic(asIScriptGeneric *gen)
+{
+    CScriptDictionary* dict = (CScriptDictionary*)gen->GetObject();
+    String* key = *(String**)gen->GetAddressOfArg(0);
+    void* ref = *(void**)gen->GetAddressOfArg(1);
+    int type_id = gen->GetArgTypeId(1);
+    dict->Set(*key, ref, type_id);
+}
+
+void ScriptDictionaryGet_Generic(asIScriptGeneric *gen)
+{
+    CScriptDictionary* dict = (CScriptDictionary*)gen->GetObject();
+    String* key = *(String**)gen->GetAddressOfArg(0);
+    void* ref = *(void**)gen->GetAddressOfArg(1);
+    int type_id = gen->GetArgTypeId(1);
+    *(bool*)gen->GetAddressOfReturnLocation() = dict->Get(*key, ref, type_id);
+}
+
 CScriptDictValue::CScriptDictValue()    // NOLINT(hicpp-member-init)
 {
     m_valueObj = nullptr;
@@ -2273,8 +2291,8 @@ void RegisterDictionary(asIScriptEngine *engine)
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptDictionary,AddRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptDictionary,Release), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "Dictionary &opAssign(const Dictionary &in)", asMETHODPR(CScriptDictionary, operator=, (const CScriptDictionary &), CScriptDictionary&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asMETHODPR(CScriptDictionary,Set,(const String&,void*,int),void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,void*,int) const,bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asFUNCTION(ScriptDictionarySet_Generic), asCALL_GENERIC);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asFUNCTION(ScriptDictionaryGet_Generic), asCALL_GENERIC);
     engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const int64&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const asINT64&),void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, int64&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,asINT64&) const,bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const double&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const double&),void), asCALL_THISCALL);
@@ -2289,11 +2307,6 @@ void RegisterDictionary(asIScriptEngine *engine)
     engine->RegisterObjectMethod("Dictionary", "const DictionaryValue &opIndex(const String &in) const", asMETHODPR(CScriptDictionary, operator[], (const String &) const, const CScriptDictValue*), asCALL_THISCALL);
 }
 
-
-static String StringFactory(asUINT length, const char* s)
-{
-    return String(s, length);
-}
 
 static void ConstructString(String* ptr)
 {
@@ -2483,10 +2496,11 @@ static void StringSetUTF8FromLatin1(const String& src, String& str)
 void RegisterString(asIScriptEngine *engine)
 {
     static const unsigned NPOS = String::NPOS; // workaround for GCC
+    static StringFactory stringFactory;
 
     engine->RegisterGlobalProperty("const uint NPOS", (void*)&NPOS);
     engine->RegisterObjectType("String", sizeof(String), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
-    engine->RegisterStringFactory("String", asFUNCTION(StringFactory), asCALL_CDECL);
+    engine->RegisterStringFactory("String", &stringFactory);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructString), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructString), asCALL_CDECL_OBJLAST);
@@ -2555,6 +2569,35 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "String& opAddAssign(bool)", asFUNCTION(StringAddAssignBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(bool) const", asFUNCTION(StringAddBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd_r(bool) const", asFUNCTION(StringAddBoolReverse), asCALL_CDECL_OBJLAST);
+}
+
+const void* StringFactory::GetStringConstant(const char* data, asUINT length)
+{
+    assert(strlen(data) == length);
+
+    StringHash hash(data);
+    auto iter = map_.Find(hash);
+    return reinterpret_cast<const void*>(&(iter == map_.End() ? map_.Insert(MakePair(hash, String(data))) : iter)->second_);
+}
+
+int StringFactory::ReleaseStringConstant(const void* str)
+{
+    // Cache all the strings
+    return str ? asSUCCESS : asERROR;
+}
+
+int StringFactory::GetRawStringData(const void* str, char* data, asUINT* length) const
+{
+    if (!str)
+        return asERROR;
+
+    auto p = reinterpret_cast<const String*>(str);
+    if (length)
+        *length = p->Length();
+    if (data)
+        memcpy(data, p->CString(), p->Length());
+
+    return asSUCCESS;
 }
 
 }

@@ -3,7 +3,10 @@ $#include "Graphics/ParticleEffect.h"
 enum EmitterType
 {
     EMITTER_SPHERE,
-    EMITTER_BOX
+    EMITTER_BOX,
+    EMITTER_SPHEREVOLUME,
+    EMITTER_CYLINDER,
+    EMITTER_RING
 };
 
 struct ColorFrame

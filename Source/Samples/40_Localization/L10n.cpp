@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,6 +77,7 @@ void L10n::InitLocalizationSystem()
     l10n->LoadJSONFile("StringsEnRu.json");
     // You can load multiple files
     l10n->LoadJSONFile("StringsDe.json");
+    l10n->LoadJSONFile("StringsLv.json", "lv");
     // Hook up to the change language
     SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(L10n, HandleChangeLanguage));
 }

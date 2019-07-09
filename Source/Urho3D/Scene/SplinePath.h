@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2018 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ public:
     explicit SplinePath(Context* context);
 
     /// Destructor.
-    ~SplinePath() override = default;;
+    ~SplinePath() override = default;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

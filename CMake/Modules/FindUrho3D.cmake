@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,9 @@
 # THE SOFTWARE.
 #
 
-# Find Urho3D include directories and libraries in the Urho3D SDK installation or build tree
-# This module should be able to find Urho3D automatically when the SDK is installed in a system-wide default location
+# Find Urho3D include directories and libraries in the Urho3D SDK installation or build tree or in Android library
+# This module should be able to find Urho3D automatically when the SDK is installed in a system-wide default location or
+# when the Urho3D Android library has been correctly declared as project dependency
 # If the SDK installation location is non-default or the Urho3D library is not installed at all (i.e. still in its build tree) then
 #   use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree
 # When setting URHO3D_HOME variable, it should be set to a parent directory containing both the "include" and "lib" subdirectories
@@ -32,7 +33,7 @@
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
 #  URHO3D_VERSION
-#  URHO3D_64BIT (may be used as input variable for multilib-capable compilers; must be anyway specified as input variable for MSVC due to CMake/VS generator limitation)
+#  URHO3D_64BIT (may be used as input variable for multilib-capable compilers; must always be specified as input variable for MSVC due to CMake/VS generator limitation)
 #  URHO3D_LIB_TYPE (may be used as input variable as well to limit the search of library type)
 #  URHO3D_OPENGL
 #  URHO3D_SSE
@@ -72,8 +73,11 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     set (FOUND_MESSAGE "Found Urho3D: as CMake target")
     set (URHO3D_COMPILE_RESULT TRUE)
 else ()
-    # Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
-    if (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
+    if (ANDROID AND GRADLE_BUILD_DIR)
+        # Urho3D AAR is a universal library
+        set (URHO3D_HOME ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI})
+    elseif (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
+        # Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
         file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
     endif ()
     # Convert to integer literal to match it with our internal cache representation; it also will be used as foreach loop control variable
@@ -151,20 +155,12 @@ else ()
         if (URHO3D_LUA)
             list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_BASE_INCLUDE_DIR}/ThirdParty/Lua${JIT})
         endif ()
-        # Intentionally do no cache the URHO3D_VERSION as it has potential to change frequently
+        # Intentionally do not cache the URHO3D_VERSION as it has potential to change frequently
         file (STRINGS ${URHO3D_BASE_INCLUDE_DIR}/librevision.h URHO3D_VERSION REGEX "^const char\\* revision=\"[^\"]*\".*$")
         string (REGEX REPLACE "^const char\\* revision=\"([^\"]*)\".*$" \\1 URHO3D_VERSION "${URHO3D_VERSION}")      # Stringify to guard against empty variable
         # The library type is baked into export header only for MSVC as it has no other way to differentiate them, fortunately both types cannot coexist for MSVC anyway unlike other compilers
         if (MSVC)
             file (STRINGS ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h MSVC_STATIC_LIB REGEX "^#define URHO3D_STATIC_DEFINE$")
-        endif ()
-    endif ()
-    # For Android platform, search in path based on the chosen Android ABI
-    if (ANDROID)
-        if (URHO3D_HOME)
-            set (URHO3D_LIB_SEARCH_HINT HINTS ${URHO3D_HOME}/libs/${ANDROID_NDK_ABI_NAME})
-        else ()
-            set (URHO3D_LIB_SEARCH_HINT HINTS /usr/local/libs/${ANDROID_NDK_ABI_NAME})
         endif ()
     endif ()
     if (URHO3D_64BIT AND MINGW AND CMAKE_CROSSCOMPILING)
@@ -175,10 +171,10 @@ else ()
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Set to search in 'lib' or 'lib64' based on the ABI being tested
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ${ABI_64BIT})    # Leave this global property setting afterwards, do not restore it to its previous value
-        find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
+        find_library (URHO3D_LIBRARIES NAMES Urho3D PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
         if (WIN32)
             # For Windows platform, give a second chance to search for a debug version of the library
-            find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
+            find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
             set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
             if (NOT URHO3D_LIBRARIES)
                 set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
@@ -243,8 +239,9 @@ else ()
                 execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq arm RESULT_VARIABLE SKIP_COMPILE_TEST OUTPUT_QUIET ERROR_QUIET)
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
-            if (SKIP_COMPILE_TEST OR URHO3D_LIB_TYPE STREQUAL MODULE)
-                # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
+            if (SKIP_COMPILE_TEST
+                OR URHO3D_LIB_TYPE STREQUAL MODULE                  # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
+                OR CMAKE_PROJECT_NAME STREQUAL Urho3D-Launcher)     # Workaround initial IDE "gradle sync" error due to library has not been built yet
                 set (URHO3D_COMPILE_RESULT 1)
             else ()
                 while (NOT URHO3D_COMPILE_RESULT)
@@ -301,7 +298,7 @@ else ()
     if (URHO3D_LIBRARIES_REL AND URHO3D_LIBRARIES_DBG)
         set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_REL} ${URHO3D_LIBRARIES_DBG})
     endif ()
-    # Ensure auto-discovered variables always prefail over user settings in all the subsequent cmake rerun (even without redoing try_compile)
+    # Ensure auto-discovered variables always prevail over user settings in all the subsequent cmake rerun (even without redoing try_compile)
     foreach (VAR ${AUTO_DISCOVER_VARS})
         if (DEFINED ${VAR} AND DEFINED AUTO_DISCOVERED_${VAR})  # Cannot combine these two ifs due to variable expansion error when it is not defined
             if ((${VAR} AND NOT ${AUTO_DISCOVERED_${VAR}}) OR (NOT ${VAR} AND ${AUTO_DISCOVERED_${VAR}}))
@@ -338,13 +335,13 @@ if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES AND URHO3D_LIB_TYPE AND URHO3D_COMP
     set (URHO3D_FOUND_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type (if specified) when Urho3D library was last found")
 elseif (Urho3D_FIND_REQUIRED)
     if (ANDROID)
-        set (NOT_FOUND_MESSAGE "For Android platform, double check if you have specified to use the same ANDROID_ABI as the Urho3D library in the build tree or SDK.")
+        set (NOT_FOUND_MESSAGE "For Android platform, double check if you have specified to use the same ANDROID_ABI as the Urho3D Android Library, especially when you are not using universal AAR.")
     endif ()
     if (URHO3D_LIB_TYPE)
         set (NOT_FOUND_MESSAGE "Ensure the specified location contains the Urho3D library of the requested library type. ${NOT_FOUND_MESSAGE}")
     endif ()
     message (FATAL_ERROR
-        "Could NOT find compatible Urho3D library in Urho3D SDK installation or build tree. "
+        "Could NOT find compatible Urho3D library in Urho3D SDK installation or build tree or in Android library. "
         "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE} ${TRY_COMPILE_OUT}")
 endif ()
 

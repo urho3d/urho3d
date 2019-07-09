@@ -6,7 +6,7 @@
 require "LuaScripts/Utilities/Sample"
 
 -- Identifier for the chat network messages
-local MSG_CHAT = 32
+local MSG_CHAT = 153
 -- UDP port we will use
 local CHAT_SERVER_PORT = 2345
 
@@ -62,7 +62,7 @@ function CreateUI()
 
     UpdateButtons()
 
-    local size = (graphics.height - 20) / chatHistoryText.rowHeight
+    local size = (graphics.height - 100) / chatHistoryText.rowHeight
     for i = 1, size do
         table.insert(chatHistory, "")
     end

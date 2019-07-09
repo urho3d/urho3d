@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2018 the Urho3D project.
+# Copyright (c) 2008-2019 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ macro (check_feature_enabled FEATURE)
     if (INVALIDATE_CCT OR NOT DEFINED ${FEATURE})
         set (COMPILER_FLAGS ${CMAKE_CXX_FLAGS})
         separate_arguments (COMPILER_FLAGS)
-        execute_process (COMMAND ${CMAKE_CXX_COMPILER} ${COMPILER_FLAGS} -E -dM -xc++ ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CXX_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        execute_process (COMMAND ${CMAKE_CXX_COMPILER} ${ARCH_FLAGS} ${COMPILER_FLAGS} -E -dM -xc++ ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CXX_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
         if (NOT CXX_EXIT_STATUS EQUAL 0)
             message (FATAL_ERROR "Could not check compiler toolchain CPU instruction extension as it does not handle '-E -dM' compiler flags correctly")
         endif ()
@@ -154,7 +154,7 @@ macro (check_native_compiler_exist)
     if (NOT HAVE_NATIVE_COMPILER)
         message (STATUS "Performing Test HAVE_NATIVE_COMPILER")
         file (WRITE ${CMAKE_BINARY_DIR}/generated/CMakeLists.txt "message (\"Probing native compiler toolchain...\")\n")
-        execute_process (COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} .
+        execute_process (COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM} .
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated RESULT_VARIABLE EXIT_CODE ERROR_VARIABLE ERR_VAR OUTPUT_QUIET)
         if (NOT EXIT_CODE EQUAL 0)
             message (STATUS "Performing Test HAVE_NATIVE_COMPILER - Failed")
@@ -180,9 +180,13 @@ else ()
         if (IOS OR TVOS)
             # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
             set (ARCH_FLAGS -arch arm64)
-        elseif (ANDROID AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
-            # Use the same target flag as configured by Android/CMake toolchain file
-            string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${CMAKE_CXX_FLAGS}")
+        elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+            # Use the same target flag as configured by CMake toolchain file, if any
+            if (ANDROID)
+                set (ARCH_FLAGS -target ${ANDROID_LLVM_TRIPLE})
+            elseif (CMAKE_CXX_FLAGS MATCHES -target)
+                string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${CMAKE_CXX_FLAGS}")
+            endif ()
         endif ()
         execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
         if (NOT CC_EXIT_STATUS EQUAL 0)
