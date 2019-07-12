@@ -30,6 +30,7 @@ env:
     - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - URHO3D_DEPLOYMENT_TARGET=generic
+    - DBE_TAG=':latest'
   matrix:
     # Linux native 64-bit
     - LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz   # GCC
@@ -251,6 +252,7 @@ env:
     - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - RPI=1
+    - DBE_TAG=':latest'
   matrix:
     # RPI 1
     - URHO3D_LIB_TYPE=STATIC
@@ -282,6 +284,7 @@ env:
     - secure: QgcKUlf4YQQI//CFF0uhMtDPBy9wmDZkCO/F59BBuda22zVBEdlkJf4s3LV8kkvnldCHcX1KaJ2+2pgzdTmsAUkpBTsJgKTs9ruCI3PbH9SxTNZAyXu8U3GU8gAWh4CD3hu0didNX7p/uu0hsQmVhD42IkBgouPZpPy6wMeu3ag=
     - numjobs=4
     - ARM=1
+    - DBE_TAG=':latest'
   matrix:
     # ODROID-C2
     - URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
