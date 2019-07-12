@@ -62,7 +62,7 @@ task :cmake do
     case option
     when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2015', 'vs2017', 'xcode'
+    when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2015', 'vs2017', 'vs2019', 'xcode'
       script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
@@ -103,7 +103,7 @@ task :make do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2015', 'vs2017', 'xcode'
+    when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2015', 'vs2017', 'vs2019', 'xcode'
       # do nothing
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
@@ -321,7 +321,7 @@ task :ci do
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
   ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
   # When not explicitly specified then use generic generator
-  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2017') : '')
+  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2019') : '')
   # Cache the initial build tree for next run on platform that is slow to generate the build tree
   system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']} && git diff $(cat #{ENV['HOME']}/initial-build-tree/.sha1) $TRAVIS_COMMIT --name-only |grep -i cmake |xargs -r touch" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/.sha1")
   system "rake cmake #{generator} URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
