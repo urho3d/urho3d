@@ -106,6 +106,7 @@ matrix:
 
 branch: {name: MinGW-CI, active: yes, appveyor: yes}
 version: '{build}'
+image: Visual Studio 2019
 platform:
   - x86
   - x64

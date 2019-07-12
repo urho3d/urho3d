@@ -44,6 +44,7 @@ environment:
 # VS build actually does not need MinGW compiler toolchains so prevent its restoration and update check
   APPVEYOR_CACHE_SKIP_RESTORE: true
   APPVEYOR_CACHE_SKIP_SAVE: true
+  TOOLSET: host=x64
   config: Release
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
