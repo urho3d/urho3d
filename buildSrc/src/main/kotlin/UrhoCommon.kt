@@ -29,7 +29,7 @@ val kotlinVersion = embeddedKotlinVersion
 
 const val androidToolsVersion = "3.5.0-alpha13"
 const val bintrayVersion = "1.8.4"
-const val cmakeVersion = "3.10.2"
+const val cmakeVersion = "3.14.5+"
 const val relinkerVersion = "1.3.1"
 const val junitVersion = "4.12"
 const val testEspressoVersion = "3.0.2"

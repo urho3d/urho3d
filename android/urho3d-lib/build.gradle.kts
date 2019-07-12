@@ -187,7 +187,7 @@ tasks {
         doLast {
             val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
             named<Exec>("makeDoc") {
-                // This is a hack - expect the first line to contain the path to the embedded CMake executable
+                // This is a hack - expect the first line to contain the path to the CMake executable
                 executable = File(buildTree, "build_command.txt").readLines().first().split(":").last().trim()
                 workingDir = buildTree
             }
