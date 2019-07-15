@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
@@ -777,8 +774,6 @@ X11_GL_CreateContext(_THIS, SDL_Window * window)
                         X11_XFree(framebuffer_config);
                     }
                 }
-                // Urho3D - fix memory leak detected by Valgrind
-                X11_XFree(framebuffer_config);
             }
         }
         X11_XFree(vinfo);

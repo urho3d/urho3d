@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -246,6 +246,14 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
         ExpandBMP = biBitCount;
         biBitCount = 8;
         break;
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+		SDL_SetError("%d-bpp BMP images are not supported", biBitCount);
+        was_error = SDL_TRUE;
+        goto done;
     default:
         ExpandBMP = 0;
         break;
@@ -313,6 +321,10 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
         SDL_assert(biBitCount <= 8);
         if (biClrUsed == 0) {
             biClrUsed = 1 << biBitCount;
+		} else if (biClrUsed > (Uint32)(1 << biBitCount)) {
+			SDL_SetError("BMP file has an invalid number of colors");
+			was_error = SDL_TRUE;
+			goto done;
         }
         if ((int) biClrUsed > palette->ncolors) {
             SDL_Color *colors;
@@ -394,19 +406,32 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
                             goto done;
                         }
                     }
-                    *(bits + i) = (pixel >> shift);
+                    bits[i] = (pixel >> shift);
+					if (bits[i] >= biClrUsed) {
+						SDL_SetError("A BMP image contains a pixel with a color out of the palette");
+						was_error = SDL_TRUE;
+						goto done;
+					}
                     pixel <<= ExpandBMP;
                 }
             }
             break;
 
         default:
-            if (SDL_RWread(src, bits, 1, surface->pitch)
-                != surface->pitch) {
+            if (SDL_RWread(src, bits, 1, surface->pitch) != surface->pitch) {
                 SDL_Error(SDL_EFREAD);
                 was_error = SDL_TRUE;
                 goto done;
             }
+			if (biBitCount == 8 && palette && biClrUsed < (Uint32)(1 << biBitCount)) {
+				for (i = 0; i < surface->w; ++i) {
+					if (bits[i] >= biClrUsed) {
+						SDL_SetError("A BMP image contains a pixel with a color out of the palette");
+						was_error = SDL_TRUE;
+						goto done;
+					}
+				}
+			}
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
             /* Byte-swap the pixels if needed. Note that the 24bpp
                case has already been taken care of above. */

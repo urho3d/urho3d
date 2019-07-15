@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -165,8 +165,7 @@ SDL_SYS_JoystickIsHaptic(SDL_Joystick *joystick)
 {
     SDL_hapticlist_item *item;
     item = HapticByDevId(((joystick_hwdata *)joystick->hwdata)->device_id);
-    int ret = (item != NULL ? 1 : 0);
-    return ret;
+    return (item != NULL) ? 1 : 0;
 }
 
 
@@ -196,6 +195,10 @@ SDL_SYS_HapticClose(SDL_Haptic * haptic)
 void
 SDL_SYS_HapticQuit(void)
 {
+/* We don't have any way to scan for joysticks (and their vibrators) at init, so don't wipe the list
+ * of joysticks here in case this is a reinit.
+ */
+#if 0
     SDL_hapticlist_item *item = NULL;
     SDL_hapticlist_item *next = NULL;
 
@@ -207,6 +210,7 @@ SDL_SYS_HapticQuit(void)
     SDL_hapticlist = SDL_hapticlist_tail = NULL;
     numhaptics = 0;
     return;
+#endif
 }
 
 
@@ -231,7 +235,12 @@ int
 SDL_SYS_HapticRunEffect(SDL_Haptic * haptic, struct haptic_effect *effect,
                         Uint32 iterations)
 {
-    Android_JNI_HapticRun (((SDL_hapticlist_item *)haptic->hwdata)->device_id, effect->effect.leftright.length);
+    float large = effect->effect.leftright.large_magnitude / 32767.0f;
+    float small = effect->effect.leftright.small_magnitude / 32767.0f;
+
+    float total = (large * 0.6f) + (small * 0.4f);
+
+    Android_JNI_HapticRun (((SDL_hapticlist_item *)haptic->hwdata)->device_id, total, effect->effect.leftright.length);
     return 0;
 }
 
@@ -239,6 +248,7 @@ SDL_SYS_HapticRunEffect(SDL_Haptic * haptic, struct haptic_effect *effect,
 int
 SDL_SYS_HapticStopEffect(SDL_Haptic * haptic, struct haptic_effect *effect)
 {
+    Android_JNI_HapticStop (((SDL_hapticlist_item *)haptic->hwdata)->device_id);
     return 0;
 }
 
