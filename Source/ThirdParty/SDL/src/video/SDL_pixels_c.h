@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,10 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+#ifndef SDL_pixels_c_h_
+#define SDL_pixels_c_h_
+
 #include "../SDL_internal.h"
 
 /* Useful functions and variables from SDL_pixel.c */
@@ -34,8 +38,9 @@ extern int SDL_MapSurface(SDL_Surface * src, SDL_Surface * dst);
 extern void SDL_FreeBlitMap(SDL_BlitMap * map);
 
 /* Miscellaneous functions */
-extern int SDL_CalculatePitch(SDL_Surface * surface);
 extern void SDL_DitherColors(SDL_Color * colors, int bpp);
 extern Uint8 SDL_FindColor(SDL_Palette * pal, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+
+#endif /* SDL_pixels_c_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

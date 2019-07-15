@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,92 +25,173 @@
 
 #if SDL_VIDEO_DRIVER_ANDROID
 
-/* We're going to do this by default */
-#define SDL_ANDROID_BLOCK_ON_PAUSE  1
-
 #include "SDL_androidevents.h"
 #include "SDL_events.h"
+#include "SDL_androidkeyboard.h"
 #include "SDL_androidwindow.h"
 
 /* Can't include sysaudio "../../audio/android/SDL_androidaudio.h"
  * because of THIS redefinition */
+
+#if !SDL_AUDIO_DISABLED && SDL_AUDIO_DRIVER_ANDROID
 extern void ANDROIDAUDIO_ResumeDevices(void);
 extern void ANDROIDAUDIO_PauseDevices(void);
+#else
+static void ANDROIDAUDIO_ResumeDevices(void) {}
+static void ANDROIDAUDIO_PauseDevices(void) {}
+#endif
 
-static void 
-android_egl_context_restore() 
+#if !SDL_AUDIO_DISABLED && SDL_AUDIO_DRIVER_OPENSLES
+extern void openslES_ResumeDevices(void);
+extern void openslES_PauseDevices(void);
+#else
+static void openslES_ResumeDevices(void) {}
+static void openslES_PauseDevices(void) {}
+#endif
+
+/* Number of 'type' events in the event queue */
+static int
+SDL_NumberOfEvents(Uint32 type)
 {
-    SDL_Event event;
-    SDL_WindowData *data = (SDL_WindowData *) Android_Window->driverdata;
-    // Urho3D: make sure there is a valid stored context to restore
-    if (data->egl_context && SDL_GL_MakeCurrent(Android_Window, (SDL_GLContext) data->egl_context) < 0) {
-        // Urho3D: if the old context could not be restored, leave it to the Graphics subsystem to create a new one
-        data->egl_context = NULL;
+    return SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, type, type);
+}
+
+static void
+android_egl_context_restore(SDL_Window *window)
+{
+    if (window) {
+        SDL_Event event;
+        SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+        // Urho3D: make sure there is a valid stored context to restore
+        if (data->egl_context && SDL_GL_MakeCurrent(window, (SDL_GLContext) data->egl_context) < 0) {
+            // Urho3D: if the old context could not be restored, leave it to the Graphics subsystem to create a new one
+            data->egl_context = NULL;
+        }
     }
 }
 
-static void 
-android_egl_context_backup() 
+static void
+android_egl_context_backup(SDL_Window *window)
 {
-    /* Keep a copy of the EGL Context so we can try to restore it when we resume */
-    SDL_WindowData *data = (SDL_WindowData *) Android_Window->driverdata;
-    data->egl_context = SDL_GL_GetCurrentContext();
-    /* We need to do this so the EGLSurface can be freed */
-    SDL_GL_MakeCurrent(Android_Window, NULL);
+    if (window) {
+        /* Keep a copy of the EGL Context so we can try to restore it when we resume */
+        SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+        data->egl_context = SDL_GL_GetCurrentContext();
+        /* We need to do this so the EGLSurface can be freed */
+        SDL_GL_MakeCurrent(window, NULL);
+    }
+}
+
+
+/*
+ * Android_ResumeSem and Android_PauseSem are signaled from Java_org_libsdl_app_SDLActivity_nativePause and Java_org_libsdl_app_SDLActivity_nativeResume
+ * When the pause semaphore is signaled, if Android_PumpEvents_Blocking is used, the event loop will block until the resume signal is emitted.
+ *
+ * No polling necessary
+ */
+
+void
+Android_PumpEvents_Blocking(_THIS)
+{
+    SDL_VideoData *videodata = (SDL_VideoData *)_this->driverdata;
+
+    if (videodata->isPaused) {
+
+        /* Make sure this is the last thing we do before pausing */
+        SDL_LockMutex(Android_ActivityMutex);
+        android_egl_context_backup(Android_Window);
+        SDL_UnlockMutex(Android_ActivityMutex);
+
+        ANDROIDAUDIO_PauseDevices();
+        openslES_PauseDevices();
+
+        if (SDL_SemWait(Android_ResumeSem) == 0) {
+
+            videodata->isPaused = 0;
+
+            ANDROIDAUDIO_ResumeDevices();
+            openslES_ResumeDevices();
+
+            /* Restore the GL Context from here, as this operation is thread dependent */
+            if (!SDL_HasEvent(SDL_QUIT)) {
+                SDL_LockMutex(Android_ActivityMutex);
+                android_egl_context_restore(Android_Window);
+                SDL_UnlockMutex(Android_ActivityMutex);
+            }
+
+            /* Make sure SW Keyboard is restored when an app becomes foreground */
+            if (SDL_IsTextInputActive()) {
+                Android_StartTextInput(_this); /* Only showTextInput */
+            }
+        }
+    } else {
+        if (videodata->isPausing || SDL_SemTryWait(Android_PauseSem) == 0) {
+            /* We've been signaled to pause (potentially several times), but before we block ourselves,
+             * we need to make sure that the very last event (of the first pause sequence, if several)
+             * has reached the app */
+            if (SDL_NumberOfEvents(SDL_APP_DIDENTERBACKGROUND) > SDL_SemValue(Android_PauseSem)) {
+                videodata->isPausing = 1;
+            } else {
+                videodata->isPausing = 0;
+                videodata->isPaused = 1;
+            }
+        }
+    }
 }
 
 void
-Android_PumpEvents(_THIS)
+Android_PumpEvents_NonBlocking(_THIS)
 {
-    static int isPaused = 0;
-#if SDL_ANDROID_BLOCK_ON_PAUSE
-    static int isPausing = 0;
-#endif
-    /* No polling necessary */
+    SDL_VideoData *videodata = (SDL_VideoData *)_this->driverdata;
+    static int backup_context = 0;
 
-    /*
-     * Android_ResumeSem and Android_PauseSem are signaled from Java_org_libsdl_app_SDLActivity_nativePause and Java_org_libsdl_app_SDLActivity_nativeResume
-     * When the pause semaphore is signaled, if SDL_ANDROID_BLOCK_ON_PAUSE is defined the event loop will block until the resume signal is emitted.
-     */
+    if (videodata->isPaused) {
 
-#if SDL_ANDROID_BLOCK_ON_PAUSE
-    if (isPaused && !isPausing) {
-        /* Make sure this is the last thing we do before pausing */
-        android_egl_context_backup();
-        ANDROIDAUDIO_PauseDevices();
-        if(SDL_SemWait(Android_ResumeSem) == 0) {
-#else
-    if (isPaused) {
-        if(SDL_SemTryWait(Android_ResumeSem) == 0) {
-#endif
-            isPaused = 0;
+        if (backup_context) {
+
+            SDL_LockMutex(Android_ActivityMutex);
+            android_egl_context_backup(Android_Window);
+            SDL_UnlockMutex(Android_ActivityMutex);
+
+            ANDROIDAUDIO_PauseDevices();
+            openslES_PauseDevices();
+
+            backup_context = 0;
+        }
+
+
+        if (SDL_SemTryWait(Android_ResumeSem) == 0) {
+
+            videodata->isPaused = 0;
+
             ANDROIDAUDIO_ResumeDevices();
+            openslES_ResumeDevices();
+
             /* Restore the GL Context from here, as this operation is thread dependent */
             if (!SDL_HasEvent(SDL_QUIT)) {
-                android_egl_context_restore();
+                SDL_LockMutex(Android_ActivityMutex);
+                android_egl_context_restore(Android_Window);
+                SDL_UnlockMutex(Android_ActivityMutex);
+            }
+
+            /* Make sure SW Keyboard is restored when an app becomes foreground */
+            if (SDL_IsTextInputActive()) {
+                Android_StartTextInput(_this); /* Only showTextInput */
             }
         }
-    }
-    else {
-#if SDL_ANDROID_BLOCK_ON_PAUSE
-        if( isPausing || SDL_SemTryWait(Android_PauseSem) == 0 ) {
-            /* We've been signaled to pause, but before we block ourselves, 
-            we need to make sure that certain key events have reached the app */
-            if (SDL_HasEvent(SDL_WINDOWEVENT) || SDL_HasEvent(SDL_APP_WILLENTERBACKGROUND) || SDL_HasEvent(SDL_APP_DIDENTERBACKGROUND) ) {
-                isPausing = 1;
-            }
-            else {
-                isPausing = 0;
-                isPaused = 1;
+    } else {
+        if (videodata->isPausing || SDL_SemTryWait(Android_PauseSem) == 0) {
+            /* We've been signaled to pause (potentially several times), but before we block ourselves,
+             * we need to make sure that the very last event (of the first pause sequence, if several)
+             * has reached the app */
+            if (SDL_NumberOfEvents(SDL_APP_DIDENTERBACKGROUND) > SDL_SemValue(Android_PauseSem)) {
+                videodata->isPausing = 1;
+            } else {
+                videodata->isPausing = 0;
+                videodata->isPaused = 1;
+                backup_context = 1;
             }
         }
-#else
-        if(SDL_SemTryWait(Android_PauseSem) == 0) {
-            android_egl_context_backup();
-            ANDROIDAUDIO_PauseDevices();
-            isPaused = 1;
-        }
-#endif
     }
 }
 

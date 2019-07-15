@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,6 +41,7 @@
 #undef main
 #endif
 
+static SDL_main_func forward_main;
 static int forward_argc;
 static char **forward_argv;
 static int exit_status;
@@ -49,11 +50,20 @@ static int exit_status;
 const char* resource_dir = 0;
 const char* documents_dir = 0;
 
-int main(int argc, char **argv)
+#if defined(SDL_MAIN_NEEDED) && !defined(IOS_DYLIB)
+/* SDL is being built as a static library, include main() */
+int main(int argc, char *argv[])
+{
+	return SDL_UIKitRunApp(argc, argv, SDL_main);
+}
+#endif /* SDL_MAIN_NEEDED && !IOS_DYLIB */
+
+int SDL_UIKitRunApp(int argc, char *argv[], SDL_main_func mainFunction)
 {
     int i;
 
     /* store arguments */
+	forward_main = mainFunction;
     forward_argc = argc;
     forward_argv = (char **)malloc((argc+1) * sizeof(char *));
     for (i = 0; i < argc; i++) {
@@ -385,6 +395,7 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
         window.alpha = 0.0;
     } completion:^(BOOL finished) {
         window.hidden = YES;
+        UIKit_ForceUpdateHomeIndicator(); /* Wait for launch screen to hide so settings are applied to the actual view controller. */
     }];
 }
 
@@ -396,7 +407,7 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 
     /* run the user's application, passing argc and argv */
     SDL_iPhoneSetEventPump(SDL_TRUE);
-    exit_status = SDL_main(forward_argc, forward_argv);
+    exit_status = forward_main(forward_argc, forward_argv);
     SDL_iPhoneSetEventPump(SDL_FALSE);
 
     if (launchWindow) {
@@ -497,30 +508,7 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 #if !TARGET_OS_TV
 - (void)application:(UIApplication *)application didChangeStatusBarOrientation:(UIInterfaceOrientation)oldStatusBarOrientation
 {
-    BOOL isLandscape = UIInterfaceOrientationIsLandscape(application.statusBarOrientation);
-    SDL_VideoDevice *_this = SDL_GetVideoDevice();
-
-    if (_this && _this->num_displays > 0) {
-        SDL_DisplayMode *desktopmode = &_this->displays[0].desktop_mode;
-        SDL_DisplayMode *currentmode = &_this->displays[0].current_mode;
-
-        /* The desktop display mode should be kept in sync with the screen
-         * orientation so that updating a window's fullscreen state to
-         * SDL_WINDOW_FULLSCREEN_DESKTOP keeps the window dimensions in the
-         * correct orientation. */
-        if (isLandscape != (desktopmode->w > desktopmode->h)) {
-            int height = desktopmode->w;
-            desktopmode->w = desktopmode->h;
-            desktopmode->h = height;
-        }
-
-        /* Same deal with the current mode + SDL_GetCurrentDisplayMode. */
-        if (isLandscape != (currentmode->w > currentmode->h)) {
-            int height = currentmode->w;
-            currentmode->w = currentmode->h;
-            currentmode->h = height;
-        }
-    }
+    SDL_OnApplicationDidChangeStatusBarOrientation();
 }
 #endif
 

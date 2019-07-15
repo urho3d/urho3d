@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -100,6 +100,7 @@ WIN_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     LPVOID pixels;
     LPVOID maskbits;
     size_t maskbitslen;
+    SDL_bool isstack;
     ICONINFO ii;
 
     SDL_zero(bmh);
@@ -115,7 +116,7 @@ WIN_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     bmh.bV4BlueMask  = 0x000000FF;
 
     maskbitslen = ((surface->w + (pad - (surface->w % pad))) / 8) * surface->h;
-    maskbits = SDL_stack_alloc(Uint8,maskbitslen);
+    maskbits = SDL_small_alloc(Uint8, maskbitslen, &isstack);
     if (maskbits == NULL) {
         SDL_OutOfMemory();
         return NULL;
@@ -132,7 +133,7 @@ WIN_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     ii.hbmColor = CreateDIBSection(hdc, (BITMAPINFO*)&bmh, DIB_RGB_COLORS, &pixels, NULL, 0);
     ii.hbmMask = CreateBitmap(surface->w, surface->h, 1, 1, maskbits);
     ReleaseDC(NULL, hdc);
-    SDL_stack_free(maskbits);
+    SDL_small_free(maskbits, isstack);
 
     SDL_assert(surface->format->format == SDL_PIXELFORMAT_ARGB8888);
     SDL_assert(surface->pitch == surface->w * 4);
@@ -308,8 +309,6 @@ WIN_InitMouse(_THIS)
     mouse->GetGlobalMouseState = WIN_GetGlobalMouseState;
 
     SDL_SetDefaultCursor(WIN_CreateDefaultCursor());
-
-    SDL_SetDoubleClickTime(GetDoubleClickTime());
 }
 
 void
