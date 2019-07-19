@@ -51,12 +51,12 @@ class JSONValue
     bool IsArray() const;
     bool IsObject() const;
 
-    bool GetBool() const;
-    int GetInt() const;
-    unsigned GetUInt() const;
-    float GetFloat() const;
-    double GetDouble() const;
-    const String GetString() const;
+    bool GetBool(bool fallback = false) const;
+    int GetInt(int fallback = 0) const;
+    unsigned GetUInt(unsigned fallback = 0) const;
+    float GetFloat(float fallback = 0) const;
+    double GetDouble(double fallback = 0) const;
+    const String GetString(const String& fallback = String("")) const;
     const JSONArray& GetArray() const;
     const JSONObject& GetObject() const;
     Variant GetVariant() const;
