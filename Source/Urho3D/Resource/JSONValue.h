@@ -187,19 +187,19 @@ public:
     bool IsObject() const { return GetValueType() == JSON_OBJECT; }
 
     /// Return boolean value.
-    bool GetBool(bool fallback = false) const { return IsBool() ? boolValue_ : fallback;}
+    bool GetBool(bool defaultValue = false) const { return IsBool() ? boolValue_ : fallback;}
     /// Return integer value.
-    int GetInt(int fallback = 0) const { return IsNumber() ? (int)numberValue_ : fallback; }
+    int GetInt(int defaultValue = 0) const { return IsNumber() ? (int)numberValue_ : fallback; }
     /// Return unsigned integer value.
-    unsigned GetUInt(unsigned fallback = 0) const { return IsNumber() ? (unsigned)numberValue_ : fallback; }
+    unsigned GetUInt(unsigned defaultValue = 0) const { return IsNumber() ? (unsigned)numberValue_ : fallback; }
     /// Return float value.
-    float GetFloat(float fallback = 0.0f) const { return IsNumber() ? (float)numberValue_ : fallback; }
+    float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : fallback; }
     /// Return double value.
-    double GetDouble(double fallback = 0.0f) const { return IsNumber() ? numberValue_ : fallback; }
+    double GetDouble(double defaultValue = 0.0f) const { return IsNumber() ? numberValue_ : fallback; }
     /// Return string value.
-    const String& GetString(String fallback = String::EMPTY) const { return IsString() ? *stringValue_ : fallback;}
+    const String& GetString(String defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : fallback;}
     /// Return C string value.
-    const char* GetCString(const char* fallback = nullptr) const { return IsString() ? stringValue_->CString() : fallback;}
+    const char* GetCString(const char* defaultValue = nullptr) const { return IsString() ? stringValue_->CString() : fallback;}
     /// Return JSON array value.
     const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.
