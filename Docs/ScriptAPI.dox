@@ -404,6 +404,8 @@ namespace Urho3D
 
 ### ConnectFailed
 
+### ConnectionInProgress
+
 ### ClientConnected
 - %Connection : Connection pointer
 
