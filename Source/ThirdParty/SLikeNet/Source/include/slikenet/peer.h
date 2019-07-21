@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -1028,7 +1028,11 @@ protected:
 
 	virtual void OnRNS2Recv(RNS2RecvStruct *recvStruct);
 	void FillIPList(void);
-} 
+
+	private:
+		// internal helpers
+		void CloseConnectionInternal2(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification, bool performImmediate, unsigned char orderingChannel, PacketPriority disconnectionNotificationPriority, RakNetSocket2& socket);
+}
 // #if defined(SN_TARGET_PSP2)
 // __attribute__((aligned(8)))
 // #endif

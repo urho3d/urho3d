@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2019, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -15,7 +15,6 @@
 
 /// \file
 ///
-
 
 #include "slikenet/types.h"
 #include "slikenet/assert.h"
@@ -26,7 +25,6 @@
 #include "slikenet/SocketDefines.h"
 #include "slikenet/socket2.h"
 
-
 #if   defined(_WIN32)
 // extern __int64 _strtoui64(const char*, char**, int); // needed for Code::Blocks. Does not compile on Visual Studio 2010
 // IP_DONTFRAGMENT is different between winsock 1 and winsock 2.  Therefore, Winsock2.h must be linked againt Ws2_32.lib
@@ -34,12 +32,12 @@
 #include "slikenet/WindowsIncludes.h"
 
 #else
-#include <sys/socket.h>
+#include <sys/socket.h> // used for getnameinfo()
+#include <netdb.h>      // used for getnameinfo()
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
 
-#include <string.h> // strncasecmp
 #include "slikenet/Itoa.h"
 #include "slikenet/SocketLayer.h"
 #include "slikenet/SuperFastHash.h"
@@ -82,16 +80,16 @@ void AddressOrGUID::ToString(bool writePort, char *dest, size_t destLength) cons
 		return rakNetGuid.ToString(dest,destLength);
 	return systemAddress.ToString(writePort,dest,destLength);
 }
+
+// Return false if IP address. Return true if domain
 bool SLNet::NonNumericHostString( const char *host )
 {
-	// Return false if IP address. Return true if domain
-	unsigned int i=0;
-	while (host[i])
-	{
-		// IPV4: natpunch.jenkinssoftware.com
+	size_t i = 0;
+	while (host[i] != '\0') {
+		// IPV4: natpunch.slikesoft.com
 		// IPV6: fe80::7c:31f7:fec4:27de%14
-		if ((host[i]>='g' && host[i]<='z') ||
-			(host[i]>='A' && host[i]<='Z'))
+		if ((host[i] >= 'g' && host[i] <= 'z') ||
+			(host[i] >= 'G' && host[i] <= 'Z'))
 			return true;
 		++i;
 	}
@@ -104,7 +102,12 @@ SocketDescriptor::SocketDescriptor() {
 #else
 	blockingSocket=true;
 #endif
-	port=0; hostAddress[0]=0; remotePortRakNetWasStartedOn_PS3_PSP2=0; extraSocketOptions=0; socketFamily=AF_INET;}
+	port=0;
+	hostAddress[0]=0;
+	remotePortRakNetWasStartedOn_PS3_PSP2=0;
+	extraSocketOptions=0;
+	socketFamily=AF_INET;
+}
 SocketDescriptor::SocketDescriptor(unsigned short _port, const char *_hostAddress)
 {
 	#ifdef __native_client__
@@ -445,6 +448,8 @@ SystemAddress::SystemAddress(const char *str)
 {
 	address.addr4.sin_family=AF_INET;
 	SetPortHostOrder(0);
+	// #med - reconsider this --- doesn't make sense to allow specifying the port using the default delimiter w/o also allowing specifying the used delimiter
+	// i.e. consider changing to FromString(str, 0) or change the ctor to SystemAddress(str, delimiter = '\0') or alternatively to delimiter = '|'
 	FromString(str);
 	systemIndex=(SystemIndex)-1;
 }
@@ -454,44 +459,6 @@ SystemAddress::SystemAddress(const char *str, unsigned short port)
 	FromStringExplicitPort(str,port);
 	systemIndex=(SystemIndex)-1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void SystemAddress::FixForIPVersion(const SystemAddress &boundAddressToSocket)
 {
 	char str[128];
@@ -531,112 +498,72 @@ bool SystemAddress::IsLANAddress(void)
 }
 bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 {
-	if ( NonNumericHostString( str ) )
-	{
-
-#if defined(_WIN32)
-		if (_strnicmp(str,"localhost", 9)==0)
-#else
-		if (strncasecmp(str,"localhost", 9)==0)
-#endif
-		{
-
-
-
-
-
-			inet_pton(AF_INET, "127.0.0.1", &address.addr4.sin_addr.s_addr);
-
-			if (str[9])
-			{
-				SetPortHostOrder((unsigned short) atoi(str+9));
-			}
-			return true;
+	size_t delimiterPos = 0;
+	size_t stringLength = strlen(str);
+	for (; delimiterPos < stringLength; ++delimiterPos) {
+		if (str[delimiterPos] == portDelineator) {
+			break; // found location of port delimiter
 		}
+	}
 
+	if (NonNumericHostString(str)) {
 		//const char *ip = ( char* ) SocketLayer::DomainNameToIP( str );
 		char ip[65];
-		ip[0]=0;
-		RakNetSocket2::DomainNameToIP(str, ip);
-		if (ip[0])
-		{
+		ip[0] = '\0';
 
+		// copy the plain hostname (excluding the (optional) port part)
+		char* hostname = OP_NEW_ARRAY<char>(delimiterPos + 1, _FILE_AND_LINE_);
+		strncpy_s(hostname, delimiterPos + 1, str, delimiterPos);
+		RakNetSocket2::DomainNameToIP(hostname, ip);
+		OP_DELETE_ARRAY(hostname, _FILE_AND_LINE_);
 
-
-
-
+		if (ip[0] != '\0') {
 			inet_pton(AF_INET, ip, &address.addr4.sin_addr.s_addr);
-
 		}
-		else
-		{
+		else {
 			*this = UNASSIGNED_SYSTEM_ADDRESS;
 			return false;
 		}
 	}
-	else
-	{
-		//#ifdef _XBOX
-		//	binaryAddress=UNASSIGNED_SYSTEM_ADDRESS.binaryAddress;
-		//#else
+	else {
 		// Split the string into the first part, and the : part
-		int index, portIndex;
 		char IPPart[22];
-		char portPart[10];
 		// Only write the valid parts, don't change existing if invalid
 		//	binaryAddress=UNASSIGNED_SYSTEM_ADDRESS.binaryAddress;
 		//	port=UNASSIGNED_SYSTEM_ADDRESS.port;
-		for (index=0; str[index] && str[index]!=portDelineator && index<22; index++)
-		{
-			if (str[index]!='.' && (str[index]<'0' || str[index]>'9'))
+		size_t index = 0;
+		// #med - revise this --- if the hostname length > 22 we'd reject it rather than skipping what is beyond the max length...
+		for (; index < delimiterPos && index < 22; ++index) {
+			if (str[index] != '.' && (str[index] < '0' || str[index] > '9')) {
 				break;
-			IPPart[index]=str[index];
-		}
-		IPPart[index]=0;
-		portPart[0]=0;
-		if (str[index] && str[index+1])
-		{
-			index++;
-			for (portIndex=0; portIndex<10 && str[index] && index < 22+10; index++, portIndex++)
-			{
-				if (str[index]<'0' || str[index]>'9')
-					break;
-
-				portPart[portIndex]=str[index];
 			}
-			portPart[portIndex]=0;
+			IPPart[index] = str[index];
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-		if (IPPart[0])
-		{
-
-
-
-
-
+		IPPart[index] = '\0';
+		if (index > 0) {
 			inet_pton(AF_INET, IPPart, &address.addr4.sin_addr.s_addr);
-
 		}
+	}
 
+	char portPart[10];
+	portPart[0] = '\0';
+	if (str[delimiterPos] != '\0') {
+		size_t portIndex;
+		++delimiterPos; // skip the delimiter
+		for (portIndex = 0; portIndex < 10 && str[delimiterPos] != '\0'; ++delimiterPos, ++portIndex) {
+			if (str[delimiterPos] < '0' || str[delimiterPos] > '9') {
+				break;
+			}
 
-		if (portPart[0])
-		{
-			address.addr4.sin_port=htons((unsigned short) atoi(portPart));
-			debugPort=ntohs(address.addr4.sin_port);
+			portPart[portIndex] = str[delimiterPos];
 		}
-		//#endif
+		portPart[portIndex] = '\0';
+	}
+	if (portPart[0] != '\0') {
+		// #med - missing / insufficient port range range
+		address.addr4.sin_port = htons((unsigned short)atoi(portPart));
+		// #med - not set in IPv6 mode
+		debugPort = ntohs(address.addr4.sin_port);
 	}
 	return true;
 }
@@ -659,54 +586,32 @@ bool SystemAddress::FromString(const char *str, char portDelineator, int ipVersi
 	char ipPart[INET_ADDRSTRLEN];
 #endif
 	char portPart[32];
-	int i=0,j;
 
 	// TODO - what about 255.255.255.255?
-	if (ipVersion==4 && strcmp(str, IPV6_LOOPBACK)==0)
-	{
+	if (ipVersion==4 && strcmp(str, IPV6_LOOPBACK) == 0) {
 		strcpy_s(ipPart,IPV4_LOOPBACK);
 	}
-	else if (ipVersion==6 && strcmp(str, IPV4_LOOPBACK)==0)
-	{
+	else if (ipVersion==6 && strcmp(str, IPV4_LOOPBACK) == 0) {
 		address.addr4.sin_family=AF_INET6;
 		strcpy_s(ipPart,IPV6_LOOPBACK);
 	}
-	else if (NonNumericHostString(str)==false)
-	{
-		for (; i < sizeof(ipPart) && str[i]!=0 && str[i]!=portDelineator; i++)
-		{
-			if ((str[i]<'0' || str[i]>'9') && (str[i]<'a' || str[i]>'f') && (str[i]<'A' || str[i]>'F') && str[i]!='.' && str[i]!=':' && str[i]!='%' && str[i]!='-' && str[i]!='/')
-				break;
 
-			ipPart[i]=str[i];
+	int i = 0;
+	for (; i < sizeof(ipPart) && str[i] != '\0'; ++i) {
+		if (str[i] == portDelineator) {
+			// #med - missing error checking, if portPart is non-numeric and/or exceeds max allowed port value
+			int j = 0;
+			++i; // skip the delimiter
+			for (; j < sizeof(portPart) && str[i] != '\0'; ++i, ++j) {
+				portPart[j] = str[i];
+			}
+			portPart[j] = '\0';
+			i = i - j - 1; // reset the position to the last position, so the trailing '\0'-terminator is set correctly below
+			break;
 		}
-		ipPart[i]=0;
+		ipPart[i] = str[i];
 	}
-	else
-	{
-		strncpy_s(ipPart,str,sizeof(ipPart));
-		ipPart[sizeof(ipPart)-1]=0;
-	}
-
-	j=0;
-	if (str[i]==portDelineator && portDelineator!=0)
-	{
-		i++;
-		for (; j < sizeof(portPart) && str[i]!=0; i++, j++)
-		{
-			portPart[j]=str[i];
-		}
-	}
-	portPart[j]=0;
-
-
-
-
-
-
-
-
-
+	ipPart[i] = '\0';
 
 	// needed for getaddrinfo
 	WSAStartupSingleton::AddRef();
@@ -722,8 +627,8 @@ bool SystemAddress::FromString(const char *str, char portDelineator, int ipVersi
 		hints.ai_family = AF_INET;
 	else
 		hints.ai_family = AF_UNSPEC;
-	getaddrinfo(ipPart, "", &hints, &servinfo);
-	if (servinfo==0)
+	INT error = getaddrinfo(ipPart, "", &hints, &servinfo);
+	if (servinfo==0 && error != 0)
 	{
 		if (ipVersion==6)
 		{
@@ -828,7 +733,7 @@ const char *RakNetGUID::ToString(void) const
 
 	unsigned char lastStrIndex=strIndex;
 	strIndex++;
-	ToString(str[lastStrIndex&7]);
+	ToString(str[lastStrIndex&7], 64);
 	return (char*) str[lastStrIndex&7];
 }
 void RakNetGUID::ToString(char *dest) const
@@ -860,12 +765,8 @@ bool RakNetGUID::FromString(const char *source)
 	if (source==0)
 		return false;
 
-
-
 #if   defined(WIN32)
 	g=_strtoui64(source, NULL, 10);
-
-
 #else
 	// Changed from g=strtoull(source,0,10); for android
 	g=strtoull(source, (char **)NULL, 10);

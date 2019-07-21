@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -32,6 +32,7 @@
 #include "NetworkIDObject.h"
 #include "DS_OrderedList.h"
 #include "DS_Queue.h"
+#include "SimpleMutex.h"
 
 /// \defgroup REPLICA_MANAGER_GROUP3 ReplicaManager3
 /// \brief Third implementation of object replication
@@ -349,6 +350,10 @@ protected:
 	RM3World *worldsArray[255];
 	// For fast traversal
 	DataStructures::List<RM3World *> worldsList;
+private:
+	// #med - reconsider visibility here --- should be properly encapsulated so to not allow access to worldsList by derived classes (which could bypass the mutex)
+	// mutex to ensure thread safe access to worldsList member
+	SimpleMutex m_WorldListMutex;
 
 	friend class Connection_RM3;
 };

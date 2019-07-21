@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2019, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -19,7 +19,6 @@
 #include "slikenet/sleep.h"
 #include "slikenet/SocketDefines.h"
 #include "slikenet/GetTime.h"
-#include "slikenet/linux_adapter.h"
 #include <stdio.h>
 #include <string.h> // memcpy
 
@@ -31,7 +30,7 @@ using namespace SLNet;
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <errno.h>  // error numbers
-#if !defined(__ANDROID__)
+#if !defined(ANDROID)
 #include <ifaddrs.h>
 #endif
 #include <netinet/in.h>
@@ -111,10 +110,6 @@ RNS2EventHandler * RakNetSocket2::GetEventHandler(void) const {return eventHandl
 void RakNetSocket2::DomainNameToIP( const char *domainName, char ip[65] ) {
 #if defined(WINDOWS_STORE_RT)
 	return RNS2_WindowsStore8::DomainNameToIP( domainName, ip );
-#elif defined(__native_client__)
-	return DomainNameToIP_Berkley( domainName, ip );
-#elif defined(_WIN32)
-	return DomainNameToIP_Berkley( domainName, ip );
 #else
 	return DomainNameToIP_Berkley( domainName, ip );
 #endif

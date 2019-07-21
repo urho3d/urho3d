@@ -165,12 +165,12 @@ public:
 	~ReliabilityLayer();
 
 	/// Resets the layer for reuse
-	void Reset( bool resetVariables, int MTUSize, bool _useSecurity );
+	void Reset(bool resetVariables, int mtuSize, bool _useSecurity);
 
 	/// Set the time, in MS, to use before considering ourselves disconnected after not being able to deliver a reliable packet
 	/// Default time is 10,000 or 10 seconds in release and 30,000 or 30 seconds in debug.
 	/// \param[in] time Time, in MS
-	void SetTimeoutTime(SLNet::TimeMS time );
+	void SetTimeoutTime(SLNet::TimeMS time);
 
 	/// Returns the value passed to SetTimeoutTime. or the default if it was never called
 	/// \param[out] the value passed to SetTimeoutTime
@@ -182,11 +182,11 @@ public:
 	/// \param[in] length The length of the socket data
 	/// \param[in] systemAddress The player that this data is from
 	/// \param[in] messageHandlerList A list of registered plugins
-	/// \param[in] MTUSize maximum datagram size
+	/// \param[in] mtuSize maximum datagram size
 	/// \retval true Success
 	/// \retval false Modified packet
 	bool HandleSocketReceiveFromConnectedPlayer(
-		const char *buffer, unsigned int length, SystemAddress &systemAddress, DataStructures::List<PluginInterface2*> &messageHandlerList, int MTUSize,
+		const char *buffer, unsigned int length, SystemAddress &systemAddress, DataStructures::List<PluginInterface2*> &messageHandlerList, int mtuSize,
 		RakNetSocket2 *s, RakNetRandom *rnr, CCTimeType timeRead, BitStream &updateBitStream);
 
 	/// This allocates bytes and writes a user-level message to those bytes.

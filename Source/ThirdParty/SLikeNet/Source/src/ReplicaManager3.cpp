@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -104,10 +104,12 @@ ReplicaManager3::~ReplicaManager3()
 {
 	if (autoDestroyConnections)
 	{
+		m_WorldListMutex.Lock();
 		for (unsigned int i=0; i < worldsList.Size(); i++)
 		{
 			RakAssert(worldsList[i]->connectionList.Size()==0);
 		}
+		m_WorldListMutex.Unlock();
 	}
 	Clear(true);
 }
@@ -547,17 +549,19 @@ bool ReplicaManager3::GetAllConnectionDownloadsCompleted(WorldId worldId) const
 
 void ReplicaManager3::Clear(bool deleteWorlds)
 {
+	m_WorldListMutex.Lock();
 	for (unsigned int i=0; i < worldsList.Size(); i++)
 	{
 		worldsList[i]->Clear(this);
 		if (deleteWorlds)
 		{
 			worldsArray[worldsList[i]->worldId]=0;
-			delete worldsList[i];
+			SLNet::OP_DELETE(worldsList[i], _FILE_AND_LINE_);
 		}
 	} 
 	if (deleteWorlds)
 		worldsList.Clear(false, _FILE_AND_LINE_);
+	m_WorldListMutex.Unlock();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -608,7 +612,9 @@ void ReplicaManager3::AddWorld(WorldId worldId)
 	RM3World *newWorld = SLNet::OP_NEW<RM3World>(_FILE_AND_LINE_);
 	newWorld->worldId=worldId;
 	worldsArray[worldId]=newWorld;
+	m_WorldListMutex.Lock();
 	worldsList.Push(newWorld,_FILE_AND_LINE_);
+	m_WorldListMutex.Unlock();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -885,6 +891,7 @@ void ReplicaManager3::Update(void)
 	RM3World *world;
 	SLNet::Time time = SLNet::GetTime();
 
+	m_WorldListMutex.Lock();
 	for (index3=0; index3 < worldsList.Size(); index3++)
 	{
 		world = worldsList[index3];
@@ -982,6 +989,7 @@ void ReplicaManager3::Update(void)
 
 		lastAutoSerializeOccurance=time;
 	}
+	m_WorldListMutex.Unlock();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1019,6 +1027,7 @@ void ReplicaManager3::OnRakPeerShutdown(void)
 	{
 		RM3World *world;
 		unsigned int index3;
+		m_WorldListMutex.Lock();
 		for (index3=0; index3 < worldsList.Size(); index3++)
 		{
 			world = worldsList[index3];
@@ -1030,6 +1039,7 @@ void ReplicaManager3::OnRakPeerShutdown(void)
 					DeallocConnection(connection);
 			}
 		}
+		m_WorldListMutex.Unlock();
 	}
 
 

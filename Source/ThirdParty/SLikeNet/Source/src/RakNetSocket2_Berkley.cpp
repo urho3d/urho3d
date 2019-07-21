@@ -26,9 +26,10 @@
 #ifdef _WIN32
 #include <tchar.h>	// used for _tprintf() (via RAKNET_DEBUG_TPRINTF)
 #else
-#include <sys/types.h>  // used for getaddrinfo()
-#include <sys/socket.h> // used for getaddrinfo()
-#include <netdb.h>      // used for getaddrinfo()
+#include "slikenet/LinuxStrings.h" // used for _stricmp()
+#include <sys/types.h>             // used for getaddrinfo()
+#include <sys/socket.h>            // used for getaddrinfo()
+#include <netdb.h>                 // used for getaddrinfo()
 #endif
 
 #include "slikenet/Itoa.h"
@@ -204,7 +205,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		return BR_FAILED_TO_BIND_SOCKET;
 #elif (defined(__GNUC__) || defined(__GCCXML__) ) && !defined(_WIN32)
 		closesocket__(rns2Socket);
-		switch (ret)
+		switch (errno)
 		{
 		case EBADF:
 			RAKNET_DEBUG_PRINTF("bind__(): sockfd is not a valid descriptor.\n"); break;
@@ -230,7 +231,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		case ELOOP:
 			RAKNET_DEBUG_PRINTF("bind__(): Too many symbolic links were encountered in resolving my_addr.\n"); break;
 		default:
-			RAKNET_DEBUG_PRINTF("Unknown bind__() error %i.\n", ret); break;
+			RAKNET_DEBUG_PRINTF("Unknown bind__() error %i.\n", errno); break;
 		}
 
 		return BR_FAILED_TO_BIND_SOCKET;

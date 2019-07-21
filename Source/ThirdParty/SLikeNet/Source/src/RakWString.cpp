@@ -110,7 +110,7 @@ RakWString& RakWString::operator = ( const char * const str )
 	Clear();
 
 // Not supported on android
-#if !defined(__ANDROID__)
+#if !defined(ANDROID)
 	if (str==0)
 		return *this;
 	if (str[0]==0)
@@ -135,7 +135,7 @@ RakWString& RakWString::operator = ( const char * const str )
 #else
 	// mbstowcs not supported on android
 	RakAssert("mbstowcs not supported on Android" && 0);
-#endif // defined(__ANDROID__)
+#endif // defined(ANDROID)
 
 	return *this;
 }
@@ -434,6 +434,13 @@ bool RakWString::Deserialize(wchar_t *str, size_t strLength, BitStream *bs)
 		wcscpy_s(str,strLength,L"");
 	}
 	return true;
+}
+
+const SLNet::RakWString operator+(const SLNet::RakWString &lhs, const SLNet::RakWString &rhs)
+{
+	SLNet::RakWString returnvalue(lhs);
+	returnvalue += rhs;
+	return returnvalue;
 }
 
 /*

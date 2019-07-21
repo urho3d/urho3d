@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2019, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -148,7 +148,7 @@ struct RAK_DLL_EXPORT SocketDescriptor
 	char hostAddress[32];
 
 	/// IP version: For IPV4, use AF_INET (default). For IPV6, use AF_INET6. To autoselect, use AF_UNSPEC.
-	/// IPV6 is the newer internet protocol. Instead of addresses such as natpunch.jenkinssoftware.com, you may have an address such as fe80::7c:31f7:fec4:27de%14.
+	/// IPV6 is the newer internet protocol. Instead of addresses such as natpunch.slikesoft.com, you may have an address such as fe80::7c:31f7:fec4:27de%14.
 	/// Encoding takes 16 bytes instead of 4, so IPV6 is less efficient for bandwidth.
 	/// On the positive side, NAT Punchthrough is not needed and should not be used with IPV6 because there are enough addresses that routers do not need to create address mappings.
 	/// RakPeer::Startup() will fail if this IP version is not supported.
@@ -400,12 +400,11 @@ struct RAK_DLL_EXPORT AddressOrGUID
 
 	inline bool operator==( const AddressOrGUID& right ) const {return (rakNetGuid!=UNASSIGNED_RAKNET_GUID && rakNetGuid==right.rakNetGuid) || (systemAddress!=UNASSIGNED_SYSTEM_ADDRESS && systemAddress==right.systemAddress);}
 
-	// Urho3D: addition of ToHash to deal with template specialization conflicting in the case of Reference types
+    // Urho3D: addition of ToHash to deal with template specialization conflicting in the case of Reference types
     unsigned ToHash() const
     {
         return ((unsigned)(size_t)(ToInteger(*this) >> 9));
     }
-
 };
 
 typedef uint64_t NetworkID;

@@ -417,7 +417,7 @@ void FullyConnectedMesh2::Clear(void)
 {
 	for (unsigned int i=0; i < fcm2ParticipantList.Size(); i++)
 	{
-		delete fcm2ParticipantList[i];
+		SLNet::OP_DELETE(fcm2ParticipantList[i], _FILE_AND_LINE_);
 	}
 	fcm2ParticipantList.Clear(false, _FILE_AND_LINE_);
 

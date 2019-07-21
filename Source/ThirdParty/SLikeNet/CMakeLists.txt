@@ -59,7 +59,7 @@ file (GLOB_RECURSE H_FILES *.h include)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS Source/include)
+set (INCLUDE_DIRS Source/include ../SLikeNetDeps)
 
 # Setup target
 setup_library ()

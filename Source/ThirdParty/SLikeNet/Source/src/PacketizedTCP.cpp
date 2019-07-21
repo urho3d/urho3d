@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -16,6 +16,7 @@
 #include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_PacketizedTCP==1 && _RAKNET_SUPPORT_TCPInterface==1
 
+#include <algorithm> // used for std::min
 #include "slikenet/PacketizedTCP.h"
 #include "slikenet/NativeTypes.h"
 #include "slikenet/BitStream.h"
@@ -92,8 +93,8 @@ bool PacketizedTCP::SendList( const char **data, const unsigned int *lengths, co
 #endif
 	
 
-	unsigned int lengthsArray[513];
-	const char *dataArray[513];
+	unsigned int lengthsArray[512];
+	const char *dataArray[512];
 	dataArray[0]=(char*) &dataLength;
 	lengthsArray[0]=sizeof(dataLength);
 	for (i=0; i < 512 && i < numParameters; i++)
@@ -101,7 +102,7 @@ bool PacketizedTCP::SendList( const char **data, const unsigned int *lengths, co
 		dataArray[i+1]=data[i];
 		lengthsArray[i+1]=lengths[i];
 	}	
-	return TCPInterface::SendList(dataArray,lengthsArray,numParameters+1,systemAddress,broadcast);
+	return TCPInterface::SendList(dataArray,lengthsArray,std::min(numParameters, 511)+1,systemAddress,broadcast);
 }
 void PacketizedTCP::PushNotificationsToQueues(void)
 {

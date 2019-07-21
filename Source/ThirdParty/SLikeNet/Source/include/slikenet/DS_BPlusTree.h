@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -1002,7 +1002,8 @@ namespace DataStructures
 		int i;
 		RAKNET_DEBUG_PRINTF("%i] SELF=%p\n", index+1, leaf);
 		for (i=0; i < leaf->size; i++)
-			RAKNET_DEBUG_PRINTF(" %i. %i\n", i+1, leaf->data[i]);
+			// #med - need to adjust printf-format specified based on the actual datatype
+			RAKNET_DEBUG_PRINTF(" %i. %p\n", i+1, leaf->data[i]);
 	}
 	template<class KeyType, class DataType, int order>
 		void BPlusTree<KeyType, DataType, order>::PrintLeaves(void)

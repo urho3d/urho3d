@@ -17,7 +17,6 @@
 /// \brief SocketLayer class implementation
 ///
 
-
 #include "slikenet/SocketLayer.h"
 #include "slikenet/assert.h"
 #include "slikenet/types.h"
@@ -68,7 +67,7 @@ using namespace pp;
 #include <arpa/inet.h>
 #include <errno.h>  // error numbers
 #include <stdio.h> // RAKNET_DEBUG_PRINTF
-#if !defined(__ANDROID__)
+#if !defined(ANDROID)
 #include <ifaddrs.h>
 #endif
 #include <netinet/in.h>
@@ -118,22 +117,16 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 	sock_opt=0;
 	setsockopt__(listenSocket, SOL_SOCKET, SO_LINGER, ( char * ) & sock_opt, sizeof ( sock_opt ) );
 
-
-
 	// This doesn't make much difference: 10% maybe
 	// Not supported on console 2
 	sock_opt=1024*16;
 	setsockopt__(listenSocket, SOL_SOCKET, SO_SNDBUF, ( char * ) & sock_opt, sizeof ( sock_opt ) );
-
 
 	if (blockingSocket==false)
 	{
 #ifdef _WIN32
 		unsigned long nonblocking = 1;
 		ioctlsocket__(listenSocket, FIONBIO, &nonblocking );
-
-
-
 #else
 		fcntl( listenSocket, F_SETFL, O_NONBLOCK );
 #endif
@@ -162,23 +155,15 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 			LocalFree( messageBuffer );
 #endif
 #endif
-
 		}
-
 	}
-
 #endif
 }
  
-
 SLNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, SLNet::RakString inIpString)
 {
 	SLNet::RakString netMaskString;
 	SLNet::RakString ipString;
-
-
-
-
 
 #if   defined(WINDOWS_STORE_RT)
 	RakAssert("Not yet supported" && 0);
@@ -265,85 +250,8 @@ SLNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, SLNe
 
 	close(fd2);
 	return "";
-
 #endif
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #if   defined(WINDOWS_STORE_RT)
 void GetMyIP_WinRT( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
@@ -391,7 +299,6 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)aip->ai_addr;
 			memcpy(&addresses[idx].address.addr4,ipv6,sizeof(sockaddr_in6));
 		}
-
 	}
 
 	freeaddrinfo(servinfo); // free the linked-list
@@ -413,7 +320,7 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 		//Free the buffer.
 		LocalFree( messageBuffer );
 	#endif
-		return ;
+		return;
 	}
 	while (curAddress != NULL && idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS)
 	{
@@ -432,18 +339,10 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 		idx++;
 	}
 }
-
 #endif
-
 
 void SocketLayer::GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 {
-
-
-
-
-
-
 #if   defined(WINDOWS_STORE_RT)
 	GetMyIP_WinRT(addresses);
 #elif defined(_WIN32)
@@ -454,7 +353,6 @@ void SocketLayer::GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_ID
 #endif
 }
 
-
 /*
 unsigned short SocketLayer::GetLocalPort(RakNetSocket *s)
 {
@@ -463,6 +361,7 @@ unsigned short SocketLayer::GetLocalPort(RakNetSocket *s)
 	return sa.GetPort();
 }
 */
+
 unsigned short SocketLayer::GetLocalPort(__UDPSOCKET__ s)
 {
 	SystemAddress sa;
@@ -499,12 +398,14 @@ void SocketLayer::GetSystemAddress_Old ( __UDPSOCKET__ s, SystemAddress *systemA
 	systemAddressOut->address.addr4.sin_addr.s_addr=sa.sin_addr.s_addr;
 #endif
 }
+
 /*
 void SocketLayer::GetSystemAddress_Old ( RakNetSocket *s, SystemAddress *systemAddressOut )
 {
 	return GetSystemAddress_Old(s->s, systemAddressOut);
 }
 */
+
 void SocketLayer::GetSystemAddress ( __UDPSOCKET__ s, SystemAddress *systemAddressOut )
 {
 #if RAKNET_SUPPORT_IPV6!=1
@@ -556,6 +457,7 @@ void SocketLayer::GetSystemAddress ( __UDPSOCKET__ s, SystemAddress *systemAddre
 	}
 #endif // #if RAKNET_SUPPORT_IPV6!=1
 }
+
 /*
 void SocketLayer::GetSystemAddress ( RakNetSocket *s, SystemAddress *systemAddressOut )
 {
@@ -573,9 +475,7 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 	SystemAddress ipList[ MAXIMUM_NUMBER_OF_INTERNAL_IDS ];
 	SocketLayer::GetMyIP( ipList );
 
-
 	if (ipProto==AF_UNSPEC)
-
 	{
 		ipList[0].ToString(false,firstBindable,static_cast<size_t>(128));
 		return true;
@@ -603,5 +503,4 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 // 	);
 	ipList[l].ToString(false,firstBindable,static_cast<size_t>(128));
 	return true;
-
 }

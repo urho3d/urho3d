@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2019, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -581,12 +581,13 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 	}
 #endif
 
-// #if !defined(_XBOX) && !defined(_XBOX_720_COMPILE_AS_WINDOWS) && !defined(X360)
 	for (i=0; i < MAXIMUM_NUMBER_OF_INTERNAL_IDS; i++)
 	{
 		if (ipList[i]==UNASSIGNED_SYSTEM_ADDRESS)
 			break;
 #if !defined(__native_client__) && !defined(WINDOWS_STORE_RT)
+		// #high - using the 1st socket here is flawed - in cases of having multiple sockets (f.e. different ports and different families (i.e. IPv4/IPv6) we must use the proper
+		//         socket for each IP address in the list
 		if (socketList[0]->IsBerkleySocket())
 		{
 			unsigned short port = ((RNS2_Berkley*)socketList[0])->GetBoundAddress().GetPort();
@@ -596,8 +597,6 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 #endif
 // 		ipList[i].SetPort(((RNS2_360_720*)socketList[0])->GetBoundAddress().GetPort());
 	}
-// #endif
-
 
 	if ( maximumNumberOfPeers == 0 )
 	{
@@ -1658,7 +1657,17 @@ void RakPeer::CloseConnection( const AddressOrGUID target, bool sendDisconnectio
 	}
 	*/
 
-	CloseConnectionInternal(target, sendDisconnectionNotification, false, orderingChannel, disconnectionNotificationPriority);
+	const SystemAddress address = (target.systemAddress == UNASSIGNED_SYSTEM_ADDRESS) ? GetSystemAddressFromGuid(target.rakNetGuid) : target.systemAddress;
+	int remoteSystemListIndex = GetIndexFromSystemAddress(address);
+	// fallback to index 0 (i.e. preserve old behavior for now)
+	// #med - review this whole design here
+	if (remoteSystemListIndex == -1) {
+		remoteSystemListIndex = 0;
+	}
+
+	// #med - review this assertion - is it architecturally ensured?
+	RakAssert(remoteSystemList[remoteSystemListIndex].rakNetSocket != nullptr);
+	CloseConnectionInternal2(target, sendDisconnectionNotification, false, orderingChannel, disconnectionNotificationPriority, *(remoteSystemList[remoteSystemListIndex].rakNetSocket));
 
 	// 12/14/09 Return ID_CONNECTION_LOST when calling CloseConnection with sendDisconnectionNotification==false, elsewise it is never returned
 	if (sendDisconnectionNotification==false && GetConnectionState(target)==IS_CONNECTED)
@@ -1666,8 +1675,8 @@ void RakPeer::CloseConnection( const AddressOrGUID target, bool sendDisconnectio
 		Packet *packet=AllocPacket(sizeof( char ), _FILE_AND_LINE_);
 		packet->data[ 0 ] = ID_CONNECTION_LOST; // DeadConnection
 		packet->guid = target.rakNetGuid==UNASSIGNED_RAKNET_GUID ? GetGuidFromSystemAddress(target.systemAddress) : target.rakNetGuid;
-		packet->systemAddress = target.systemAddress==UNASSIGNED_SYSTEM_ADDRESS ? GetSystemAddressFromGuid(target.rakNetGuid) : target.systemAddress;
-		packet->systemAddress.systemIndex = (SystemIndex) GetIndexFromSystemAddress(packet->systemAddress);
+		packet->systemAddress = address;
+		packet->systemAddress.systemIndex = static_cast<SystemIndex>(remoteSystemListIndex);
 		packet->guid.systemIndex=packet->systemAddress.systemIndex;
 		packet->wasGeneratedLocally=true; // else processed twice
 		AddPacketToProducer(packet);
@@ -2573,22 +2582,17 @@ int RakPeer::GetMTUSize( const SystemAddress target ) const
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 unsigned int RakPeer::GetNumberOfAddresses( void )
 {
-
-	if (IsActive()==false)
-	{
+	if (IsActive() == false) {
 		FillIPList();
 	}
 
-	unsigned int i = 0;
+	for (unsigned int i = 0; i < MAXIMUM_NUMBER_OF_INTERNAL_IDS && ipList[i] != UNASSIGNED_SYSTEM_ADDRESS; i++) {
+		if (ipList[i] == UNASSIGNED_SYSTEM_ADDRESS) {
+			return i; // first unassigned address entry found -> end of address list reached
+		}
+	}
 
-	while ( ipList[ i ]!=UNASSIGNED_SYSTEM_ADDRESS )
-		i++;
-
-	return i;
-
-
-
-
+	return MAXIMUM_NUMBER_OF_INTERNAL_IDS;
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2626,7 +2630,7 @@ bool RakPeer::IsLocalIP( const char *ip )
 	if (ip==0 || ip[0]==0)
 		return false;
 
-
+	// #med - this should also check for "::1" here in IPv6 mode
 	if (strcmp(ip, "127.0.0.1")==0 || strcmp(ip, "localhost")==0)
 		return true;
 
@@ -3801,12 +3805,12 @@ unsigned int RakPeer::RemoteSystemLookupHashIndex(const SystemAddress &sa) const
 void RakPeer::ReferenceRemoteSystem(const SystemAddress &sa, unsigned int remoteSystemListIndex)
 {
 // #ifdef _DEBUG
-// 	for ( int remoteSystemIndex = 0; remoteSystemIndex < maximumNumberOfPeers; ++remoteSystemIndex )
+// 	for ( unsigned int remoteSystemIndex = 0; remoteSystemIndex < maximumNumberOfPeers; ++remoteSystemIndex )
 // 	{
 // 		if (remoteSystemList[remoteSystemIndex].isActive )
 // 		{
-// 			unsigned int hashIndex = GetRemoteSystemIndex(remoteSystemList[remoteSystemIndex].systemAddress);
-// 			RakAssert(hashIndex==remoteSystemIndex);
+// 			unsigned int debugHashIndex = GetRemoteSystemIndex(remoteSystemList[remoteSystemIndex].systemAddress);
+// 			RakAssert(debugHashIndex==remoteSystemIndex);
 // 		}
 // 	}
 // #endif
@@ -3825,14 +3829,14 @@ void RakPeer::ReferenceRemoteSystem(const SystemAddress &sa, unsigned int remote
 	DereferenceRemoteSystem(sa);
 
 // #ifdef _DEBUG
-// 	for ( int remoteSystemIndex = 0; remoteSystemIndex < maximumNumberOfPeers; ++remoteSystemIndex )
+// 	for ( unsigned int remoteSystemIndex = 0; remoteSystemIndex < maximumNumberOfPeers; ++remoteSystemIndex )
 // 	{
 // 		if (remoteSystemList[remoteSystemIndex].isActive )
 // 		{
-// 			unsigned int hashIndex = GetRemoteSystemIndex(remoteSystemList[remoteSystemIndex].systemAddress);
-// 			if (hashIndex!=remoteSystemIndex)
+// 			unsigned int debugHashIndex = GetRemoteSystemIndex(remoteSystemList[remoteSystemIndex].systemAddress);
+// 			if (debugHashIndex!=remoteSystemIndex)
 // 			{
-// 				RakAssert(hashIndex==remoteSystemIndex);
+// 				RakAssert(debugHashIndex==remoteSystemIndex);
 // 			}
 // 		}
 // 	}
@@ -3865,12 +3869,12 @@ void RakPeer::ReferenceRemoteSystem(const SystemAddress &sa, unsigned int remote
 	}
 
 // #ifdef _DEBUG
-// 	for ( int remoteSystemIndex = 0; remoteSystemIndex < maximumNumberOfPeers; ++remoteSystemIndex )
+// 	for ( unsigned int remoteSystemIndex = 0; remoteSystemIndex < maximumNumberOfPeers; ++remoteSystemIndex )
 // 	{
 // 		if (remoteSystemList[remoteSystemIndex].isActive )
 // 		{
-// 			unsigned int hashIndex = GetRemoteSystemIndex(remoteSystemList[remoteSystemIndex].systemAddress);
-// 			RakAssert(hashIndex==remoteSystemIndex);
+// 			unsigned int debugHashIndex = GetRemoteSystemIndex(remoteSystemList[remoteSystemIndex].systemAddress);
+// 			RakAssert(debugHashIndex==remoteSystemIndex);
 // 		}
 // 	}
 // #endif
@@ -4111,9 +4115,22 @@ void RakPeer::PingInternal( const SystemAddress target, bool performImmediate, P
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void RakPeer::CloseConnectionInternal( const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification, bool performImmediate, unsigned char orderingChannel, PacketPriority disconnectionNotificationPriority )
 {
-#ifdef _DEBUG
 	RakAssert(orderingChannel < 32);
-#endif
+
+	if (systemIdentifier.IsUndefined())
+		return;
+
+	if (remoteSystemList == 0 || endThreads == true)
+		return;
+
+	// #med - this is flawed and needs to be resolved properly - socketList[0] is not correct here
+	CloseConnectionInternal2(systemIdentifier, sendDisconnectionNotification, performImmediate, orderingChannel, disconnectionNotificationPriority, *(socketList[0]));
+}
+
+// #med - better integrate directly in CloseConnectionInternal2()
+void RakPeer::CloseConnectionInternal2(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification, bool performImmediate, unsigned char orderingChannel, PacketPriority disconnectionNotificationPriority, RakNetSocket2& socket)
+{
+	RakAssert(orderingChannel < 32);
 
 	if (systemIdentifier.IsUndefined())
 		return;
@@ -4131,8 +4148,9 @@ void RakPeer::CloseConnectionInternal( const AddressOrGUID& systemIdentifier, bo
 		target=GetSystemAddressFromGuid(systemIdentifier.rakNetGuid);
 	}
 
-	if (target!=UNASSIGNED_SYSTEM_ADDRESS && performImmediate)
-		target.FixForIPVersion(socketList[0]->GetBoundAddress());
+	if (target != UNASSIGNED_SYSTEM_ADDRESS && performImmediate) {
+		target.FixForIPVersion(socket.GetBoundAddress());
+	}
 
 	if (sendDisconnectionNotification)
 	{
@@ -4173,6 +4191,8 @@ void RakPeer::CloseConnectionInternal( const AddressOrGUID& systemIdentifier, bo
 			bcs=bufferedCommands.Allocate( _FILE_AND_LINE_ );
 			bcs->command=BufferedCommandStruct::BCS_CLOSE_CONNECTION;
 			bcs->systemIdentifier=target;
+			// #med - review whether this is safe here - can't the socket be closed/released before its used?
+			bcs->socket = &socket;
 			bcs->data=0;
 			bcs->orderingChannel=orderingChannel;
 			bcs->priority=disconnectionNotificationPriority;
@@ -5406,6 +5426,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 	return false;
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// #med - deprecate this overload --- socketList[0] is not really ensured to be the correctly bound socket at all!
 void ProcessNetworkPacket( SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, SLNet::TimeUS timeRead, BitStream &updateBitStream )
 {
 	ProcessNetworkPacket(systemAddress,data,length,rakPeer,rakPeer->socketList[0],timeRead, updateBitStream);
@@ -5571,6 +5592,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 
 	#if   defined(WINDOWS_STORE_RT)
 	#elif defined(_WIN32)
+		// #high - review this - this is hardly correct to only work with the first socket here...
 		if (socketList[0]->GetSocketType()==RNS2T_WINDOWS && ((RNS2_Windows*)socketList[0])->GetSocketLayerOverride())
 		{
 			int len;
@@ -5625,7 +5647,8 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 		}
 		else if (bcs->command==BufferedCommandStruct::BCS_CLOSE_CONNECTION)
 		{
-			CloseConnectionInternal(bcs->systemIdentifier, false, true, bcs->orderingChannel, bcs->priority);
+			RakAssert(bcs->socket != nullptr);
+			CloseConnectionInternal2(bcs->systemIdentifier, false, true, bcs->orderingChannel, bcs->priority, *(bcs->socket));
 		}
 		else if (bcs->command==BufferedCommandStruct::BCS_CHANGE_SYSTEM_ADDRESS)
 		{
@@ -5908,7 +5931,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 				// (and trying to resend them unnecessarily)
 				remoteSystem->reliabilityLayer.UpdateAndForceACKs(remoteSystem->rakNetSocket, systemAddress, remoteSystem->MTUSize, timeNS, maxOutgoingBPS, pluginListNTS, &rnr, updateBitStream);
 
-				CloseConnectionInternal( systemAddress, false, true, 0, LOW_PRIORITY );
+				CloseConnectionInternal2(systemAddress, false, true, 0, LOW_PRIORITY, *(remoteSystem->rakNetSocket));
 				continue;
 			}
 
@@ -5953,7 +5976,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 					}
 					else
 					{
-						CloseConnectionInternal( systemAddress, false, true, 0, LOW_PRIORITY );
+						CloseConnectionInternal2(systemAddress, false, true, 0, LOW_PRIORITY, *(remoteSystem->rakNetSocket));
 #ifdef _DO_PRINTF
 						RAKNET_DEBUG_PRINTF("Temporarily banning %i:%i for sending nonsense data\n", systemAddress);
 #endif

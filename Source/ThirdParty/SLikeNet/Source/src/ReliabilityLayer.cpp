@@ -151,39 +151,38 @@ struct DatagramHeaderFormat
 		//		return;
 
 		b->Write(true); // IsValid
-		if (isACK)
-		{
-			b->Write(true);
+		if (isACK) {
+			b->Write(true); // IsACK
 			b->Write(hasBAndAS);
 			b->AlignWriteToByteBoundary();
-#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			SLNet::TimeMS timeMSLow=(SLNet::TimeMS) sourceSystemTime&0xFFFFFFFF; b->Write(timeMSLow);
+#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS == 1
+			SLNet::TimeMS timeMSLow = (SLNet::TimeMS)sourceSystemTime&0xFFFFFFFF;
+			b->Write(timeMSLow);
 #endif
-			if (hasBAndAS)
-			{
+			if (hasBAndAS) {
 				//		b->Write(B);
 				b->Write(AS);
 			}
 		}
-		else if (isNAK)
-		{
-			b->Write(false);
-			b->Write(true);
+		else if (isNAK) {
+			b->Write(false); // isACK
+			b->Write(true);  // isNAK
 		}
-		else
-		{
-			b->Write(false);
-			b->Write(false);
+		else {
+			b->Write(false); // isACK
+			b->Write(false); // isNAK
 			b->Write(isPacketPair);
 			b->Write(isContinuousSend);
 			b->Write(needsBAndAs);
 			b->AlignWriteToByteBoundary();
-#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			SLNet::TimeMS timeMSLow=(SLNet::TimeMS) sourceSystemTime&0xFFFFFFFF; b->Write(timeMSLow);
+#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS == 1
+			SLNet::TimeMS timeMSLow = (SLNet::TimeMS)sourceSystemTime&0xFFFFFFFF;
+			b->Write(timeMSLow);
 #endif
 			b->Write(datagramNumber);
 		}
 	}
+
 	void Deserialize(SLNet::BitStream *b)
 	{
 		// Not endian safe
@@ -192,35 +191,32 @@ struct DatagramHeaderFormat
 
 		b->Read(isValid);
 		b->Read(isACK);
-		if (isACK)
-		{
-			isNAK=false;
-			isPacketPair=false;
+		if (isACK) {
+			isNAK = false;
+			isPacketPair = false;
 			b->Read(hasBAndAS);
 			b->AlignReadToByteBoundary();
-#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			SLNet::TimeMS timeMS; b->Read(timeMS); sourceSystemTime=(CCTimeType) timeMS;
+#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS == 1
+			SLNet::TimeMS timeMS;
+			b->Read(timeMS);
+			sourceSystemTime = (CCTimeType)timeMS;
 #endif
-			if (hasBAndAS)
-			{
+			if (hasBAndAS) {
 				//			b->Read(B);
 				b->Read(AS);
 			}
 		}
-		else
-		{
+		else {
 			b->Read(isNAK);
-			if (isNAK)
-			{
-				isPacketPair=false;
+			if (isNAK) {
+				isPacketPair = false;
 			}
-			else
-			{
+			else {
 				b->Read(isPacketPair);
 				b->Read(isContinuousSend);
 				b->Read(needsBAndAs);
 				b->AlignReadToByteBoundary();
-#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
+#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS == 1
 				SLNet::TimeMS timeMS; b->Read(timeMS); sourceSystemTime=(CCTimeType) timeMS;
 #endif
 				b->Read(datagramNumber);
@@ -238,7 +234,7 @@ struct DatagramHeaderFormat
 
 //#define DEBUG_SPLIT_PACKET_PROBLEMS
 #if defined (DEBUG_SPLIT_PACKET_PROBLEMS)
-static int waitFlag=-1;
+static int waitFlag = -1;
 #endif
 
 using namespace SLNet;
@@ -252,19 +248,21 @@ SplitPacketSort::SplitPacketSort() :
 
 SplitPacketSort::~SplitPacketSort()
 {
-	if (m_allocationSize)
+	if (m_allocationSize) {
 		OP_DELETE_ARRAY(m_data, _FILE_AND_LINE_);
+	}
 }
 
 void SplitPacketSort::Preallocate(InternalPacket *internalPacket, const char *file, unsigned int line)
 {
 	RakAssert(m_data == nullptr);
 	m_allocationSize = internalPacket->splitPacketCount;
-	m_data = OP_NEW_ARRAY<InternalPacket*>(m_allocationSize, file, line);
+	m_data = OP_NEW_ARRAY<InternalPacket*>((int)m_allocationSize, file, line);
 	m_packetId = internalPacket->splitPacketId;
 
-	for (size_t i = 0; i < m_allocationSize; ++i)
+	for (size_t i = 0; i < m_allocationSize; ++i) {
 		m_data[i] = nullptr;
+	}
 }
 
 bool SplitPacketSort::AllPacketsAdded() const
@@ -373,14 +371,14 @@ ReliabilityLayer::ReliabilityLayer()
 
 #ifdef _DEBUG
 	// Wait longer to disconnect in debug so I don't get disconnected while tracing
-	timeoutTime=30000;
+	timeoutTime = 30000;
 #else
-	timeoutTime=10000;
+	timeoutTime = 10000;
 #endif
 
 #ifdef _DEBUG
-	minExtraPing=extraPingVariance=0;
-	packetloss=(double) minExtraPing;	
+	minExtraPing = extraPingVariance = 0;
+	packetloss = (double)minExtraPing;
 #endif
 
 
@@ -408,38 +406,37 @@ ReliabilityLayer::~ReliabilityLayer()
 //-------------------------------------------------------------------------------------------------------
 // Resets the layer for reuse
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::Reset( bool resetVariables, int MTUSize, bool _useSecurity )
+void ReliabilityLayer::Reset(bool resetVariables, int mtuSize, bool _useSecurity)
 {
-
-	FreeMemory( true ); // true because making a memory reset pending in the update cycle causes resets after reconnects.  Instead, just call Reset from a single thread
-	if (resetVariables)
-	{
+	FreeMemory(true); // true because making a memory reset pending in the update cycle causes resets after reconnects.  Instead, just call Reset from a single thread
+	if (resetVariables) {
 		InitializeVariables();
 
-#if LIBCAT_SECURITY==1
+#if LIBCAT_SECURITY == 1
 		useSecurity = _useSecurity;
 
-		if (_useSecurity)
-			MTUSize -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+		if (_useSecurity) {
+			mtuSize -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+		}
 #else
 		(void) _useSecurity;
 #endif // LIBCAT_SECURITY
-		congestionManager.Init(SLNet::GetTimeUS(), MTUSize - UDP_HEADER_SIZE);
+		congestionManager.Init(SLNet::GetTimeUS(), mtuSize - UDP_HEADER_SIZE);
 	}
 }
 
 //-------------------------------------------------------------------------------------------------------
 // Set the time, in MS, to use before considering ourselves disconnected after not being able to deliver a reliable packet
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::SetTimeoutTime(SLNet::TimeMS time )
+void ReliabilityLayer::SetTimeoutTime(SLNet::TimeMS time)
 {
-	timeoutTime=time;
+	timeoutTime = time;
 }
 
 //-------------------------------------------------------------------------------------------------------
 // Returns the value passed to SetTimeoutTime. or the default if it was never called
 //-------------------------------------------------------------------------------------------------------
-SLNet::TimeMS ReliabilityLayer::GetTimeoutTime(void)
+SLNet::TimeMS ReliabilityLayer::GetTimeoutTime()
 {
 	return timeoutTime;
 }
@@ -447,7 +444,7 @@ SLNet::TimeMS ReliabilityLayer::GetTimeoutTime(void)
 //-------------------------------------------------------------------------------------------------------
 // Initialize the variables
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::InitializeVariables( void )
+void ReliabilityLayer::InitializeVariables()
 {
 	memset( orderedWriteIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType));
 	memset( sequencedWriteIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType) );
@@ -699,31 +696,27 @@ void ReliabilityLayer::FreeThreadSafeMemory( void )
 //split packets
 //-------------------------------------------------------------------------------------------------------
 bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
-	const char *buffer, unsigned int length, SystemAddress &systemAddress, DataStructures::List<PluginInterface2*> &messageHandlerList, int MTUSize,
-	RakNetSocket2 *s, RakNetRandom *rnr, CCTimeType timeRead,
-	BitStream &updateBitStream)
+	const char *buffer, unsigned int length, SystemAddress &systemAddress, DataStructures::List<PluginInterface2*> &messageHandlerList, int mtuSize,
+	RakNetSocket2 *s, RakNetRandom *rnr, CCTimeType timeRead, BitStream &updateBitStream)
 {
-#ifdef _DEBUG
-	RakAssert( !( buffer == 0 ) );
+	// unreferenced parameters
+	(void)mtuSize;
+
+	RakAssert(buffer != nullptr);
+
+#if CC_TIME_TYPE_BYTES == 4
+	timeRead /= 1000;
 #endif
 
-#if CC_TIME_TYPE_BYTES==4
-	timeRead/=1000;
-#endif
+	bpsMetrics[(int)ACTUAL_BYTES_RECEIVED].Push1(timeRead, length);
 
-
-	bpsMetrics[(int) ACTUAL_BYTES_RECEIVED].Push1(timeRead,length);
-
-	(void) MTUSize;
-
-	if ( length <= 2 || buffer == 0 )   // Length of 1 is a connection request resend that we just ignore
-	{
-		for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-			messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("length <= 2 || buffer == 0", BYTES_TO_BITS(length), systemAddress, true);
+	if (length <= 2 || buffer == nullptr) { // Length of 1 is a connection request resend that we just ignore
+		for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
+			messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("length <= 2 || buffer == nullptr", BYTES_TO_BITS(length), systemAddress, true);
 		return true;
 	}
 
-	timeLastDatagramArrived= SLNet::GetTimeMS();
+	timeLastDatagramArrived = SLNet::GetTimeMS();
 
 	//	CCTimeType time;
 //	bool indexFound;
@@ -731,19 +724,19 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 	DatagramSequenceNumberType holeCount;
 	unsigned i;
 
-#if LIBCAT_SECURITY==1
-	if (useSecurity)
-	{
+#if LIBCAT_SECURITY == 1
+	if (useSecurity) {
 		unsigned int received = length;
 
-		if (!auth_enc.Decrypt((cat::u8*)buffer, received))
+		if (!auth_enc.Decrypt((cat::u8*)buffer, received)) {
 			return false;
+		}
 
 		length = received;
 	}
 #endif
 
-	SLNet::BitStream socketData( (unsigned char*) buffer, length, false ); // Convert the incoming data to a bitstream for easy parsing
+	SLNet::BitStream socketData((unsigned char*)buffer, length, false); // Convert the incoming data to a bitstream for easy parsing
 	//	time = SLNet::GetTimeUS();
 
 	// Set to the current time if it is not zero, and we get incoming data
@@ -752,22 +745,21 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 
 	DatagramHeaderFormat dhf;
 	dhf.Deserialize(&socketData);
-	if (dhf.isValid==false)
-	{
-		for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
-			messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("dhf.isValid==false", BYTES_TO_BITS(length), systemAddress, true);
+	if (!dhf.isValid) {
+		for (unsigned int messageHandlerIndex = 0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++) {
+			messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("!dhf.isValid", BYTES_TO_BITS(length), systemAddress, true);
+		}
 
 		return true;
 	}
-	if (dhf.isACK)
-	{
+	if (dhf.isACK) {
 		DatagramSequenceNumberType datagramNumber;
 		// datagramNumber=dhf.datagramNumber;
 
-#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-		SLNet::TimeMS timeMSLow=(SLNet::TimeMS) timeRead&0xFFFFFFFF;
+#if INCLUDE_TIMESTAMP_WITH_DATAGRAMS == 1
+		SLNet::TimeMS timeMSLow = (SLNet::TimeMS)timeRead&0xFFFFFFFF;
 		CCTimeType rtt = timeMSLow-dhf.sourceSystemTime;
-#if CC_TIME_TYPE_BYTES==4
+#if CC_TIME_TYPE_BYTES == 4
 		if (rtt > 10000)
 #else
 		if (rtt > 10000000)
@@ -778,14 +770,13 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 		}
 		//	RakAssert(rtt < 500000);
 		//	printf("%i ", (SLNet::TimeMS)(rtt/1000));
-		ackPing=rtt;
+		ackPing = rtt;
 #endif
 
 #ifdef _DEBUG
-		if (dhf.hasBAndAS==false)
-		{
+		if (!dhf.hasBAndAS) {
 			//			dhf.B=0;
-			dhf.AS=0;
+			dhf.AS = 0;
 		}
 #endif
 		//		congestionManager.OnAck(timeRead, rtt, dhf.hasBAndAS, dhf.B, dhf.AS, totalUserDataBytesAcked );
@@ -1025,8 +1016,9 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 
 					if (holeCount == (DatagramSequenceNumberType)0) {
 						// Got what we were expecting
-						if (hasReceivedPacketQueue.Size())
+						if (hasReceivedPacketQueue.Size()) {
 							hasReceivedPacketQueue.Pop();
+						}
 						++receivedPacketsBaseIndex;
 					} else if (holeCount > typeRange/(DatagramSequenceNumberType) 2) {
 						bpsMetrics[(int) USER_MESSAGE_BYTES_RECEIVED_IGNORED].Push1(timeRead,BITS_TO_BYTES(internalPacket->dataBitLength));

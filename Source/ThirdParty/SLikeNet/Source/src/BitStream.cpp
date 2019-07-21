@@ -15,8 +15,10 @@
 
 /// \file
 ///
-
 #include "slikenet/BitStream.h"
+
+#include <float.h>
+#include <memory.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,26 +26,16 @@
 #include "slikenet/SocketIncludes.h"
 #include "slikenet/defines.h"
 
-
-
 #if   defined(_WIN32)
 #include "slikenet/WindowsIncludes.h"
-#include <memory.h>
 #include <cmath>
-#include <float.h>
-
-
-
-
 #else
 #include <arpa/inet.h>
-#include <memory.h>
-#if defined(__ANDROID__)
+#if defined(ANDROID)
 #include <math.h>
 #else
 #include <cmath>
 #endif
-#include <float.h>
 #endif
 #include "slikenet/linux_adapter.h"
 #include "slikenet/osx_adapter.h"

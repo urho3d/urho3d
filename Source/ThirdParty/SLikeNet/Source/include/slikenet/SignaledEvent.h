@@ -60,7 +60,7 @@ protected:
 #else
 	SimpleMutex isSignaledMutex;
 	bool isSignaled;
-#if !defined(__ANDROID__)
+#if !defined(ANDROID)
 	pthread_condattr_t condAttr;
 #endif
 	pthread_cond_t eventList;
