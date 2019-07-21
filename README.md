@@ -157,6 +157,7 @@ Urho3D development, contributions and bugfixes by:
 - rifai
 - rikorin
 - skaiware
+- smortex
 - ssinai1
 - sssooonnnggg
 - svifylabs
