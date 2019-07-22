@@ -60,6 +60,9 @@ for a in $@; do
         -DARM=1)
             if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Arm.cmake"; fi
             ;;
+        -DFREEBSD=1)
+            if [[ $(uname -s) =~ ^Linux ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/FreeBSD.cmake"; fi
+            ;;
         -DMINGW=1)
             OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/MinGW.cmake"
             ;;
