@@ -7,6 +7,8 @@ class ToolTip : public UIElement
 
     void Reset();
 
+    void AddAltTarget(UIElement* target);
+
     void SetDelay(float delay);
     
     float GetDelay() const;
