@@ -5,6 +5,8 @@ class ToolTip : public UIElement
     ToolTip();
     virtual ~ToolTip();
 
+    void Reset();
+
     void SetDelay(float delay);
     
     float GetDelay() const;

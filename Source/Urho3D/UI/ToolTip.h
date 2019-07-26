@@ -44,6 +44,9 @@ public:
     /// Perform UI element update.
     void Update(float timeStep) override;
 
+    /// Hide tooltip if visible and reset parentage.
+    void Reset();
+
     /// Set the delay in seconds until the tooltip shows once hovering. Set zero to use the default from the UI subsystem.
     void SetDelay(float delay);
 

@@ -89,15 +89,20 @@ void ToolTip::Update(float timeStep)
     }
     else
     {
-        if (IsVisible() && parent_ == root)
-        {
-            SetParent(target_);
-            SetPosition(originalPosition_);
-            SetVisible(false);
-        }
-        parentHovered_ = false;
-        displayAt_.Reset();
+        Reset();
     }
+}
+
+void ToolTip::Reset()
+{
+    if (IsVisible() && parent_ == GetRoot())
+    {
+        SetParent(target_);
+        SetPosition(originalPosition_);
+        SetVisible(false);
+    }
+    parentHovered_ = false;
+    displayAt_.Reset();
 }
 
 void ToolTip::SetDelay(float delay)
