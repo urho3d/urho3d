@@ -195,7 +195,7 @@ public:
     /// Return float value.
     float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : defaultValue; }
     /// Return double value.
-    double GetDouble(double defaultValue = 0.0f) const { return IsNumber() ? numberValue_ : defaultValue; }
+    double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
     /// Return string value.
     const String& GetString(String defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
     /// Return C string value.
