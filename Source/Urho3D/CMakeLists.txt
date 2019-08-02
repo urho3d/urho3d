@@ -110,10 +110,6 @@ if (URHO3D_HASH_DEBUG)
     add_definitions (-DURHO3D_HASH_DEBUG)
 endif ()
 
-if (URHO3D_SSL)
-    add_definitions (-DURHO3D_SSL)
-endif ()
-
 # Define source files
 foreach (DIR IK Navigation Network Physics Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)

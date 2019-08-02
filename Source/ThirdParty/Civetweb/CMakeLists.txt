@@ -58,43 +58,43 @@ set (INCLUDE_DIRS include)
 setup_library ()
 
 # Link OpenSSL libraries
-if (URHO3D_SSL)
-    if (URHO3D_SSL_DYNAMIC)
-        add_definitions(-DNO_SSL_DL)
-        # Unix systems can define the dynamic library names to load
-        if (UNIX AND NOT DARWIN)
-            add_definitions(-DCRYPTO_LIB="libcrypto.so")
-            add_definitions(-DSSL_LIB="libssl.so")
-        endif()
-        find_library(LIBDL_LIBRARIES dl)
-        include(FindPackageHandleStandardArgs)
-        find_package_handle_standard_args(LibDl DEFAULT_MSG LIBDL_LIBRARIES LIBDL_INCLUDE_DIRS)
-        mark_as_advanced(LIBDL_INCLUDE_DIRS LIBDL_LIBRARIES)
-        find_path(LIBDL_INCLUDE_DIRS
-                NAMES dlfcn.h
-                PATHS ${LIBDL_ROOT}/include/
-                )
 
-        if(LIBDL_FOUND)
-            if(NOT TARGET LIBDL::LIBDL)
-                add_library(LIBDL::LIBDL UNKNOWN IMPORTED)
-                set_target_properties(LIBDL::LIBDL PROPERTIES
-                        IMPORTED_LOCATION "${LIBDL_LIBRARIES}"
-                        INTERFACE_INCLUDE_DIRECTORIES "${LIBDL_INCLUDE_DIRS}")
-            endif()
+if (URHO3D_SSL_DYNAMIC)
+    add_definitions(-DNO_SSL_DL)
+    # Unix systems can define the dynamic library names to load
+    if (UNIX AND NOT DARWIN)
+        add_definitions(-DCRYPTO_LIB="libcrypto.so")
+        add_definitions(-DSSL_LIB="libssl.so")
+    endif()
+    find_library(LIBDL_LIBRARIES dl)
+    include(FindPackageHandleStandardArgs)
+    find_package_handle_standard_args(LibDl DEFAULT_MSG LIBDL_LIBRARIES LIBDL_INCLUDE_DIRS)
+    mark_as_advanced(LIBDL_INCLUDE_DIRS LIBDL_LIBRARIES)
+    find_path(LIBDL_INCLUDE_DIRS
+            NAMES dlfcn.h
+            PATHS ${LIBDL_ROOT}/include/
+            )
+
+    if(LIBDL_FOUND)
+        if(NOT TARGET LIBDL::LIBDL)
+            add_library(LIBDL::LIBDL UNKNOWN IMPORTED)
+            set_target_properties(LIBDL::LIBDL PROPERTIES
+                    IMPORTED_LOCATION "${LIBDL_LIBRARIES}"
+                    INTERFACE_INCLUDE_DIRECTORIES "${LIBDL_INCLUDE_DIRS}")
         endif()
-        if (LIBDL_FOUND)
-            target_link_libraries(Civetweb -ldl)
-        endif()
-    else()
-        find_package(OpenSSL)
-        include_directories(${OPENSSL_INCLUDE_DIR})
-        message(STATUS "OpenSSL include directory: ${OPENSSL_INCLUDE_DIR}")
-        target_link_libraries(Civetweb ${OPENSSL_LIBRARIES})
-        add_definitions(-DOPENSSL_API_1_1)
+    endif()
+    if (LIBDL_FOUND)
+        target_link_libraries(Civetweb -ldl)
     endif()
 else()
-    add_definitions(-DNO_SSL=1)
+    find_package(OpenSSL)
+    if (APPLE)
+        set(OPENSSL_INCLUDE_DIR "/usr/local/opt/openssl/include")
+        set(DOPENSSL_ROOT_DIR "/usr/local/opt/openssl")
+    endif()
+    include_directories(${OPENSSL_INCLUDE_DIR})
+    message(STATUS "OpenSSL include directory: ${OPENSSL_INCLUDE_DIR}")
+    target_link_libraries(Civetweb ${OPENSSL_LIBRARIES})
 endif()
 
 # Install headers for building the Urho3D library

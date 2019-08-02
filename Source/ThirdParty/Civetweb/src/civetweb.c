@@ -16435,7 +16435,7 @@ psa = (sa.sa.sa_family == AF_INET)
                     NULL, /* No truncation check for ebuf */
                     ebuf,
                     ebuf_len,
-                    "Cannot create mutex [%s] [%d]", strerror(res), use_ssl);
+                    "Cannot create mutex [%s] [%d] [%d]", strerror(res), use_ssl, res);
 
 #if !defined(NO_SSL)
         SSL_CTX_free(conn->client_ssl_ctx);

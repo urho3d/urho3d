@@ -113,7 +113,7 @@ void HttpRequest::ThreadFunction()
     // Initiate the connection. This may block due to DNS query
     mg_connection* connection = nullptr;
 
-#if defined(URHO3D_SSL) || defined(URHO3D_SSL_DYNAMIC)
+
     if (mg_check_feature(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
         URHO3D_LOGINFO("Initializing SSL");
         if (mg_init_library(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
@@ -128,14 +128,9 @@ void HttpRequest::ThreadFunction()
         } else {
             URHO3D_LOGERROR("SSL Initialization failed!");
         }
-    } else {
-        URHO3D_LOGERROR("MG_FEATURES_SSL and/or MG_FEATURES_TLS not available!");
-    }
-#else
-    if (protocol.Compare("https", false) >= 0) {
-        URHO3D_LOGERROR("SSL support is disabled");
-    }
-#endif
+   } else {
+       URHO3D_LOGERROR("MG_FEATURES_SSL and/or MG_FEATURES_TLS not available!");
+   }
 
     if (postData_.Empty())
     {
