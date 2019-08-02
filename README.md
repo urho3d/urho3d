@@ -145,6 +145,7 @@ Urho3D development, contributions and bugfixes by:
 - marynate
 - meshonline
 - mightyCelu
+- MystMagus
 - neat3d
 - nemerle
 - ninjastone
