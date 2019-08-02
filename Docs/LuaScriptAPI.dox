@@ -3161,12 +3161,13 @@ Methods:
 - bool IsString() const
 - bool IsArray() const
 - bool IsObject() const
-- bool GetBool() const
-- int GetInt() const
-- unsigned GetUInt() const
-- float GetFloat() const
-- double GetDouble() const
+- bool GetBool(bool defaultValue = false) const
+- int GetInt(int defaultValue = 0) const
+- unsigned GetUInt(unsigned defaultValue = 0) const
+- float GetFloat(float defaultValue = 0) const
+- double GetDouble(double defaultValue = 0) const
 - const String GetString() const
+- const String GetString(const String defaultValue) const
 - const JSONArray& GetArray() const
 - const JSONObject& GetObject() const
 - Variant GetVariant() const
@@ -7093,6 +7094,8 @@ Methods:
 - ToolTip() (GC)
 - ToolTip* new()
 - void delete()
+- void Reset()
+- void AddAltTarget(UIElement* target)
 - void SetDelay(float delay)
 - float GetDelay() const
 
