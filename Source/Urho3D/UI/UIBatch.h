@@ -25,6 +25,7 @@
 #include "../Math/Color.h"
 #include "../Math/Rect.h"
 #include "../Graphics/GraphicsDefs.h"
+#include "../Graphics/Material.h"
 
 namespace Urho3D
 {
@@ -92,6 +93,8 @@ public:
     unsigned color_{};
     /// Gradient flag.
     bool useGradient_{};
+    /// Custom material
+    Material* custom_material_{};
 
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
     static Vector3 posAdjust;

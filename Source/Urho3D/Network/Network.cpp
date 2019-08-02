@@ -385,19 +385,11 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         SLNet::SocketDescriptor socket;
         // Startup local connection with max 2 incoming connections(first param) and 1 socket description (third param)
         rakPeerClient_->Startup(2, &socket, 1);
-    } else {
-        OnServerDisconnected();
     }
 
     //isServer_ = false;
     SLNet::ConnectionAttemptResult connectResult = rakPeerClient_->Connect(address.CString(), port, password_.CString(), password_.Length());
-    if (connectResult != SLNet::CONNECTION_ATTEMPT_STARTED)
-    {
-        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
-        SendEvent(E_CONNECTFAILED);
-        return false;
-    }
-    else
+    if (connectResult == SLNet::CONNECTION_ATTEMPT_STARTED)
     {
         serverConnection_ = new Connection(context_, false, rakPeerClient_->GetMyBoundAddress(), rakPeerClient_);
         serverConnection_->SetScene(scene);
@@ -407,6 +399,22 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
 
         URHO3D_LOGINFO("Connecting to server " + address + ":" + String(port) + ", Client: " + serverConnection_->ToString());
         return true;
+    }
+    else if (connectResult == SLNet::ALREADY_CONNECTED_TO_ENDPOINT) {
+        URHO3D_LOGWARNING("Already connected to server!");
+        SendEvent(E_CONNECTIONINPROGRESS);
+        return false;
+    }
+    else if (connectResult == SLNet::CONNECTION_ATTEMPT_ALREADY_IN_PROGRESS) {
+        URHO3D_LOGWARNING("Connection attempt already in progress!");
+        SendEvent(E_CONNECTIONINPROGRESS);
+        return false;
+    }
+    else
+    {
+        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
+        SendEvent(E_CONNECTFAILED);
+        return false;
     }
 }
 

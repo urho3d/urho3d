@@ -31,6 +31,11 @@ if (MINGW AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.1 AND NOT URHO3D_64BIT
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpreferred-stack-boundary=2")
 endif ()
 
+check_include_files (stdint.h HAVE_STDINT_H)
+if (HAVE_STDINT_H)
+  add_definitions (-DHAVE_STDINT_H)
+endif ()
+
 # Generate JSON compilation database format specification
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     set (CMAKE_EXPORT_COMPILE_COMMANDS 1)

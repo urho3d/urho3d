@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#ifdef __MINGW32__
+#ifdef INET_FUNCTIONS_MISSING
 #include <cstdarg>  // for va_start, va_end, va_list
 #include <cstdio>   // for FILE
 #include <ctime>    // for time_t
@@ -28,13 +28,28 @@ int inet_pton(int af, const char *src, unsigned long *dst);
 
 #endif
 
-#ifdef __linux__
+#if defined(SPRINTFS_FUNCTION_MISSING) || defined(VSNPRINTFS_FUNCTION_MISSING)
+
 #define _TRUNCATE ((size_t)-1)
 typedef int errno_t;
-
 #include <cstdarg>  // for va_start, va_end, va_list
 #include <cstdio>   // for FILE
 #include <ctime>    // for time_t
+
+#endif
+
+#ifdef VSNPRINTFS_FUNCTION_MISSING
+int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
+#endif
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
+template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
+{
+    return vsnprintf_s(buffer, BufferSize, count, format, argptr);
+}
+#endif
+
+#ifdef SPRINTFS_FUNCTION_MISSING
 
 // MS specific security enhanced functions
 errno_t fopen_s(FILE **pfile, const char *filename, const char *mode);
@@ -45,7 +60,6 @@ errno_t strcat_s(char *strDestination, size_t numberOfElements, const char *strS
 errno_t strcpy_s(char* strDestination, size_t numberOfElements, const char *strSource);
 errno_t strncat_s(char *strDest, size_t numberOfElements, const char *strSource, size_t count);
 errno_t strncpy_s(char *strDest, size_t numberOfElements, const char *strSource, size_t count);
-int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list argptr);
 errno_t wcscat_s(wchar_t *strDestination, size_t numberOfElements, const wchar_t *strSource);
 errno_t wcscpy_s(wchar_t* strDestination, size_t numberOfElements, const wchar_t *strSource);
 
@@ -83,11 +97,6 @@ template<size_t BufferSize> errno_t strncat_s(char(&strDest)[BufferSize], const 
 template<size_t BufferSize> errno_t strncpy_s(char(&strDest)[BufferSize], const char *strSource, size_t count)
 {
     return strncpy_s(strDest, BufferSize, strSource, count);
-}
-
-template<size_t BufferSize> int vsnprintf_s(char (&buffer)[BufferSize], size_t count, const char *format, va_list argptr)
-{
-    return vsnprintf_s(buffer, BufferSize, count, format, argptr);
 }
 
 #endif
