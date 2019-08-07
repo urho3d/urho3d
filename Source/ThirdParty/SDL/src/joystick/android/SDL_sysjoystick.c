@@ -454,7 +454,7 @@ SDL_SYS_JoystickDetect(void)
      * Ref: http://developer.android.com/reference/android/hardware/input/InputManager.InputDeviceListener.html
      */
     static Uint32 timeout = 0;
-    if (SDL_TICKS_PASSED(SDL_GetTicks(), timeout)) {
+    if (timeout == 0 || SDL_TICKS_PASSED(SDL_GetTicks(), timeout)) {
         timeout = SDL_GetTicks() + 3000;
         Android_JNI_PollInputDevices();
     }
@@ -493,7 +493,9 @@ JoystickByDeviceId(int device_id)
     }
     
     /* Joystick not found, try adding it */
-    SDL_SYS_JoystickDetect();
+    /* SDL_SYS_JoystickDetect may not update joystick's list up to 3 second, so call Android_JNI_PollInputDevices */
+    Android_JNI_PollInputDevices();
+    item = SDL_joylist;
     
     while (item != NULL) {
         if (item->device_id == device_id) {
