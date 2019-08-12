@@ -204,6 +204,34 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
     return success;
 }
 
+void CustomGeometry::MakeCircle(float radius, int inc, float startTheta, float endTheta)
+{
+    Clear();
+	float stepSize = (endTheta - startTheta) / (float)inc;
+	SetNumGeometries(1);
+	for (int i = 0; i < inc; i++) {
+		float curTheta1 = startTheta + ((float)i * stepSize);
+		float curTheta2 = startTheta + ((float)(i + 1) * stepSize);
+		float curX1 = radius * cos(curTheta1);
+		float curY1 = radius * sin(curTheta1);
+		float curX2 = radius * cos(curTheta2);
+		float curY2 = radius * sin(curTheta2);
+		//center point
+		DefineVertex(Urho3D::Vector3(0, 0, 0));
+		DefineTexCoord(Urho3D::Vector2(radius, radius));
+		DefineNormal(Urho3D::Vector3(0, 1, 0));
+		//first circle point
+		DefineVertex(Urho3D::Vector3(curX1, 0, curY1));
+		DefineTexCoord(Urho3D::Vector2(curX1 * 2.0f - curX1, curY1 * 2.0f - curY1));
+		DefineNormal(Urho3D::Vector3(0, 1, 0));
+		//2nd circle point
+		DefineVertex(Urho3D::Vector3(curX2, 0, curY2));
+		DefineTexCoord(Urho3D::Vector2(curX2 * 2.0f - curX2, curY2 * 2.0f - curY2));
+		DefineNormal(Urho3D::Vector3(0, 1, 0));
+	}
+	Commit();
+}
+
 void CustomGeometry::Clear()
 {
     elementMask_ = MASK_POSITION;

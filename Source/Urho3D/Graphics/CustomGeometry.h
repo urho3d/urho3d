@@ -65,6 +65,8 @@ public:
     unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     bool DrawOcclusion(OcclusionBuffer* buffer) override;
+	/// Make the custom geometry int a circle, change start and stop to make a segment instead
+	void MakeCircle(float radius = 1, int inc = 100, float startTheta = 0, float endTheta = 2*M_PI);
 
     /// Clear all geometries.
     void Clear();
