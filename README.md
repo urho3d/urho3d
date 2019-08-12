@@ -116,6 +116,7 @@ Urho3D development, contributions and bugfixes by:
 - Ner'zhul
 - Newb I the Newbd
 - OvermindDL1
+- Polynominal
 - PredatorMF
 - Scellow
 - Skrylar
