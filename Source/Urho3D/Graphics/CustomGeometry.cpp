@@ -204,32 +204,32 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
     return success;
 }
 
-void CustomGeometry::MakeCircle(float radius, int inc, Vector3 normal, float startTheta, float endTheta)
+void CustomGeometry::MakeCircle(float radius, int iterations, Vector3 normal, float startTheta, float endTheta)
 {
     Clear();
-	float stepSize = (endTheta - startTheta) / (float)inc;
-	SetNumGeometries(1);
-	for (int i = 0; i < inc; i++) {
-		float curTheta1 = startTheta + ((float)i * stepSize);
-		float curTheta2 = startTheta + ((float)(i + 1) * stepSize);
-		float curX1 = radius * cos(curTheta1);
-		float curY1 = radius * sin(curTheta1);
-		float curX2 = radius * cos(curTheta2);
-		float curY2 = radius * sin(curTheta2);
-		//center point
-		DefineVertex(Urho3D::Vector3(0, 0, 0));
-		DefineTexCoord(Urho3D::Vector2(radius, radius));
-		DefineNormal(normal);
-		//first circle point
-		DefineVertex(Urho3D::Vector3(curX1, 0, curY1));
-		DefineTexCoord(Urho3D::Vector2(curX1 * 2.0f - curX1, curY1 * 2.0f - curY1));
-		DefineNormal(normal);
-		//2nd circle point
-		DefineVertex(Urho3D::Vector3(curX2, 0, curY2));
-		DefineTexCoord(Urho3D::Vector2(curX2 * 2.0f - curX2, curY2 * 2.0f - curY2));
-		DefineNormal(normal);
-	}
-	Commit();
+    float stepSize = (endTheta - startTheta) / (float)iterations;
+    SetNumGeometries(1);
+    for (int i = 0; i < iterations; i++) {
+        float curTheta1 = startTheta + ((float)i * stepSize);
+        float curTheta2 = startTheta + ((float)(i + 1) * stepSize);
+        float curX1 = radius * cos(curTheta1);
+        float curY1 = radius * sin(curTheta1);
+        float curX2 = radius * cos(curTheta2);
+        float curY2 = radius * sin(curTheta2);
+        //center point
+        DefineVertex(Urho3D::Vector3(0, 0, 0));
+        DefineTexCoord(Urho3D::Vector2(radius, radius));
+        DefineNormal(normal);
+        //first circle point
+        DefineVertex(Urho3D::Vector3(curX1, 0, curY1));
+        DefineTexCoord(Urho3D::Vector2(curX1 * 2.0f - curX1, curY1 * 2.0f - curY1));
+        DefineNormal(normal);
+        //2nd circle point
+        DefineVertex(Urho3D::Vector3(curX2, 0, curY2));
+        DefineTexCoord(Urho3D::Vector2(curX2 * 2.0f - curX2, curY2 * 2.0f - curY2));
+        DefineNormal(normal);
+    }
+    Commit();
 }
 
 void CustomGeometry::Clear()
