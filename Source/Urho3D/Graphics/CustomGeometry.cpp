@@ -209,6 +209,7 @@ void CustomGeometry::MakeCircle(float radius, int iterations, Vector3 normal, fl
     Clear();
     float stepSize = (endTheta - startTheta) / (float)iterations;
     SetNumGeometries(1);
+    BeginGeometry(0, Urho3D::PrimitiveType::TRIANGLE_STRIP);
     for (int i = 0; i < iterations; i++) {
         float curTheta1 = startTheta + ((float)i * stepSize);
         float curTheta2 = startTheta + ((float)(i + 1) * stepSize);
