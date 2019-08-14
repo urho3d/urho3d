@@ -42,6 +42,11 @@ URHO3D_EVENT(E_CONNECTFAILED, ConnectFailed)
 {
 }
 
+/// Server connection failed because its already connected or tries to connect already.
+URHO3D_EVENT(E_CONNECTIONINPROGRESS, ConnectionInProgress)
+{
+}
+
 /// New client connection established.
 URHO3D_EVENT(E_CLIENTCONNECTED, ClientConnected)
 {

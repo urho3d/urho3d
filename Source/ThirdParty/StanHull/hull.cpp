@@ -34,7 +34,7 @@
 		THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------*/
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Romain Tartière for Urho3D
 
 // Urho3D: use a namespace to not clash with Urho3D's inbuilt math types
 namespace StanHull
@@ -2587,7 +2587,8 @@ int overhull(Plane *planes,int planes_count,float3 *verts, int verts_count,int m
 			 float3 *&verts_out, int &verts_count_out,  int *&faces_out, int &faces_count_out ,float inflate)
 {
 	int i,j;
-	if(verts_count <4) return NULL;
+	// Urho3D: Return 0, not NULL, in function returning an int
+	if(verts_count <4) return 0;
 	maxplanes = Min(maxplanes,planes_count);
 	float3 bmin(verts[0]),bmax(verts[0]);
 	for(i=0;i<verts_count;i++) 
