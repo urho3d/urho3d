@@ -28,11 +28,15 @@ class b2Shape;
 /// It encapsulates any shape.
 struct b2DistanceProxy
 {
-	b2DistanceProxy() : m_vertices(NULL), m_count(0), m_radius(0.0f) {}
+	b2DistanceProxy() : m_vertices(nullptr), m_count(0), m_radius(0.0f) {}
 
 	/// Initialize the proxy using the given shape. The shape
 	/// must remain in scope while the proxy is in use.
 	void Set(const b2Shape* shape, int32 index);
+
+    /// Initialize the proxy using a vertex cloud and radius. The vertices
+    /// must remain in scope while the proxy is in use.
+    void Set(const b2Vec2* vertices, int32 count, float32 radius);
 
 	/// Get the supporting vertex index in the given direction.
 	int32 GetSupport(const b2Vec2& d) const;
@@ -90,6 +94,27 @@ void b2Distance(b2DistanceOutput* output,
 				b2SimplexCache* cache, 
 				const b2DistanceInput* input);
 
+/// Input parameters for b2ShapeCast
+struct b2ShapeCastInput
+{
+	b2DistanceProxy proxyA;
+	b2DistanceProxy proxyB;
+	b2Transform transformA;
+	b2Transform transformB;
+	b2Vec2 translationB;
+};
+
+/// Output results for b2ShapeCast
+struct b2ShapeCastOutput
+{
+	b2Vec2 point;
+	b2Vec2 normal;
+	float32 lambda;
+	int32 iterations;
+};
+
+/// Perform a linear shape cast of shape B moving and shape A fixed. Determines the hit point, normal, and translation fraction.
+bool b2ShapeCast(b2ShapeCastOutput* output, const b2ShapeCastInput* input);
 
 //////////////////////////////////////////////////////////////////////////
 
