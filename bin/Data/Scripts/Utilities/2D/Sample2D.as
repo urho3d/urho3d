@@ -534,6 +534,7 @@ void CreateBackgroundSprite(TileMapInfo2D@ info, float scale, String texture, bo
     sprite.sprite = cache.GetResource("Sprite2D", texture);
     SetRandomSeed(time.systemTime); // Randomize from system clock
     sprite.color = Color(Random(0.0f, 1.0f), Random(0.0f, 1.0f), Random(0.0f, 1.0f), 1.0f);
+    sprite.layer = -99;
 
     // Create rotation animation
     if (animate)
