@@ -197,8 +197,9 @@ public:
     /// Return double value.
     double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
     /// Return string value.
-    String GetString(String const& defaultValue) const { return IsString() ? *stringValue_ : defaultValue;}
+    String GetString(String const& defaultValue) const { return GetStringWithDefault(defaultValue);}
     const String& GetString() const { return IsString() ? *stringValue_ : String::EMPTY;}
+    String GetStringWithDefault(const String& defaultValue) const { return IsString() ? *stringValue_ : String::EMPTY;}
     /// Return C string value.
     const char* GetCString(const char* defaultValue = nullptr) const { return IsString() ? stringValue_->CString() : defaultValue;}
     /// Return JSON array value.
