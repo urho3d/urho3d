@@ -197,7 +197,16 @@ public:
     /// Return double value.
     double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
     /// Return string value.
-    const String& GetString(String defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
+    /// Need two version because.
+    ///     Can not pass by value (as undefined to return a reference)
+    ///     or reference (as String::EMPTY is const)
+    ///     or const reference (as you can pass temporary and undefined to return a reference to this).
+    /// So we need to return by value.
+    /// To make it more efficient we don't provide a default parameter version so we can return by reference.
+    /// We also need a version to be compatable with the script system (GetStringWithDefault()) that has unique name.
+    String GetString(String const& defaultValue) const { return GetStringWithDefault(defaultValue);}
+    const String& GetString() const { return IsString() ? *stringValue_ : String::EMPTY;}
+    String GetStringWithDefault(String const& defaultValue) const { return IsString() ? *stringValue_ : defaultValue;}
     /// Return C string value.
     const char* GetCString(const char* defaultValue = nullptr) const { return IsString() ? stringValue_->CString() : defaultValue;}
     /// Return JSON array value.
