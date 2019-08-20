@@ -128,7 +128,7 @@ public:
     void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
     /// Add a sphere.
     void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true);
-    /// Add a sphere sector.
+    /// Add a sphere sector. Angle ranges from 0 to 360. Identity Quaternion yields the filled portion of the sector upwards.
     void AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle,
         bool drawLines, const Color& color, bool depthTest = true);
     /// Add a cylinder
