@@ -23,7 +23,6 @@
 ---
 
 dist: trusty
-sudo: required
 addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
@@ -168,7 +167,6 @@ language: cpp
 compiler: gcc
 cache: ccache
 dist: trusty
-sudo: false
 addons:
   apt:
     packages: libpulse-dev
@@ -201,6 +199,7 @@ branch: {name: Annotate, active: no}
 language: cpp
 compiler: gcc
 cache: ccache
+dist: trusty
 addons: {apt: {packages: libpulse-dev}}
 env:
   global:
@@ -221,7 +220,6 @@ after_script: rake ci_delete_mirror
 
 branch: {name: Android-CI, active: yes}
 dist: trusty
-sudo: required
 addons: {apt: {packages: docker-ce}}
 cache:
   directories:
@@ -260,7 +258,6 @@ matrix:
 
 branch: {name: RPI-CI, active: yes}
 dist: trusty
-sudo: required
 addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
@@ -293,7 +290,6 @@ matrix:
 
 branch: {name: ARM-CI, active: yes}
 dist: trusty
-sudo: required
 addons: {apt: {packages: docker-ce}}
 cache: {directories: $HOME/urho3d_home_dir/.ccache}
 env:
@@ -326,7 +322,6 @@ matrix:
 
 branch: {name: Web-CI, active: yes}
 dist: trusty
-sudo: required
 addons: {apt: {packages: docker-ce}}
 cache:
   directories:
@@ -382,7 +377,7 @@ cache:
   directories:
     - $HOME/.ccache
     - $HOME/initial-build-tree
-osx_image: xcode9.4
+osx_image: xcode10.2
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=

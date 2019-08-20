@@ -298,7 +298,7 @@ void Context::ReleaseSDL()
 #ifdef URHO3D_IK
 void Context::RequireIK()
 {
-    // Always increment, the caller must match with ReleaseSDL(), regardless of
+    // Always increment, the caller must match with ReleaseIK(), regardless of
     // what happens.
     ++ikInitCounter;
 

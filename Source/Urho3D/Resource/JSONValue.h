@@ -187,19 +187,19 @@ public:
     bool IsObject() const { return GetValueType() == JSON_OBJECT; }
 
     /// Return boolean value.
-    bool GetBool() const { return IsBool() ? boolValue_ : false;}
+    bool GetBool(bool defaultValue = false) const { return IsBool() ? boolValue_ : defaultValue;}
     /// Return integer value.
-    int GetInt() const { return IsNumber() ? (int)numberValue_ : 0; }
+    int GetInt(int defaultValue = 0) const { return IsNumber() ? (int)numberValue_ : defaultValue; }
     /// Return unsigned integer value.
-    unsigned GetUInt() const { return IsNumber() ? (unsigned)numberValue_ : 0; }
+    unsigned GetUInt(unsigned defaultValue = 0) const { return IsNumber() ? (unsigned)numberValue_ : defaultValue; }
     /// Return float value.
-    float GetFloat() const { return IsNumber() ? (float)numberValue_ : 0.0f; }
+    float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : defaultValue; }
     /// Return double value.
-    double GetDouble() const { return IsNumber() ? numberValue_ : 0.0; }
+    double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
     /// Return string value.
-    const String& GetString() const { return IsString() ? *stringValue_ : String::EMPTY;}
+    const String& GetString(String defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
     /// Return C string value.
-    const char* GetCString() const { return IsString() ? stringValue_->CString() : nullptr;}
+    const char* GetCString(const char* defaultValue = nullptr) const { return IsString() ? stringValue_->CString() : defaultValue;}
     /// Return JSON array value.
     const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.
