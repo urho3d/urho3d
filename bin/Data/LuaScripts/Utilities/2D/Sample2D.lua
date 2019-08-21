@@ -461,6 +461,7 @@ function CreateBackgroundSprite(info, scale, texture, animate)
     sprite.sprite = cache:GetResource("Sprite2D", texture)
     SetRandomSeed(time:GetSystemTime()) -- Randomize from system clock
     sprite.color = Color(Random(0, 1), Random(0, 1), Random(0, 1), 1)
+    sprite.layer = -99
 
     -- Create rotation animation
     if animate then
