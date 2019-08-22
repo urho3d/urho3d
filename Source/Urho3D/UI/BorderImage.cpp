@@ -41,6 +41,7 @@ BorderImage::BorderImage(Context* context) :
     border_(IntRect::ZERO),
     imageBorder_(IntRect::ZERO),
     hoverOffset_(IntVector2::ZERO),
+    disabledOffset_(IntVector2::ZERO),
     blendMode_(BLEND_REPLACE),
     tiled_(false)
 {
@@ -59,6 +60,7 @@ void BorderImage::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Image Border", GetImageBorder, SetImageBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Tiled", IsTiled, SetTiled, bool, false, AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
@@ -67,7 +69,10 @@ void BorderImage::RegisterObject(Context* context)
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ || HasFocus() ? hoverOffset_ : IntVector2::ZERO);
+    if (enabled_)
+        GetBatches(batches, vertexData, currentScissor, (hovering_ || selected_ || HasFocus()) ? hoverOffset_ : IntVector2::ZERO);
+    else
+        GetBatches(batches, vertexData, currentScissor, disabledOffset_);
 }
 
 void BorderImage::SetTexture(Texture* texture)
@@ -113,6 +118,16 @@ void BorderImage::SetHoverOffset(const IntVector2& offset)
 void BorderImage::SetHoverOffset(int x, int y)
 {
     hoverOffset_ = IntVector2(x, y);
+}
+
+void BorderImage::SetDisabledOffset(const IntVector2& offset)
+{
+    disabledOffset_ = offset;
+}
+
+void BorderImage::SetDisabledOffset(int x, int y)
+{
+    disabledOffset_ = IntVector2(x, y);
 }
 
 void BorderImage::SetBlendMode(BlendMode mode)
