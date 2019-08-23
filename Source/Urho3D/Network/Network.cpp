@@ -881,9 +881,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 {
     unsigned char packetID = packet->data[0];
 
-    if (packetID < ID_USER_PACKET_ENUM) {
-        URHO3D_LOGERROR(">> " + String((int)packetID) + "  HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
-    }
+//    if (packetID < ID_USER_PACKET_ENUM) {
+//        URHO3D_LOGERROR(">> " + String((int)packetID) + "  HandleIncomingPacket: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
+//    }
 
     bool packetHandled = false;
 
@@ -935,7 +935,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     }
     else if (packetID == ID_REMOTE_CONNECTION_LOST || packetID == ID_REMOTE_DISCONNECTION_NOTIFICATION)
     {
-        //TODO find out who's really sending out this message
+        // TODO find out who's really sending out this message
         packetHandled = true;
     }
     else if (packetID == ID_ALREADY_CONNECTED)
@@ -1690,6 +1690,7 @@ void Network::SetMode(NetworkMode mode, bool force)
         fullyConnectedMesh2_ = SLNet::FullyConnectedMesh2::GetInstance();
         rakPeer_->AttachPlugin(fullyConnectedMesh2_);
         fullyConnectedMesh2_->SetAutoparticipateConnections(true);
+        fullyConnectedMesh2_->SetConnectOnNewRemoteConnection(true, password_.CString());
 
         if (readyEvent_) {
             rakPeer_->DetachPlugin(readyEvent_);
