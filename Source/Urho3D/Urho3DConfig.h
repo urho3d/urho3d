@@ -49,12 +49,12 @@
 #endif
 
 // Macros with a strong guarantee of what c++ version is available.
-#define URHO_CPP11_OR_LATER (URHO_CPLUSPLUS >= 201103L)
-#define URHO_CPP14_OR_LATER (URHO_CPLUSPLUS >= 201402L)
-#define URHO_CPP17_OR_LATER (URHO_CPLUSPLUS >= 201703L)
+#define URHO_CPP11_OR_LATER (URHO_CPLUSPLUS >= URHO_CPP11_STANDARD)
+#define URHO_CPP14_OR_LATER (URHO_CPLUSPLUS >= URHO_CPP14_STANDARD)
+#define URHO_CPP17_OR_LATER (URHO_CPLUSPLUS >= URHO_CPP17_STANDARD)
 
 // Macros for specific c++ versions
-#if (URHO_CPLUSPLUS >= 201103L)
+#if (URHO_CPLUSPLUS >= URHO_CPP11_STANDARD)
 	// Least match
 	#define URHO_CPP11(x) x
 	#define URHO_CPP14(x)
@@ -63,7 +63,7 @@
 	#define URHO_CPP11_ONLY(x) x
 	#define URHO_CPP14_ONLY(x)
 	#define URHO_CPP17_ONLY(x)
-#elif (URHO_CPLUSPLUS >= 201402L)
+#elif (URHO_CPLUSPLUS >= URHO_CPP14_STANDARD)
 	// Least match
 	#define URHO_CPP11(x) x
 	#define URHO_CPP14(x) x
@@ -72,7 +72,7 @@
 	#define URHO_CPP11_ONLY(x)
 	#define URHO_CPP14_ONLY(x) x
 	#define URHO_CPP17_ONLY(x)
-#elif (URHO_CPLUSPLUS >= 201703L)
+#elif (URHO_CPLUSPLUS >= URHO_CPP17_STANDARD)
 	// Least match
 	#define URHO_CPP11(x) x
 	#define URHO_CPP14(x) x
