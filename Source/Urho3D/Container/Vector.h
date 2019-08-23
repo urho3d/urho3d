@@ -79,6 +79,12 @@ public:
         DoInsertElements(0, vector.Begin(), vector.End(), CopyTag{});
     }
 
+    /// Copy-construct from another vector (iterator version)
+    Vector(ConstIterator start, ConstIterator end)
+    {
+        DoInsertElements(0, start, end, CopyTag{});
+    }
+
     /// Move-construct from another vector.
     Vector(Vector<T> && vector)
     {

@@ -37,6 +37,12 @@
 namespace Urho3D
 {
 
+// Parameter Angle Type Def
+enum AngleType {
+    DEGREES,
+    RADIANS
+} typedef AngleTypeEnum;
+
 #undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
 static const float M_HALF_PI = M_PI * 0.5f;
@@ -90,6 +96,14 @@ inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 /// Return the sign of a float (-1, 0 or 1.)
 template <class T>
 inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
+
+/// Returns radians from degrees
+template <class T>
+inline T toRadians(const T degrees) { return M_DEGTORAD * degrees; }
+
+/// Returns degrees from radians
+template <class T>
+inline T toDegrees(const T radians) { return M_RADTODEG * radians; }
 
 /// Return a representation of the specified floating-point value as a single format bit layout.
 inline unsigned FloatToRawIntBits(float value)
@@ -165,6 +179,17 @@ template <class T> inline int FloorToInt(T x) { return static_cast<int>(floor(x)
 
 /// Round value to nearest integer.
 template <class T> inline T Round(T x) { return round(x); }
+
+///Compute Average
+template <class T> inline T Average(const Vector<T> &list){
+    T average = T();
+    auto it = list.Begin();
+    while (it != list.End()) {
+        average += (*it);
+        it++;
+    }
+    return average / list.Size();
+}
 
 /// Round value to nearest integer.
 template <class T> inline int RoundToInt(T x) { return static_cast<int>(round(x)); }
