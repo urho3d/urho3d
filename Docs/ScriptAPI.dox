@@ -1084,6 +1084,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -1133,11 +1134,11 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
 - %Pressed %Image %Offset : IntVector2
-- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1207,6 +1208,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -1470,6 +1472,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -1554,11 +1557,11 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
 - %Pressed %Image %Offset : IntVector2
-- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1696,6 +1699,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -1811,11 +1815,11 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
 - %Pressed %Image %Offset : IntVector2
-- %Disabled %Image %Offset : IntVector2
 - %Pressed %Child %Offset : IntVector2
 - %Repeat %Delay : float
 - %Repeat %Rate : float
@@ -1978,6 +1982,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -2116,6 +2121,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -2240,6 +2246,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -2664,6 +2671,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -2722,6 +2730,7 @@ namespace Urho3D
 - %Border : IntRect
 - %Image %Border : IntRect
 - %Hover %Image %Offset : IntVector2
+- %Disabled %Image %Offset : IntVector2
 - %Tiled : bool
 - %Blend %Mode : int
 - %Material : ResourceRef
@@ -3777,6 +3786,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -3820,6 +3830,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -4308,6 +4319,7 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCheckedOffset(int, int)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -4353,6 +4365,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -6299,6 +6312,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -6344,6 +6358,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -8416,6 +8431,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -8463,6 +8479,7 @@ Properties:
 - uint cursorPosition
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -12499,6 +12516,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -12542,6 +12560,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -15903,6 +15922,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -15950,6 +15970,7 @@ Properties:
 - XMLFile@ defaultStyle
 - Texture2D@ depthTexture // readonly
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode
@@ -16150,6 +16171,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
+- void SetDisabledOffset(int, int)
 - void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -16193,6 +16215,7 @@ Properties:
 - IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
+- IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
 - uint dragDropMode

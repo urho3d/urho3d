@@ -922,6 +922,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -973,6 +974,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -1540,6 +1542,7 @@ void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCheckedOffset(int, int);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -1593,6 +1596,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -3869,6 +3873,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -3922,6 +3927,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -6411,6 +6417,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -6467,6 +6474,7 @@ uint cursorPosition;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -11138,6 +11146,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -11189,6 +11198,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -15234,6 +15244,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -15291,6 +15302,7 @@ XMLFile defaultStyle;
 Texture2D depthTexture;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */
@@ -15526,6 +15538,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
+void SetDisabledOffset(int, int);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
@@ -15577,6 +15590,7 @@ IntRect combinedScreenRect;
 XMLFile defaultStyle;
 /* readonly */
 float derivedOpacity;
+IntVector2 disabledOffset;
 /* readonly */
 uint dragButtonCombo;
 /* readonly */

@@ -681,6 +681,8 @@ Methods:
 - void SetImageBorder(const IntRect& rect)
 - void SetHoverOffset(const IntVector2& offset)
 - void SetHoverOffset(int x, int y)
+- void SetDisabledOffset(const IntVector2& offset)
+- void SetDisabledOffset(int x, int y)
 - void SetBlendMode(BlendMode mode)
 - void SetTiled(bool enable)
 - Texture* GetTexture() const
@@ -688,6 +690,7 @@ Methods:
 - const IntRect& GetBorder() const
 - const IntRect& GetImageBorder() const
 - const IntVector2& GetHoverOffset() const
+- const IntVector2& GetDisabledOffset() const
 - BlendMode GetBlendMode() const
 - bool IsTiled() const
 
@@ -698,6 +701,7 @@ Properties:
 - IntRect& border
 - IntRect& imageBorder
 - IntVector2& hoverOffset
+- IntVector2& disabledOffset
 - BlendMode blendMode
 - bool tiled
 
@@ -775,15 +779,12 @@ Methods:
 - void delete()
 - void SetPressedOffset(const IntVector2& offset)
 - void SetPressedOffset(int x, int y)
-- void SetDisabledOffset(const IntVector2& offset)
-- void SetDisabledOffset(int x, int y)
 - void SetPressedChildOffset(const IntVector2& offset)
 - void SetPressedChildOffset(int x, int y)
 - void SetRepeat(float delay, float rate)
 - void SetRepeatDelay(float delay)
 - void SetRepeatRate(float rate)
 - const IntVector2& GetPressedOffset() const
-- const IntVector2& GetDisabledOffset() const
 - const IntVector2& GetPressedChildOffset() const
 - float GetRepeatDelay() const
 - float GetRepeatRate() const
@@ -792,7 +793,6 @@ Methods:
 Properties:
 
 - IntVector2& pressedOffset
-- IntVector2& disabledOffset
 - IntVector2& pressedChildOffset
 - float repeatDelay
 - float repeatRate
