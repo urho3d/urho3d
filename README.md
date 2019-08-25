@@ -132,6 +132,7 @@ Urho3D development, contributions and bugfixes by:
 - att-kin9
 - celeron55
 - chenjie199234
+- codexhound
 - cosmy1
 - damu
 - dragonCASTjosh
