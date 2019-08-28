@@ -315,15 +315,6 @@ public:
             };
     }
 
-    /// Generate a forwarder for a lambda handler. Lambda must be stored separately and outlive this object!
-    template <class L>
-    static ForwarderType LambdaFwd()
-    {
-        return [](void* thisPtr, StringHash type, VariantMap& args) -> void {
-                (reinterpret_cast<L*>(thisPtr)->operator()(type, args));
-            };
-    }
-
 protected:
     /// Event receiver.
     Object* receiver_;
