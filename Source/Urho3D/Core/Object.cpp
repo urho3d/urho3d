@@ -182,16 +182,6 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     }
 }
 
-void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
-{
-    SubscribeToEvent(eventType, new EventHandler11Impl(function, userData));
-}
-
-void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
-{
-    SubscribeToEvent(sender, eventType, new EventHandler11Impl(function, userData));
-}
-
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
     for (;;)

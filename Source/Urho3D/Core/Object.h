@@ -114,10 +114,6 @@ public:
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event.
     void SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler);
-    /// Subscribe to an event that can be sent by any sender.
-    void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr);
-    /// Subscribe to a specific sender's event.
-    void SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr);
     /// Unsubscribe from an event.
     void UnsubscribeFromEvent(StringHash eventType);
     /// Unsubscribe from a specific sender's event.
@@ -247,16 +243,19 @@ public:
 class URHO3D_API EventHandler : public LinkedListNode
 {
 public:
+    /// Signature of the object that forwards the call.
+    using ForwarderType = void (*)(Object*, StringHash, VariantMap&);
+
     /// Construct with specified receiver and userdata.
-    explicit EventHandler(Object* receiver, void* userData = nullptr) :
+    EventHandler(Object* receiver, ForwarderType forwarder, void* userData = nullptr) :
         receiver_(receiver),
         sender_(nullptr),
+        forwarder_(forwarder),
         userData_(userData)
     {
+        assert(receiver_);
+        assert(forwarder_);
     }
-
-    /// Destruct.
-    virtual ~EventHandler() = default;
 
     /// Set sender and event type.
     void SetSenderAndEventType(Object* sender, StringHash eventType)
@@ -266,9 +265,16 @@ public:
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData) = 0;
+    void Invoke(VariantMap& eventData)
+    {
+        (*forwarder_)(receiver_, eventType_, eventData);
+    }
+
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const = 0;
+    EventHandler* Clone() const
+    {
+        return new EventHandler(receiver_, forwarder_, userData_);
+    }
 
     /// Return event receiver.
     Object* GetReceiver() const { return receiver_; }
@@ -282,6 +288,42 @@ public:
     /// Return userdata.
     void* GetUserData() const { return userData_; }
 
+    /// Generate a forwarder for a function handler.
+    template <void(*Fptr)(StringHash, VariantMap&)>
+    static ForwarderType FreeFwd()
+    {
+        return [](void* /* thisPtr */, StringHash type, VariantMap& args) -> void {
+                (*Fptr)(type, args);
+            };
+    }
+
+    /// Generate a forwarder for a member handler.
+    template <class T, void(T::*Mptr)(StringHash, VariantMap&)>
+    static ForwarderType MemberFwd()
+    {
+        return [](Object* thisPtr, StringHash type, VariantMap& args) -> void {
+                (static_cast<T*>(thisPtr)->*Mptr)(type, args);
+            };
+    }
+
+    /// Generate a forwarder for a constant member handler.
+    template <class T, void(T::*Mptr)(StringHash, VariantMap&)const>
+    static ForwarderType MemberFwd()
+    {
+        return [](Object* thisPtr, StringHash type, VariantMap& args) -> void {
+                (static_cast<const T*>(thisPtr)->*Mptr)(type, args);
+            };
+    }
+
+    /// Generate a forwarder for a lambda handler. Lambda must be stored separately and outlive this object!
+    template <class L>
+    static ForwarderType LambdaFwd()
+    {
+        return [](void* thisPtr, StringHash type, VariantMap& args) -> void {
+                (reinterpret_cast<L*>(thisPtr)->operator()(type, args));
+            };
+    }
+
 protected:
     /// Event receiver.
     Object* receiver_;
@@ -289,70 +331,10 @@ protected:
     Object* sender_;
     /// Event type.
     StringHash eventType_;
+    /// Event handler.
+    ForwarderType forwarder_;
     /// Userdata.
     void* userData_;
-};
-
-/// Template implementation of the event handler invoke helper (stores a function pointer of specific class.)
-template <class T> class EventHandlerImpl : public EventHandler
-{
-public:
-    using HandlerFunctionPtr = void (T::*)(StringHash, VariantMap&);
-
-    /// Construct with receiver and function pointers and userdata.
-    EventHandlerImpl(T* receiver, HandlerFunctionPtr function, void* userData = nullptr) :
-        EventHandler(receiver, userData),
-        function_(function)
-    {
-        assert(receiver_);
-        assert(function_);
-    }
-
-    /// Invoke event handler function.
-    void Invoke(VariantMap& eventData) override
-    {
-        auto* receiver = static_cast<T*>(receiver_);
-        (receiver->*function_)(eventType_, eventData);
-    }
-
-    /// Return a unique copy of the event handler.
-    EventHandler* Clone() const override
-    {
-        return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
-    }
-
-private:
-    /// Class-specific pointer to handler function.
-    HandlerFunctionPtr function_;
-};
-
-/// Template implementation of the event handler invoke helper (std::function instance).
-class EventHandler11Impl : public EventHandler
-{
-public:
-    /// Construct with receiver and function pointers and userdata.
-    explicit EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = nullptr) :
-        EventHandler(nullptr, userData),
-        function_(std::move(function))
-    {
-        assert(function_);
-    }
-
-    /// Invoke event handler function.
-    void Invoke(VariantMap& eventData) override
-    {
-        function_(eventType_, eventData);
-    }
-
-    /// Return a unique copy of the event handler.
-    EventHandler* Clone() const override
-    {
-        return new EventHandler11Impl(function_, userData_);
-    }
-
-private:
-    /// Class-specific pointer to handler function.
-    std::function<void(StringHash, VariantMap&)> function_;
 };
 
 /// Get register of event names.
@@ -363,8 +345,8 @@ URHO3D_API StringHashRegister& GetEventNameRegister();
 /// Describe an event's parameter hash ID. Should be used inside an event namespace.
 #define URHO3D_PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function.
-#define URHO3D_HANDLER(className, function) (new Urho3D::EventHandlerImpl<className>(this, &className::function))
+#define URHO3D_HANDLER(className, function) (new Urho3D::EventHandler(this, Urho3D::EventHandler::MemberFwd<className, &className::function>()))
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
-#define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
+#define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandler(this, Urho3D::EventHandler::MemberFwd<className, &className::function>(), userData))
 
 }

@@ -692,13 +692,13 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 
     if (!sender)
     {
-        i->second_->SubscribeToEvent(eventType, new EventHandlerImpl<ScriptEventInvoker>
-            (i->second_, &ScriptEventInvoker::HandleScriptEvent, (void*)function));
+        i->second_->SubscribeToEvent(eventType, new EventHandler
+            (i->second_, EventHandler::MemberFwd<ScriptEventInvoker, &ScriptEventInvoker::HandleScriptEvent>(), (void*)function));
     }
     else
     {
-        i->second_->SubscribeToEvent(sender, eventType, new EventHandlerImpl<ScriptEventInvoker>
-            (i->second_, &ScriptEventInvoker::HandleScriptEvent, (void*)function));
+        i->second_->SubscribeToEvent(sender, eventType, new EventHandler
+            (i->second_, EventHandler::MemberFwd<ScriptEventInvoker, &ScriptEventInvoker::HandleScriptEvent>(), (void*)function));
     }
 }
 
