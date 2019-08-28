@@ -290,7 +290,7 @@ public:
 
     /// Generate a forwarder for a function handler.
     template <void(*Fptr)(StringHash, VariantMap&)>
-    static ForwarderType FreeFwd()
+    static ForwarderType FreeForwarder()
     {
         return [](void* /* thisPtr */, StringHash type, VariantMap& args) -> void {
                 (*Fptr)(type, args);
@@ -299,7 +299,7 @@ public:
 
     /// Generate a forwarder for a member handler.
     template <class T, void(T::*Mptr)(StringHash, VariantMap&)>
-    static ForwarderType MemberFwd()
+    static ForwarderType Forwarder()
     {
         return [](Object* thisPtr, StringHash type, VariantMap& args) -> void {
                 (static_cast<T*>(thisPtr)->*Mptr)(type, args);
@@ -308,7 +308,7 @@ public:
 
     /// Generate a forwarder for a constant member handler.
     template <class T, void(T::*Mptr)(StringHash, VariantMap&)const>
-    static ForwarderType MemberFwd()
+    static ForwarderType Forwarder()
     {
         return [](Object* thisPtr, StringHash type, VariantMap& args) -> void {
                 (static_cast<const T*>(thisPtr)->*Mptr)(type, args);
@@ -336,8 +336,8 @@ URHO3D_API StringHashRegister& GetEventNameRegister();
 /// Describe an event's parameter hash ID. Should be used inside an event namespace.
 #define URHO3D_PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function.
-#define URHO3D_HANDLER(className, function) (new Urho3D::EventHandler(this, Urho3D::EventHandler::MemberFwd<className, &className::function>()))
+#define URHO3D_HANDLER(className, function) (new Urho3D::EventHandler(this, Urho3D::EventHandler::Forwarder<className, &className::function>()))
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
-#define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandler(this, Urho3D::EventHandler::MemberFwd<className, &className::function>(), userData))
+#define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandler(this, Urho3D::EventHandler::Forwarder<className, &className::function>(), userData))
 
 }
