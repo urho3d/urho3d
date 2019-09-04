@@ -35,15 +35,10 @@
 #include <cstdlib>
 #include <cmath>
 #include <limits>
+#include <type_traits>
 
 namespace Urho3D
 {
-
-// Parameter Angle Type Def
-enum AngleType {
-    DEGREES,
-    RADIANS
-} typedef AngleTypeEnum;
 
 #undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
@@ -99,13 +94,13 @@ inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 template <class T>
 inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
 
-/// Returns radians from degrees
+/// Convert degrees to radians.
 template <class T>
-inline T toRadians(const T degrees) { return M_DEGTORAD * degrees; }
+inline T ToRadians(const T degrees) { return M_DEGTORAD * degrees; }
 
-/// Returns degrees from radians
+/// Convert radians to degrees.
 template <class T>
-inline T toDegrees(const T radians) { return M_RADTODEG * radians; }
+inline T ToDegrees(const T radians) { return M_RADTODEG * radians; }
 
 /// Return a representation of the specified floating-point value as a single format bit layout.
 inline unsigned FloatToRawIntBits(float value)
@@ -182,27 +177,32 @@ template <class T> inline int FloorToInt(T x) { return static_cast<int>(floor(x)
 /// Round value to nearest integer.
 template <class T> inline T Round(T x) { return round(x); }
 
-///Compute Average
-template <class T> inline T Average(const Vector<T> &list){
-    T average = T();
-    auto it = list.Begin();
-    while (it != list.End()) {
-        average += (*it);
-        it++;
+/// Compute average value of the range.
+template <class Iterator> inline auto Average(Iterator begin, Iterator end) -> typename std::decay<decltype(*begin)>::type
+{
+    using T = typename std::decay<decltype(*begin)>::type;
+
+    T average{};
+    unsigned size{};
+    for (Iterator it = begin; it != end; ++it)
+    {
+        average += *it;
+        ++size;
     }
-    return average / list.Size();
+
+    return size != 0 ? average / size : average;
 }
 
 /// Round value to nearest integer.
 template <class T> inline int RoundToInt(T x) { return static_cast<int>(round(x)); }
 
-/// Round value to nearest multiple. 
+/// Round value to nearest multiple.
 template <class T> inline T RoundToNearestMultiple(T x, T multiple)
 {
     T mag = Abs(x);
     multiple = Abs(multiple);
     T remainder = Mod(mag, multiple);
-    if (remainder >= multiple / 2) 
+    if (remainder >= multiple / 2)
         return (FloorToInt<T>(mag / multiple) * multiple + multiple)*Sign(x);
     else
         return (FloorToInt<T>(mag / multiple) * multiple)*Sign(x);
