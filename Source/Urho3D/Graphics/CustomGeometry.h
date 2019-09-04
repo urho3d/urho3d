@@ -66,6 +66,9 @@ public:
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     bool DrawOcclusion(OcclusionBuffer* buffer) override;
 
+    // TODO: Extract this code from CustomGeometry
+    // {
+
     /// Geometry Shape Helper Functions (normal defaults to (0,1,0)
 
     /// Shape Creation Functions, can be used as input into protrude shape
@@ -81,7 +84,7 @@ public:
     /// Makes this custom geometry into a square shape
     void MakeSquare(float size);
     /// Produces a circle graph given a vector of paired (weights and materials)
-    void MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material> > >& parts, 
+    void MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material> > >& parts,
         int radius = 1, int iterations = 300);
     void MakeSphere(float radius = 1, size_t iterations = 200);
     /// Protrode a shape along a line (note: the input vector must be a complete shape with the tail connecting to head)
@@ -93,6 +96,8 @@ public:
     /// Fills a point List shape with triangles
     void FillShape(const Vector<Vector3>& shapeList, bool connectTail = true, bool clear = true, int geomNum = 0);
     /// End Shape Generation Helper Functions
+
+    // }
 
     /// Clear all geometries.
     void Clear();

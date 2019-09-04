@@ -410,15 +410,8 @@ public:
         return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_);
     }
 
-    /// Returns the angle between this vector and another vector in degrees or radians.
-    float Angle(const Vector3& rhs, Urho3D::AngleTypeEnum angleType = DEGREES) const 
-    { 
-        float angle = Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length()));
-        if (angleType == RADIANS) {
-            angle = Urho3D::toRadians(angle);
-        }
-        return angle; 
-    }
+    /// Returns the angle between this vector and another vector in degrees.
+    float Angle(const Vector3& rhs) const { return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length())); }
 
     /// Return whether is NaN.
     bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_); }

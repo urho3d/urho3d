@@ -294,7 +294,7 @@ void CustomGeometry::MakeShape(const Vector<Vector3>& pointList , bool connectTa
             DefineVertex(current);
             DefineVertex(next);
         }
-        
+
     }
     Commit();
 }
@@ -311,7 +311,7 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
         BeginGeometry(usedGeomNum, PrimitiveType::TRIANGLE_STRIP);
         auto centerPoint = Vector3(0, 0, 0);
         if (connectTail) {
-            auto centerPoint = Urho3D::Average(shapeList);
+            auto centerPoint = Average(shapeList.Begin(), shapeList.End());
         }
         Vector<Vector3> vertices(3);
         Vector3 current;
@@ -334,7 +334,7 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
 
                 vertices = { centerPoint, current, next };
 
-                normal = Urho3D::Average(vertices);
+                normal = Average(vertices.Begin(), vertices.End());
                 normal.Normalize();
                 normal.Orthogonalize(normal);
                 DefineVertex(vertices.At(0));
@@ -371,10 +371,10 @@ void CustomGeometry::MakeSphere(float radius, size_t iterations)
     CreateQuadsFromBuffer(m_xyPoints, iterations, iterations, true);
 }
 
-void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList, 
+void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
     const Vector<Vector3>& mPointList, bool connectTail)
 {
-    Vector3 centerPoint = Urho3D::Average<Vector3>(mShapeList);
+    Vector3 centerPoint = Average(mShapeList.Begin(), mShapeList.End());
     Vector3 pointCurrent;
     Vector3 shapeCurrent;
     Vector3 shapePointVec;
@@ -392,7 +392,7 @@ void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
         bufferCount++;
     }
 
-    
+
     int count = 0;
     while (pointIter != mPointList.End()) {
         shapeIter = mLastShapePos.Begin();
@@ -428,7 +428,7 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
     else {
         SetNumGeometries(1);
     }
-    
+
     //Create the quads from the buffer
     BeginGeometry(0, Urho3D::PrimitiveType::TRIANGLE_STRIP);
     for (size_t i = 0; i < zIterations; i++) {
@@ -446,7 +446,7 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
                 Vector<Vector3> avList;
                 avList = { pointList.At((i*thetaIterations) + j) ,pointList.At((iplus*thetaIterations)+
                     j) ,pointList.At((i*thetaIterations) + jplus) };
-                Vector3 normal = Urho3D::Average<Vector3>(avList);
+                Vector3 normal = Average(avList.Begin(), avList.End());
                 normal.Normalize();
                 DefineVertex(avList.At(0));
                 DefineVertex(avList.At(1));
@@ -456,7 +456,7 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
 
                 avList = { pointList.At((i*thetaIterations) + j) ,pointList.At((iplus*thetaIterations)+
                     j) ,pointList.At((iplus*thetaIterations) + jplus) };
-                normal = Urho3D::Average<Vector3>(avList);
+                normal = Average(avList.Begin(), avList.End());
                 normal.Normalize();
                 DefineVertex(avList.At(0));
                 DefineVertex(avList.At(1));
@@ -476,7 +476,7 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
         auto headBegin = pointList.Begin() + pointList.Size() - thetaIterations;
         auto headEnd = pointList.Begin() + pointList.Size();
         Vector<Vector3> head(headBegin, headEnd);
-        
+
         FillShape(tail, true, false, 1);
         FillShape(head, true, false, 2);
     }

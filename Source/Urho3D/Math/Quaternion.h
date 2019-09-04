@@ -104,7 +104,7 @@ public:
         FromAngleAxis(angle, Vector3::FORWARD);
     }
 
-    /// Construct from Euler angles (in degrees.)
+    /// Construct from Euler angles (in degrees.) Equivalent to Y*X*Z.
     Quaternion(float x, float y, float z) noexcept
     {
         FromEulerAngles(x, y, z);
@@ -292,7 +292,7 @@ public:
 
     /// Define from an angle (in degrees) and axis.
     void FromAngleAxis(float angle, const Vector3& axis);
-    /// Define from Euler angles (in degrees.)
+    /// Define from Euler angles (in degrees.) Equivalent to Y*X*Z.
     void FromEulerAngles(float x, float y, float z);
     /// Define from the rotation difference between two direction vectors.
     void FromRotationTo(const Vector3& start, const Vector3& end);

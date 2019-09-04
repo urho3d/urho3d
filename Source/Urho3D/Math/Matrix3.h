@@ -241,17 +241,6 @@ public:
         );
     }
 
-    /// Make a rotation matrix given an axis of rotation
-    /*
-        Useful for standalone rotation of a node around an arbtitrary position,
-        by the given axis of rotation (can be used for orbital mechanics).
-        rotating the parent node doesn't do the same as it's children orbit around its axis
-        of rotation, not the center point
-        To get the next point multiply this by a starting Vector3 pos with it's origin (0,0,0)
-        being the center of rotation
-    */
-    void MakeRotationMatrix(float xAxis,float yAxis, float zAxis, Urho3D::AngleTypeEnum angleType = DEGREES);
-
     /// Test for equality with another matrix with epsilon.
     bool Equals(const Matrix3& rhs) const
     {
