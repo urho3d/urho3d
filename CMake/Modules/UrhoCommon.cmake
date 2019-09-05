@@ -1135,7 +1135,7 @@ macro (add_html_shell)
             # Create Urho3D custom HTML shell that also embeds our own project logo
             if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
                 file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html HTML_SHELL)
-                string (REPLACE "<!doctype html>" "#!/usr/bin/env ${EMSCRIPTEN_EMRUN_BROWSER}\n<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" HTML_SHELL "${HTML_SHELL}")     # Stringify to preserve semicolons
+                string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" HTML_SHELL "${HTML_SHELL}")     # Stringify to preserve semicolons
                 string (REPLACE "<body>" "<body>\n<script>document.body.innerHTML=document.body.innerHTML.replace(/^#!.*\\n/, '');</script>\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" HTML_SHELL "${HTML_SHELL}")
                 file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${HTML_SHELL}")
             endif ()
