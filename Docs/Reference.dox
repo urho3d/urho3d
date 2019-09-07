@@ -1216,6 +1216,10 @@ A material definition looks like this:
 </material>
 \endcode
 
+The default values for a material are set by \ref Material::ResetToDefaults() and are as follows:
+
+\include DefaultMaterial.xml
+
 Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()".
 
 The techniques for different LOD levels and quality settings must appear in a specific order:
