@@ -51,6 +51,7 @@ static const int DEFAULT_HISTORY_SIZE = 16;
 
 const char* logStyles[] =
 {
+    "ConsoleTraceText",
     "ConsoleDebugText",
     "ConsoleInfoText",
     "ConsoleWarningText",
