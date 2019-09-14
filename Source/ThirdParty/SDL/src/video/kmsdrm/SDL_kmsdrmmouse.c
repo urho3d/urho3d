@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,6 +44,40 @@ KMSDRM_CreateDefaultCursor(void)
     return SDL_CreateCursor(default_cdata, default_cmask, DEFAULT_CWIDTH, DEFAULT_CHEIGHT, DEFAULT_CHOTX, DEFAULT_CHOTY);
 }
 
+/* Evaluate if a given cursor size is supported or not. Notably, current Intel gfx only support 64x64 and up. */
+static SDL_bool
+KMSDRM_IsCursorSizeSupported (int w, int h, uint32_t bo_format) {
+
+    SDL_VideoDevice *dev = SDL_GetVideoDevice();
+    SDL_VideoData *vdata = ((SDL_VideoData *)dev->driverdata);
+    int ret;
+    uint32_t bo_handle;
+    struct gbm_bo *bo = KMSDRM_gbm_bo_create(vdata->gbm, w, h, bo_format,
+                                       GBM_BO_USE_CURSOR | GBM_BO_USE_WRITE);
+
+    if (bo == NULL) {
+        SDL_SetError("Could not create GBM cursor BO width size %dx%d for size testing", w, h);
+        goto cleanup;
+    }
+
+    bo_handle = KMSDRM_gbm_bo_get_handle(bo).u32;
+    ret = KMSDRM_drmModeSetCursor(vdata->drm_fd, vdata->crtc_id, bo_handle, w, h);
+
+    if (ret) {
+        goto cleanup;
+    }
+    else {
+        KMSDRM_gbm_bo_destroy(bo);
+        return SDL_TRUE;
+    }
+
+cleanup:
+    if (bo != NULL) {
+        KMSDRM_gbm_bo_destroy(bo);
+    }
+    return SDL_FALSE;
+}
+
 /* Create a cursor from a surface */
 static SDL_Cursor *
 KMSDRM_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
@@ -53,7 +87,8 @@ KMSDRM_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     SDL_PixelFormat *pixlfmt = surface->format;
     KMSDRM_CursorData *curdata;
     SDL_Cursor *cursor;
-    int i, ret;
+    SDL_bool cursor_supported = SDL_FALSE;
+    int i, ret, usable_cursor_w, usable_cursor_h;
     uint32_t bo_format, bo_stride;
     char *buffer = NULL;
     size_t bufsize;
@@ -143,20 +178,43 @@ KMSDRM_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
         return NULL;
     }
 
+    /* We have to know beforehand if a cursor with the same size as the surface is supported.
+     * If it's not, we have to find an usable cursor size and use an intermediate and clean buffer.
+     * If we can't find a cursor size supported by the hardware, we won't go on trying to 
+     * call SDL_SetCursor() later. */
+
+    usable_cursor_w = surface->w;
+    usable_cursor_h = surface->h;
+
+    while (usable_cursor_w <= MAX_CURSOR_W && usable_cursor_h <= MAX_CURSOR_H) { 
+        if (KMSDRM_IsCursorSizeSupported(usable_cursor_w, usable_cursor_h, bo_format)) {
+            cursor_supported = SDL_TRUE;
+            break;
+        }
+        usable_cursor_w += usable_cursor_w;
+        usable_cursor_h += usable_cursor_h;
+    }
+
+    if (!cursor_supported) {
+        SDL_SetError("Could not find a cursor size supported by the kernel driver");
+        goto cleanup;
+    }
+
     curdata->hot_x = hot_x;
     curdata->hot_y = hot_y;
-    curdata->w = surface->w;
-    curdata->h = surface->h;
+    curdata->w = usable_cursor_w;
+    curdata->h = usable_cursor_h;
 
-    curdata->bo = KMSDRM_gbm_bo_create(vdata->gbm, surface->w, surface->h, bo_format,
+    curdata->bo = KMSDRM_gbm_bo_create(vdata->gbm, usable_cursor_w, usable_cursor_h, bo_format,
                                        GBM_BO_USE_CURSOR | GBM_BO_USE_WRITE);
+
     if (curdata->bo == NULL) {
         SDL_SetError("Could not create GBM cursor BO");
         goto cleanup;
     }
 
     bo_stride = KMSDRM_gbm_bo_get_stride(curdata->bo);
-    bufsize = bo_stride * surface->h;
+    bufsize = bo_stride * curdata->h;
 
     if (surface->pitch != bo_stride) {
         /* pitch doesn't match stride, must be copied to temp buffer  */
@@ -172,6 +230,9 @@ KMSDRM_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
                 goto cleanup;
             }
         }
+
+        /* Clean the whole temporary buffer */
+        SDL_memset(buffer, 0x00, bo_stride * curdata->h);
 
         /* Copy to temporary buffer */
         for (i = 0; i < surface->h; i++) {
@@ -362,8 +423,13 @@ KMSDRM_WarpMouseGlobal(int x, int y)
     SDL_Mouse *mouse = SDL_GetMouse();
 
     if (mouse != NULL && mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
+        /* Update internal mouse position. */
+        SDL_SendMouseMotion(mouse->focus, mouse->mouseID, 0, x, y);
+
+        /* And now update the cursor graphic position on screen. */
         curdata = (KMSDRM_CursorData *) mouse->cur_cursor->driverdata;
         if (curdata->bo != NULL) {
+
             if (curdata->crtc_id != 0) {
                 int ret, drm_fd;
                 drm_fd = KMSDRM_gbm_device_get_fd(KMSDRM_gbm_bo_get_device(curdata->bo));
@@ -414,7 +480,20 @@ static void
 KMSDRM_MoveCursor(SDL_Cursor * cursor)
 {
     SDL_Mouse *mouse = SDL_GetMouse();
-    KMSDRM_WarpMouse(mouse->focus, mouse->x, mouse->y);
+    KMSDRM_CursorData *curdata;
+    int drm_fd, ret;
+
+    /* We must NOT call SDL_SendMouseMotion() here or we will enter recursivity!
+       That's why we move the cursor graphic ONLY. */
+    if (mouse != NULL && mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
+        curdata = (KMSDRM_CursorData *) mouse->cur_cursor->driverdata;
+        drm_fd = KMSDRM_gbm_device_get_fd(KMSDRM_gbm_bo_get_device(curdata->bo));
+        ret = KMSDRM_drmModeMoveCursor(drm_fd, curdata->crtc_id, mouse->x, mouse->y);
+
+        if (ret) {
+            SDL_SetError("drmModeMoveCursor() failed.");
+        }
+    }
 }
 
 #endif /* SDL_VIDEO_DRIVER_KMSDRM */

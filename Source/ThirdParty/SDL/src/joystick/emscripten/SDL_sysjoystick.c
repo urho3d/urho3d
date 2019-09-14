@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -97,7 +97,7 @@ Emscripten_JoyStickConnected(int eventType, const EmscriptenGamepadEvent *gamepa
 
     ++numjoysticks;
 
-    SDL_PrivateJoystickAdded(numjoysticks - 1);
+    SDL_PrivateJoystickAdded(item->device_instance);
 
 #ifdef DEBUG_JOYSTICK
     SDL_Log("Number of joysticks is %d", numjoysticks);
@@ -156,22 +156,48 @@ Emscripten_JoyStickDisconnected(int eventType, const EmscriptenGamepadEvent *gam
     return 1;
 }
 
+/* Function to perform any system-specific joystick related cleanup */
+static void
+EMSCRIPTEN_JoystickQuit(void)
+{
+    SDL_joylist_item *item = NULL;
+    SDL_joylist_item *next = NULL;
+
+    for (item = SDL_joylist; item; item = next) {
+        next = item->next;
+        SDL_free(item->mapping);
+        SDL_free(item->name);
+        SDL_free(item);
+    }
+
+    SDL_joylist = SDL_joylist_tail = NULL;
+
+    numjoysticks = 0;
+    instance_counter = 0;
+
+    emscripten_set_gamepadconnected_callback(NULL, 0, NULL);
+    emscripten_set_gamepaddisconnected_callback(NULL, 0, NULL);
+}
+
 /* Function to scan the system for joysticks.
  * It should return 0, or -1 on an unrecoverable fatal error.
  */
-int
-SDL_SYS_JoystickInit(void)
+static int
+EMSCRIPTEN_JoystickInit(void)
 {
     int retval, i, numjs;
     EmscriptenGamepadEvent gamepadState;
 
     numjoysticks = 0;
-    numjs = emscripten_get_num_gamepads();
+
+    retval = emscripten_sample_gamepad_data();
 
     /* Check if gamepad is supported by browser */
-    if (numjs == EMSCRIPTEN_RESULT_NOT_SUPPORTED) {
+    if (retval == EMSCRIPTEN_RESULT_NOT_SUPPORTED) {
         return SDL_SetError("Gamepads not supported");
     }
+
+    numjs = emscripten_get_num_gamepads();
 
     /* handle already connected gamepads */
     if (numjs > 0) {
@@ -190,7 +216,7 @@ SDL_SYS_JoystickInit(void)
                                                       Emscripten_JoyStickConnected);
 
     if(retval != EMSCRIPTEN_RESULT_SUCCESS) {
-        SDL_SYS_JoystickQuit();
+        EMSCRIPTEN_JoystickQuit();
         return SDL_SetError("Could not set gamepad connect callback");
     }
 
@@ -198,7 +224,7 @@ SDL_SYS_JoystickInit(void)
                                                          0,
                                                          Emscripten_JoyStickDisconnected);
     if(retval != EMSCRIPTEN_RESULT_SUCCESS) {
-        SDL_SYS_JoystickQuit();
+        EMSCRIPTEN_JoystickQuit();
         return SDL_SetError("Could not set gamepad disconnect callback");
     }
 
@@ -239,26 +265,31 @@ JoystickByIndex(int index)
     return item;
 }
 
-int
-SDL_SYS_NumJoysticks(void)
+static int
+EMSCRIPTEN_JoystickGetCount(void)
 {
     return numjoysticks;
 }
 
-void
-SDL_SYS_JoystickDetect(void)
+static void
+EMSCRIPTEN_JoystickDetect(void)
 {
 }
 
-/* Function to get the device-dependent name of a joystick */
-const char *
-SDL_SYS_JoystickNameForDeviceIndex(int device_index)
+static const char *
+EMSCRIPTEN_JoystickGetDeviceName(int device_index)
 {
     return JoystickByDeviceIndex(device_index)->name;
 }
 
-/* Function to perform the mapping from device index to the instance id for this index */
-SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
+static int
+EMSCRIPTEN_JoystickGetDevicePlayerIndex(int device_index)
+{
+    return -1;
+}
+
+static SDL_JoystickID
+EMSCRIPTEN_JoystickGetDeviceInstanceID(int device_index)
 {
     return JoystickByDeviceIndex(device_index)->device_instance;
 }
@@ -268,8 +299,8 @@ SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
-int
-SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
+static int
+EMSCRIPTEN_JoystickOpen(SDL_Joystick * joystick, int device_index)
 {
     SDL_joylist_item *item = JoystickByDeviceIndex(device_index);
 
@@ -295,23 +326,19 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
     return (0);
 }
 
-/* Function to determine if this joystick is attached to the system right now */
-SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
-{
-    return joystick->hwdata != NULL;
-}
-
 /* Function to update the state of a joystick - called as a device poll.
  * This function shouldn't update the joystick structure directly,
  * but instead should call SDL_PrivateJoystick*() to deliver events
  * and update joystick device state.
  */
-void
-SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
+static void
+EMSCRIPTEN_JoystickUpdate(SDL_Joystick * joystick)
 {
     EmscriptenGamepadEvent gamepadState;
     SDL_joylist_item *item = (SDL_joylist_item *) joystick->hwdata;
     int i, result, buttonState;
+
+    emscripten_sample_gamepad_data();
 
     if (item) {
         result = emscripten_get_gamepad_status(item->index, &gamepadState);
@@ -346,8 +373,8 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
 }
 
 /* Function to close a joystick after use */
-void
-SDL_SYS_JoystickClose(SDL_Joystick * joystick)
+static void
+EMSCRIPTEN_JoystickClose(SDL_Joystick * joystick)
 {
     SDL_joylist_item *item = (SDL_joylist_item *) joystick->hwdata;
     if (item) {
@@ -355,49 +382,39 @@ SDL_SYS_JoystickClose(SDL_Joystick * joystick)
     }
 }
 
-/* Function to perform any system-specific joystick related cleanup */
-void
-SDL_SYS_JoystickQuit(void)
-{
-    SDL_joylist_item *item = NULL;
-    SDL_joylist_item *next = NULL;
-
-    for (item = SDL_joylist; item; item = next) {
-        next = item->next;
-        SDL_free(item->mapping);
-        SDL_free(item->name);
-        SDL_free(item);
-    }
-
-    SDL_joylist = SDL_joylist_tail = NULL;
-
-    numjoysticks = 0;
-    instance_counter = 0;
-
-    emscripten_set_gamepadconnected_callback(NULL, 0, NULL);
-    emscripten_set_gamepaddisconnected_callback(NULL, 0, NULL);
-}
-
-SDL_JoystickGUID
-SDL_SYS_JoystickGetDeviceGUID(int device_index)
+static SDL_JoystickGUID
+EMSCRIPTEN_JoystickGetDeviceGUID(int device_index)
 {
     SDL_JoystickGUID guid;
     /* the GUID is just the first 16 chars of the name for now */
-    const char *name = SDL_SYS_JoystickNameForDeviceIndex(device_index);
+    const char *name = EMSCRIPTEN_JoystickGetDeviceName(device_index);
     SDL_zero(guid);
     SDL_memcpy(&guid, name, SDL_min(sizeof(guid), SDL_strlen(name)));
     return guid;
 }
 
-SDL_JoystickGUID
-SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick)
+static int
+EMSCRIPTEN_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
 {
-    SDL_JoystickGUID guid;
-    /* the GUID is just the first 16 chars of the name for now */
-    const char *name = joystick->name;
-    SDL_zero(guid);
-    SDL_memcpy(&guid, name, SDL_min(sizeof(guid), SDL_strlen(name)));
-    return guid;
+    return SDL_Unsupported();
 }
+
+SDL_JoystickDriver SDL_EMSCRIPTEN_JoystickDriver =
+{
+    EMSCRIPTEN_JoystickInit,
+    EMSCRIPTEN_JoystickGetCount,
+    EMSCRIPTEN_JoystickDetect,
+    EMSCRIPTEN_JoystickGetDeviceName,
+    EMSCRIPTEN_JoystickGetDevicePlayerIndex,
+    EMSCRIPTEN_JoystickGetDeviceGUID,
+    EMSCRIPTEN_JoystickGetDeviceInstanceID,
+    EMSCRIPTEN_JoystickOpen,
+    EMSCRIPTEN_JoystickRumble,
+    EMSCRIPTEN_JoystickUpdate,
+    EMSCRIPTEN_JoystickClose,
+    EMSCRIPTEN_JoystickQuit,
+};
 
 #endif /* SDL_JOYSTICK_EMSCRIPTEN */
+
+/* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,6 +24,8 @@
 
 #include "SDL_assert.h"
 #include "SDL_uikitmodes.h"
+
+#include "../../events/SDL_events_c.h"
 
 @implementation SDL_DisplayData
 
@@ -188,6 +190,9 @@ UIKit_InitModes(_THIS)
                 return -1;
             }
         }
+#if !TARGET_OS_TV
+        SDL_OnApplicationDidChangeStatusBarOrientation();
+#endif
     }
 
     return 0;
@@ -211,17 +216,18 @@ UIKit_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
         availableModes = data.uiscreen.availableModes;
 #endif
 
-#ifdef __IPHONE_8_0
-        /* The UIScreenMode of an iPhone 6 Plus should be 1080x1920 rather than
-         * 1242x2208 (414x736@3x), so we should use the native scale. */
-        if ([data.uiscreen respondsToSelector:@selector(nativeScale)]) {
-            scale = data.uiscreen.nativeScale;
-        }
-#endif
-
         for (UIScreenMode *uimode in availableModes) {
             /* The size of a UIScreenMode is in pixels, but we deal exclusively
-             * in points (except in SDL_GL_GetDrawableSize.) */
+             * in points (except in SDL_GL_GetDrawableSize.)
+             *
+             * For devices such as iPhone 6/7/8 Plus, the UIScreenMode reported
+             * by iOS is not in physical pixels of the display, but rather the
+             * point size times the scale.  For example, on iOS 12.2 on iPhone 8
+             * Plus the uimode.size is 1242x2208 and the uiscreen.scale is 3
+             * thus this will give the size in points which is 414x736. The code
+             * used to use the nativeScale, assuming UIScreenMode returned raw
+             * physical pixels (as suggested by its documentation, but in
+             * practice it is returning the retina pixels). */
             int w = (int)(uimode.size.width / scale);
             int h = (int)(uimode.size.height / scale);
 
@@ -318,6 +324,57 @@ UIKit_QuitModes(_THIS)
         }
     }
 }
+
+#if !TARGET_OS_TV
+void SDL_OnApplicationDidChangeStatusBarOrientation()
+{
+    BOOL isLandscape = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation);
+    SDL_VideoDisplay *display = SDL_GetDisplay(0);
+
+    if (display) {
+        SDL_DisplayMode *desktopmode = &display->desktop_mode;
+        SDL_DisplayMode *currentmode = &display->current_mode;
+        SDL_DisplayOrientation orientation = SDL_ORIENTATION_UNKNOWN;
+
+        /* The desktop display mode should be kept in sync with the screen
+         * orientation so that updating a window's fullscreen state to
+         * SDL_WINDOW_FULLSCREEN_DESKTOP keeps the window dimensions in the
+         * correct orientation. */
+        if (isLandscape != (desktopmode->w > desktopmode->h)) {
+            int height = desktopmode->w;
+            desktopmode->w = desktopmode->h;
+            desktopmode->h = height;
+        }
+
+        /* Same deal with the current mode + SDL_GetCurrentDisplayMode. */
+        if (isLandscape != (currentmode->w > currentmode->h)) {
+            int height = currentmode->w;
+            currentmode->w = currentmode->h;
+            currentmode->h = height;
+        }
+
+        switch ([UIApplication sharedApplication].statusBarOrientation) {
+        case UIInterfaceOrientationPortrait:
+            orientation = SDL_ORIENTATION_PORTRAIT;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown:
+            orientation = SDL_ORIENTATION_PORTRAIT_FLIPPED;
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            /* Bug: UIInterfaceOrientationLandscapeLeft/Right are reversed - http://openradar.appspot.com/7216046 */
+            orientation = SDL_ORIENTATION_LANDSCAPE_FLIPPED;
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            /* Bug: UIInterfaceOrientationLandscapeLeft/Right are reversed - http://openradar.appspot.com/7216046 */
+            orientation = SDL_ORIENTATION_LANDSCAPE;
+            break;
+        default:
+            break;
+        }
+        SDL_SendDisplayEvent(display, SDL_DISPLAYEVENT_ORIENTATION, orientation);
+    }
+}
+#endif /* !TARGET_OS_TV */
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
 

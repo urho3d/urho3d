@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -79,7 +79,9 @@ Emscripten_CreateCursor(SDL_Surface* surface, int hot_x, int hot_y)
     cursor_url = (const char *)EM_ASM_INT({
         var w = $0;
         var h = $1;
-        var pixels = $2;
+        var hot_x = $2;
+        var hot_y = $3;
+        var pixels = $4;
 
         var canvas = document.createElement("canvas");
         canvas.width = w;
@@ -114,13 +116,15 @@ Emscripten_CreateCursor(SDL_Surface* surface, int hot_x, int hot_y)
         }
 
         ctx.putImageData(image, 0, 0);
-        var url = "url(" + canvas.toDataURL() + "), auto";
+        var url = hot_x === 0 && hot_y === 0
+            ? "url(" + canvas.toDataURL() + "), auto"
+            : "url(" + canvas.toDataURL() + ") " + hot_x + " " + hot_y + ", auto";
 
         var urlBuf = _malloc(url.length + 1);
         stringToUTF8(url, urlBuf, url.length + 1);
 
         return urlBuf;
-    }, surface->w, surface->h, conv_surf->pixels);
+    }, surface->w, surface->h, hot_x, hot_y, conv_surf->pixels);
 
     SDL_FreeSurface(conv_surf);
 
@@ -161,6 +165,7 @@ Emscripten_CreateSystemCursor(SDL_SystemCursor id)
             cursor_name = "ns-resize";
             break;
         case SDL_SYSTEM_CURSOR_SIZEALL:
+            cursor_name = "move";
             break;
         case SDL_SYSTEM_CURSOR_NO:
             cursor_name = "not-allowed";
@@ -205,7 +210,7 @@ Emscripten_ShowCursor(SDL_Cursor* cursor)
             if(curdata->system_cursor) {
                 EM_ASM_INT({
                     if (Module['canvas']) {
-                        Module['canvas'].style['cursor'] = Module['Pointer_stringify']($0);
+                        Module['canvas'].style['cursor'] = UTF8ToString($0);
                     }
                     return 0;
                 }, curdata->system_cursor);

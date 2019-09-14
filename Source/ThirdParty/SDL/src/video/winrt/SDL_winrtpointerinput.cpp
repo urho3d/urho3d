@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -38,13 +38,12 @@ extern "C" {
 
 /* File-specific globals: */
 static SDL_TouchID WINRT_TouchID = 1;
-static unsigned int WINRT_LeftFingerDown = 0;
 
 
 void
 WINRT_InitTouch(_THIS)
 {
-    SDL_AddTouch(WINRT_TouchID, "");
+    SDL_AddTouch(WINRT_TouchID, SDL_TOUCH_DEVICE_DIRECT, "");
 }
 
 
@@ -231,15 +230,6 @@ void WINRT_ProcessPointerPressedEvent(SDL_Window *window, Windows::UI::Input::Po
         Windows::Foundation::Point normalizedPoint = WINRT_TransformCursorPosition(window, pointerPoint->Position, NormalizeZeroToOne);
         Windows::Foundation::Point windowPoint = WINRT_TransformCursorPosition(window, pointerPoint->Position, TransformToSDLWindowSize);
 
-        if (!WINRT_LeftFingerDown) {
-            if (button) {
-                SDL_SendMouseMotion(window, SDL_TOUCH_MOUSEID, 0, (int)windowPoint.X, (int)windowPoint.Y);
-                SDL_SendMouseButton(window, SDL_TOUCH_MOUSEID, SDL_PRESSED, button);
-            }
-
-            WINRT_LeftFingerDown = pointerPoint->PointerId;
-        }
-
         SDL_SendTouch(
             WINRT_TouchID,
             (SDL_FingerID) pointerPoint->PointerId,
@@ -263,10 +253,6 @@ WINRT_ProcessPointerMovedEvent(SDL_Window *window, Windows::UI::Input::PointerPo
     if ( ! WINRT_IsTouchEvent(pointerPoint)) {
         SDL_SendMouseMotion(window, 0, 0, (int)windowPoint.X, (int)windowPoint.Y);
     } else {
-        if (pointerPoint->PointerId == WINRT_LeftFingerDown) {
-            SDL_SendMouseMotion(window, SDL_TOUCH_MOUSEID, 0, (int)windowPoint.X, (int)windowPoint.Y);
-        }
-
         SDL_SendTouchMotion(
             WINRT_TouchID,
             (SDL_FingerID) pointerPoint->PointerId,
@@ -288,13 +274,6 @@ void WINRT_ProcessPointerReleasedEvent(SDL_Window *window, Windows::UI::Input::P
         SDL_SendMouseButton(window, 0, SDL_RELEASED, button);
     } else {
         Windows::Foundation::Point normalizedPoint = WINRT_TransformCursorPosition(window, pointerPoint->Position, NormalizeZeroToOne);
-
-        if (WINRT_LeftFingerDown == pointerPoint->PointerId) {
-            if (button) {
-                SDL_SendMouseButton(window, SDL_TOUCH_MOUSEID, SDL_RELEASED, button);
-            }
-            WINRT_LeftFingerDown = 0;
-        }
 
         SDL_SendTouch(
             WINRT_TouchID,

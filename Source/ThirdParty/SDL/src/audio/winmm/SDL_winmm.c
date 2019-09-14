@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -78,7 +78,7 @@ static void DetectWave##typ##Devs(void) { \
     capstyp##2W caps; \
     UINT i; \
     for (i = 0; i < devcount; i++) { \
-	if (wave##typ##GetDevCaps(i,(LP##capstyp##W)&caps,sizeof(caps))==MMSYSERR_NOERROR) { \
+        if (wave##typ##GetDevCaps(i,(LP##capstyp##W)&caps,sizeof(caps))==MMSYSERR_NOERROR) { \
             char *name = WIN_LookupAudioDeviceName(caps.szPname,&caps.NameGuid); \
             if (name != NULL) { \
                 SDL_AddAudioDevice((int) iscapture, name, (void *) ((size_t) i+1)); \
@@ -375,8 +375,7 @@ WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 #endif
 
     /* Create the audio buffer semaphore */
-    this->hidden->audio_sem =
-		CreateSemaphore(NULL, iscapture ? 0 : NUM_BUFFERS - 1, NUM_BUFFERS, NULL);
+    this->hidden->audio_sem = CreateSemaphore(NULL, iscapture ? 0 : NUM_BUFFERS - 1, NUM_BUFFERS, NULL);
     if (this->hidden->audio_sem == NULL) {
         return SDL_SetError("Couldn't create semaphore");
     }

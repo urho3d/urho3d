@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -101,7 +101,7 @@
                 SDL_SetError("sRGB drawables are not supported.");
                 return nil;
             }
-        } else if (rBits >= 8 || gBits >= 8 || bBits >= 8) {
+        } else if (rBits >= 8 || gBits >= 8 || bBits >= 8 || aBits > 0) {
             /* if user specifically requests rbg888 or some color format higher than 16bpp */
             colorFormat = kEAGLColorFormatRGBA8;
             colorBufferFormat = GL_RGBA8;

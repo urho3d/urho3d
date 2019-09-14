@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -227,16 +227,54 @@ UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen)
     return frame;
 }
 
+void
+UIKit_ForceUpdateHomeIndicator()
+{
+#if !TARGET_OS_TV
+    /* Force the main SDL window to re-evaluate home indicator state */
+    SDL_Window *focus = SDL_GetFocusWindow();
+    if (focus) {
+        SDL_WindowData *data = (__bridge SDL_WindowData *) focus->driverdata;
+        if (data != nil) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
+            if ([data.viewcontroller respondsToSelector:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden)]) {
+                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden) withObject:nil waitUntilDone:NO];
+                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfScreenEdgesDeferringSystemGestures) withObject:nil waitUntilDone:NO];
+            }
+#pragma clang diagnostic pop
+        }
+    }
+#endif /* !TARGET_OS_TV */
+}
+
 /*
  * iOS log support.
  *
  * This doesn't really have aything to do with the interfaces of the SDL video
  *  subsystem, but we need to stuff this into an Objective-C source code file.
+ *
+ * NOTE: This is copypasted from src/video/cocoa/SDL_cocoavideo.m! Thus, if
+ *  Cocoa is supported, we use that one instead. Be sure both versions remain
+ *  identical!
  */
 
+#if !defined(SDL_VIDEO_DRIVER_COCOA)
 void SDL_NSLog(const char *text)
 {
     NSLog(@"%s", text);
+}
+#endif /* SDL_VIDEO_DRIVER_COCOA */
+
+/*
+ * iOS Tablet detection
+ *
+ * This doesn't really have aything to do with the interfaces of the SDL video
+ * subsystem, but we need to stuff this into an Objective-C source code file.
+ */
+SDL_bool SDL_IsIPad(void)
+{
+    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
