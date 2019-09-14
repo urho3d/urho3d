@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@
 
 @interface SDL_VideoData : NSObject
 
-@property (nonatomic) id pasteboardObserver;
+@property (nonatomic, assign) id pasteboardObserver;
 
 @end
 
@@ -38,6 +38,8 @@ CGRect UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen);
 #endif /* __OBJC__ */
 
 void UIKit_SuspendScreenSaver(_THIS);
+
+void UIKit_ForceUpdateHomeIndicator(void);
 
 SDL_bool UIKit_IsSystemVersionAtLeast(double version);
 

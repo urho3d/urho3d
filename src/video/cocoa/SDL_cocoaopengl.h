@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,6 +28,12 @@
 #include "SDL_atomic.h"
 #import <Cocoa/Cocoa.h>
 
+/* We still support OpenGL as long as Apple offers it, deprecated or not, so disable deprecation warnings about it. */
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 struct SDL_GLDriverData
 {
     int initialized;
@@ -46,7 +52,6 @@ struct SDL_GLDriverData
 
 @end
 
-
 /* OpenGL functions */
 extern int Cocoa_GL_LoadLibrary(_THIS, const char *path);
 extern void *Cocoa_GL_GetProcAddress(_THIS, const char *proc);
@@ -60,6 +65,10 @@ extern int Cocoa_GL_SetSwapInterval(_THIS, int interval);
 extern int Cocoa_GL_GetSwapInterval(_THIS);
 extern int Cocoa_GL_SwapWindow(_THIS, SDL_Window * window);
 extern void Cocoa_GL_DeleteContext(_THIS, SDL_GLContext context);
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif /* SDL_VIDEO_OPENGL_CGL */
 

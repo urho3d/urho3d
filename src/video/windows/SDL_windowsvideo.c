@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -63,6 +63,15 @@ UpdateWindowFrameUsableWhileCursorHidden(void *userdata, const char *name, const
         g_WindowFrameUsableWhileCursorHidden = SDL_FALSE;
     } else {
         g_WindowFrameUsableWhileCursorHidden = SDL_TRUE;
+    }
+}
+
+static void WIN_SuspendScreenSaver(_THIS)
+{
+    if (_this->suspend_screensaver) {
+        SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
+    } else {
+        SetThreadExecutionState(ES_CONTINUOUS);
     }
 }
 
@@ -144,6 +153,7 @@ WIN_CreateDevice(int devindex)
     device->GetDisplayModes = WIN_GetDisplayModes;
     device->SetDisplayMode = WIN_SetDisplayMode;
     device->PumpEvents = WIN_PumpEvents;
+    device->SuspendScreenSaver = WIN_SuspendScreenSaver;
 
     device->CreateSDLWindow = WIN_CreateWindow;
     device->CreateSDLWindowFrom = WIN_CreateWindowFrom;
@@ -151,6 +161,7 @@ WIN_CreateDevice(int devindex)
     device->SetWindowIcon = WIN_SetWindowIcon;
     device->SetWindowPosition = WIN_SetWindowPosition;
     device->SetWindowSize = WIN_SetWindowSize;
+    device->GetWindowBordersSize = WIN_GetWindowBordersSize;
     device->SetWindowOpacity = WIN_SetWindowOpacity;
     device->ShowWindow = WIN_ShowWindow;
     device->HideWindow = WIN_HideWindow;
@@ -171,6 +182,7 @@ WIN_CreateDevice(int devindex)
     device->DestroyWindowFramebuffer = WIN_DestroyWindowFramebuffer;
     device->OnWindowEnter = WIN_OnWindowEnter;
     device->SetWindowHitTest = WIN_SetWindowHitTest;
+    device->AcceptDragAndDrop = WIN_AcceptDragAndDrop;
 
     device->shape_driver.CreateShaper = Win32_CreateShaper;
     device->shape_driver.SetWindowShape = Win32_SetWindowShape;

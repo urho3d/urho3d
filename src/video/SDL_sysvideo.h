@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -119,8 +119,8 @@ struct SDL_Window
      !((W)->flags & SDL_WINDOW_MINIMIZED))
 
 /*
- * Define the SDL display structure This corresponds to physical monitors
- * attached to the system.
+ * Define the SDL display structure.
+ * This corresponds to physical monitors attached to the system.
  */
 struct SDL_VideoDisplay
 {
@@ -130,6 +130,7 @@ struct SDL_VideoDisplay
     SDL_DisplayMode *display_modes;
     SDL_DisplayMode desktop_mode;
     SDL_DisplayMode current_mode;
+    SDL_DisplayOrientation orientation;
 
     SDL_Window *fullscreen_window;
 
@@ -181,14 +182,14 @@ struct SDL_VideoDevice
     int (*GetDisplayBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
 
     /*
-     * Get the dots/pixels-per-inch of a display
-     */
-    int (*GetDisplayDPI) (_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
-
-    /*
      * Get the usable bounds of a display (bounds minus menubar or whatever)
      */
     int (*GetDisplayUsableBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
+
+    /*
+     * Get the dots/pixels-per-inch of a display
+     */
+    int (*GetDisplayDPI) (_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
 
     /*
      * Get a list of the available display modes for a display.
@@ -304,6 +305,9 @@ struct SDL_VideoDevice
     /* Hit-testing */
     int (*SetWindowHitTest)(SDL_Window * window, SDL_bool enabled);
 
+    /* Tell window that app enabled drag'n'drop events */
+    void (*AcceptDragAndDrop)(SDL_Window * window, SDL_bool accept);
+
     /* * * */
     /* Data common to all drivers */
     SDL_bool is_dummy;
@@ -365,8 +369,8 @@ struct SDL_VideoDevice
     /* Data used by the Vulkan drivers */
     struct
     {
-        void *vkGetInstanceProcAddr;
-        void *vkEnumerateInstanceExtensionProperties;
+        PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
+        PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;
         int loader_loaded;
         char loader_path[256];
         void *loader_handle;
@@ -401,7 +405,6 @@ typedef struct VideoBootStrap
 /* Not all of these are available in a given build. Use #ifdefs, etc. */
 extern VideoBootStrap COCOA_bootstrap;
 extern VideoBootStrap X11_bootstrap;
-extern VideoBootStrap MIR_bootstrap;
 extern VideoBootStrap DirectFB_bootstrap;
 extern VideoBootStrap WINDOWS_bootstrap;
 extern VideoBootStrap WINRT_bootstrap;
@@ -423,6 +426,8 @@ extern SDL_VideoDevice *SDL_GetVideoDevice(void);
 extern int SDL_AddBasicVideoDisplay(const SDL_DisplayMode * desktop_mode);
 extern int SDL_AddVideoDisplay(const SDL_VideoDisplay * display);
 extern SDL_bool SDL_AddDisplayMode(SDL_VideoDisplay *display, const SDL_DisplayMode * mode);
+extern int SDL_GetIndexOfDisplay(SDL_VideoDisplay *display);
+extern SDL_VideoDisplay *SDL_GetDisplay(int displayIndex);
 extern SDL_VideoDisplay *SDL_GetDisplayForWindow(SDL_Window *window);
 extern void *SDL_GetDisplayDriverData( int displayIndex );
 
@@ -453,6 +458,8 @@ extern void SDL_OnApplicationWillResignActive(void);
 extern void SDL_OnApplicationDidEnterBackground(void);
 extern void SDL_OnApplicationWillEnterForeground(void);
 extern void SDL_OnApplicationDidBecomeActive(void);
+
+extern void SDL_ToggleDragAndDropSupport(void);
 
 #endif /* SDL_sysvideo_h_ */
 

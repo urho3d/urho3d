@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,7 @@
 int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    SDL_bool isstack;
     size_t size;
     LPBITMAPINFO info;
     HBITMAP hbm;
@@ -41,7 +42,7 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
 
     /* Find out the format of the screen */
     size = sizeof(BITMAPINFOHEADER) + 256 * sizeof (RGBQUAD);
-    info = (LPBITMAPINFO)SDL_stack_alloc(Uint8, size);
+    info = (LPBITMAPINFO)SDL_small_alloc(Uint8, size, &isstack);
     if (!info) {
         return SDL_OutOfMemory();
     }
@@ -85,7 +86,7 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
 
     data->mdc = CreateCompatibleDC(data->hdc);
     data->hbm = CreateDIBSection(data->hdc, info, DIB_RGB_COLORS, pixels, NULL, 0);
-    SDL_stack_free(info);
+    SDL_small_free(info, isstack);
 
     if (!data->hbm) {
         return WIN_SetError("Unable to create DIB");

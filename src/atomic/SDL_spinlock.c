@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,11 +32,15 @@
 #include <atomic.h>
 #endif
 
+#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+#include <xmmintrin.h>
+#endif
+
 #if defined(__WATCOMC__) && defined(__386__)
 SDL_COMPILE_TIME_ASSERT(locksize, 4==sizeof(SDL_SpinLock));
 extern _inline int _SDL_xchg_watcom(volatile int *a, int v);
 #pragma aux _SDL_xchg_watcom = \
-  "xchg [ecx], eax" \
+  "lock xchg [ecx], eax" \
   parm [ecx] [eax] \
   value [eax] \
   modify exact [eax];
@@ -116,12 +120,32 @@ SDL_AtomicTryLock(SDL_SpinLock *lock)
 #endif
 }
 
+/* "REP NOP" is PAUSE, coded for tools that don't know it by that name. */
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__i386__) || defined(__x86_64__))
+    #define PAUSE_INSTRUCTION() __asm__ __volatile__("pause\n")  /* Some assemblers can't do REP NOP, so go with PAUSE. */
+#elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+    #define PAUSE_INSTRUCTION() _mm_pause()  /* this is actually "rep nop" and not a SIMD instruction. No inline asm in MSVC x86-64! */
+#elif defined(__WATCOMC__) && defined(__386__)
+    /* watcom assembler rejects PAUSE if CPU < i686, and it refuses REP NOP as an invalid combination. Hardcode the bytes.  */
+    extern _inline void PAUSE_INSTRUCTION(void);
+    #pragma aux PAUSE_INSTRUCTION = "db 0f3h,90h"
+#else
+    #define PAUSE_INSTRUCTION()
+#endif
+
 void
 SDL_AtomicLock(SDL_SpinLock *lock)
 {
+    int iterations = 0;
     /* FIXME: Should we have an eventual timeout? */
     while (!SDL_AtomicTryLock(lock)) {
-        SDL_Delay(0);
+        if (iterations < 32) {
+            iterations++;
+            PAUSE_INSTRUCTION();
+        } else {
+            /* !!! FIXME: this doesn't definitely give up the current timeslice, it does different things on various platforms. */
+            SDL_Delay(0);
+        }
     }
 }
 

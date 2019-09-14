@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+
+// Modified by Yao Wei Tjong for Urho3D
 
 /**
  *  \file SDL_surface.h
@@ -53,6 +56,12 @@ extern "C" {
 #define SDL_PREALLOC        0x00000001  /**< Surface uses preallocated memory */
 #define SDL_RLEACCEL        0x00000002  /**< Surface is RLE encoded */
 #define SDL_DONTFREE        0x00000004  /**< Surface is referenced internally */
+// Urho3D - bug fix - check if SIMD is supported
+#ifdef __EMSCRIPTEN__
+#define SDL_SIMD_ALIGNED    0
+#else
+#define SDL_SIMD_ALIGNED    0x00000008  /**< Surface uses aligned memory */
+#endif
 /* @} *//* Surface flags */
 
 /**
@@ -96,6 +105,17 @@ typedef struct SDL_Surface
  */
 typedef int (SDLCALL *SDL_blit) (struct SDL_Surface * src, SDL_Rect * srcrect,
                                  struct SDL_Surface * dst, SDL_Rect * dstrect);
+
+/**
+ * \brief The formula used for converting between YUV and RGB
+ */
+typedef enum
+{
+    SDL_YUV_CONVERSION_JPEG,        /**< Full range JPEG */
+    SDL_YUV_CONVERSION_BT601,       /**< BT.601 (the default) */
+    SDL_YUV_CONVERSION_BT709,       /**< BT.709 */
+    SDL_YUV_CONVERSION_AUTOMATIC    /**< BT.601 for SD content, BT.709 for HD content */
+} SDL_YUV_CONVERSION_MODE;
 
 /**
  *  Allocate and free an RGB surface.
@@ -236,6 +256,13 @@ extern DECLSPEC int SDLCALL SDL_SetSurfaceRLE(SDL_Surface * surface,
  */
 extern DECLSPEC int SDLCALL SDL_SetColorKey(SDL_Surface * surface,
                                             int flag, Uint32 key);
+
+/**
+ *  \brief Returns whether the surface has a color key
+ *
+ *  \return SDL_TRUE if the surface has a color key, or SDL_FALSE if the surface is NULL or has no color key
+ */
+extern DECLSPEC SDL_bool SDLCALL SDL_HasColorKey(SDL_Surface * surface);
 
 /**
  *  \brief Gets the color key (transparent pixel) in a blittable surface.
@@ -509,6 +536,20 @@ extern DECLSPEC int SDLCALL SDL_LowerBlitScaled
     (SDL_Surface * src, SDL_Rect * srcrect,
     SDL_Surface * dst, SDL_Rect * dstrect);
 
+/**
+ *  \brief Set the YUV conversion mode
+ */
+extern DECLSPEC void SDLCALL SDL_SetYUVConversionMode(SDL_YUV_CONVERSION_MODE mode);
+
+/**
+ *  \brief Get the YUV conversion mode
+ */
+extern DECLSPEC SDL_YUV_CONVERSION_MODE SDLCALL SDL_GetYUVConversionMode(void);
+
+/**
+ *  \brief Get the YUV conversion mode, returning the correct mode for the resolution when the current conversion mode is SDL_YUV_CONVERSION_AUTOMATIC
+ */
+extern DECLSPEC SDL_YUV_CONVERSION_MODE SDLCALL SDL_GetYUVConversionModeForResolution(int width, int height);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
