@@ -198,10 +198,10 @@ public:
     float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : defaultValue; }
     /// Return double value.
     double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
-    /// Return string value.
-    const String& GetString(String defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
-    /// Return C string value.
-    const char* GetCString(const char* defaultValue = nullptr) const { return IsString() ? stringValue_->CString() : defaultValue;}
+    /// Return string value. The 'defaultValue' may potentially be returned as is, so it is the responsibility of the caller to ensure the 'defaultValue' remains valid while the return value is being referenced.
+    const String& GetString(const String& defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
+    /// Return C string value. Default to empty string literal.
+    const char* GetCString(const char* defaultValue = "") const { return IsString() ? stringValue_->CString() : defaultValue;}
     /// Return JSON array value.
     const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.
