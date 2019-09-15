@@ -16,16 +16,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef B2_MATH_H
 #define B2_MATH_H
 
 #include "Box2D/Common/b2Settings.h"
-#include <math.h>
+// Urho3D - use C++11 std function
+#include <cmath>
 
 /// This function is used to ensure that a floating point number is not a NaN or infinity.
 inline bool b2IsValid(float32 x)
 {
-	return isfinite(x);
+    // Urho3D - use C++11 std function
+	return std::isfinite(x);
 }
 
 #define	b2Sqrt(x)	sqrtf(x)
