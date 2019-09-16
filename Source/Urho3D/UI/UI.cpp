@@ -153,6 +153,9 @@ UI::~UI() = default;
 
 void UI::SetCursor(Cursor* cursor)
 {
+    if (cursor_ == cursor)
+        return;
+
     // Remove old cursor (if any) and set new
     if (cursor_)
     {
