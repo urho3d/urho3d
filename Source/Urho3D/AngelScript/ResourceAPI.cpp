@@ -401,7 +401,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "uint GetUInt(uint defaultValue = 0) const", asMETHOD(JSONValue, GetUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "float GetFloat(float defaultValue = 0) const", asMETHOD(JSONValue, GetFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "double GetDouble(double defaultValue = 0) const", asMETHOD(JSONValue, GetDouble), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "const String& GetString(const String& defaultValue = String(\"\")) const", asMETHOD(JSONValue, GetString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "const String& GetString(const String& defaultValue = String()) const", asMETHOD(JSONValue, GetString), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "Variant GetVariant(Variant defaultValue = Variant()) const", asMETHOD(JSONValue, GetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "VariantMap GetVariantMap(VariantMap defaultValue = VariantMap()) const", asMETHOD(JSONValue, GetVariantMap), asCALL_THISCALL);
 
