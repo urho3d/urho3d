@@ -2081,7 +2081,7 @@ static void RegisterDebugRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "void AddSphereSector(const Sphere&in, const Quaternion&in, float, bool, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSphereSector), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddCircle(const Vector3&in, const Vector3&in, float, const Color&in, int steps = 64, bool depthTest = true)", asMETHOD(DebugRenderer, AddCircle), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddCross(const Vector3&in, float size, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddCross), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddCross(const Vector3&in, const Quaternion&in, float size, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddCross), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddQuad(const Vector3&in, float, float, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddQuad), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "DebugRenderer@+ get_debugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);

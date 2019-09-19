@@ -131,8 +131,13 @@ public:
     /// Add a sphere sector.
     void AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle,
         bool drawLines, const Color& color, bool depthTest = true);
+    void AddArc(const Sphere& sphere, const Vector3& from, const Vector3& to, const Color& color, int steps=16, bool depthTest=true);
     /// Add a cylinder
-    void AddCylinder(const Vector3& position, float radius, float height, const Color& color, bool depthTest = true);
+    void AddCylinder(     const Vector3& position, float radius, float height, const Color& color, bool depthTest = true);
+    void AddSolidCylinder(const Vector3& position, const Vector3& normal, float radius, float height, const Color& color, int steps=64, bool drawCaps=true, bool depthTest = true);
+    /// Add a solid arrow    
+    void AddSolidArrow(const Vector3& position, const Vector3& normal, float radius, float height, Color color, int steps=64, bool depthTest=true);
+
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     /// Add a triangle mesh.
@@ -144,9 +149,14 @@ public:
     /// Add a circle.
     void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
     /// Add a cross.
-    void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true);
+    void AddCross(const Vector3& center,  const Quaternion& orient, float size, const Color& color, bool depthTest = true);
     /// Add a quad on the XZ plane.
     void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true);
+
+    void AddLabel(const Vector3& position, const String& name, const String& text, bool dynamicText=true);
+
+    void AddSolidCone(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
+    void AddWireCone(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
 
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
