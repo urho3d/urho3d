@@ -861,10 +861,10 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
             context->SetArgDWord(i, (asDWORD)parameters[i].GetInt());
             break;
 
-		case asTYPEID_INT64:
-		case asTYPEID_UINT64:
-			context->SetArgQWord(i, (asQWORD)parameters[i].GetInt64());
-			break;
+        case asTYPEID_INT64:
+        case asTYPEID_UINT64:
+            context->SetArgQWord(i, (asQWORD)parameters[i].GetInt64());
+            break;
 
         case asTYPEID_FLOAT:
             context->SetArgFloat(i, parameters[i].GetFloat());
