@@ -136,6 +136,7 @@ Urho3D development, contributions and bugfixes by:
 - cosmy1
 - damu
 - dragonCASTjosh
+- error408
 - feltech
 - fredakilla
 - gleblebedev
