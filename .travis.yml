@@ -31,7 +31,6 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=4
     - URHO3D_DEPLOYMENT_TARGET=generic
-    - DBE_TAG=':latest'
   matrix:
     # Linux native 64-bit
     - LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz   # GCC
@@ -238,7 +237,6 @@ env:
     - ANDROID=1
     - ORG_GRADLE_PROJECT_URHO3D_LUAJIT=1
     - HOT=$HOME/urho3d_home_dir/.ccache/.hot
-    - DBE_TAG=':latest'
   matrix:
     - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=STATIC
     - ORG_GRADLE_PROJECT_URHO3D_LIB_TYPE=SHARED
@@ -269,7 +267,6 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=4
     - RPI=1
-    - DBE_TAG=':latest'
   matrix:
     # RPI 1
     - URHO3D_LIB_TYPE=STATIC
@@ -302,7 +299,6 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=4
     - ARM=1
-    - DBE_TAG=':latest'
   matrix:
     # ODROID-C2
     - URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
@@ -341,7 +337,6 @@ env:
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
-    - DBE_TAG=':latest'
   matrix:
     - URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=0 numjobs=4
     - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=0
