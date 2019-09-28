@@ -6164,7 +6164,7 @@ void Resize(uint);
 void Set(const String&, const JSONValue&);
 void SetVariant(const Variant&);
 void SetVariantMap(const VariantMap&);
-const String& GetString(const String& = String ( "" )) const;
+const String& GetString(const String& = String ( )) const;
 
 // Properties:
 /* readonly */
