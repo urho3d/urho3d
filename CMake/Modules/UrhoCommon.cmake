@@ -242,7 +242,7 @@ else ()
     else ()
         # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
         find_package (Urho3D REQUIRED)
-        include_directories (${URHO3D_INCLUDE_DIRS})
+        include_directories (SYSTEM ${URHO3D_INCLUDE_DIRS})
     endif ()
 endif ()
 cmake_dependent_option (URHO3D_PACKAGING "Enable resources packaging support" FALSE "NOT WEB" TRUE)
@@ -1739,7 +1739,7 @@ unset (INSTALLED_RESOURCE_DIRS CACHE)
 # Macro for setting up dependency lib for compilation and linking of a target (to be used internally)
 macro (_setup_target)
     # Include directories
-    include_directories (${INCLUDE_DIRS})
+    include_directories (SYSTEM ${INCLUDE_DIRS})
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
