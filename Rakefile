@@ -417,24 +417,24 @@ task :ci_site_update do
   next unless File.exist?("#{build_tree}/CMakeCache.txt")
   next if timeup
   puts "Updating site...\n\n"
-  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ~/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
   # Update credits from README.md to about.yml
-  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' ~/urho3d.github.io/_data/about.yml" or abort 'Failed to update credits'
+  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' build/urho3d.github.io/_data/about.yml" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 40, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}, %q{COLS_IN_ALPHA_INDEX} => 3} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' #{build_tree}/Docs/generated/Doxyfile" or abort 'Failed to setup doxygen configuration file'
-  system "cp ~/urho3d.github.io/_includes/Doxygen/minimal-* #{build_tree}/Docs" or abort 'Failed to copy minimal-themed template'
+  system "cp build/urho3d.github.io/_includes/Doxygen/minimal-* #{build_tree}/Docs" or abort 'Failed to copy minimal-themed template'
   release = ENV['RELEASE_TAG'] || 'HEAD'
   unless release == 'HEAD'
-    system "mkdir -p ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to create directory for new document version'
+    system "mkdir -p build/urho3d.github.io/documentation/#{release}" or abort 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' #{build_tree}/Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
     append_new_release release or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
-  system "cd #{build_tree} && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  system "cd #{build_tree} && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ build/urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # TODO: remove below workaround after upgrading to 1.8.14 or greater
-  system "cp ~/urho3d.github.io/documentation/1.7/dynsections.js ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to workaround Doxygen 1.8.13 bug'
+  system "cp build/urho3d.github.io/documentation/1.7/dynsections.js build/urho3d.github.io/documentation/#{release}" or abort 'Failed to workaround Doxygen 1.8.13 bug'
   # Supply GIT credentials to push site documentation changes to urho3d/urho3d.github.io.git
-  system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
+  system "cd build/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
   next if timeup
   # Skip detecting source tree changes when HEAD has moved or it is too late already as a release tag has just been pushed
   unless ENV['RELEASE_TAG'] || `git fetch -qf origin #{ENV['TRAVIS_BRANCH']}; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
@@ -462,9 +462,9 @@ task :ci_emscripten_samples_update do
   next if timeup
   build_tree = 'build/ci'
   puts 'Updating Web samples in main website...'
-  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ~/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
-  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md #{build_tree}/bin/ ~/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
-  Dir.chdir('~/urho3d.github.io/samples') {
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md #{build_tree}/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  Dir.chdir('build/urho3d.github.io/samples') {
     next unless system 'git diff --quiet Urho3D.js.data'
     uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
     system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js)
@@ -477,7 +477,7 @@ task :ci_emscripten_samples_update do
   }
   update_web_samples_data or abort 'Failed to update Web json data file'
   root_commit, _ = get_root_commit_and_recipients
-  system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
+  system "cd build/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
 end
 
 # Usage: NOT intended to be used manually
@@ -746,7 +746,7 @@ def retry_block retries = 10, retry_interval = 1
     0
 end
 
-def append_new_release release, filename = '~/urho3d.github.io/_data/urho3d.json'
+def append_new_release release, filename = 'build/urho3d.github.io/_data/urho3d.json'
   begin
     urho3d_hash = JSON.parse File.read filename
     unless urho3d_hash['releases'].last == release
@@ -759,7 +759,7 @@ def append_new_release release, filename = '~/urho3d.github.io/_data/urho3d.json
   end
 end
 
-def update_web_samples_data dir = '~/urho3d.github.io/samples', filename = '~/urho3d.github.io/_data/web.json'
+def update_web_samples_data dir = 'build/urho3d.github.io/samples', filename = 'build/urho3d.github.io/_data/web.json'
   begin
     web = { 'samples' => {} }
     Dir.chdir(dir) { web['samples']['Native'] = Dir['*.html'].sort }
