@@ -355,7 +355,7 @@ function Character2D:Update(timeStep)
         if self.onSlope then
             body:ApplyForceToCenter(moveDir * MOVE_SPEED / 2, true) -- When climbing a slope, apply force (todo: replace by setting linear velocity to zero when will work)
         else
-            node:Translate(moveDir * timeStep * 1.8)
+            node:Translate(Vector3(moveDir.x, moveDir.y, 0) * timeStep * 1.8)
         end
         if jump then
             body:ApplyLinearImpulse(Vector2(0, 0.17) * MOVE_SPEED, body.massCenter, true)

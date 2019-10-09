@@ -654,6 +654,8 @@ static void RegisterFileSelector(asIScriptEngine* engine)
 static void RegisterToolTip(asIScriptEngine* engine)
 {
     RegisterUIElement<ToolTip>(engine, "ToolTip");
+    engine->RegisterObjectMethod("ToolTip", "void Reset()", asMETHOD(ToolTip, Reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ToolTip", "void add_altTarget(UIElement@+)", asMETHOD(ToolTip, AddAltTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "void set_delay(float)", asMETHOD(ToolTip, SetDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "float get_delay() const", asMETHOD(ToolTip, GetDelay), asCALL_THISCALL);
 }

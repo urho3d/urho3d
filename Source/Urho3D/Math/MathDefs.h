@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
 #ifdef _MSC_VER
@@ -33,6 +35,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <limits>
+#include <type_traits>
 
 namespace Urho3D
 {
@@ -90,6 +93,14 @@ inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 /// Return the sign of a float (-1, 0 or 1.)
 template <class T>
 inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
+
+/// Convert degrees to radians.
+template <class T>
+inline T ToRadians(const T degrees) { return M_DEGTORAD * degrees; }
+
+/// Convert radians to degrees.
+template <class T>
+inline T ToDegrees(const T radians) { return M_RADTODEG * radians; }
 
 /// Return a representation of the specified floating-point value as a single format bit layout.
 inline unsigned FloatToRawIntBits(float value)
@@ -166,16 +177,32 @@ template <class T> inline int FloorToInt(T x) { return static_cast<int>(floor(x)
 /// Round value to nearest integer.
 template <class T> inline T Round(T x) { return round(x); }
 
+/// Compute average value of the range.
+template <class Iterator> inline auto Average(Iterator begin, Iterator end) -> typename std::decay<decltype(*begin)>::type
+{
+    using T = typename std::decay<decltype(*begin)>::type;
+
+    T average{};
+    unsigned size{};
+    for (Iterator it = begin; it != end; ++it)
+    {
+        average += *it;
+        ++size;
+    }
+
+    return size != 0 ? average / size : average;
+}
+
 /// Round value to nearest integer.
 template <class T> inline int RoundToInt(T x) { return static_cast<int>(round(x)); }
 
-/// Round value to nearest multiple. 
+/// Round value to nearest multiple.
 template <class T> inline T RoundToNearestMultiple(T x, T multiple)
 {
     T mag = Abs(x);
     multiple = Abs(multiple);
     T remainder = Mod(mag, multiple);
-    if (remainder >= multiple / 2) 
+    if (remainder >= multiple / 2)
         return (FloorToInt<T>(mag / multiple) * multiple + multiple)*Sign(x);
     else
         return (FloorToInt<T>(mag / multiple) * multiple)*Sign(x);

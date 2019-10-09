@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Base/Algorithm.h"
 #include "../Core/CoreEvents.h"
 #include "../Engine/Console.h"
 #include "../Engine/EngineEvents.h"
@@ -50,6 +51,7 @@ static const int DEFAULT_HISTORY_SIZE = 16;
 
 const char* logStyles[] =
 {
+    "ConsoleTraceText",
     "ConsoleDebugText",
     "ConsoleInfoText",
     "ConsoleWarningText",

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,6 +35,9 @@ typedef struct SDL_EGL_VideoData
     EGLDisplay egl_display;
     EGLConfig egl_config;
     int egl_swapinterval;
+    int egl_surfacetype;
+    int egl_version_major, egl_version_minor;
+    EGLint egl_required_visual_id;
     
     EGLDisplay(EGLAPIENTRY *eglGetDisplay) (NativeDisplayType display);
     EGLDisplay(EGLAPIENTRY *eglGetPlatformDisplay) (EGLenum platform,
@@ -61,6 +64,9 @@ typedef struct SDL_EGL_VideoData
     
     EGLBoolean(EGLAPIENTRY *eglDestroyContext) (EGLDisplay dpy, EGLContext ctx);
     
+    EGLSurface(EGLAPIENTRY *eglCreatePbufferSurface)(EGLDisplay dpy, EGLConfig config,
+                                                     EGLint const* attrib_list);
+
     EGLSurface(EGLAPIENTRY *eglCreateWindowSurface) (EGLDisplay dpy,
                                          EGLConfig config,
                                          NativeWindowType window,
@@ -97,6 +103,7 @@ extern int SDL_EGL_GetAttribute(_THIS, SDL_GLattr attrib, int *value);
 extern int SDL_EGL_LoadLibrary(_THIS, const char *path, NativeDisplayType native_display, EGLenum platform);
 extern void *SDL_EGL_GetProcAddress(_THIS, const char *proc);
 extern void SDL_EGL_UnloadLibrary(_THIS);
+extern void SDL_EGL_SetRequiredVisualId(_THIS, int visual_id);
 extern int SDL_EGL_ChooseConfig(_THIS);
 extern int SDL_EGL_SetSwapInterval(_THIS, int interval);
 extern int SDL_EGL_GetSwapInterval(_THIS);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -139,9 +139,14 @@ SDL_DBus_Quit(void)
         dbus.connection_close(dbus.session_conn);
         dbus.connection_unref(dbus.session_conn);
     }
+/* Don't do this - bug 3950
+   dbus_shutdown() is a debug feature which closes all global resources in the dbus library. Calling this should be done by the app, not a library, because if there are multiple users of dbus in the process then SDL could shut it down even though another part is using it.
+*/
+#if 0
     if (dbus.shutdown) {
         dbus.shutdown();
     }
+#endif
     SDL_zero(dbus);
     UnloadDBUSLibrary();
 }
@@ -168,17 +173,29 @@ SDL_DBus_CallMethodInternal(DBusConnection *conn, const char *node, const char *
     if (conn) {
         DBusMessage *msg = dbus.message_new_method_call(node, path, interface, method);
         if (msg) {
-            int firstarg = va_arg(ap, int);
+            int firstarg;
+            va_list ap_reply;
+            va_copy(ap_reply, ap);  /* copy the arg list so we don't compete with D-Bus for it */
+            firstarg = va_arg(ap, int);
             if ((firstarg == DBUS_TYPE_INVALID) || dbus.message_append_args_valist(msg, firstarg, ap)) {
                 DBusMessage *reply = dbus.connection_send_with_reply_and_block(conn, msg, 300, NULL);
                 if (reply) {
-                    firstarg = va_arg(ap, int);
-                    if ((firstarg == DBUS_TYPE_INVALID) || dbus.message_get_args_valist(reply, NULL, firstarg, ap)) {
+                    /* skip any input args, get to output args. */
+                    while ((firstarg = va_arg(ap_reply, int)) != DBUS_TYPE_INVALID) {
+                        /* we assume D-Bus already validated all this. */
+                        { void *dumpptr = va_arg(ap_reply, void*); (void) dumpptr; }
+                        if (firstarg == DBUS_TYPE_ARRAY) {
+                            { const int dumpint = va_arg(ap_reply, int); (void) dumpint; }
+                        }
+                    }
+                    firstarg = va_arg(ap_reply, int);
+                    if ((firstarg == DBUS_TYPE_INVALID) || dbus.message_get_args_valist(reply, NULL, firstarg, ap_reply)) {
                         retval = SDL_TRUE;
                     }
                     dbus.message_unref(reply);
                 }
             }
+            va_end(ap_reply);
             dbus.message_unref(msg);
         }
     }
@@ -293,7 +310,11 @@ SDL_DBus_QueryProperty(const char *node, const char *path, const char *interface
 void
 SDL_DBus_ScreensaverTickle(void)
 {
-    SDL_DBus_CallVoidMethod("org.gnome.ScreenSaver", "/org/gnome/ScreenSaver", "org.gnome.ScreenSaver", "SimulateUserActivity", DBUS_TYPE_INVALID);
+    if (screensaver_cookie == 0) {  /* no need to tickle if we're inhibiting. */
+        /* org.gnome.ScreenSaver is the legacy interface, but it'll either do nothing or just be a second harmless tickle on newer systems, so we leave it for now. */
+        SDL_DBus_CallVoidMethod("org.gnome.ScreenSaver", "/org/gnome/ScreenSaver", "org.gnome.ScreenSaver", "SimulateUserActivity", DBUS_TYPE_INVALID);
+        SDL_DBus_CallVoidMethod("org.freedesktop.ScreenSaver", "/org/freedesktop/ScreenSaver", "org.freedesktop.ScreenSaver", "SimulateUserActivity", DBUS_TYPE_INVALID);
+    }
 }
 
 SDL_bool

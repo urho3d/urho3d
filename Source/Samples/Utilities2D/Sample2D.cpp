@@ -506,6 +506,7 @@ void Sample2D::CreateBackgroundSprite(TileMapInfo2D info, float scale, const Str
     sprite->SetSprite(cache->GetResource<Sprite2D>(texture));
     SetRandomSeed(Time::GetSystemTime()); // Randomize from system clock
     sprite->SetColor(Color(Random(0.0f, 1.0f), Random(0.0f, 1.0f), Random(0.0f, 1.0f), 1.0f));
+    sprite->SetLayer(-99);
 
     // Create rotation animation
     if (animate)
