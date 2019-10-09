@@ -51,7 +51,7 @@
 
 #include "../DebugNew.h"
 
-extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
+extern "C" int SDL_AddTouch(SDL_TouchID touchID, SDL_TouchDeviceType type, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
 #if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS) && !defined(TVOS)) || (defined(__linux__) && !defined(__ANDROID__))
@@ -387,7 +387,9 @@ Input::Input(Context* context) :
     SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Input, HandleScreenMode));
 
 #if defined(__ANDROID__)
-    SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
+    // Prevent mouse events from being registered as synthetic touch events and vice versa
+    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 #elif defined(__EMSCRIPTEN__)
     emscriptenInput_ = new EmscriptenInput(this);
 #endif
@@ -1199,7 +1201,7 @@ void Input::SetTouchEmulation(bool enable)
 
             // Add a virtual touch device the first time we are enabling emulated touch
             if (!SDL_GetNumTouchDevices())
-                SDL_AddTouch(0, "Emulated Touch");
+                SDL_AddTouch(0, SDL_TOUCH_DEVICE_INDIRECT_RELATIVE, "Emulated Touch");
         }
         else
             ResetTouches();

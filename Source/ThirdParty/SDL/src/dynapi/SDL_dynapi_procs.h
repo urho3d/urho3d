@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -69,12 +69,12 @@ SDL_DYNAPI_PROC(int,SDL_Direct3D9GetAdapterIndex,(int a),(a),return)
 SDL_DYNAPI_PROC(IDirect3DDevice9*,SDL_RenderGetD3D9Device,(SDL_Renderer *a),(a),return)
 #endif
 
-#if defined(__IPHONEOS__) && __IPHONEOS__
+#ifdef __IPHONEOS__
 SDL_DYNAPI_PROC(int,SDL_iPhoneSetAnimationCallback,(SDL_Window *a, int b, void c, void *d),(a,b,c,d),return)
 SDL_DYNAPI_PROC(void,SDL_iPhoneSetEventPump,(SDL_bool a),(a),)
 #endif
 
-#if defined(__ANDROID__) && __ANDROID__
+#ifdef __ANDROID__
 SDL_DYNAPI_PROC(void*,SDL_AndroidGetJNIEnv,(void),(),return)
 SDL_DYNAPI_PROC(void*,SDL_AndroidGetActivity,(void),(),return)
 SDL_DYNAPI_PROC(const char*,SDL_AndroidGetInternalStoragePath,(void),(),return)
@@ -681,3 +681,102 @@ SDL_DYNAPI_PROC(void,SDL_AudioStreamClear,(SDL_AudioStream *a),(a),)
 SDL_DYNAPI_PROC(int,SDL_AudioStreamAvailable,(SDL_AudioStream *a),(a),return)
 SDL_DYNAPI_PROC(void,SDL_FreeAudioStream,(SDL_AudioStream *a),(a),)
 SDL_DYNAPI_PROC(int,SDL_AudioStreamFlush,(SDL_AudioStream *a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_acosf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_asinf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_atanf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_atan2f,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_ceilf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_copysignf,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_fabsf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_floorf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_logf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_powf,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_scalbnf,(float a, int b),(a,b),return)
+SDL_DYNAPI_PROC(double,SDL_fmod,(double a, double b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_fmodf,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(void,SDL_SetYUVConversionMode,(SDL_YUV_CONVERSION_MODE a),(a),)
+SDL_DYNAPI_PROC(SDL_YUV_CONVERSION_MODE,SDL_GetYUVConversionMode,(void),(),return)
+SDL_DYNAPI_PROC(SDL_YUV_CONVERSION_MODE,SDL_GetYUVConversionModeForResolution,(int a, int b),(a,b),return)
+SDL_DYNAPI_PROC(void*,SDL_RenderGetMetalLayer,(SDL_Renderer *a),(a),return)
+SDL_DYNAPI_PROC(void*,SDL_RenderGetMetalCommandEncoder,(SDL_Renderer *a),(a),return)
+#ifdef __WINRT__
+SDL_DYNAPI_PROC(SDL_WinRT_DeviceFamily,SDL_WinRTGetDeviceFamily,(void),(),return)
+#endif
+#ifdef __ANDROID__
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsAndroidTV,(void),(),return)
+#endif
+SDL_DYNAPI_PROC(double,SDL_log10,(double a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_log10f,(float a),(a),return)
+SDL_DYNAPI_PROC(char*,SDL_GameControllerMappingForDeviceIndex,(int a),(a),return)
+#ifdef __LINUX__
+SDL_DYNAPI_PROC(int,SDL_LinuxSetThreadPriority,(Sint64 a, int b),(a,b),return)
+#endif
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasAVX512F,(void),(),return)
+#ifdef __ANDROID__
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsChromebook,(void),(),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsDeXMode,(void),(),return)
+SDL_DYNAPI_PROC(void,SDL_AndroidBackButton,(void),(),return)
+#endif
+SDL_DYNAPI_PROC(double,SDL_exp,(double a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_expf,(float a),(a),return)
+SDL_DYNAPI_PROC(wchar_t*,SDL_wcsdup,(const wchar_t *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_GameControllerRumble,(SDL_GameController *a, Uint16 b, Uint16 c, Uint32 d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_JoystickRumble,(SDL_Joystick *a, Uint16 b, Uint16 c, Uint32 d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_NumSensors,(void),(),return)
+SDL_DYNAPI_PROC(const char*,SDL_SensorGetDeviceName,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorType,SDL_SensorGetDeviceType,(int a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetDeviceNonPortableType,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorID,SDL_SensorGetDeviceInstanceID,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_Sensor*,SDL_SensorOpen,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_Sensor*,SDL_SensorFromInstanceID,(SDL_SensorID a),(a),return)
+SDL_DYNAPI_PROC(const char*,SDL_SensorGetName,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorType,SDL_SensorGetType,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetNonPortableType,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorID,SDL_SensorGetInstanceID,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetData,(SDL_Sensor *a, float *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(void,SDL_SensorClose,(SDL_Sensor *a),(a),)
+SDL_DYNAPI_PROC(void,SDL_SensorUpdate,(void),(),)
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsTablet,(void),(),return)
+SDL_DYNAPI_PROC(SDL_DisplayOrientation,SDL_GetDisplayOrientation,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasColorKey,(SDL_Surface *a),(a),return)
+
+#ifdef SDL_CreateThreadWithStackSize
+#undef SDL_CreateThreadWithStackSize
+#endif
+
+#if defined(__WIN32__) && !defined(HAVE_LIBC)
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d, pfnSDL_CurrentBeginThread e, pfnSDL_CurrentEndThread f),(a,b,c,d,e,f),return)
+#elif defined(__OS2__)
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d, pfnSDL_CurrentBeginThread e, pfnSDL_CurrentEndThread f),(a,b,c,d,e,f),return)
+#else
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d),(a,b,c,d),return)
+#endif
+
+SDL_DYNAPI_PROC(int,SDL_JoystickGetDevicePlayerIndex,(int a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_JoystickGetPlayerIndex,(SDL_Joystick *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_GameControllerGetPlayerIndex,(SDL_GameController *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_RenderFlush,(SDL_Renderer *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_RenderDrawPointF,(SDL_Renderer *a, float b, float c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_RenderDrawPointsF,(SDL_Renderer *a, const SDL_FPoint *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_RenderDrawLineF,(SDL_Renderer *a, float b, float c, float d, float e),(a,b,c,d,e),return)
+SDL_DYNAPI_PROC(int,SDL_RenderDrawLinesF,(SDL_Renderer *a, const SDL_FPoint *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_RenderDrawRectF,(SDL_Renderer *a, const SDL_FRect *b),(a,b),return)
+SDL_DYNAPI_PROC(int,SDL_RenderDrawRectsF,(SDL_Renderer *a, const SDL_FRect *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_RenderFillRectF,(SDL_Renderer *a, const SDL_FRect *b),(a,b),return)
+SDL_DYNAPI_PROC(int,SDL_RenderFillRectsF,(SDL_Renderer *a, const SDL_FRect *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_RenderCopyF,(SDL_Renderer *a, SDL_Texture *b, const SDL_Rect *c, const SDL_FRect *d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_RenderCopyExF,(SDL_Renderer *a, SDL_Texture *b, const SDL_Rect *c, const SDL_FRect *d, const double e, const SDL_FPoint *f, const SDL_RendererFlip g),(a,b,c,d,e,f,g),return)
+SDL_DYNAPI_PROC(SDL_TouchDeviceType,SDL_GetTouchDeviceType,(SDL_TouchID a),(a),return)
+#ifdef __IPHONEOS__
+SDL_DYNAPI_PROC(int,SDL_UIKitRunApp,(int a, char *b, SDL_main_func c),(a,b,c),return)
+#endif
+SDL_DYNAPI_PROC(size_t,SDL_SIMDGetAlignment,(void),(),return)
+SDL_DYNAPI_PROC(void*,SDL_SIMDAlloc,(const size_t a),(a),return)
+SDL_DYNAPI_PROC(void,SDL_SIMDFree,(void *a),(a),)
+SDL_DYNAPI_PROC(Sint64,SDL_RWsize,(SDL_RWops *a),(a),return)
+SDL_DYNAPI_PROC(Sint64,SDL_RWseek,(SDL_RWops *a, Sint64 b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(Sint64,SDL_RWtell,(SDL_RWops *a),(a),return)
+SDL_DYNAPI_PROC(size_t,SDL_RWread,(SDL_RWops *a, void *b, size_t c, size_t d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(size_t,SDL_RWwrite,(SDL_RWops *a, const void *b, size_t c, size_t d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_RWclose,(SDL_RWops *a),(a),return)
+SDL_DYNAPI_PROC(void*,SDL_LoadFile,(const char *a, size_t *b),(a,b),return)

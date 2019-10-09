@@ -252,8 +252,8 @@
         <attribute name="Hover Color" value="0.3 0.4 0.32 1" />
         <attribute name="Selection Color" value="0.23 0.3 0.27 1" />
     </element>
-    <element type="ConsoleErrorText" style="ConsoleText" auto="false">
-        <attribute name="Color" value="1 0 0 1" />
+    <element type="ConsoleTraceText" style="ConsoleText" auto="false">
+        <attribute name="Color" value="0.85 0.85 0.6 1" />
     </element>
     <element type="ConsoleDebugText" style="ConsoleText" auto="false">
         <attribute name="Color" value="1 0.6 0 1" />
@@ -263,6 +263,9 @@
     </element>
     <element type="ConsoleWarningText" style="ConsoleText" auto="false">
         <attribute name="Color" value="1 1 0 1" />
+    </element>
+    <element type="ConsoleErrorText" style="ConsoleText" auto="false">
+        <attribute name="Color" value="1 0 0 1" />
     </element>
     <element type="ConsoleLineEdit" style="LineEdit" auto="false">
         <attribute name="Min Size" value="0 17" />

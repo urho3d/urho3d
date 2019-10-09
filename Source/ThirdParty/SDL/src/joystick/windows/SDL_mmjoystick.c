@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -279,12 +279,6 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
     return (0);
 }
 
-/* Function to determine if this joystick is attached to the system right now */
-SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
-{
-    return SDL_TRUE;
-}
-
 static Uint8
 TranslatePOV(DWORD value)
 {
@@ -366,10 +360,7 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
 
     /* joystick hat events */
     if (joyinfo.dwFlags & JOY_RETURNPOV) {
-        Uint8 pos;
-
-        pos = TranslatePOV(joyinfo.dwPOV);
-        SDL_PrivateJoystickHat(joystick, 0, pos);
+        SDL_PrivateJoystickHat(joystick, 0, TranslatePOV(joyinfo.dwPOV));
     }
 }
 

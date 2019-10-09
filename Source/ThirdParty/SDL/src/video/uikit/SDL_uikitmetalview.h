@@ -1,6 +1,6 @@
 /*
  Simple DirectMedia Layer
- Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+ Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
  
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
@@ -32,23 +32,26 @@
 #import "../SDL_sysvideo.h"
 #import "SDL_uikitwindow.h"
 
+#if SDL_VIDEO_DRIVER_UIKIT && (SDL_VIDEO_RENDER_METAL || SDL_VIDEO_VULKAN)
+
 #import <UIKit/UIKit.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 
 #define METALVIEW_TAG 255
 
-@interface SDL_uikitmetalview : UIView
+@interface SDL_uikitmetalview : SDL_uikitview
 
 - (instancetype)initWithFrame:(CGRect)frame
-                        scale:(CGFloat)scale
-                        tag:(int)tag;
+                        scale:(CGFloat)scale;
 
 @end
 
 SDL_uikitmetalview* UIKit_Mtl_AddMetalView(SDL_Window* window);
 
 void UIKit_Mtl_GetDrawableSize(SDL_Window * window, int * w, int * h);
+
+#endif /* SDL_VIDEO_DRIVER_UIKIT && (SDL_VIDEO_RENDER_METAL || SDL_VIDEO_VULKAN) */
 
 #endif /* SDL_uikitmetalview_h_ */
 

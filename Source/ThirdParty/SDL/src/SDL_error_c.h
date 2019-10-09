@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -51,6 +51,7 @@ typedef struct SDL_error
         unsigned char value_c;
 #endif
         int value_i;
+        long value_l;
         double value_f;
         char buf[ERR_MAX_STRLEN];
     } args[ERR_MAX_ARGS];
