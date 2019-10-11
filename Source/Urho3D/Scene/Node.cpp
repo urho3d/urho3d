@@ -554,6 +554,11 @@ void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation
     SetWorldScale(scale);
 }
 
+void Node::SetWorldTransform(const Matrix3x4& worldTransform)
+{
+    SetWorldTransform(worldTransform.Translation(), worldTransform.Rotation(), worldTransform.Scale());
+}
+
 void Node::Translate(const Vector3& delta, TransformSpace space)
 {
     switch (space)
