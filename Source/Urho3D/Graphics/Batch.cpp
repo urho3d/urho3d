@@ -187,7 +187,14 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : nullptr;
 
     // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
-    graphics->SetShaders(vertexShader_, pixelShader_);
+    if (wireframe_)
+    {
+        graphics->SetShaders(vertexShader_, graphics->GetShader(PS, "Wireframe"));
+    }
+    else
+    {
+        graphics->SetShaders(vertexShader_, pixelShader_);
+    }
 
     // Set pass / material-specific renderstates
     if (pass_ && material_)
@@ -218,7 +225,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         }
 
         // Use the "least filled" fill mode combined from camera & material
-        graphics->SetFillMode((FillMode)(Max(camera->GetFillMode(), material_->GetFillMode())));
+        graphics->SetFillMode((FillMode)(wireframe_ ? FILL_WIREFRAME : Max(camera->GetFillMode(), material_->GetFillMode())));
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }
