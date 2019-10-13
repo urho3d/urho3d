@@ -430,7 +430,10 @@ task :ci_site_update do
     append_new_release release or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
-  system "cd #{build_tree} && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ build/urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  Dir.chdir build_tree do
+    system "make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html" or abort 'Failed to generate doxygen pages'
+  end
+  system "rsync -a --delete #{build_tree}/Docs/html/ build/urho3d.github.io/documentation/#{release}" or abort 'Failed to rsync doxygen pages'
   # TODO: remove below workaround after upgrading to 1.8.14 or greater
   system "cp build/urho3d.github.io/documentation/1.7/dynsections.js build/urho3d.github.io/documentation/#{release}" or abort 'Failed to workaround Doxygen 1.8.13 bug'
   # Supply GIT credentials to push site documentation changes to urho3d/urho3d.github.io.git
