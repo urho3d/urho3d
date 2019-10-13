@@ -23,37 +23,37 @@
 
 if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh native|mingw|android|rpi|arm|web [command [params]]"; exit 1; fi
 
-PROJECT_DIR=$(cd ${0%/*}/..; pwd)
+PROJECT_DIR=$(cd "${0%/*}/.." || exit 1; pwd)
 
 if [[ ! $DBE_TAG ]]; then
-    DBE_TAG=$(git describe --exact-match 2>/dev/null)
-    # If the command failed or not on a tag then use 'master' by default
-    if [[ $? -ne 0 ]]; then DBE_TAG=master; fi
+    # If the command failed or not on a tag then use 'master' by default; TRAVIS_COMMIT should be empty for non-CI usage
+    DBE_TAG=$(git describe --exact-match "$TRAVIS_COMMIT" 2>/dev/null || echo master)
 fi
 
 BuildEnvironment=-$1; shift
 BuildEnvironment=${BuildEnvironment/-base}
 
 # Workaround Travis-CI intermittent network I/O error
-if [[ $TRAVIS ]]; then while (! docker pull urho3d/dockerized$BuildEnvironment); do sleep 10; done; fi
+if [[ $TRAVIS ]]; then while (! docker pull "urho3d/dockerized$BuildEnvironment:$DBE_TAG"); do sleep 10; done; fi
 
-if [[ $(docker version -f {{.Client.Version}}) =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( ${BASH_REMATCH[1]} * 100 + ${BASH_REMATCH[2]} >= 1809 )); then
+# shellcheck disable=SC1083
+if [[ $(docker version -f {{.Client.Version}}) =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( BASH_REMATCH[1] * 100 + BASH_REMATCH[2] >= 1809 )); then
     docker run -it --rm -h fishtank \
-        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -e PROJECT_DIR=$PROJECT_DIR \
-        --env-file $PROJECT_DIR/script/.env-file \
-        --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
-        --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
-        --name dockerized$BuildEnvironment \
-        urho3d/dockerized$BuildEnvironment:$DBE_TAG $@
+        -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
+        --env-file "$PROJECT_DIR/script/.env-file" \
+        --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
+        --mount source="$(id -u).urho3d_home_dir",target=/home/urho3d \
+        --name "dockerized$BuildEnvironment" \
+        "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 else
     # Fallback workaround on older Docker CLI version
     docker run -it --rm -h fishtank \
-        -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -e PROJECT_DIR=$PROJECT_DIR \
-        --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' $PROJECT_DIR/script/.env-file) \
-        --mount type=bind,source=$PROJECT_DIR,target=$PROJECT_DIR \
-        --mount source=$(id -u).urho3d_home_dir,target=/home/urho3d \
-        --name dockerized$BuildEnvironment \
-        urho3d/dockerized$BuildEnvironment:$DBE_TAG $@
+        -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
+        --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$PROJECT_DIR/script/.env-file") \
+        --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
+        --mount source="$(id -u).urho3d_home_dir",target=/home/urho3d \
+        --name "dockerized$BuildEnvironment" \
+        "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 fi
 
 # vi: set ts=4 sw=4 expandtab:
