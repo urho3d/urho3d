@@ -383,7 +383,7 @@ task :ci do
       Dir.chdir scaffolding 'UsingSDK' do
         puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
         # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
-        system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+        system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} && rake make #{test} && rm -rf ~/usr" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
       end
       next if timeup
       # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
