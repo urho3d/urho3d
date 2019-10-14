@@ -234,9 +234,11 @@ bool CompressedLevel::Decompress(unsigned char* dest)
         return true;
 
 	case CF_ETC2_RGB:
+		DecompressImageETC2(dest, data_, width_, height_, false);
+		return true;
 	case CF_ETC2_RGBA:
-		DecompressImageETC2(dest, data_, width_, height_);
-		return false;
+		DecompressImageETC2(dest, data_, width_, height_, true);
+		return true;
 
     case CF_PVRTC_RGB_2BPP:
     case CF_PVRTC_RGBA_2BPP:
