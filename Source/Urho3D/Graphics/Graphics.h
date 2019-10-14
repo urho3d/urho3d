@@ -679,6 +679,8 @@ private:
     bool dxtTextureSupport_{};
     /// ETC1 format support flag.
     bool etcTextureSupport_{};
+    /// ETC2 format support flag.
+    bool etc2TextureSupport_{};
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_{};
     /// Hardware shadow map depth compare support flag.
