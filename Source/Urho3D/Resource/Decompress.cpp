@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Resource/Decompress.h"
+#include "../Resource/DecompressETC2.h"
 
 // DXT decompression based on the Squish library, modified for Urho3D
 
@@ -1068,6 +1069,41 @@ void FlipBlockHorizontal(unsigned char* dest, const unsigned char* src, Compress
     default:
         /// ETC1 & PVRTC not yet implemented
         break;
+    }
+}
+
+// ETC2 decompress
+// references : https://raw.githubusercontent.com/KhronosGroup/KTX-Software/dbfc3ed538cbe0839039fceb09d6c2be8aede67b/lib/etcunpack.cxx
+
+static void readBigEndian4byteWord(uint32_t* pBlock, const unsigned char *s)
+{
+    *pBlock = (s[0] << 24) | (s[1] << 16) | (s[2] << 8) | s[3];
+}
+
+void DecompressImageETC2(unsigned char* dstImage, const void* blocks, int width, int height, bool hasAlpha)
+{
+    const int channelCount = hasAlpha ? 4 : 3;
+    unsigned char* src = (unsigned char*)blocks;
+    unsigned int blockPart1, blockPart2;
+
+    memset(dstImage, 0xFF, width * height * 4);
+
+    for (int y = 0; y < height / 4; ++y) 
+    {
+        for (int x = 0; x < width / 4; ++x) 
+        {
+            if (hasAlpha)
+            {
+                decompressBlockAlphaC(src, dstImage + 3, width, height, 4 * x, 4 * y, channelCount);
+                src += 8;
+            }
+
+            readBigEndian4byteWord(&blockPart1, src);
+            src += 4;
+            readBigEndian4byteWord(&blockPart2, src);
+            src += 4;
+            decompressBlockETC2c(blockPart1, blockPart2, dstImage, width, height, 4 * x, 4 * y, 4);
+        }
     }
 }
 
