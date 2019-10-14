@@ -51,6 +51,12 @@
 #ifndef GL_ETC1_RGB8_OES
 #define GL_ETC1_RGB8_OES 0x8d64
 #endif
+#ifndef GL_ETC2_RGB8_OES
+#define GL_ETC2_RGB8_OES 0x9274
+#endif
+#ifndef GL_ETC2_RGBA8_OES
+#define GL_ETC2_RGBA8_OES 0x9278
+#endif
 #ifndef COMPRESSED_RGB_PVRTC_4BPPV1_IMG
 #define COMPRESSED_RGB_PVRTC_4BPPV1_IMG 0x8c00
 #endif
