@@ -330,10 +330,36 @@ void StaticSprite2D::UpdateSourceBatches()
     vertex2.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.max_.y_, 0.0f);
     vertex3.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.min_.y_, 0.0f);
 
-    vertex0.uv_ = textureRect_.min_;
-    (swapXY_ ? vertex3.uv_ : vertex1.uv_) = Vector2(textureRect_.min_.x_, textureRect_.max_.y_);
-    vertex2.uv_ = textureRect_.max_;
-    (swapXY_ ? vertex1.uv_ : vertex3.uv_) = Vector2(textureRect_.max_.x_, textureRect_.min_.y_);
+    Rect rect(textureRect_);
+
+    if (flipX_)
+        Swap(rect.min_.x_, rect.max_.x_);
+
+    if (flipY_)
+        Swap(rect.min_.y_, rect.max_.y_);
+
+    vertex0.uv_ = rect.min_;
+    (swapXY_ ? vertex3.uv_ : vertex1.uv_) = Vector2(rect.min_.x_, rect.max_.y_);
+    vertex2.uv_ = rect.max_;
+    (swapXY_ ? vertex1.uv_ : vertex3.uv_) = Vector2(rect.max_.x_, rect.min_.y_);
+
+    if (swapXY_)
+    {
+        Swap(vertex0.uv_, vertex2.uv_);
+        Swap(vertex1.uv_, vertex3.uv_);
+    }
+
+    if (flipX_)
+    {
+        Swap(vertex0.uv_, vertex3.uv_);
+        Swap(vertex1.uv_, vertex2.uv_);
+    }
+
+    if (flipY_)
+    {
+        Swap(vertex0.uv_, vertex1.uv_);
+        Swap(vertex3.uv_, vertex2.uv_);
+    }
 
     vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
 
