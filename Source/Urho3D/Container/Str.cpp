@@ -519,38 +519,38 @@ String String::Substring(unsigned pos, unsigned length) const
 
 String String::TrimLeft() const
 {
-	unsigned trimStart = 0;
-	
-	while (trimStart < length_)
-	{
-		char c = buffer_[trimStart];
-		if (c != ' ' && c != 9)
-			break;
-		++trimStart;
-	}
-	if (trimStart >= length_)
-	{
-		return *this;
-	}
-	return Substring(trimStart);
+    unsigned trimStart = 0;
+
+    while (trimStart < length_)
+    {
+        char c = buffer_[trimStart];
+        if (c != ' ' && c != 9)
+            break;
+        ++trimStart;
+    }
+    if (trimStart >= length_)
+    {
+        return *this;
+    }
+    return Substring(trimStart);
 }
 
 String String::TrimRight() const
 {
-	unsigned trimEnd = length_;
+    unsigned trimEnd = length_;
 
-	while (trimEnd > 0)
-	{
-		char c = buffer_[trimEnd - 1];
-		if (c != ' ' && c != 9)
-			break;
-		--trimEnd;
-	}
-	if (trimEnd <= 0)
-	{
-		return *this;
-	}
-	return Substring(0, trimEnd);
+    while (trimEnd > 0)
+    {
+        char c = buffer_[trimEnd - 1];
+        if (c != ' ' && c != 9)
+            break;
+        --trimEnd;
+    }
+    if (trimEnd <= 0)
+    {
+        return *this;
+    }
+    return Substring(0, trimEnd);
 }
 
 String String::Trimmed() const
