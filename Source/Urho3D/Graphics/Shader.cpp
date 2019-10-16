@@ -180,6 +180,18 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     {
         String line = source.ReadLine();
 
+		//Empty line
+		if (line.Empty())
+		{
+			continue;
+		}
+		//Comment line
+		line = line.TrimLeft();
+		if (line.StartsWith("//") || line.Empty())
+		{
+			continue;
+		}
+		//include dependency file
         if (line.StartsWith("#include"))
         {
             String includeFileName = GetPath(source.GetName()) + line.Substring(9).Replaced("\"", "").Trimmed();
