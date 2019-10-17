@@ -50,7 +50,7 @@ cbuffer CustomPS : register(b6)
 #endif
 
 static const int BlurKernelSize = 5;
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     out float2 oTexCoord : TEXCOORD0,
     out float2 oScreenPos : TEXCOORD1,
@@ -96,7 +96,8 @@ void VS(float4 iPos : POSITION,
 
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     float2 iScreenPos : TEXCOORD1,
     out float4 oColor : OUTCOLOR0)
@@ -162,3 +163,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
     oColor = float4(color + bloom, 1.0);
     #endif
 }
+#endif

@@ -9,7 +9,7 @@ uniform float cBlurRadius;
 uniform float cBlurSigma;
 uniform float2 cBlurHOffsets;
 uniform float2 cBlurHInvSize;
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     out float2 oTexCoord : TEXCOORD0,
     out float2 oScreenPos : TEXCOORD1,
@@ -21,7 +21,8 @@ void VS(float4 iPos : POSITION,
     oTexCoord = GetQuadTexCoord(oPos) + cBlurHOffsets;
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     float2 iScreenPos : TEXCOORD1,
     out float4 oColor : OUTCOLOR0)
@@ -58,3 +59,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
     #endif
 }
+#endif

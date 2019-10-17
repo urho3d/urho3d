@@ -45,7 +45,7 @@ static const float weights[5] = {
     0.25,
     0.1
 };
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     out float2 oTexCoord : TEXCOORD0,
     out float2 oScreenPos : TEXCOORD1,
@@ -57,7 +57,8 @@ void VS(float4 iPos : POSITION,
     oTexCoord = GetQuadTexCoord(oPos) + cBlurHOffsets;
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     float2 iScreenPos : TEXCOORD1,
     out float4 oColor : OUTCOLOR0)
@@ -89,3 +90,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
     oColor = float4(original + bloom, 1.0);
     #endif
 }
+#endif

@@ -3,8 +3,8 @@
 #include "Transform.glsl"
 
 varying vec3 vTexCoord;
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -12,8 +12,9 @@ void VS()
     gl_Position.z = gl_Position.w;
     vTexCoord = iPos.xyz;
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     vec4 sky = cMatDiffColor * textureCube(sDiffCubeMap, vTexCoord);
     #ifdef HDRSCALE
@@ -21,3 +22,4 @@ void PS()
     #endif
     gl_FragColor = sky;
 }
+#endif

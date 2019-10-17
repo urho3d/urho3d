@@ -37,7 +37,7 @@ SamplerState sDetailMap3 : register(s3);
 #endif
 
 #endif
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
@@ -118,7 +118,8 @@ void VS(float4 iPos : POSITION,
         oScreenPos = GetScreenPos(oPos);
     #endif
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     float3 iNormal : TEXCOORD1,
     float4 iWorldPos : TEXCOORD2,
@@ -240,3 +241,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }
+#endif
