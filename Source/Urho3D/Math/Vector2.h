@@ -82,12 +82,20 @@ public:
 
     /// Multiply with a scalar.
     IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
+    /// Multiply with a scalar.
+    IntVector2 operator *(float rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
+    /// Multiply with a scalar.
+    IntVector2 operator *(double rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
 
     /// Multiply with a vector.
     IntVector2 operator *(const IntVector2& rhs) const { return IntVector2(x_ * rhs.x_, y_ * rhs.y_); }
 
     /// Divide by a scalar.
     IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
+    /// Divide by a scalar.
+    IntVector2 operator /(float rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
+    /// Divide by a scalar.
+    IntVector2 operator /(double rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
 
     /// Divide by a vector.
     IntVector2 operator /(const IntVector2& rhs) const { return IntVector2(x_ / rhs.x_, y_ / rhs.y_); }
@@ -115,6 +123,20 @@ public:
         y_ *= rhs;
         return *this;
     }
+    /// Multiply-assign a scalar.
+    IntVector2& operator *=(float rhs)
+    {
+        x_ *= rhs;
+        y_ *= rhs;
+        return *this;
+    }
+    /// Multiply-assign a scalar.
+    IntVector2& operator *=(double rhs)
+    {
+        x_ *= rhs;
+        y_ *= rhs;
+        return *this;
+    }
 
     /// Multiply-assign a vector.
     IntVector2& operator *=(const IntVector2& rhs)
@@ -126,6 +148,18 @@ public:
 
     /// Divide-assign a scalar.
     IntVector2& operator /=(int rhs)
+    {
+        x_ /= rhs;
+        y_ /= rhs;
+        return *this;
+    }
+    IntVector2& operator /=(float rhs)
+    {
+        x_ /= rhs;
+        y_ /= rhs;
+        return *this;
+    }
+    IntVector2& operator /=(double rhs)
     {
         x_ /= rhs;
         y_ /= rhs;
