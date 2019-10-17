@@ -3,7 +3,7 @@
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     out float2 oScreenPos : TEXCOORD0,
     out float4 oPos : OUTPOSITION)
@@ -13,7 +13,8 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
@@ -21,3 +22,4 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float intensity = GetIntensity(rgb);
     oColor = float4(intensity, intensity, intensity, 1.0);
 }
+#endif

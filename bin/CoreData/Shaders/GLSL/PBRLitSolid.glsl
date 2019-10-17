@@ -9,7 +9,7 @@
 #include "IBL.glsl"
 #line 30010
 
-#if defined(NORMALMAP)
+#if defined(NORMALMAP) || defined(IBL)
     varying vec4 vTexCoord;
     varying vec4 vTangent;
 #else
@@ -44,8 +44,8 @@ varying vec4 vWorldPos;
         varying vec2 vTexCoord2;
     #endif
 #endif
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -57,7 +57,7 @@ void VS()
         vColor = iColor;
     #endif
 
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
         vec4 tangent = GetWorldTangent(modelMatrix);
         vec3 bitangent = cross(tangent.xyz, vNormal) * tangent.w;
         vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
@@ -107,8 +107,9 @@ void VS()
         #endif
     #endif
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
@@ -145,7 +146,7 @@ void PS()
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness;
 
     // Get normal
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
         vec3 tangent = vTangent.xyz;
         vec3 bitangent = vec3(vTexCoord.zw, vTangent.w);
         mat3 tbn = mat3(tangent, bitangent, vNormal);
@@ -239,7 +240,7 @@ void PS()
         vec3 cubeColor = vVertexLight.rgb;
 
         #ifdef IBL
-          vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
+          vec3 iblColor = ImageBasedLighting(reflection, tangent, bitangent, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
           float gamma = 0.0;
           finalColor.rgb += iblColor;
         #endif
@@ -259,3 +260,4 @@ void PS()
         gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }
+#endif

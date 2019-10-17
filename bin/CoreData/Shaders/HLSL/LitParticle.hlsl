@@ -17,7 +17,7 @@ cbuffer CustomPS : register(b6)
 }
 #endif
 #endif
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
@@ -117,7 +117,8 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef SOFTPARTICLES
         float4 iScreenPos: TEXCOORD1,
@@ -220,3 +221,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }
+#endif

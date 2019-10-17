@@ -3,8 +3,8 @@
 #include "Transform.glsl"
 
 varying vec2 vTexCoord;
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -12,8 +12,10 @@ void VS()
     gl_Position.z = gl_Position.w;
     vTexCoord = iTexCoord.xy;
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     gl_FragColor = texture2D(sDiffMap, vTexCoord);
 }
+#endif

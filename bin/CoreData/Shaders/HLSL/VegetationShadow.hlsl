@@ -22,7 +22,7 @@ cbuffer CustomVS : register(b6)
 }
 
 #endif
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #ifdef SKINNED
         float4 iBlendWeights : BLENDWEIGHT,
@@ -46,3 +46,4 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
 }
+#endif

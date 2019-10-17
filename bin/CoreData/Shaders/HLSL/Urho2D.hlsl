@@ -1,7 +1,7 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     float2 iTexCoord : TEXCOORD0,
     float4 iColor : COLOR0,
@@ -16,7 +16,8 @@ void VS(float4 iPos : POSITION,
     oColor = iColor;
     oTexCoord = iTexCoord;
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float4 iColor : COLOR0,
         float2 iTexCoord : TEXCOORD0,
         out float4 oColor : OUTCOLOR0)
@@ -25,3 +26,4 @@ void PS(float4 iColor : COLOR0,
     float4 diffInput = Sample2D(DiffMap, iTexCoord);
     oColor = diffColor * diffInput;
 }
+#endif

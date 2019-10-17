@@ -2,6 +2,7 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD4,
@@ -16,7 +17,8 @@ void VS(float4 iPos : POSITION,
     oPos.z = oPos.w;
     oTexCoord = iPos.xyz;
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float3 iTexCoord : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
@@ -26,3 +28,4 @@ void PS(float3 iTexCoord : TEXCOORD0,
     #endif
     oColor = sky;
 }
+#endif

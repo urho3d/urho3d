@@ -11,8 +11,8 @@ uniform float cBloomThreshold;
 uniform vec2 cBloomMix;
 uniform vec2 cBlurHInvSize;
 #endif
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -20,8 +20,9 @@ void VS()
     vTexCoord = GetQuadTexCoord(gl_Position);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     #ifdef BRIGHT
     vec3 rgb = texture2D(sDiffMap, vScreenPos).rgb;
@@ -54,4 +55,4 @@ void PS()
     gl_FragColor = vec4(original + bloom, 1.0);
     #endif
 }
-
+#endif
