@@ -65,6 +65,12 @@ public:
     void SetDisabledOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when disabled.
     void SetDisabledOffset(int x, int y);
+    /// Set 90 degree image rotation.
+    void SetRotate(bool rotate);
+    /// Set horizontal image flip.
+    void SetFlipH(bool flip);
+    /// Set vertical image flip.
+    void SetFlipV(bool flip);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
     /// Set tiled mode.
@@ -89,6 +95,15 @@ public:
 
     /// Return offset to image rectangle used when disabled.
     const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
+
+    /// Return image rotation.
+    bool GetRotate() const { return rotate_; }
+
+    /// Return horizontal image flip.
+    bool GetFlipH() const { return flipH_; }
+
+    /// Return vertical image flip.
+    bool GetFlipV() const { return flipV_; }
 
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
@@ -125,6 +140,12 @@ protected:
     IntVector2 hoverOffset_;
     /// Offset to image rectangle when disabled.
     IntVector2 disabledOffset_;
+    /// Image rotation.
+    bool rotate_;
+    /// Horizontal image flip.
+    bool flipH_;
+    /// Vertical image flip.
+    bool flipV_;
     /// Blend mode flag.
     BlendMode blendMode_;
     /// Tiled flag.

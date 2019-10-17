@@ -65,6 +65,7 @@ public:
     void AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d,
         const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD, const Color& colA,
         const Color& colB, const Color& colC, const Color& colD);
+    void TransformUV(bool rotate, bool mirrorH, bool mirrorV, const IntRect& imageRect);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
     /// Return an interpolated color for the UI element.

@@ -42,6 +42,9 @@ BorderImage::BorderImage(Context* context) :
     imageBorder_(IntRect::ZERO),
     hoverOffset_(IntVector2::ZERO),
     disabledOffset_(IntVector2::ZERO),
+    rotate_(0),
+    flipH_(false),
+    flipV_(false),
     blendMode_(BLEND_REPLACE),
     tiled_(false)
 {
@@ -62,6 +65,9 @@ void BorderImage::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Tiled", IsTiled, SetTiled, bool, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Rotate", GetRotate, SetRotate, bool, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("FlipH", GetFlipH, SetFlipH, bool, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("FlipV", GetFlipV, SetFlipV, bool, false, AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_FILE);
@@ -128,6 +134,21 @@ void BorderImage::SetDisabledOffset(const IntVector2& offset)
 void BorderImage::SetDisabledOffset(int x, int y)
 {
     disabledOffset_ = IntVector2(x, y);
+}
+
+void BorderImage::SetRotate(bool rotate)
+{
+    rotate_ = rotate;
+}
+
+void BorderImage::SetFlipH(bool flip)
+{
+    flipH_ = flip;
+}
+
+void BorderImage::SetFlipV(bool flip)
+{
+    flipV_ = flip;
 }
 
 void BorderImage::SetBlendMode(BlendMode mode)
@@ -209,6 +230,16 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
             batch.AddQuad(x + border_.left_ + innerSize.x_, border_.top_ + innerSize.y_, border_.right_, border_.bottom_,
                 uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_, uvBorder.right_,
                 uvBorder.bottom_);
+    }
+
+    if(rotate_ || flipH_ || flipV_)
+    {
+        IntRect localRect = imageRect_;
+        localRect.left_ += offset.x_;
+        localRect.right_ += offset.x_;
+        localRect.top_ += offset.y_;
+        localRect.bottom_ += offset.y_;
+        batch.TransformUV(rotate_, flipH_, flipV_, localRect);
     }
 
     UIBatch::AddOrMerge(batch, batches);

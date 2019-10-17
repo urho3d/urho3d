@@ -1324,6 +1324,12 @@ template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "const IntVector2& get_hoverOffset() const", asMETHOD(T, GetHoverOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_disabledOffset(const IntVector2&in)", asMETHODPR(T, SetDisabledOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_disabledOffset() const", asMETHOD(T, GetDisabledOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_rotate(bool)", asMETHOD(T, SetRotate), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_rotate() const", asMETHOD(T, GetRotate), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_flipH(bool)", asMETHOD(T, SetFlipH), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_flipH() const", asMETHOD(T, GetFlipH), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_flipV(bool)", asMETHOD(T, SetFlipV), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_flipV() const", asMETHOD(T, GetFlipV), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(BlendMode)", asMETHOD(T, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "BlendMode get_blendMode() const", asMETHOD(T, GetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_tiled(bool)", asMETHOD(T, SetTiled), asCALL_THISCALL);

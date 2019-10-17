@@ -402,6 +402,28 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     dest[35] = uv4.y_;
 }
 
+void UIBatch::TransformUV(bool rotate, bool mirrorH, bool mirrorV, const IntRect& imageRect)
+{
+    float* begin = &(vertexData_->At(vertexStart_));
+    float* end = begin + (vertexEnd_ - vertexStart_);
+    float width = imageRect.right_ - imageRect.left_;
+    float height = imageRect.bottom_ - imageRect.top_;
+    for(float* data = begin; data != end; data += 6)
+    {
+        if(mirrorH)
+            data[4] = imageRect.right_ * invTextureSize_.x_ - (data[4] - imageRect.left_ * invTextureSize_.x_);
+        if(mirrorV)
+            data[5] = imageRect.bottom_ * invTextureSize_.y_ - (data[5] - imageRect.top_ * invTextureSize_.y_);
+        if(rotate)
+        {
+            float localU = (data[4] / invTextureSize_.x_ - imageRect.left_) / width;
+            float localV = (data[5] / invTextureSize_.y_ - imageRect.top_) / height;
+            data[4] = (imageRect.left_ + (1 - localV) * width) * invTextureSize_.x_;
+            data[5] = (imageRect.top_ + localU * height) * invTextureSize_.y_;
+        }
+    }
+}
+
 bool UIBatch::Merge(const UIBatch& batch)
 {
     if (batch.blendMode_ != blendMode_ ||
