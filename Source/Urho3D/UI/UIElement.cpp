@@ -169,6 +169,95 @@ void UIElement::ApplyAttributes()
     }
 }
 
+bool UIElement::Load(Deserializer& source)
+{
+    // Just used for loading children
+    source.ReadString(); // Clear type string
+    source.ReadBool(); // Clear internal bool
+
+    appliedStyle_ =  source.ReadString(); // Can't filter attributes on save, so it effectively becomes this
+
+    if (!Animatable::Load(source))
+        return false;
+
+    unsigned numChildren = source.ReadVLE();
+    unsigned nextInternalChild = 0;
+    for (unsigned i = 0; i < numChildren; ++i)
+    {
+        unsigned startPos = source.Tell();
+        String typeName = source.ReadString();
+        bool internalElem = source.ReadBool();
+        if (typeName.Empty())
+            typeName = "UIElement";
+        source.SeekRelative(startPos - source.Tell());
+
+        UIElement* child = nullptr;
+        if (!internalElem)
+            child = CreateChild(typeName, String::EMPTY, M_MAX_UNSIGNED);
+        else
+        {
+            for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
+            {
+                if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
+                {
+                    child = children_[i];
+                    nextInternalChild = i + 1;
+                    break;
+                }
+            }
+
+            if (!child)
+                URHO3D_LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
+        }
+
+        if (child)
+        {
+            if (!child->Load(source))
+                return false;
+        }
+    }
+
+    ApplyAttributes();
+
+    EnableLayoutUpdate();
+    UpdateLayout();
+
+    return true;
+}
+
+bool UIElement::Save(Serializer& dest) const
+{
+    // Write type
+    if (!dest.WriteString(GetTypeName()))
+        return false;
+
+    // Write internal flag
+    if (!dest.WriteBool(internal_))
+        return false;
+
+    // Write style
+    if (!dest.WriteString(appliedStyle_))
+        return false;
+
+    // Write attributes
+    if (!Animatable::Save(dest))
+        return false;
+
+    // Write child elements
+    dest.WriteVLE(children_.Size());
+    for (unsigned i = 0; i < children_.Size(); ++i)
+    {
+        UIElement* element = children_[i];
+        if (element->IsTemporary())
+            continue;
+
+        if (!element->Save(dest))
+            return false;
+    }
+
+    return true;
+}
+
 bool UIElement::LoadXML(const XMLElement& source)
 {
     return LoadXML(source, nullptr);
