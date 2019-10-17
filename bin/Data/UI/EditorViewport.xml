@@ -23,7 +23,7 @@
 			<attribute name="Max Size" value="16 16" />
 			<attribute name="Layout Mode" value="Horizontal" />
 			<element type="BorderImage">
-				<attribute name="Image Rect" value="128 32 144 48" />
+				<attribute name="Image Rect" value="128 48 144 64" />
 			</element>
 		</element>
 		<element type="Button" style="CloseButton">

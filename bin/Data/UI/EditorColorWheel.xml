@@ -20,7 +20,7 @@
 					<attribute name="Name" value="ColorCursor" />
 					<attribute name="Position" value="124 124" />
 					<attribute name="Size" value="16 16" />
-					<attribute name="Image Rect" value="62 83 78 99" />
+					<attribute name="Image Rect" value="62 115 78 131" />
 				</element>
 			</element>
 			<element type="BorderImage">
@@ -35,7 +35,7 @@
 					<attribute name="Name" value="BWCursor" />
 					<attribute name="Size" value="61 15" />
 					<attribute name="Is Editable" value="false" />
-					<attribute name="Image Rect" value="0 84 61 99" />
+					<attribute name="Image Rect" value="0 116 61 131" />
 					<attribute name="Position" value="1 0" />
 				</element>
 			</element>
@@ -191,14 +191,14 @@
 				<element type="BorderImage">
 					<attribute name="Name" value="Chess" />
 					<attribute name="Size" value="200 33" />
-					<attribute name="Image Rect" value="2 102 18 118" />
+					<attribute name="Image Rect" value="2 134 18 150" />
 					<attribute name="Tiled" value="true" />
 				</element>
 				<element type="BorderImage">
 					<attribute name="Name" value="ColorCheck" />
 					<attribute name="Size" value="200 33" />
 					<attribute name="Priority" value="1" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -245,19 +245,19 @@
 					<attribute name="Name" value="Chess" />
 					<attribute name="Size" value="200 27" />
 					<attribute name="Is Editable" value="false" />
-					<attribute name="Image Rect" value="2 102 18 118" />
+					<attribute name="Image Rect" value="2 134 18 150" />
 					<attribute name="Tiled" value="true" />
 					<element type="BorderImage">
 						<attribute name="Name" value="AGradient" />
 						<attribute name="Size" value="200 27" />
 						<attribute name="Is Editable" value="false" />
-						<attribute name="Image Rect" value="0 120 200 128" />
+						<attribute name="Image Rect" value="0 152 200 160" />
 						<attribute name="Blend Mode" value="alpha" />
 						<element type="BorderImage">
 							<attribute name="Name" value="ACursor" />
 							<attribute name="Position" value="0 1" />
 							<attribute name="Size" value="14 25" />
-							<attribute name="Image Rect" value="131 87 144 112" />
+							<attribute name="Image Rect" value="131 119 144 144" />
 							<attribute name="Blend Mode" value="alpha" />
 						</element>
 					</element>
@@ -273,14 +273,14 @@
 			<element type="BorderImage">
 				<attribute name="Name" value="Chess" />
 				<attribute name="Layout Mode" value="Horizontal" />
-				<attribute name="Image Rect" value="2 102 18 118" />
+				<attribute name="Image Rect" value="2 134 18 150" />
 				<attribute name="Tiled" value="true" />
 				<element type="BorderImage">
 					<attribute name="Name" value="h0" />
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -289,7 +289,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -298,7 +298,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -307,7 +307,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -316,7 +316,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -325,7 +325,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -334,7 +334,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>
@@ -343,7 +343,7 @@
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Is Editable" value="false" />
 					<attribute name="Is Selected" value="true" />
-					<attribute name="Image Rect" value="83 86 94 98" />
+					<attribute name="Image Rect" value="83 118 94 130" />
 					<attribute name="Blend Mode" value="alpha" />
 					<attribute name="Image Border" value="1 1 1 1" />
 				</element>

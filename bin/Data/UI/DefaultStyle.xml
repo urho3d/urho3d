@@ -8,10 +8,11 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
+        <attribute name="Disabled Image Offset" value="0 32" />
         <attribute name="Pressed Child Offset" value="-1 1" />
     </element>
     <element type="ToggledButton" style="Button" auto="false">
-        <attribute name="Image Rect" value="160 64 176 80" />
+        <attribute name="Image Rect" value="160 96 176 112" />
     </element>
     <element type="CheckBox" style="BorderImage">
         <attribute name="Min Size" value="16 16" />
@@ -20,6 +21,7 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Checked Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
+        <attribute name="Disabled Image Offset" value="0 32" />
     </element>
     <element type="CloseButton" style="Button" auto="false">    <!-- non-auto style is shown explicitly in the Editor's style drop down list for user selection -->
         <attribute name="Min Size" value="16 16" />
@@ -38,43 +40,43 @@
             <variant type="VariantVector" >
                 <variant type="String" value="ResizeVertical" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="0 64 20 84" />
+                <variant type="IntRect" value="0 96 20 112" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="ResizeDiagonalTopRight" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="20 64 40 84" />
+                <variant type="IntRect" value="20 96 40 112" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="ResizeHorizontal" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="40 64 60 84" />
+                <variant type="IntRect" value="40 96 60 112" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="ResizeDiagonalTopLeft" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="60 64 80 84" />
+                <variant type="IntRect" value="60 96 80 112" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="RejectDrop" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="80 64 100 84" />
+                <variant type="IntRect" value="80 96 100 112" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="AcceptDrop" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="100 64 128 90" />
+                <variant type="IntRect" value="100 96 128 112" />
                 <variant type="IntVector2" value="0 0" />
             </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="Busy" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
-                <variant type="IntRect" value="128 64 148 85" />
+                <variant type="IntRect" value="128 96 148 117" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
         </attribute>
@@ -84,6 +86,7 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
+        <attribute name="Disabled Image Offset" value="0 32" />
         <attribute name="Pressed Child Offset" value="-1 1" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="4 1 4 1" />
@@ -105,6 +108,7 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Image Rect" value="64 0 80 16" />
         <attribute name="Hover Image Offset" value="0 16" />    <!-- Background color of the hover image IS the hover color of LineEdit -->
+        <attribute name="Disabled Image Offset" value="0 32" />
         <element type="Text" internal="true">
             <attribute name="Color" value="0.9 1 0.9 1" />
             <attribute name="Selection Color" value="0.3 0.4 0.32 1" />
@@ -148,15 +152,16 @@
     </element>
     <element type="ScrollBar">
         <attribute name="Min Size" value="16 16" />
-        <attribute name="Left Image Rect" value="32 32 48 48" />
-        <attribute name="Up Image Rect" value="0 32 16 48" />
-        <attribute name="Right Image Rect" value="48 32 64 48" />
-        <attribute name="Down Image Rect" value="16 32 32 48" />
+        <attribute name="Left Image Rect" value="32 48 48 64" />
+        <attribute name="Up Image Rect" value="0 48 16 64" />
+        <attribute name="Right Image Rect" value="48 48 64 64" />
+        <attribute name="Down Image Rect" value="16 48 32 64" />
         <element type="Button" internal="true">
             <attribute name="Size" value="16 16" />
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Pressed Image Offset" value="64 0" />
             <attribute name="Hover Image Offset" value="0 16" />
+            <attribute name="Disabled Image Offset" value="0 32" />
         </element>
         <element type="Slider" internal="true">
             <attribute name="Size" value="16 16" />
@@ -166,6 +171,7 @@
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Pressed Image Offset" value="64 0" />
             <attribute name="Hover Image Offset" value="0 16" />
+            <attribute name="Disabled Image Offset" value="0 32" />
         </element>
     </element>
     <element type="ScrollView">
@@ -179,6 +185,7 @@
             <attribute name="Image Rect" value="48 0 64 16" />
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Hover Image Offset" value="16 16" />
+            <attribute name="Disabled Image Offset" value="16 32" />
             <attribute name="Clip Border" value="2 2 2 2" />
         </element>
     </element>
@@ -205,6 +212,7 @@
     <element type="Window" style="BorderImage">
         <attribute name="Image Rect" value="48 0 64 16" />
         <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Disabled Image Offset" value="16 32" />
         <attribute name="Resize Border" value="8 8 8 8" />
     </element>
     <element type="DialogWindow" style="Window" auto="false">
@@ -221,7 +229,8 @@
     <element type="PanelView" style="ListView" auto="false">    <!-- todo: rename this to PanelListView -->
         <element type="BorderImage" internal="true">
             <attribute name="Image Rect" value="48 16 64 32" />
-            <attribute name="Hover Image Offset" value="80 32" />
+            <attribute name="Hover Image Offset" value="80 48" />
+            <attribute name="Disabled Image Offset" value="0 16" />
             <element internal="true">
                 <attribute name="Layout Spacing" value="4" />
                 <attribute name="Layout Border" value="4 4 4 4" />
@@ -315,19 +324,19 @@
     </element>
     <element type="FileSelectorTitleText" style="Text" auto="false" />
     <element type="EditorDivider" style="BorderImage" auto="false">
-        <attribute name="Image Rect" value="144 32 160 43" />
+        <attribute name="Image Rect" value="144 48 160 59" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Min Size" value="0 11" />
         <attribute name="Max Size" value="2147483647 11" />
     </element>
     <element type="EditorVerticalDivider" style="BorderImage" auto="false">
-        <attribute name="Image Rect" value="144 48 155 64" />
+        <attribute name="Image Rect" value="144 64 155 80" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Min Size" value="11 0" />
         <attribute name="Max Size" value="11 2147483647" />
     </element>
     <element type="EditorDragSlider" style="BorderImage">
-	    <attribute name="Image Rect" value="240 64 256 80" />
+	    <attribute name="Image Rect" value="240 96 256 112" />
     </element>
     <element type="EditorSeparator" auto="false">
         <attribute name="Min Size" value="0 2" />
@@ -367,13 +376,13 @@
         <attribute name="Focus Mode" value="NotFocusable" />
     </element>
     <element type="ToolBarToggleGroupLeft" style="ToolBarToggle">
-        <attribute name="Image Rect" value="160 32 176 48" />
+        <attribute name="Image Rect" value="160 48 176 64" />
     </element>
     <element type="ToolBarToggleGroupMiddle" style="ToolBarToggle">
-        <attribute name="Image Rect" value="192 32 208 48" />
+        <attribute name="Image Rect" value="192 48 208 64" />
     </element>
     <element type="ToolBarToggleGroupRight" style="ToolBarToggle">
-        <attribute name="Image Rect" value="224 32 240 48" />
+        <attribute name="Image Rect" value="224 48 240 64" />
     </element>
     <element type="EditorAttributeEdit" style="LineEdit" auto="false" />
     <element type="ToolTipBorderImage" style="BorderImage">
