@@ -623,10 +623,15 @@ void LineEdit::UpdateCursor()
     SDL_Rect rect = {screenPosition.x_, screenPosition.y_, cursor_->GetSize().x_, cursor_->GetSize().y_};
     SDL_SetTextInputRect(&rect);
 
+    // Restart blinking
+    cursorBlinkTimer_ = 0.0f;
+
     // Scroll if necessary
     int sx = -GetChildOffset().x_;
     int left = clipBorder_.left_;
     int right = GetWidth() - clipBorder_.left_ - clipBorder_.right_ - cursor_->GetWidth();
+    if(right < left)
+        return;
     if (x - sx > right)
         sx = x - right;
     if (x - sx < left)
@@ -634,9 +639,6 @@ void LineEdit::UpdateCursor()
     if (sx < 0)
         sx = 0;
     SetChildOffset(IntVector2(-sx, 0));
-
-    // Restart blinking
-    cursorBlinkTimer_ = 0.0f;
 }
 
 bool LineEdit::FilterText(String& string)
