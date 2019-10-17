@@ -84,6 +84,9 @@ public:
     /// Return height.
     int GetHeight() const { return height_; }
 
+    /// Return size.
+    IntVector2 GetSize() const { return IntVector2(width_, height_); }
+
     /// Return depth.
     int GetDepth() const { return depth_; }
 
