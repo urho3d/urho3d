@@ -419,7 +419,7 @@ float Text::GetRowWidth(unsigned index) const
 float Text::GetMaxRowWidth() const
 {
     float maxWidth = 0;
-    for(float rowWidth : rowWidths_)
+    for (float rowWidth : rowWidths_)
         maxWidth = Max(maxWidth, rowWidth);
     return maxWidth;
 }
