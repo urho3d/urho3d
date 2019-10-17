@@ -892,6 +892,54 @@ String String::SubstringUTF8(unsigned pos, unsigned length) const
     return ret;
 }
 
+unsigned String::FindUTF8(unsigned c, unsigned startPos) const
+{
+    for (unsigned i = startPos; i < LengthUTF8(); ++i)
+    {
+        if (AtUTF8(i) == c)
+            return i;
+    }
+
+    return NPOS;
+}
+
+unsigned String::FindUTF8(const String& str, unsigned startPos) const
+{
+    if (str.Empty() || str.LengthUTF8() > LengthUTF8())
+        return NPOS;
+
+    unsigned first = str.AtUTF8(0);
+    for (unsigned i = startPos; i <= LengthUTF8() - str.LengthUTF8(); ++i)
+    {
+        unsigned c = AtUTF8(i);
+        if (c == first)
+        {
+            unsigned skip = NPOS;
+            bool found = true;
+            for (unsigned j = 1; j < str.LengthUTF8(); ++j)
+            {
+                c = AtUTF8(i + j);
+                char d = str.AtUTF8(j);
+
+                if (skip == NPOS && c == first)
+                    skip = i + j - 1;
+
+                if (c != d)
+                {
+                    found = false;
+                    if (skip != NPOS)
+                        i = skip;
+                    break;
+                }
+            }
+            if (found)
+                return i;
+        }
+    }
+
+    return NPOS;
+}
+
 void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
 {
     if (unicodeChar < 0x80)

@@ -409,10 +409,10 @@ public:
     /// Join substrings with a 'glue' string.
     void Join(const Vector<String>& subStrings, const String& glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
-    unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const;
-    /// Return index to the first occurrence of a character, or NPOS if not found.
     unsigned Find(char c, unsigned startPos = 0, bool caseSensitive = true) const;
     /// Return index to the last occurrence of a string, or NPOS if not found.
+    unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const;
+    /// Return index to the first occurrence of a character, or NPOS if not found.
     unsigned FindLast(const String& str, unsigned startPos = NPOS, bool caseSensitive = true) const;
     /// Return index to the last occurrence of a character, or NPOS if not found.
     unsigned FindLast(char c, unsigned startPos = NPOS, bool caseSensitive = true) const;
@@ -464,6 +464,10 @@ public:
     String SubstringUTF8(unsigned pos) const;
     /// Return a UTF8 substring with length from position.
     String SubstringUTF8(unsigned pos, unsigned length) const;
+    /// Return UTF8 index to the first occurrence of a character, or NPOS if not found.
+    unsigned FindUTF8(unsigned c, unsigned startPos = 0) const;
+    /// Return UTF8 index to the first occurrence of a string, or NPOS if not found.
+    unsigned FindUTF8(const String& str, unsigned startPos = 0) const;
 
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const
