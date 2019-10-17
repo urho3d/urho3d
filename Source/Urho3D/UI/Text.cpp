@@ -416,6 +416,14 @@ float Text::GetRowWidth(unsigned index) const
     return index < rowWidths_.Size() ? rowWidths_[index] : 0;
 }
 
+float Text::GetMaxRowWidth() const
+{
+    float maxWidth = 0;
+    for(float rowWidth : rowWidths_)
+        maxWidth = Max(maxWidth, rowWidth);
+    return maxWidth;
+}
+
 Vector2 Text::GetCharPosition(unsigned index)
 {
     if (charLocationsDirty_)

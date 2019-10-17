@@ -179,6 +179,8 @@ public:
 
     /// Return width of row by index.
     float GetRowWidth(unsigned index) const;
+    /// Return width of widest row.
+    float GetMaxRowWidth() const;
     /// Return position of character by index relative to the text element origin.
     Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
