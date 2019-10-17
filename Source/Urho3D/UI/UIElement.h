@@ -141,6 +141,14 @@ public:
     virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const override;
+    /// Load from JSON data. Return true if successful.
+    bool LoadJSON(const JSONValue& source) override;
+    /// Load from JSON data with style. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, XMLFile* styleFile);
+    /// Create a child by loading from JSON data with style. Returns the child element if successful, null if otherwise.
+    virtual UIElement* LoadChildJSON(const JSONValue& childElem, XMLFile* styleFile);
+    /// Save as JSON data. Return true if successful.
+    bool SaveJSON(JSONValue& dest) const override;
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -212,8 +220,14 @@ public:
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest, const String& indentation = "\t") const;
+    /// Load from a JSON file. Return true if successful.
+    bool LoadJSON(Deserializer& source);
+    /// Save to a JSON file. Return true if successful.
+    bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Filter attributes in serialization process.
     bool FilterAttributes(XMLElement& dest) const;
+    /// Filter attributes in serialization process.
+    bool FilterAttributes(JSONValue& dest) const;
 
     /// Set name.
     void SetName(const String& name);
@@ -668,6 +682,10 @@ protected:
     bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem) const;
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    /// Filter UI-style attributes in serialization process.
+    bool FilterUIStyleAttributes(JSONValue& dest, const XMLElement& styleElem) const;
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(JSONValue& dest) const;
     /// Update anchored size & position. Only called when anchoring is enabled.
     void UpdateAnchoring();
 
