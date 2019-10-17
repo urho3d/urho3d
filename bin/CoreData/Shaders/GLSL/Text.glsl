@@ -13,17 +13,17 @@ uniform vec4 cShadowColor;
 #ifdef TEXT_EFFECT_STROKE
 uniform vec4 cStrokeColor;
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    
+
     vTexCoord = iTexCoord;
     vColor = iColor;
 }
-#endif
+
 /*
     1) Simplest SDF shader:
 
@@ -56,8 +56,8 @@ void main()
     // Comment this define to turn off supersampling
     #define SUPERSAMPLING
 #endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
 #ifdef SIGNED_DISTANCE_FIELD
     gl_FragColor.rgb = vColor.rgb;
@@ -120,4 +120,3 @@ void main()
     #endif
 #endif
 }
-#endif

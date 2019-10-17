@@ -7,8 +7,8 @@ uniform float cWindPeriod;
 uniform vec2 cWindWorldSpacing;
 
 varying vec3 vTexCoord;
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -21,4 +21,4 @@ void main()
     gl_Position = GetClipPos(worldPos);
     vTexCoord = vec3(GetTexCoord(iTexCoord), GetDepth(gl_Position));
 }
-#endif
+

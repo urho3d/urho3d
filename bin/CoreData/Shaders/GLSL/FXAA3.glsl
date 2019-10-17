@@ -722,17 +722,16 @@ vec4 FxaaPixelShader(
                       Urho3D Vertex- and Pixelshader
                       
 ============================================================================*/
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     vec2 rcpFrame = vec2(cGBufferInvSize.x, cGBufferInvSize.y);
 
@@ -745,4 +744,4 @@ void main()
         0.0833                              // float fxaaQualityEdgeThresholdMin
     );
 }
-#endif
+

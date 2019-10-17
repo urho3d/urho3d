@@ -8,8 +8,8 @@
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -22,9 +22,8 @@ void main()
         vColor = iColor;
     #endif
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     vec4 diffColor = cMatDiffColor;
 
@@ -52,4 +51,3 @@ void main()
         gl_FragColor = vec4(diffColor.rgb, diffColor.a * alphaInput);
     #endif
 }
-#endif

@@ -26,8 +26,8 @@ uniform float cNoiseStrength;
 uniform float cFresnelPower;
 uniform vec3 cWaterTint;
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -44,9 +44,8 @@ void main()
     vNormal = GetWorldNormal(modelMatrix);
     vEyeVec = vec4(cCameraPos - worldPos, GetDepth(gl_Position));
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     vec2 refractUV = vScreenPos.xy / vScreenPos.w;
     vec2 reflectUV = vReflectUV.xy / vScreenPos.w;
@@ -65,4 +64,3 @@ void main()
 
     gl_FragColor = vec4(GetFog(finalColor, GetFogFactor(vEyeVec.w)), 1.0);
 }
-#endif

@@ -3,7 +3,7 @@
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
-#ifdef COMPILEVS
+
 void VS(float4 iPos : POSITION,
     #ifdef DIRLIGHT
         out float2 oScreenPos : TEXCOORD0,
@@ -33,8 +33,7 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 }
-#endif
-#ifdef COMPILEPS
+
 void PS(
     #ifdef DIRLIGHT
         float2 iScreenPos : TEXCOORD0,
@@ -105,4 +104,3 @@ void PS(
         oColor = diff * float4(lightColor * albedoInput.rgb, 0.0);
     #endif
 }
-#endif

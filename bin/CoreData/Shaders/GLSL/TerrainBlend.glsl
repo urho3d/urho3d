@@ -50,8 +50,8 @@ uniform vec2 cDetailTiling;
 #else
 uniform mediump vec2 cDetailTiling;
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -102,9 +102,8 @@ void main()
         #endif
     #endif
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     // Get material diffuse albedo
     vec3 weights = texture2D(sWeightMap0, vTexCoord).rgb;
@@ -194,4 +193,3 @@ void main()
         gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }
-#endif

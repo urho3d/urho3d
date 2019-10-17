@@ -6,7 +6,7 @@
 #include "Constants.hlsl"
 #include "PBR.hlsl"
 #line 9
-#ifdef COMPILEVS
+
 void VS(float4 iPos : POSITION,
     #ifdef DIRLIGHT
         out float2 oScreenPos : TEXCOORD0,
@@ -36,8 +36,7 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 }
-#endif
-#ifdef COMPILEPS
+
 void PS(
     #ifdef DIRLIGHT
         float2 iScreenPos : TEXCOORD0,
@@ -127,4 +126,3 @@ void PS(
     oColor.a = 1;
     oColor.rgb  = BRDF * lightColor * shadow * atten / M_PI;
 }
-#endif

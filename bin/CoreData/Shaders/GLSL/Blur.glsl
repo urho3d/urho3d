@@ -13,8 +13,8 @@ uniform float cBlurRadius;
 uniform float cBlurSigma;
 uniform vec2 cBlurHInvSize;
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -22,9 +22,8 @@ void main()
     vTexCoord = GetQuadTexCoord(gl_Position);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     #ifdef BLUR3
         gl_FragColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, vTexCoord);
@@ -42,4 +41,3 @@ void main()
         gl_FragColor = GaussianBlur(9, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, vTexCoord);
     #endif
 }
-#endif

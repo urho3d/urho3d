@@ -1,7 +1,7 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
-#ifdef COMPILEVS
+
 void VS(float4 iPos : POSITION,
     #ifdef SKINNED
         float4 iBlendWeights : BLENDWEIGHT,
@@ -26,8 +26,7 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
 }
-#endif
-#ifdef COMPILEPS
+
 void PS(
     float3 iTexCoord : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
@@ -40,4 +39,3 @@ void PS(
 
     oColor = iTexCoord.z;
 }
-#endif
