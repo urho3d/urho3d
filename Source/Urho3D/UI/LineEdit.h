@@ -77,6 +77,8 @@ public:
     void SetCursorBlinkRate(float rate);
     /// Set maximum text length. 0 for unlimited.
     void SetMaxLength(unsigned length);
+    /// Set text filter. Checks agains the characters in the string and discards ones not present.
+    void SetTextFilter(const String& filter);
     /// Set echo character for password entry and such. 0 (default) shows the actual text.
     void SetEchoCharacter(unsigned c);
     /// Set whether can move cursor with arrows or mouse, default true.
@@ -97,6 +99,9 @@ public:
 
     /// Return maximum text length.
     unsigned GetMaxLength() const { return maxLength_; }
+
+    /// Return filter.
+    const String& GetTextFilter() const { return filter_; }
 
     /// Return echo character.
     unsigned GetEchoCharacter() const { return echoCharacter_; }
@@ -123,6 +128,8 @@ protected:
     void UpdateText();
     /// Update cursor position and restart cursor blinking.
     void UpdateCursor();
+    /// Filter the text, removing disallowed characters.
+    bool FilterText(String& string);
     /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
     unsigned GetCharIndex(const IntVector2& position);
 
@@ -146,6 +153,8 @@ protected:
     float cursorBlinkTimer_;
     /// Maximum text length.
     unsigned maxLength_;
+    /// Text filter.
+    String filter_;
     /// Echo character.
     unsigned echoCharacter_;
     /// Cursor movable flag.

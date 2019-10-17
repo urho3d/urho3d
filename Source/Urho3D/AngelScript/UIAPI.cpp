@@ -486,6 +486,8 @@ static void RegisterText3D(asIScriptEngine* engine)
 static void RegisterLineEdit(asIScriptEngine* engine)
 {
     RegisterBorderImage<LineEdit>(engine, "LineEdit");
+    engine->RegisterObjectMethod("LineEdit", "void set_textFilter(const String&in)", asMETHOD(LineEdit, SetTextFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "const String& get_textFilter() const", asMETHOD(LineEdit, GetTextFilter), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void set_text(const String&in)", asMETHOD(LineEdit, SetText), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "const String& get_text() const", asMETHOD(LineEdit, GetText), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void set_cursorPosition(uint)", asMETHOD(LineEdit, SetCursorPosition), asCALL_THISCALL);

@@ -10,6 +10,7 @@ class LineEdit : public BorderImage
     void SetCursorPosition(unsigned position);
     void SetCursorBlinkRate(float rate);
     void SetMaxLength(unsigned length);
+    void SetTextFilter(const String filter);
     void SetEchoCharacter(unsigned c);
     void SetCursorMovable(bool enable);
     void SetTextSelectable(bool enable);
@@ -19,6 +20,7 @@ class LineEdit : public BorderImage
     unsigned GetCursorPosition() const;
     float GetCursorBlinkRate() const;
     unsigned GetMaxLength() const;
+    const String GetTextFilter() const;
     unsigned GetEchoCharacter() const;
     bool IsCursorMovable() const;
     bool IsTextSelectable() const;
@@ -30,6 +32,7 @@ class LineEdit : public BorderImage
     tolua_property__get_set unsigned cursorPosition;
     tolua_property__get_set float cursorBlinkRate;
     tolua_property__get_set unsigned maxLength;
+    tolua_property__get_set String textFilter;
     tolua_property__get_set unsigned echoCharacter;
     tolua_property__is_set bool cursorMovable;
     tolua_property__is_set bool textSelectable;

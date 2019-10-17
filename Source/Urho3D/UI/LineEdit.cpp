@@ -79,6 +79,7 @@ void LineEdit::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Text filter", GetTextFilter, SetTextFilter, String, "", AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
@@ -237,7 +238,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
     case KEY_V:
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
-            const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();
+            String clipBoard = GetSubsystem<UI>()->GetClipboardText();
+            FilterText(clipBoard);
             if (!clipBoard.Empty())
             {
                 // Remove selected text first
@@ -444,7 +446,8 @@ void LineEdit::OnTextInput(const String& text)
     eventData[P_TEXT] = text;
     SendEvent(E_TEXTENTRY, eventData);
 
-    const String newText = eventData[P_TEXT].GetString().SubstringUTF8(0);
+    String newText = eventData[P_TEXT].GetString().SubstringUTF8(0);
+    FilterText(newText);
     if (!newText.Empty() && (!maxLength_ || line_.LengthUTF8() + newText.LengthUTF8() <= maxLength_))
     {
         if (!text_->GetSelectionLength())
@@ -482,6 +485,7 @@ void LineEdit::SetText(const String& text)
     if (text != line_)
     {
         line_ = text;
+        FilterText(line_);
         cursorPosition_ = line_.LengthUTF8();
         UpdateText();
         UpdateCursor();
@@ -511,6 +515,24 @@ void LineEdit::SetCursorBlinkRate(float rate)
 void LineEdit::SetMaxLength(unsigned length)
 {
     maxLength_ = length;
+    if(line_.Length() > maxLength_)
+    {
+        line_ = line_.Substring(0, maxLength_);
+        UpdateText();
+        UpdateCursor();
+    }
+}
+
+void LineEdit::SetTextFilter(const String& filter)
+{
+    filter_ = filter;
+    if(FilterText(line_))
+    {
+        if(cursorPosition_ > line_.LengthUTF8())
+            cursorPosition_ = line_.LengthUTF8();
+        UpdateText();
+        UpdateCursor();
+    }
 }
 
 void LineEdit::SetEchoCharacter(unsigned c)
@@ -615,6 +637,24 @@ void LineEdit::UpdateCursor()
 
     // Restart blinking
     cursorBlinkTimer_ = 0.0f;
+}
+
+bool LineEdit::FilterText(String& string)
+{
+    if (filter_.Empty() || string.Empty())
+        return false;
+
+    unsigned originalLength = string.LengthUTF8();
+    unsigned charPos = 0;
+    while (charPos < string.LengthUTF8())
+    {
+        if (filter_.FindUTF8(string.AtUTF8(charPos), 0) == String::NPOS)
+            string = string.SubstringUTF8(0, charPos) + string.SubstringUTF8(charPos + 1);
+        else
+            ++charPos;
+    }
+
+    return originalLength != string.LengthUTF8();
 }
 
 unsigned LineEdit::GetCharIndex(const IntVector2& position)
