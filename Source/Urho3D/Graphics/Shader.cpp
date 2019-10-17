@@ -94,7 +94,17 @@ bool Shader::BeginLoad(Deserializer& source)
         return false;
 
     // Comment out the unneeded shader function
-	shaderCode_ = shaderCode;
+    vsSourceCode_ = shaderCode;
+    psSourceCode_ = shaderCode;
+    CommentOutFunction(vsSourceCode_, "void PS(");
+    CommentOutFunction(psSourceCode_, "void VS(");
+
+    // OpenGL: rename either VS() or PS() to main()
+#ifdef URHO3D_OPENGL
+    vsSourceCode_.Replace("void VS(", "void main(");
+    psSourceCode_.Replace("void PS(", "void main(");
+#endif
+
     RefreshMemoryUse();
     return true;
 }
@@ -169,18 +179,19 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     while (!source.IsEof())
     {
         String line = source.ReadLine();
-		//Empty line
-		if (line.Empty())
-		{
-			continue;
-		}
-		//Comment line
-		line = line.TrimLeft();
-		if (line.StartsWith("//") || line.Empty())
-		{
-			continue;
-		}
-		//include dependency file
+
+        //Empty line
+        if (line.Empty())
+        {
+            continue;
+        }
+        //Comment line
+        line = line.TrimLeft();
+        if (line.StartsWith("//") || line.Empty())
+        {
+            continue;
+        }
+        //include dependency file
         if (line.StartsWith("#include"))
         {
             String includeFileName = GetPath(source.GetName()) + line.Substring(9).Replaced("\"", "").Trimmed();
@@ -216,7 +227,7 @@ String Shader::NormalizeDefines(const String& defines)
 void Shader::RefreshMemoryUse()
 {
     SetMemoryUse(
-        (unsigned)(sizeof(Shader) + shaderCode_.Length() + numVariations_ * sizeof(ShaderVariation)));
+        (unsigned)(sizeof(Shader) + vsSourceCode_.Length() + psSourceCode_.Length() + numVariations_ * sizeof(ShaderVariation)));
 }
 
 }

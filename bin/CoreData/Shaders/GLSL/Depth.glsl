@@ -3,17 +3,16 @@
 #include "Transform.glsl"
 
 varying vec3 vTexCoord;
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vTexCoord = vec3(GetTexCoord(iTexCoord), GetDepth(gl_Position));
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     #ifdef ALPHAMASK
         float alpha = texture2D(sDiffMap, vTexCoord.xy).a;
@@ -23,4 +22,3 @@ void main()
 
     gl_FragColor = vec4(EncodeDepth(vTexCoord.z), 1.0);
 }
-#endif

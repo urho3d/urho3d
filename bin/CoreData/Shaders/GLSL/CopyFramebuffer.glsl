@@ -4,19 +4,17 @@
 #include "ScreenPos.glsl"
 
 varying vec2 vScreenPos;
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     gl_FragColor = texture2D(sDiffMap, vScreenPos);
 }
-#endif
 

@@ -26,8 +26,8 @@ float GatherAvgLum(sampler2D texSampler, vec2 texCoord, vec2 texelSize)
     return lumAvg / 4.0;
 }
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -35,9 +35,8 @@ void main()
     vTexCoord = GetQuadTexCoord(gl_Position);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     #ifdef LUMINANCE64
     float logLumSum = 0.0;
@@ -72,4 +71,3 @@ void main()
     gl_FragColor = vec4(color * (cAutoExposureMiddleGrey / adaptedLum), 1.0);
     #endif
 }
-#endif

@@ -1,7 +1,7 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
-#ifdef COMPILEVS
+
 void VS(float4 iPos : POSITION,
     #ifndef NOUV
         float2 iTexCoord : TEXCOORD0,
@@ -37,8 +37,7 @@ void VS(float4 iPos : POSITION,
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
 }
-#endif
-#ifdef COMPILEPS
+
 void PS(
     #ifdef VSM_SHADOW
         float4 iTexCoord : TEXCOORD0,
@@ -60,4 +59,3 @@ void PS(
         oColor = 1.0;
     #endif
 }
-#endif

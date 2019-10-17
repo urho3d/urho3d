@@ -16,17 +16,16 @@ varying vec2 vScreenPos;
 #ifdef COMPILEPS
 uniform vec3 cFXAAParams;
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-#endif
-#ifdef COMPILEPS
-void main()
+
+void PS()
 {
     float FXAA_SUBPIX_SHIFT = 1.0/4.0; // Not used
     float FXAA_SPAN_MAX = 8.0;
@@ -86,4 +85,4 @@ void main()
     else
         gl_FragColor = vec4(rgbM, 1.0);
 }
-#endif
+

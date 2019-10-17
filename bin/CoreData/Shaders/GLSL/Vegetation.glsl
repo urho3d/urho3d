@@ -43,8 +43,8 @@ varying vec4 vWorldPos;
         varying vec2 vTexCoord2;
     #endif
 #endif
-#ifdef COMPILEVS
-void main()
+
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -112,4 +112,3 @@ void main()
         #endif
     #endif
 }
-#endif

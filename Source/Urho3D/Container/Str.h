@@ -400,8 +400,8 @@ public:
     String Substring(unsigned pos, unsigned length) const;
 	/// Return string with whitespace trimmed from the beginning.
 	String TrimLeft() const;
-	/// Return string with whitespace trimmed from the end.
-	String TrimRight() const;
+    /// Return string with whitespace trimmed from the end.
+    String TrimRight() const;
     /// Return string with whitespace trimmed from the beginning and the end.
     String Trimmed() const;
     /// Return string in uppercase.

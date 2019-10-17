@@ -2,7 +2,7 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 #include "Fog.hlsl"
-#ifdef COMPILEVS
+
 void VS(float4 iPos : POSITION,
     #ifndef NOUV
         float2 iTexCoord : TEXCOORD0,
@@ -55,8 +55,7 @@ void VS(float4 iPos : POSITION,
         oColor = iColor;
     #endif
 }
-#endif
-#ifdef COMPILEPS
+
 void PS(float2 iTexCoord : TEXCOORD0,
     float4 iWorldPos: TEXCOORD2,
     #ifdef VERTEXCOLOR
@@ -111,4 +110,3 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
     #endif
 }
-#endif

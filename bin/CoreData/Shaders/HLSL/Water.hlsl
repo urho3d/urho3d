@@ -32,7 +32,7 @@ cbuffer CustomPS : register(b6)
 #endif
 
 #endif
-#ifdef COMPILEVS
+
 void VS(float4 iPos : POSITION,
     float3 iNormal: NORMAL,
     float2 iTexCoord : TEXCOORD0,
@@ -65,8 +65,7 @@ void VS(float4 iPos : POSITION,
         oClip = dot(oPos, cClipPlane);
     #endif
 }
-#endif
-#ifdef COMPILEPS
+
 void PS(
     float4 iScreenPos : TEXCOORD0,
     float2 iReflectUV : TEXCOORD1,
@@ -95,4 +94,3 @@ void PS(
 
     oColor = float4(GetFog(finalColor, GetFogFactor(iEyeVec.w)), 1.0);
 }
-#endif
