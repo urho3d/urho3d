@@ -40,14 +40,21 @@ if (FILENAME)
     file (WRITE ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n")
 else ()
     # Output just major.minor.patch number to stdout
-    string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format
+    string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})                    # Assume release tag always has major.minor format with possible pre-release identifier
     if (VERSION)
-        string (REGEX MATCH "${VERSION}-([^-]+)" PATCH ${LIB_REVISION})     # Subsequent commits count after a release tag is treated as patch number
+        string (REGEX MATCH "${VERSION}(-[A-Z]+)" PRE_ID ${LIB_REVISION})            # Workaround as CMake's regex does not support look around
+        if (PRE_ID)
+            set (PRE_ID ${CMAKE_MATCH_1})
+        endif ()
+        string (REGEX MATCH "${VERSION}${PRE_ID}-([^-]+)" PATCH ${LIB_REVISION})    # Subsequent commits count after a release tag is treated as patch number
         if (PATCH)
             set (VERSION ${VERSION}.${CMAKE_MATCH_1})
+            unset (PRE_ID)
+        else ()
+            set (VERSION ${VERSION}.0)
         endif ()
     else ()
-        set (VERSION 0.0)
+        set (VERSION 0.0.0)
     endif ()
-    execute_process (COMMAND ${CMAKE_COMMAND} -E echo ${VERSION})
+    execute_process (COMMAND ${CMAKE_COMMAND} -E echo ${VERSION}${PRE_ID})
 endif ()
