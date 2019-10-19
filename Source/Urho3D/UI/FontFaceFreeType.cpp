@@ -196,26 +196,18 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     int textureWidth = maxTextureSize;
     int textureHeight = maxTextureSize;
-    hasMutableGlyph_ = false;
-
+    
     SharedPtr<Image> image(new Image(font_->GetContext()));
     image->SetSize(textureWidth, textureHeight, 1);
     unsigned char* imageData = image->GetData();
     memset(imageData, 0, (size_t)image->GetWidth() * image->GetHeight());
     allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
-
-    for (unsigned i = 0; i < charCodes.Size(); ++i)
-    {
-        unsigned charCode = charCodes[i];
-        if (charCode == 0)
-            continue;
-
-        if (!LoadCharGlyph(charCode, image))
-        {
-            hasMutableGlyph_ = true;
-            break;
-        }
-    }
+    
+    const unsigned char code[] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+    for (unsigned i = 0; i < sizeof(code); ++i)
+        LoadCharGlyph(code[i], image);
+    
+    hasMutableGlyph_ = true;
 
     SharedPtr<Texture2D> texture = LoadFaceTexture(image);
     if (!texture)
@@ -314,19 +306,11 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
         glyph.used_ = true;
         return &glyph;
     }
+    FontGlyph* glyph = LoadCharGlyph(c);
+    if (glyph != nullptr)
+        glyph->used_ = true;
 
-    if (LoadCharGlyph(c))
-    {
-        HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
-        if (i != glyphMapping_.End())
-        {
-            FontGlyph& glyph = i->second_;
-            glyph.used_ = true;
-            return &glyph;
-        }
-    }
-
-    return nullptr;
+    return glyph;
 }
 
 bool FontFaceFreeType::SetupNextTexture(int textureWidth, int textureHeight)
@@ -407,10 +391,10 @@ void FontFaceFreeType::BoxFilter(unsigned char* dest, size_t destSize, const uns
     }
 }
 
-bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
+FontGlyph* FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
 {
     if (!face_)
-        return false;
+        return nullptr;
 
     auto face = (FT_Face)face_;
     FT_GlyphSlot slot = face->glyph;
@@ -464,7 +448,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             if (image)
             {
                 // We're rendering into a fixed image and we ran out of room.
-                return false;
+                return nullptr;
             }
 
             int w = allocator_.GetWidth();
@@ -472,13 +456,13 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             if (!SetupNextTexture(w, h))
             {
                 URHO3D_LOGWARNINGF("FontFaceFreeType::LoadCharGlyph: failed to allocate new %dx%d texture", w, h);
-                return false;
+                return nullptr;
             }
 
             if (!allocator_.Allocate(fontGlyph.texWidth_ + 1, fontGlyph.texHeight_ + 1, x, y))
             {
                 URHO3D_LOGWARNINGF("FontFaceFreeType::LoadCharGlyph: failed to position char code %u in blank page", charCode);
-                return false;
+                return nullptr;
             }
         }
 
@@ -534,10 +518,10 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         fontGlyph.y_ = 0;
         fontGlyph.page_ = 0;
     }
+    FontGlyph* retFontGlyph = &glyphMapping_[charCode];
+    *retFontGlyph = fontGlyph;
 
-    glyphMapping_[charCode] = fontGlyph;
-
-    return true;
+    return retFontGlyph;
 }
 
 }
