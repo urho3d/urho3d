@@ -150,13 +150,13 @@ string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
 define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
 
 # Define generated source files
-#if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
+if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
     execute_process (COMMAND ${CMAKE_COMMAND}
         -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h
         -P CMake/Modules/GetUrhoRevision.cmake
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_QUIET ERROR_QUIET)
-#endif ()
+endif ()
 set (URHO3D_DEPS ${STATIC_LIBRARY_TARGETS})
 if (TARGET LuaJIT_universal)
     list (REMOVE_ITEM URHO3D_DEPS LuaJIT)
