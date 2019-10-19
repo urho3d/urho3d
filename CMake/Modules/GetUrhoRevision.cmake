@@ -91,45 +91,45 @@ if (FILENAME)
         "\n} UrhoVersion;"
     )
 
-file (APPEND ${FILENAME} "\n\n///Printable format: \"%d.%d.%d\", MAJOR, MINOR, PATCHLEVEL"
-    "\n#define URHO3D_MAJOR_VERSION   " ${URHO3D_VERSION_MAJOR}
-    "\n#define URHO3D_MINOR_VERSION   " ${URHO3D_VERSION_MINOR}
-    "\n#define URHO3D_PATCHLEVEL      " ${URHO3D_VERSION_PATCH})
+    file (APPEND ${FILENAME} "\n\n///Printable format: \"%d.%d.%d\", MAJOR, MINOR, PATCHLEVEL"
+        "\n#define URHO3D_MAJOR_VERSION   " ${URHO3D_VERSION_MAJOR}
+        "\n#define URHO3D_MINOR_VERSION   " ${URHO3D_VERSION_MINOR}
+        "\n#define URHO3D_PATCHLEVEL      " ${URHO3D_VERSION_PATCH})
 
-file (APPEND ${FILENAME} "\n\n/**"
-    "\n*  \\brief Macro to determine Urho3D version program was compiled against."
-    "\n*"
-    "\n*  This macro fills in a UrhoVersion structure with the version of the"
-    "\n*  library you compiled against. This is determined by what header the"
-    "\n*  compiler uses. Note that if you dynamically linked the library, you might"
-    "\n*  have a slightly newer or older version at runtime. That version can be"
-    "\n*  determined with ::Urho3D::GetVersion(), which, unlike URHO3D_VERSION(),"
-    "\n*  is not a macro."
-    "\n*"
-    "\n*  \\param x A pointer to a UrhoVersion struct to initialize."
-    "\n*"
-    "\n*  \\sa UrhoVersion"
-    "\n*  \\sa ::Urho3D::GetVersion"
-    "\n*/"
-    "\n#define URHO3D_VERSION(x) {                        " "\\"
-    "\n    (x)->major = URHO3D_MAJOR_VERSION;           " "\\"
-    "\n    (x)->minor = URHO3D_MINOR_VERSION;           " "\\"
-    "\n    (x)->patch = URHO3D_PATCHLEVEL;              " "\\"
-    "\n}")
+    file (APPEND ${FILENAME} "\n\n/**"
+        "\n*  \\brief Macro to determine Urho3D version program was compiled against."
+        "\n*"
+        "\n*  This macro fills in a UrhoVersion structure with the version of the"
+        "\n*  library you compiled against. This is determined by what header the"
+        "\n*  compiler uses. Note that if you dynamically linked the library, you might"
+        "\n*  have a slightly newer or older version at runtime. That version can be"
+        "\n*  determined with ::Urho3D::GetVersion(), which, unlike URHO3D_VERSION(),"
+        "\n*  is not a macro."
+        "\n*"
+        "\n*  \\param x A pointer to a UrhoVersion struct to initialize."
+        "\n*"
+        "\n*  \\sa UrhoVersion"
+        "\n*  \\sa ::Urho3D::GetVersion"
+        "\n*/"
+        "\n#define URHO3D_VERSION(x) {                        " "\\"
+        "\n    (x)->major = URHO3D_MAJOR_VERSION;           " "\\"
+        "\n    (x)->minor = URHO3D_MINOR_VERSION;           " "\\"
+        "\n    (x)->patch = URHO3D_PATCHLEVEL;              " "\\"
+        "\n}")
 
-file (APPEND ${FILENAME} "\n\n///This macro turns the version numbers into a numeric value:"
-    "\n///    (1,2,3) -> (1203)"
-    "\n///This assumes that there will never be more than 100 patchlevels."
-    "\n#define URHO3D_VERSIONNUM(X, Y, Z) " "\\"
-    "\n    ((X)*1000 + (Y)*100 + (Z))")
+    file (APPEND ${FILENAME} "\n\n///This macro turns the version numbers into a numeric value:"
+        "\n///    (1,2,3) -> (1203)"
+        "\n///This assumes that there will never be more than 100 patchlevels."
+        "\n#define URHO3D_VERSIONNUM(X, Y, Z) " "\\"
+        "\n    ((X)*1000 + (Y)*100 + (Z))")
 
-file (APPEND ${FILENAME} "\n\n///This is the version number macro for the current URHO version."
-    "\n#define URHO3D_COMPILEDVERSION " "\\"
-    "\n    URHO3D_VERSIONNUM(URHO3D_MAJOR_VERSION, URHO3D_MINOR_VERSION, URHO3D_PATCHLEVEL)")
+    file (APPEND ${FILENAME} "\n\n///This is the version number macro for the current URHO version."
+        "\n#define URHO3D_COMPILEDVERSION " "\\"
+        "\n    URHO3D_VERSIONNUM(URHO3D_MAJOR_VERSION, URHO3D_MINOR_VERSION, URHO3D_PATCHLEVEL)")
 
-file (APPEND ${FILENAME} "\n\n///This macro will evaluate to true if compiled with URHO at least X.Y.Z."
-    "\n#define URHO3D_VERSION_ATLEAST(X, Y, Z) " "\\"
-    "\n    (URHO3D_COMPILEDVERSION >= URHO3D_VERSIONNUM(X, Y, Z))")
+    file (APPEND ${FILENAME} "\n\n///This macro will evaluate to true if compiled with URHO at least X.Y.Z."
+        "\n#define URHO3D_VERSION_ATLEAST(X, Y, Z) " "\\"
+        "\n    (URHO3D_COMPILEDVERSION >= URHO3D_VERSIONNUM(X, Y, Z))")
 
 else ()
     # Output just major.minor.patch number to stdout
