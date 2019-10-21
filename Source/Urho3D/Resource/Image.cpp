@@ -229,7 +229,7 @@ bool CompressedLevel::Decompress(unsigned char* dest)
         DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
         return true;
 	
-	// ETC2 format is compatible with ETC1, so we just use the same function.
+    // ETC2 format is compatible with ETC1, so we just use the same function.
     case CF_ETC1:
     case CF_ETC2_RGB:
         DecompressImageETC(dest, data_, width_, height_, false);
@@ -723,7 +723,7 @@ bool Image::BeginLoad(Deserializer& source)
             components_ = 4;
             break;
 
-		// .pvr files also support ETC2 texture format.
+        // .pvr files also support ETC2 texture format.
         case 22:
             compressedFormat_ = CF_ETC2_RGB;
             components_ = 3;
