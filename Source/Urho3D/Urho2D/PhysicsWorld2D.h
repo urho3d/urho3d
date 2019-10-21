@@ -249,7 +249,7 @@ protected:
         /// Construct.
         ContactInfo();
         /// Construct.
-        explicit ContactInfo(b2Contact* contact);
+        explicit ContactInfo(b2Contact* contract);
         /// Write contact info to buffer.
         const PODVector<unsigned char>& Serialize(VectorBuffer& buffer) const;
 
