@@ -2253,28 +2253,52 @@ static double CScriptDictValue_opConvDouble(CScriptDictValue *obj)
     CScriptDictValue_opCast(&value, asTYPEID_DOUBLE, obj);
     return value;
 }
+#ifdef AS_MAX_PORTABILITY
+static void CScriptDictValue_opAssign_gen(asIScriptGeneric* gen) {
+    *static_cast<CScriptDictValue**>(gen->GetAddressOfReturnLocation()) =
+        &CScriptDictValue_opAssign(*static_cast<void**>(gen->GetAddressOfArg(0)),
+            gen->GetArgTypeId(0),
+            static_cast<CScriptDictValue*>(gen->GetObject()));
+}
+
+static void CScriptDictValue_opCast_gen(asIScriptGeneric* gen) {
+    CScriptDictValue_opCast(
+        *static_cast<void**>(gen->GetAddressOfArg(0)),
+        gen->GetArgTypeId(0),
+        static_cast<CScriptDictValue*>(gen->GetObject()));
+}
+static void CScriptDictionary_Set(asIScriptGeneric* gen) {
+    static_cast<CScriptDictionary*>(gen->GetObject())->Set(
+        **static_cast<const String**>(gen->GetAddressOfArg(0)),
+        *static_cast<void**>(gen->GetAddressOfArg(1)),
+        gen->GetArgTypeId(1));
+}
+
+static void CScriptDictionary_Get(asIScriptGeneric* gen) {
+    *static_cast<bool*>(gen->GetAddressOfReturnLocation()) =
+        static_cast<CScriptDictionary*>(gen->GetObject())->Get(
+            **static_cast<const String**>(gen->GetAddressOfArg(0)),
+            *static_cast<void**>(gen->GetAddressOfArg(1)),
+            gen->GetArgTypeId(1));
+}
+#endif
 
 void RegisterDictionary(asIScriptEngine *engine)
 {
     engine->RegisterObjectType("DictionaryValue", sizeof(CScriptDictValue), asOBJ_VALUE | asOBJ_ASHANDLE | asOBJ_APP_CLASS_CD);
     engine->RegisterObjectBehaviour("DictionaryValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(CScriptDictValue_Construct), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("DictionaryValue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(CScriptDictValue_Destruct), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opHndlAssign(const ?&in)", asFUNCTIONPR(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(const ?&in)", asFUNCTIONPR(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(double)", asFUNCTIONPR(CScriptDictValue_opAssign, (double, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(int64)", asFUNCTIONPR(CScriptDictValue_opAssign, (asINT64, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "void opCast(?&out)", asFUNCTIONPR(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "void opConv(?&out)", asFUNCTIONPR(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DictionaryValue", "int64 opConv()", asFUNCTIONPR(CScriptDictValue_opConvInt, (CScriptDictValue*), asINT64), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DictionaryValue", "double opConv()", asFUNCTIONPR(CScriptDictValue_opConvDouble, (CScriptDictValue*), double), asCALL_CDECL_OBJLAST);
+
     engine->RegisterObjectType("Dictionary", sizeof(CScriptDictionary), asOBJ_REF);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_FACTORY, "Dictionary@ f()", asFUNCTION(ScriptDictionaryFactory_Generic), asCALL_GENERIC);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_LIST_FACTORY, "Dictionary @f(int &in) {repeat {String, ?}}", asFUNCTION(ScriptDictionaryListFactory_Generic), asCALL_GENERIC);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptDictionary,AddRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptDictionary,Release), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "Dictionary &opAssign(const Dictionary &in)", asMETHODPR(CScriptDictionary, operator=, (const CScriptDictionary &), CScriptDictionary&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asMETHODPR(CScriptDictionary,Set,(const String&,void*,int),void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,void*,int) const,bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const int64&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const asINT64&),void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, int64&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,asINT64&) const,bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const double&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const double&),void), asCALL_THISCALL);
@@ -2287,6 +2311,25 @@ void RegisterDictionary(asIScriptEngine *engine)
     engine->RegisterObjectMethod("Dictionary", "Array<String> @get_keys() const", asMETHOD(CScriptDictionary,GetKeys), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "DictionaryValue &opIndex(const String &in)", asMETHODPR(CScriptDictionary, operator[], (const String &), CScriptDictValue*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Dictionary", "const DictionaryValue &opIndex(const String &in) const", asMETHODPR(CScriptDictionary, operator[], (const String &) const, const CScriptDictValue*), asCALL_THISCALL);
+
+#ifndef AS_MAX_PORTABILITY
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opHndlAssign(const ?&in)", asFUNCTIONPR(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(const ?&in)", asFUNCTIONPR(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "void opCast(?&out)", asFUNCTIONPR(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "void opConv(?&out)", asFUNCTIONPR(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asMETHODPR(CScriptDictionary, Set, (const String&, void*, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asMETHODPR(CScriptDictionary, Get, (const String&, void*, int) const, bool), asCALL_THISCALL);
+#else
+    // autowrapper not correctly worked with ?& parameters, it must be registered "by hand"
+#undef RegisterObjectMethod
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opHndlAssign(const ?&in)", asFunctionPtr(CScriptDictValue_opAssign_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(const ?&in)", asFunctionPtr(CScriptDictValue_opAssign_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("DictionaryValue", "void opCast(?&out)", asFunctionPtr(CScriptDictValue_opCast_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("DictionaryValue", "void opConv(?&out)", asFunctionPtr(CScriptDictValue_opCast_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asFunctionPtr(CScriptDictionary_Set), asCALL_GENERIC);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asFunctionPtr(CScriptDictionary_Get), asCALL_GENERIC);
+#define RegisterObjectMethod(...) RegObjectMethodIndirect(__VA_ARGS__)
+#endif
 }
 
 

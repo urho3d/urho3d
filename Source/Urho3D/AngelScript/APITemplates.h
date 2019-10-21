@@ -1249,7 +1249,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_focus() const", asMETHOD(T, HasFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_selected(bool)", asMETHOD(T, SetSelected), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_selected() const", asMETHOD(T, IsSelected), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_selected() const", asMETHOD(UIElement, IsSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visibleEffective() const", asMETHOD(T, IsVisibleEffective), asCALL_THISCALL);
