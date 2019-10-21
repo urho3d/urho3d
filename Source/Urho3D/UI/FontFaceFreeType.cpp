@@ -203,6 +203,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     memset(imageData, 0, (size_t)image->GetWidth() * image->GetHeight());
     allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
     
+    hasMutableGlyph_ = false;
     //Pre-cache characters of customer defined.
     const HashMap<unsigned, unsigned>& preCacheChars = font_->GetPreCacheCharacters();
     bool hasPreCacheChars = !preCacheChars.Empty();
@@ -224,7 +225,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         }
     }
 
-    if (!hasMutableGlyph_)
+    if (!hasMutableGlyph_ && hasPreCacheChars)
         hasMutableGlyph_ = cachedNum < charCodes.Size(); //Not all of characters are cached.
 
     SharedPtr<Texture2D> texture = LoadFaceTexture(image);
