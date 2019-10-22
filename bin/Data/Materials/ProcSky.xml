@@ -1,4 +1,0 @@
-<material>
-    <technique name="Techniques/DiffProcSky.xml" />
-    <cull value="none" />
-</material>
