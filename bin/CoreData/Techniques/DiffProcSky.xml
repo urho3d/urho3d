@@ -1,3 +1,0 @@
-<technique vs="ProcSky" ps="ProcSky">
-    <pass name="postopaque" depthwrite="false" />
-</technique>
