@@ -87,7 +87,6 @@ void RigidBody2D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, true, AM_DEFAULT);
 }
 
 
@@ -427,7 +426,7 @@ void RigidBody2D::ApplyWorldTransform()
     // If the rigid body is parented to another rigid body, can not set the transform immediately.
     // In that case store it to PhysicsWorld2D for delayed assignment
     RigidBody2D* parentRigidBody = nullptr;
-    auto* parent = node_->GetParent();
+    Node* parent = node_->GetParent();
     if (parent != GetScene() && parent)
         parentRigidBody = parent->GetComponent<RigidBody2D>();
 

@@ -60,7 +60,7 @@ public:
     void OnSetEnabled() override;
 
     /// Set body type.
-    void SetBodyType(BodyType2D bodyType);
+    void SetBodyType(BodyType2D type);
     /// Set mass.
     void SetMass(float mass);
     /// Set inertia.
@@ -159,13 +159,6 @@ public:
     /// Return Box2D body.
     b2Body* GetBody() const { return body_; }
 
-    /// Return cast shadows
-    bool GetCastShadows() const { return castShadows_; }
-    /// 
-    void SetCastShadows(bool castShadows) { 
-        castShadows_ = castShadows; 
-    }
-
 private:
     /// Handle node being assigned.
     void OnNodeSet(Node* node) override;
@@ -181,15 +174,13 @@ private:
     /// Box2D mass data.
     b2MassData massData_;
     /// Use fixture mass (calculate mass & inertia from collision shapes automatically.)
-    bool useFixtureMass_{true};
+    bool useFixtureMass_;
     /// Box2D body.
-    b2Body* body_{};
+    b2Body* body_;
     /// Collision shapes.
     Vector<WeakPtr<CollisionShape2D> > collisionShapes_;
     /// Constraints.
     Vector<WeakPtr<Constraint2D> > constraints_;
-    /// Cast shadows
-    bool castShadows_{true};
 };
 
 }

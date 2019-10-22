@@ -53,7 +53,7 @@
 #include "../Urho2D/TileMapLayer2D.h"
 #include "../Urho2D/TmxFile2D.h"
 #include "../Urho2D/Urho2D.h"
-#include "../Urho2D/Light2D.h"
+
 #include "../DebugNew.h"
 
 namespace Urho3D
@@ -106,12 +106,6 @@ void RegisterUrho2DLibrary(Context* context)
     ConstraintRope2D::RegisterObject(context);
     ConstraintWeld2D::RegisterObject(context);
     ConstraintWheel2D::RegisterObject(context);
-    
-    Light2DGroup::RegisterObject(context);
-    Light2D::RegisterObject(context);
-    DirectionalLight2D::RegisterObject(context);
-    PositionalLight2D::RegisterObject(context);
-    PointLight2D::RegisterObject(context);
 }
 
 }
