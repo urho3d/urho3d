@@ -22,6 +22,8 @@
 
 #include "Precompiled.h"
 
+#include "librevision.h"
+
 #include "LibraryInfo.h"
 
 namespace Urho3D

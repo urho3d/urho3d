@@ -24,10 +24,8 @@
 
 #ifdef URHO3D_IS_BUILDING
 #include "Urho3D.h"
-#include "librevision.h"
 #else
 #include <Urho3D/Urho3D.h>
-#include <Urho3D/librevision.h>
 #endif
 
 namespace Urho3D

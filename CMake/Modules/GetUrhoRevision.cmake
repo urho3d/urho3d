@@ -66,7 +66,7 @@ endif ()
 if (FILENAME)
     # Output complete revision number to a file
     file (WRITE ${FILENAME} "#pragma once\n")
-    file (APPEND ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n")
+    file (APPEND ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n\n")
 
     file (APPEND ${FILENAME} "/**"
         "\n*  \\brief Information the version of Urho3D in use."
