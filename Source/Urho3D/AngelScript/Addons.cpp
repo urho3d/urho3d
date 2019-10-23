@@ -2254,14 +2254,16 @@ static double CScriptDictValue_opConvDouble(CScriptDictValue *obj)
     return value;
 }
 #ifdef AS_MAX_PORTABILITY
-static void CScriptDictValue_opAssign_gen(asIScriptGeneric* gen) {
+static void CScriptDictValue_opAssign_gen(asIScriptGeneric* gen)
+{
     *static_cast<CScriptDictValue**>(gen->GetAddressOfReturnLocation()) =
         &CScriptDictValue_opAssign(*static_cast<void**>(gen->GetAddressOfArg(0)),
             gen->GetArgTypeId(0),
             static_cast<CScriptDictValue*>(gen->GetObject()));
 }
 
-static void CScriptDictValue_opCast_gen(asIScriptGeneric* gen) {
+static void CScriptDictValue_opCast_gen(asIScriptGeneric* gen)
+{
     CScriptDictValue_opCast(
         *static_cast<void**>(gen->GetAddressOfArg(0)),
         gen->GetArgTypeId(0),
