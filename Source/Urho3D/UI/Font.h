@@ -88,7 +88,7 @@ public:
     void ReleaseFaces();
 
     /// Get all of characters which are defined by user for caching.
-    const HashMap<unsigned, unsigned>& GetPreCacheCharacters() const { return precacheChars_; }
+    const HashMap<unsigned, bool>& GetPreCacheCharacters() const { return precacheChars_; }
 
 private:
     /// Load font glyph offset parameters from an optional XML file. Called internally when loading TrueType fonts.
@@ -113,7 +113,7 @@ private:
     /// Signed distance field font flag.
     bool sdfFont_;
     /// Pre-Cache charaters
-    HashMap<unsigned, unsigned> precacheChars_;
+    HashMap<unsigned, bool> precacheChars_;
 };
 
 }

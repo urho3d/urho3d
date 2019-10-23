@@ -205,16 +205,18 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     
     hasMutableGlyph_ = false;
     //Pre-cache characters of customer defined.
-    const HashMap<unsigned, unsigned>& preCacheChars = font_->GetPreCacheCharacters();
+    const HashMap<unsigned, bool>& preCacheChars = font_->GetPreCacheCharacters();
     bool hasPreCacheChars = !preCacheChars.Empty();
     unsigned cachedNum = 0;
+    bool bLoaded = false;
     for (auto charCode : charCodes)
     {
         if (charCode == 0)
             continue;
         if (hasPreCacheChars)
         {
-            if (!preCacheChars.TryGetValue(charCode, charCode)) //Does not exist in pre-cache characters.
+            bLoaded = false;
+            if (!preCacheChars.TryGetValue(charCode, bLoaded)) //Does not exist in pre-caching characters.
                 continue;
             cachedNum++;
         }
