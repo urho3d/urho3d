@@ -1310,7 +1310,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(ConstructSphereFrustum), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(ConstructSpherePolyhedron), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Sphere", "Sphere& opAssign(const Sphere&in)", asMETHODPR(Sphere, operator =, (const Sphere&), Sphere&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sphere", "bool &opEquals(const Sphere&in) const", asMETHOD(Sphere, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sphere", "bool opEquals(const Sphere&in) const", asMETHOD(Sphere, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "void Define(const Vector3&in, float)", asMETHODPR(Sphere, Define, (const Vector3&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "void Define(const BoundingBox&in)", asMETHODPR(Sphere, Define, (const BoundingBox&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "void Define(const Frustum&in)", asMETHODPR(Sphere, Define, (const Frustum&), void), asCALL_THISCALL);
