@@ -494,7 +494,7 @@ public:
             return false;
 
         unsigned hashKey = Hash(key);
-        return FindNode(key, hashKey) != 0;
+        return FindNode(key, hashKey) != nullptr;
     }
 
     /// Return iterator to the beginning.
@@ -533,13 +533,13 @@ private:
             node = node->Down();
         }
 
-        return 0;
+        return nullptr;
     }
 
     /// Find a node and the previous node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey, Node*& previous) const
     {
-        previous = 0;
+        previous = nullptr;
 
         auto* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
@@ -550,14 +550,14 @@ private:
             node = node->Down();
         }
 
-        return 0;
+        return nullptr;
     }
 
     /// Insert a node into the list. Return the new node.
     Node* InsertNode(Node* dest, const T& key)
     {
         if (!dest)
-            return 0;
+            return nullptr;
 
         Node* newNode = ReserveNode(key);
         Node* prev = dest->Prev();

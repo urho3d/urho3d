@@ -230,7 +230,7 @@ void Font::LoadParameters()
         while (byteOffset < len)
         {
             charCode = characters.NextUTF8Char(byteOffset);
-            precacheChars_[charCode] = true;
+            precacheChars_.Insert(charCode);
         }
     }
 }
