@@ -527,6 +527,10 @@ public:
     void SetVBO(unsigned object);
     /// Bind a UBO, avoiding redundant operation. Used only on OpenGL.
     void SetUBO(unsigned object);
+    /// Get Renderer name. Used on OpenGL
+    const String& GetRendererName() const { return rendererName_; }
+    /// Get Version string. Used on OpenGL
+    const String& GetVersionString() const { return versionString_; }
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -795,6 +799,8 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
+    String rendererName_;
+    String versionString_;
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;
