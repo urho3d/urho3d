@@ -64,7 +64,7 @@ vec3 Uncharted2Tonemap(vec3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
-#ifndef GL_ES
+#if !defined(GL_ES) || __VERSION >= 300
 vec3 ColorCorrection(vec3 color, sampler3D lut)
 {
     float lutSize = 16.0;

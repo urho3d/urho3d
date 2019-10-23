@@ -314,7 +314,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
     engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
-#ifdef DESKTOP_GRAPHICS
+#ifdef DESKTOP_GRAPHICS_OR_GLES3
     engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM1", TU_CUSTOM1);
     engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM2", TU_CUSTOM2);
     engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
