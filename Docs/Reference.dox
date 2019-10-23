@@ -2522,12 +2522,15 @@ A separate mechanism from layouting that allows automatically adjusting %UI hier
 
 Urho3D supports both FreeType (.ttf, .otf) and \ref http://www.angelcode.com/products/bmfont/ "bitmap" fonts.
 
-For FreeType fonts, it is possible to adjust the positioning of the font glyphs. See \ref Font::SetAbsoluteGlyphOffset "SetAbsoluteGlyphOffset()" to set a fixed pixel offset for all point sizes, or \ref Font::SetScaledGlyphOffset "SetScaledGlyphOffset()" to set a floating point offset that will be multiplied with the point size before applying. The offset information can be also stored in an accompanying XML file next to the font file, which is formatted in the following way: (it is legal to specify either or both of absolute and scaled offsets, and either or both of X & Y coordinates)
-
+For FreeType fonts, it is possible to adjust the positioning of the font glyphs.
+See \ref Font::SetAbsoluteGlyphOffset "SetAbsoluteGlyphOffset()" to set a fixed pixel offset for all point sizes, or \ref Font::SetScaledGlyphOffset "SetScaledGlyphOffset()" to set a floating point offset that will be multiplied with the point size before applying. And see \ref Font::GetPreCacheCharacters "GetPreCacheCharacters()" to get pre-caching characters which are defined by user, it`s a option item. The offset information and pre-caching characters can be also stored in an accompanying XML file next to the font file, which is formatted in the following way: (it is legal to specify either or both of absolute and scaled offsets, and either or both of X & Y coordinates)
 \code
 <font>
     <absoluteoffset x="xInt" y="yInt" />
     <scaledoffset x="xFloat" y="yFloat" />
+    <precache charset="utf8">
+    <![CDATA[Pre-caching characters. e.g ' !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~']]>
+    </precache>
 </font>
 \endcode
 
