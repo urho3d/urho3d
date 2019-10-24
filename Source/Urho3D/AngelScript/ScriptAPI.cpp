@@ -74,7 +74,8 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
             asIScriptObject* object = instance->GetScriptObject();
             if (!object)
             {
-                instance->CreateObject(file, className);
+                if (instance->CreateObject(file, className))
+                    instance->SubscribeToAutoEvents();
                 return instance->GetScriptObject();
             }
         }

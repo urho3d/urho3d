@@ -149,6 +149,8 @@ public:
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    /// Subscribe to events by names of methods in script's class.
+    void SubscribeToAutoEvents();
 
 protected:
     /// Handle scene being assigned.
@@ -191,8 +193,6 @@ private:
     void HandleScriptFileReload(StringHash eventType, VariantMap& eventData);
     /// Handle script file reload finished.
     void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
-
-    void SubscribeToAutoEvents();
 
     /// Script file.
     WeakPtr<ScriptFile> scriptFile_;
