@@ -31,6 +31,61 @@
 namespace Urho3D
 {
 /**
+*  \brief Information the version of Urho3D in use.
+*
+*  Represents the library's version as three levels: major revision
+*  (increments with massive changes, additions, and enhancements),
+*  minor revision (increments with backwards-compatible changes to the
+*  major revision), and patchlevel (increments with fixes to the minor
+*  revision).
+*
+*  \sa URHO3D_VERSION
+*  \sa ::Urho3D::GetVersion
+*/
+typedef struct UrhoVersion
+{
+    ///major version
+    unsigned char major;
+    ///minor version
+    unsigned char minor;
+    ///patch version
+    unsigned char patch;
+}UrhoVersion;
+
+/**
+*  \brief Macro to determine Urho3D version program was compiled against.
+*
+*  This macro fills in a UrhoVersion structure with the version of the
+*  library you compiled against. This is determined by what header the
+*  compiler uses. Note that if you dynamically linked the library, you might
+*  have a slightly newer or older version at runtime. That version can be
+*  determined with ::Urho3D::GetVersion(), which, unlike URHO3D_VERSION(),
+*  is not a macro.
+*
+*  \param x A pointer to a UrhoVersion struct to initialize.
+*
+*  \sa UrhoVersion
+*  \sa ::Urho3D::GetVersion
+*/
+#define URHO3D_VERSION(x)                               \
+{                                                                           \
+    (x)->major = URHO3D_MAJOR_VERSION;         \
+    (x)->minor = URHO3D_MINOR_VERSION;         \
+    (x)->patch = URHO3D_PATCHLEVEL;                 \
+}
+
+///This macro turns the version numbers into a numeric value:
+///    (1,2,3) -> (1203)
+///This assumes that there will never be more than 100 patchlevels.
+#define URHO3D_VERSIONNUM(X, Y, Z)          ((X)*1000 + (Y)*100 + (Z))
+
+///This is the version number macro for the current URHO version.
+#define URHO3D_COMPILEDVERSION             URHO3D_VERSIONNUM(URHO3D_MAJOR_VERSION, URHO3D_MINOR_VERSION, URHO3D_PATCHLEVEL)
+
+///This macro will evaluate to true if compiled with URHO at least X.Y.Z.
+#define URHO3D_VERSION_ATLEAST(X, Y, Z)    (URHO3D_COMPILEDVERSION >= URHO3D_VERSIONNUM(X, Y, Z))
+
+/**
  *  \brief Get the version of Urho3D that is linked against your program.
  *
  *  If you are linking to Urho3D dynamically, then it is possible that the

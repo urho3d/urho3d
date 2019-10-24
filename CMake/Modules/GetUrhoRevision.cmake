@@ -37,99 +37,48 @@ if (NOT GIT_EXIT_CODE EQUAL 0)
 endif ()
 
 # Output just major.minor.patch number to stdout
-string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format
-if (VERSION)
-    string (REGEX MATCH "${VERSION}-([^-]+)" PATCH ${LIB_REVISION})     # Subsequent commits count after a release tag is treated as patch number
+string (REGEX MATCH "[^.]+\\.[^-]+" URHO_VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format
+if (URHO_VERSION)
+    string (REGEX MATCH "${URHO_VERSION}-([^-]+)" PATCH ${LIB_REVISION})     # Subsequent commits count after a release tag is treated as patch number
     if (PATCH)
-        set (VERSION ${VERSION}.${CMAKE_MATCH_1})
+        set (URHO_VERSION ${URHO_VERSION}.${CMAKE_MATCH_1})
     endif ()
 else ()
-    set (VERSION 0.0.0)
+    set (URHO_VERSION 0.0.0)
 endif ()
 
 set (URHO3D_VERSION_MAJOR 0)
 set (URHO3D_VERSION_MINOR 0)
 set (URHO3D_VERSION_PATCH 0)
 
-string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${VERSION})
+string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO_VERSION})
 if (MATCHED)
     set (URHO3D_VERSION_MAJOR ${CMAKE_MATCH_1})
     set (URHO3D_VERSION_MINOR ${CMAKE_MATCH_2})
     set (URHO3D_VERSION_PATCH ${CMAKE_MATCH_3})
+
+    string (REGEX MATCH "([0-9]+)-([^-]+)" MINOR_NUM ${URHO3D_VERSION_MINOR})
+    if (MINOR_NUM)
+        set (URHO3D_VERSION_MINOR ${CMAKE_MATCH_1})
+    endif ()
     
-    string (REGEX MATCH "(^[0-9]+)" PATCH ${CMAKE_MATCH_3})
-    if (NOT PATCH)
+    string (REGEX MATCH "(^[0-9]+)" PATCH_NUM ${URHO3D_VERSION_PATCH})
+    if (NOT PATCH_NUM)
         set (URHO3D_VERSION_PATCH 0)
     endif ()
 endif ()
 
 if (FILENAME)
     # Output complete revision number to a file
-    file (WRITE ${FILENAME} "#pragma once\n")
-    file (APPEND ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n\n")
-
-    file (APPEND ${FILENAME} "/**"
-        "\n*  \\brief Information the version of Urho3D in use."
-        "\n*"
-        "\n*  Represents the library's version as three levels: major revision"
-        "\n*  (increments with massive changes, additions, and enhancements),"
-        "\n*  minor revision (increments with backwards-compatible changes to the"
-        "\n*  major revision), and patchlevel (increments with fixes to the minor"
-        "\n*  revision)."
-        "\n*"
-        "\n*  \\sa URHO3D_VERSION"
-        "\n*  \\sa ::Urho3D::GetVersion"
-        "\n*/"
-        "\ntypedef struct UrhoVersion"
+    file (WRITE ${FILENAME} "#pragma once"
+        "\n\nnamespace Urho3D"
         "\n{"
-        "\n    ///major version"
-        "\n    unsigned char major;"
-        "\n    ///minor version"
-        "\n    unsigned char minor;"
-        "\n    ///patch version"
-        "\n    unsigned char patch;"
-        "\n} UrhoVersion;"
-    )
-
-    file (APPEND ${FILENAME} "\n\n///Printable format: \"%d.%d.%d\", MAJOR, MINOR, PATCHLEVEL"
+        "\n\nconst char* revision=\"${LIB_REVISION}\";"
+        "\n\n///Printable format: \"%d.%d.%d\", MAJOR, MINOR, PATCHLEVEL"
         "\n#define URHO3D_MAJOR_VERSION   " ${URHO3D_VERSION_MAJOR}
         "\n#define URHO3D_MINOR_VERSION   " ${URHO3D_VERSION_MINOR}
-        "\n#define URHO3D_PATCHLEVEL      " ${URHO3D_VERSION_PATCH})
-
-    file (APPEND ${FILENAME} "\n\n/**"
-        "\n*  \\brief Macro to determine Urho3D version program was compiled against."
-        "\n*"
-        "\n*  This macro fills in a UrhoVersion structure with the version of the"
-        "\n*  library you compiled against. This is determined by what header the"
-        "\n*  compiler uses. Note that if you dynamically linked the library, you might"
-        "\n*  have a slightly newer or older version at runtime. That version can be"
-        "\n*  determined with ::Urho3D::GetVersion(), which, unlike URHO3D_VERSION(),"
-        "\n*  is not a macro."
-        "\n*"
-        "\n*  \\param x A pointer to a UrhoVersion struct to initialize."
-        "\n*"
-        "\n*  \\sa UrhoVersion"
-        "\n*  \\sa ::Urho3D::GetVersion"
-        "\n*/"
-        "\n#define URHO3D_VERSION(x) {                        " "\\"
-        "\n    (x)->major = URHO3D_MAJOR_VERSION;           " "\\"
-        "\n    (x)->minor = URHO3D_MINOR_VERSION;           " "\\"
-        "\n    (x)->patch = URHO3D_PATCHLEVEL;              " "\\"
-        "\n}")
-
-    file (APPEND ${FILENAME} "\n\n///This macro turns the version numbers into a numeric value:"
-        "\n///    (1,2,3) -> (1203)"
-        "\n///This assumes that there will never be more than 100 patchlevels."
-        "\n#define URHO3D_VERSIONNUM(X, Y, Z) " "\\"
-        "\n    ((X)*1000 + (Y)*100 + (Z))")
-
-    file (APPEND ${FILENAME} "\n\n///This is the version number macro for the current URHO version."
-        "\n#define URHO3D_COMPILEDVERSION " "\\"
-        "\n    URHO3D_VERSIONNUM(URHO3D_MAJOR_VERSION, URHO3D_MINOR_VERSION, URHO3D_PATCHLEVEL)")
-
-    file (APPEND ${FILENAME} "\n\n///This macro will evaluate to true if compiled with URHO at least X.Y.Z."
-        "\n#define URHO3D_VERSION_ATLEAST(X, Y, Z) " "\\"
-        "\n    (URHO3D_COMPILEDVERSION >= URHO3D_VERSIONNUM(X, Y, Z))")
+        "\n#define URHO3D_PATCHLEVEL      " ${URHO3D_VERSION_PATCH}
+        "\n\n}")
 
 else ()
     # Output just major.minor.patch number to stdout
