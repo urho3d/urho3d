@@ -1,4 +1,5 @@
 <technique vs="PBRLitSolid" ps="PBRLitSolid"  vsdefines="NORMALMAP" psdefines="DIFFMAP NORMALMAP EMISSIVEMAP PBR IBL">
+    <pass name="base" />
     <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
     <pass name="deferred" psdefines="DEFERRED" blend="add" />
