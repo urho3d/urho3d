@@ -52,6 +52,8 @@ struct BackgroundLoadItem
 /// Background loader of resources. Owned by the ResourceCache.
 class BackgroundLoader : public RefCounted, public Thread
 {
+    URHO3D_REFCOUNTED(BackgroundLoader)
+
 public:
     /// Construct.
     explicit BackgroundLoader(ResourceCache* owner);

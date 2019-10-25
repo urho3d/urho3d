@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../UI/FontFace.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -33,6 +34,8 @@ class Serializer;
 /// Bitmap font face description.
 class URHO3D_API FontFaceBitmap : public FontFace
 {
+    URHO3D_REFCOUNTED(FontFaceBitmap)
+
 public:
     /// Construct.
     explicit FontFaceBitmap(Font* font);

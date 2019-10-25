@@ -24,6 +24,7 @@
 
 #include "../Audio/SoundStream.h"
 #include "../Container/ArrayPtr.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -33,6 +34,8 @@ class Sound;
 /// Ogg Vorbis sound stream.
 class URHO3D_API OggVorbisSoundStream : public SoundStream
 {
+    URHO3D_REFCOUNTED(OggVorbisSoundStream)
+
 public:
     /// Construct from an Ogg Vorbis compressed sound.
     explicit OggVorbisSoundStream(const Sound* sound);

@@ -26,6 +26,7 @@
 #include "../../Graphics/ConstantBuffer.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/ShaderVariation.h"
+#include "../../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -33,6 +34,8 @@ namespace Urho3D
 /// Combined information for specific vertex and pixel shaders.
 class URHO3D_API ShaderProgram : public RefCounted
 {
+    URHO3D_REFCOUNTED(ShaderProgram)
+
 public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)

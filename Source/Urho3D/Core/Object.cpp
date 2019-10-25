@@ -126,6 +126,16 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
     }
 }
 
+bool Object::IsTypeOf(StringHash type)
+{
+    return GetTypeInfoStatic()->IsTypeOf(type);
+}
+
+bool Object::IsTypeOf(const TypeInfo* typeInfo)
+{
+    return GetTypeInfoStatic()->IsTypeOf(typeInfo);
+}
+
 bool Object::IsInstanceOf(StringHash type) const
 {
     return GetTypeInfo()->IsTypeOf(type);

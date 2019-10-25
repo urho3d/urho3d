@@ -28,6 +28,7 @@
 #include "../Math/BoundingBox.h"
 #include "../Math/Quaternion.h"
 #include "../Scene/Component.h"
+#include "../Container/RefCounted.h"
 
 class btBvhTriangleMeshShape;
 class btCollisionShape;
@@ -66,6 +67,7 @@ enum ShapeType
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
+    URHO3D_REFCOUNTED(CollisionGeometryData)
 };
 
 /// Cache of collision geometry data.
@@ -75,6 +77,8 @@ using CollisionGeometryDataCache = HashMap<Pair<Model*, unsigned>, SharedPtr<Col
 /// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
 {
+    URHO3D_REFCOUNTED(TriangleMeshData)
+
     /// Construct from a model.
     TriangleMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -91,6 +95,8 @@ struct TriangleMeshData : public CollisionGeometryData
 /// Triangle mesh geometry data.
 struct GImpactMeshData : public CollisionGeometryData
 {
+    URHO3D_REFCOUNTED(GImpactMeshData)
+
     /// Construct from a model.
     GImpactMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -103,6 +109,8 @@ struct GImpactMeshData : public CollisionGeometryData
 /// Convex hull geometry data.
 struct ConvexData : public CollisionGeometryData
 {
+    URHO3D_REFCOUNTED(ConvexData)
+
     /// Construct from a model.
     ConvexData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -124,6 +132,8 @@ struct ConvexData : public CollisionGeometryData
 /// Heightfield geometry data.
 struct HeightfieldData : public CollisionGeometryData
 {
+    URHO3D_REFCOUNTED(HeightfieldData)
+
     /// Construct from a terrain.
     HeightfieldData(Terrain* terrain, unsigned lodLevel);
 

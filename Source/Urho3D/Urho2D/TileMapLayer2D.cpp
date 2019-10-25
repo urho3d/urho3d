@@ -193,7 +193,7 @@ void TileMapLayer2D::Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer)
     if (!tmxLayer_)
         return;
 
-    switch (tmxLayer_->GetType())
+    switch (tmxLayer_->GetLayerType())
     {
     case LT_TILE_LAYER:
         SetTileLayer((const TmxTileLayer2D*)tmxLayer_);
@@ -268,7 +268,7 @@ const String& TileMapLayer2D::GetProperty(const String& name) const
 
 TileMapLayerType2D TileMapLayer2D::GetLayerType() const
 {
-    return tmxLayer_ ? tmxLayer_->GetType() : LT_INVALID;
+    return tmxLayer_ ? tmxLayer_->GetLayerType() : LT_INVALID;
 }
 
 int TileMapLayer2D::GetWidth() const

@@ -27,6 +27,7 @@
 #include "../Math/Vector4.h"
 #include "../Resource/Resource.h"
 #include "../Scene/ValueAnimationInfo.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -75,6 +76,8 @@ struct TechniqueEntry
 /// Material's shader parameter animation instance.
 class ShaderParameterAnimationInfo : public ValueAnimationInfo
 {
+    URHO3D_REFCOUNTED(ShaderParameterAnimationInfo)
+
 public:
     /// Construct.
     ShaderParameterAnimationInfo

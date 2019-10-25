@@ -165,7 +165,7 @@ void Context::RegisterFactory(ObjectFactory* factory)
     if (!factory)
         return;
 
-    factories_[factory->GetType()] = factory;
+    factories_[factory->GetFactoryType()] = factory;
 }
 
 void Context::RegisterFactory(ObjectFactory* factory, const char* category)
@@ -383,7 +383,7 @@ const String& Context::GetTypeName(StringHash objectType) const
 {
     // Search factories to find the hash-to-name mapping
     HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
-    return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
+    return i != factories_.End() ? i->second_->GetFactoryTypeName() : String::EMPTY;
 }
 
 AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)

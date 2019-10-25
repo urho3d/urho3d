@@ -25,6 +25,7 @@
 #include "../Container/List.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -41,6 +42,8 @@ class WorkerThread;
 struct WorkItem : public RefCounted
 {
     friend class WorkQueue;
+
+    URHO3D_REFCOUNTED(WorkItem)
 
 public:
     /// Work function. Called with the work item and thread index (0 = main thread) as parameters.

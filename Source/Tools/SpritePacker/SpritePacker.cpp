@@ -29,7 +29,7 @@
 #include <Urho3D/Resource/Image.h>
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/Resource/XMLFile.h>
-
+#include <Urho3D/Container/RefCounted.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -51,6 +51,8 @@ void Run(Vector<String>& arguments);
 
 class PackerInfo : public RefCounted
 {
+    URHO3D_REFCOUNTED(PackerInfo)
+
 public:
     String path;
     String name;

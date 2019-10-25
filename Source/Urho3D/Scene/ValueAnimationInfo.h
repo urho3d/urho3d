@@ -38,6 +38,8 @@ struct VAnimEventFrame;
 /// Base class for a value animation instance, which includes animation runtime information and updates the target object's value automatically.
 class URHO3D_API ValueAnimationInfo : public RefCounted
 {
+    URHO3D_REFCOUNTED(ValueAnimationInfo)
+
 public:
     /// Construct without target object.
     ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed);

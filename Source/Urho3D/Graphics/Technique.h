@@ -26,6 +26,7 @@
 
 #include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -43,6 +44,8 @@ enum PassLightingMode
 /// %Material rendering pass, which defines shaders and render state.
 class URHO3D_API Pass : public RefCounted
 {
+    URHO3D_REFCOUNTED(Pass)
+
 public:
     /// Construct.
     explicit Pass(const String& name);

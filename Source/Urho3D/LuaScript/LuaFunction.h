@@ -37,6 +37,8 @@ class Variant;
 /// C++ representation of Lua function object.
 class URHO3D_API LuaFunction : public RefCounted
 {
+    URHO3D_REFCOUNTED(LuaFunction)
+
 public:
     /// Construct from a Lua function object at the specified stack index.
     LuaFunction(lua_State* L, int index);

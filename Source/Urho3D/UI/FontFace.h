@@ -25,6 +25,7 @@
 #include "../Container/ArrayPtr.h"
 #include "../Container/List.h"
 #include "../Math/AreaAllocator.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -64,6 +65,8 @@ struct URHO3D_API FontGlyph
 class URHO3D_API FontFace : public RefCounted
 {
     friend class Font;
+    
+    URHO3D_REFCOUNTED(FontFace)
 
 public:
     /// Construct.

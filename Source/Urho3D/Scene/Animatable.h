@@ -25,6 +25,7 @@
 #include "../Container/HashSet.h"
 #include "../Scene/Serializable.h"
 #include "../Scene/ValueAnimationInfo.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -37,6 +38,8 @@ class ObjectAnimation;
 /// Attribute animation instance.
 class AttributeAnimationInfo : public ValueAnimationInfo
 {
+    URHO3D_REFCOUNTED(AttributeAnimationInfo)
+
 public:
     /// Construct.
     AttributeAnimationInfo

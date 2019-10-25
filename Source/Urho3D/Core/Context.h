@@ -25,6 +25,7 @@
 #include "../Container/HashSet.h"
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -32,6 +33,8 @@ namespace Urho3D
 /// Tracking structure for event receivers.
 class URHO3D_API EventReceiverGroup : public RefCounted
 {
+    URHO3D_REFCOUNTED(EventReceiverGroup)
+
 public:
     /// Construct.
     EventReceiverGroup() :
@@ -66,6 +69,8 @@ private:
 class URHO3D_API Context : public RefCounted
 {
     friend class Object;
+    
+    URHO3D_REFCOUNTED(Context)
 
 public:
     /// Construct.

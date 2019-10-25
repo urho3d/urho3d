@@ -24,6 +24,7 @@
 
 #include "../Graphics/GraphicsDefs.h"
 #include "../Graphics/Viewport.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -36,6 +37,8 @@ class URHO3D_API RenderSurface : public RefCounted
     friend class Texture2D;
     friend class Texture2DArray;
     friend class TextureCube;
+
+    URHO3D_REFCOUNTED(RenderSurface)
 
 public:
     /// Construct with parent texture.

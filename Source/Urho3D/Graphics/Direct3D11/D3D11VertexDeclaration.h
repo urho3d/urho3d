@@ -36,6 +36,8 @@ class VertexBuffer;
 /// Vertex declaration.
 class URHO3D_API VertexDeclaration : public RefCounted
 {
+    URHO3D_REFCOUNTED(VertexDeclaration)
+
 public:
     /// Construct with vertex buffers and element masks to base declaration on.
     VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers);

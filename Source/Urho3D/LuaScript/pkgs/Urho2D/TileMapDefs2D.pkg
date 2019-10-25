@@ -70,8 +70,8 @@ class Tile2D
 class TileMapObject2D
 {
     TileMapObjectType2D GetObjectType() const;
-    const String GetName() const;
-    const String GetType() const;
+    const String& GetName() const;
+    const String& GetMapObjectType@GetType() const;
     const Vector2& GetPosition() const;
     const Vector2& GetSize() const;
     unsigned GetNumPoints() const;
@@ -86,7 +86,7 @@ class TileMapObject2D
 
     tolua_readonly tolua_property__get_set TileMapObjectType2D objectType;
     tolua_readonly tolua_property__get_set String name;
-    tolua_readonly tolua_property__get_set String type;
+    tolua_readonly tolua_property__get_set String mapObjectType@type;
     tolua_readonly tolua_property__get_set Vector2 position;
     tolua_readonly tolua_property__get_set Vector2 size;
     tolua_readonly tolua_property__get_set unsigned numPoints;

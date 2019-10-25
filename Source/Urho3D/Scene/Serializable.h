@@ -24,6 +24,7 @@
 
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
+#include "../Container/RefCounted.h"
 
 #include <cstddef>
 
@@ -152,6 +153,8 @@ private:
 template <class TClassType, class TGetFunction, class TSetFunction>
 class VariantAttributeAccessorImpl : public AttributeAccessor
 {
+    URHO3D_REFCOUNTED(VariantAttributeAccessorImpl)
+
 public:
     /// Construct.
     VariantAttributeAccessorImpl(TGetFunction getFunction, TSetFunction setFunction) : getFunction_(getFunction), setFunction_(setFunction) { }

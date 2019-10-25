@@ -24,6 +24,7 @@
 
 #include "../Resource/Resource.h"
 #include "../Urho2D/TileMapDefs2D.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -37,6 +38,8 @@ class XMLFile;
 /// Tmx layer.
 class TmxLayer2D : public RefCounted
 {
+    URHO3D_REFCOUNTED(TmxLayer2D)
+
 public:
     TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
     ~TmxLayer2D() override = default;
@@ -45,7 +48,7 @@ public:
     TmxFile2D* GetTmxFile() const;
 
     /// Return type.
-    TileMapLayerType2D GetType() const { return type_; }
+    TileMapLayerType2D GetLayerType() const { return type_; }
 
     /// Return name.
     const String& GetName() const { return name_; }
@@ -90,6 +93,8 @@ protected:
 /// Tmx tile layer.
 class TmxTileLayer2D : public TmxLayer2D
 {
+    URHO3D_REFCOUNTED(TmxTileLayer2D)
+
 public:
     explicit TmxTileLayer2D(TmxFile2D* tmxFile);
 
@@ -106,6 +111,8 @@ protected:
 /// Tmx objects layer.
 class TmxObjectGroup2D : public TmxLayer2D
 {
+    URHO3D_REFCOUNTED(TmxObjectGroup2D)
+
 public:
     explicit TmxObjectGroup2D(TmxFile2D* tmxFile);
 
@@ -129,6 +136,8 @@ private:
 /// Tmx image layer.
 class TmxImageLayer2D : public TmxLayer2D
 {
+    URHO3D_REFCOUNTED(TmxImageLayer2D)
+    
 public:
     explicit TmxImageLayer2D(TmxFile2D* tmxFile);
 

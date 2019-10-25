@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../UI/FontFace.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -33,6 +34,8 @@ class Texture2D;
 /// Free type font face description.
 class URHO3D_API FontFaceFreeType : public FontFace
 {
+    URHO3D_REFCOUNTED(FontFaceFreeType)
+
 public:
     /// Construct.
     explicit FontFaceFreeType(Font* font);

@@ -340,7 +340,7 @@ void Sample2D::PopulateTriggers(TileMapLayer2D* triggersLayer)
         if (triggerObject->GetObjectType() == OT_RECTANGLE)
         {
             Node* triggerClone = triggerNode->Clone();
-            triggerClone->SetName(triggerObject->GetType());
+            triggerClone->SetName(triggerObject->GetMapObjectType());
             auto* shape = triggerClone->GetComponent<CollisionBox2D>();
             shape->SetSize(triggerObject->GetSize());
             triggerClone->SetPosition2D(triggerObject->GetPosition() + triggerObject->GetSize() / 2);

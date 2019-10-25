@@ -27,6 +27,7 @@
 #include "../Container/List.h"
 #include "../Core/Mutex.h"
 #include "../Container/Pair.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -34,6 +35,8 @@ namespace Urho3D
 /// %Sound stream that supports manual buffering of data from the main thread.
 class URHO3D_API BufferedSoundStream : public SoundStream
 {
+    URHO3D_REFCOUNTED(BufferedSoundStream)
+
 public:
     /// Construct.
     BufferedSoundStream();
