@@ -220,7 +220,7 @@ bool CharacterMap::Load(const pugi::xml_node& node)
             return false;
     }
 
-    return false;
+    return true;
 }
 
 bool MapInstruction::Load(const pugi::xml_node& node)
