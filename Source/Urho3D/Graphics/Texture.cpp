@@ -270,6 +270,11 @@ unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requ
         return requestedLevels;
 }
 
+bool Texture::IsPow2(int x)
+{
+    return (x & (x - 1)) == 0 && (x != 0);
+}
+
 void Texture::CheckTextureBudget(StringHash type)
 {
     auto* cache = GetSubsystem<ResourceCache>();
