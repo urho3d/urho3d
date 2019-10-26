@@ -25,7 +25,7 @@ cbuffer CustomVS : register(b6)
 }
 
 #endif
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
@@ -162,3 +162,4 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 }
+#endif

@@ -4,7 +4,7 @@
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
@@ -135,7 +135,8 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(
     #ifndef NORMALMAP
         float2 iTexCoord : TEXCOORD0,
@@ -317,3 +318,4 @@ void PS(
         oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }
+#endif

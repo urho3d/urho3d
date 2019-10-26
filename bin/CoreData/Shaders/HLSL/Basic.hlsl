@@ -1,7 +1,7 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #ifdef DIFFMAP
         float2 iTexCoord : TEXCOORD0,
@@ -51,7 +51,8 @@ void VS(float4 iPos : POSITION,
         oTexCoord = iTexCoord;
     #endif
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(
     #if defined(DIFFMAP) || defined(ALPHAMAP)
         float2 iTexCoord : TEXCOORD0,
@@ -86,3 +87,4 @@ void PS(
         oColor = float4(diffColor.rgb, diffColor.a * alphaInput);
     #endif
 }
+#endif

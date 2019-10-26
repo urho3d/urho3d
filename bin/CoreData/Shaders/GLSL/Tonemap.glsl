@@ -10,16 +10,17 @@ varying vec2 vScreenPos;
 uniform float cTonemapExposureBias;
 uniform float cTonemapMaxWhite;
 #endif
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vScreenPos = GetScreenPosPreDiv(gl_Position);
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     #ifdef REINHARDEQ3
     vec3 color = ReinhardEq3Tonemap(max(texture2D(sDiffMap, vScreenPos).rgb * cTonemapExposureBias, 0.0));
@@ -37,4 +38,4 @@ void PS()
     gl_FragColor = vec4(color, 1.0);
     #endif
 }
-
+#endif
