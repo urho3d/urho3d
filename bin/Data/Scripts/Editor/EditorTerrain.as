@@ -123,7 +123,7 @@ class TerrainEditor
         //SubscribeToEvent(window.GetChild("PaintFoliage", true), "Toggled", "OnEditModeSelected");
         SubscribeToEvent(window.GetChild("CloseButton", true), "Released", "Hide");
         SubscribeToEvent(window.GetChild("CreateTerrainButton", true), "Released", "CreateTerrain");
-		SubscribeToEvent(window.GetChild("ResetButton", true), "Released", "ResetWindow");
+        SubscribeToEvent(window.GetChild("ResetButton", true), "Released", "ResetWindow");
         SubscribeToEvent(brushSizeSlider, "DragEnd", "UpdateScaledBrush");
 
         LoadBrushes();
@@ -131,36 +131,36 @@ class TerrainEditor
 
         brushVisualizer.Create();
     }
-	
-	void ResetWindow()
-	{
-		// Reset edit mode to default
-		SetEditMode(TERRAIN_EDITMODE_RAISELOWERHEIGHT, "Raise or lower terrain");
-		
-		// Clear selected brush
-		ClearSelectedBrush();
-	}
 
-	void ClearSelectedBrush()
-	{
-		selectedBrush = null;
-		selectedBrushImage = null;
-		scaledSelectedBrushImage = null;
-		
-		ListView@ terrainBrushes = window.GetChild("BrushesContainer", true);
+    void ResetWindow()
+    {
+        // Reset edit mode to default
+        SetEditMode(TERRAIN_EDITMODE_RAISELOWERHEIGHT, "Raise or lower terrain");
+
+        // Clear selected brush
+        ClearSelectedBrush();
+    }
+
+    void ClearSelectedBrush()
+    {
+        selectedBrush = null;
+        selectedBrushImage = null;
+        scaledSelectedBrushImage = null;
+
+        ListView@ terrainBrushes = window.GetChild("BrushesContainer", true);
 
         for (uint i = 0; i < terrainBrushes.numItems; ++i)
         {
             CheckBox@ checkbox = cast<CheckBox>(terrainBrushes.items[i]);
             checkbox.checked = false;
-			checkbox.enabled = true;
+            checkbox.enabled = true;
         }
-	}
+    }
 	
     // Hide the window
     void Hide()
     {
-		HideBrushVisualizer();
+        HideBrushVisualizer();
         window.visible = false;
     }
 
@@ -176,9 +176,9 @@ class TerrainEditor
             brushVisualizer.Hide();
             return;
         }
-		
-		if (window.visible == true)
-			brushVisualizer.Update(terrainComponent, position, scaledSelectedBrushImage.width / 2);
+
+        if (window.visible == true)
+            brushVisualizer.Update(terrainComponent, position, scaledSelectedBrushImage.width / 2);
     }
 
     // Save all the terrains we have edited
@@ -259,7 +259,7 @@ class TerrainEditor
             checkbox.checked = terrainBrushes.items[i] is selectedBrush;
             checkbox.enabled = !checkbox.checked;
         }
-		
+
         dirty = false;
     }
 
@@ -473,7 +473,7 @@ class TerrainEditor
         CheckBox@ checkbox = cast<CheckBox>(eventData["Element"].GetPtr());
         if (checkbox.checked == false)
             return;
-		
+
         selectedBrush = checkbox;
         selectedBrushImage = GetBrushImage(selectedBrush.name);
         UpdateScaledBrush();
