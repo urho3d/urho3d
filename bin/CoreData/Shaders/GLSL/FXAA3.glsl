@@ -43,7 +43,7 @@
 //                      Urho3D specific preparations
 //
 /*--------------------------------------------------------------------------*/
-
+#urhover 1.8.0
 #include "Uniforms.glsl"
 #include "Samplers.glsl"
 #include "Transform.glsl"

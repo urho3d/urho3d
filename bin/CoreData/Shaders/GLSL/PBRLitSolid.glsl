@@ -1,3 +1,4 @@
+#urhover 1.8.0
 #include "Uniforms.glsl"
 #include "Samplers.glsl"
 #include "Transform.glsl"
@@ -9,7 +10,7 @@
 #include "IBL.glsl"
 #line 30010
 
-#if defined(NORMALMAP) || defined(IBL)
+#if defined(NORMALMAP)
     varying vec4 vTexCoord;
     varying vec4 vTangent;
 #else
@@ -57,7 +58,7 @@ void main()
         vColor = iColor;
     #endif
 
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
         vec4 tangent = GetWorldTangent(modelMatrix);
         vec3 bitangent = cross(tangent.xyz, vNormal) * tangent.w;
         vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
@@ -146,7 +147,7 @@ void main()
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness;
 
     // Get normal
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
         vec3 tangent = vTangent.xyz;
         vec3 bitangent = vec3(vTexCoord.zw, vTangent.w);
         mat3 tbn = mat3(tangent, bitangent, vNormal);
@@ -240,7 +241,7 @@ void main()
         vec3 cubeColor = vVertexLight.rgb;
 
         #ifdef IBL
-          vec3 iblColor = ImageBasedLighting(reflection, tangent, bitangent, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
+          vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
           float gamma = 0.0;
           finalColor.rgb += iblColor;
         #endif

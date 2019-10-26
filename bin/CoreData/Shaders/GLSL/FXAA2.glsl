@@ -6,6 +6,7 @@
 
 // Adapted for Urho3D from http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
+#urhover 1.8.0
 #include "Uniforms.glsl"
 #include "Samplers.glsl"
 #include "Transform.glsl"

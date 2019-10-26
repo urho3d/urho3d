@@ -54,30 +54,35 @@ public:
     ShaderVariation* GetVariation(ShaderType type, const char* defines);
 
     /// Return either vertex or pixel shader source code.
-    const String& GetSourceCode(ShaderType type) const { return  shaderCode_; }
+    const String& GetSourceCode(ShaderType type) const;
 
     /// Return the latest timestamp of the shader code and its includes.
     unsigned GetTimeStamp() const { return timeStamp_; }
 
 private:
     /// Process source code and include files. Return true if successful.
-    bool ProcessSource(String& code, Deserializer& source);
+    bool ProcessSource(String& code, Deserializer& source, bool readVersion, bool& isVersioned);
     /// Sort the defines and strip extra spaces to prevent creation of unnecessary duplicate shader variations.
     String NormalizeDefines(const String& defines);
     /// Recalculate the memory used by the shader.
     void RefreshMemoryUse();
+    /// Source code adapted for vertex shader.
+    String vsSourceCode_;
+    /// Source code adapted for pixel shader.
+    String psSourceCode_;
 
     /// Source code adapted for shader.
     String shaderCode_;
-
     /// Vertex shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
     /// Pixel shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
     /// Source code timestamp.
-    unsigned timeStamp_;
+    unsigned timeStamp_{};
     /// Number of unique variations so far.
-    unsigned numVariations_;
+    unsigned numVariations_{};
+    /// Surports version
+    bool versioned_{ true };
 };
 
 }

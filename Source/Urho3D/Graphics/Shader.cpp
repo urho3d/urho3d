@@ -30,6 +30,8 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
+#include "../Core/StringUtils.h"
+#include "../LibraryInfo.h"
 
 #include "../DebugNew.h"
 
@@ -62,9 +64,7 @@ void CommentOutFunction(String& code, const String& signature)
 }
 
 Shader::Shader(Context* context) :
-    Resource(context),
-    timeStamp_(0),
-    numVariations_(0)
+    Resource(context)
 {
     RefreshMemoryUse();
 }
@@ -74,6 +74,14 @@ Shader::~Shader()
     auto* cache = GetSubsystem<ResourceCache>();
     if (cache)
         cache->ResetDependencies(this);
+}
+
+const String& Shader::GetSourceCode(ShaderType type) const
+{
+    if (versioned_)
+        return shaderCode_;
+
+    return type == VS ? vsSourceCode_ : psSourceCode_;
 }
 
 void Shader::RegisterObject(Context* context)
@@ -89,12 +97,32 @@ bool Shader::BeginLoad(Deserializer& source)
 
     // Load the shader source code and resolve any includes
     timeStamp_ = 0;
+    versioned_ = false;
+
     String shaderCode;
-    if (!ProcessSource(shaderCode, source))
+    if (!ProcessSource(shaderCode, source, true, versioned_))
         return false;
 
-    // Comment out the unneeded shader function
-	shaderCode_ = shaderCode;
+    if (versioned_)
+    {
+        // Comment out the unneeded shader function
+        shaderCode_ = shaderCode;
+    }
+    else
+    {
+        // Comment out the unneeded shader function
+        vsSourceCode_ = shaderCode;
+        psSourceCode_ = shaderCode;
+        CommentOutFunction(vsSourceCode_, "void PS(");
+        CommentOutFunction(psSourceCode_, "void VS(");
+
+        // OpenGL: rename either VS() or PS() to main()
+#ifdef URHO3D_OPENGL
+        vsSourceCode_.Replace("void VS(", "void main(");
+        psSourceCode_.Replace("void PS(", "void main(");
+#endif
+
+    }
     RefreshMemoryUse();
     return true;
 }
@@ -147,7 +175,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
     return i->second_;
 }
 
-bool Shader::ProcessSource(String& code, Deserializer& source)
+bool Shader::ProcessSource(String& code, Deserializer& source, bool readVersion, bool& isVersioned)
 {
     auto* cache = GetSubsystem<ResourceCache>();
 
@@ -166,6 +194,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     if (source.GetName() != GetName())
         cache->StoreResourceDependency(this, source.GetName());
 
+    bool bVersioned = false;
     while (!source.IsEof())
     {
         String line = source.ReadLine();
@@ -180,6 +209,38 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 		{
 			continue;
 		}
+        //Uho3D supports shader file version.It`s different from GLSL`s version defining.
+        if (line.StartsWith("#urhover"))
+        {
+            bool hadErr = false;
+            if (!readVersion) //Doesn`t need process #urhover
+                continue;
+
+            String version = line.Substring(9).Replaced("\"", "").Trimmed();
+            Vector<String> verNum = version.Split('.');
+            do
+            {
+                if (verNum.Size() < 3)
+                {
+                    hadErr = true;
+                    break;
+                }
+                unsigned major = ToUInt(verNum[0]);
+                unsigned minor = ToUInt(verNum[1]);
+                unsigned patch = ToUInt(verNum[2]);
+                // Surports shader file version since 1.8.0
+                if (URHO3D_VERSIONNUM(major, minor, patch) < URHO3D_VERSIONNUM(1, 8, 0))
+                {
+                    hadErr = true;
+                    break;
+                }
+                bVersioned = true;
+            } while (false);
+
+            if (hadErr)
+                URHO3D_LOGERROR("Shader file need define '#urhover major.minor.patch'(e.g #urhover 1.8.0) at the begining since Urho3D ver1.8.0.NOTE urhover atleast >= 1.8.0");
+            continue;
+        }
 		//include dependency file
         if (line.StartsWith("#include"))
         {
@@ -188,9 +249,9 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
             SharedPtr<File> includeFile = cache->GetFile(includeFileName);
             if (!includeFile)
                 return false;
-
+            bool usedRet = false;
             // Add the include file into the current code recursively
-            if (!ProcessSource(code, *includeFile))
+            if (!ProcessSource(code, *includeFile, false, usedRet))
                 return false;
         }
         else
@@ -202,7 +263,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 
     // Finally insert an empty line to mark the space between files
     code += "\n";
-
+    isVersioned = bVersioned;
     return true;
 }
 
@@ -215,8 +276,16 @@ String Shader::NormalizeDefines(const String& defines)
 
 void Shader::RefreshMemoryUse()
 {
-    SetMemoryUse(
-        (unsigned)(sizeof(Shader) + shaderCode_.Length() + numVariations_ * sizeof(ShaderVariation)));
+    if (versioned_)
+    {
+        SetMemoryUse(
+            (unsigned)(sizeof(Shader) + shaderCode_.Length() + numVariations_ * sizeof(ShaderVariation)));
+    }
+    else
+    {
+        SetMemoryUse(
+            (unsigned)(sizeof(Shader) + vsSourceCode_.Length() + psSourceCode_.Length() + numVariations_ * sizeof(ShaderVariation)));
+    }
 }
 
 }
