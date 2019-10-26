@@ -496,7 +496,11 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         vertex2.uv_ = textureRect.max_;
         vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
-        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color;
+		Color finalColor;
+		finalColor.FromUInt( color );
+		finalColor.a_ = info.alpha_;
+
+        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = finalColor.ToUInt();
 
         vertices.Push(vertex0);
         vertices.Push(vertex1);
