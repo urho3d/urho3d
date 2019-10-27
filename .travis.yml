@@ -333,15 +333,12 @@ env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-    - numjobs=2
+    - numjobs=4
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
   matrix:
-    - URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=0 numjobs=4
-    - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=0
-    - URHO3D_LIB_TYPE=SHARED EMSCRIPTEN_WASM=0
-    # URHO3D_LIB_TYPE=MODULE numjobs=4
+    - URHO3D_LIB_TYPE=MODULE
     - URHO3D_LIB_TYPE=STATIC
     - URHO3D_LIB_TYPE=SHARED
 stage: release build configuration
@@ -357,18 +354,6 @@ script: script/dockerized.sh web rake ci && if [ $PACKAGE_UPLOAD ]; then script/
 matrix:
   fast_finish: true
   include: [stage: housekeep]
-
-# Below samples are excluded from build due to build time constraint
-data:
-  excluded_sample:
-    '#4': &shortlisted
-      - 01_HelloWorld
-      - 02_HelloGUI
-      - 03_Sprites
-      - 26_ConsoleInput
-      - 29_SoundSynthesis
-      - 38_SceneAndUILoad
-    '#5': *shortlisted
 
 ---
 
