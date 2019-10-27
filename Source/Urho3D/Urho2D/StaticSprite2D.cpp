@@ -330,7 +330,7 @@ void StaticSprite2D::UpdateSourceBatches()
     vertex1.position_ = worldTransform * Vector3(drawRect_.min_.x_, drawRect_.max_.y_, 0.0f);
     vertex2.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.max_.y_, 0.0f);
     vertex3.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.min_.y_, 0.0f);
-    //In the following logica, it inneed to flip diagonal first, and flip x-coordinate or y-x-coordinate then.
+    //In the following logic, it need flip diagonal first, and flip x-coordinate or y-coordinate then.
     //Otherwise, the rendering will be wrong.
     if (!swapXY_)
     {
