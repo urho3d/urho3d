@@ -155,7 +155,7 @@ void ProgressBar::UpdateProgressBar()
             auto loadingBarLength = (int) Max((float) GetHeight() * value_ / range_,
                                              (float) (border.top_ + border.bottom_));
             knob_->SetSize(GetWidth(), loadingBarLength);
-            knob_->SetPosition(0, Clamp(0, 0, GetHeight() - knob_->GetHeight()));
+            knob_->SetPosition(0, Clamp(GetHeight() - knob_->GetHeight(), 0, GetHeight() - knob_->GetHeight()));
         }
     }
     else
