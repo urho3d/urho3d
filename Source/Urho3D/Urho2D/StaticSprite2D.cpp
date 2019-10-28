@@ -330,7 +330,7 @@ void StaticSprite2D::UpdateSourceBatches()
     vertex1.position_ = worldTransform * Vector3(drawRect_.min_.x_, drawRect_.max_.y_, 0.0f);
     vertex2.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.max_.y_, 0.0f);
     vertex3.position_ = worldTransform * Vector3(drawRect_.max_.x_, drawRect_.min_.y_, 0.0f);
-    //In the following logic, it need flip diagonal first, and flip x-coordinate or y-coordinate then.
+    //In the following logic, it needs flip diagonal first, and flip x-coordinate or y-coordinate then.
     //Otherwise, the rendering will be wrong.
     if (!swapXY_)
     {
@@ -354,8 +354,10 @@ void StaticSprite2D::UpdateSourceBatches()
         //Flip the horizontal vertexes`s coordinates
         Swap(vertex0.uv_, vertex3.uv_);
         Swap(vertex1.uv_, vertex2.uv_);
+
         //Flip x-axis for texture rectangle
-        Swap(textureRect_.min_.x_, textureRect_.max_.x_);
+        if(!useTextureRect_)
+            Swap(textureRect_.min_.x_, textureRect_.max_.x_);
     }
 
     if (flipY_)
@@ -365,7 +367,8 @@ void StaticSprite2D::UpdateSourceBatches()
         Swap(vertex3.uv_, vertex2.uv_);
 
         //Flip y-axis for texture rectangle
-        Swap(textureRect_.min_.y_, textureRect_.max_.y_);
+        if(!useTextureRect_)
+            Swap(textureRect_.min_.y_, textureRect_.max_.y_);
     }
     
     vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
