@@ -68,6 +68,7 @@ const StringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const StringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 
 const unsigned TOUCHID_MAX = 32;
+int sdlUserEventType = 0;
 
 /// Convert SDL keycode if necessary.
 Key ConvertSDLKeyCode(int keySym, int scanCode)
@@ -393,6 +394,7 @@ Input::Input(Context* context) :
 #elif defined(__EMSCRIPTEN__)
     emscriptenInput_ = new EmscriptenInput(this);
 #endif
+    sdlUserEventType = SDL_RegisterEvents(1);
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -2389,7 +2391,26 @@ void Input::HandleSDLEvent(void* sdlEvent)
         SendEvent(E_EXITREQUESTED);
         break;
 
-    default: break;
+    default:
+        if (evt.type == sdlUserEventType)
+        {
+            if (evt.user.code)
+            {
+                Object* sender = reinterpret_cast<Object*>(evt.user.data1);
+                if (!sender)
+                    sender = this;
+                VariantMap* pMap = reinterpret_cast<VariantMap*>(evt.user.data2);
+                StringHash eventType((unsigned)evt.user.code);
+                if (!pMap)
+                    sender->SendEvent(eventType);
+                else
+                {
+                    sender->SendEvent(eventType, *pMap);
+                    delete pMap;
+                }
+            }
+        }
+        break;
     }
 }
 

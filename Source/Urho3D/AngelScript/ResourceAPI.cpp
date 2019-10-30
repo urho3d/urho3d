@@ -437,9 +437,9 @@ static void RegisterJSONFile(asIScriptEngine* engine)
     RegisterResource<JSONFile>(engine, "JSONFile");
     engine->RegisterObjectMethod("JSONFile", "bool FromString(const String&in)", asMETHOD(JSONFile, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "String ToString(const String&in = String(\"\t\")) const", asMETHOD(JSONFile, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONFile", "JSONValue& GetRoot()", asMETHODPR(JSONFile, GetRoot, () const, const JSONValue&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONFile", "JSONValue& GetRoot()", asMETHODPR(JSONFile, GetRoot, (), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "bool Save(File@+, const String&in) const", asFUNCTION(JSONFileSave), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("JSONFile", "JSONValue& get_root()", asMETHODPR(JSONFile, GetRoot, () const, const JSONValue&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONFile", "JSONValue& get_root()", asMETHODPR(JSONFile, GetRoot, (), JSONValue&), asCALL_THISCALL);
 }
 
 static void ConstructXMLElement(XMLElement* ptr)
