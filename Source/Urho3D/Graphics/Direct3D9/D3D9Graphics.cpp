@@ -304,7 +304,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
-    bool monitor_changed = false;
+    bool monitorChanged = false;
 
     highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
@@ -351,7 +351,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && monitor == monitor_ && refreshRate == refreshRate_)
         return true;
 
-    monitor_changed = monitor != monitor_;
+    monitorChanged = monitor != monitor_;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
@@ -477,13 +477,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     }
     else
     {
-        if (!monitor_changed)
+        if (!monitorChanged)
             ResetDevice();
         else
         {
-#ifdef URHO3D_LOGGING
             URHO3D_LOGINFO("Destroying D3D9 device");
-#endif
             // Monitor changed, re-create the D3D9 device on the new monitor
             impl_->vertexDeclarations_.Clear();
             OnDeviceLost();
