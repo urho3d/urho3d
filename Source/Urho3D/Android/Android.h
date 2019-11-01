@@ -38,7 +38,7 @@ namespace Urho3D
     // AndroidNotify event whith Input subsytem as sender.
     // JSON object in notification has attribute "source" whith arbitrary name
     // of source of event, and "event" whith name of event.
-    void PostCommandToAndroid(const JSONFile& data);
+    void PostCommandToPlatform(const JSONFile& data);
 
 }
 #endif

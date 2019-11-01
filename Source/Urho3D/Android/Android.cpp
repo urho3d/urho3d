@@ -25,8 +25,8 @@
 #include "../Input/Input.h"
 #include "../Resource/JSONFile.h"
 #include "../IO/Log.h"
+#include "../IO/IOEvents.h"
 #include "Android.h"
-#include "AndroidEvents.h"
 #include <jni.h>
 #include <SDL/SDL_events.h>
 
@@ -50,41 +50,41 @@ JNIEXPORT void Java_com_github_urho3d_UrhoActivity_nativeUserActivityCallback(JN
     if (str)
         env->ReleaseStringUTFChars(json, str);
     VariantMap* pArgs = new VariantMap;
-    (*pArgs)[AndroidNotify::P_DATA] = strData;
+    (*pArgs)[PlatformNotify::P_DATA] = strData;
     SDL_Event event;
     SDL_zero(event);
     event.type = sdlUserEventType;
     event.user.data2 = pArgs;
-    event.user.code = E_ANDROID_NOTIFY.Value();
+    event.user.code = E_PLATFORM_NOTIFY.Value();
     SDL_PushEvent(&event);
 }
 
 }
 
-void PostCommandToAndroid(const JSONFile& data)
+void PostCommandToPlatform(const JSONFile& data)
 {
     JNIEnv *mEnv = Android_JNI_GetEnv();
     if (!mEnv)
     {
-        URHO3D_LOGERROR("No mEnv in PostCommandToAndroid");
+        URHO3D_LOGERROR("No mEnv in PostCommandToPlatform");
         return;
     }
-    jclass mainClass = mEnv->FindClass("com/github/urho3d/UrhoActivity");
+    static jclass mainClass = mEnv->FindClass("com/github/urho3d/UrhoActivity");
     if (!mainClass)
     {
-        URHO3D_LOGERROR("No mainClass in PostCommandToAndroid");
+        URHO3D_LOGERROR("No mainClass in PostCommandToPlatform");
         return;
     }
-    jmethodID midPostData = mEnv->GetStaticMethodID(mainClass, "postDataToUI", "(Ljava/lang/String;)V");
+    static jmethodID midPostData = mEnv->GetStaticMethodID(mainClass, "postDataToUI", "(Ljava/lang/String;)V");
     if (!midPostData)
     {
-        URHO3D_LOGERROR("No midPostData in PostCommandToAndroid");
+        URHO3D_LOGERROR("No midPostData in PostCommandToPlatform");
         return;
     }
     jstring jparam = (jstring)mEnv->NewStringUTF(data.ToString(String()).CString());
     if (!jparam)
     {
-        URHO3D_LOGERROR("No jparam in PostCommandToAndroid");
+        URHO3D_LOGERROR("No jparam in PostCommandToPlatform");
         return;
     }
     mEnv->CallStaticVoidMethod(mainClass, midPostData, jparam);

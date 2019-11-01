@@ -79,6 +79,6 @@ void RegisterScriptInterfaceAPI(asIScriptEngine* engine);
 void RegisterScriptAPI(asIScriptEngine* engine);
 /// Register the Engine library to script.
 void RegisterEngineAPI(asIScriptEngine* engine);
-void RegisterAndroidAPI(asIScriptEngine* engine);
+void RegisterPlatformAPI(asIScriptEngine* engine);
 
 }

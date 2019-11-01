@@ -26,8 +26,8 @@ void Start()
     SubscribeToEvents();
 
     if (GetPlatform() == "Android") {
-        postCommandToAndroid("startReceiveBatteryStatus");
-        postCommandToAndroid("getSystemInfo");
+        postCommandToPlatform("startReceiveBatteryStatus");
+        postCommandToPlatform("getSystemInfo");
     }
 }
 
@@ -62,11 +62,11 @@ void CreateText()
 
 void SubscribeToEvents()
 {
-    // Set Android notification handlers
-    androidHandlers["SysInfo"] = @onAndroidSysInfo;
-    androidHandlers["Battery"] = @onAndroidBattery;
-    // Subscribe to Android notifications
-    SubscribeToEvent("AndroidNotify", "onAndroidNotify");
+    // Set platform notification handlers
+    plaformHandlers["SysInfo"] = @onAndroidSysInfo;
+    plaformHandlers["Battery"] = @onAndroidBattery;
+    // Subscribe to platform notifications
+    SubscribeToEvent("PlatformNotify", "onPlatformNotify");
 }
 
 Text@ createText(HorizontalAlignment ha, VerticalAlignment va, const IntVector2& pos, const Color& clr)
@@ -103,18 +103,18 @@ Button@ createButton(int x, int y, int xSize, int ySize, HorizontalAlignment ha,
     return button;
 }
 
-funcdef void AndroidHandler(const String&, JSONValue&);
-Dictionary androidHandlers;
+funcdef void PlatformHandler(const String&, JSONValue&);
+Dictionary plaformHandlers;
 
-void onAndroidNotify(StringHash, VariantMap& d)
+void onPlatformNotify(StringHash, VariantMap& d)
 {
     JSONFile json;
     if (!json.FromString(d["Data"].GetString()))
         return;
     String source = json.root["source"].GetString();
     String event = json.root["event"].GetString();
-    AndroidHandler@ handler;
-    if (androidHandlers.Get(source, @handler))
+    PlatformHandler@ handler;
+    if (plaformHandlers.Get(source, @handler))
         handler(event, json.root);
 }
 
@@ -123,30 +123,30 @@ void onAndroidNotify(StringHash, VariantMap& d)
 // More about exists methods and their params see at 
 // android\launcher-app\src\main\java\com\github\urho3d\launcher\MainActivity.kt
 // Also you can add more methods in activity to hold you are need
-void postCommandToAndroid(const String& method, JSONFile@ f = JSONFile())
+void postCommandToPlatform(const String& method, JSONFile@ f = JSONFile())
 {
     f.root["method"] = method;
-    PostCommandToAndroid(f);
+    PostCommandToPlatform(f);
 }
 
 void onShowToast()
 {
-    postCommandToAndroid("showToast", JsonBuilder()("text", "Hello from Urho3D!!!")("lengthLong", true).f);
+    postCommandToPlatform("showToast", JsonBuilder()("text", "Hello from Urho3D!!!")("lengthLong", true).f);
 }
 
 void onOpenUrl()
 {
-    postCommandToAndroid("openUrl", JsonBuilder()("url", "https://urho3d.github.io/").f);
+    postCommandToPlatform("openUrl", JsonBuilder()("url", "https://urho3d.github.io/").f);
 }
 
 void onOpenPlaymarket()
 {
-    postCommandToAndroid("openUrl", JsonBuilder()("url", "market://details?id=com.horovo.games.bb.r").f);
+    postCommandToPlatform("openUrl", JsonBuilder()("url", "market://details?id=com.horovo.games.bb.r").f);
 }
 
 void onShareText()
 {
-    postCommandToAndroid("shareText",
+    postCommandToPlatform("shareText",
         JsonBuilder()
         ("text", "Hello from Urho3D!!!")
         ("subject", "Urho3D")

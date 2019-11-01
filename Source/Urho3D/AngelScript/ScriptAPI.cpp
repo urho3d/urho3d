@@ -26,6 +26,7 @@
 #include "../AngelScript/ScriptAPI.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../Resource/ResourceCache.h"
+#include "../Android/Android.h"
 
 namespace Urho3D
 {
@@ -293,6 +294,11 @@ void RegisterScriptAPI(asIScriptEngine* engine)
     RegisterScriptFile(engine);
     RegisterScriptInstance(engine);
     RegisterScript(engine);
+}
+
+void RegisterPlatformAPI(asIScriptEngine* engine)
+{
+    engine->RegisterGlobalFunction("void PostCommandToPlatform(const JSONFile& data)", asFUNCTION(PostCommandToPlatform), asCALL_CDECL);
 }
 
 }
