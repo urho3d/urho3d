@@ -296,6 +296,11 @@ void RegisterScriptAPI(asIScriptEngine* engine)
     RegisterScript(engine);
 }
 
+#ifndef __ANDROID__
+// While there is an implementation only for Android, for other platforms while a noop
+void PostCommandToPlatform(const JSONFile& data) {}
+#endif
+
 void RegisterPlatformAPI(asIScriptEngine* engine)
 {
     engine->RegisterGlobalFunction("void PostCommandToPlatform(const JSONFile& data)", asFUNCTION(PostCommandToPlatform), asCALL_CDECL);
