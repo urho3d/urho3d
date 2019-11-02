@@ -3027,11 +3027,11 @@ void Graphics::PrepareDraw()
                 {
                     if (renderTargets_[j])
                     {
-        #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
                         if (!gl3Support)
                             drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + j;
                         else
-            #endif
+#endif
                             drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + j;
                     }
                 }
