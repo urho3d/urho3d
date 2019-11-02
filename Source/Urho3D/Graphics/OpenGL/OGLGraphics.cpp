@@ -396,14 +396,14 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             apiName_ = "GL2";
         }
 #else
-  #if defined(GL_ES_VERSION_3_0)
+#if defined(GL_ES_VERSION_3_0)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         apiName_ = "GLES3";
         gl3Support = true;
-  #else
+#else
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         apiName_ = "GLES2";
-  #endif
+#endif
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
         if (multiSample > 1)
@@ -783,7 +783,7 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
         impl_->resolveSrcFBO_ = CreateFramebuffer();
     if (!impl_->resolveDestFBO_)
         impl_->resolveDestFBO_ = CreateFramebuffer();
-  #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
     if (!gl3Support)
     {
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
@@ -798,7 +798,7 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
         glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
     }
     else
-  #endif
+#endif
     {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
         glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
@@ -835,7 +835,7 @@ bool Graphics::ResolveToTexture(TextureCube* texture)
     if (!impl_->resolveDestFBO_)
         impl_->resolveDestFBO_ = CreateFramebuffer();
 
-  #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
     if (!gl3Support)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
@@ -860,7 +860,7 @@ bool Graphics::ResolveToTexture(TextureCube* texture)
         glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
     }
     else
-  #endif
+#endif
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
@@ -967,20 +967,20 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     glDrawElementsInstancedANGLE(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
         instanceCount);
 #else
-  #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
     if (gl3Support)
     {
-  #endif
+#endif
         glDrawElementsInstanced(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
             instanceCount);
-  #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
     }
     else
     {
         glDrawElementsInstancedARB(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
             instanceCount);
     }
-  #endif
+#endif
 #endif
 
     numPrimitives_ += instanceCount * primitiveCount;
@@ -2720,14 +2720,14 @@ unsigned Graphics::GetFloat32Format()
 
 unsigned Graphics::GetLinearDepthFormat()
 {
-#ifndef GL_ES_VERSION_2_0 
+#ifndef GL_ES_VERSION_2_0
     // OpenGL 3 can use different color attachment formats
     if (gl3Support)
         return GL_R32F;
     else
 #endif
 #ifdef GL_ES_VERSION_3_0
-    return GL_R16F;
+        return GL_R16F;
 #else
     // OpenGL 2 requires color attachments to have the same format, therefore encode deferred depth to RGBA manually
     // if not using a readable hardware depth texture
@@ -2877,7 +2877,6 @@ void Graphics::CheckFeatureSupport()
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
     if (CheckExtension("GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
-#endif
 
 #ifdef __EMSCRIPTEN__
     if (!CheckExtension("WEBGL_depth_texture"))
@@ -2887,9 +2886,9 @@ void Graphics::CheckFeatureSupport()
     {
         shadowMapFormat_ = 0;
         hiresShadowMapFormat_ = 0;
-    #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
         glesReadableDepthFormat = 0;
-    #endif
+#endif
     }
     else
     {
@@ -2904,6 +2903,7 @@ void Graphics::CheckFeatureSupport()
         dummyColorFormat_ = GetRGBAFormat();
 #endif
     }
+#endif
 #endif
 
     // Consider OpenGL shadows always hardware sampled, if supported at all
@@ -3011,12 +3011,12 @@ void Graphics::PrepareDraw()
             // Check for no color rendertargets (depth rendering only)
             if (!newDrawBuffers)
             {
-            #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
                 glDrawBuffer(GL_NONE);
-            #else
+#else
                 const GLenum bufs[] = {GL_NONE, GL_NONE, GL_NONE, GL_NONE};
                 glDrawBuffers(sizeof(bufs) / sizeof(bufs[0]), bufs);
-            #endif
+#endif
             }
             else
             {
@@ -3027,11 +3027,11 @@ void Graphics::PrepareDraw()
                 {
                     if (renderTargets_[j])
                     {
-                    #ifndef GL_ES_VERSION_3_0
+        #ifndef GL_ES_VERSION_3_0
                         if (!gl3Support)
                             drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + j;
                         else
-                        #endif
+            #endif
                             drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + j;
                     }
                 }
@@ -3377,7 +3377,7 @@ void Graphics::BindFramebuffer(unsigned fbo)
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
     else
 #endif
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 }
 
 void Graphics::BindColorAttachment(unsigned index, unsigned target, unsigned object, bool isRenderBuffer)
@@ -3456,25 +3456,25 @@ bool Graphics::CheckFramebuffer()
         return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
     else
 #endif
-    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+        return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
 void Graphics::SetVertexAttribDivisor(unsigned location, unsigned divisor)
 {
 #ifndef URHO3D_GLES2
-  #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
     if (gl3Support && instancingSupport_)
-  #endif
+#endif
         glVertexAttribDivisor(location, divisor);
-  #ifndef GL_ES_VERSION_3_0
+#ifndef GL_ES_VERSION_3_0
     else if (instancingSupport_)
         glVertexAttribDivisorARB(location, divisor);
-  #endif
+#endif
 #else
-  #ifdef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
     if (instancingSupport_)
         glVertexAttribDivisorANGLE(location, divisor);
-  #endif
+#endif
 #endif
 }
 

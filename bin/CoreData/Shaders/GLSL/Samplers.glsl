@@ -9,7 +9,7 @@ uniform samplerCube sEnvCubeMap;
 uniform sampler2D sLightRampMap;
 uniform sampler2D sLightSpotMap;
 uniform samplerCube sLightCubeMap;
-#if !defined(GL_ES) || __VERSION__>=300
+#if !defined(GL_ES) || __VERSION__ >= 300
     uniform highp sampler3D sVolumeMap;
     uniform sampler2D sAlbedoBuffer;
     uniform sampler2D sNormalBuffer;
