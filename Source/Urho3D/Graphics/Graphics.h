@@ -799,7 +799,9 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
+    /// Renderer name, on OpenGL it is GPU model.
     String rendererName_;
+    /// String with version of drivers
     String versionString_;
 
     /// Pixel perfect UV offset.
