@@ -212,6 +212,7 @@ namespace Urho3D
 <a href="#Class_UI"><b>UI</b></a>
 <a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_UIElement3D"><b>UIElement3D</b></a>
 <a href="#Class_UISelectable"><b>UISelectable</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -7469,6 +7470,9 @@ Properties:
 - int indentWidth (readonly)
 - TraversalMode traversalMode
 - bool elementEventSender
+
+<a name="Class_UIElement3D"></a>
+### UIElement3D : UIElement
 
 <a name="Class_UISelectable"></a>
 ### UISelectable : UIElement
