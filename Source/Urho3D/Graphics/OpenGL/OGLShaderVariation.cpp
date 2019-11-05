@@ -127,7 +127,7 @@ bool ShaderVariation::Create()
     // Force GLSL version 150 if no version define and GL3 is being used
     if (!verEnd && Graphics::GetGL3Support())
     {
-#if defined(MOBILE_GRAPHICS) || URHO3D_GLES3
+#ifdef GL_ES_VERSION_3_0
         shaderCode += "#version 300 es\n";
 #else
         shaderCode += "#version 150\n";
