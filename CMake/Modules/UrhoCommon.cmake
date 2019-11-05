@@ -918,7 +918,7 @@ macro (define_dependency_libs TARGET)
 
         # Graphics
         if (URHO3D_OPENGL)
-            if (NOT ANDROID AND NOT WEB)
+            if (NOT (ANDROID OR WEB OR IOS OR TVOS))
                 set (URHO3D_GLES3 FALSE)
             endif()
             if (APPLE)
