@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class Vector3;
+
 /// Three-dimensional vector with integer values.
 class URHO3D_API IntVector3
 {
@@ -56,6 +58,8 @@ public:
     {
     }
 
+    explicit IntVector3(const Vector3& rhs) noexcept;
+
     /// Copy-construct from another vector.
     IntVector3(const IntVector3& rhs) noexcept = default;
 
@@ -79,20 +83,12 @@ public:
 
     /// Multiply with a scalar.
     IntVector3 operator *(int rhs) const { return IntVector3(x_ * rhs, y_ * rhs, z_ * rhs); }
-    /// Multiply with a scalar.
-    IntVector3 operator *(float rhs) const { return IntVector3(x_ * rhs, y_ * rhs, z_ * rhs); }
-    /// Multiply with a scalar.
-    IntVector3 operator *(double rhs) const { return IntVector3(x_ * rhs, y_ * rhs, z_ * rhs); }
 
     /// Multiply with a vector.
     IntVector3 operator *(const IntVector3& rhs) const { return IntVector3(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_); }
 
     /// Divide by a scalar.
     IntVector3 operator /(int rhs) const { return IntVector3(x_ / rhs, y_ / rhs, z_ / rhs); }
-    /// Divide by a scalar.
-    IntVector3 operator /(float rhs) const { return IntVector3(x_ / rhs, y_ / rhs, z_ / rhs); }
-    /// Divide by a scalar.
-    IntVector3 operator /(double rhs) const { return IntVector3(x_ / rhs, y_ / rhs, z_ / rhs); }
 
     /// Divide by a vector.
     IntVector3 operator /(const IntVector3& rhs) const { return IntVector3(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_); }
@@ -123,22 +119,6 @@ public:
         z_ *= rhs;
         return *this;
     }
-    /// Multiply-assign a scalar.
-    IntVector3& operator *=(float rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        z_ *= rhs;
-        return *this;
-    }
-    /// Multiply-assign a scalar.
-    IntVector3& operator *=(double rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        z_ *= rhs;
-        return *this;
-    }
 
     /// Multiply-assign a vector.
     IntVector3& operator *=(const IntVector3& rhs)
@@ -151,22 +131,6 @@ public:
 
     /// Divide-assign a scalar.
     IntVector3& operator /=(int rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        z_ /= rhs;
-        return *this;
-    }
-    /// Divide-assign a scalar.
-    IntVector3& operator /=(float rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        z_ /= rhs;
-        return *this;
-    }
-    /// Divide-assign a scalar.
-    IntVector3& operator /=(double rhs)
     {
         x_ /= rhs;
         y_ /= rhs;
@@ -219,6 +183,12 @@ public:
     /// (1,1,1) vector.
     static const IntVector3 ONE;
 };
+
+inline void operator * (const IntVector3& lhs, double rhs) = delete;
+inline void operator * (double lhs, const IntVector3& rhs) = delete;
+inline void operator / (const IntVector3& lhs, double rhs) = delete;
+inline IntVector3& operator *= (IntVector3& lhs, double rhs) = delete;
+inline IntVector3& operator /= (IntVector3& lhs, double rhs) = delete;
 
 /// Three-dimensional vector.
 class URHO3D_API Vector3
@@ -510,6 +480,13 @@ public:
     /// (1,1,1) vector.
     static const Vector3 ONE;
 };
+
+inline IntVector3::IntVector3(const Vector3& rhs) noexcept :
+    x_((int)rhs.x_),
+    y_((int)rhs.y_),
+    z_((int)rhs.z_)
+{
+}
 
 /// Multiply Vector3 with a scalar.
 inline Vector3 operator *(float lhs, const Vector3& rhs) { return rhs * lhs; }

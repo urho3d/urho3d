@@ -47,6 +47,7 @@ class IntVector2
 {
     IntVector2();
     IntVector2(int x, int y);
+    IntVector2(const Vector2& rhs);
     IntVector2(const IntVector2& rhs);
     ~IntVector2();
 

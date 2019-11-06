@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class Vector2;
+
 /// Two-dimensional vector with integer values.
 class URHO3D_API IntVector2
 {
@@ -52,6 +54,8 @@ public:
         y_(data[1])
     {
     }
+
+    explicit IntVector2(const Vector2& rhs) noexcept;
 
     /// Construct from an float array.
     explicit IntVector2(const float* data) :
@@ -82,20 +86,12 @@ public:
 
     /// Multiply with a scalar.
     IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
-    /// Multiply with a scalar.
-    IntVector2 operator *(float rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
-    /// Multiply with a scalar.
-    IntVector2 operator *(double rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
 
     /// Multiply with a vector.
     IntVector2 operator *(const IntVector2& rhs) const { return IntVector2(x_ * rhs.x_, y_ * rhs.y_); }
 
     /// Divide by a scalar.
     IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
-    /// Divide by a scalar.
-    IntVector2 operator /(float rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
-    /// Divide by a scalar.
-    IntVector2 operator /(double rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
 
     /// Divide by a vector.
     IntVector2 operator /(const IntVector2& rhs) const { return IntVector2(x_ / rhs.x_, y_ / rhs.y_); }
@@ -123,20 +119,6 @@ public:
         y_ *= rhs;
         return *this;
     }
-    /// Multiply-assign a scalar.
-    IntVector2& operator *=(float rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        return *this;
-    }
-    /// Multiply-assign a scalar.
-    IntVector2& operator *=(double rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        return *this;
-    }
 
     /// Multiply-assign a vector.
     IntVector2& operator *=(const IntVector2& rhs)
@@ -148,18 +130,6 @@ public:
 
     /// Divide-assign a scalar.
     IntVector2& operator /=(int rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        return *this;
-    }
-    IntVector2& operator /=(float rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        return *this;
-    }
-    IntVector2& operator /=(double rhs)
     {
         x_ /= rhs;
         y_ /= rhs;
@@ -204,6 +174,12 @@ public:
     /// (1,1) vector.
     static const IntVector2 ONE;
 };
+
+inline void operator * (const IntVector2& lhs, double rhs) = delete;
+inline void operator * (double lhs, const IntVector2& rhs) = delete;
+inline void operator / (const IntVector2& lhs, double rhs) = delete;
+inline IntVector2& operator *= (IntVector2& lhs, double rhs) = delete;
+inline IntVector2& operator /= (IntVector2& lhs, double rhs) = delete;
 
 /// Two-dimensional vector.
 class URHO3D_API Vector2
@@ -398,6 +374,12 @@ public:
     /// (1,1) vector.
     static const Vector2 ONE;
 };
+
+inline IntVector2::IntVector2(const Vector2& rhs) noexcept :
+    x_((int)rhs.x_),
+    y_((int)rhs.y_)
+{
+}
 
 /// Multiply Vector2 with a scalar
 inline Vector2 operator *(float lhs, const Vector2& rhs) { return rhs * lhs; }

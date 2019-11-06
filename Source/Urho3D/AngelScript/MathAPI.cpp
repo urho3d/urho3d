@@ -171,6 +171,11 @@ static void ConstructIntVector2Init(int x, int y, IntVector2* ptr)
     new(ptr) IntVector2(x, y);
 }
 
+static void ConstructIntVector2Vector2Init(const Vector2& in, IntVector2* ptr)
+{
+    new(ptr) IntVector2(in.x_, in.y_);
+}
+
 static void ConstructIntVector2ArrayInit(CScriptArray* data, IntVector2* ptr)
 {
     new(ptr) IntVector2((static_cast<int*>(data->At(0))));
@@ -187,6 +192,7 @@ static void RegisterIntVector2(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructIntVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(ConstructIntVector2Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(ConstructIntVector2Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(ConstructIntVector2Vector2Init), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int[]&)", asFUNCTION(ConstructIntVector2ArrayInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntVector2", "int[]& get_data() const", asFUNCTION(IntVector2Data), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntVector2", "IntVector2& opAssign(const IntVector2&in)", asMETHOD(IntVector2, operator =), asCALL_THISCALL);
@@ -237,6 +243,11 @@ static void ConstructIntVector3Init(int x, int y, int z, IntVector3* ptr)
     new(ptr) IntVector3(x, y, z);
 }
 
+static void ConstructIntVector3Vector3Init(const Vector3& in, IntVector3* ptr)
+{
+    new(ptr) IntVector3(in.x_, in.y_, in.z_);
+}
+
 static void ConstructIntVector3ArrayInit(CScriptArray* data, IntVector3* ptr)
 {
     new(ptr) IntVector3((static_cast<int*>(data->At(0))));
@@ -253,6 +264,7 @@ static void RegisterIntVector3(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructIntVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", asFUNCTION(ConstructIntVector3Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int, int, int)", asFUNCTION(ConstructIntVector3Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructIntVector3Vector3Init), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int[]&)", asFUNCTION(ConstructIntVector3ArrayInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntVector3", "int[]& get_data() const", asFUNCTION(IntVector3Data), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntVector3", "IntVector3& opAssign(const IntVector3&in)", asMETHOD(IntVector3, operator =), asCALL_THISCALL);
