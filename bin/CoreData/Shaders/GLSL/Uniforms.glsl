@@ -1,9 +1,5 @@
 // Use of constant buffers on OpenGL 3 commented out for now as it seems to be slower in practice
 //#define USE_CBUFFERS
-// Now need tests for constant uniform buffers for GLES3.
-#if defined(GL_ES) && __VERSION__ >= 300
-#define USE_CBUFFERS
-#endif
 
 #if !defined(GL3) || !defined(USE_CBUFFERS)
 
