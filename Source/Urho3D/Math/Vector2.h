@@ -59,8 +59,8 @@ public:
 
     /// Construct from an float array.
     explicit IntVector2(const float* data) :
-        x_((int)data[0]),
-        y_((int)data[1])
+        x_(static_cast<int>(data[0])),
+        y_(static_cast<int>(data[1]))
     {
     }
     /// Copy-construct from another vector.
@@ -376,8 +376,8 @@ public:
 };
 
 inline IntVector2::IntVector2(const Vector2& rhs) noexcept :
-    x_((int)rhs.x_),
-    y_((int)rhs.y_)
+    x_(static_cast<int>(rhs.x_)),
+    y_(static_cast<int>(rhs.y_))
 {
 }
 

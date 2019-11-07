@@ -482,9 +482,9 @@ public:
 };
 
 inline IntVector3::IntVector3(const Vector3& rhs) noexcept :
-    x_((int)rhs.x_),
-    y_((int)rhs.y_),
-    z_((int)rhs.z_)
+    x_(static_cast<int>(rhs.x_)),
+    y_(static_cast<int>(rhs.y_)),
+    z_(static_cast<int>(rhs.z_))
 {
 }
 
