@@ -29,6 +29,7 @@ class BorderImage : public UIElement
     bool IsTiled() const;
     
     tolua_property__get_set Texture* texture;
+    tolua_property__get_set Material* material;
     tolua_property__get_set IntRect& imageRect;
     tolua_property__get_set IntRect& border;
     tolua_property__get_set IntRect& imageBorder;
