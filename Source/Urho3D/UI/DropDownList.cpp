@@ -233,6 +233,11 @@ void DropDownList::SetSelectionAttr(unsigned index)
     SetSelection(index);
 }
 
+void DropDownList::EnableSearch(bool enable)
+{
+    listView_->EnableSearch(enable);
+}
+
 bool DropDownList::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!Menu::FilterImplicitAttributes(dest))

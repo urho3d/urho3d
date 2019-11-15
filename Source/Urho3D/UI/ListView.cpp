@@ -171,7 +171,8 @@ ListView::ListView(Context* context) :
     hierarchyMode_(true),    // Init to true here so that the setter below takes effect
     baseIndent_(0),
     clearSelectionOnDefocus_(false),
-    selectOnClickEnd_(false)
+    selectOnClickEnd_(false),
+    searchEnabled_(false)
 {
     resizeContentWidth_ = true;
 
@@ -310,6 +311,28 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
     eventData[P_BUTTONS] = (unsigned)buttons;
     eventData[P_QUALIFIERS] = (unsigned)qualifiers;
     SendEvent(E_UNHANDLEDKEY, eventData);
+}
+
+void ListView::OnTextInput(const String& text)
+{
+    if (!searchEnabled_)
+        return;
+    const unsigned selection = GetSelection();
+    const unsigned int numChildren = contentElement_->GetNumChildren();
+    for (unsigned int i = 0; i < numChildren; ++i)
+    {
+        const unsigned int idx = (i + selection + 1) % GetNumItems();
+        const Text *textWidget = dynamic_cast<const Text*>(contentElement_->GetChild(idx));
+        if (textWidget)
+        {
+            const String &str = textWidget->GetText();
+            if (str.StartsWith(text, false))
+            {
+                ChangeSelection(idx - selection, true);
+                break;
+            }
+        }
+    }
 }
 
 void ListView::OnResize(const IntVector2& newSize, const IntVector2& delta)
@@ -1013,6 +1036,11 @@ void ListView::EnsureItemVisibility(UIElement* item)
         newView.y_ += currentOffset.y_ + item->GetHeight() - windowSize.y_;
 
     SetViewPosition(newView);
+}
+
+void ListView::EnableSearch(bool enable)
+{
+  searchEnabled_ = enable;
 }
 
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)

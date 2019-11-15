@@ -96,6 +96,9 @@ public:
     /// Set selection attribute.
     void SetSelectionAttr(unsigned index);
 
+    /// Enable/disable text search
+    void EnableSearch(bool enable);
+
 protected:
     /// Filter implicit attributes in serialization process.
     bool FilterImplicitAttributes(XMLElement& dest) const override;

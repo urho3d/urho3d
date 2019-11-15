@@ -56,6 +56,8 @@ public:
 
     /// React to a key press.
     void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
+    /// React to text input.
+    void OnTextInput(const String& text);
     /// React to resize.
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
@@ -160,6 +162,9 @@ public:
     /// Ensure full visibility of the item.
     void EnsureItemVisibility(UIElement* item);
 
+    /// Enabled (or disable) search by keypresses
+    void EnableSearch(bool enable);
+
 protected:
     /// Filter implicit attributes in serialization process.
     bool FilterImplicitAttributes(XMLElement& dest) const override;
@@ -182,6 +187,8 @@ protected:
     bool clearSelectionOnDefocus_;
     /// React to click end instead of click start flag.
     bool selectOnClickEnd_;
+    /// Whether key presses search for a text field starting with that character
+    bool searchEnabled_;
 
 private:
     /// Handle global UI mouseclick to check for selection change.
