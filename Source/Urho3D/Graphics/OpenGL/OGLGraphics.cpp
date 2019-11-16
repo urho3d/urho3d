@@ -2843,6 +2843,9 @@ void Graphics::CheckFeatureSupport()
 
     // Consider OpenGL shadows always hardware sampled, if supported at all
     hardwareShadowSupport_ = shadowMapFormat_ != 0;
+    
+    // check whether  the extention GL_OES_standard_derivatives is supported
+    glOESStandardDerivativesSupport_ = CheckExtension("GL_OES_standard_derivatives");
 }
 
 void Graphics::PrepareDraw()

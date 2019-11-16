@@ -527,6 +527,9 @@ public:
     void SetVBO(unsigned object);
     /// Bind a UBO, avoiding redundant operation. Used only on OpenGL.
     void SetUBO(unsigned object);
+    
+    /// Return whether  the extention GL_OES_standard_derivatives is supported
+    bool glOESStandardDerivativesSupport(){return glOESStandardDerivativesSupport_;}
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -795,7 +798,8 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
-
+    /// indicates if the extention GL_OES_standard_derivatives is supported
+    bool glOESStandardDerivativesSupport_{};
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;
     /// OpenGL3 support flag.

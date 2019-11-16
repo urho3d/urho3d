@@ -103,6 +103,19 @@ bool ShaderVariation::Create()
 
     const String& originalShaderCode = owner_->GetSourceCode(type_);
     String shaderCode;
+    /*
+        Relevant only to Fragment processing functions  , only in case of OpenGL ES 2.0  .
+        The built-in derivative functions dFdx, dFdy, and fwidth are optional, and
+        must be enabled by #extension GL_OES_standard_derivatives : enable
+        See : https://www.khronos.org/registry/OpenGL/extensions/OES/OES_standard_derivatives.txt
+        On some platforms it's already enabled by default but on some it's not .
+    */
+#if defined(GL_ES_VERSION_2_0)
+    if(type_ == PS && graphics_->glOESStandardDerivativesSupport() == true)
+    {
+            shaderCode += "#extension GL_OES_standard_derivatives : enable \n";
+    }
+#endif
 
     // Check if the shader code contains a version define
     unsigned verStart = originalShaderCode.Find('#');
