@@ -698,6 +698,7 @@ Methods:
 Properties:
 
 - Texture* texture
+- Material* material
 - IntRect& imageRect
 - IntRect& border
 - IntRect& imageBorder
