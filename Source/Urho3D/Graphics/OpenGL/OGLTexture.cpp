@@ -105,7 +105,7 @@ void Texture::UpdateParameters()
     // Wrapping
     glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressModes_[COORD_U]));
     glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressModes_[COORD_V]));
-#ifdef DESKTOP_GRAPHICS_OR_GLES3
+#ifndef URHO3D_GLES2
     glTexParameteri(target_, GL_TEXTURE_WRAP_R, GetWrapMode(addressModes_[COORD_W]));
 #endif
 
@@ -360,7 +360,7 @@ unsigned Texture::GetDataType(unsigned format)
 
 unsigned Texture::GetSRGBFormat(unsigned format)
 {
-#ifdef DESKTOP_GRAPHICS_OR_GLES3
+#ifndef URHO3D_GLES2
     if (!graphics_ || !graphics_->GetSRGBSupport())
         return format;
 
