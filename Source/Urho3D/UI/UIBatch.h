@@ -52,6 +52,7 @@ public:
     /// Restore UI element's default color.
     void SetDefaultColor();
     /// Add a quad.
+    void AddQuad(float x, float y, float width, float height, float top_dx, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
     void AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
     /// Add a quad using a transform matrix.
     void AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0,

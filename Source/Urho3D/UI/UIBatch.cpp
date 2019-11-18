@@ -75,7 +75,7 @@ void UIBatch::SetDefaultColor()
     }
 }
 
-void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+void UIBatch::AddQuad(float x, float y, float width, float height, float top_dx, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
@@ -115,14 +115,14 @@ void UIBatch::AddQuad(float x, float y, float width, float height, int texOffset
     float* dest = &(vertexData_->At(begin));
     vertexEnd_ = vertexData_->Size();
 
-    dest[0] = left;
+    dest[0] = left + width * top_dx;
     dest[1] = top;
     dest[2] = 0.0f;
     ((unsigned&)dest[3]) = topLeftColor;
     dest[4] = leftUV;
     dest[5] = topUV;
 
-    dest[6] = right;
+    dest[6] = right + width * top_dx;
     dest[7] = top;
     dest[8] = 0.0f;
     ((unsigned&)dest[9]) = topRightColor;
@@ -136,7 +136,7 @@ void UIBatch::AddQuad(float x, float y, float width, float height, int texOffset
     dest[16] = leftUV;
     dest[17] = bottomUV;
 
-    dest[18] = right;
+    dest[18] = right + width * top_dx;
     dest[19] = top;
     dest[20] = 0.0f;
     ((unsigned&)dest[21]) = topRightColor;
@@ -156,6 +156,11 @@ void UIBatch::AddQuad(float x, float y, float width, float height, int texOffset
     ((unsigned&)dest[33]) = bottomLeftColor;
     dest[34] = leftUV;
     dest[35] = bottomUV;
+}
+
+void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+{
+    AddQuad(x, y, width, height, 0.0f, texOffsetX, texOffsetY, texWidth, texHeight);
 }
 
 void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,

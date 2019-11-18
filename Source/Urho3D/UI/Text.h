@@ -40,7 +40,8 @@ enum TextEffect
 {
     TE_NONE = 0,
     TE_SHADOW,
-    TE_STROKE
+    TE_STROKE,
+    TE_ITALIC
 };
 
 /// Cached character location and size within text. Used for queries related to text editing.
@@ -212,7 +213,7 @@ protected:
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Construct batch.
     void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
+        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, float top_dx = 0, Color* color = nullptr,
             float depthBias = 0.0f);
 
     /// Font.

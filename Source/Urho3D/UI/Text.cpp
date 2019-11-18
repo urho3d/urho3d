@@ -43,6 +43,7 @@ const char* textEffects[] =
     "None",
     "Shadow",
     "Stroke",
+    "Italic",
     nullptr
 };
 
@@ -190,8 +191,12 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
 
+        case TE_ITALIC:
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0, 0.3f);
+            break;
+
         case TE_SHADOW:
-            ConstructBatch(pageBatch, pageGlyphLocation, shadowOffset_.x_, shadowOffset_.y_, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, shadowOffset_.x_, shadowOffset_.y_, 0, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
 
@@ -209,7 +214,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 {
                     float x = Cos(angle * i) * floatThickness;
                     float y = Sin(angle * i) * floatThickness;
-                    ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, x, y, 0, &effectColor_, effectDepthBias_);
                 }
             }
             else
@@ -225,7 +230,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                             y > -thickness && y < thickness)
                             continue;
 
-                        ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
+                        ConstructBatch(pageBatch, pageGlyphLocation, x, y, 0, &effectColor_, effectDepthBias_);
                     }
                 }
             }
@@ -784,7 +789,7 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     return ret;
 }
 
-void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx, float dy, Color* color,
+void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx, float dy, float top_dx, Color* color,
     float depthBias)
 {
     unsigned startDataSize = pageBatch.vertexData_->Size();
@@ -799,7 +804,7 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
         const GlyphLocation& glyphLocation = pageGlyphLocation[i];
         const FontGlyph& glyph = *glyphLocation.glyph_;
         pageBatch.AddQuad(dx + glyphLocation.x_ + glyph.offsetX_, dy + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
-            glyph.height_, glyph.x_, glyph.y_, glyph.texWidth_, glyph.texHeight_);
+            glyph.height_, top_dx, glyph.x_, glyph.y_, glyph.texWidth_, glyph.texHeight_);
     }
 
     if (depthBias != 0.0f)
