@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
 #include "../Graphics/Texture2D.h"
 #include "../Resource/ResourceCache.h"
 #include "../UI/Sprite.h"
@@ -37,6 +38,8 @@ extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
 extern const char* UI_CATEGORY;
 
+Timer Sprite::timer;
+
 Sprite::Sprite(Context* context) :
     UIElement(context),
     floatPosition_(Vector2::ZERO),
@@ -44,7 +47,8 @@ Sprite::Sprite(Context* context) :
     scale_(Vector2::ONE),
     rotation_(0.0f),
     imageRect_(IntRect::ZERO),
-    blendMode_(BLEND_REPLACE)
+    blendMode_(BLEND_REPLACE),
+    frame_(0)
 {
 }
 
@@ -116,7 +120,7 @@ void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
 
     const IntVector2& size = GetSize();
     UIBatch
-        batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
+        batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, textures_.Empty() ? NULL : textures_[frame_].first_, &vertexData);
 
     batch.AddQuad(GetTransform(), 0, 0, size.x_, size.y_, imageRect_.left_, imageRect_.top_, imageRect_.right_ - imageRect_.left_,
         imageRect_.bottom_ - imageRect_.top_);
@@ -193,9 +197,24 @@ void Sprite::SetRotation(float angle)
 
 void Sprite::SetTexture(Texture* texture)
 {
-    texture_ = texture;
+    textures_.Clear();
+    frame_ = 0;
+    textures_.Push(MakePair<SharedPtr<Texture>, unsigned int>(SharedPtr<Texture>(texture), 0));
     if (imageRect_ == IntRect::ZERO)
         SetFullImageRect();
+    UnsubscribeFromEvent(Urho3D::E_UPDATE);
+}
+
+void Sprite::SetAnimation(const Vector<Pair<SharedPtr<Texture>, unsigned int>> &textures)
+{
+    textures_ = textures;
+    frame_ = 0;
+    if (imageRect_ == IntRect::ZERO)
+        SetFullImageRect();
+    if (textures_.Size() > 1)
+        SubscribeToEvent(Urho3D::E_UPDATE, URHO3D_HANDLER(Sprite, UpdateAnimation));
+    else
+        UnsubscribeFromEvent(Urho3D::E_UPDATE);
 }
 
 void Sprite::SetImageRect(const IntRect& rect)
@@ -206,8 +225,16 @@ void Sprite::SetImageRect(const IntRect& rect)
 
 void Sprite::SetFullImageRect()
 {
-    if (texture_)
-        SetImageRect(IntRect(0, 0, texture_->GetWidth(), texture_->GetHeight()));
+    if (!textures_.Empty())
+    {
+        int width = 0, height = 0;
+        for (const auto &texture: textures_)
+        {
+            width = std::max(width, texture.first_->GetWidth());
+            height = std::max(height, texture.first_->GetHeight());
+            SetImageRect(IntRect(0, 0, width, height));
+        }
+    }
 }
 
 void Sprite::SetBlendMode(BlendMode mode)
@@ -289,7 +316,38 @@ void Sprite::SetTextureAttr(const ResourceRef& value)
 
 ResourceRef Sprite::GetTextureAttr() const
 {
-    return GetResourceRef(texture_, Texture2D::GetTypeStatic());
+    return GetResourceRef(textures_.Empty() ? NULL : textures_[frame_].first_, Texture2D::GetTypeStatic());
+}
+
+void Sprite::UpdateAnimation(StringHash eventType, VariantMap& eventData)
+{
+    if (textures_.Size() <= 1)
+    {
+        frame_ = 0;
+        return;
+    }
+
+    unsigned total_time = 0;
+    for (const auto &t: textures_)
+        total_time += t.second_;
+    if (total_time == 0)
+    {
+        ++frame_;
+        if (frame_ >= textures_.Size())
+            frame_ = 0;
+        return;
+    }
+
+    unsigned ms = timer.GetMSec(false);
+    unsigned t = ms % total_time;
+    frame_ = 0;
+    for (const auto &texture: textures_)
+    {
+        if (t < texture.second_)
+            break;
+        t -= texture.second_;
+        ++frame_;
+    }
 }
 
 }

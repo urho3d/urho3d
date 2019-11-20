@@ -72,6 +72,8 @@ public:
     void SetRotation(float angle);
     /// Set texture.
     void SetTexture(Texture* texture);
+    /// Set animation.
+    void SetAnimation(const Vector<Pair<SharedPtr<Texture>, unsigned int>> &textures);
     /// Set part of texture to use as the image.
     void SetImageRect(const IntRect& rect);
     /// Use whole texture as the image.
@@ -92,7 +94,10 @@ public:
     float GetRotation() const { return rotation_; }
 
     /// Return texture.
-    Texture* GetTexture() const { return texture_; }
+    Texture* GetTexture() const { return textures_.Empty() ? NULL : textures_.Front().first_; }
+
+    /// Return texture.
+    const Vector<Pair<SharedPtr<Texture>, unsigned int>> &GetTextures() const { return textures_; }
 
     /// Return image rectangle.
     const IntRect& GetImageRect() const { return imageRect_; }
@@ -108,6 +113,9 @@ public:
     const Matrix3x4& GetTransform() const;
 
 protected:
+    void UpdateAnimation(StringHash eventType, VariantMap& eventData);
+
+protected:
     /// Floating point position.
     Vector2 floatPosition_;
     /// Hotspot for positioning and rotation.
@@ -117,13 +125,16 @@ protected:
     /// Rotation angle.
     float rotation_;
     /// Texture.
-    SharedPtr<Texture> texture_;
+    Vector<Pair<SharedPtr<Texture>, unsigned int>> textures_;
     /// Image rectangle.
     IntRect imageRect_;
     /// Blend mode flag.
     BlendMode blendMode_;
     /// Transform matrix.
     mutable Matrix3x4 transform_;
+    /// Current aninmation frame
+    int frame_;
+    static Timer timer;
 };
 
 }
