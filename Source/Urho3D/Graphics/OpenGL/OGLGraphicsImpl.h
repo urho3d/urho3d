@@ -30,7 +30,7 @@
 #include "../../Math/Color.h"
 
 #if defined(IOS) || defined(TVOS)
-#if URHO3D_GLES3
+#ifdef URHO3D_GLES3
 #include <OpenGLES/ES3/gl.h>
 #include <OpenGLES/ES3/glext.h>
 #else
@@ -39,7 +39,7 @@
 #define URHO3D_GLES2
 #endif
 #elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__) || defined (__EMSCRIPTEN__)
-#if URHO3D_GLES3
+#ifdef URHO3D_GLES3
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
 #else

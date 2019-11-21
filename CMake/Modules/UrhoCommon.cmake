@@ -148,7 +148,6 @@ option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
-option (URHO3D_GLES3 "Enable GLES3" FALSE)
 option (URHO3D_WEBP "Enable WebP support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT APPLE)
     set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
@@ -172,6 +171,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
         set (DEFAULT_OPENGL TRUE)
     endif ()
     cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" "${DEFAULT_OPENGL}" WIN32 TRUE)
+    cmake_dependent_option (URHO3D_GLES3 "Use GLES 3 instead of GLES 2 (Android/RPI/ARM/iOS/tvOS platforms only); default to true for Android and iOS/tvOS" "ANDROID OR IOS OR TVOS" "ANDROID OR ARM" FALSE)
     # On Windows platform Direct3D11 can be optionally chosen
     # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
     cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
@@ -448,7 +448,6 @@ foreach (OPT
         URHO3D_PROFILING
         URHO3D_THREADING
         URHO3D_URHO2D
-        URHO3D_GLES3
         URHO3D_WEBP
         URHO3D_WIN32_CONSOLE)
     if (${OPT})
@@ -909,21 +908,21 @@ macro (define_dependency_libs TARGET)
 
         # Graphics
         if (URHO3D_OPENGL)
-            if (NOT (ANDROID OR WEB OR IOS OR TVOS))
-                set (URHO3D_GLES3 FALSE)
-            endif()
             if (APPLE)
                 # Do nothing
             elseif (WIN32)
                 list (APPEND LIBS opengl32)
             elseif (RPI)
                 list (APPEND LIBS brcmGLESv2)
-            elseif (ANDROID OR ARM)
+            elseif (ANDROID)
                 if (URHO3D_GLES3)
                     list (APPEND LIBS GLESv3)
                 else ()
                     list (APPEND LIBS GLESv1_CM GLESv2)
                 endif ()
+            elseif (ARM)
+                # libGLESv2.so (from Mesa) is used for both GLES 2 and GLES 3 for now, adjust as appropriate if you have better GLES 3 driver implementation
+                list (APPEND LIBS GLESv1_CM GLESv2)
             else ()
                 list (APPEND LIBS GL)
             endif ()

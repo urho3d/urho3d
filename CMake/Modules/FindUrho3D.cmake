@@ -36,6 +36,7 @@
 #  URHO3D_64BIT (may be used as input variable for multilib-capable compilers; must always be specified as input variable for MSVC due to CMake/VS generator limitation)
 #  URHO3D_LIB_TYPE (may be used as input variable as well to limit the search of library type)
 #  URHO3D_OPENGL
+#  URHO3D_GLES3
 #  URHO3D_SSE
 #  URHO3D_DATABASE_ODBC
 #  URHO3D_DATABASE_SQLITE
@@ -54,7 +55,7 @@
 #  URHO3D_STATIC_RUNTIME
 #
 
-set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING URHO3D_STATIC_RUNTIME)
+set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_GLES3 URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING URHO3D_STATIC_RUNTIME)
 set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # A special case where library location is already known to be in the build tree of Urho3D project

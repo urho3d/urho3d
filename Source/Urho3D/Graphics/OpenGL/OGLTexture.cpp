@@ -32,7 +32,7 @@
 
 #include "../../DebugNew.h"
 
-#if URHO3D_GLES3
+#ifdef URHO3D_GLES3
 #define GL_COMPARE_R_TO_TEXTURE GL_COMPARE_REF_TO_TEXTURE
 #endif
 

@@ -230,7 +230,7 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 }
 
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
-#if URHO3D_GLES3
+#ifdef URHO3D_GLES3
 bool Graphics::gl3Support = true;
 #else
 bool Graphics::gl3Support = false;
@@ -2666,7 +2666,7 @@ unsigned Graphics::GetRGBAFloat32Format()
 {
 #ifndef GL_ES_VERSION_2_0
     return GL_RGBA32F_ARB;
-#elif URHO3D_GLES3
+#elif defined(URHO3D_GLES3)
     return GL_RGBA32F;
 #else
     return GL_RGBA;
@@ -2677,7 +2677,7 @@ unsigned Graphics::GetRG16Format()
 {
 #ifndef GL_ES_VERSION_2_0
     return GL_RG16;
-#elif URHO3D_GLES3
+#elif defined(URHO3D_GLES3)
     return GL_RG16UI;
 #else
     return GL_RGBA;

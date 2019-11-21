@@ -40,10 +40,9 @@ class Vector3;
 #define DESKTOP_GRAPHICS
 #endif
 
-#if defined(DESKTOP_GRAPHICS) || URHO3D_GLES3
+#if defined(DESKTOP_GRAPHICS) || defined(URHO3D_GLES3)
 #define DESKTOP_GRAPHICS_OR_GLES3
 #endif
-
 
 /// Primitive type.
 enum PrimitiveType
