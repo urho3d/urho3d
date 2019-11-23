@@ -30,6 +30,21 @@ namespace Urho3D
 
 class Console;
 class DebugHud;
+class FileSystem;
+class Log;
+class Profiler;
+class EventProfiler;
+class Graphics;
+class Renderer;
+class Input;
+class Audio;
+class UI;
+class Time;
+class WorkQueue;
+class ResourceCache;
+class Localization;
+class Network;
+class Database;
 
 /// Urho3D engine. Creates the other subsystems.
 class URHO3D_API Engine : public Object
