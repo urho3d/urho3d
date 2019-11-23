@@ -54,7 +54,7 @@ Application::Application(Context* context) :
     engineParameters_ = Engine::ParseParameters(GetArguments());
 
     // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
-    engine_ = new Engine(context);
+    engine_ = context->RegisterSubsystem<Engine>();
 
     // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
     SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Application, HandleLogMessage));
@@ -86,6 +86,9 @@ int Application::Run()
             engine_->RunFrame();
 
         Stop();
+
+		context_->RemoveSubsystem<Engine>();
+
         // iOS/tvOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
         // support calling the Stop() function, as the application will never stop manually
 #else

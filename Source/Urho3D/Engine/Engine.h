@@ -126,6 +126,48 @@ private:
     /// Actually perform the exit actions.
     void DoExit();
 
+private:
+	/// FileSystem subsystem.
+	SharedPtr<FileSystem> filesystem_;
+#ifdef URHO3D_LOGGING
+	/// Log subsystem.
+	SharedPtr<Log> log_;
+#endif
+#ifdef URHO3D_PROFILING
+	/// Profiler subsystem.
+	SharedPtr<Profiler> profiler_;
+	/// EventProfiler subsystem.
+	SharedPtr<EventProfiler> eventProfiler_;
+#endif
+
+	/// Graphics subsystem
+	SharedPtr<Graphics> graphics_;
+	/// Renderer subsystem.
+	SharedPtr<Renderer> renderer_;
+	/// Input subsystem
+	SharedPtr<Input> input_;
+	/// Audio subsystem
+	SharedPtr<Audio> audio_;
+	/// UI subsystem.
+	SharedPtr<UI> ui_;
+
+	// Time subsystem.
+	SharedPtr<Time> time_;
+	/// WorkQueue subsystem.
+	SharedPtr<WorkQueue> workQueue_;
+	/// ResourceCache subsystem.
+	SharedPtr<ResourceCache> resourceCache_;
+	/// Localization subsystem.
+	SharedPtr<Localization> localization_;
+#ifdef URHO3D_NETWORK
+	/// Network subsystem.
+	SharedPtr<Network> network_;
+#endif
+#ifdef URHO3D_DATABASE
+	/// Database subsystem.
+	SharedPtr<Database> database_;
+#endif
+
     /// Frame update timer.
     HiresTimer frameTimer_;
     /// Previous timesteps for smoothing.
