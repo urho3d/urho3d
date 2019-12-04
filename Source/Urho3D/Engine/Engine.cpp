@@ -87,6 +87,9 @@ typedef struct _CrtMemBlockHeader
 } _CrtMemBlockHeader;
 #endif
 
+// Implemented by ETCPACK
+extern void setupAlphaTable();
+
 namespace Urho3D
 {
 
@@ -215,6 +218,9 @@ bool Engine::Initialize(const VariantMap& parameters)
         URHO3D_LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }
 #endif
+
+    // ETCPACK initialization
+    setupAlphaTable();
 
     // Add resource paths
     if (!InitializeResourceCache(parameters, false))

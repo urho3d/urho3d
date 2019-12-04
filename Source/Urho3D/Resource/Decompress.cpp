@@ -912,15 +912,18 @@ void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, 
     unsigned char* src = (unsigned char*)blocks;
     unsigned int blockPart1, blockPart2;
 
-    memset(dstImage, 0xFF, width * height * 4);
+    // ETCPACK write 4x4 blocks, so it needs padding.
+    int w4 = ((width + 3) / 4);
+    int h4 = ((height + 3) / 4);
+    memset(dstImage, 0xFF, w4 * 4 * h4 * 4 * 4);
 
-    for (int y = 0; y < height / 4; ++y) 
+    for (int y = 0; y < h4; ++y) 
     {
-        for (int x = 0; x < width / 4; ++x) 
+        for (int x = 0; x < w4; ++x) 
         {
             if (hasAlpha)
             {
-                decompressBlockAlphaC(src, dstImage + 3, width, height, 4 * x, 4 * y, channelCount);
+                decompressBlockAlphaC(src, dstImage + 3, 4 * w4, 4 * h4, 4 * x, 4 * y, channelCount);
                 src += 8;
             }
 
@@ -928,7 +931,23 @@ void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, 
             src += 4;
             ReadBigEndian4byteWord(&blockPart2, src);
             src += 4;
-            decompressBlockETC2c(blockPart1, blockPart2, dstImage, width, height, 4 * x, 4 * y, 4);
+            decompressBlockETC2c(blockPart1, blockPart2, dstImage, 4 * w4, 4 * h4, 4 * x, 4 * y, 4);
+        }
+    }
+
+    // Remove padding from the output.
+    int r = width % 4;
+    if (r)
+    {
+        unsigned char *p1, *p2;
+        p1 = p2 = dstImage;
+        unsigned d1 = width * 4;
+        unsigned d2 = d1 + (4 - r) * 4;
+        for (int y = 1; y < height; ++y)
+        {
+            p1 += d1;
+            p2 += d2;
+            memmove(p1, p2, d1);
         }
     }
 }

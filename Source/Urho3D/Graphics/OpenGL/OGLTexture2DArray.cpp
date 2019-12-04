@@ -347,7 +347,10 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
             }
             else
             {
-                auto* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
+                // ETCPACK needs padding
+                int w = ((level.width_ + 3) / 4) * 4;
+                int h = ((level.height_ + 3) / 4) * 4;
+                auto* rgbaData = new unsigned char[w * h * 4];
                 level.Decompress(rgbaData);
                 SetData(layer, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
