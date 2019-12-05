@@ -915,15 +915,17 @@ void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, 
     // ETCPACK write 4x4 blocks, so it needs padding.
     int w4 = ((width + 3) / 4);
     int h4 = ((height + 3) / 4);
-    memset(dstImage, 0xFF, w4 * 4 * h4 * 4 * 4);
+
+    unsigned char buffer4x4[4 * 4 * 4];
 
     for (int y = 0; y < h4; ++y) 
     {
         for (int x = 0; x < w4; ++x) 
         {
+            memset(&buffer4x4[0], 0xFF, 4 * 4 * 4);
             if (hasAlpha)
             {
-                decompressBlockAlphaC(src, dstImage + 3, 4 * w4, 4 * h4, 4 * x, 4 * y, channelCount);
+                decompressBlockAlphaC(src, &buffer4x4[3], 4, 4, 0, 0, channelCount);
                 src += 8;
             }
 
@@ -931,23 +933,22 @@ void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, 
             src += 4;
             ReadBigEndian4byteWord(&blockPart2, src);
             src += 4;
-            decompressBlockETC2c(blockPart1, blockPart2, dstImage, 4 * w4, 4 * h4, 4 * x, 4 * y, 4);
-        }
-    }
+            decompressBlockETC2c(blockPart1, blockPart2, &buffer4x4[0], 4, 4, 0, 0, 4);
 
-    // Remove padding from the output.
-    int r = width % 4;
-    if (r)
-    {
-        unsigned char *p1, *p2;
-        p1 = p2 = dstImage;
-        unsigned d1 = width * 4;
-        unsigned d2 = d1 + (4 - r) * 4;
-        for (int y = 1; y < height; ++y)
-        {
-            p1 += d1;
-            p2 += d2;
-            memmove(p1, p2, d1);
+            int wbuf = Min(width - x * 4, 4);
+            int hbuf = Min(height - y * 4, 4);
+            for(int dy = 0; dy < hbuf; ++dy)
+            {
+                for (int dx = 0; dx < wbuf; ++dx)
+                {
+                    int idst = ((y * 4 + dy) * width + x * 4 + dx) * 4;
+                    int ibuf = (dy * 4 + dx) * 4;
+                    dstImage[idst] = buffer4x4[ibuf];
+                    dstImage[idst + 1] = buffer4x4[ibuf + 1];
+                    dstImage[idst + 2] = buffer4x4[ibuf + 2];
+                    dstImage[idst + 3] = buffer4x4[ibuf + 3];
+                }
+            }
         }
     }
 }
