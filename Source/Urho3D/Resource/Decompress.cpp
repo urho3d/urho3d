@@ -32,6 +32,7 @@ typedef short int16;
 // Implemented by ETCPACK
 extern void decompressBlockAlphaC(uint8* data, uint8* img, int width, int height, int ix, int iy, int channels);
 extern void decompressBlockETC2c(unsigned int block_part1, unsigned int block_part2, uint8 *img, int width, int height, int startx, int starty, int channels);
+extern void setupAlphaTable();
 
 // DXT decompression based on the Squish library, modified for Urho3D
 
@@ -908,6 +909,8 @@ static void ReadBigEndian4byteWord(uint32_t* pBlock, const unsigned char *s)
 // Use ETCPACK to decompress ETC texture.
 void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, int height, bool hasAlpha)
 {
+	static const bool placeholder = []() { setupAlphaTable(); return true; }();
+
     const int channelCount = hasAlpha ? 4 : 3;
     unsigned char* src = (unsigned char*)blocks;
     unsigned int blockPart1, blockPart2;
