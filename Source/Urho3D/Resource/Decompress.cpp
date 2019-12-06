@@ -909,7 +909,8 @@ static void ReadBigEndian4byteWord(uint32_t* pBlock, const unsigned char *s)
 // Use ETCPACK to decompress ETC texture.
 void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, int height, bool hasAlpha)
 {
-	static const bool placeholder = []() { setupAlphaTable(); return true; }();
+    // ETCPACK initialization.
+    static const bool placeholder = []() { setupAlphaTable(); return true; }();
 
     const int channelCount = hasAlpha ? 4 : 3;
     unsigned char* src = (unsigned char*)blocks;
