@@ -32,6 +32,7 @@ typedef short int16;
 // Implemented by ETCPACK
 extern void decompressBlockAlphaC(uint8* data, uint8* img, int width, int height, int ix, int iy, int channels);
 extern void decompressBlockETC2c(unsigned int block_part1, unsigned int block_part2, uint8 *img, int width, int height, int startx, int starty, int channels);
+extern void setupAlphaTable();
 
 // DXT decompression based on the Squish library, modified for Urho3D
 
@@ -908,19 +909,27 @@ static void ReadBigEndian4byteWord(uint32_t* pBlock, const unsigned char *s)
 // Use ETCPACK to decompress ETC texture.
 void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, int height, bool hasAlpha)
 {
+    // ETCPACK initialization.
+    static const bool placeholder = []() { setupAlphaTable(); return true; }();
+
     const int channelCount = hasAlpha ? 4 : 3;
     unsigned char* src = (unsigned char*)blocks;
     unsigned int blockPart1, blockPart2;
 
-    memset(dstImage, 0xFF, width * height * 4);
+    // ETCPACK write 4x4 blocks, so it needs padding.
+    int w4 = ((width + 3) / 4);
+    int h4 = ((height + 3) / 4);
 
-    for (int y = 0; y < height / 4; ++y) 
+    unsigned char buffer4x4[4 * 4 * 4];
+
+    for (int y = 0; y < h4; ++y) 
     {
-        for (int x = 0; x < width / 4; ++x) 
+        for (int x = 0; x < w4; ++x) 
         {
+            memset(&buffer4x4[0], 0xFF, 4 * 4 * 4);
             if (hasAlpha)
             {
-                decompressBlockAlphaC(src, dstImage + 3, width, height, 4 * x, 4 * y, channelCount);
+                decompressBlockAlphaC(src, &buffer4x4[3], 4, 4, 0, 0, channelCount);
                 src += 8;
             }
 
@@ -928,7 +937,22 @@ void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, 
             src += 4;
             ReadBigEndian4byteWord(&blockPart2, src);
             src += 4;
-            decompressBlockETC2c(blockPart1, blockPart2, dstImage, width, height, 4 * x, 4 * y, 4);
+            decompressBlockETC2c(blockPart1, blockPart2, &buffer4x4[0], 4, 4, 0, 0, 4);
+
+            int wbuf = Min(width - x * 4, 4);
+            int hbuf = Min(height - y * 4, 4);
+            for(int dy = 0; dy < hbuf; ++dy)
+            {
+                for (int dx = 0; dx < wbuf; ++dx)
+                {
+                    int idst = ((y * 4 + dy) * width + x * 4 + dx) * 4;
+                    int ibuf = (dy * 4 + dx) * 4;
+                    dstImage[idst] = buffer4x4[ibuf];
+                    dstImage[idst + 1] = buffer4x4[ibuf + 1];
+                    dstImage[idst + 2] = buffer4x4[ibuf + 2];
+                    dstImage[idst + 3] = buffer4x4[ibuf + 3];
+                }
+            }
         }
     }
 }
