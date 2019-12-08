@@ -529,16 +529,10 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 {
     if (!rakPeer_) 
         return;
-    /* Make sure not to use SLikeNet(RakNet) internal message ID's
-     and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
-    if (msgID < ID_USER_PACKET_ENUM || msgID >= 255)
-    {
-        URHO3D_LOGERROR("Can not send message with reserved ID");
-        return;
-    }
 
     VectorBuffer msgData;
-    msgData.WriteUByte((unsigned char)msgID);
+    msgData.WriteUByte((unsigned char)ID_USER_PACKET_ENUM);
+    msgData.WriteUInt((unsigned int)msgID);
     msgData.Write(data, numBytes);
 
     if (isServer_)
@@ -875,17 +869,20 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     // Urho3D messages
     if (packetID >= ID_USER_PACKET_ENUM)
     {
+        unsigned int messageID = *(unsigned int*)(packet->data + dataStart);
+        dataStart += sizeof(unsigned int);
+
         if (isServer)
         {
-            HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+            HandleMessage(packet->systemAddress, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
         }
         else
         {
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            bool processed = serverConnection_->ProcessMessage(packetID, buffer);
+            bool processed = serverConnection_->ProcessMessage(messageID, buffer);
             if (!processed)
             {
-                HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+                HandleMessage(packet->systemAddress, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
             }
         }
         packetHandled = true;
