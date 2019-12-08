@@ -427,7 +427,7 @@ void Network::Disconnect(int waitMSec)
     serverConnection_->Disconnect(waitMSec);
 }
 
-bool Network::StartServer(unsigned short port)
+bool Network::StartServer(unsigned short port, unsigned int maxConnections)
 {
     if (IsServerRunning())
         return true;
@@ -438,11 +438,11 @@ bool Network::StartServer(unsigned short port)
     socket.port = port;
     socket.socketFamily = AF_INET;
     // Startup local connection with max 128 incoming connection(first param) and 1 socket description (third param)
-    SLNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
+    SLNet::StartupResult startResult = rakPeer_->Startup(maxConnections, &socket, 1);
     if (startResult == SLNet::RAKNET_STARTED)
     {
         URHO3D_LOGINFO("Started server on port " + String(port));
-        rakPeer_->SetMaximumIncomingConnections(128);
+        rakPeer_->SetMaximumIncomingConnections(maxConnections);
         isServer_ = true;
         rakPeer_->SetOccasionalPing(true);
         rakPeer_->SetUnreliableTimeout(1000);
