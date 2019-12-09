@@ -5,7 +5,7 @@ class Network
     bool Connect(const String address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     
     void Disconnect(int waitMSec = 0);
-    bool StartServer(unsigned short port);
+    bool StartServer(unsigned short port, unsigned int maxConnections = 128);
     void StopServer();
     
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
