@@ -61,11 +61,11 @@ public:
     ~Sample2D() override = default;
 
     /// Generate physics collision shapes from the tmx file's objects located in tileMapLayer.
-    void CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer,const TileMapInfo2D& info);
+    void CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, const TileMapInfo2D& info);
     /// Build collision shape from Tiled 'Rectangle' objects.
-    CollisionBox2D* CreateRectangleShape(Node* node, TileMapObject2D* object, const Vector2& size,const TileMapInfo2D& info);
+    CollisionBox2D* CreateRectangleShape(Node* node, TileMapObject2D* object, const Vector2& size, const TileMapInfo2D& info);
     /// Build collision shape from Tiled 'Ellipse' objects.
-    CollisionCircle2D* CreateCircleShape(Node* node, TileMapObject2D* object, float radius,const TileMapInfo2D& info);
+    CollisionCircle2D* CreateCircleShape(Node* node, TileMapObject2D* object, float radius, const TileMapInfo2D& info);
     /// Build collision shape from Tiled 'Polygon' objects.
     CollisionPolygon2D* CreatePolygonShape(Node* node, TileMapObject2D* object);
     /// Build collision shape from Tiled 'Poly Line' objects.
