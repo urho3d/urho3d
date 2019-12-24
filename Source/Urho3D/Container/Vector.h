@@ -852,7 +852,7 @@ public:
     {
         unsigned oldSize = size_;
         Resize(size_ + vector.size_);
-        CopyElements(Buffer() + oldSize, vector.Buffer(), vector.size_);
+        CopyElements(Buffer() + oldSize, vector.Buffer(), (this == &vector) ? oldSize : vector.size_);
     }
 
     /// Remove the last element.
