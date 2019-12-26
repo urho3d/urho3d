@@ -222,8 +222,9 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis 1.13b (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 - WebP (https://chromium.googlesource.com/webm/libwebp)
+- ETCPACK (https://github.com/Ericsson/ETCPACK)
 
-DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
+DXT / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
 Jack and mushroom models from the realXtend project. (https://www.realxtend.org)
 Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.

@@ -7819,7 +7819,7 @@ bool SetDiscoveryBeacon(const VariantMap& = VariantMap ( ));
 void SetNATServerInfo(const String&, uint16);
 bool SetPassword(const String&);
 void StartNATClient() const;
-bool StartServer(uint16);
+bool StartServer(uint16, uint = 128);
 void StopServer();
 void UnregisterAllRemoteEvents();
 void UnregisterRemoteEvent(const String&) const;

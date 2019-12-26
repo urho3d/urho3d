@@ -212,6 +212,7 @@ namespace Urho3D
 <a href="#Class_UI"><b>UI</b></a>
 <a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_UIElement3D"><b>UIElement3D</b></a>
 <a href="#Class_UISelectable"><b>UISelectable</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -697,6 +698,7 @@ Methods:
 Properties:
 
 - Texture* texture
+- Material* material
 - IntRect& imageRect
 - IntRect& border
 - IntRect& imageBorder
@@ -4041,7 +4043,7 @@ Methods:
 - bool Connect(const String address, short port, Scene* scene)
 - bool Connect(const String address, short port, Scene* scene, const VariantMap& identity)
 - void Disconnect(int waitMSec = 0)
-- bool StartServer(short port)
+- bool StartServer(short port, int maxConnections = 128)
 - void StopServer()
 - void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
 - void BroadcastRemoteEvent(StringHash eventType, bool inOrder)
@@ -7469,6 +7471,9 @@ Properties:
 - int indentWidth (readonly)
 - TraversalMode traversalMode
 - bool elementEventSender
+
+<a name="Class_UIElement3D"></a>
+### UIElement3D : UIElement
 
 <a name="Class_UISelectable"></a>
 ### UISelectable : UIElement

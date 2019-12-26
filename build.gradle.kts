@@ -86,7 +86,7 @@ fun bumpSemVer(version: String, index: Int) = version
         .mapIndexed { i: Int, s: String ->
             when {
                 i < index -> s
-                i == index -> (s.toInt() + 1).toString()
+                i == index -> if (s.contains('-')) s else (s.toInt() + 1).toString()
                 else -> "0"
             }
         }

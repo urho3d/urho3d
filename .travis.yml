@@ -23,8 +23,8 @@
 ---
 
 dist: trusty
-addons: {apt: {packages: docker-ce}}
-cache: {directories: $HOME/urho3d_home_dir/.ccache}
+addons: {apt: {packages: [docker-ce]}}
+cache: {directories: [$HOME/urho3d_home_dir/.ccache]}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -170,7 +170,7 @@ cache: ccache
 dist: trusty
 addons:
   apt:
-    packages: libpulse-dev
+    packages: [libpulse-dev]
   coverity_scan:
     project:
       name: $TRAVIS_REPO_SLUG
@@ -201,7 +201,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 dist: trusty
-addons: {apt: {packages: libpulse-dev}}
+addons: {apt: {packages: [libpulse-dev]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -221,7 +221,7 @@ after_script: rake ci_delete_mirror
 
 branch: {name: Android-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
+addons: {apt: {packages: [docker-ce]}}
 cache:
   directories:
     - $HOME/urho3d_home_dir/.android/build-cache
@@ -259,8 +259,8 @@ matrix:
 
 branch: {name: RPI-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
-cache: {directories: $HOME/urho3d_home_dir/.ccache}
+addons: {apt: {packages: [docker-ce]}}
+cache: {directories: [$HOME/urho3d_home_dir/.ccache]}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -291,8 +291,8 @@ matrix:
 
 branch: {name: ARM-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
-cache: {directories: $HOME/urho3d_home_dir/.ccache}
+addons: {apt: {packages: [docker-ce]}}
+cache: {directories: [$HOME/urho3d_home_dir/.ccache]}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -323,7 +323,7 @@ matrix:
 
 branch: {name: Web-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
+addons: {apt: {packages: [docker-ce]}}
 cache:
   directories:
     - $HOME/urho3d_home_dir/.ccache

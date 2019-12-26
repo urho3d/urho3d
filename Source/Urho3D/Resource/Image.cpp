@@ -53,6 +53,10 @@
 #define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
 #define FOURCC_DX10 (MAKEFOURCC('D','X','1','0'))
 
+#define FOURCC_ETC1 (MAKEFOURCC('E','T','C','1'))
+#define FOURCC_ETC2 (MAKEFOURCC('E','T','C','2'))
+#define FOURCC_ETC2A (MAKEFOURCC('E','T','2','A'))
+
 static const unsigned DDSCAPS_COMPLEX = 0x00000008U;
 static const unsigned DDSCAPS_TEXTURE = 0x00001000U;
 static const unsigned DDSCAPS_MIPMAP = 0x00400000U;
@@ -224,9 +228,14 @@ bool CompressedLevel::Decompress(unsigned char* dest)
     case CF_DXT5:
         DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
         return true;
-
+	
+    // ETC2 format is compatible with ETC1, so we just use the same function.
     case CF_ETC1:
-        DecompressImageETC(dest, data_, width_, height_);
+    case CF_ETC2_RGB:
+        DecompressImageETC(dest, data_, width_, height_, false);
+        return true;
+    case CF_ETC2_RGBA:
+        DecompressImageETC(dest, data_, width_, height_, true);
         return true;
 
     case CF_PVRTC_RGB_2BPP:
@@ -578,6 +587,16 @@ bool Image::BeginLoad(Deserializer& source)
             components_ = 3;
             break;
 
+        case 0x9274:
+            compressedFormat_ = CF_ETC2_RGB;
+            components_ = 3;
+            break;
+
+        case 0x9278:
+            compressedFormat_ = CF_ETC2_RGBA;
+            components_ = 4;
+            break;
+
         case 0x8c00:
             compressedFormat_ = CF_PVRTC_RGB_4BPP;
             components_ = 3;
@@ -701,6 +720,17 @@ bool Image::BeginLoad(Deserializer& source)
 
         case 11:
             compressedFormat_ = CF_DXT5;
+            components_ = 4;
+            break;
+
+        // .pvr files also support ETC2 texture format.
+        case 22:
+            compressedFormat_ = CF_ETC2_RGB;
+            components_ = 3;
+            break;
+
+        case 23:
+            compressedFormat_ = CF_ETC2_RGBA;
             components_ = 4;
             break;
 
@@ -1989,7 +2019,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     }
     else if (compressedFormat_ < CF_PVRTC_RGB_2BPP)
     {
-        level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
+        level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1 || compressedFormat_ == CF_ETC2_RGB) ? 8 : 16;
         unsigned i = 0;
         unsigned offset = 0;
 
