@@ -35,6 +35,7 @@ URHO3D_EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
     URHO3D_PARAM(P_BUTTON, Button);                // int
     URHO3D_PARAM(P_BUTTONS, Buttons);              // int
     URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_CLICKS, Clicks);                // int
 }
 
 /// Mouse button released.

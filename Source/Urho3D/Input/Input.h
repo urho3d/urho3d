@@ -326,7 +326,7 @@ private:
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
-    void SetMouseButton(MouseButton button, bool newState);
+    void SetMouseButton(MouseButton button, bool newState, int clicks);
     /// Handle a key change.
     void SetKey(Key key, Scancode scancode, bool newState);
     /// Handle mouse wheel change.
