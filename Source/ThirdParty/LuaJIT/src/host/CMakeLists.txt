@@ -25,7 +25,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
     else ()
-        cmake_minimum_required (VERSION 3.2.3)
+        cmake_minimum_required (VERSION 3.14.5)
     endif ()
     if (COMMAND cmake_policy)
         # Libraries linked via full path no longer produce linker search paths
