@@ -112,7 +112,11 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     while (eventFrameElem)
     {
         float time = eventFrameElem.GetFloat("time");
-        unsigned eventType = eventFrameElem.GetUInt("eventtype");
+        unsigned eventType = 0;
+        if (eventFrameElem.HasAttribute("eventname"))
+            eventType = StringHash(eventFrameElem.GetAttributeCString("eventname")).Value();
+        else
+            eventType = eventFrameElem.GetUInt("eventtype");
         VariantMap eventData = eventFrameElem.GetChild("eventdata").GetVariantMap();
 
         SetEventFrame(time, StringHash(eventType), eventData);
@@ -176,7 +180,11 @@ bool ValueAnimation::LoadJSON(const JSONValue& source)
     {
         const JSONValue& eventFrameVal = eventFramesArray[i];
         float time = eventFrameVal.Get("time").GetFloat();
-        unsigned eventType = eventFrameVal.Get("eventtype").GetUInt();
+        unsigned eventType = 0;
+        if (eventFrameVal.Contains("eventname"))
+            eventType = StringHash(eventFrameVal.GetCString()).Value();
+        else
+            eventType = eventFrameVal.Get("eventtype").GetUInt();
         VariantMap eventData = eventFrameVal.Get("eventdata").GetVariantMap();
         SetEventFrame(time, StringHash(eventType), eventData);
     }
