@@ -571,7 +571,7 @@ void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context)
     SetType(JSON_OBJECT);
     for (VariantMap::ConstIterator i = variantMap.Begin(); i != variantMap.End(); ++i)
         if (i->first_.GetGlobalStringHashRegister() && !i->first_.Reverse().Empty())
-            (*this)[variantMapStringKeyMarker + i->first_.Reverse()].SetVariant(i->second_, context);
+            (*this)[String(variantMapStringKeyMarker) + i->first_.Reverse()].SetVariant(i->second_, context);
         else
             (*this)[i->first_.ToString()].SetVariant(i->second_, context);
 }
@@ -592,7 +592,7 @@ VariantMap JSONValue::GetVariantMap() const
         if (!i->first_.Empty() && i->first_[0] == variantMapStringKeyMarker)
             key = StringHash(i->first_.Substring(1));
         else
-            key = ToUInt(i->first_, 16);
+            key = StringHash(ToUInt(i->first_, 16));
         Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }
