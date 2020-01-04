@@ -567,7 +567,7 @@ void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context)
 {
     SetType(JSON_OBJECT);
     for (VariantMap::ConstIterator i = variantMap.Begin(); i != variantMap.End(); ++i)
-        (*this)[i->first_.ToString()].SetVariant(i->second_);
+        (*this)[i->first_.ToString()].SetVariant(i->second_, context);
 }
 
 VariantMap JSONValue::GetVariantMap() const

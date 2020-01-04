@@ -198,7 +198,7 @@ bool ValueAnimation::SaveJSON(JSONValue& dest) const
         JSONValue keyFrameVal;
         keyFrameVal.Set("time", keyFrame.time_);
         JSONValue valueVal;
-        valueVal.SetVariant(keyFrame.value_);
+        valueVal.SetVariant(keyFrame.value_,GetContext());
         keyFrameVal.Set("value", valueVal);
         keyFramesArray.Push(keyFrameVal);
     }
@@ -213,7 +213,7 @@ bool ValueAnimation::SaveJSON(JSONValue& dest) const
         eventFrameVal.Set("time", eventFrame.time_);
         eventFrameVal.Set("eventtype", eventFrame.eventType_.Value());
         JSONValue eventDataVal;
-        eventDataVal.SetVariantMap(eventFrame.eventData_);
+        eventDataVal.SetVariantMap(eventFrame.eventData_,GetContext());
         eventFrameVal.Set("eventdata", eventDataVal);
 
         eventFramesArray.Push(eventFrameVal);
