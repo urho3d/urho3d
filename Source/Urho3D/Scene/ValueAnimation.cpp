@@ -145,7 +145,10 @@ bool ValueAnimation::SaveXML(XMLElement& dest) const
         const VAnimEventFrame& eventFrame = eventFrames_[i];
         XMLElement eventFrameElem = dest.CreateChild("eventframe");
         eventFrameElem.SetFloat("time", eventFrame.time_);
-        eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
+        if (StringHash::GetGlobalStringHashRegister() && !eventFrame.eventType_.Reverse().Empty())
+            eventFrameElem.SetAttribute("eventname",eventFrame.eventType_.Reverse());
+        else
+            eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
         eventFrameElem.CreateChild("eventdata").SetVariantMap(eventFrame.eventData_);
     }
 
@@ -219,7 +222,10 @@ bool ValueAnimation::SaveJSON(JSONValue& dest) const
         const VAnimEventFrame& eventFrame = eventFrames_[i];
         JSONValue eventFrameVal;
         eventFrameVal.Set("time", eventFrame.time_);
-        eventFrameVal.Set("eventtype", eventFrame.eventType_.Value());
+        if (StringHash::GetGlobalStringHashRegister() && !eventFrame.eventType_.Reverse().Empty())
+            eventFrameVal.Set("eventname",eventFrame.eventType_.Reverse());
+        else
+            eventFrameVal.Set("eventtype", eventFrame.eventType_.Value());
         JSONValue eventDataVal;
         eventDataVal.SetVariantMap(eventFrame.eventData_,GetContext());
         eventFrameVal.Set("eventdata", eventDataVal);
