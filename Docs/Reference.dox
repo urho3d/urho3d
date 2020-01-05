@@ -3880,7 +3880,7 @@ When contributing code to the Urho3D project, there are a few things to check so
 
 First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
-Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2019 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2020 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
 Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
 
