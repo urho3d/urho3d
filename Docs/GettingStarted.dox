@@ -378,11 +378,11 @@ When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d
 
 OpenGL does not depend on a separate shader compiler DLL.
 
-\section Dockerized_Build_Environment Dockerized build environment (EXPERIMENTAL)
+\section Dockerized_Build_Environment Dockerized build environment (EXPERIMENTAL on *nix host only)
 
 The building prerequisites are understandably different for each target platform. If you want to target multiple platforms with a single build/host system then you have to not only install all of the prequisites in your host system, but also have to be able to configure your build environment properly so that they do not interfere with each other. Rather than configuring the build environment manually, we have now provided a new build mechanism that we called "dockerized build environment" which addresses both hurdles above. Currently the dockerized build environment, or DBE for short, supports the following platforms: native (Linux), MinGW (Windows), Android, Raspberry-Pi, generic ARM, and Web.
 
-The DBE requires Docker-CE to be installed in the host system and that's all it needs. Head to https://docs.docker.com/install/ to get the right download for your own host system and follow its installation instruction.
+The DBE requires podman (from repository provided by your distro, recommended) or Docker-CE (from https://docs.docker.com/install/) to be installed in the host system and that's all it needs.
 
 To use the DBE, execute script/dockerized.sh in the project root directory, specify the platform name (native|mingw|android|rpi|arm|web) as the mandatory parameter, and optionally followed by an alternative command to be invoked in the docker container. By default the command is to generate a build tree for the specified target platform and then build it. The Urho3D build options can be specified by using environment variables in the host system before executing the dockerized.sh. It could be done just in time as well, e.g. "URHO3D_LIB_TYPE=SHARED script/dockerized.sh mingw". The build artifact from DBE can be found in the usual location as the normal build environment. In fact the build artifacts should function and work as if they are built using conventional way too.
 
