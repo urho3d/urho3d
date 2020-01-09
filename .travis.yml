@@ -335,12 +335,10 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=4
     - WEB=1
-    - EMSCRIPTEN_SHARE_DATA=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
   matrix:
-    - URHO3D_LIB_TYPE=MODULE
-    - URHO3D_LIB_TYPE=STATIC
-    - URHO3D_LIB_TYPE=SHARED
+    - EMSCRIPTEN_SHARE_DATA=1
+    - EMSCRIPTEN_SHARE_DATA=0
 stage: release build configuration
 before_script:
   - rake ci_timer
@@ -348,9 +346,10 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - if [[ "$URHO3D_LIB_TYPE" != "MODULE" ]] && (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
+  - if echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]; then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
+  - if [[ $URHO3D_SAMPLES = 1 ]] && [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export SAMPLE_UPLOAD=1; fi
   - rake ci_setup_cache
-script: script/dockerized.sh web rake ci && if [ $PACKAGE_UPLOAD ]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ ! $EMSCRIPTEN_WASM ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]] && [[ ! $URHO3D_SAMPLES ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi && rake ci_timer
+script: script/dockerized.sh web rake ci && if [[ $EMSCRIPTEN_SHARE_DATA = 1 ]]; then if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ $SAMPLE_UPLOAD ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]

@@ -1391,7 +1391,7 @@ From 1.7 to master:
 - Constants are replaced with enums and flag sets in multiple places. Use corresponding types and typed constants instead of integers and integer constants. For example, "unsigned vertexMask = MASK_POSITION" becomes "VertexMaskFlags vertexMask = MASK_POSITION" and "input->GetKeyDown('A')" becomes "input->GetKeyDown(KEY_A)".
 - StringHash::Calculate() method is now case-sensitive.
 - Build system - integrate with Gradle build system and migration to use Kotlin for Android platform.
-- Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Also set the default for "EMSCRIPTEN_WASM" build option to TRUE in order to align with the upstream EMCC compiler changes.
+- Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Switch to LLVM WASM backend with the implication of removing the "EMSCRIPTEN_WASM" build option (WASM is now always enabled and we do not support asm.js anymore), also removing the SHARED and MODULE library types for Web platform (they do not build correctly with LLVM backend).
 - Build system - the 'WIN32' build option for 'cmake_generic.sh' is renamed to 'MINGW' to be consistent with 'cmake_generic.bat'.
 - Build system - CMake version 3.14.5 is now minimum version required for building Urho3D library on any host systems.
 
