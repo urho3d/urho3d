@@ -36,6 +36,7 @@ const ResourceRef Variant::emptyResourceRef { };
 const ResourceRefList Variant::emptyResourceRefList { };
 const VariantMap Variant::emptyVariantMap;
 const VariantVector Variant::emptyVariantVector { };
+const VariantMapVector Variant::emptyVariantMapVector { };
 const StringVector Variant::emptyStringVector { };
 
 static const char* typeNames[] =
@@ -67,6 +68,7 @@ static const char* typeNames[] =
     "Rect",
     "IntVector3",
     "Int64",
+    "VariantMapVector",
     "CustomHeap",
     "CustomStack",
     nullptr
@@ -671,6 +673,10 @@ void Variant::SetType(VariantType newType)
         delete value_.matrix4_;
         break;
 
+    case VAR_VARIANTMAPVECTOR:
+        value_.variantMapVector_.~VariantMapVector();
+        break;
+
     case VAR_CUSTOM_HEAP:
         delete value_.customValueHeap_;
         break;
@@ -729,6 +735,10 @@ void Variant::SetType(VariantType newType)
 
     case VAR_MATRIX4:
         value_.matrix4_ = new Matrix4();
+        break;
+
+    case VAR_VARIANTMAPVECTOR:
+        new(&value_.variantMapVector_) VariantMapVector();
         break;
 
     case VAR_CUSTOM_HEAP:
@@ -879,6 +889,11 @@ template <> ResourceRefList Variant::Get<ResourceRefList>() const
 template <> VariantVector Variant::Get<VariantVector>() const
 {
     return GetVariantVector();
+}
+
+template <> VariantMapVector Variant::Get<VariantMapVector>() const
+{
+    return GetVariantMapVector();
 }
 
 template <> StringVector Variant::Get<StringVector >() const

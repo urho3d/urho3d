@@ -67,6 +67,7 @@ enum VariantType
     VAR_RECT,
     VAR_INTVECTOR3,
     VAR_INT64,
+    VAR_VARIANTMAPVECTOR,
     // Add new types here
     VAR_CUSTOM_HEAP,
     VAR_CUSTOM_STACK,
@@ -84,6 +85,9 @@ using StringVector = Vector<String>;
 
 /// Map of variants.
 using VariantMap = HashMap<StringHash, Variant>;
+
+/// Vector of variants maps.
+using VariantMapVector = Vector<VariantMap>;
 
 /// Typed resource reference.
 struct URHO3D_API ResourceRef
@@ -303,6 +307,7 @@ union VariantValue
     String string_;
     StringVector stringVector_;
     VariantVector variantVector_;
+    VariantMapVector variantMapVector_;
     VariantMap variantMap_;
     PODVector<unsigned char> buffer_;
     ResourceRef resourceRef_;
@@ -449,6 +454,12 @@ public:
 
     /// Construct from a variant vector.
     Variant(const VariantVector& value) // NOLINT(google-explicit-constructor)
+    {
+        *this = value;
+    }
+
+    /// Construct from a variant map vector.
+    Variant(const VariantMapVector& value) // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
@@ -728,6 +739,14 @@ public:
         return *this;
     }
 
+    /// Assign from a variant map vector.
+    Variant& operator =(const VariantMapVector& rhs)
+    {
+        SetType(VAR_VARIANTMAPVECTOR);
+        value_.variantMapVector_ = rhs;
+        return *this;
+    }
+
     /// Assign from a string vector.
     Variant& operator =(const StringVector& rhs)
     {
@@ -910,6 +929,12 @@ public:
         return type_ == VAR_VARIANTVECTOR ? value_.variantVector_ == rhs : false;
     }
 
+    /// Test for equality with a variant map vector. To return true, both the type and value must match.
+    bool operator ==(const VariantMapVector& rhs) const
+    {
+        return type_ == VAR_VARIANTMAPVECTOR ? value_.variantMapVector_ == rhs : false;
+    }
+
     /// Test for equality with a string vector. To return true, both the type and value must match.
     bool operator ==(const StringVector& rhs) const
     {
@@ -1034,6 +1059,9 @@ public:
 
     /// Test for inequality with a variant vector.
     bool operator !=(const VariantVector& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with a variant map vector.
+    bool operator !=(const VariantMapVector& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a string vector.
     bool operator !=(const StringVector& rhs) const { return !(*this == rhs); }
@@ -1234,6 +1262,12 @@ public:
         return type_ == VAR_VARIANTVECTOR ? value_.variantVector_ : emptyVariantVector;
     }
 
+    /// Return a variant map vector or empty on type mismatch.
+    const VariantMapVector& GetVariantMapVector() const
+    {
+        return type_ == VAR_VARIANTMAPVECTOR ? value_.variantMapVector_ : emptyVariantMapVector;
+    }
+
     /// Return a string vector or empty on type mismatch.
     const StringVector& GetStringVector() const
     {
@@ -1353,6 +1387,9 @@ public:
     /// Return a pointer to a modifiable variant vector or null on type mismatch.
     VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? &value_.variantVector_ : nullptr; }
 
+    /// Return a pointer to a modifiable variant vector or null on type mismatch.
+    VariantMapVector* GetVariantMapVectorPtr() { return type_ == VAR_VARIANTMAPVECTOR ? &value_.variantMapVector_ : nullptr; }
+
     /// Return a pointer to a modifiable string vector or null on type mismatch.
     StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? &value_.stringVector_ : nullptr; }
 
@@ -1389,6 +1426,8 @@ public:
     static const VariantMap emptyVariantMap;
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
+    /// Empty variant map vector.
+    static const VariantMapVector emptyVariantMapVector;
     /// Empty string vector.
     static const StringVector emptyStringVector;
 
@@ -1441,6 +1480,8 @@ template <> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOUR
 template <> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RESOURCEREFLIST; }
 
 template <> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
+
+template <> inline VariantType GetVariantType<VariantMapVector>() { return VAR_VARIANTMAPVECTOR; }
 
 template <> inline VariantType GetVariantType<StringVector>() { return VAR_STRINGVECTOR; }
 
@@ -1514,6 +1555,8 @@ template <> URHO3D_API ResourceRef Variant::Get<ResourceRef>() const;
 template <> URHO3D_API ResourceRefList Variant::Get<ResourceRefList>() const;
 
 template <> URHO3D_API VariantVector Variant::Get<VariantVector>() const;
+
+template <> URHO3D_API VariantMapVector Variant::Get<VariantMapVector>() const;
 
 template <> URHO3D_API StringVector Variant::Get<StringVector>() const;
 
