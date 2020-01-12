@@ -43,7 +43,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed.
 
-- For Web, the Emscripten SDK (version 1.39.0 or later) need to be installed with the upstream LLVM WASM backend is activated. On Windows host also MinGW-W64 compiler toolchain is required.
+- For Web, the Emscripten SDK (version 1.39.0 or later) needs to be installed with the upstream LLVM WASM backend is activated. On Windows host also MinGW-W64 compiler toolchain is required.
 
 To run Urho3D, the minimum system requirements are:
 
@@ -307,7 +307,7 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 > WHAT DOESN'T WORK:
 >    - Networking. Javascript can only use http and websockets protocols and at the moment it's not supported.
 
-This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain with upstream LLVM WASM backend on your host system as per described in https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
+This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain with upstream LLVM WASM backend on your host system as per described in https://emscripten.org/docs/getting_started/downloads.html.
 
 Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. Alternatively, call the emsdk_env script to set the EMSCRIPTEN environment variable for you. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
 

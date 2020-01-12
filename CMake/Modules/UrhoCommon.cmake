@@ -1748,7 +1748,7 @@ macro (_setup_target)
     endif ()
     # Extra linker flags for Emscripten
     if (EMSCRIPTEN)
-        # These flags are set only once either in the main executable
+        # These flags are set only once in the main executable
         if (NOT LIB_TYPE)   # LIB_TYPE is empty for executable target
             list (APPEND LINK_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
             if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
