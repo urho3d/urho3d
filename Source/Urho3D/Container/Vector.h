@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -850,9 +850,11 @@ public:
     /// Add another vector at the end.
     void Push(const PODVector<T>& vector)
     {
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        CopyElements(Buffer() + oldSize, vector.Buffer(), vector.size_);
+        // Obtain the size before resizing, in case the other vector is another reference to this vector
+        unsigned thisSize = size_;
+        unsigned vectorSize = vector.size_;
+        Resize(thisSize + vectorSize);
+        CopyElements(Buffer() + thisSize, vector.Buffer(), vectorSize);
     }
 
     /// Remove the last element.
