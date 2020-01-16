@@ -38,10 +38,19 @@
 #include <OpenGLES/ES2/glext.h>
 #define URHO3D_GLES2
 #endif
-#elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__) || defined (__EMSCRIPTEN__)
+#elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__)
 #ifdef URHO3D_GLES3
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
+#else
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#define URHO3D_GLES2
+#endif
+#elif defined (__EMSCRIPTEN__)
+#ifdef URHO3D_GLES3
+#include <GLES3/gl3.h>
+#include <GLES2/gl2ext.h>
 #else
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>

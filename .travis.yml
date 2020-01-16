@@ -340,8 +340,8 @@ env:
     - WEB=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
   matrix:
-    - EMSCRIPTEN_SHARE_DATA=1
-    - EMSCRIPTEN_SHARE_DATA=0
+    - EMSCRIPTEN_WEBGL2=1
+    - EMSCRIPTEN_WEBGL2=0
 stage: release build configuration
 before_script:
   - rake ci_timer
@@ -352,7 +352,7 @@ before_script:
   - if echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]; then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
   - if [[ $URHO3D_SAMPLES = 1 ]] && [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export SAMPLE_UPLOAD=1; fi
   - rake ci_setup_cache
-script: script/dockerized.sh web rake ci && if [[ $EMSCRIPTEN_SHARE_DATA = 1 ]]; then if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ $SAMPLE_UPLOAD ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi; fi && rake ci_timer
+script: script/dockerized.sh web rake ci && if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ $SAMPLE_UPLOAD ]] && [[ $EMSCRIPTEN_WEBGL2 = 1 ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
