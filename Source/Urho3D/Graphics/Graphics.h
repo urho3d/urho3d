@@ -269,6 +269,10 @@ public:
 
     /// Return graphics API name.
     const String& GetApiName() const { return apiName_; }
+    /// Return renderer name.
+    const String& GetRendererName() const { return rendererName_; }
+    /// Return driver version string.
+    const String& GetVersionString() const { return versionString_; }
 
     /// Return window position.
     IntVector2 GetWindowPosition() const;
@@ -300,10 +304,10 @@ public:
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
 
-    /// Return refresh rate when using vsync in fullscreen
+    /// Return refresh rate when using vsync in fullscreen.
     int GetRefreshRate() const { return refreshRate_; }
 
-    /// Return the current monitor index. Effective on in fullscreen
+    /// Return the current monitor index. Effective on in fullscreen.
     int GetMonitor() const { return monitor_; }
 
     /// Return whether triple buffering is enabled.
@@ -527,10 +531,6 @@ public:
     void SetVBO(unsigned object);
     /// Bind a UBO, avoiding redundant operation. Used only on OpenGL.
     void SetUBO(unsigned object);
-    /// Get Renderer name. Used on OpenGL
-    const String& GetRendererName() const { return rendererName_; }
-    /// Get Version string. Used on OpenGL
-    const String& GetVersionString() const { return versionString_; }
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -799,9 +799,9 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
-    /// Renderer name, on OpenGL it is GPU model.
+    /// Renderer name, on OpenGL it is GPU model. \todo Implement for other Graphics APIs.
     String rendererName_;
-    /// String with version of drivers
+    /// Driver version string on OpenGL. \todo Implement for other Graphics APIs.
     String versionString_;
 
     /// Pixel perfect UV offset.

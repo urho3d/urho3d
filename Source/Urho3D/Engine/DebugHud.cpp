@@ -175,10 +175,10 @@ void DebugHud::Update()
             renderer->GetDynamicInstancing() ? "On" : "Off",
             graphics->GetApiName().CString());
     #ifdef URHO3D_OPENGL
+        // \todo Implement for other Graphics API
         mode.AppendWithFormat(" Renderer:%s Version:%s", graphics->GetRendererName().CString(),
             graphics->GetVersionString().CString());
     #endif
-
 
         modeText_->SetText(mode);
     }
