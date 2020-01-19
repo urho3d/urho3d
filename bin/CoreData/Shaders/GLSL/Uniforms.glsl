@@ -48,7 +48,7 @@ uniform mat4 cZone;
 #ifdef COMPILEPS
 
 // Fragment shader uniforms
-#ifdef MOBILE_GRAPHICS
+#ifdef GL_ES
     precision mediump float;
 #endif
 
