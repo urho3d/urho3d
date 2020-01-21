@@ -21,7 +21,7 @@
 #
 
 # Set CMake minimum version and CMake policy required by UrhoCommon module
-cmake_minimum_required (VERSION 3.14.5)
+cmake_minimum_required (VERSION 3.10.2)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)

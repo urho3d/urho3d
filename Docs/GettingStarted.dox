@@ -67,7 +67,7 @@ SIMD requirement can be eliminated by disabling the use of SIMD instruction set,
 
 The NEON instruction set will be used by default whenever it is available. See the ANDROID_ABI and RPI_ABI build options for more detail for Android and Raspberry-Pi platforms, respectively. The NEON instruction set is always used on iOS and tVOS platforms.
 
-CMake (https://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 3.14.5. However, it is recommended to use the latest CMake version available, especially when targeting Apple platforms using its latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
+CMake (https://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 3.10.2. However, it is recommended to use the latest CMake version available, especially when targeting Apple platforms using its latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
 \section Build_Scripts Build scripts
 
@@ -597,7 +597,7 @@ In your own project root directory, create a main CMakeLists.txt file and add th
 
 \code
 # Set CMake minimum version and CMake policy required by UrhoCommon module
-cmake_minimum_required (VERSION 3.14.5)
+cmake_minimum_required (VERSION 3.10.2)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)

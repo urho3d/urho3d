@@ -23,9 +23,9 @@
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by UrhoCommon module
     if (APPLE)
-        cmake_minimum_required (VERSION 3.4.1)
+        cmake_minimum_required (VERSION 3.10.2)
     else ()
-        cmake_minimum_required (VERSION 3.14.5)
+        cmake_minimum_required (VERSION 3.10.2)
     endif ()
     if (COMMAND cmake_policy)
         # Libraries linked via full path no longer produce linker search paths
