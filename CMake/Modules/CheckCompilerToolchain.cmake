@@ -31,6 +31,7 @@
 #  POWERPC
 #  WEB
 #  X86
+#  E2K
 #
 # CPU SIMD instruction extensions support for x86/x86_64 archs:
 #  HAVE_MMX
@@ -210,6 +211,8 @@ else ()
     check_native_define (__EMSCRIPTEN__ WEB)
     # Compiler should emit __x86_64__, __i686__, or __i386__, etc when targeting archs using Intel or AMD processors
     check_native_define ("__(i.86|x86_64)__" X86)
+    # MCST lcc compiler only emits __e2k__ when targeting arch using MCST Elbrus 2000 processor
+    check_native_define ("__e2k__" E2K)
     if (ARM)
         check_feature_enabled (NEON __ARM_NEON)
         if (NEON)
