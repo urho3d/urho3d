@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni, Nathanial Lydick, and Yao Wei Tjong for Urho3D
+// Modified by Lasse Oorni, Nathanial Lydick, Yao Wei Tjong and Ramil Sattarov for Urho3D
 
 //
 // angelscript.h
