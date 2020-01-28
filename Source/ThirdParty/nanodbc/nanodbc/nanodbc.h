@@ -1,4 +1,4 @@
-﻿/// \file nanodbc.h The entirety of nanodbc can be found within this file and nanodbc.cpp.
+/// \file nanodbc.h The entirety of nanodbc can be found within this file and nanodbc.cpp.
 
 /// \mainpage
 ///
