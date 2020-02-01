@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Yao Wei Tjong and Skrylar for Urho3D
+// Modified by Yao Wei Tjong, Skrylar and Ramil Sattarov for Urho3D
 
 
 //
@@ -178,6 +178,16 @@
 // Oracle Solaris Studio (previously known as Sun CC compiler)
 // __SUNPRO_CC is defined
 
+// Urho3D: Added description of how to identify LCC and MCST lcc compilers
+
+// Local (or Little) C Compiler
+// __LCC__ is defined
+// __e2k__ is not defined
+
+// MCST eLbrus C Compiler
+// __LCC__ is defined
+// __e2k__ is defined
+
 
 
 //
@@ -227,6 +237,11 @@
 
 // AS_SPARC
 // Define this for SPARC CPU family
+
+// Urho3D: Added identifier for definition e2k architecture
+
+// AS_E2K
+// Define this for MCST Elbrus 2000 CPU family
 
 
 
@@ -945,6 +960,17 @@
 			// although use 64bit PPC only uses 32bit pointers.
 			// TODO: Add support for native calling conventions on Linux with PPC 64bit
 			#define AS_MAX_PORTABILITY
+		// Urho3D - Add support for e2k-linux-gnu
+		#elif defined(__e2k__)
+			// 64bit MCST Elbrus 2000
+			#define AS_E2K
+			// AngelScript currently doesn't support native calling
+			// for MCST Elbrus 2000 processor so it's necessary to turn on
+			// portability mode
+			#define AS_MAX_PORTABILITY
+			// STDCALL is not available on 64bit Linux
+			#undef STDCALL
+			#define STDCALL
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
