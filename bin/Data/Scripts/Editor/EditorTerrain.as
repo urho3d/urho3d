@@ -160,7 +160,7 @@ class TerrainEditor
     // Hide the window
     void Hide()
     {
-        HideBrushVisualizer();
+        ClearSelectedBrush();
         window.visible = false;
     }
 
