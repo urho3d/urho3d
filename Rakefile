@@ -163,7 +163,7 @@ task :make do
     if numjobs.empty?
       case RUBY_PLATFORM
       when /linux/
-        numjobs = (platform == 'web' ? `grep 'core id' /proc/cpuinfo |sort |uniq |wc -l` : `grep -c processor /proc/cpuinfo`).chomp
+        numjobs = `grep -c processor /proc/cpuinfo`.chomp
       when /darwin/
         numjobs = `sysctl -n hw.#{platform == 'web' ? 'physical' : 'logical'}cpu`.chomp
       when /win32|mingw|mswin/
@@ -649,7 +649,7 @@ def scaffolding dir, project = 'Scaffolding', target = 'Main'
   dir.gsub!(/\//, '\\') if ENV['OS']
   build_script = <<EOF
 # Set CMake minimum version and CMake policy required by UrhoCommon module
-cmake_minimum_required (VERSION 3.2.3)
+cmake_minimum_required (VERSION 3.10.2)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)

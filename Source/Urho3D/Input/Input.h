@@ -103,7 +103,7 @@ struct JoystickState
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
 
     /// Return hat position.
-    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
+    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : int(HAT_CENTER); }
 
     /// SDL joystick.
     SDL_Joystick* joystick_{};
@@ -326,7 +326,7 @@ private:
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
-    void SetMouseButton(MouseButton button, bool newState);
+    void SetMouseButton(MouseButton button, bool newState, int clicks);
     /// Handle a key change.
     void SetKey(Key key, Scancode scancode, bool newState);
     /// Handle mouse wheel change.
