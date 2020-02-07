@@ -94,7 +94,7 @@ public:
     /// Gradient flag.
     bool useGradient_{};
     /// Custom material
-    Material* custom_material_{};
+    Material* customMaterial_{};
 
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
     static Vector3 posAdjust;
