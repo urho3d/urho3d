@@ -33,7 +33,7 @@ import com.github.urho3d.UrhoActivity
 class LauncherActivity : ExpandableListActivity() {
 
     // Filter to only include filename that has an extension
-    private fun getScriptNames(path: String) = assets.list(path).filter { it.contains('.') }
+    private fun getScriptNames(path: String) = assets.list(path)!!.filter { it.contains('.') }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

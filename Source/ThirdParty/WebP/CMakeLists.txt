@@ -27,7 +27,9 @@ set (TARGET_NAME WebP)
 define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h)
 
 # Define dependency libs
-#set (INCLUDE_DIRS include)
+if (ANDROID)
+    set (INCLUDE_DIRS ${ANDROID_NDK}/sources/android/cpufeatures)
+endif ()
 
 # Setup target
 setup_library ()

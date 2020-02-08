@@ -91,3 +91,7 @@ fun bumpSemVer(version: String, index: Int) = version
             }
         }
         .joinToString(".")
+
+tasks.wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+}

@@ -25,11 +25,11 @@ pluginManagement {
         eachPlugin {
             when {
                 requested.id.id.startsWith("com.android.") ->
-                    useModule("com.android.tools.build:gradle:$androidToolsVersion")
+                    useModule("com.android.tools.build:gradle:3.5.3")
                 requested.id.id.startsWith("org.jetbrains.kotlin.") ->
-                    useVersion(kotlinVersion)
+                    useVersion(embeddedKotlinVersion)
                 requested.id.id == "com.jfrog.bintray" ->
-                    useVersion(bintrayVersion)
+                    useVersion("1.8.4")
             }
         }
     }

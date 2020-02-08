@@ -33,7 +33,7 @@ open class UrhoActivity : SDLActivity() {
 
         @JvmStatic
         fun getLibraryNames(context: Context) = File(context.applicationInfo.nativeLibraryDir)
-                    .listFiles { _, it -> regex.matches(it) }
+                    .listFiles { _, it -> regex.matches(it) }!!
                     .sortedBy { it.lastModified() }
                     .map {
                         regex.find(it.name)?.groupValues?.last() ?: throw IllegalStateException()

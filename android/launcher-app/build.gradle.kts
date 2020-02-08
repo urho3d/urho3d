@@ -30,10 +30,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
     defaultConfig {
-        minSdkVersion(17)
-        targetSdkVersion(28)
+        minSdkVersion(18)
+        targetSdkVersion(29)
         applicationId = "com.github.urho3d.launcher"
         versionCode = 1
         versionName = project.version.toString()
@@ -87,10 +87,10 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":android:urho3d-lib"))
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-    testImplementation("junit:junit:$junitVersion")
-    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
+    implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
 
 // Ensure IDE "gradle sync" evaluate the urho3d-lib module first
