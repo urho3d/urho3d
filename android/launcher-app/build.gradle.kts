@@ -43,19 +43,23 @@ android {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
                     add("-DGRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
-                    addAll(listOf(
+                    addAll(
+                        listOf(
                             "URHO3D_LIB_TYPE",
                             // TODO: "URHO3D_PACKAGING",
                             "URHO3D_ANGELSCRIPT",
-                            "URHO3D_LUA")
+                            "URHO3D_LUA"
+                        )
                             .filter { project.hasProperty(it) }
                             .map { "-D$it=${project.property(it)}" }
                     )
                     // In order to get clean module segregation, only build player/samples here
                     // unless it is explicitly excluded
-                    addAll(listOf(
+                    addAll(
+                        listOf(
                             "URHO3D_PLAYER",
-                            "URHO3D_SAMPLES")
+                            "URHO3D_SAMPLES"
+                        )
                             .map { "-D$it=${project.findProperty(it) ?: "1"}" }
                     )
                 }
@@ -65,8 +69,11 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
-                        .split(',').toTypedArray())
+                include(
+                    *(project.findProperty("ANDROID_ABI") as String? ?: "")
+                        .split(',')
+                        .toTypedArray()
+                )
             }
         }
     }
