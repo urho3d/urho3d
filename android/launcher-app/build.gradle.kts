@@ -30,6 +30,7 @@ plugins {
 }
 
 android {
+    ndkVersion = ndkSideBySideVersion
     compileSdkVersion(29)
     defaultConfig {
         minSdkVersion(18)

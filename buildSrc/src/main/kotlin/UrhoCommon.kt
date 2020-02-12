@@ -24,6 +24,7 @@ import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 import java.io.File
 
+const val ndkSideBySideVersion = "21.0.6113669"
 const val cmakeVersion = "3.10.2+"
 
 /**
