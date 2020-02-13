@@ -156,6 +156,7 @@ Urho3D development, contributions and bugfixes by:
 - orefkov
 - pat2nav
 - proller
+- r-a-sattarov
 - raould
 - rasteron
 - reattiva

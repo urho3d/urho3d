@@ -20,20 +20,12 @@
 // THE SOFTWARE.
 //
 
-import org.gradle.kotlin.dsl.embeddedKotlinVersion
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 import java.io.File
 
-val kotlinVersion = embeddedKotlinVersion
-
-const val androidToolsVersion = "3.5.0-alpha13"
-const val bintrayVersion = "1.8.4"
-const val cmakeVersion = "3.14.5+"
-const val relinkerVersion = "1.3.1"
-const val junitVersion = "4.12"
-const val testEspressoVersion = "3.0.2"
-const val testRunnerVersion = "1.0.2"
+const val ndkSideBySideVersion = "21.0.6113669"
+const val cmakeVersion = "3.10.2+"
 
 /**
  * Apply Urho3D custom plugin for the given platform.
@@ -41,8 +33,7 @@ const val testRunnerVersion = "1.0.2"
  * Current supported platforms: android.
  */
 @Suppress("unused")
-fun PluginDependenciesSpec.urho3d(platform: String): PluginDependencySpec =
-        id("com.github.urho3d.$platform")
+fun PluginDependenciesSpec.urho3d(platform: String): PluginDependencySpec = id("com.github.urho3d.$platform")
 
 /**
  * Naive implementation of "touch" command.

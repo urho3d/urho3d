@@ -33,10 +33,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    ndkVersion = ndkSideBySideVersion
+    compileSdkVersion(29)
     defaultConfig {
-        minSdkVersion(17)
-        targetSdkVersion(28)
+        minSdkVersion(18)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -46,7 +47,8 @@ android {
                     System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
                     add("-DGRADLE_BUILD_DIR=$buildDir")
                     // Pass along matching Gradle properties as CMake build options
-                    addAll(listOf(
+                    addAll(
+                        listOf(
                             "URHO3D_LIB_TYPE",
                             "URHO3D_ANGELSCRIPT",
                             "URHO3D_LUA",
@@ -63,14 +65,15 @@ android {
                             "URHO3D_FILEWATCHER",
                             "URHO3D_PROFILING",
                             "URHO3D_LOGGING",
-                            "URHO3D_THREADING")
+                            "URHO3D_THREADING"
+                        )
                             .filter { project.hasProperty(it) }
                             .map { "-D$it=${project.property(it)}" }
                     )
                     // In order to get clean module segregation, always exclude player/samples from AAR
                     addAll(listOf(
-                            "URHO3D_PLAYER",
-                            "URHO3D_SAMPLES"
+                        "URHO3D_PLAYER",
+                        "URHO3D_SAMPLES"
                     ).map { "-D$it=0" })
                 }
                 targets.add("Urho3D")
@@ -80,8 +83,11 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
-                        .split(',').toTypedArray())
+                include(
+                    *(project.findProperty("ANDROID_ABI") as String? ?: "")
+                        .split(',')
+                        .toTypedArray()
+                )
             }
         }
     }
@@ -109,11 +115,11 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-    implementation("com.getkeepsafe.relinker:relinker:$relinkerVersion")
-    testImplementation("junit:junit:$junitVersion")
-    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
+    implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
+    implementation("com.getkeepsafe.relinker:relinker:1.3.1")
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
 
 lateinit var docABI: String
@@ -210,9 +216,9 @@ publishing {
             afterEvaluate {
                 // Exclude publishing STATIC-debug AAR because its size exceeds 250MB limit allowed by Bintray
                 android.buildTypes
-                        .map { it.name }
-                        .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
-                        .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
+                    .map { it.name }
+                    .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
+                    .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
             }
             artifact(tasks["sourcesJar"])
             artifact(tasks["documentationZip"])

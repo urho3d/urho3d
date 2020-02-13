@@ -37,6 +37,7 @@ BuildEnvironment=${BuildEnvironment/-base}
 if ! docker --version >/dev/null 2>&1; then
     if podman --version >/dev/null 2>&1; then
         use_podman=1
+        mount_option=,exec  # Podman mount volume as 'noexec' by default but we need 'exec' for Android build (aapt2 permission denied otherwise)
     else
         echo "Could not find Docker client or podman"
         exit 1
@@ -61,8 +62,7 @@ if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
         --env-file "$PROJECT_DIR/script/.env-file" \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
-        --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d \
-        --name "dockerized$BuildEnvironment" \
+        --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d$mount_option \
         "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 else
     # Fallback workaround on older Docker CLI version
@@ -71,7 +71,6 @@ else
         --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$PROJECT_DIR/script/.env-file") \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
         --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d \
-        --name "dockerized$BuildEnvironment" \
         "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 fi
 
