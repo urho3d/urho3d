@@ -404,6 +404,9 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
 
 void UIBatch::TransformUV(bool rotate, bool mirrorH, bool mirrorV, const IntRect& imageRect)
 {
+    if (vertexEnd_ == vertexStart_)
+        return;
+
     float* begin = &(vertexData_->At(vertexStart_));
     float* end = begin + (vertexEnd_ - vertexStart_);
     float width = imageRect.right_ - imageRect.left_;
