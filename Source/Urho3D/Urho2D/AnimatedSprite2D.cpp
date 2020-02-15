@@ -306,6 +306,8 @@ void AnimatedSprite2D::UpdateSpineAnimation(float timeStep)
     worldBoundingBoxDirty_ = true;
 }
 
+// This enum used to be defined in spine/RegionAttachment.h but it got moved inside RegionAttachment.c so it's no longer accessible.
+// It's required because AnimatedSprite2D::UpdateSourceBatchesSpine() references its values (SP_VERTEX_*)
 typedef enum {
 	SP_VERTEX_X1 = 0, SP_VERTEX_Y1, SP_VERTEX_X2, SP_VERTEX_Y2, SP_VERTEX_X3, SP_VERTEX_Y3, SP_VERTEX_X4, SP_VERTEX_Y4
 } spVertexIndex;
