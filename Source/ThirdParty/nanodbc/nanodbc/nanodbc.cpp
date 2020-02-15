@@ -1,4 +1,4 @@
-﻿/// \file nanodbc.cpp Implementation details.
+/// \file nanodbc.cpp Implementation details.
 #ifndef DOXYGEN
 
 // ASCII art banners are helpful for code editors with a minimap display.

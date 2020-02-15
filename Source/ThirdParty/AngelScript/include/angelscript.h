@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni, Nathanial Lydick, and Yao Wei Tjong for Urho3D
+// Modified by Lasse Oorni, Nathanial Lydick, Yao Wei Tjong and Ramil Sattarov for Urho3D
 
 //
 // angelscript.h
@@ -40,8 +40,8 @@
 #ifndef ANGELSCRIPT_H
 #define ANGELSCRIPT_H
 
-// Urho3D: Define AS_MAX_PORTABILITY for Web and 64-bit ARM platforms
-#if defined(__EMSCRIPTEN__) || defined(__aarch64__)
+// Urho3D: Define AS_MAX_PORTABILITY for Web and 64-bit ARM / MCST Elbrus 2000 platforms
+#if defined(__EMSCRIPTEN__) || defined(__aarch64__) || defined(__e2k__)
 #define AS_MAX_PORTABILITY
 #endif
 

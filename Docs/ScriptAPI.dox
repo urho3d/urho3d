@@ -170,6 +170,7 @@ namespace Urho3D
 - %Button : int
 - %Buttons : int
 - %Qualifiers : int
+- %Clicks : int
 
 ### MouseButtonUp
 - %Button : int
