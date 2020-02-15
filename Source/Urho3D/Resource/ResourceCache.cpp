@@ -1077,7 +1077,8 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
     for (unsigned i = 0; i < fileWatchers_.Size(); ++i)
     {
         String fileName;
-        while (fileWatchers_[i]->GetNextChange(fileName))
+        FileChangeType type;
+        while (fileWatchers_[i]->GetNextChange(fileName, type))
         {
             ReloadResourceWithDependencies(fileName);
 
@@ -1086,6 +1087,7 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_FILENAME] = fileWatchers_[i]->GetPath() + fileName;
+            eventData[P_CHANGEDTPYE] = (int)type;
             eventData[P_RESOURCENAME] = fileName;
             SendEvent(E_FILECHANGED, eventData);
         }

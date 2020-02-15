@@ -33,6 +33,15 @@ namespace Urho3D
 
 class FileSystem;
 
+/// File change type.
+enum FileChangeType
+{
+    FileChange_Unknown = 0,
+    FileChange_Added,
+    FileChange_Modified,
+    FileChange_Removed
+};
+
 /// Watches a directory and its subdirectories for files being modified.
 class URHO3D_API FileWatcher : public Object, public Thread
 {
@@ -54,9 +63,9 @@ public:
     /// Set the delay in seconds before file changes are notified. This (hopefully) avoids notifying when a file save is still in progress. Default 1 second.
     void SetDelay(float interval);
     /// Add a file change into the changes queue.
-    void AddChange(const String& fileName);
+    void AddChange(const String& fileName, FileChangeType type);
     /// Return a file change (true if was found, false if not.)
-    bool GetNextChange(String& dest);
+    bool GetNextChange(String& dest, FileChangeType& type);
 
     /// Return the path being watched, or empty if not watching.
     const String& GetPath() const { return path_; }
@@ -65,12 +74,18 @@ public:
     float GetDelay() const { return delay_; }
 
 private:
+    /// File change information.
+    struct FileChangeInfo
+    {
+        FileChangeType type_;
+        Timer timer_;
+    };
     /// Filesystem.
     SharedPtr<FileSystem> fileSystem_;
     /// The path being watched.
     String path_;
     /// Pending changes. These will be returned and removed from the list when their timer has exceeded the delay.
-    HashMap<String, Timer> changes_;
+    HashMap<String, FileChangeInfo> changes_;
     /// Mutex for the change buffer.
     Mutex changesMutex_;
     /// Delay in seconds for notifying changes.

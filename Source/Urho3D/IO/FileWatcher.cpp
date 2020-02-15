@@ -96,7 +96,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs, bool 
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
         nullptr,
         OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS,
+        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
         nullptr);
 
     if (dirHandle_ != INVALID_HANDLE_VALUE)
@@ -262,18 +262,34 @@ void FileWatcher::ThreadFunction()
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
 
-                if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME 
-                    || record->Action == FILE_ACTION_ADDED || record->Action == FILE_ACTION_REMOVED)
-                {
-                    String fileName;
-                    const wchar_t* src = record->FileName;
-                    const wchar_t* end = src + record->FileNameLength / 2;
-                    while (src < end)
-                        fileName.AppendUTF8(String::DecodeUTF16(src));
+                FileChangeType changeType;
 
-                    fileName = GetInternalPath(fileName);
-                    AddChange(fileName);
+                String fileName;
+                const wchar_t* src = record->FileName;
+                const wchar_t* end = src + record->FileNameLength / 2;
+                while (src < end)
+                    fileName.AppendUTF8(String::DecodeUTF16(src));
+
+                fileName = GetInternalPath(fileName);
+
+                switch (record->Action)
+                {
+                case FILE_ACTION_MODIFIED:
+                    changeType = FileChange_Modified;
+                    break;
+                case FILE_ACTION_ADDED:
+                case FILE_ACTION_RENAMED_NEW_NAME:
+                    changeType = FileChange_Added;
+                    break;
+                case FILE_ACTION_REMOVED:
+                case FILE_ACTION_RENAMED_OLD_NAME:
+                    changeType = FileChange_Removed;
+                    break;
+                default:
+                    changeType = FileChange_Unknown;
                 }
+
+                AddChange(fileName, changeType);
 
                 if (!record->NextEntryOffset)
                     break;
@@ -327,15 +343,16 @@ void FileWatcher::ThreadFunction()
 #endif
 }
 
-void FileWatcher::AddChange(const String& fileName)
+void FileWatcher::AddChange(const String& fileName, FileChangeType type)
 {
     MutexLock lock(changesMutex_);
 
     // Reset the timer associated with the filename. Will be notified once timer exceeds the delay
-    changes_[fileName].Reset();
+    changes_[fileName].type_ = type;
+    changes_[fileName].timer_.Reset();
 }
 
-bool FileWatcher::GetNextChange(String& dest)
+bool FileWatcher::GetNextChange(String& dest, FileChangeType& type)
 {
     MutexLock lock(changesMutex_);
 
@@ -345,11 +362,12 @@ bool FileWatcher::GetNextChange(String& dest)
         return false;
     else
     {
-        for (HashMap<String, Timer>::Iterator i = changes_.Begin(); i != changes_.End(); ++i)
+        for (HashMap<String, FileChangeInfo>::Iterator i = changes_.Begin(); i != changes_.End(); ++i)
         {
-            if (i->second_.GetMSec(false) >= delayMsec)
+            if (i->second_.timer_.GetMSec(false) >= delayMsec)
             {
                 dest = i->first_;
+                type = i->second_.type_;
                 changes_.Erase(i);
                 return true;
             }
