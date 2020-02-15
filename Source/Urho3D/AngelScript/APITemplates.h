@@ -40,6 +40,10 @@
 #include "../Scene/Node.h"
 #include "../UI/BorderImage.h"
 
+#ifdef URHO3D_URHO2D
+#include "../Urho2D/Drawable2D.h"
+#endif
+
 #include <AngelScript/angelscript.h>
 #include <cstring>
 
@@ -1373,6 +1377,20 @@ template <class T> void RegisterButton(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "float get_repeatRate() const", asMETHOD(T, GetRepeatRate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_pressed() const", asMETHOD(T, IsPressed), asCALL_THISCALL);
 }
+
+#ifdef URHO3D_URHO2D
+/// Template function for registering a class derived from Drawable2D.
+template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* className)
+{
+    RegisterDrawable<T>(engine, className);
+    RegisterSubclass<Drawable2D, T>(engine, "Drawable2D", className);
+    engine->RegisterObjectMethod(className, "void set_layer(int)", asMETHOD(T, SetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_layer() const", asMETHOD(T, GetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_orderInLayer(int)", asMETHOD(T, SetOrderInLayer), asCALL_THISCALL); 
+    engine->RegisterObjectMethod(className, "int get_orderInLayer() const", asMETHOD(T, GetOrderInLayer), asCALL_THISCALL);
+}
+#endif
+
 
 }
 
