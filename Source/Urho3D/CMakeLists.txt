@@ -171,6 +171,7 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "")     # Suppress the comment as the header file may or may not be re-generated
+source_group ("Source Files" FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
 
 # Use the AutoBinder tool to generate source files for binding script subsystems
 if (URHO3D_BINDINGS)
@@ -261,6 +262,7 @@ endif ()
 generate_export_header (${TARGET_NAME} ${URHO3D_LIB_TYPE} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new)
 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
+source_group ("Source Files" FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
 
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
