@@ -10,9 +10,10 @@
 
 ### To-do
 
+- [ ] I have familiarized myself with [Contribution Checklist](https://urho3d.github.io/documentation/HEAD/_contribution_checklist.html)
 - [ ] Code is formatted according to the guidlines [Coding conventions](https://urho3d.github.io/documentation/HEAD/_coding_conventions.html)
-- [ ] Angel Script bindings include my changes (if there are any) [AS bindings](https://github.com/urho3d/Urho3D/tree/master/Source/Urho3D/AngelScript)
-- [ ] LUA bindings include my changes (if there are any) [LUA bindings](https://github.com/urho3d/Urho3D/tree/master/Source/Urho3D/LuaScript)
+- [ ] Angel Script bindings are up-to-date with my changes [AS bindings](https://github.com/urho3d/Urho3D/tree/master/Source/Urho3D/AngelScript)
+- [ ] LUA bindings are up-to-date with my changes [LUA bindings](https://github.com/urho3d/Urho3D/tree/master/Source/Urho3D/LuaScript)
 - [ ] I have tested my changes and I'm happy with the quality of it
 
 ### Platforms used for development/testing
