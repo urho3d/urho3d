@@ -122,7 +122,7 @@ unsigned BufferedSoundStream::GetBufferNumBytes() const
 
 float BufferedSoundStream::GetBufferLength() const
 {
-    return (float)GetBufferNumBytes() / (GetFrequency() * (float)GetSampleSize());
+    return GetBufferNumBytes() / (GetFrequency() * GetSampleSize());
 }
 
 }

@@ -88,7 +88,7 @@ public:
     unsigned GetSampleSize() const;
 
     /// Return default frequency as a float.
-    float GetFrequency() const { return (float)frequency_; }
+    float GetFrequency() const { return static_cast<float>(frequency_); }
 
     /// Return default frequency as an integer.
     unsigned GetIntFrequency() const { return frequency_; }

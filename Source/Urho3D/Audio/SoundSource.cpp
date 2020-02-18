@@ -374,7 +374,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     {
         int streamBufferSize = streamBuffer_->GetDataSize();
         // Calculate how many bytes of stream sound data is needed
-        auto neededSize = (int)((float)samples * frequency_ / (float)mixRate);
+        auto neededSize = static_cast<int>(samples * frequency_ / mixRate);
         // Add a little safety buffer. Subtract previous unused data
         neededSize += STREAM_SAFETY_SAMPLES;
         neededSize *= soundStream_->GetSampleSize();
@@ -386,11 +386,11 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
 
         // Request new data from the stream
         signed char* destination = streamBuffer_->GetStart() + unusedStreamSize_;
-        outBytes = neededSize ? soundStream_->GetData(destination, (unsigned)neededSize) : 0;
+        outBytes = neededSize ? soundStream_->GetData(destination, static_cast<unsigned>(neededSize)) : 0;
         destination += outBytes;
         // Zero-fill rest if stream did not produce enough data
         if (outBytes < neededSize)
-            memset(destination, 0, (size_t)(neededSize - outBytes));
+            memset(destination, 0, static_cast<size_t>(neededSize - outBytes));
 
         // Calculate amount of total bytes of data in stream buffer now, to know how much went unused after mixing
         streamFilledSize = neededSize + unusedStreamSize_;
@@ -440,11 +440,11 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     // Update the time position. In stream mode, copy unused data back to the beginning of the stream buffer
     if (soundStream_)
     {
-        timePosition_ += ((float)samples / (float)mixRate) * frequency_ / soundStream_->GetFrequency();
+        timePosition_ += (static_cast<float>(samples) / mixRate) * frequency_ / soundStream_->GetFrequency();
 
-        unusedStreamSize_ = Max(streamFilledSize - (int)(size_t)(position_ - streamBuffer_->GetStart()), 0);
+        unusedStreamSize_ = Max(streamFilledSize - static_cast<int>(position_ - streamBuffer_->GetStart()), 0);
         if (unusedStreamSize_)
-            memcpy(streamBuffer_->GetStart(), (const void*)position_, (size_t)unusedStreamSize_);
+            memcpy(streamBuffer_->GetStart(), (const void*)position_, static_cast<size_t>(unusedStreamSize_));
 
         // If stream did not produce any data, stop if applicable
         if (!outBytes && soundStream_->GetStopAtEnd())
@@ -454,7 +454,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         }
     }
     else if (sound_)
-        timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
+        timePosition_ = static_cast<float>(position_ - sound_->GetStart()) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
 void SoundSource::UpdateMasterGain()
@@ -599,7 +599,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
         pos = end;
 
     position_ = pos;
-    timePosition_ = ((float)(int)(size_t)(pos - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
+    timePosition_ = static_cast<float>(pos - sound_->GetStart()) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
 void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
@@ -612,9 +612,9 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -677,17 +677,17 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    auto leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    auto rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto leftVol = static_cast<int>((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto rightVol = static_cast<int>((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -766,9 +766,9 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -832,15 +832,15 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
     float totalGain = masterGain_ * attenuation_ * gain_;
-    auto leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    auto rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto leftVol = static_cast<int>((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    auto rightVol = static_cast<int>((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
+    float add = frequency_ / mixRate;
     auto intAdd = (int)add;
     auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
@@ -925,9 +925,9 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -1002,9 +1002,9 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
+    float add = frequency_ / mixRate;
     auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -1083,9 +1083,9 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -1160,9 +1160,9 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         return;
     }
 
-    float add = frequency_ / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -1233,9 +1233,9 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
 
 void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
 {
-    float add = frequency_ * (float)samples / (float)mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    float add = frequency_ * samples / mixRate;
+    auto intAdd = static_cast<int>(add);
+    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
     unsigned sampleSize = sound->GetSampleSize();
 
     fractPosition_ += fractAdd;

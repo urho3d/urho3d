@@ -322,7 +322,7 @@ float Sound::GetLength() const
         if (!frequency_)
             return 0.0f;
         else
-            return ((float)dataSize_) / GetSampleSize() / frequency_;
+            return static_cast<float>(dataSize_) / GetSampleSize() / frequency_;
     }
     else
         return compressedLength_;
