@@ -70,7 +70,7 @@ static const SharedPtr<Resource> noResource;
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false),
-    watchResouceDirChange_(false),
+    fullResourceWatch_(false),
     returnFailedResources_(false),
     searchPackagesFirst_(true),
     isRouting_(false),
@@ -126,7 +126,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     if (autoReloadResources_)
     {
         SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
-        watcher->StartWatching(fixedPath, true, watchResouceDirChange_);
+        watcher->StartWatching(fixedPath, true, fullResourceWatch_);
         fileWatchers_.Push(watcher);
     }
 
@@ -439,9 +439,9 @@ void ResourceCache::SetMemoryBudget(StringHash type, unsigned long long budget)
     resourceGroups_[type].memoryBudget_ = budget;
 }
 
-void ResourceCache::SetAutoReloadResources(bool enable, bool watchDirChange)
+void ResourceCache::SetAutoReloadResources(bool enable, bool fullResourceWatch)
 {
-    if (enable != autoReloadResources_ || watchDirChange != watchResouceDirChange_)
+    if (enable != autoReloadResources_ || fullResourceWatch != fullResourceWatch_)
     {
         fileWatchers_.Clear();
 
@@ -450,13 +450,13 @@ void ResourceCache::SetAutoReloadResources(bool enable, bool watchDirChange)
             for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
             {
                 SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
-                watcher->StartWatching(resourceDirs_[i], true, watchResouceDirChange_);
+                watcher->StartWatching(resourceDirs_[i], true, fullResourceWatch_);
                 fileWatchers_.Push(watcher);
             }
         }            
 
         autoReloadResources_ = enable;
-        watchResouceDirChange_ = watchDirChange;
+        fullResourceWatch_ = fullResourceWatch;
     }
 }
 
@@ -1076,19 +1076,18 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 {
     for (unsigned i = 0; i < fileWatchers_.Size(); ++i)
     {
-        String fileName;
-        FileChangeType type;
-        while (fileWatchers_[i]->GetNextChange(fileName, type))
+        FileChange change;
+        while (fileWatchers_[i]->GetNextChange(change))
         {
-            ReloadResourceWithDependencies(fileName);
+            ReloadResourceWithDependencies(change.fileName_);
 
             // Finally send a general file changed event even if the file was not a tracked resource
             using namespace FileChanged;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_FILENAME] = fileWatchers_[i]->GetPath() + fileName;
-            eventData[P_CHANGEDTPYE] = (int)type;
-            eventData[P_RESOURCENAME] = fileName;
+            eventData[P_FILENAME] = fileWatchers_[i]->GetPath() + change.fileName_;
+            eventData[P_CHANGEDTPYE] = (int)change.type_;
+            eventData[P_RESOURCENAME] = change.fileName_;
             SendEvent(E_FILECHANGED, eventData);
         }
     }
