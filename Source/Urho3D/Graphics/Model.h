@@ -181,7 +181,7 @@ public:
         return index < geometryCenters_.Size() ? geometryCenters_[index] : Vector3::ZERO;
     }
 
-    /// Return geometery bone mappings.
+    /// Return geometry bone mappings.
     const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
     /// Return vertex morphs.

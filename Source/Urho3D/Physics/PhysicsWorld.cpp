@@ -43,6 +43,7 @@
 #include <Bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btConvexHullShape.h>
 #include <Bullet/BulletCollision/CollisionShapes/btSphereShape.h>
 #include <Bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
@@ -646,6 +647,33 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
     btBoxShape boxShape(ToBtVector3(box.HalfSize()));
     UniquePtr<btRigidBody> tempRigidBody(new btRigidBody(1.0f, nullptr, &boxShape));
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(box.Center())));
+    tempRigidBody->activate();
+    world_->addRigidBody(tempRigidBody.Get());
+
+    PhysicsQueryCallback callback(result, collisionMask);
+    world_->contactTest(tempRigidBody.Get(), callback);
+
+    world_->removeRigidBody(tempRigidBody.Get());
+}
+
+void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Frustum& frustum, unsigned collisionMask)
+{
+    URHO3D_PROFILE(PhysicsBoxQuery);
+
+    result.Clear();
+
+    btConvexHullShape convexShape;
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[0]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[1]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[2]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[3]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[4]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[5]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[6]));
+    convexShape.addPoint(ToBtVector3(frustum.vertices_[7]));
+
+    UniquePtr<btRigidBody> tempRigidBody(new btRigidBody(1.0f, nullptr, &convexShape));
+    tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), btVector3(0, 0, 0)));
     tempRigidBody->activate();
     world_->addRigidBody(tempRigidBody.Get());
 

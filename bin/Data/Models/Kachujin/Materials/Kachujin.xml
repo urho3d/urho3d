@@ -4,7 +4,9 @@
 	<texture unit="diffuse" name="Models/Kachujin/Textures/Kachujin_diffuse.png" />
 	<texture unit="normal" name="Models/Kachujin/Textures/Kachujin_normal.png" />
 	<texture unit="specular" name="Models/Kachujin/Textures/Kachujin_specular.png" />
+	<shader psdefines="ALPHAMASK" />
 	<parameter name="MatDiffColor" value="1.0 1.0 1.0 1" />
 	<parameter name="MatSpecColor" value="1.0 1.0 1.0 50" />
 	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+	<cull value="none" />
 </material>

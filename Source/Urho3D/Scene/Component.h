@@ -75,6 +75,8 @@ public:
 
     /// Set enabled/disabled state.
     void SetEnabled(bool enable);
+    /// Set selected state.
+    void SetSelected(bool selected);
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
 
@@ -93,6 +95,8 @@ public:
     bool IsEnabled() const { return enabled_; }
     /// Return whether is effectively enabled (node is also enabled).
     bool IsEnabledEffective() const;
+    /// Return whether is selected.
+    bool IsSelected() const { return selected_; }
 
     /// Return component in the same scene node by type. If there are several, returns the first.
     Component* GetComponent(StringHash type) const;
@@ -142,6 +146,8 @@ protected:
     bool networkUpdate_;
     /// Enabled flag.
     bool enabled_;
+    /// Selected flag.
+    bool selected_;
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
