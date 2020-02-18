@@ -279,18 +279,18 @@ void FileWatcher::ThreadFunction()
                 switch (record->Action)
                 {
                 case FILE_ACTION_MODIFIED:
-                    changeType = FileChange_Modified;
+                    changeType = FILECHANGE_MODIFIED;
                     break;
                 case FILE_ACTION_ADDED:
                 case FILE_ACTION_RENAMED_NEW_NAME:
-                    changeType = FileChange_Added;
+                    changeType = FILECHANGE_ADDED;
                     break;
                 case FILE_ACTION_REMOVED:
                 case FILE_ACTION_RENAMED_OLD_NAME:
-                    changeType = FileChange_Removed;
+                    changeType = FILECHANGE_REMOVED;
                     break;
                 default:
-                    changeType = FileChange_Unknown;
+                    changeType = FILECHANGE_UNKNOWN;
                 }
 
                 AddChange({fileName, changeType});

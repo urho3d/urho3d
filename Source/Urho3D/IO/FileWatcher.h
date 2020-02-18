@@ -36,10 +36,10 @@ class FileSystem;
 /// File change type.
 enum FileChangeType
 {
-    FileChange_Unknown = 0,
-    FileChange_Added,
-    FileChange_Modified,
-    FileChange_Removed
+    FILECHANGE_UNKNOWN = 0,
+    FILECHANGE_ADDED,
+    FILECHANGE_MODIFIED,
+    FILECHANGE_REMOVED
 };
 
 /// File change information.
