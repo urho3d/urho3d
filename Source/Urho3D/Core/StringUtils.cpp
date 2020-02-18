@@ -49,6 +49,7 @@ unsigned CountElements(const char* buffer, char separator)
     {
         if (*pos != separator)
             break;
+
         ++pos;
     }
 
@@ -99,8 +100,10 @@ bool ToBool(const char* source)
     for (unsigned i = 0; i < length; ++i)
     {
         auto c = (char)tolower(source[i]);
+
         if (c == 't' || c == 'y' || c == '1')
             return true;
+
         else if (c != ' ' && c != '\t')
             break;
     }
@@ -122,7 +125,7 @@ int ToInt(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return (int)strtol(source, nullptr, base);
+    return static_cast<int>(strtol(source, nullptr, base));
 }
 
 long long ToInt64(const char* source, int base)
@@ -172,7 +175,7 @@ unsigned ToUInt(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return (unsigned)strtoul(source, nullptr, base);
+    return static_cast<unsigned>(strtoul(source, nullptr, base));
 }
 
 float ToFloat(const String& source)
@@ -185,7 +188,7 @@ float ToFloat(const char* source)
     if (!source)
         return 0;
 
-    return (float)strtod(source, nullptr);
+    return static_cast<float>(strtod(source, nullptr));
 }
 
 double ToDouble(const String& source)
@@ -215,11 +218,11 @@ Color ToColor(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.r_ = (float)strtod(ptr, &ptr);
-    ret.g_ = (float)strtod(ptr, &ptr);
-    ret.b_ = (float)strtod(ptr, &ptr);
+    ret.r_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.g_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.b_ = static_cast<float>(strtod(ptr, &ptr));
     if (elements > 3)
-        ret.a_ = (float)strtod(ptr, &ptr);
+        ret.a_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
@@ -231,17 +234,17 @@ IntRect ToIntRect(const String& source)
 
 IntRect ToIntRect(const char* source)
 {
-    IntRect ret(IntRect::ZERO);
+    IntRect ret{ IntRect::ZERO };
 
     unsigned elements = CountElements(source, ' ');
     if (elements < 4)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.left_ = (int)strtol(ptr, &ptr, 10);
-    ret.top_ = (int)strtol(ptr, &ptr, 10);
-    ret.right_ = (int)strtol(ptr, &ptr, 10);
-    ret.bottom_ = (int)strtol(ptr, &ptr, 10);
+    ret.left_   = static_cast<int>(strtol(ptr, &ptr, 10));
+    ret.top_    = static_cast<int>(strtol(ptr, &ptr, 10));
+    ret.right_  = static_cast<int>(strtol(ptr, &ptr, 10));
+    ret.bottom_ = static_cast<int>(strtol(ptr, &ptr, 10));
 
     return ret;
 }
@@ -260,8 +263,8 @@ IntVector2 ToIntVector2(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.x_ = (int)strtol(ptr, &ptr, 10);
-    ret.y_ = (int)strtol(ptr, &ptr, 10);
+    ret.x_ = static_cast<float>(strtol(ptr, &ptr, 10));
+    ret.y_ = static_cast<float>(strtol(ptr, &ptr, 10));
 
     return ret;
 }
@@ -280,9 +283,9 @@ IntVector3 ToIntVector3(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.x_ = (int)strtol(ptr, &ptr, 10);
-    ret.y_ = (int)strtol(ptr, &ptr, 10);
-    ret.z_ = (int)strtol(ptr, &ptr, 10);
+    ret.x_ = static_cast<int>(strtol(ptr, &ptr, 10));
+    ret.y_ = static_cast<int>(strtol(ptr, &ptr, 10));
+    ret.z_ = static_cast<int>(strtol(ptr, &ptr, 10));
 
     return ret;
 }
@@ -301,10 +304,10 @@ Rect ToRect(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.min_.x_ = (float)strtod(ptr, &ptr);
-    ret.min_.y_ = (float)strtod(ptr, &ptr);
-    ret.max_.x_ = (float)strtod(ptr, &ptr);
-    ret.max_.y_ = (float)strtod(ptr, &ptr);
+    ret.min_.x_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.min_.y_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.max_.x_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.max_.y_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
@@ -320,14 +323,16 @@ Quaternion ToQuaternion(const char* source)
     auto* ptr = (char*)source;
 
     if (elements < 3)
+    {
         return Quaternion::IDENTITY;
+    }
     else if (elements < 4)
     {
         // 3 coords specified: conversion from Euler angles
         float x, y, z;
-        x = (float)strtod(ptr, &ptr);
-        y = (float)strtod(ptr, &ptr);
-        z = (float)strtod(ptr, &ptr);
+        x = static_cast<float>(strtod(ptr, &ptr));
+        y = static_cast<float>(strtod(ptr, &ptr));
+        z = static_cast<float>(strtod(ptr, &ptr));
 
         return Quaternion(x, y, z);
     }
@@ -335,10 +340,10 @@ Quaternion ToQuaternion(const char* source)
     {
         // 4 coords specified: full quaternion
         Quaternion ret;
-        ret.w_ = (float)strtod(ptr, &ptr);
-        ret.x_ = (float)strtod(ptr, &ptr);
-        ret.y_ = (float)strtod(ptr, &ptr);
-        ret.z_ = (float)strtod(ptr, &ptr);
+        ret.w_ = static_cast<float>(strtod(ptr, &ptr));
+        ret.x_ = static_cast<float>(strtod(ptr, &ptr));
+        ret.y_ = static_cast<float>(strtod(ptr, &ptr));
+        ret.z_ = static_cast<float>(strtod(ptr, &ptr));
 
         return ret;
     }
@@ -358,8 +363,8 @@ Vector2 ToVector2(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.x_ = (float)strtod(ptr, &ptr);
-    ret.y_ = (float)strtod(ptr, &ptr);
+    ret.x_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.y_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
@@ -371,16 +376,16 @@ Vector3 ToVector3(const String& source)
 
 Vector3 ToVector3(const char* source)
 {
-    Vector3 ret(Vector3::ZERO);
+    Vector3 ret{ Vector3::ZERO };
 
     unsigned elements = CountElements(source, ' ');
     if (elements < 3)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.x_ = (float)strtod(ptr, &ptr);
-    ret.y_ = (float)strtod(ptr, &ptr);
-    ret.z_ = (float)strtod(ptr, &ptr);
+    ret.x_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.y_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.z_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
@@ -402,23 +407,23 @@ Vector4 ToVector4(const char* source, bool allowMissingCoords)
         if (elements < 4)
             return ret;
 
-        ret.x_ = (float)strtod(ptr, &ptr);
-        ret.y_ = (float)strtod(ptr, &ptr);
-        ret.z_ = (float)strtod(ptr, &ptr);
-        ret.w_ = (float)strtod(ptr, &ptr);
+        ret.x_ = static_cast<float>(strtod(ptr, &ptr));
+        ret.y_ = static_cast<float>(strtod(ptr, &ptr));
+        ret.z_ = static_cast<float>(strtod(ptr, &ptr));
+        ret.w_ = static_cast<float>(strtod(ptr, &ptr));
 
         return ret;
     }
     else
     {
         if (elements > 0)
-            ret.x_ = (float)strtod(ptr, &ptr);
+            ret.x_ = static_cast<float>(strtod(ptr, &ptr));
         if (elements > 1)
-            ret.y_ = (float)strtod(ptr, &ptr);
+            ret.y_ = static_cast<float>(strtod(ptr, &ptr));
         if (elements > 2)
-            ret.z_ = (float)strtod(ptr, &ptr);
+            ret.z_ = static_cast<float>(strtod(ptr, &ptr));
         if (elements > 3)
-            ret.w_ = (float)strtod(ptr, &ptr);
+            ret.w_ = static_cast<float>(strtod(ptr, &ptr));
 
         return ret;
     }
@@ -486,15 +491,15 @@ Matrix3 ToMatrix3(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.m00_ = (float)strtod(ptr, &ptr);
-    ret.m01_ = (float)strtod(ptr, &ptr);
-    ret.m02_ = (float)strtod(ptr, &ptr);
-    ret.m10_ = (float)strtod(ptr, &ptr);
-    ret.m11_ = (float)strtod(ptr, &ptr);
-    ret.m12_ = (float)strtod(ptr, &ptr);
-    ret.m20_ = (float)strtod(ptr, &ptr);
-    ret.m21_ = (float)strtod(ptr, &ptr);
-    ret.m22_ = (float)strtod(ptr, &ptr);
+    ret.m00_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m01_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m02_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m10_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m11_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m12_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m20_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m21_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m22_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
@@ -513,18 +518,18 @@ Matrix3x4 ToMatrix3x4(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.m00_ = (float)strtod(ptr, &ptr);
-    ret.m01_ = (float)strtod(ptr, &ptr);
-    ret.m02_ = (float)strtod(ptr, &ptr);
-    ret.m03_ = (float)strtod(ptr, &ptr);
-    ret.m10_ = (float)strtod(ptr, &ptr);
-    ret.m11_ = (float)strtod(ptr, &ptr);
-    ret.m12_ = (float)strtod(ptr, &ptr);
-    ret.m13_ = (float)strtod(ptr, &ptr);
-    ret.m20_ = (float)strtod(ptr, &ptr);
-    ret.m21_ = (float)strtod(ptr, &ptr);
-    ret.m22_ = (float)strtod(ptr, &ptr);
-    ret.m23_ = (float)strtod(ptr, &ptr);
+    ret.m00_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m01_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m02_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m03_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m10_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m11_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m12_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m13_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m20_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m21_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m22_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m23_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
@@ -543,29 +548,29 @@ Matrix4 ToMatrix4(const char* source)
         return ret;
 
     auto* ptr = (char*)source;
-    ret.m00_ = (float)strtod(ptr, &ptr);
-    ret.m01_ = (float)strtod(ptr, &ptr);
-    ret.m02_ = (float)strtod(ptr, &ptr);
-    ret.m03_ = (float)strtod(ptr, &ptr);
-    ret.m10_ = (float)strtod(ptr, &ptr);
-    ret.m11_ = (float)strtod(ptr, &ptr);
-    ret.m12_ = (float)strtod(ptr, &ptr);
-    ret.m13_ = (float)strtod(ptr, &ptr);
-    ret.m20_ = (float)strtod(ptr, &ptr);
-    ret.m21_ = (float)strtod(ptr, &ptr);
-    ret.m22_ = (float)strtod(ptr, &ptr);
-    ret.m23_ = (float)strtod(ptr, &ptr);
-    ret.m30_ = (float)strtod(ptr, &ptr);
-    ret.m31_ = (float)strtod(ptr, &ptr);
-    ret.m32_ = (float)strtod(ptr, &ptr);
-    ret.m33_ = (float)strtod(ptr, &ptr);
+    ret.m00_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m01_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m02_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m03_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m10_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m11_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m12_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m13_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m20_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m21_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m22_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m23_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m30_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m31_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m32_ = static_cast<float>(strtod(ptr, &ptr));
+    ret.m33_ = static_cast<float>(strtod(ptr, &ptr));
 
     return ret;
 }
 
 String ToString(void* value)
 {
-    return ToStringHex((unsigned)(size_t)value);
+    return ToStringHex(static_cast<unsigned>((size_t)value));
 }
 
 String ToStringHex(unsigned value)
@@ -649,7 +654,7 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
         if (inSpace && *ptr != ' ')
         {
             inSpace = false;
-            value = (unsigned)(*ptr - '0');
+            value = static_cast<unsigned>(*ptr - '0');
         }
         else if (!inSpace && *ptr != ' ')
         {
@@ -658,7 +663,7 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
         }
         else if (!inSpace && *ptr == ' ')
         {
-            dest[index++] = (unsigned char)value;
+            dest[index++] = static_cast<unsigned char>(value);
             inSpace = true;
         }
 
@@ -667,7 +672,7 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
 
     // Write the final value
     if (!inSpace && index < size)
-        dest[index] = (unsigned char)value;
+        dest[index] = static_cast<unsigned char>(value);
 }
 
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
@@ -725,12 +730,12 @@ bool IsDigit(unsigned ch)
 
 unsigned ToUpper(unsigned ch)
 {
-    return (unsigned)toupper(ch);
+    return static_cast<unsigned>(toupper(ch));
 }
 
 unsigned ToLower(unsigned ch)
 {
-    return (unsigned)tolower(ch);
+    return static_cast<unsigned>(tolower(ch));
 }
 
 String GetFileSizeString(unsigned long long memorySize)
@@ -745,8 +750,8 @@ String GetFileSizeString(unsigned long long memorySize)
     }
     else
     {
-        const auto exponent = (int)(log((double)memorySize) / log(1024.0));
-        const double majorValue = ((double)memorySize) / pow(1024.0, exponent);
+        const auto exponent = static_cast<int>(log(static_cast<double>(memorySize)) / log(1024.0));
+        const double majorValue = static_cast<double>(memorySize) / pow(1024.0, exponent);
         char buffer[64];
         memset(buffer, 0, 64);
         sprintf(buffer, "%.1f", majorValue);

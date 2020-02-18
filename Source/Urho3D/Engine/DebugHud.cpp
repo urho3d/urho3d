@@ -166,7 +166,7 @@ void DebugHud::Update()
         String mode;
         mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
             qualityTexts[renderer->GetTextureQuality()],
-            qualityTexts[Min((unsigned)renderer->GetMaterialQuality(), 3)],
+            qualityTexts[Min(static_cast<unsigned>(renderer->GetMaterialQuality()), 3)],
             renderer->GetSpecularLighting() ? "On" : "Off",
             renderer->GetDrawShadows() ? "On" : "Off",
             renderer->GetShadowMapSize(),
@@ -249,7 +249,7 @@ void DebugHud::SetProfilerMaxDepth(unsigned depth)
 
 void DebugHud::SetProfilerInterval(float interval)
 {
-    profilerInterval_ = Max((unsigned)(interval * 1000.0f), 0U);
+    profilerInterval_ = Max(static_cast<unsigned>(interval * 1000.0f), 0U);
 }
 
 void DebugHud::SetUseRendererStats(bool enable)
@@ -274,7 +274,7 @@ XMLFile* DebugHud::GetDefaultStyle() const
 
 float DebugHud::GetProfilerInterval() const
 {
-    return (float)profilerInterval_ / 1000.0f;
+    return profilerInterval_ / 1000.0f;
 }
 
 void DebugHud::SetAppStats(const String& label, const Variant& stats)
