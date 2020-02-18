@@ -87,8 +87,6 @@ struct ScenePassInfo
     bool markToStencil_;
     /// Vertex light flag.
     bool vertexLights_;
-    /// Wireframe flag.
-    bool wireframe_;
     /// Batch queue.
     BatchQueue* batchQueue_;
 };

@@ -96,7 +96,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs, bool 
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
         nullptr,
         OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+        FILE_FLAG_BACKUP_SEMANTICS,
         nullptr);
 
     if (dirHandle_ != INVALID_HANDLE_VALUE)

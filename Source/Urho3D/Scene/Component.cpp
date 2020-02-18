@@ -56,8 +56,7 @@ Component::Component(Context* context) :
     node_(nullptr),
     id_(0),
     networkUpdate_(false),
-    enabled_(true),
-    selected_(false)
+    enabled_(true)
 {
 }
 
@@ -140,11 +139,6 @@ void Component::SetEnabled(bool enable)
             scene->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
         }
     }
-}
-
-void Component::SetSelected(bool selected)
-{
-    selected_ = selected;
 }
 
 void Component::Remove()

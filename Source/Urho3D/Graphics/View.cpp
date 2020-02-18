@@ -413,7 +413,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
             info.markToStencil_ = !noStencil_ && command.markToStencil_;
             info.vertexLights_ = command.vertexLights_;
-            info.wireframe_ = false;
 
             // Check scenepass metadata for defining custom passes which interact with lighting
             if (!command.metadata_.Empty())
@@ -429,11 +428,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
                 {
                     alphaPassIndex_ = command.passIndex_;
                     litAlphaPassIndex_ = Technique::GetPassIndex("lit" + command.pass_);
-                }
-
-                if (command.metadata_ == "wireframe")
-                {
-                    info.wireframe_ = true;
                 }
             }
 
@@ -1225,23 +1219,10 @@ void View::GetBaseBatches()
                     continue;
 
                 Pass* pass = tech->GetSupportedPass(info.passIndex_);
-
-                if (info.wireframe_)
-                {
-                    if (!drawable->IsSelected())
-                        continue;
-
-                    if (!pass && !tech->GetPasses().Empty())
-                    {
-                        pass = tech->GetPasses()[0];
-                    }
-                }
-
                 if (!pass)
                     continue;
 
                 Batch destBatch(srcBatch);
-                destBatch.wireframe_ = info.wireframe_;
                 destBatch.pass_ = pass;
                 destBatch.zone_ = GetZone(drawable);
                 destBatch.isBase_ = true;

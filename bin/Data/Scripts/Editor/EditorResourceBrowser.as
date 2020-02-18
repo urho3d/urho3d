@@ -1334,30 +1334,29 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
         return false;
 
     String name;
-    File@ file;
-    XMLFile@ xml;
-
     if (useCache)
     {
-        file = cache.GetFile(path);
-        if (file is null)
+        XMLFile@ xml = cache.GetResource("XMLFile", path);
+        if (xml is null)
             return false;
+
+        name = xml.root.name;
     }
     else
     {
-        file = File();
+        File@ file = File();
         if (!file.Open(path))
             return false;
+
+        if (file.size == 0)
+            return false;
+
+        XMLFile@ xml = XMLFile();
+        if (xml.Load(file))
+            name = xml.root.name;
+        else
+            return false;
     }
-
-    if (file.size == 0)
-        return false;
-
-    xml = XMLFile();
-    if (xml.Load(file))
-        name = xml.root.name;
-    else
-        return false;
 
     bool found = false;
     if (!name.empty)

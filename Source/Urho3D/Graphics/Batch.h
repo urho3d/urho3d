@@ -63,8 +63,7 @@ struct Batch
         numWorldTransforms_(rhs.numWorldTransforms_),
         instancingData_(rhs.instancingData_),
         lightQueue_(nullptr),
-        geometryType_(rhs.geometryType_),
-        wireframe_(false)
+        geometryType_(rhs.geometryType_)
     {
     }
 
@@ -107,8 +106,6 @@ struct Batch
     ShaderVariation* pixelShader_{};
     /// %Geometry type.
     GeometryType geometryType_{};
-    /// Wireframe flag.
-    bool wireframe_;
 };
 
 /// Data for one geometry instance.
