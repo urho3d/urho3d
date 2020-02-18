@@ -31,6 +31,7 @@ Urho3D development, contributions and bugfixes by:
 - Danny Boisvert
 - Sergey Bosko
 - Lisandro Bruzzo
+- Steven Burns
 - Thomas Böhm
 - Carlo Carollo
 - Pete Chown
@@ -156,6 +157,7 @@ Urho3D development, contributions and bugfixes by:
 - orefkov
 - pat2nav
 - proller
+- r-a-sattarov
 - raould
 - rasteron
 - reattiva

@@ -25,6 +25,7 @@
 #include "Scripts/Editor/EditorViewDebugIcons.as"
 #include "Scripts/Editor/EditorViewSelectableOrigins.as"
 #include "Scripts/Editor/EditorViewPaintSelection.as"
+#include "Scripts/Editor/EditorDuplicator.as"
 
 String configFileName;
 

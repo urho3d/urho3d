@@ -30,10 +30,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    ndkVersion = ndkSideBySideVersion
+    compileSdkVersion(29)
     defaultConfig {
-        minSdkVersion(17)
-        targetSdkVersion(28)
+        minSdkVersion(18)
+        targetSdkVersion(29)
         applicationId = "com.github.urho3d.launcher"
         versionCode = 1
         versionName = project.version.toString()
@@ -43,19 +44,23 @@ android {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
                     add("-DGRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
-                    addAll(listOf(
+                    addAll(
+                        listOf(
                             "URHO3D_LIB_TYPE",
                             // TODO: "URHO3D_PACKAGING",
                             "URHO3D_ANGELSCRIPT",
-                            "URHO3D_LUA")
+                            "URHO3D_LUA"
+                        )
                             .filter { project.hasProperty(it) }
                             .map { "-D$it=${project.property(it)}" }
                     )
                     // In order to get clean module segregation, only build player/samples here
                     // unless it is explicitly excluded
-                    addAll(listOf(
+                    addAll(
+                        listOf(
                             "URHO3D_PLAYER",
-                            "URHO3D_SAMPLES")
+                            "URHO3D_SAMPLES"
+                        )
                             .map { "-D$it=${project.findProperty(it) ?: "1"}" }
                     )
                 }
@@ -65,8 +70,11 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
-                        .split(',').toTypedArray())
+                include(
+                    *(project.findProperty("ANDROID_ABI") as String? ?: "")
+                        .split(',')
+                        .toTypedArray()
+                )
             }
         }
     }
@@ -87,10 +95,10 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":android:urho3d-lib"))
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-    testImplementation("junit:junit:$junitVersion")
-    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
+    implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
 
 // Ensure IDE "gradle sync" evaluate the urho3d-lib module first

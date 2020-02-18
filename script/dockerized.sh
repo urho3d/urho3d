@@ -37,6 +37,10 @@ BuildEnvironment=${BuildEnvironment/-base}
 if ! docker --version >/dev/null 2>&1; then
     if podman --version >/dev/null 2>&1; then
         use_podman=1
+        # Disable SELinux protection in order to mount Urho3D project root directory from host to container in unprivileged mode
+        run_option="--security-opt label=disable"
+        # Podman mount volume as 'noexec' by default but we need 'exec' for Android build (aapt2 permission denied otherwise)
+        mount_option=,exec
     else
         echo "Could not find Docker client or podman"
         exit 1
@@ -45,24 +49,26 @@ fi
 
 d () {
     if [[ $use_podman ]]; then
-        # Disable SELinux protection in order to mount Urho3D project root directory from host to container in unprivileged mode
-        podman $1 --security-opt label=disable "${@:2}"
+        podman "$@"
     else
         docker "$@"
     fi
 }
 
-# Workaround Travis-CI intermittent network I/O error
-if [[ $TRAVIS ]]; then while (! d pull "urho3d/dockerized$BuildEnvironment:$DBE_TAG"); do sleep 10; done; fi
+if [[ $TRAVIS ]]; then
+  # Workaround Travis-CI intermittent network I/O error
+  while (! d pull "urho3d/dockerized$BuildEnvironment:$DBE_TAG"); do sleep 10; done;
+elif [[ $DBE_REFRESH == 1 ]]; then
+  d pull "urho3d/dockerized$BuildEnvironment:$DBE_TAG"
+fi
 
 if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( BASH_REMATCH[1] * 100 + BASH_REMATCH[2] >= 1809 )) ); then
     # podman or newer Docker client
-    d run -it --rm -h fishtank \
+    d run -it --rm -h fishtank $run_option \
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
         --env-file "$PROJECT_DIR/script/.env-file" \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
-        --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d \
-        --name "dockerized$BuildEnvironment" \
+        --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d$mount_option \
         "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 else
     # Fallback workaround on older Docker CLI version
@@ -71,7 +77,6 @@ else
         --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$PROJECT_DIR/script/.env-file") \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
         --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d \
-        --name "dockerized$BuildEnvironment" \
         "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 fi
 

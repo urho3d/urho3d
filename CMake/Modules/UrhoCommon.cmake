@@ -156,7 +156,7 @@ if ((RPI AND "${RPI_ABI}" MATCHES NEON) OR (ARM AND (APPLE OR URHO3D_64BIT OR "$
     # TODO: remove this logic when the compiler flags are set in each toolchain file, such that the CheckCompilerToolchain can perform the check automatically
     set (NEON 1)
 endif ()
-# For Raspbery Pi, find Broadcom VideoCore IV firmware
+# For Raspberry Pi, find Broadcom VideoCore IV firmware
 if (RPI)
     # TODO: this logic is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling
     find_package (VideoCore REQUIRED)
@@ -989,20 +989,7 @@ macro (define_source_files)
     endif ()
     # Optionally group the sources based on their physical subdirectories
     if (ARG_GROUP)
-        foreach (CPP_FILE ${CPP_FILES})
-            get_filename_component (PATH ${CPP_FILE} PATH)
-            if (PATH)
-                string (REPLACE / \\ PATH ${PATH})
-                source_group ("Source Files\\${PATH}" FILES ${CPP_FILE})
-            endif ()
-        endforeach ()
-        foreach (H_FILE ${H_FILES})
-            get_filename_component (PATH ${H_FILE} PATH)
-            if (PATH)
-                string (REPLACE / \\ PATH ${PATH})
-                source_group ("Header Files\\${PATH}" FILES ${H_FILE})
-            endif ()
-        endforeach ()
+        source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${SOURCE_FILES})
     endif ()
 endmacro ()
 
@@ -1062,7 +1049,7 @@ macro (define_resource_dirs)
         set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
         if (WEB)
             if (EMSCRIPTEN)
-                # Set the custom EMCC_OPTION property to peload the generated shared data file
+                # Set the custom EMCC_OPTION property to preload the generated shared data file
                 if (EMSCRIPTEN_SHARE_DATA)
                     set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
                     list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
@@ -1205,6 +1192,7 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                     list (INSERT SOURCE_FILES 0 ${${LANG}_FILENAME})
                 endif ()
+                source_group ("Source Files\\Generated" FILES ${${LANG}_FILENAME})
             endif ()
         elseif (XCODE)
             if (TARGET ${TARGET_NAME})
