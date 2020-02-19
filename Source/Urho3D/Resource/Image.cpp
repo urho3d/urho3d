@@ -43,7 +43,7 @@
 #include "../DebugNew.h"
 
 #ifndef MAKEFOURCC
-#define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
+#define MAKEFOURCC(ch0, ch1, ch2, ch3) (static_cast<unsigned>(ch0) | (static_cast<unsigned>(ch1) << 8) | (static_cast<unsigned>(ch2) << 16) | (static_cast<unsigned>(ch3) << 24))
 #endif
 
 #define FOURCC_DXT1 (MAKEFOURCC('D','X','T','1'))
@@ -629,7 +629,7 @@ bool Image::BeginLoad(Deserializer& source)
         }
 
         source.Seek(source.GetPosition() + keyValueBytes);
-        auto dataSize = (unsigned)(source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned));
+        auto dataSize = static_cast<unsigned>(source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned));
 
         data_ = new unsigned char[dataSize];
         width_ = width;
@@ -863,7 +863,7 @@ bool Image::Save(Serializer& dest) const
 
     int len;
     unsigned char* png = stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
-    bool success = dest.Write(png, (unsigned)len) == (unsigned)len;
+    bool success = dest.Write(png, static_cast<unsigned>(len)) == static_cast<unsigned>(len);
     free(png);      // NOLINT(hicpp-no-malloc)
     return success;
 }
@@ -1011,12 +1011,12 @@ bool Image::LoadColorLUT(Deserializer& source)
     {
         for (int y = 0; y < height_; ++y)
         {
-            unsigned char* in = &pixelDataIn[z * width_ * 3 + y * width * 3];
+            unsigned char* in  = &pixelDataIn [z * width_ *           3 + y * width  * 3];
             unsigned char* out = &pixelDataOut[z * width_ * height_ * 3 + y * width_ * 3];
 
             for (int x = 0; x < width_ * 3; x += 3)
             {
-                out[x] = in[x];
+                out[x]     = in[x];
                 out[x + 1] = in[x + 1];
                 out[x + 2] = in[x + 2];
             }
@@ -1181,8 +1181,8 @@ bool Image::Resize(int width, int height)
         for (int x = 0; x < width; ++x)
         {
             // Calculate float coordinates between 0 - 1 for resampling
-            float xF = (width_ > 1) ? (float)x / (float)(width - 1) : 0.0f;
-            float yF = (height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
+            float xF = (width_  > 1) ? x / (width  - 1.0f) : 0.0f;
+            float yF = (height_ > 1) ? y / (height - 1.0f) : 0.0f;
             unsigned uintColor = GetPixelBilinear(xF, yF).ToUInt();
             unsigned char* dest = newData + (y * width + x) * components_;
             auto* src = (unsigned char*)&uintColor;
@@ -1490,17 +1490,17 @@ Color Image::GetPixel(int x, int y, int z) const
     switch (components_)
     {
     case 4:
-        ret.a_ = (float)src[3] / 255.0f;
+        ret.a_ = src[3] / 255.0f;
         // Fall through
     case 3:
-        ret.b_ = (float)src[2] / 255.0f;
+        ret.b_ = src[2] / 255.0f;
         // Fall through
     case 2:
-        ret.g_ = (float)src[1] / 255.0f;
-        ret.r_ = (float)src[0] / 255.0f;
+        ret.g_ = src[1] / 255.0f;
+        ret.r_ = src[0] / 255.0f;
         break;
     default:
-        ret.r_ = ret.g_ = ret.b_ = (float)src[0] / 255.0f;
+        ret.r_ = ret.g_ = ret.b_ = src[0] / 255.0f;
         break;
     }
 
@@ -1516,7 +1516,7 @@ unsigned Image::GetPixelInt(int x, int y, int z) const
 {
     if (!data_ || z < 0 || z >= depth_ || IsCompressed())
         return 0xff000000;
-    x = Clamp(x, 0, width_ - 1);
+    x = Clamp(x, 0, width_  - 1);
     y = Clamp(y, 0, height_ - 1);
 
     unsigned char* src = data_ + (z * width_ * height_ + y * width_ + x) * components_;
@@ -1527,19 +1527,19 @@ unsigned Image::GetPixelInt(int x, int y, int z) const
     switch (components_)
     {
     case 4:
-        ret |= (unsigned)src[3] << 24;
+        ret |= static_cast<unsigned>(src[3]) << 24;
         // Fall through
     case 3:
-        ret |= (unsigned)src[2] << 16;
+        ret |= static_cast<unsigned>(src[2]) << 16;
         // Fall through
     case 2:
-        ret |= (unsigned)src[1] << 8;
-        ret |= (unsigned)src[0];
+        ret |= static_cast<unsigned>(src[1]) << 8;
+        ret |= static_cast<unsigned>(src[0]);
         break;
     default:
-        ret |= (unsigned)src[0] << 16;
-        ret |= (unsigned)src[0] << 8;
-        ret |= (unsigned)src[0];
+        ret |= static_cast<unsigned>(src[0]) << 16;
+        ret |= static_cast<unsigned>(src[0]) << 8;
+        ret |= static_cast<unsigned>(src[0]);
         break;
     }
 
@@ -1548,15 +1548,15 @@ unsigned Image::GetPixelInt(int x, int y, int z) const
 
 Color Image::GetPixelBilinear(float x, float y) const
 {
-    x = Clamp(x * width_ - 0.5f, 0.0f, (float)(width_ - 1));
-    y = Clamp(y * height_ - 0.5f, 0.0f, (float)(height_ - 1));
+    x = Clamp(x * width_  - 0.5f, 0.0f, width_  - 1.0f);
+    y = Clamp(y * height_ - 0.5f, 0.0f, height_ - 1.0f);
 
-    auto xI = (int)x;
-    auto yI = (int)y;
+    auto xI  = static_cast<int>(x);
+    auto yI  = static_cast<int>(y);
     float xF = Fract(x);
     float yF = Fract(y);
 
-    Color topColor = GetPixel(xI, yI).Lerp(GetPixel(xI + 1, yI), xF);
+    Color topColor    = GetPixel(xI, yI    ).Lerp(GetPixel(xI + 1, yI    ), xF);
     Color bottomColor = GetPixel(xI, yI + 1).Lerp(GetPixel(xI + 1, yI + 1), xF);
     return topColor.Lerp(bottomColor, yF);
 }
@@ -1566,25 +1566,25 @@ Color Image::GetPixelTrilinear(float x, float y, float z) const
     if (depth_ < 2)
         return GetPixelBilinear(x, y);
 
-    x = Clamp(x * width_ - 0.5f, 0.0f, (float)(width_ - 1));
-    y = Clamp(y * height_ - 0.5f, 0.0f, (float)(height_ - 1));
-    z = Clamp(z * depth_ - 0.5f, 0.0f, (float)(depth_ - 1));
+    x = Clamp(x * width_  - 0.5f, 0.0f, width_  - 1.0f);
+    y = Clamp(y * height_ - 0.5f, 0.0f, height_ - 1.0f);
+    z = Clamp(z * depth_  - 0.5f, 0.0f, depth_  - 1.0f);
 
-    auto xI = (int)x;
-    auto yI = (int)y;
-    auto zI = (int)z;
+    auto xI = static_cast<int>(x);
+    auto yI = static_cast<int>(y);
+    auto zI = static_cast<int>(z);
     if (zI == depth_ - 1)
         return GetPixelBilinear(x, y);
     float xF = Fract(x);
     float yF = Fract(y);
     float zF = Fract(z);
 
-    Color topColorNear = GetPixel(xI, yI, zI).Lerp(GetPixel(xI + 1, yI, zI), xF);
-    Color bottomColorNear = GetPixel(xI, yI + 1, zI).Lerp(GetPixel(xI + 1, yI + 1, zI), xF);
-    Color colorNear = topColorNear.Lerp(bottomColorNear, yF);
-    Color topColorFar = GetPixel(xI, yI, zI + 1).Lerp(GetPixel(xI + 1, yI, zI + 1), xF);
-    Color bottomColorFar = GetPixel(xI, yI + 1, zI + 1).Lerp(GetPixel(xI + 1, yI + 1, zI + 1), xF);
-    Color colorFar = topColorFar.Lerp(bottomColorFar, yF);
+    Color topColorNear    = GetPixel(xI, yI    , zI    ).Lerp(GetPixel(xI + 1, yI    , zI    ), xF);
+    Color bottomColorNear = GetPixel(xI, yI + 1, zI    ).Lerp(GetPixel(xI + 1, yI + 1, zI    ), xF);
+    Color colorNear       = topColorNear.Lerp(bottomColorNear, yF);
+    Color topColorFar     = GetPixel(xI, yI    , zI + 1).Lerp(GetPixel(xI + 1, yI    , zI + 1), xF);
+    Color bottomColorFar  = GetPixel(xI, yI + 1, zI + 1).Lerp(GetPixel(xI + 1, yI + 1, zI + 1), xF);
+    Color colorFar        = topColorFar.Lerp(bottomColorFar, yF);
     return colorNear.Lerp(colorFar, zF);
 }
 
@@ -1606,9 +1606,9 @@ SharedPtr<Image> Image::GetNextLevel() const
 
     URHO3D_PROFILE(CalculateImageMipLevel);
 
-    int widthOut = width_ / 2;
+    int widthOut  = width_  / 2;
     int heightOut = height_ / 2;
-    int depthOut = depth_ / 2;
+    int depthOut  = depth_  / 2;
 
     if (widthOut < 1)
         widthOut = 1;
@@ -1638,33 +1638,33 @@ SharedPtr<Image> Image::GetNextLevel() const
         {
         case 1:
             for (int x = 0; x < widthOut; ++x)
-                pixelDataOut[x] = (unsigned char)(((unsigned)pixelDataIn[x * 2] + pixelDataIn[x * 2 + 1]) >> 1);
+                pixelDataOut[x] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2]) + pixelDataIn[x * 2 + 1]) >> 1);
             break;
 
         case 2:
             for (int x = 0; x < widthOut * 2; x += 2)
             {
-                pixelDataOut[x] = (unsigned char)(((unsigned)pixelDataIn[x * 2] + pixelDataIn[x * 2 + 2]) >> 1);
-                pixelDataOut[x + 1] = (unsigned char)(((unsigned)pixelDataIn[x * 2 + 1] + pixelDataIn[x * 2 + 3]) >> 1);
+                pixelDataOut[x]     = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2])     + pixelDataIn[x * 2 + 2]) >> 1);
+                pixelDataOut[x + 1] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2 + 1]) + pixelDataIn[x * 2 + 3]) >> 1);
             }
             break;
 
         case 3:
             for (int x = 0; x < widthOut * 3; x += 3)
             {
-                pixelDataOut[x] = (unsigned char)(((unsigned)pixelDataIn[x * 2] + pixelDataIn[x * 2 + 3]) >> 1);
-                pixelDataOut[x + 1] = (unsigned char)(((unsigned)pixelDataIn[x * 2 + 1] + pixelDataIn[x * 2 + 4]) >> 1);
-                pixelDataOut[x + 2] = (unsigned char)(((unsigned)pixelDataIn[x * 2 + 2] + pixelDataIn[x * 2 + 5]) >> 1);
+                pixelDataOut[x]     = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2])     + pixelDataIn[x * 2 + 3]) >> 1);
+                pixelDataOut[x + 1] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2 + 1]) + pixelDataIn[x * 2 + 4]) >> 1);
+                pixelDataOut[x + 2] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2 + 2]) + pixelDataIn[x * 2 + 5]) >> 1);
             }
             break;
 
         case 4:
             for (int x = 0; x < widthOut * 4; x += 4)
             {
-                pixelDataOut[x] = (unsigned char)(((unsigned)pixelDataIn[x * 2] + pixelDataIn[x * 2 + 4]) >> 1);
-                pixelDataOut[x + 1] = (unsigned char)(((unsigned)pixelDataIn[x * 2 + 1] + pixelDataIn[x * 2 + 5]) >> 1);
-                pixelDataOut[x + 2] = (unsigned char)(((unsigned)pixelDataIn[x * 2 + 2] + pixelDataIn[x * 2 + 6]) >> 1);
-                pixelDataOut[x + 3] = (unsigned char)(((unsigned)pixelDataIn[x * 2 + 3] + pixelDataIn[x * 2 + 7]) >> 1);
+                pixelDataOut[x] =     static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2])     + pixelDataIn[x * 2 + 4]) >> 1);
+                pixelDataOut[x + 1] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2 + 1]) + pixelDataIn[x * 2 + 5]) >> 1);
+                pixelDataOut[x + 2] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2 + 2]) + pixelDataIn[x * 2 + 6]) >> 1);
+                pixelDataOut[x + 3] = static_cast<unsigned char>((static_cast<unsigned>(pixelDataIn[x * 2 + 3]) + pixelDataIn[x * 2 + 7]) >> 1);
             }
             break;
 
@@ -1681,14 +1681,14 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 1:
             for (int y = 0; y < heightOut; ++y)
             {
-                const unsigned char* inUpper = &pixelDataIn[(y * 2) * width_];
+                const unsigned char* inUpper = &pixelDataIn[(y * 2)     * width_];
                 const unsigned char* inLower = &pixelDataIn[(y * 2 + 1) * width_];
                 unsigned char* out = &pixelDataOut[y * widthOut];
 
                 for (int x = 0; x < widthOut; ++x)
                 {
-                    out[x] = (unsigned char)(((unsigned)inUpper[x * 2] + inUpper[x * 2 + 1] +
-                                              inLower[x * 2] + inLower[x * 2 + 1]) >> 2);
+                    out[x] = static_cast<unsigned char>((static_cast<unsigned>(inUpper[x * 2]) + inUpper[x * 2 + 1] +
+                                                                               inLower[x * 2]  + inLower[x * 2 + 1]) >> 2);
                 }
             }
             break;
@@ -1696,16 +1696,18 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 2:
             for (int y = 0; y < heightOut; ++y)
             {
-                const unsigned char* inUpper = &pixelDataIn[(y * 2) * width_ * 2];
+                const unsigned char* inUpper = &pixelDataIn[(y * 2)     * width_ * 2];
                 const unsigned char* inLower = &pixelDataIn[(y * 2 + 1) * width_ * 2];
                 unsigned char* out = &pixelDataOut[y * widthOut * 2];
 
                 for (int x = 0; x < widthOut * 2; x += 2)
                 {
-                    out[x] = (unsigned char)(((unsigned)inUpper[x * 2] + inUpper[x * 2 + 2] +
-                                              inLower[x * 2] + inLower[x * 2 + 2]) >> 2);
-                    out[x + 1] = (unsigned char)(((unsigned)inUpper[x * 2 + 1] + inUpper[x * 2 + 3] +
-                                                  inLower[x * 2 + 1] + inLower[x * 2 + 3]) >> 2);
+                    out[x]     = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2])     + inUpper[x * 2 + 2] +
+                                                            inLower[x * 2]      + inLower[x * 2 + 2]) >> 2);
+                    out[x + 1] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2 + 1]) + inUpper[x * 2 + 3] +
+                                                            inLower[x * 2 + 1]  + inLower[x * 2 + 3]) >> 2);
                 }
             }
             break;
@@ -1713,18 +1715,21 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 3:
             for (int y = 0; y < heightOut; ++y)
             {
-                const unsigned char* inUpper = &pixelDataIn[(y * 2) * width_ * 3];
+                const unsigned char* inUpper = &pixelDataIn[(y * 2)     * width_ * 3];
                 const unsigned char* inLower = &pixelDataIn[(y * 2 + 1) * width_ * 3];
                 unsigned char* out = &pixelDataOut[y * widthOut * 3];
 
                 for (int x = 0; x < widthOut * 3; x += 3)
                 {
-                    out[x] = (unsigned char)(((unsigned)inUpper[x * 2] + inUpper[x * 2 + 3] +
-                                              inLower[x * 2] + inLower[x * 2 + 3]) >> 2);
-                    out[x + 1] = (unsigned char)(((unsigned)inUpper[x * 2 + 1] + inUpper[x * 2 + 4] +
-                                                  inLower[x * 2 + 1] + inLower[x * 2 + 4]) >> 2);
-                    out[x + 2] = (unsigned char)(((unsigned)inUpper[x * 2 + 2] + inUpper[x * 2 + 5] +
-                                                  inLower[x * 2 + 2] + inLower[x * 2 + 5]) >> 2);
+                    out[x]     = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2])     + inUpper[x * 2 + 3] +
+                                                            inLower[x * 2]      + inLower[x * 2 + 3]) >> 2);
+                    out[x + 1] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2 + 1]) + inUpper[x * 2 + 4] +
+                                                            inLower[x * 2 + 1]  + inLower[x * 2 + 4]) >> 2);
+                    out[x + 2] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2 + 2]) + inUpper[x * 2 + 5] +
+                                                            inLower[x * 2 + 2]  + inLower[x * 2 + 5]) >> 2);
                 }
             }
             break;
@@ -1732,20 +1737,24 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 4:
             for (int y = 0; y < heightOut; ++y)
             {
-                const unsigned char* inUpper = &pixelDataIn[(y * 2) * width_ * 4];
+                const unsigned char* inUpper = &pixelDataIn[(y * 2)     * width_ * 4];
                 const unsigned char* inLower = &pixelDataIn[(y * 2 + 1) * width_ * 4];
                 unsigned char* out = &pixelDataOut[y * widthOut * 4];
 
                 for (int x = 0; x < widthOut * 4; x += 4)
                 {
-                    out[x] = (unsigned char)(((unsigned)inUpper[x * 2] + inUpper[x * 2 + 4] +
-                                              inLower[x * 2] + inLower[x * 2 + 4]) >> 2);
-                    out[x + 1] = (unsigned char)(((unsigned)inUpper[x * 2 + 1] + inUpper[x * 2 + 5] +
-                                                  inLower[x * 2 + 1] + inLower[x * 2 + 5]) >> 2);
-                    out[x + 2] = (unsigned char)(((unsigned)inUpper[x * 2 + 2] + inUpper[x * 2 + 6] +
-                                                  inLower[x * 2 + 2] + inLower[x * 2 + 6]) >> 2);
-                    out[x + 3] = (unsigned char)(((unsigned)inUpper[x * 2 + 3] + inUpper[x * 2 + 7] +
-                                                  inLower[x * 2 + 3] + inLower[x * 2 + 7]) >> 2);
+                    out[x]     = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2])     + inUpper[x * 2 + 4] +
+                                                            inLower[x * 2]      + inLower[x * 2 + 4]) >> 2);
+                    out[x + 1] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2 + 1]) + inUpper[x * 2 + 5] +
+                                                            inLower[x * 2 + 1]  + inLower[x * 2 + 5]) >> 2);
+                    out[x + 2] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2 + 2]) + inUpper[x * 2 + 6] +
+                                                            inLower[x * 2 + 2]  + inLower[x * 2 + 6]) >> 2);
+                    out[x + 3] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inUpper[x * 2 + 3]) + inUpper[x * 2 + 7] +
+                                                            inLower[x * 2 + 3]  + inLower[x * 2 + 7]) >> 2);
                 }
             }
             break;
@@ -1763,7 +1772,7 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 1:
             for (int z = 0; z < depthOut; ++z)
             {
-                const unsigned char* inOuter = &pixelDataIn[(z * 2) * width_ * height_];
+                const unsigned char* inOuter = &pixelDataIn[(z * 2)     * width_ * height_];
                 const unsigned char* inInner = &pixelDataIn[(z * 2 + 1) * width_ * height_];
 
                 for (int y = 0; y < heightOut; ++y)
@@ -1776,10 +1785,11 @@ SharedPtr<Image> Image::GetNextLevel() const
 
                     for (int x = 0; x < widthOut; ++x)
                     {
-                        out[x] = (unsigned char)(((unsigned)inOuterUpper[x * 2] + inOuterUpper[x * 2 + 1] +
-                                                  inOuterLower[x * 2] + inOuterLower[x * 2 + 1] +
-                                                  inInnerUpper[x * 2] + inInnerUpper[x * 2 + 1] +
-                                                  inInnerLower[x * 2] + inInnerLower[x * 2 + 1]) >> 3);
+                        out[x] = static_cast<unsigned char>(
+                                     (static_cast<unsigned>(inOuterUpper[x * 2]) + inOuterUpper[x * 2 + 1] +
+                                                            inOuterLower[x * 2]  + inOuterLower[x * 2 + 1] +
+                                                            inInnerUpper[x * 2]  + inInnerUpper[x * 2 + 1] +
+                                                            inInnerLower[x * 2]  + inInnerLower[x * 2 + 1]) >> 3);
                     }
                 }
             }
@@ -1788,27 +1798,30 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 2:
             for (int z = 0; z < depthOut; ++z)
             {
-                const unsigned char* inOuter = &pixelDataIn[(z * 2) * width_ * height_ * 2];
+                const unsigned char* inOuter = &pixelDataIn[(z * 2)     * width_ * height_ * 2];
                 const unsigned char* inInner = &pixelDataIn[(z * 2 + 1) * width_ * height_ * 2];
 
                 for (int y = 0; y < heightOut; ++y)
                 {
-                    const unsigned char* inOuterUpper = &inOuter[(y * 2) * width_ * 2];
+                    const unsigned char* inOuterUpper = &inOuter[(y * 2)     * width_ * 2];
                     const unsigned char* inOuterLower = &inOuter[(y * 2 + 1) * width_ * 2];
-                    const unsigned char* inInnerUpper = &inInner[(y * 2) * width_ * 2];
+                    const unsigned char* inInnerUpper = &inInner[(y * 2)     * width_ * 2];
                     const unsigned char* inInnerLower = &inInner[(y * 2 + 1) * width_ * 2];
                     unsigned char* out = &pixelDataOut[z * widthOut * heightOut * 2 + y * widthOut * 2];
 
                     for (int x = 0; x < widthOut * 2; x += 2)
                     {
-                        out[x] = (unsigned char)(((unsigned)inOuterUpper[x * 2] + inOuterUpper[x * 2 + 2] +
-                                                  inOuterLower[x * 2] + inOuterLower[x * 2 + 2] +
-                                                  inInnerUpper[x * 2] + inInnerUpper[x * 2 + 2] +
-                                                  inInnerLower[x * 2] + inInnerLower[x * 2 + 2]) >> 3);
-                        out[x + 1] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 1] + inOuterUpper[x * 2 + 3] +
-                                                      inOuterLower[x * 2 + 1] + inOuterLower[x * 2 + 3] +
-                                                      inInnerUpper[x * 2 + 1] + inInnerUpper[x * 2 + 3] +
-                                                      inInnerLower[x * 2 + 1] + inInnerLower[x * 2 + 3]) >> 3);
+                        out[x]     = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2]) + inOuterUpper[x * 2 + 2] +
+                                                                inOuterLower[x * 2]  + inOuterLower[x * 2 + 2] +
+                                                                inInnerUpper[x * 2]  + inInnerUpper[x * 2 + 2] +
+                                                                inInnerLower[x * 2]  + inInnerLower[x * 2 + 2]) >> 3);
+
+                        out[x + 1] = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2 + 1]) + inOuterUpper[x * 2 + 3] +
+                                                                inOuterLower[x * 2 + 1]  + inOuterLower[x * 2 + 3] +
+                                                                inInnerUpper[x * 2 + 1]  + inInnerUpper[x * 2 + 3] +
+                                                                inInnerLower[x * 2 + 1]  + inInnerLower[x * 2 + 3]) >> 3);
                     }
                 }
             }
@@ -1817,31 +1830,36 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 3:
             for (int z = 0; z < depthOut; ++z)
             {
-                const unsigned char* inOuter = &pixelDataIn[(z * 2) * width_ * height_ * 3];
+                const unsigned char* inOuter = &pixelDataIn[(z * 2)     * width_ * height_ * 3];
                 const unsigned char* inInner = &pixelDataIn[(z * 2 + 1) * width_ * height_ * 3];
 
                 for (int y = 0; y < heightOut; ++y)
                 {
-                    const unsigned char* inOuterUpper = &inOuter[(y * 2) * width_ * 3];
+                    const unsigned char* inOuterUpper = &inOuter[(y * 2)     * width_ * 3];
                     const unsigned char* inOuterLower = &inOuter[(y * 2 + 1) * width_ * 3];
-                    const unsigned char* inInnerUpper = &inInner[(y * 2) * width_ * 3];
+                    const unsigned char* inInnerUpper = &inInner[(y * 2)     * width_ * 3];
                     const unsigned char* inInnerLower = &inInner[(y * 2 + 1) * width_ * 3];
                     unsigned char* out = &pixelDataOut[z * widthOut * heightOut * 3 + y * widthOut * 3];
 
                     for (int x = 0; x < widthOut * 3; x += 3)
                     {
-                        out[x] = (unsigned char)(((unsigned)inOuterUpper[x * 2] + inOuterUpper[x * 2 + 3] +
-                                                  inOuterLower[x * 2] + inOuterLower[x * 2 + 3] +
-                                                  inInnerUpper[x * 2] + inInnerUpper[x * 2 + 3] +
-                                                  inInnerLower[x * 2] + inInnerLower[x * 2 + 3]) >> 3);
-                        out[x + 1] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 1] + inOuterUpper[x * 2 + 4] +
-                                                      inOuterLower[x * 2 + 1] + inOuterLower[x * 2 + 4] +
-                                                      inInnerUpper[x * 2 + 1] + inInnerUpper[x * 2 + 4] +
-                                                      inInnerLower[x * 2 + 1] + inInnerLower[x * 2 + 4]) >> 3);
-                        out[x + 2] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 2] + inOuterUpper[x * 2 + 5] +
-                                                      inOuterLower[x * 2 + 2] + inOuterLower[x * 2 + 5] +
-                                                      inInnerUpper[x * 2 + 2] + inInnerUpper[x * 2 + 5] +
-                                                      inInnerLower[x * 2 + 2] + inInnerLower[x * 2 + 5]) >> 3);
+                        out[x]     = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2])     + inOuterUpper[x * 2 + 3] +
+                                                                inOuterLower[x * 2]      + inOuterLower[x * 2 + 3] +
+                                                                inInnerUpper[x * 2]      + inInnerUpper[x * 2 + 3] +
+                                                                inInnerLower[x * 2]      + inInnerLower[x * 2 + 3]) >> 3);
+
+                        out[x + 1] = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2 + 1]) + inOuterUpper[x * 2 + 4] +
+                                                                inOuterLower[x * 2 + 1]  + inOuterLower[x * 2 + 4] +
+                                                                inInnerUpper[x * 2 + 1]  + inInnerUpper[x * 2 + 4] +
+                                                                inInnerLower[x * 2 + 1]  + inInnerLower[x * 2 + 4]) >> 3);
+
+                        out[x + 2] = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2 + 2]) + inOuterUpper[x * 2 + 5] +
+                                                                inOuterLower[x * 2 + 2]  + inOuterLower[x * 2 + 5] +
+                                                                inInnerUpper[x * 2 + 2]  + inInnerUpper[x * 2 + 5] +
+                                                                inInnerLower[x * 2 + 2]  + inInnerLower[x * 2 + 5]) >> 3);
                     }
                 }
             }
@@ -1850,31 +1868,36 @@ SharedPtr<Image> Image::GetNextLevel() const
         case 4:
             for (int z = 0; z < depthOut; ++z)
             {
-                const unsigned char* inOuter = &pixelDataIn[(z * 2) * width_ * height_ * 4];
+                const unsigned char* inOuter = &pixelDataIn[(z * 2)     * width_ * height_ * 4];
                 const unsigned char* inInner = &pixelDataIn[(z * 2 + 1) * width_ * height_ * 4];
 
                 for (int y = 0; y < heightOut; ++y)
                 {
-                    const unsigned char* inOuterUpper = &inOuter[(y * 2) * width_ * 4];
+                    const unsigned char* inOuterUpper = &inOuter[(y * 2)     * width_ * 4];
                     const unsigned char* inOuterLower = &inOuter[(y * 2 + 1) * width_ * 4];
-                    const unsigned char* inInnerUpper = &inInner[(y * 2) * width_ * 4];
+                    const unsigned char* inInnerUpper = &inInner[(y * 2)     * width_ * 4];
                     const unsigned char* inInnerLower = &inInner[(y * 2 + 1) * width_ * 4];
                     unsigned char* out = &pixelDataOut[z * widthOut * heightOut * 4 + y * widthOut * 4];
 
                     for (int x = 0; x < widthOut * 4; x += 4)
                     {
-                        out[x] = (unsigned char)(((unsigned)inOuterUpper[x * 2] + inOuterUpper[x * 2 + 4] +
-                                                  inOuterLower[x * 2] + inOuterLower[x * 2 + 4] +
-                                                  inInnerUpper[x * 2] + inInnerUpper[x * 2 + 4] +
-                                                  inInnerLower[x * 2] + inInnerLower[x * 2 + 4]) >> 3);
-                        out[x + 1] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 1] + inOuterUpper[x * 2 + 5] +
-                                                      inOuterLower[x * 2 + 1] + inOuterLower[x * 2 + 5] +
-                                                      inInnerUpper[x * 2 + 1] + inInnerUpper[x * 2 + 5] +
-                                                      inInnerLower[x * 2 + 1] + inInnerLower[x * 2 + 5]) >> 3);
-                        out[x + 2] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 2] + inOuterUpper[x * 2 + 6] +
-                                                      inOuterLower[x * 2 + 2] + inOuterLower[x * 2 + 6] +
-                                                      inInnerUpper[x * 2 + 2] + inInnerUpper[x * 2 + 6] +
-                                                      inInnerLower[x * 2 + 2] + inInnerLower[x * 2 + 6]) >> 3);
+                        out[x]     = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2])     + inOuterUpper[x * 2 + 4] +
+                                                                inOuterLower[x * 2]      + inOuterLower[x * 2 + 4] +
+                                                                inInnerUpper[x * 2]      + inInnerUpper[x * 2 + 4] +
+                                                                inInnerLower[x * 2]      + inInnerLower[x * 2 + 4]) >> 3);
+
+                        out[x + 1] = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2 + 1]) + inOuterUpper[x * 2 + 5] +
+                                                                inOuterLower[x * 2 + 1]  + inOuterLower[x * 2 + 5] +
+                                                                inInnerUpper[x * 2 + 1]  + inInnerUpper[x * 2 + 5] +
+                                                                inInnerLower[x * 2 + 1]  + inInnerLower[x * 2 + 5]) >> 3);
+
+                        out[x + 2] = static_cast<unsigned char>(
+                                         (static_cast<unsigned>(inOuterUpper[x * 2 + 2]) + inOuterUpper[x * 2 + 6] +
+                                                                inOuterLower[x * 2 + 2]  + inOuterLower[x * 2 + 6] +
+                                                                inInnerUpper[x * 2 + 2]  + inInnerUpper[x * 2 + 6] +
+                                                                inInnerLower[x * 2 + 2]  + inInnerLower[x * 2 + 6]) >> 3);
                     }
                 }
             }
@@ -1994,9 +2017,9 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             if (!level.depth_)
                 level.depth_ = 1;
 
-            level.rowSize_ = level.width_ * level.blockSize_;
-            level.rows_ = (unsigned)level.height_;
-            level.data_ = data_.Get() + offset;
+            level.rowSize_  = level.width_ * level.blockSize_;
+            level.rows_     = static_cast<unsigned>(level.height_);
+            level.data_     = data_.Get() + offset;
             level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
 
             if (offset + level.dataSize_ > GetMemoryUse())
@@ -2032,9 +2055,9 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             if (!level.depth_)
                 level.depth_ = 1;
 
-            level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
-            level.rows_ = (unsigned)((level.height_ + 3) / 4);
-            level.data_ = data_.Get() + offset;
+            level.rowSize_  = ((level.width_ + 3) / 4) * level.blockSize_;
+            level.rows_     = static_cast<unsigned>((level.height_ + 3) / 4);
+            level.data_     = data_.Get() + offset;
             level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
 
             if (offset + level.dataSize_ > GetMemoryUse())
@@ -2068,12 +2091,12 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             if (!level.height_)
                 level.height_ = 1;
 
-            int dataWidth = Max(level.width_, level.blockSize_ == 2 ? 16 : 8);
+            int dataWidth  = Max(level.width_, level.blockSize_ == 2 ? 16 : 8);
             int dataHeight = Max(level.height_, 8);
-            level.data_ = data_.Get() + offset;
+            level.data_     = data_.Get() + offset;
             level.dataSize_ = (dataWidth * dataHeight * level.blockSize_ + 7) >> 3;
-            level.rows_ = (unsigned)dataHeight;
-            level.rowSize_ = level.dataSize_ / level.rows_;
+            level.rows_     = static_cast<unsigned>(dataHeight);
+            level.rowSize_  = level.dataSize_ / level.rows_;
 
             if (offset + level.dataSize_ > GetMemoryUse())
             {
@@ -2087,7 +2110,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
                 return level;
 
             offset += level.dataSize_;
-            level.width_ /= 2;
+            level.width_  /= 2;
             level.height_ /= 2;
             ++i;
         }
@@ -2115,7 +2138,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
     {
         int x = rect.left_;
         int y = rect.top_;
-        int width = rect.Width();
+        int width  = rect.Width();
         int height = rect.Height();
 
         auto* image = new Image(context_);
@@ -2126,8 +2149,8 @@ Image* Image::GetSubimage(const IntRect& rect) const
         for (int i = 0; i < height; ++i)
         {
             memcpy(dest, src, (size_t)width * components_);
-            dest += width * components_;
-            src += width_ * components_;
+            dest += width  * components_;
+            src  += width_ * components_;
         }
 
         return image;
@@ -2136,9 +2159,9 @@ Image* Image::GetSubimage(const IntRect& rect) const
     {
         // Pad the region to be a multiple of block size
         IntRect paddedRect = rect;
-        paddedRect.left_ = (rect.left_ / 4) * 4;
-        paddedRect.top_ = (rect.top_ / 4) * 4;
-        paddedRect.right_ = (rect.right_ / 4) * 4;
+        paddedRect.left_   = (rect.left_   / 4) * 4;
+        paddedRect.top_    = (rect.top_    / 4) * 4;
+        paddedRect.right_  = (rect.right_  / 4) * 4;
         paddedRect.bottom_ = (rect.bottom_ / 4) * 4;
         IntRect currentRect = paddedRect;
 
@@ -2154,8 +2177,8 @@ Image* Image::GetSubimage(const IntRect& rect) const
 
             // Mips are stored continuously
             unsigned destStartOffset = subimageData.Size();
-            unsigned destRowSize = currentRect.Width() / 4 * level.blockSize_;
-            unsigned destSize = currentRect.Height() / 4 * destRowSize;
+            unsigned destRowSize = currentRect.Width()  / 4 * level.blockSize_;
+            unsigned destSize    = currentRect.Height() / 4 * destRowSize;
             if (!destSize)
                 break;
 
@@ -2171,7 +2194,9 @@ Image* Image::GetSubimage(const IntRect& rect) const
 
             ++subimageLevels;
             if ((currentRect.left_ & 4) || (currentRect.right_ & 4) || (currentRect.top_ & 4) || (currentRect.bottom_ & 4))
+            {
                 break;
+            }
             else
             {
                 currentRect.left_ /= 2;
@@ -2230,14 +2255,14 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
     if (imageRect.left_ < 0 || imageRect.top_ < 0 || imageRect.right_ > width_ || imageRect.bottom_ > height_ ||
         imageRect.left_ >= imageRect.right_ || imageRect.top_ >= imageRect.bottom_)
     {
-        imageRect.left_ = 0;
-        imageRect.top_ = 0;
-        imageRect.right_ = width_;
+        imageRect.left_   = 0;
+        imageRect.top_    = 0;
+        imageRect.right_  = width_;
         imageRect.bottom_ = height_;
     }
 
     int imageWidth = width_;
-    int width = imageRect.Width();
+    int width  = imageRect.Width();
     int height = imageRect.Height();
 
     // Assume little-endian for all the supported platforms
@@ -2386,7 +2411,7 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
             for (int x = 0; x < destWidth; ++x)
             {
                 // Calculate float coordinates between 0 - 1 for resampling
-                const float xF = (image->width_ > 1) ? static_cast<float>(x) / (destWidth - 1) : 0.0f;
+                const float xF = (image->width_  > 1) ? static_cast<float>(x) / (destWidth  - 1) : 0.0f;
                 const float yF = (image->height_ > 1) ? static_cast<float>(y) / (destHeight - 1) : 0.0f;
                 const unsigned uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
 

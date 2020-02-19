@@ -1050,7 +1050,7 @@ XMLElement XPathResultSet::FirstResult()
 
 unsigned XPathResultSet::Size() const
 {
-    return resultSet_ ? (unsigned)resultSet_->size() : 0;
+    return resultSet_ ? static_cast<unsigned>(resultSet_->size()) : 0;
 }
 
 bool XPathResultSet::Empty() const
@@ -1174,7 +1174,7 @@ float XPathQuery::EvaluateToFloat(const XMLElement& element) const
         return 0.0f;
 
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node() : pugi::xml_node(element.GetNode());
-    return (float)query_->evaluate_number(node);
+    return static_cast<float>(query_->evaluate_number(node));
 }
 
 String XPathQuery::EvaluateToString(const XMLElement& element) const
@@ -1185,7 +1185,7 @@ String XPathQuery::EvaluateToString(const XMLElement& element) const
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node() : pugi::xml_node(element.GetNode());
     String result;
     // First call get the size
-    result.Reserve((unsigned)query_->evaluate_string(nullptr, 0, node));
+    result.Reserve(static_cast<unsigned>(query_->evaluate_string(nullptr, 0, node)));
     // Second call get the actual string
     query_->evaluate_string(const_cast<pugi::char_t*>(result.CString()), result.Capacity(), node);
     return result;

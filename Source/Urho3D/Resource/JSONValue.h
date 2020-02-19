@@ -191,17 +191,17 @@ public:
     /// Return boolean value.
     bool GetBool(bool defaultValue = false) const { return IsBool() ? boolValue_ : defaultValue;}
     /// Return integer value.
-    int GetInt(int defaultValue = 0) const { return IsNumber() ? (int)numberValue_ : defaultValue; }
+    int GetInt(int defaultValue = 0) const { return IsNumber() ? static_cast<int>(numberValue_) : defaultValue; }
     /// Return unsigned integer value.
-    unsigned GetUInt(unsigned defaultValue = 0) const { return IsNumber() ? (unsigned)numberValue_ : defaultValue; }
+    unsigned GetUInt(unsigned defaultValue = 0) const { return IsNumber() ? static_cast<unsigned>(numberValue_) : defaultValue; }
     /// Return float value.
-    float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : defaultValue; }
+    float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? static_cast<float>(numberValue_) : defaultValue; }
     /// Return double value.
     double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
     /// Return string value. The 'defaultValue' may potentially be returned as is, so it is the responsibility of the caller to ensure the 'defaultValue' remains valid while the return value is being referenced.
     const String& GetString(const String& defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
     /// Return C string value. Default to empty string literal.
-    const char* GetCString(const char* defaultValue = "") const { return IsString() ? stringValue_->CString() : defaultValue;}
+    const char* GetCString(const char* defaultValue = "") const { return IsString() ? stringValue_->CString() : defaultValue; }
     /// Return JSON array value.
     const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.
