@@ -147,10 +147,10 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
+    unsigned ToHash() const { return x_ * 31U + y_; }
 
     /// Return length.
-    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_)); }
+    float Length() const { return sqrtf(static_cast<float>(x_ * x_ + y_ * y_)); }
 
     /// X coordinate.
     int x_;
@@ -187,8 +187,8 @@ public:
 
     /// Construct from an IntVector2.
     explicit Vector2(const IntVector2& vector) noexcept :
-        x_((float)vector.x_),
-        y_((float)vector.y_)
+        x_(static_cast<float>(vector.x_)),
+        y_(static_cast<float>(vector.y_))
     {
     }
 
