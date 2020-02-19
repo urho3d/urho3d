@@ -46,7 +46,7 @@ URHO3D_EVENT(E_RELOADFAILED, ReloadFailed)
 URHO3D_EVENT(E_FILECHANGED, FileChanged)
 {
     URHO3D_PARAM(P_FILENAME, FileName);                    // String
-    URHO3D_PARAM(P_CHANGEDTPYE, ChangedType);              // int
+    URHO3D_PARAM(P_CHANGETPYE, ChangeType);                // int
     URHO3D_PARAM(P_RESOURCENAME, ResourceName);            // String
 }
 

@@ -1086,7 +1086,7 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_FILENAME] = fileWatchers_[i]->GetPath() + change.fileName_;
-            eventData[P_CHANGEDTPYE] = (int)change.type_;
+            eventData[P_CHANGETPYE] = (int)change.type_;
             eventData[P_RESOURCENAME] = change.fileName_;
             SendEvent(E_FILECHANGED, eventData);
         }
