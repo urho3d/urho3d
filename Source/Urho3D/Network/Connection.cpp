@@ -108,12 +108,12 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     }
     
     VectorBuffer buffer;
-    buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
-    buffer.WriteUInt((unsigned int)msgID);
+    buffer.WriteUByte(static_cast<unsigned char>(DefaultMessageIDTypes::ID_USER_PACKET_ENUM));
+    buffer.WriteUInt(static_cast<unsigned int>(msgID));
     buffer.Write(data, numBytes);
     PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
     if (peer_) {
-        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0, *address_, false);
+        peer_->Send((const char *) buffer.GetData(), static_cast<int>(buffer.GetSize()), HIGH_PRIORITY, reliability, 0, *address_, false);
         tempPacketCounter_.y_++;
     }
 }
@@ -121,10 +121,10 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
     RemoteEvent queuedEvent;
-    queuedEvent.senderID_ = 0;
+    queuedEvent.senderID_  = 0;
     queuedEvent.eventType_ = eventType;
     queuedEvent.eventData_ = eventData;
-    queuedEvent.inOrder_ = inOrder;
+    queuedEvent.inOrder_   = inOrder;
     remoteEvents_.Push(queuedEvent);
 }
 
@@ -338,7 +338,8 @@ void Connection::SendPackages()
             HashMap<StringHash, PackageUpload>::Iterator current = i++;
             PackageUpload& upload = current->second_;
             auto fragmentSize =
-                (unsigned)Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
+                static_cast<unsigned>(Min(static_cast<int>(upload.file_->GetSize() - upload.file_->GetPosition()),
+                                          static_cast<int>(PACKAGE_FRAGMENT_SIZE)));
             upload.file_->Read(buffer, fragmentSize);
 
             msg_.Clear();
@@ -1012,7 +1013,7 @@ float Connection::GetRoundTripTime() const
     {
         SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
-            return (float)peer_->GetAveragePing(*address_);
+            return static_cast<float>(peer_->GetAveragePing(*address_));
     }
     return 0.0f;
 }
@@ -1028,7 +1029,7 @@ float Connection::GetBytesInPerSec() const
     {
         SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
-            return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_RECEIVED];
+            return static_cast<float>(stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_RECEIVED]);
     }
     return 0.0f;
 }
@@ -1039,7 +1040,7 @@ float Connection::GetBytesOutPerSec() const
     {
         SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
-            return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_SENT];
+            return static_cast<float>(stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_SENT]);
     }
     return 0.0f;
 }
@@ -1079,7 +1080,7 @@ float Connection::GetDownloadProgress() const
     for (HashMap<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
     {
         if (i->second_.initiated_)
-            return (float)i->second_.receivedFragments_.Size() / (float)i->second_.totalFragments_;
+            return static_cast<float>(i->second_.receivedFragments_.Size()) / i->second_.totalFragments_;
     }
     return 1.0f;
 }
@@ -1151,14 +1152,18 @@ void Connection::ProcessNode(unsigned nodeID)
             sceneState_.nodeStates_.Erase(nodeID);
         }
         else
+        {
             ProcessExistingNode(node, i->second_);
+        }
     }
     else
     {
         // Replication state not found: this is a new node
         Node* node = scene_->GetNode(nodeID);
         if (node)
+        {
             ProcessNewNode(node);
+        }
         else
         {
             // Did not find the new node (may have been created, then removed immediately): erase from dirty set.
@@ -1293,7 +1298,8 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 }
                 else
                 {
-                    // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
+                    // Variable has been marked dirty, but is removed (which is unsupported):
+                    // Send a dummy variable in place
                     URHO3D_LOGWARNING("Sending dummy user variable as original value was removed");
                     msg_.WriteStringHash(StringHash());
                     msg_.WriteVariant(Variant::EMPTY);
@@ -1480,9 +1486,9 @@ void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned 
         return; // Download already exists
 
     PackageDownload& download = downloads_[nameHash];
-    download.name_ = name;
+    download.name_           = name;
     download.totalFragments_ = (fileSize + PACKAGE_FRAGMENT_SIZE - 1) / PACKAGE_FRAGMENT_SIZE;
-    download.checksum_ = checksum;
+    download.checksum_       = checksum;
 
     // Start download now only if no existing downloads, else wait for the existing ones to finish
     if (downloads_.Size() == 1)

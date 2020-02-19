@@ -198,7 +198,7 @@ Network::Network(Context* context) :
     updateFps_(DEFAULT_UPDATE_FPS),
     simulatedLatency_(0),
     simulatedPacketLoss_(0.0f),
-    updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
+    updateInterval_(1.0f / DEFAULT_UPDATE_FPS),
     updateAcc_(0.0f),
     isServer_(false),
     scene_(nullptr),
@@ -297,8 +297,8 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
     Connection* connection = GetConnection(source);
     if (connection)
     {
-        MemoryBuffer msg(data, (unsigned)numBytes);
-        if (connection->ProcessMessage((int)msgID, msg))
+        MemoryBuffer msg(data, static_cast<unsigned>(numBytes));
+        if (connection->ProcessMessage(msgID, msg))
             return;
 
         // If message was not handled internally, forward as an event
@@ -306,12 +306,14 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
 
         VariantMap& eventData = GetEventDataMap();
         eventData[P_CONNECTION] = connection;
-        eventData[P_MESSAGEID] = (int)msgID;
+        eventData[P_MESSAGEID]  = msgID;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
     else
+    {
         URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()));
+    }
 }
 
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
@@ -412,7 +414,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     }
     else
     {
-        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
+        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String(static_cast<int>(connectResult)));
         SendEvent(E_CONNECTFAILED);
         return false;
     }
@@ -446,12 +448,12 @@ bool Network::StartServer(unsigned short port, unsigned int maxConnections)
         isServer_ = true;
         rakPeer_->SetOccasionalPing(true);
         rakPeer_->SetUnreliableTimeout(1000);
-        //rakPeer_->SetIncomingPassword("Parole", (int)strlen("Parole"));
+        //rakPeer_->SetIncomingPassword("Parole", static_cast<int>(strlen("Parole")));
         return true;
     }
     else
     {
-        URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String((int)startResult));
+        URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String(static_cast<int>(startResult)));
         return false;
     }
 }
@@ -536,7 +538,8 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
     msgData.Write(data, numBytes);
 
     if (isServer_)
-        rakPeer_->Send((const char*)msgData.GetData(), (int)msgData.GetSize(), HIGH_PRIORITY, RELIABLE, (char)0, SLNet::UNASSIGNED_RAKNET_GUID, true);
+        rakPeer_->Send((const char*)msgData.GetData(), static_cast<int>(msgData.GetSize()),
+                       HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_RAKNET_GUID, true);
     else
         URHO3D_LOGERROR("Server not running, can not broadcast messages");
 }
@@ -582,7 +585,7 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
 void Network::SetUpdateFps(int fps)
 {
     updateFps_ = Max(fps, 1);
-    updateInterval_ = 1.0f / (float)updateFps_;
+    updateInterval_ = 1.0f / updateFps_;
     updateAcc_ = 0.0f;
 }
 
@@ -663,7 +666,9 @@ void Network::BanAddress(const String& address)
 Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
 {
     if (serverConnection_ && serverConnection_->GetAddressOrGUID() == connection)
+    {
         return serverConnection_;
+    }
     else
     {
         HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
@@ -684,7 +689,9 @@ Vector<SharedPtr<Connection> > Network::GetClientConnections() const
     Vector<SharedPtr<Connection> > ret;
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
+    {
         ret.Push(i->second_);
+    }
 
     return ret;
 }
@@ -860,7 +867,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             }
 
             eventMap[P_ADDRESS] = String(packet->systemAddress.ToString(false));
-            eventMap[P_PORT] = (int)packet->systemAddress.GetPort();
+            eventMap[P_PORT] = static_cast<int>(packet->systemAddress.GetPort());
             SendEvent(E_NETWORKHOSTDISCOVERED, eventMap);
         }
         packetHandled = true;
@@ -1031,7 +1038,9 @@ void Network::ConfigureNetworkSimulator()
 
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
+    {
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+    }
 }
 
 void RegisterNetworkLibrary(Context* context)
