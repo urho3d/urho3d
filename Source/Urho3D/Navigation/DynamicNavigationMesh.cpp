@@ -69,7 +69,7 @@ struct TileCompressor : public dtTileCacheCompressor
 {
     int maxCompressedSize(const int bufferSize) override
     {
-        return (int)(bufferSize * 1.05f);
+        return static_cast<int>(bufferSize * 1.05f);
     }
 
     dtStatus compress(const unsigned char* buffer, const int bufferSize,
@@ -133,9 +133,9 @@ struct MeshProcess : public dtTileCacheMeshProcess
                     offMeshVertices_.Push(start);
                     offMeshVertices_.Push(end);
                     offMeshRadii_.Push(connection->GetRadius());
-                    offMeshFlags_.Push((unsigned short)connection->GetMask());
-                    offMeshAreas_.Push((unsigned char)connection->GetAreaID());
-                    offMeshDir_.Push((unsigned char)(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0));
+                    offMeshFlags_.Push(static_cast<unsigned short>(connection->GetMask()));
+                    offMeshAreas_.Push(static_cast<unsigned char>(connection->GetAreaID()));
+                    offMeshDir_.Push(static_cast<unsigned char>(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0));
                 }
             }
             params->offMeshConCount = offMeshRadii_.Size();
@@ -251,7 +251,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
 
     // Calculate number of tiles
     int gridW = 0, gridH = 0;
-    float tileEdgeLength = (float)tileSize_ * cellSize_;
+    float tileEdgeLength = tileSize_ * cellSize_;
     rcCalcGridSize(&boundingBox_.min_.x_, &boundingBox_.max_.x_, cellSize_, &gridW, &gridH);
     numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
     numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
@@ -365,13 +365,13 @@ bool DynamicNavigationMesh::Build()
 
         // Calculate number of tiles
         int gridW = 0, gridH = 0;
-        float tileEdgeLength = (float)tileSize_ * cellSize_;
+        float tileEdgeLength = tileSize_ * cellSize_;
         rcCalcGridSize(&boundingBox_.min_.x_, &boundingBox_.max_.x_, cellSize_, &gridW, &gridH);
         numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
         numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
 
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
-        unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * maxLayers_;
+        unsigned maxTiles = NextPowerOfTwo(static_cast<unsigned>(numTilesX_) * numTilesZ_) * maxLayers_;
         unsigned tileBits = LogBaseTwo(maxTiles);
         unsigned maxPolys = 1u << (22 - tileBits);
 
@@ -497,15 +497,15 @@ bool DynamicNavigationMesh::Build(const BoundingBox& boundingBox)
 
     BoundingBox localSpaceBox = boundingBox.Transformed(node_->GetWorldTransform().Inverse());
 
-    float tileEdgeLength = (float)tileSize_ * cellSize_;
+    float tileEdgeLength = tileSize_ * cellSize_;
 
     Vector<NavigationGeometryInfo> geometryList;
     CollectGeometries(geometryList);
 
-    int sx = Clamp((int)((localSpaceBox.min_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
-    int sz = Clamp((int)((localSpaceBox.min_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
-    int ex = Clamp((int)((localSpaceBox.max_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
-    int ez = Clamp((int)((localSpaceBox.max_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
+    int sx = Clamp(static_cast<int>((localSpaceBox.min_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
+    int sz = Clamp(static_cast<int>((localSpaceBox.min_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
+    int ex = Clamp(static_cast<int>((localSpaceBox.max_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
+    int ez = Clamp(static_cast<int>((localSpaceBox.max_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
 
     unsigned numTiles = BuildTiles(geometryList, IntVector2(sx, sz), IntVector2(ex, ez));
 
@@ -763,7 +763,7 @@ void DynamicNavigationMesh::WriteTiles(Serializer& dest, int x, int z) const
                       // The header conveniently has the majority of the information required
         dest.Write(tile->header, sizeof(dtTileCacheLayerHeader));
         dest.WriteInt(tile->dataSize);
-        dest.Write(tile->data, (unsigned)tile->dataSize);
+        dest.Write(tile->data, static_cast<unsigned>(tile->dataSize));
     }
 }
 
@@ -783,7 +783,7 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
             return false;
         }
 
-        source.Read(data, (unsigned)dataSize);
+        source.Read(data, static_cast<unsigned>(dataSize));
         if (dtStatusFailed(tileCache_->addTile(data, dataSize, DT_TILE_FREE_DATA, nullptr)))
         {
             URHO3D_LOGERROR("Failed to add tile");
@@ -831,21 +831,21 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
     memset(&cfg, 0, sizeof cfg);
     cfg.cs = cellSize_;
     cfg.ch = cellHeight_;
-    cfg.walkableSlopeAngle = agentMaxSlope_;
-    cfg.walkableHeight = (int)ceilf(agentHeight_ / cfg.ch);
-    cfg.walkableClimb = (int)floorf(agentMaxClimb_ / cfg.ch);
-    cfg.walkableRadius = (int)ceilf(agentRadius_ / cfg.cs);
-    cfg.maxEdgeLen = (int)(edgeMaxLength_ / cellSize_);
+    cfg.walkableSlopeAngle     = agentMaxSlope_;
+    cfg.walkableHeight         = static_cast<int>(ceilf(agentHeight_ / cfg.ch));
+    cfg.walkableClimb          = static_cast<int>(floorf(agentMaxClimb_ / cfg.ch));
+    cfg.walkableRadius         = static_cast<int>(ceilf(agentRadius_ / cfg.cs));
+    cfg.maxEdgeLen             = static_cast<int>(edgeMaxLength_ / cellSize_);
     cfg.maxSimplificationError = edgeMaxError_;
-    cfg.minRegionArea = (int)sqrtf(regionMinSize_);
-    cfg.mergeRegionArea = (int)sqrtf(regionMergeSize_);
-    cfg.maxVertsPerPoly = 6;
-    cfg.tileSize = tileSize_;
-    cfg.borderSize = cfg.walkableRadius + 3; // Add padding
-    cfg.width = cfg.tileSize + cfg.borderSize * 2;
-    cfg.height = cfg.tileSize + cfg.borderSize * 2;
-    cfg.detailSampleDist = detailSampleDistance_ < 0.9f ? 0.0f : cellSize_ * detailSampleDistance_;
-    cfg.detailSampleMaxError = cellHeight_ * detailSampleMaxError_;
+    cfg.minRegionArea          = static_cast<int>(sqrtf(regionMinSize_));
+    cfg.mergeRegionArea        = static_cast<int>(sqrtf(regionMergeSize_));
+    cfg.maxVertsPerPoly        = 6;
+    cfg.tileSize               = tileSize_;
+    cfg.borderSize             = cfg.walkableRadius + 3; // Add padding
+    cfg.width                  = cfg.tileSize + cfg.borderSize * 2;
+    cfg.height                 = cfg.tileSize + cfg.borderSize * 2;
+    cfg.detailSampleDist       = detailSampleDistance_ < 0.9f ? 0.0f : cellSize_ * detailSampleDistance_;
+    cfg.detailSampleMaxError   = cellHeight_ * detailSampleMaxError_;
 
     rcVcopy(cfg.bmin, &tileBoundingBox.min_.x_);
     rcVcopy(cfg.bmax, &tileBoundingBox.max_.x_);
@@ -962,14 +962,14 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
         // Tile info.
         rcVcopy(header.bmin, layer->bmin);
         rcVcopy(header.bmax, layer->bmax);
-        header.width = (unsigned char)layer->width;
-        header.height = (unsigned char)layer->height;
-        header.minx = (unsigned char)layer->minx;
-        header.maxx = (unsigned char)layer->maxx;
-        header.miny = (unsigned char)layer->miny;
-        header.maxy = (unsigned char)layer->maxy;
-        header.hmin = (unsigned short)layer->hmin;
-        header.hmax = (unsigned short)layer->hmax;
+        header.width  = static_cast<unsigned char>(layer->width);
+        header.height = static_cast<unsigned char>(layer->height);
+        header.minx   = static_cast<unsigned char>(layer->minx);
+        header.maxx   = static_cast<unsigned char>(layer->maxx);
+        header.miny   = static_cast<unsigned char>(layer->miny);
+        header.maxy   = static_cast<unsigned char>(layer->maxy);
+        header.hmin   = static_cast<unsigned short>(layer->hmin);
+        header.hmax   = static_cast<unsigned short>(layer->hmax);
 
         if (dtStatusFailed(
             dtBuildTileCacheLayer(compressor_.Get()/*compressor*/, &header, layer->heights, layer->areas/*areas*/, layer->cons,

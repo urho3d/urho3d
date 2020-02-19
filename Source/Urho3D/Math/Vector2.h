@@ -147,7 +147,7 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return x_ * 31U + y_; }
+    unsigned ToHash() const { return x_ * 31u + y_; }
 
     /// Return length.
     float Length() const { return sqrtf(static_cast<float>(x_ * x_ + y_ * y_)); }

@@ -338,7 +338,7 @@ bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
 
     // Calculate number of tiles
     int gridW = 0, gridH = 0;
-    float tileEdgeLength = (float)tileSize_ * cellSize_;
+    float tileEdgeLength = tileSize_ * cellSize_;
     rcCalcGridSize(&boundingBox_.min_.x_, &boundingBox_.max_.x_, cellSize_, &gridW, &gridH);
     numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
     numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
@@ -413,13 +413,13 @@ bool NavigationMesh::Build()
 
         // Calculate number of tiles
         int gridW = 0, gridH = 0;
-        float tileEdgeLength = (float)tileSize_ * cellSize_;
+        float tileEdgeLength = tileSize_ * cellSize_;
         rcCalcGridSize(&boundingBox_.min_.x_, &boundingBox_.max_.x_, cellSize_, &gridW, &gridH);
         numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
         numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
 
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
-        unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_));
+        unsigned maxTiles = NextPowerOfTwo(static_cast<unsigned>(numTilesX_ * numTilesZ_));
         unsigned tileBits = LogBaseTwo(maxTiles);
         unsigned maxPolys = 1u << (22 - tileBits);
 
@@ -480,15 +480,15 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
 
     BoundingBox localSpaceBox = boundingBox.Transformed(node_->GetWorldTransform().Inverse());
 
-    float tileEdgeLength = (float)tileSize_ * cellSize_;
+    float tileEdgeLength = tileSize_ * cellSize_;
 
     Vector<NavigationGeometryInfo> geometryList;
     CollectGeometries(geometryList);
 
-    int sx = Clamp((int)((localSpaceBox.min_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
-    int sz = Clamp((int)((localSpaceBox.min_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
-    int ex = Clamp((int)((localSpaceBox.max_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
-    int ez = Clamp((int)((localSpaceBox.max_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
+    int sx = Clamp(static_cast<int>((localSpaceBox.min_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
+    int sz = Clamp(static_cast<int>((localSpaceBox.min_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
+    int ex = Clamp(static_cast<int>((localSpaceBox.max_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
+    int ez = Clamp(static_cast<int>((localSpaceBox.max_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
 
     unsigned numTiles = BuildTiles(geometryList, IntVector2(sx, sz), IntVector2(ex, ez));
 
@@ -543,23 +543,23 @@ bool NavigationMesh::HasTile(const IntVector2& tile) const
 
 BoundingBox NavigationMesh::GetTileBoundingBox(const IntVector2& tile) const
 {
-    const float tileEdgeLength = (float)tileSize_ * cellSize_;
+    const float tileEdgeLength = tileSize_ * cellSize_;
     return BoundingBox(
         Vector3(
-            boundingBox_.min_.x_ + tileEdgeLength * (float)tile.x_,
+            boundingBox_.min_.x_ + tileEdgeLength * tile.x_,
             boundingBox_.min_.y_,
-            boundingBox_.min_.z_ + tileEdgeLength * (float)tile.y_
+            boundingBox_.min_.z_ + tileEdgeLength * tile.y_
         ),
         Vector3(
-            boundingBox_.min_.x_ + tileEdgeLength * (float)(tile.x_ + 1),
+            boundingBox_.min_.x_ + tileEdgeLength * (tile.x_ + 1),
             boundingBox_.max_.y_,
-            boundingBox_.min_.z_ + tileEdgeLength * (float)(tile.y_ + 1)
+            boundingBox_.min_.z_ + tileEdgeLength * (tile.y_ + 1)
         ));
 }
 
 IntVector2 NavigationMesh::GetTileIndex(const Vector3& position) const
 {
-    const float tileEdgeLength = (float)tileSize_ * cellSize_;
+    const float tileEdgeLength = tileSize_ * cellSize_;
     const Vector3 localPosition = node_->GetWorldTransform().Inverse() * position - boundingBox_.min_;
     const Vector2 localPosition2D(localPosition.x_, localPosition.z_);
     return VectorMin(VectorMax(IntVector2::ZERO, VectorFloorToInt(localPosition2D / tileEdgeLength)), GetNumTiles() - IntVector2::ONE);
@@ -633,7 +633,7 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     Matrix3x4 inverse = transform.Inverse();
 
     Vector3 localStart = inverse * start;
-    Vector3 localEnd = inverse * end;
+    Vector3 localEnd   = inverse * end;
 
     const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
     dtPolyRef startRef;
@@ -644,7 +644,7 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     Vector3 resultPos;
     int visitedCount = 0;
     maxVisited = Max(maxVisited, 0);
-    PODVector<dtPolyRef> visited((unsigned)maxVisited);
+    PODVector<dtPolyRef> visited(static_cast<unsigned>(maxVisited));
     navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter, &resultPos.x_, maxVisited ?
         &visited[0] : nullptr, &visitedCount, maxVisited);
     return transform * resultPos;
@@ -731,7 +731,7 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
                 }
             }
         }
-        pt.areaID_ = (unsigned char)nearestNavAreaID;
+        pt.areaID_ = static_cast<unsigned char>(nearestNavAreaID);
 
         dest.Push(pt);
     }
@@ -861,7 +861,7 @@ void NavigationMesh::DrawDebugGeometry(bool depthTest)
 void NavigationMesh::SetAreaCost(unsigned areaID, float cost)
 {
     if (queryFilter_)
-        queryFilter_->setAreaCost((int)areaID, cost);
+        queryFilter_->setAreaCost(static_cast<int>(areaID), cost);
 }
 
 BoundingBox NavigationMesh::GetWorldBoundingBox() const
@@ -872,7 +872,7 @@ BoundingBox NavigationMesh::GetWorldBoundingBox() const
 float NavigationMesh::GetAreaCost(unsigned areaID) const
 {
     if (queryFilter_)
-        return queryFilter_->getAreaCost((int)areaID);
+        return queryFilter_->getAreaCost(static_cast<int>(areaID));
     return 1.0f;
 }
 
@@ -886,15 +886,15 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
     MemoryBuffer buffer(value);
 
     boundingBox_ = buffer.ReadBoundingBox();
-    numTilesX_ = buffer.ReadInt();
-    numTilesZ_ = buffer.ReadInt();
+    numTilesX_   = buffer.ReadInt();
+    numTilesZ_   = buffer.ReadInt();
 
     dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     rcVcopy(params.orig, &boundingBox_.min_.x_);
-    params.tileWidth = buffer.ReadFloat();
+    params.tileWidth  = buffer.ReadFloat();
     params.tileHeight = buffer.ReadFloat();
-    params.maxTiles = buffer.ReadInt();
-    params.maxPolys = buffer.ReadInt();
+    params.maxTiles   = buffer.ReadInt();
+    params.maxPolys   = buffer.ReadInt();
 
     navMesh_ = dtAllocNavMesh();
     if (!navMesh_)
@@ -1101,16 +1101,16 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                 build->offMeshVertices_.Push(start);
                 build->offMeshVertices_.Push(end);
                 build->offMeshRadii_.Push(connection->GetRadius());
-                build->offMeshFlags_.Push((unsigned short)connection->GetMask());
-                build->offMeshAreas_.Push((unsigned char)connection->GetAreaID());
-                build->offMeshDir_.Push((unsigned char)(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0));
+                build->offMeshFlags_.Push(static_cast<unsigned short>(connection->GetMask()));
+                build->offMeshAreas_.Push(static_cast<unsigned char>(connection->GetAreaID()));
+                build->offMeshDir_.Push(static_cast<unsigned char>(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0));
                 continue;
             }
             else if (geometryList[i].component_->GetType() == NavArea::GetTypeStatic())
             {
                 auto* area = static_cast<NavArea*>(geometryList[i].component_);
                 NavAreaStub stub;
-                stub.areaID_ = (unsigned char)area->GetAreaID();
+                stub.areaID_ = static_cast<unsigned char>(area->GetAreaID());
                 stub.bounds_ = area->GetWorldBoundingBox();
                 build->navAreas_.Push(stub);
                 continue;
@@ -1260,8 +1260,8 @@ void NavigationMesh::WriteTile(Serializer& dest, int x, int z) const
     dest.WriteInt(x);
     dest.WriteInt(z);
     dest.WriteUInt(navMesh->getTileRef(tile));
-    dest.WriteUInt((unsigned)tile->dataSize);
-    dest.Write(tile->data, (unsigned)tile->dataSize);
+    dest.WriteUInt(static_cast<unsigned>(tile->dataSize));
+    dest.Write(tile->data, static_cast<unsigned>(tile->dataSize));
 }
 
 bool NavigationMesh::ReadTile(Deserializer& source, bool silent)
@@ -1318,10 +1318,10 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     cfg.walkableHeight = CeilToInt(agentHeight_ / cfg.ch);
     cfg.walkableClimb = FloorToInt(agentMaxClimb_ / cfg.ch);
     cfg.walkableRadius = CeilToInt(agentRadius_ / cfg.cs);
-    cfg.maxEdgeLen = (int)(edgeMaxLength_ / cellSize_);
+    cfg.maxEdgeLen = static_cast<int>(edgeMaxLength_ / cellSize_);
     cfg.maxSimplificationError = edgeMaxError_;
-    cfg.minRegionArea = (int)sqrtf(regionMinSize_);
-    cfg.mergeRegionArea = (int)sqrtf(regionMergeSize_);
+    cfg.minRegionArea = static_cast<int>(sqrtf(regionMinSize_));
+    cfg.mergeRegionArea = static_cast<int>(sqrtf(regionMergeSize_));
     cfg.maxVertsPerPoly = 6;
     cfg.tileSize = tileSize_;
     cfg.borderSize = cfg.walkableRadius + 3; // Add padding
@@ -1467,23 +1467,23 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
 
     dtNavMeshCreateParams params;       // NOLINT(hicpp-member-init)
     memset(&params, 0, sizeof params);
-    params.verts = build.polyMesh_->verts;
-    params.vertCount = build.polyMesh_->nverts;
-    params.polys = build.polyMesh_->polys;
-    params.polyAreas = build.polyMesh_->areas;
-    params.polyFlags = build.polyMesh_->flags;
-    params.polyCount = build.polyMesh_->npolys;
-    params.nvp = build.polyMesh_->nvp;
-    params.detailMeshes = build.polyMeshDetail_->meshes;
-    params.detailVerts = build.polyMeshDetail_->verts;
+    params.verts            = build.polyMesh_->verts;
+    params.vertCount        = build.polyMesh_->nverts;
+    params.polys            = build.polyMesh_->polys;
+    params.polyAreas        = build.polyMesh_->areas;
+    params.polyFlags        = build.polyMesh_->flags;
+    params.polyCount        = build.polyMesh_->npolys;
+    params.nvp              = build.polyMesh_->nvp;
+    params.detailMeshes     = build.polyMeshDetail_->meshes;
+    params.detailVerts      = build.polyMeshDetail_->verts;
     params.detailVertsCount = build.polyMeshDetail_->nverts;
-    params.detailTris = build.polyMeshDetail_->tris;
-    params.detailTriCount = build.polyMeshDetail_->ntris;
-    params.walkableHeight = agentHeight_;
-    params.walkableRadius = agentRadius_;
-    params.walkableClimb = agentMaxClimb_;
-    params.tileX = x;
-    params.tileY = z;
+    params.detailTris       = build.polyMeshDetail_->tris;
+    params.detailTriCount   = build.polyMeshDetail_->ntris;
+    params.walkableHeight   = agentHeight_;
+    params.walkableRadius   = agentRadius_;
+    params.walkableClimb    = agentMaxClimb_;
+    params.tileX            = x;
+    params.tileY            = z;
     rcVcopy(params.bmin, build.polyMesh_->bmin);
     rcVcopy(params.bmax, build.polyMesh_->bmax);
     params.cs = cfg.cs;
