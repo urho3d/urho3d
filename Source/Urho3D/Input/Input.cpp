@@ -457,12 +457,12 @@ void Input::Update()
         mpos -= windowPos;
 
         const int buffer = 5;
-        const int width = graphics_->GetWidth() - buffer * 2;
+        const int width  = graphics_->GetWidth()  - buffer * 2;
         const int height = graphics_->GetHeight() - buffer * 2;
 
         // SetMousePosition utilizes backbuffer coordinate system, scale now from window coordinates
-        mpos.x_ = (int)(mpos.x_ * inputScale_.x_);
-        mpos.y_ = (int)(mpos.y_ * inputScale_.y_);
+        mpos.x_ = static_cast<int>(mpos.x_ * inputScale_.x_);
+        mpos.y_ = static_cast<int>(mpos.y_ * inputScale_.y_);
 
         bool warp = false;
         if (mpos.x_ < buffer)
@@ -534,12 +534,12 @@ void Input::Update()
 
                 VariantMap& eventData = GetEventDataMap();
 
-                eventData[P_X] = mousePosition.x_;
-                eventData[P_Y] = mousePosition.y_;
-                eventData[P_DX] = mouseMove_.x_;
-                eventData[P_DY] = mouseMove_.y_;
-                eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
-                eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
+                eventData[P_X]          = mousePosition.x_;
+                eventData[P_Y]          = mousePosition.y_;
+                eventData[P_DX]         = mouseMove_.x_;
+                eventData[P_DY]         = mouseMove_.y_;
+                eventData[P_BUTTONS]    = static_cast<unsigned>(mouseButtonDown_);
+                eventData[P_QUALIFIERS] = static_cast<unsigned>(GetQualifiers());
                 SendEvent(E_MOUSEMOVE, eventData);
             }
         }
@@ -913,7 +913,7 @@ void Input::SetMouseMode(MouseMode mode, bool suppressEvent)
         if (mouseMode_ != previousMode)
         {
             VariantMap& eventData = GetEventDataMap();
-            eventData[MouseModeChanged::P_MODE] = mode;
+            eventData[MouseModeChanged::P_MODE]        = mode;
             eventData[MouseModeChanged::P_MOUSELOCKED] = IsMouseLocked();
             SendEvent(E_MOUSEMODECHANGED, eventData);
         }
@@ -934,38 +934,38 @@ static void PopulateKeyBindingMap(HashMap<String, int>& keyBindingMap)
 {
     if (keyBindingMap.Empty())
     {
-        keyBindingMap.Insert(MakePair<String, int>("SPACE", KEY_SPACE));
-        keyBindingMap.Insert(MakePair<String, int>("LCTRL", KEY_LCTRL));
-        keyBindingMap.Insert(MakePair<String, int>("RCTRL", KEY_RCTRL));
-        keyBindingMap.Insert(MakePair<String, int>("LSHIFT", KEY_LSHIFT));
-        keyBindingMap.Insert(MakePair<String, int>("RSHIFT", KEY_RSHIFT));
-        keyBindingMap.Insert(MakePair<String, int>("LALT", KEY_LALT));
-        keyBindingMap.Insert(MakePair<String, int>("RALT", KEY_RALT));
-        keyBindingMap.Insert(MakePair<String, int>("LGUI", KEY_LGUI));
-        keyBindingMap.Insert(MakePair<String, int>("RGUI", KEY_RGUI));
-        keyBindingMap.Insert(MakePair<String, int>("TAB", KEY_TAB));
-        keyBindingMap.Insert(MakePair<String, int>("RETURN", KEY_RETURN));
-        keyBindingMap.Insert(MakePair<String, int>("RETURN2", KEY_RETURN2));
-        keyBindingMap.Insert(MakePair<String, int>("ENTER", KEY_KP_ENTER));
-        keyBindingMap.Insert(MakePair<String, int>("SELECT", KEY_SELECT));
-        keyBindingMap.Insert(MakePair<String, int>("LEFT", KEY_LEFT));
-        keyBindingMap.Insert(MakePair<String, int>("RIGHT", KEY_RIGHT));
-        keyBindingMap.Insert(MakePair<String, int>("UP", KEY_UP));
-        keyBindingMap.Insert(MakePair<String, int>("DOWN", KEY_DOWN));
-        keyBindingMap.Insert(MakePair<String, int>("PAGEUP", KEY_PAGEUP));
+        keyBindingMap.Insert(MakePair<String, int>("SPACE",    KEY_SPACE));
+        keyBindingMap.Insert(MakePair<String, int>("LCTRL",    KEY_LCTRL));
+        keyBindingMap.Insert(MakePair<String, int>("RCTRL",    KEY_RCTRL));
+        keyBindingMap.Insert(MakePair<String, int>("LSHIFT",   KEY_LSHIFT));
+        keyBindingMap.Insert(MakePair<String, int>("RSHIFT",   KEY_RSHIFT));
+        keyBindingMap.Insert(MakePair<String, int>("LALT",     KEY_LALT));
+        keyBindingMap.Insert(MakePair<String, int>("RALT",     KEY_RALT));
+        keyBindingMap.Insert(MakePair<String, int>("LGUI",     KEY_LGUI));
+        keyBindingMap.Insert(MakePair<String, int>("RGUI",     KEY_RGUI));
+        keyBindingMap.Insert(MakePair<String, int>("TAB",      KEY_TAB));
+        keyBindingMap.Insert(MakePair<String, int>("RETURN",   KEY_RETURN));
+        keyBindingMap.Insert(MakePair<String, int>("RETURN2",  KEY_RETURN2));
+        keyBindingMap.Insert(MakePair<String, int>("ENTER",    KEY_KP_ENTER));
+        keyBindingMap.Insert(MakePair<String, int>("SELECT",   KEY_SELECT));
+        keyBindingMap.Insert(MakePair<String, int>("LEFT",     KEY_LEFT));
+        keyBindingMap.Insert(MakePair<String, int>("RIGHT",    KEY_RIGHT));
+        keyBindingMap.Insert(MakePair<String, int>("UP",       KEY_UP));
+        keyBindingMap.Insert(MakePair<String, int>("DOWN",     KEY_DOWN));
+        keyBindingMap.Insert(MakePair<String, int>("PAGEUP",   KEY_PAGEUP));
         keyBindingMap.Insert(MakePair<String, int>("PAGEDOWN", KEY_PAGEDOWN));
-        keyBindingMap.Insert(MakePair<String, int>("F1", KEY_F1));
-        keyBindingMap.Insert(MakePair<String, int>("F2", KEY_F2));
-        keyBindingMap.Insert(MakePair<String, int>("F3", KEY_F3));
-        keyBindingMap.Insert(MakePair<String, int>("F4", KEY_F4));
-        keyBindingMap.Insert(MakePair<String, int>("F5", KEY_F5));
-        keyBindingMap.Insert(MakePair<String, int>("F6", KEY_F6));
-        keyBindingMap.Insert(MakePair<String, int>("F7", KEY_F7));
-        keyBindingMap.Insert(MakePair<String, int>("F8", KEY_F8));
-        keyBindingMap.Insert(MakePair<String, int>("F9", KEY_F9));
-        keyBindingMap.Insert(MakePair<String, int>("F10", KEY_F10));
-        keyBindingMap.Insert(MakePair<String, int>("F11", KEY_F11));
-        keyBindingMap.Insert(MakePair<String, int>("F12", KEY_F12));
+        keyBindingMap.Insert(MakePair<String, int>("F1",       KEY_F1));
+        keyBindingMap.Insert(MakePair<String, int>("F2",       KEY_F2));
+        keyBindingMap.Insert(MakePair<String, int>("F3",       KEY_F3));
+        keyBindingMap.Insert(MakePair<String, int>("F4",       KEY_F4));
+        keyBindingMap.Insert(MakePair<String, int>("F5",       KEY_F5));
+        keyBindingMap.Insert(MakePair<String, int>("F6",       KEY_F6));
+        keyBindingMap.Insert(MakePair<String, int>("F7",       KEY_F7));
+        keyBindingMap.Insert(MakePair<String, int>("F8",       KEY_F8));
+        keyBindingMap.Insert(MakePair<String, int>("F9",       KEY_F9));
+        keyBindingMap.Insert(MakePair<String, int>("F10",      KEY_F10));
+        keyBindingMap.Insert(MakePair<String, int>("F11",      KEY_F11));
+        keyBindingMap.Insert(MakePair<String, int>("F12",      KEY_F12));
     }
 }
 
@@ -973,11 +973,11 @@ static void PopulateMouseButtonBindingMap(HashMap<String, int>& mouseButtonBindi
 {
     if (mouseButtonBindingMap.Empty())
     {
-        mouseButtonBindingMap.Insert(MakePair<String, int>("LEFT", SDL_BUTTON_LEFT));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("LEFT",   SDL_BUTTON_LEFT));
         mouseButtonBindingMap.Insert(MakePair<String, int>("MIDDLE", SDL_BUTTON_MIDDLE));
-        mouseButtonBindingMap.Insert(MakePair<String, int>("RIGHT", SDL_BUTTON_RIGHT));
-        mouseButtonBindingMap.Insert(MakePair<String, int>("X1", SDL_BUTTON_X1));
-        mouseButtonBindingMap.Insert(MakePair<String, int>("X2", SDL_BUTTON_X2));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("RIGHT",  SDL_BUTTON_RIGHT));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("X1",     SDL_BUTTON_X1));
+        mouseButtonBindingMap.Insert(MakePair<String, int>("X2",     SDL_BUTTON_X2));
     }
 }
 
@@ -1047,7 +1047,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
                     HashMap<String, int>::Iterator i = keyBindingMap.Find(key);
                     if (i != keyBindingMap.End())
+                    {
                         keyBinding = i->second_;
+                    }
                     else
                     {
                         URHO3D_LOGERRORF("Unsupported key binding: %s", key.CString());
@@ -1107,7 +1109,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                     for (unsigned j = 0; j < 4; ++j)
                     {
                         if (keyBindings[j].Length() == 1)
+                        {
                             mappedKeyBinding[j] = keyBindings[j][0];
+                        }
                         else
                         {
                             HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
@@ -1120,7 +1124,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                     }
                 }
                 else
+                {
                     URHO3D_LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                }
                 element->SetVar(VAR_BUTTON_KEY_BINDING, IntRect(mappedKeyBinding));
             }
         }
@@ -1204,7 +1210,9 @@ void Input::SetTouchEmulation(bool enable)
                 SDL_AddTouch(0, SDL_TOUCH_DEVICE_INDIRECT_RELATIVE, "Emulated Touch");
         }
         else
+        {
             ResetTouches();
+        }
 
         touchEmulation_ = enable;
     }
@@ -1245,7 +1253,7 @@ unsigned Input::LoadGestures(Deserializer& source)
     }
 
     RWOpsWrapper<Deserializer> wrapper(source);
-    return (unsigned)SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
+    return static_cast<unsigned>(SDL_LoadDollarTemplates(-1, wrapper.GetRWOps()));
 }
 
 
@@ -1283,9 +1291,9 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     if (SDL_IsGameController(index))
         state.controller_ = SDL_GameControllerOpen(index);
 
-    auto numButtons = (unsigned)SDL_JoystickNumButtons(joystick);
-    auto numAxes = (unsigned)SDL_JoystickNumAxes(joystick);
-    auto numHats = (unsigned)SDL_JoystickNumHats(joystick);
+    auto numButtons = static_cast<unsigned>(SDL_JoystickNumButtons(joystick));
+    auto numAxes    = static_cast<unsigned>(SDL_JoystickNumAxes(joystick));
+    auto numHats    = static_cast<unsigned>(SDL_JoystickNumHats(joystick));
 
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
@@ -1406,8 +1414,8 @@ IntVector2 Input::GetMousePosition() const
         return ret;
 
     SDL_GetMouseState(&ret.x_, &ret.y_);
-    ret.x_ = (int)(ret.x_ * inputScale_.x_);
-    ret.y_ = (int)(ret.y_ * inputScale_.y_);
+    ret.x_ = static_cast<int>(ret.x_ * inputScale_.x_);
+    ret.y_ = static_cast<int>(ret.y_ * inputScale_.y_);
 
     return ret;
 }
@@ -1415,7 +1423,8 @@ IntVector2 Input::GetMousePosition() const
 IntVector2 Input::GetMouseMove() const
 {
     if (!suppressNextMouseMove_)
-        return mouseMoveScaled_ ? mouseMove_ : IntVector2((int)(mouseMove_.x_ * inputScale_.x_), (int)(mouseMove_.y_ * inputScale_.y_));
+        return mouseMoveScaled_ ? mouseMove_ : IntVector2(static_cast<int>(mouseMove_.x_ * inputScale_.x_),
+                                                          static_cast<int>(mouseMove_.y_ * inputScale_.y_));
     else
         return IntVector2::ZERO;
 }
@@ -1423,7 +1432,7 @@ IntVector2 Input::GetMouseMove() const
 int Input::GetMouseMoveX() const
 {
     if (!suppressNextMouseMove_)
-        return mouseMoveScaled_ ? mouseMove_.x_ : (int)(mouseMove_.x_ * inputScale_.x_);
+        return mouseMoveScaled_ ? mouseMove_.x_ : static_cast<int>(mouseMove_.x_ * inputScale_.x_);
     else
         return 0;
 }
@@ -1683,7 +1692,7 @@ unsigned Input::GetTouchIndexFromID(int touchID)
     HashMap<int, int>::ConstIterator i = touchIDMap_.Find(touchID);
     if (i != touchIDMap_.End())
     {
-        return (unsigned)i->second_;
+        return static_cast<unsigned>(i->second_);
     }
 
     unsigned index = PopTouchIndex();
@@ -1696,7 +1705,7 @@ unsigned Input::PopTouchIndex()
     if (availableTouchIDs_.Empty())
         return 0;
 
-    auto index = (unsigned)availableTouchIDs_.Front();
+    auto index = static_cast<unsigned>(availableTouchIDs_.Front());
     availableTouchIDs_.PopFront();
     return index;
 }
@@ -1764,10 +1773,10 @@ void Input::SetMouseButton(MouseButton button, bool newState, int clicks)
     using namespace MouseButtonDown;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_BUTTON] = button;
-    eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
-    eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
-    eventData[P_CLICKS] = clicks;
+    eventData[P_BUTTON]     = button;
+    eventData[P_BUTTONS]    = static_cast<unsigned>(mouseButtonDown_);
+    eventData[P_QUALIFIERS] = static_cast<unsigned>(GetQualifiers());
+    eventData[P_CLICKS]     = clicks;
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
@@ -1799,10 +1808,10 @@ void Input::SetKey(Key key, Scancode scancode, bool newState)
     using namespace KeyDown;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_KEY] = key;
-    eventData[P_SCANCODE] = scancode;
-    eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
-    eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
+    eventData[P_KEY]        = key;
+    eventData[P_SCANCODE]   = scancode;
+    eventData[P_BUTTONS]    = static_cast<unsigned>(mouseButtonDown_);
+    eventData[P_QUALIFIERS] = static_cast<unsigned>(GetQualifiers());
     if (newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
@@ -1821,9 +1830,9 @@ void Input::SetMouseWheel(int delta)
         using namespace MouseWheel;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_WHEEL] = delta;
-        eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
-        eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
+        eventData[P_WHEEL]      = delta;
+        eventData[P_BUTTONS]    = static_cast<unsigned>(mouseButtonDown_);
+        eventData[P_QUALIFIERS] = static_cast<unsigned>(GetQualifiers());
         SendEvent(E_MOUSEWHEEL, eventData);
     }
 }
@@ -1833,7 +1842,9 @@ void Input::SetMousePosition(const IntVector2& position)
     if (!graphics_)
         return;
 
-    SDL_WarpMouseInWindow(graphics_->GetWindow(), (int)(position.x_ / inputScale_.x_), (int)(position.y_ / inputScale_.y_));
+    SDL_WarpMouseInWindow(graphics_->GetWindow(),
+                          static_cast<int>(position.x_ / inputScale_.x_),
+                          static_cast<int>(position.y_ / inputScale_.y_));
 }
 
 void Input::CenterMousePosition()
@@ -1941,16 +1952,16 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
-            x = (int)(x * inputScale_.x_);
-            y = (int)(y * inputScale_.y_);
+            x = static_cast<int>(x * inputScale_.x_);
+            y = static_cast<int>(y * inputScale_.y_);
 
             SDL_Event event;
             event.type = SDL_FINGERDOWN;
             event.tfinger.touchId = 0;
             event.tfinger.fingerId = evt.button.button - 1;
             event.tfinger.pressure = 1.0f;
-            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
-            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.x = static_cast<float>(x) / graphics_->GetWidth();
+            event.tfinger.y = static_cast<float>(y) / graphics_->GetHeight();
             event.tfinger.dx = 0;
             event.tfinger.dy = 0;
             SDL_PushEvent(&event);
@@ -1967,16 +1978,16 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
-            x = (int)(x * inputScale_.x_);
-            y = (int)(y * inputScale_.y_);
+            x = static_cast<int>(x * inputScale_.x_);
+            y = static_cast<int>(y * inputScale_.y_);
 
             SDL_Event event;
             event.type = SDL_FINGERUP;
             event.tfinger.touchId = 0;
             event.tfinger.fingerId = evt.button.button - 1;
             event.tfinger.pressure = 0.0f;
-            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
-            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
+            event.tfinger.x = static_cast<float>(x) / graphics_->GetWidth();
+            event.tfinger.y = static_cast<float>(y) / graphics_->GetHeight();
             event.tfinger.dx = 0;
             event.tfinger.dy = 0;
             SDL_PushEvent(&event);
@@ -2008,13 +2019,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 using namespace MouseMove;
 
                 VariantMap& eventData = GetEventDataMap();
-                eventData[P_X] = (int)(evt.motion.x * inputScale_.x_);
-                eventData[P_Y] = (int)(evt.motion.y * inputScale_.y_);
+                eventData[P_X] = static_cast<int>(evt.motion.x * inputScale_.x_);
+                eventData[P_Y] = static_cast<int>(evt.motion.y * inputScale_.y_);
                 // The "on-the-fly" motion data needs to be scaled now, though this may reduce accuracy
-                eventData[P_DX] = (int)(evt.motion.xrel * inputScale_.x_);
-                eventData[P_DY] = (int)(evt.motion.yrel * inputScale_.y_);
-                eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
-                eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
+                eventData[P_DX] = static_cast<int>(evt.motion.xrel * inputScale_.x_);
+                eventData[P_DY] = static_cast<int>(evt.motion.yrel * inputScale_.y_);
+                eventData[P_BUTTONS]    = static_cast<unsigned>(mouseButtonDown_);
+                eventData[P_QUALIFIERS] = static_cast<unsigned>(GetQualifiers());
                 SendEvent(E_MOUSEMOVE, eventData);
             }
         }
@@ -2023,18 +2034,18 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int x, y;
             SDL_GetMouseState(&x, &y);
-            x = (int)(x * inputScale_.x_);
-            y = (int)(y * inputScale_.y_);
+            x = static_cast<int>(x * inputScale_.x_);
+            y = static_cast<int>(y * inputScale_.y_);
 
             SDL_Event event;
             event.type = SDL_FINGERMOTION;
             event.tfinger.touchId = 0;
             event.tfinger.fingerId = 0;
             event.tfinger.pressure = 1.0f;
-            event.tfinger.x = (float)x / (float)graphics_->GetWidth();
-            event.tfinger.y = (float)y / (float)graphics_->GetHeight();
-            event.tfinger.dx = (float)evt.motion.xrel * inputScale_.x_ / (float)graphics_->GetWidth();
-            event.tfinger.dy = (float)evt.motion.yrel * inputScale_.y_ / (float)graphics_->GetHeight();
+            event.tfinger.x = static_cast<float>(x) / graphics_->GetWidth();
+            event.tfinger.y = static_cast<float>(y) / graphics_->GetHeight();
+            event.tfinger.dx = evt.motion.xrel * inputScale_.x_ / graphics_->GetWidth();
+            event.tfinger.dy = evt.motion.yrel * inputScale_.y_ / graphics_->GetHeight();
             SDL_PushEvent(&event);
         }
         break;
@@ -2050,8 +2061,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
             int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffffu);
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
-            state.lastPosition_ = state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
-                (int)(evt.tfinger.y * graphics_->GetHeight()));
+            state.lastPosition_ = state.position_ = IntVector2(static_cast<int>(evt.tfinger.x * graphics_->GetWidth()),
+                                                               static_cast<int>(evt.tfinger.y * graphics_->GetHeight()));
             state.delta_ = IntVector2::ZERO;
             state.pressure_ = evt.tfinger.pressure;
 
@@ -2102,8 +2113,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 break;
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
-            state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
-                (int)(evt.tfinger.y * graphics_->GetHeight()));
+            state.position_ = IntVector2(static_cast<int>(evt.tfinger.x * graphics_->GetWidth()),
+                                         static_cast<int>(evt.tfinger.y * graphics_->GetHeight()));
             state.delta_ = state.position_ - state.lastPosition_;
             state.pressure_ = evt.tfinger.pressure;
 
@@ -2113,8 +2124,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_TOUCHID] = touchID;
             eventData[P_X] = state.position_.x_;
             eventData[P_Y] = state.position_.y_;
-            eventData[P_DX] = (int)(evt.tfinger.dx * graphics_->GetWidth());
-            eventData[P_DY] = (int)(evt.tfinger.dy * graphics_->GetHeight());
+            eventData[P_DX] = static_cast<int>(evt.tfinger.dx * graphics_->GetWidth());
+            eventData[P_DY] = static_cast<int>(evt.tfinger.dy * graphics_->GetHeight());
             eventData[P_PRESSURE] = state.pressure_;
             SendEvent(E_TOUCHMOVE, eventData);
 
@@ -2129,7 +2140,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             using namespace GestureRecorded;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_GESTUREID] = (int)evt.dgesture.gestureId;
+            eventData[P_GESTUREID] = static_cast<int>(evt.dgesture.gestureId);
             SendEvent(E_GESTURERECORDED, eventData);
         }
         break;
@@ -2139,11 +2150,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
             using namespace GestureInput;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_GESTUREID] = (int)evt.dgesture.gestureId;
-            eventData[P_CENTERX] = (int)(evt.dgesture.x * graphics_->GetWidth());
-            eventData[P_CENTERY] = (int)(evt.dgesture.y * graphics_->GetHeight());
-            eventData[P_NUMFINGERS] = (int)evt.dgesture.numFingers;
-            eventData[P_ERROR] = evt.dgesture.error;
+            eventData[P_GESTUREID]  = static_cast<int>(evt.dgesture.gestureId);
+            eventData[P_CENTERX]    = static_cast<int>(evt.dgesture.x * graphics_->GetWidth());
+            eventData[P_CENTERY]    = static_cast<int>(evt.dgesture.y * graphics_->GetHeight());
+            eventData[P_NUMFINGERS] = static_cast<int>(evt.dgesture.numFingers);
+            eventData[P_ERROR]      = evt.dgesture.error;
             SendEvent(E_GESTUREINPUT, eventData);
         }
         break;
@@ -2153,11 +2164,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
             using namespace MultiGesture;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_CENTERX] = (int)(evt.mgesture.x * graphics_->GetWidth());
-            eventData[P_CENTERY] = (int)(evt.mgesture.y * graphics_->GetHeight());
-            eventData[P_NUMFINGERS] = (int)evt.mgesture.numFingers;
-            eventData[P_DTHETA] = M_RADTODEG * evt.mgesture.dTheta;
-            eventData[P_DDIST] = evt.mgesture.dDist;
+            eventData[P_CENTERX]    = static_cast<int>(evt.mgesture.x * graphics_->GetWidth());
+            eventData[P_CENTERY]    = static_cast<int>(evt.mgesture.y * graphics_->GetHeight());
+            eventData[P_NUMFINGERS] = static_cast<int>(evt.mgesture.numFingers);
+            eventData[P_DTHETA]     = M_RADTODEG * evt.mgesture.dTheta;
+            eventData[P_DDIST]      = evt.mgesture.dDist;
             SendEvent(E_MULTIGESTURE, eventData);
         }
         break;
@@ -2166,7 +2177,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             using namespace JoystickConnected;
 
-            SDL_JoystickID joystickID = OpenJoystick((unsigned)evt.jdevice.which);
+            SDL_JoystickID joystickID = OpenJoystick(static_cast<unsigned>(evt.jdevice.which));
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICKID] = joystickID;
@@ -2247,7 +2258,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 VariantMap& eventData = GetEventDataMap();
                 eventData[P_JOYSTICKID] = joystickID;
                 eventData[P_AXIS] = evt.jaxis.axis;
-                eventData[P_POSITION] = Clamp((float)evt.jaxis.value / 32767.0f, -1.0f, 1.0f);
+                eventData[P_POSITION] = Clamp(evt.jaxis.value / 32767.0f, -1.0f, 1.0f);
 
                 if (evt.jaxis.axis < state.axes_.Size())
                 {
@@ -2295,7 +2306,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             if (button < state.buttons_.Size())
             {
-                state.buttons_[button] = true;
+                state.buttons_[button]     = true;
                 state.buttonPress_[button] = true;
                 SendEvent(E_JOYSTICKBUTTONDOWN, eventData);
             }
@@ -2331,8 +2342,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICKID] = joystickID;
-            eventData[P_AXIS] = evt.caxis.axis;
-            eventData[P_POSITION] = Clamp((float)evt.caxis.value / 32767.0f, -1.0f, 1.0f);
+            eventData[P_AXIS]       = evt.caxis.axis;
+            eventData[P_POSITION]   = Clamp(evt.caxis.value / 32767.0f, -1.0f, 1.0f);
 
             if (evt.caxis.axis < state.axes_.Size())
             {
@@ -2425,11 +2436,13 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     SDL_GetWindowSize(window, &winWidth, &winHeight);
     if (winWidth > 0 && winHeight > 0 && gfxWidth > 0 && gfxHeight > 0)
     {
-        inputScale_.x_ = (float)gfxWidth / (float)winWidth;
-        inputScale_.y_ = (float)gfxHeight / (float)winHeight;
+        inputScale_.x_ = static_cast<float>(gfxWidth)  / winWidth;
+        inputScale_.y_ = static_cast<float>(gfxHeight) / winHeight;
     }
     else
+    {
         inputScale_ = Vector2::ONE;
+    }
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
@@ -2456,7 +2469,8 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
 
     // Only interested in events from screen joystick(s)
     TouchState& state = touches_[eventData[P_TOUCHID].GetInt()];
-    IntVector2 position(int(state.position_.x_ / GetSubsystem<UI>()->GetScale()), int(state.position_.y_ / GetSubsystem<UI>()->GetScale()));
+    IntVector2 position(static_cast<int>(state.position_.x_ / GetSubsystem<UI>()->GetScale()),
+                        static_cast<int>(state.position_.y_ / GetSubsystem<UI>()->GetScale()));
     UIElement* element = eventType == E_TOUCHBEGIN ? GetSubsystem<UI>()->GetElementAt(position) : state.touchedElement_;
     if (!element)
         return;
