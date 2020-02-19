@@ -101,7 +101,7 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     XMLElement keyFrameElem = source.GetChild("keyframe");
     while (keyFrameElem)
     {
-        float time = keyFrameElem.GetFloat("time");
+        float time =    keyFrameElem.GetFloat("time");
         Variant value = keyFrameElem.GetVariant();
         SetKeyFrame(time, value);
 
@@ -111,8 +111,8 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     XMLElement eventFrameElem = source.GetChild("eventframe");
     while (eventFrameElem)
     {
-        float time = eventFrameElem.GetFloat("time");
-        unsigned eventType = eventFrameElem.GetUInt("eventtype");
+        float time           = eventFrameElem.GetFloat("time");
+        unsigned eventType   = eventFrameElem.GetUInt("eventtype");
         VariantMap eventData = eventFrameElem.GetChild("eventdata").GetVariantMap();
 
         SetEventFrame(time, StringHash(eventType), eventData);
@@ -188,7 +188,7 @@ bool ValueAnimation::SaveJSON(JSONValue& dest) const
 {
     dest.Set("interpolationmethod", interpMethodNames[interpolationMethod_]);
     if (interpolationMethod_ == IM_SPLINE)
-        dest.Set("splinetension", (float) splineTension_);
+        dest.Set("splinetension", splineTension_);
 
     JSONArray keyFramesArray;
     keyFramesArray.Reserve(keyFrames_.Size());
@@ -230,10 +230,10 @@ void ValueAnimation::SetValueType(VariantType valueType)
 
     valueType_ = valueType;
     interpolatable_ =
-        (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) ||
-        (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
+        valueType_ == VAR_FLOAT   || valueType_ == VAR_VECTOR2    || valueType_ == VAR_VECTOR3 ||
+        valueType_ == VAR_VECTOR4 || valueType_ == VAR_QUATERNION || valueType_ == VAR_COLOR;
 
-    if ((valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2) || (valueType_ == VAR_INTVECTOR3))
+    if (valueType_ == VAR_INTRECT || valueType_ == VAR_INTVECTOR2 || valueType_ == VAR_INTVECTOR3)
     {
         interpolatable_ = true;
         // Force linear interpolation for IntRect, IntVector2 and IntVector3
@@ -243,8 +243,8 @@ void ValueAnimation::SetValueType(VariantType valueType)
 
     keyFrames_.Clear();
     eventFrames_.Clear();
-    beginTime_ = M_INFINITY;
-    endTime_ = -M_INFINITY;
+    beginTime_ =  M_INFINITY;
+    endTime_   = -M_INFINITY;
 }
 
 void ValueAnimation::SetOwner(void* owner)
@@ -283,7 +283,9 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
     keyFrame.value_ = value;
 
     if (keyFrames_.Empty() || time > keyFrames_.Back().time_)
+    {
         keyFrames_.Push(keyFrame);
+    }
     else
     {
         for (unsigned i = 0; i < keyFrames_.Size(); ++i)
@@ -300,7 +302,7 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
     }
 
     beginTime_ = Min(time, beginTime_);
-    endTime_ = Max(time, endTime_);
+    endTime_   = Max(time, endTime_);
     splineTangentsDirty_ = true;
 
     return true;
@@ -314,7 +316,9 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
     eventFrame.eventData_ = eventData;
 
     if (eventFrames_.Empty() || time >= eventFrames_.Back().time_)
+    {
         eventFrames_.Push(eventFrame);
+    }
     else
     {
         for (unsigned i = 0; i < eventFrames_.Size(); ++i)
@@ -328,14 +332,14 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
     }
 
     beginTime_ = Min(time, beginTime_);
-    endTime_ = Max(time, endTime_);
+    endTime_   = Max(time, endTime_);
 }
 
 bool ValueAnimation::IsValid() const
 {
-    return (interpolationMethod_ == IM_NONE) ||
-           (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) ||
-           (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
+    return interpolationMethod_ == IM_NONE ||
+           interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1 ||
+           interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2;
 }
 
 Variant ValueAnimation::GetAnimationValue(float scaledTime) const
@@ -348,7 +352,9 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime) const
     }
 
     if (index >= keyFrames_.Size() || !interpolatable_ || interpolationMethod_ == IM_NONE)
+    {
         return keyFrames_[index - 1].value_;
+    }
     else
     {
         if (interpolationMethod_ == IM_LINEAR)
@@ -405,8 +411,10 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             float s = 1.0f - t;
             const IntRect& r1 = value1.GetIntRect();
             const IntRect& r2 = value2.GetIntRect();
-            return IntRect((int)(r1.left_ * s + r2.left_ * t), (int)(r1.top_ * s + r2.top_ * t), (int)(r1.right_ * s + r2.right_ * t),
-                (int)(r1.bottom_ * s + r2.bottom_ * t));
+            return IntRect(static_cast<int>(r1.left_   * s + r2.left_   * t),
+                           static_cast<int>(r1.top_    * s + r2.top_    * t),
+                           static_cast<int>(r1.right_  * s + r2.right_  * t),
+                           static_cast<int>(r1.bottom_ * s + r2.bottom_ * t));
         }
 
     case VAR_INTVECTOR2:
@@ -414,7 +422,8 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             float s = 1.0f - t;
             const IntVector2& v1 = value1.GetIntVector2();
             const IntVector2& v2 = value2.GetIntVector2();
-            return IntVector2((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t));
+            return IntVector2(static_cast<int>(v1.x_ * s + v2.x_ * t),
+                              static_cast<int>(v1.y_ * s + v2.y_ * t));
         }
 
     case VAR_INTVECTOR3:
@@ -422,7 +431,9 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             float s = 1.0f - t;
             const IntVector3& v1 = value1.GetIntVector3();
             const IntVector3& v2 = value2.GetIntVector3();
-            return IntVector3((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t), (int)(v1.z_ * s + v2.z_ * t));
+            return IntVector3(static_cast<int>(v1.x_ * s + v2.x_ * t),
+                              static_cast<int>(v1.y_ * s + v2.y_ * t),
+                              static_cast<int>(v1.z_ * s + v2.z_ * t));
         }
 
     case VAR_DOUBLE:
@@ -444,7 +455,7 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
 
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
 
-    float tt = t * t;
+    float tt  = t * t;
     float ttt = t * tt;
 
     float h1 = 2.0f * ttt - 3.0f * tt + 1.0f;

@@ -746,9 +746,9 @@ Component* Scene::GetComponent(unsigned id) const
 
 float Scene::GetAsyncProgress() const
 {
-    return !asyncLoading_ || asyncProgress_.totalNodes_ + asyncProgress_.totalResources_ == 0 ? 1.0f :
-        (float)(asyncProgress_.loadedNodes_ + asyncProgress_.loadedResources_) /
-        (float)(asyncProgress_.totalNodes_ + asyncProgress_.totalResources_);
+    return !asyncLoading_ || asyncProgress_.totalNodes_  + asyncProgress_.totalResources_ == 0 ? 1.0f :
+          static_cast<float>(asyncProgress_.loadedNodes_ + asyncProgress_.loadedResources_) /
+                            (asyncProgress_.totalNodes_  + asyncProgress_.totalResources_);
 }
 
 const String& Scene::GetVarName(StringHash hash) const
@@ -774,7 +774,7 @@ void Scene::Update(float timeStep)
     using namespace SceneUpdate;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_SCENE] = this;
+    eventData[P_SCENE]    = this;
     eventData[P_TIMESTEP] = timeStep;
 
     // Update variable timestep logic
@@ -988,7 +988,9 @@ void Scene::NodeRemoved(Node* node)
         MarkReplicationDirty(node);
     }
     else
+    {
         localNodes_.Erase(id);
+    }
 
     node->ResetScene();
 
@@ -1124,7 +1126,9 @@ void Scene::MarkNetworkUpdate(Node* node)
     if (node)
     {
         if (!threadedUpdate_)
+        {
             networkUpdateNodes_.Insert(node->GetID());
+        }
         else
         {
             MutexLock lock(sceneMutex_);
@@ -1138,7 +1142,9 @@ void Scene::MarkNetworkUpdate(Component* component)
     if (component)
     {
         if (!threadedUpdate_)
+        {
             networkUpdateComponents_.Insert(component->GetID());
+        }
         else
         {
             MutexLock lock(sceneMutex_);
@@ -1218,7 +1224,7 @@ void Scene::UpdateAsyncLoading()
         {
             const JSONValue& childValue = asyncProgress_.jsonFile_->GetRoot().Get("children").GetArray().At(asyncProgress_.jsonIndex_);
 
-            unsigned nodeID =childValue.Get("id").GetUInt();
+            unsigned nodeID = childValue.Get("id").GetUInt();
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadJSON(childValue, resolver_);
@@ -1242,12 +1248,12 @@ void Scene::UpdateAsyncLoading()
     using namespace AsyncLoadProgress;
 
     VariantMap& eventData = GetEventDataMap();
-    eventData[P_SCENE] = this;
-    eventData[P_PROGRESS] = GetAsyncProgress();
-    eventData[P_LOADEDNODES] = asyncProgress_.loadedNodes_;
-    eventData[P_TOTALNODES] = asyncProgress_.totalNodes_;
+    eventData[P_SCENE]           = this;
+    eventData[P_PROGRESS]        = GetAsyncProgress();
+    eventData[P_LOADEDNODES]     = asyncProgress_.loadedNodes_;
+    eventData[P_TOTALNODES]      = asyncProgress_.totalNodes_;
     eventData[P_LOADEDRESOURCES] = asyncProgress_.loadedResources_;
-    eventData[P_TOTALRESOURCES] = asyncProgress_.totalResources_;
+    eventData[P_TOTALRESOURCES]  = asyncProgress_.totalResources_;
     SendEvent(E_ASYNCLOADPROGRESS, eventData);
 }
 

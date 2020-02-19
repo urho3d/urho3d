@@ -240,7 +240,7 @@ bool Animatable::SaveJSON(JSONValue& dest) const
             return false;
 
         attributeValue.Set("wrapmode", wrapModeNames[i->second_->GetWrapMode()]);
-        attributeValue.Set("speed", (float) i->second_->GetSpeed());
+        attributeValue.Set("speed", i->second_->GetSpeed());
 
         attributeAnimationValue.Set(attr.name_, attributeValue);
     }

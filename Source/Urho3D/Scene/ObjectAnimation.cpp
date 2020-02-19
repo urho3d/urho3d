@@ -181,7 +181,7 @@ bool ObjectAnimation::SaveJSON(JSONValue& dest) const
             return false;
 
         animValue.Set("wrapmode", wrapModeNames[info->GetWrapMode()]);
-        animValue.Set("speed", (float) info->GetSpeed());
+        animValue.Set("speed", info->GetSpeed());
 
         attributeAnimationsValue.Set(i->first_, animValue);
     }
