@@ -445,7 +445,7 @@ void DebugRenderer::AddCircle(const Vector3& center, const Vector3& normal, floa
 
     for(int i = 1; i <= steps; ++i)
     {
-        const float angle = (float)i / (float)steps * 360.0f;
+        const float angle = static_cast<float>(i) / steps * 360.0f;
         Vector3 v(radius * Cos(angle), 0, radius * Sin(angle));
         Vector3 c = orientation * v + center;
         AddLine(p, c, uintColor, depthTest);

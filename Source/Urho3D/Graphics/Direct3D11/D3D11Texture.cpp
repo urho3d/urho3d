@@ -88,13 +88,13 @@ unsigned Texture::GetRowDataSize(int width) const
     {
     case DXGI_FORMAT_R8_UNORM:
     case DXGI_FORMAT_A8_UNORM:
-        return (unsigned)width;
+        return static_cast<unsigned>(width);
 
     case DXGI_FORMAT_R8G8_UNORM:
     case DXGI_FORMAT_R16_UNORM:
     case DXGI_FORMAT_R16_FLOAT:
     case DXGI_FORMAT_R16_TYPELESS:
-        return (unsigned)(width * 2);
+        return static_cast<unsigned>(width) * 2;
 
     case DXGI_FORMAT_R8G8B8A8_UNORM:
     case DXGI_FORMAT_R16G16_UNORM:
@@ -102,21 +102,21 @@ unsigned Texture::GetRowDataSize(int width) const
     case DXGI_FORMAT_R32_FLOAT:
     case DXGI_FORMAT_R24G8_TYPELESS:
     case DXGI_FORMAT_R32_TYPELESS:
-        return (unsigned)(width * 4);
+        return static_cast<unsigned>(width) * 4;
 
     case DXGI_FORMAT_R16G16B16A16_UNORM:
     case DXGI_FORMAT_R16G16B16A16_FLOAT:
-        return (unsigned)(width * 8);
+        return static_cast<unsigned>(width) * 8;
 
     case DXGI_FORMAT_R32G32B32A32_FLOAT:
-        return (unsigned)(width * 16);
+        return static_cast<unsigned>(width) * 16;
 
     case DXGI_FORMAT_BC1_UNORM:
-        return (unsigned)(((width + 3) >> 2) * 8);
+        return static_cast<unsigned>((width + 3) >> 2) * 8;
 
     case DXGI_FORMAT_BC2_UNORM:
     case DXGI_FORMAT_BC3_UNORM:
-        return (unsigned)(((width + 3) >> 2) * 16);
+        return static_cast<unsigned>((width + 3) >> 2) * 16;
 
     default:
         return 0;
@@ -133,9 +133,11 @@ void Texture::UpdateParameters()
 
     D3D11_SAMPLER_DESC samplerDesc;
     memset(&samplerDesc, 0, sizeof samplerDesc);
+
     unsigned filterModeIndex = filterMode_ != FILTER_DEFAULT ? filterMode_ : graphics_->GetDefaultTextureFilterMode();
     if (shadowCompare_)
         filterModeIndex += 5;
+
     samplerDesc.Filter = d3dFilterMode[filterModeIndex];
     samplerDesc.AddressU = d3dAddressMode[addressModes_[0]];
     samplerDesc.AddressV = d3dAddressMode[addressModes_[1]];

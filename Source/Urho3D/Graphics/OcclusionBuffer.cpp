@@ -137,6 +137,7 @@ void OcclusionBuffer::SetCullMode(CullMode mode)
     {
         if (mode == CULL_CW)
             mode = CULL_CCW;
+
         else if (mode == CULL_CCW)
             mode = CULL_CW;
     }
@@ -380,7 +381,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     }
 
     // Expand the bounding box 1 pixel in each direction to be conservative and correct rasterization offset
-    IntRect rect((int)(minX - 1.5f), (int)(minY - 1.5f), RoundToInt(maxX), RoundToInt(maxY));
+    IntRect rect(static_cast<int>(minX - 1.5f), static_cast<int>(minY - 1.5f), RoundToInt(maxX), RoundToInt(maxY));
 
     // If the rect is outside, let frustum culling handle
     if (rect.right_ < 0 || rect.bottom_ < 0)
@@ -774,7 +775,7 @@ struct Gradients
         dInvZdY_ = invdY * (((vertices[1].z_ - vertices[2].z_) * (vertices[0].x_ - vertices[2].x_)) -
                             ((vertices[0].z_ - vertices[2].z_) * (vertices[1].x_ - vertices[2].x_)));
 
-        dInvZdXInt_ = (int)dInvZdX_;
+        dInvZdXInt_ = static_cast<int>(dInvZdX_);
     }
 
     /// Integer horizontal gradient.
@@ -791,9 +792,9 @@ struct Edge
     /// Construct from gradients and top & bottom vertices.
     Edge(const Gradients& gradients, const Vector3& top, const Vector3& bottom, int topY)
     {
-        float height = (bottom.y_ - top.y_);
+        float height = bottom.y_ - top.y_;
         float slope = (height != 0.0f) ? (bottom.x_ - top.x_) / height : 0.0f;
-        float yPreStep = (float)(topY + 1) - top.y_;
+        float yPreStep = ++topY - top.y_;
         float xPreStep = slope * yPreStep;
 
         x_ = RoundToInt((xPreStep + top.x_) * OCCLUSION_X_SCALE);
@@ -871,9 +872,9 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         }
     }
 
-    auto topY = (int)vertices[top].y_;
-    auto middleY = (int)vertices[middle].y_;
-    auto bottomY = (int)vertices[bottom].y_;
+    auto topY    = static_cast<int>(vertices[top].y_);
+    auto middleY = static_cast<int>(vertices[middle].y_);
+    auto bottomY = static_cast<int>(vertices[bottom].y_);
 
     // Check for degenerate triangle
     if (topY == bottomY)
@@ -1032,7 +1033,7 @@ void OcclusionBuffer::ClearBuffer(unsigned threadIndex)
 
     int* dest = buffers_[threadIndex].data_;
     int count = width_ * height_;
-    auto fillValue = (int)OCCLUSION_Z_SCALE;
+    auto fillValue = static_cast<int>(OCCLUSION_Z_SCALE);
 
     while (count--)
         *dest++ = fillValue;

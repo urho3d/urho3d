@@ -229,7 +229,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
 {
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
-    if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
+    if (frame.camera_ && abs(static_cast<int>(frame.frameNumber_) - static_cast<int>(viewFrameNumber_)) > 1)
     {
         // First check for no update at all when invisible. In that case reset LOD timer to ensure update
         // next time the model is in view
@@ -265,7 +265,9 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     // Note: per-geometry distances do not take skinning into account. Especially in case of a ragdoll they may be
     // much off base if the node's own transform is not updated
     if (batches_.Size() == 1)
+    {
         batches_[0].distance_ = distance_;
+    }
     else
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -285,7 +287,9 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         animationLodFrameNumber_ = frame.frameNumber_;
     }
     else
+    {
         animationLodDistance_ = Min(animationLodDistance_, newLodDistance);
+    }
 
     if (newLodDistance != lodDistance_)
     {
@@ -856,7 +860,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
 void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
 {
     for (unsigned index = 0; index < value.Size(); ++index)
-        SetMorphWeight(index, (float)value[index] / 255.0f);
+        SetMorphWeight(index, value[index] / 255.0f);
 }
 
 ResourceRef AnimatedModel::GetModelAttr() const
@@ -889,7 +893,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
         ret.Push(state->IsLooped());
         ret.Push(state->GetWeight());
         ret.Push(state->GetTime());
-        ret.Push((int)state->GetLayer());
+        ret.Push(static_cast<int>(state->GetLayer()));
     }
     return ret;
 }
@@ -898,7 +902,7 @@ const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
 {
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
-        attrBuffer_.WriteUByte((unsigned char)(i->weight_ * 255.0f));
+        attrBuffer_.WriteUByte(static_cast<unsigned char>(i->weight_ * 255.0f));
 
     return attrBuffer_.GetBuffer();
 }
@@ -927,7 +931,7 @@ void AnimatedModel::UpdateBoneBoundingBox()
         }
     }
 
-    boneBoundingBoxDirty_ = false;
+    boneBoundingBoxDirty_  = false;
     worldBoundingBoxDirty_ = true;
 }
 
@@ -1126,7 +1130,9 @@ void AnimatedModel::CloneGeometries()
             morphVertexBuffers_[i] = clone;
         }
         else
+        {
             morphVertexBuffers_[i].Reset();
+        }
     }
 
     // Geometries will always be cloned fully. They contain only references to buffer, so they are relatively light
@@ -1162,7 +1168,9 @@ void AnimatedModel::CloneGeometries()
                     clone->SetVertexBuffer(l++, clonedBuffer);
                 }
                 else
+                {
                     clone->SetVertexBuffer(l++, originalBuffer);
+                }
             }
 
             clone->SetIndexBuffer(original->GetIndexBuffer());
@@ -1186,7 +1194,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
     unsigned tangentOffset = srcBuffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = srcBuffer->GetVertexSize();
     auto* dest = (float*)destVertexData;
-    auto* src = (unsigned char*)srcVertexData;
+    auto* src  = (unsigned char*)srcVertexData;
 
     while (vertexCount--)
     {
@@ -1267,7 +1275,9 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
                 return;
         }
         else
+        {
             animationLodTimer_ = 0.0f;
+        }
     }
 
     ApplyAnimation();
@@ -1387,10 +1397,10 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
     float weight)
 {
     const VertexMaskFlags elementMask = morph.elementMask_ & buffer->GetElementMask();
-    unsigned vertexCount = morph.vertexCount_;
-    unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
+    unsigned vertexCount   = morph.vertexCount_;
+    unsigned normalOffset  = buffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);
-    unsigned vertexSize = buffer->GetVertexSize();
+    unsigned vertexSize    = buffer->GetVertexSize();
 
     unsigned char* srcData = morph.morphData_;
     auto* destData = (unsigned char*)destVertexData;

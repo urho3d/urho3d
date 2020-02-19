@@ -206,11 +206,12 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
 
 Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, float startTheta, float endTheta)
 {
-    float stepSize = (endTheta - startTheta) / (float)iterations;
+    float stepSize = (endTheta - startTheta) / iterations;
     Vector<Vector3> shapeList;
-    for (int i = 0; i < iterations; i++) {
-        float curTheta1 = startTheta + ((float)i * stepSize);
-        float curTheta2 = startTheta + ((float)(i+1) * stepSize);
+    for (int i = 0; i < iterations; i++)
+    {
+        float curTheta1 = startTheta + ( i      * stepSize);
+        float curTheta2 = startTheta + ((i + 1) * stepSize);
         float curX1 = radius * cos(curTheta1);
         float curY1 = radius * sin(curTheta1);
         float curX2 = radius * cos(curTheta2);
@@ -219,11 +220,11 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
         shapeList.Push(Urho3D::Vector3(curX1, 0, curY1));
         shapeList.Push(Urho3D::Vector3(curX2, 0, curY2));
 
-        if (i >= iterations - 1) {
+        if (i >= iterations - 1)
+        {
             float curTheta =0;
-            if (Abs(endTheta - startTheta) < (2*M_PI)) {
+            if (Abs(endTheta - startTheta) < (2*M_PI))
                 curTheta = endTheta;
-            }
             float curX = radius * cos(curTheta);
             float curY = radius * sin(curTheta);
             shapeList.Push(Urho3D::Vector3(curX, 0, curY));
@@ -243,17 +244,19 @@ void CustomGeometry::MakeCircle(float radius, size_t iterations, float startThet
     float endTheta, bool clear, int geomNum)
 {
     Vector<Vector3> mCircleShape = GetCircleShape(radius, iterations, startTheta, endTheta);
-    FillShape(mCircleShape,false,clear,geomNum);
+    FillShape(mCircleShape, false, clear, geomNum);
 }
 
 void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material> > >& parts,
     int radius, int iterations)
 {
-    if (parts.Size() > 0) {
+    if (parts.Size() > 0)
+    {
         float totalWeight = 0;
         SetNumGeometries(parts.Size());
         auto it = parts.Begin();
-        while (it != parts.End()) {
+        while (it != parts.End())
+        {
             const auto current = (*it);
             totalWeight += current.first_;
             it++;
@@ -261,13 +264,15 @@ void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<
 
         it = parts.Begin();
         float currentStartTheta = 0;
-        float currentEndTheta = 0;
+        float currentEndTheta   = 0;
         int count = 0;
-        while (it != parts.End()) {
+        while (it != parts.End())
+        {
             const auto current = (*it);
-            currentEndTheta = ((current.first_ / totalWeight)*(2 * M_PI)) + currentStartTheta;
-            MakeCircle(radius, (iterations / parts.Size()), currentStartTheta, currentEndTheta,false,count);
-            if (current.second_.NotNull()) {
+            currentEndTheta = ((current.first_ / totalWeight) * (2 * M_PI)) + currentStartTheta;
+            MakeCircle(radius, (iterations / parts.Size()), currentStartTheta, currentEndTheta, false, count);
+            if (current.second_.NotNull())
+            {
                 SetMaterial(count, current.second_);
             }
             it++;
@@ -284,13 +289,14 @@ void CustomGeometry::MakeShape(const Vector<Vector3>& pointList , bool connectTa
     BeginGeometry(0, Urho3D::PrimitiveType::LINE_STRIP);
     Vector3 current;
     Vector3 next;
-    for (size_t i = 0; i < pointList.Size(); i++) {
-        if ((connectTail && i >= pointList.Size() - 1) || i < pointList.Size() - 1) {
+    for (size_t i = 0; i < pointList.Size(); i++)
+    {
+        if ((connectTail && i >= pointList.Size() - 1) || i < pointList.Size() - 1)
+        {
             current = pointList[i];
             next = pointList[0];
-            if (i < pointList.Size() - 1) {
+            if (i < pointList.Size() - 1)
                 next = pointList[i + 1];
-            }
             DefineVertex(current);
             DefineVertex(next);
         }
@@ -301,17 +307,20 @@ void CustomGeometry::MakeShape(const Vector<Vector3>& pointList , bool connectTa
 
 void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTail, bool clear, int geomNum)
 {
-    if (shapeList.Size() > 0) {
+    if (shapeList.Size() > 0)
+    {
         int usedGeomNum = geomNum;
-        if (clear) {
+        if (clear)
+        {
             Clear();
             SetNumGeometries(1);
             usedGeomNum = 0;
         }
         BeginGeometry(usedGeomNum, PrimitiveType::TRIANGLE_STRIP);
         auto centerPoint = Vector3(0, 0, 0);
-        if (connectTail) {
-            auto centerPoint = Average(shapeList.Begin(), shapeList.End());
+        if (connectTail)
+        {
+            centerPoint = Average(shapeList.Begin(), shapeList.End());
         }
         Vector<Vector3> vertices(3);
         Vector3 current;
@@ -319,18 +328,17 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
         Vector3 normal;
         auto it = shapeList.Begin();
         auto nextIt = it;
-        while (it != shapeList.End()) {
+        while (it != shapeList.End())
+        {
             nextIt = it + 1;
             if (connectTail && nextIt == shapeList.End() || nextIt != shapeList.End())
             {
                 current = (*it);
 
-                if (nextIt != shapeList.End()) {
+                if (nextIt != shapeList.End())
                     next = (*nextIt);
-                }
-                else {
+                else
                     next = (*shapeList.Begin());
-                }
 
                 vertices = { centerPoint, current, next };
 
@@ -355,16 +363,18 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
 void CustomGeometry::MakeSphere(float radius, size_t iterations)
 {
     //Create the geometry buffer
-    float angleStepSize = (2.0f * M_PI) / (float)iterations;
+    float angleStepSize = (2.0f * M_PI) / iterations;
     Vector<Vector3> m_xyPoints;
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 0; i < iterations; i++)
+    {
         float curTheta = i * angleStepSize;
-        for (int j = 0; j < iterations; j++) {
+        for (int j = 0; j < iterations; j++)
+        {
             float curPhi = j * angleStepSize;
             float curX = radius * cos(curTheta) * sin(curPhi);
             float curY = radius * sin(curTheta) * sin(curPhi);
             float curZ = radius * cos(curPhi);
-            m_xyPoints.Push(Vector3(curX,curY,curZ));
+            m_xyPoints.Push(Vector3(curX, curY, curZ));
         }
     }
 
@@ -386,7 +396,8 @@ void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
     auto shapeIter = mLastShapePos.Begin();
 
     int bufferCount = 0;
-    while (shapeIter != mLastShapePos.End()) {
+    while (shapeIter != mLastShapePos.End())
+    {
         mPointBuffer.At(bufferCount) = (*shapeIter);
         shapeIter++;
         bufferCount++;
@@ -394,13 +405,16 @@ void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
 
 
     int count = 0;
-    while (pointIter != mPointList.End()) {
+    while (pointIter != mPointList.End())
+    {
         shapeIter = mLastShapePos.Begin();
         pointCurrent = (*pointIter);
         count = 0;
-        while (shapeIter != mLastShapePos.End()) {
+        while (shapeIter != mLastShapePos.End())
+        {
             shapeCurrent = (*shapeIter);
-            if (shapeIter == mLastShapePos.Begin()) { //protrude from first point of the shape and create dir Vector to point
+            if (shapeIter == mLastShapePos.Begin()) //protrude from first point of the shape and create dir Vector to point
+            {
                 shapePointVec = pointCurrent - centerPoint;
                 centerPoint = pointCurrent;
             }
@@ -422,30 +436,28 @@ void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
 void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, size_t zIterations,
     size_t thetaIterations, bool connectTail)
 {
-    if (!connectTail) {
+    if (!connectTail)
         SetNumGeometries(3);
-    }
-    else {
+    else
         SetNumGeometries(1);
-    }
 
     //Create the quads from the buffer
     BeginGeometry(0, Urho3D::PrimitiveType::TRIANGLE_STRIP);
-    for (size_t i = 0; i < zIterations; i++) {
-        if ((i >= zIterations - 1 && connectTail) || i < zIterations - 1) {
-            for (size_t j = 0; j < thetaIterations; j++) {
+    for (size_t i = 0; i < zIterations; i++)
+        if ((i >= zIterations - 1 && connectTail) || i < zIterations - 1)
+            for (size_t j = 0; j < thetaIterations; j++)
+            {
                 //if at the end connect to the beginning to complete pass
                 size_t iplus = i + 1;
                 size_t jplus = j + 1;
-                if (i >= zIterations - 1) {
+                if (i >= zIterations - 1)
                     iplus = 0;
-                }
-                if (j >= thetaIterations - 1) {
+                if (j >= thetaIterations - 1)
                     jplus = 0;
-                }
+
                 Vector<Vector3> avList;
-                avList = { pointList.At((i*thetaIterations) + j) ,pointList.At((iplus*thetaIterations)+
-                    j) ,pointList.At((i*thetaIterations) + jplus) };
+                avList = { pointList.At((i * thetaIterations) + j) ,pointList.At((iplus * thetaIterations) +
+                    j) ,pointList.At((i * thetaIterations) + jplus) };
                 Vector3 normal = Average(avList.Begin(), avList.End());
                 normal.Normalize();
                 DefineVertex(avList.At(0));
@@ -454,8 +466,8 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
                 DefineNormal(normal);
                 avList.Clear();
 
-                avList = { pointList.At((i*thetaIterations) + j) ,pointList.At((iplus*thetaIterations)+
-                    j) ,pointList.At((iplus*thetaIterations) + jplus) };
+                avList = { pointList.At((i * thetaIterations) + j) ,pointList.At((iplus * thetaIterations) +
+                    j) ,pointList.At((iplus * thetaIterations) + jplus) };
                 normal = Average(avList.Begin(), avList.End());
                 normal.Normalize();
                 DefineVertex(avList.At(0));
@@ -464,17 +476,17 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
                 DefineNormal(normal);
                 avList.Clear();
             }
-        }
-    }
+
     Commit();
 
-    if (!connectTail) {
+    if (!connectTail)
+    {
         //fill in the head and tail
         auto tailBegin = pointList.Begin();
-        auto tailEnd = pointList.Begin() + thetaIterations;
+        auto tailEnd   = pointList.Begin() + thetaIterations;
         Vector<Vector3> tail(tailBegin, tailEnd);
         auto headBegin = pointList.Begin() + pointList.Size() - thetaIterations;
-        auto headEnd = pointList.Begin() + pointList.Size();
+        auto headEnd   = pointList.Begin() + pointList.Size();
         Vector<Vector3> head(headBegin, headEnd);
 
         FillShape(tail, true, false, 1);
@@ -484,9 +496,9 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
 
 void CustomGeometry::MakeSquare(float size)
 {
-    Vector<Vector3> mSquareList = { Urho3D::Vector3(-(size / 2.0f),0,(size / 2.0f)),Urho3D::Vector3(-(size / 2.0f),0,-(size / 2.0f)),
-        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)),Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f)) };
-    FillShape(mSquareList,true);
+    Vector<Vector3> mSquareList = { Urho3D::Vector3(-(size / 2.0f), 0, (size / 2.0f)), Urho3D::Vector3(-(size / 2.0f), 0, -(size / 2.0f)),
+        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)), Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f)) };
+    FillShape(mSquareList, true);
 }
 
 void CustomGeometry::Clear()
@@ -630,7 +642,9 @@ void CustomGeometry::Commit()
     // Resize (recreate) the vertex buffer only if necessary
     if (vertexBuffer_->GetVertexCount() != totalVertices || vertexBuffer_->GetElementMask() != elementMask_ ||
         vertexBuffer_->IsDynamic() != dynamic_)
+    {
         vertexBuffer_->SetSize(totalVertices, elementMask_, dynamic_);
+    }
 
     if (totalVertices)
     {

@@ -327,9 +327,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
-                unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
+                unsigned error = static_cast<unsigned>(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
                 if (refreshRate != 0)
-                    error += (unsigned)(Abs(resolutions[i].z_ - refreshRate));
+                    error += static_cast<unsigned>(Abs(resolutions[i].z_ - refreshRate));
                 if (error < bestError)
                 {
                     best = i;
@@ -1190,7 +1190,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     impl_->dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter(info->offset_, (unsigned)(count * sizeof(float)), data);
+                buffer->SetParameter(info->offset_, static_cast<unsigned>(count * sizeof(float)), data);
                 return;
             }
 
@@ -1281,11 +1281,12 @@ void Graphics::SetShaderParameter(StringHash param, bool value)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     impl_->dirtyConstantBuffers_.Push(buffer);
+
                 buffer->SetParameter(info->offset_, sizeof(bool), &value);
                 return;
             }
 
-            glUniform1i(info->location_, (int)value);
+            glUniform1i(info->location_, static_cast<int>(value));
         }
     }
 }
@@ -1910,10 +1911,10 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         IntRect intRect;
         int expand = borderInclusive ? 1 : 0;
 
-        intRect.left_ = Clamp((int)((rect.min_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_, 0, rtSize.x_ - 1);
-        intRect.top_ = Clamp((int)((-rect.max_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_, 0, rtSize.y_ - 1);
-        intRect.right_ = Clamp((int)((rect.max_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_ + expand, 0, rtSize.x_);
-        intRect.bottom_ = Clamp((int)((-rect.min_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_ + expand, 0, rtSize.y_);
+        intRect.left_   = Clamp(static_cast<int>(( rect.min_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_, 0, rtSize.x_ - 1);
+        intRect.top_    = Clamp(static_cast<int>((-rect.max_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_, 0, rtSize.y_ - 1);
+        intRect.right_  = Clamp(static_cast<int>(( rect.max_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_ + expand, 0, rtSize.x_);
+        intRect.bottom_ = Clamp(static_cast<int>((-rect.min_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_ + expand, 0, rtSize.y_);
 
         if (intRect.right_ == intRect.left_)
             intRect.right_++;
@@ -1931,7 +1932,9 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         }
     }
     else
+    {
         scissorRect_ = IntRect::ZERO;
+    }
 
     if (enable != scissorTest_)
     {
@@ -1939,6 +1942,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
             glEnable(GL_SCISSOR_TEST);
         else
             glDisable(GL_SCISSOR_TEST);
+
         scissorTest_ = enable;
     }
 }
@@ -1972,7 +1976,9 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         }
     }
     else
+    {
         scissorRect_ = IntRect::ZERO;
+    }
 
     if (enable != scissorTest_)
     {
@@ -1980,6 +1986,7 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
             glEnable(GL_SCISSOR_TEST);
         else
             glDisable(GL_SCISSOR_TEST);
+
         scissorTest_ = enable;
     }
 }
@@ -3135,7 +3142,7 @@ void Graphics::PrepareDraw()
 
                     SetVBO(buffer->GetGPUObjectName());
                     glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
-                        element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
+                        element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, buffer->GetVertexSize(),
                         (const void *)(size_t)dataStart);
                 }
             }
@@ -3169,7 +3176,9 @@ void Graphics::CleanupFramebuffers()
 
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
              i != impl_->frameBuffers_.End(); ++i)
+        {
             DeleteFramebuffer(i->second_.fbo_);
+        }
 
         if (impl_->resolveSrcFBO_)
             DeleteFramebuffer(impl_->resolveSrcFBO_);
@@ -3177,7 +3186,9 @@ void Graphics::CleanupFramebuffers()
             DeleteFramebuffer(impl_->resolveDestFBO_);
     }
     else
+    {
         impl_->boundFBO_ = 0;
+    }
 
     impl_->resolveSrcFBO_ = 0;
     impl_->resolveDestFBO_ = 0;
@@ -3252,27 +3263,27 @@ void Graphics::ResetCachedState()
 
 void Graphics::SetTextureUnitMappings()
 {
-    textureUnits_["DiffMap"] = TU_DIFFUSE;
-    textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
-    textureUnits_["AlbedoBuffer"] = TU_ALBEDOBUFFER;
-    textureUnits_["NormalMap"] = TU_NORMAL;
-    textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
-    textureUnits_["SpecMap"] = TU_SPECULAR;
-    textureUnits_["EmissiveMap"] = TU_EMISSIVE;
-    textureUnits_["EnvMap"] = TU_ENVIRONMENT;
-    textureUnits_["EnvCubeMap"] = TU_ENVIRONMENT;
-    textureUnits_["LightRampMap"] = TU_LIGHTRAMP;
-    textureUnits_["LightSpotMap"] = TU_LIGHTSHAPE;
-    textureUnits_["LightCubeMap"] = TU_LIGHTSHAPE;
-    textureUnits_["ShadowMap"] = TU_SHADOWMAP;
+    textureUnits_["DiffMap"]            = TU_DIFFUSE;
+    textureUnits_["DiffCubeMap"]        = TU_DIFFUSE;
+    textureUnits_["AlbedoBuffer"]       = TU_ALBEDOBUFFER;
+    textureUnits_["NormalMap"]          = TU_NORMAL;
+    textureUnits_["NormalBuffer"]       = TU_NORMALBUFFER;
+    textureUnits_["SpecMap"]            = TU_SPECULAR;
+    textureUnits_["EmissiveMap"]        = TU_EMISSIVE;
+    textureUnits_["EnvMap"]             = TU_ENVIRONMENT;
+    textureUnits_["EnvCubeMap"]         = TU_ENVIRONMENT;
+    textureUnits_["LightRampMap"]       = TU_LIGHTRAMP;
+    textureUnits_["LightSpotMap"]       = TU_LIGHTSHAPE;
+    textureUnits_["LightCubeMap"]       = TU_LIGHTSHAPE;
+    textureUnits_["ShadowMap"]          = TU_SHADOWMAP;
 #ifndef GL_ES_VERSION_2_0
-    textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
-    textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
+    textureUnits_["VolumeMap"]          = TU_VOLUMEMAP;
+    textureUnits_["FaceSelectCubeMap"]  = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
-    textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
-    textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
-    textureUnits_["ZoneCubeMap"] = TU_ZONE;
-    textureUnits_["ZoneVolumeMap"] = TU_ZONE;
+    textureUnits_["DepthBuffer"]        = TU_DEPTHBUFFER;
+    textureUnits_["LightBuffer"]        = TU_LIGHTBUFFER;
+    textureUnits_["ZoneCubeMap"]        = TU_ZONE;
+    textureUnits_["ZoneVolumeMap"]      = TU_ZONE;
 #endif
 }
 

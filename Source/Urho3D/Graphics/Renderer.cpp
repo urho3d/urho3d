@@ -837,7 +837,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 {
     LightType type = light->GetLightType();
     const FocusParameters& parameters = light->GetShadowFocus();
-    float size = (float)shadowMapSize_ * light->GetShadowResolution();
+    float size = shadowMapSize_ * light->GetShadowResolution();
     // Automatically reduce shadow map size when far away
     if (parameters.autoSize_ && type != LIGHT_DIRECTIONAL)
     {
@@ -861,7 +861,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
 
         Vector2 projectionSize = lightBox.Projected(projection).Size();
-        lightPixels = Max(0.5f * (float)viewWidth * projectionSize.x_, 0.5f * (float)viewHeight * projectionSize.y_);
+        lightPixels = Max(0.5f * viewWidth * projectionSize.x_, 0.5f * viewHeight * projectionSize.y_);
 
         // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision
         if (lightPixels < SHADOW_MIN_PIXELS)
@@ -871,13 +871,13 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     }
 
     /// \todo Allow to specify maximum shadow maps per resolution, as smaller shadow maps take less memory
-    int width = NextPowerOfTwo((unsigned)size);
+    int width  = NextPowerOfTwo(static_cast<unsigned>(size));
     int height = width;
 
     // Adjust the size for directional or point light shadow map atlases
     if (type == LIGHT_DIRECTIONAL)
     {
-        auto numSplits = (unsigned)light->GetNumShadowSplits();
+        auto numSplits = static_cast<unsigned>(light->GetNumShadowSplits());
         if (numSplits > 1)
             width *= 2;
         if (numSplits > 2)
@@ -894,7 +894,9 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     {
         // If shadow maps are reused, always return the first
         if (reuseShadowMaps_)
+        {
             return shadowMaps_[searchKey][0];
+        }
         else
         {
             // If not reused, check allocation count and return existing shadow map if possible
@@ -904,7 +906,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
                 shadowMapAllocations_[searchKey].Push(light);
                 return shadowMaps_[searchKey][allocated];
             }
-            else if ((int)allocated >= maxShadowMaps_)
+            else if (static_cast<int>(allocated) >= maxShadowMaps_)
                 return nullptr;
         }
     }
@@ -1010,7 +1012,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
     if (multiSample == 1)
         autoResolve = false;
 
-    auto searchKey = (unsigned long long)format << 32u | multiSample << 24u | width << 12u | height;
+    auto searchKey = static_cast<unsigned long long>(format) << 32u | multiSample << 24u | width << 12u | height;
     if (filtered)
         searchKey |= 0x8000000000000000ULL;
     if (srgb)
@@ -1022,7 +1024,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
 
     // Add persistent key if defined
     if (persistentKey)
-        searchKey += (unsigned long long)persistentKey << 32u;
+        searchKey += static_cast<unsigned long long>(persistentKey) << 32u;
 
     // If new size or format, initialize the allocation stats
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
@@ -1109,7 +1111,7 @@ OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
         occlusionBuffers_.Push(newBuffer);
     }
 
-    int width = occlusionBufferSize_;
+    int  width  = occlusionBufferSize_;
     auto height = RoundToInt(occlusionBufferSize_ / camera->GetAspectRatio());
 
     OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_++];
@@ -1194,7 +1196,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows,
             {
                 // Do not log error, as it would result in a lot of spam
                 batch.vertexShader_ = nullptr;
-                batch.pixelShader_ = nullptr;
+                batch.pixelShader_  = nullptr;
                 return;
             }
 
@@ -1695,12 +1697,14 @@ void Renderer::LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation> >& 
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    psDefines + lightPSVariations[l] + GetShadowVariations() +
-                    heightFogVariations[h]);
+                                                       psDefines + lightPSVariations[l] + GetShadowVariations() +
+                                                       heightFogVariations[h]);
             }
             else
+            {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    psDefines + lightPSVariations[l] + heightFogVariations[h]);
+                                                       psDefines + lightPSVariations[l] + heightFogVariations[h]);
+            }
         }
     }
     else
@@ -1838,17 +1842,17 @@ void Renderer::SetIndirectionTextureData()
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
     {
         unsigned axis = i / 2;
-        data[0] = (unsigned char)((axis == 0) ? 255 : 0);
-        data[1] = (unsigned char)((axis == 1) ? 255 : 0);
-        data[2] = (unsigned char)((axis == 2) ? 255 : 0);
+        data[0] = static_cast<unsigned char>((axis == 0) ? 255 : 0);
+        data[1] = static_cast<unsigned char>((axis == 1) ? 255 : 0);
+        data[2] = static_cast<unsigned char>((axis == 2) ? 255 : 0);
         data[3] = 0;
         faceSelectCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 1, 1, data);
     }
 
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
     {
-        auto faceX = (unsigned char)((i & 1u) * 255);
-        auto faceY = (unsigned char)((i / 2) * 255 / 3);
+        auto faceX = static_cast<unsigned char>((i & 1u) * 255);
+        auto faceY = static_cast<unsigned char>((i / 2)  * 255 / 3);
         unsigned char* dest = data;
         for (unsigned y = 0; y < 256; ++y)
         {
@@ -1860,8 +1864,8 @@ void Renderer::SetIndirectionTextureData()
                 dest[2] = faceX;
                 dest[3] = (unsigned char)(255 * 2 / 3 - faceY);
 #else
-                dest[0] = (unsigned char)x;
-                dest[1] = (unsigned char)y;
+                dest[0] = static_cast<unsigned char>(x);
+                dest[1] = static_cast<unsigned char>(y);
                 dest[2] = faceX;
                 dest[3] = faceY;
 #endif

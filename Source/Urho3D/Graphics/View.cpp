@@ -551,7 +551,7 @@ void View::Update(const FrameInfo& frame)
 
     // Set automatic aspect ratio if required
     if (cullCamera_ && cullCamera_->GetAutoAspectRatio())
-        cullCamera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
+        cullCamera_->SetAspectRatioInternal(static_cast<float>(frame_.viewSize_.x_) / frame_.viewSize_.y_);
 
     GetDrawables();
     GetBatches();
@@ -585,7 +585,7 @@ void View::Render()
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
     // to ensure correct projection will be used
     if (camera_ && camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatioInternal((float)(viewSize_.x_) / (float)(viewSize_.y_));
+        camera_->SetAspectRatioInternal(static_cast<float>(viewSize_.x_) / viewSize_.y_);
 
     // Bind the face selection and indirection cube maps for point light shadows
 #ifndef GL_ES_VERSION_2_0
@@ -761,18 +761,18 @@ void View::SetCommandShaderParameters(const RenderPathCommand& command)
 
 void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect)
 {
-    auto texWidth = (float)texSize.x_;
-    auto texHeight = (float)texSize.y_;
+    auto texWidth = static_cast<float>(texSize.x_);
+    auto texHeight = static_cast<float>(texSize.y_);
     float widthRange = 0.5f * viewRect.Width() / texWidth;
     float heightRange = 0.5f * viewRect.Height() / texHeight;
 
 #ifdef URHO3D_OPENGL
-    Vector4 bufferUVOffset(((float)viewRect.left_) / texWidth + widthRange,
-        1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
+    Vector4 bufferUVOffset(viewRect.left_ / texWidth + widthRange,
+        1.0f - (viewRect.top_ / texHeight + heightRange), widthRange, heightRange);
 #else
     const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
-    Vector4 bufferUVOffset((pixelUVOffset.x_ + (float)viewRect.left_) / texWidth + widthRange,
-        (pixelUVOffset.y_ + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
+    Vector4 bufferUVOffset((pixelUVOffset.x_ + viewRect.left_) / texWidth + widthRange,
+        (pixelUVOffset.y_ + viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
 #endif
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
 
@@ -1011,7 +1011,7 @@ void View::GetLightBatches()
 
         lightQueues_.Resize(numLightQueues);
         maxLightsDrawables_.Clear();
-        auto maxSortedInstances = (unsigned)renderer_->GetMaxSortedInstances();
+        auto maxSortedInstances = static_cast<unsigned>(renderer_->GetMaxSortedInstances());
 
         for (Vector<LightQueryResult>::Iterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
@@ -1051,7 +1051,11 @@ void View::GetLightBatches()
                 // Allocate shadow map now
                 if (shadowSplits > 0)
                 {
-                    lightQueue.shadowMap_ = renderer_->GetShadowMap(light, cullCamera_, (unsigned)viewSize_.x_, (unsigned)viewSize_.y_);
+                    lightQueue.shadowMap_ = renderer_->GetShadowMap(
+                                                light, cullCamera_,
+                                                static_cast<unsigned>(viewSize_.x_),
+                                                static_cast<unsigned>(viewSize_.y_));
+
                     // If did not manage to get a shadow map, convert the light to unshadowed
                     if (!lightQueue.shadowMap_)
                         shadowSplits = 0;
@@ -1226,7 +1230,7 @@ void View::GetBaseBatches()
                 destBatch.pass_ = pass;
                 destBatch.zone_ = GetZone(drawable);
                 destBatch.isBase_ = true;
-                destBatch.lightMask_ = (unsigned char)GetLightMask(drawable);
+                destBatch.lightMask_ = static_cast<unsigned char>(GetLightMask(drawable));
 
                 if (info.vertexLights_)
                 {
@@ -1481,7 +1485,7 @@ void View::ExecuteRenderPathCommands()
             if (!actualView->IsNecessary(command))
                 continue;
 
-            bool viewportRead = actualView->CheckViewportRead(command);
+            bool viewportRead  = actualView->CheckViewportRead(command);
             bool viewportWrite = actualView->CheckViewportWrite(command);
             bool beginPingpong = actualView->CheckPingpong(i);
 
@@ -1721,8 +1725,8 @@ void View::ExecuteRenderPathCommands()
 void View::SetRenderTargets(RenderPathCommand& command)
 {
     unsigned index = 0;
-    bool useColorWrite = true;
-    bool useCustomDepth = false;
+    bool useColorWrite     = true;
+    bool useCustomDepth    = false;
     bool useViewportOutput = false;
 
     while (index < command.outputs_.Size())
@@ -1754,7 +1758,9 @@ void View::SetRenderTargets(RenderPathCommand& command)
                 graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(texture));
             }
             else
+            {
                 graphics_->SetRenderTarget(index, GetRenderSurfaceFromTexture(texture, command.outputs_[index].second_));
+            }
         }
 
         ++index;
@@ -1780,11 +1786,11 @@ void View::SetRenderTargets(RenderPathCommand& command)
     // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets should use
     // their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (useViewportOutput && currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
-        rtSizeNow.y_);
-
+    IntRect viewport = (useViewportOutput && currentRenderTarget_ == renderTarget_) ? viewRect_ :
+                                                                                      IntRect(0, 0, rtSizeNow.x_, rtSizeNow.y_);
     if (!useCustomDepth)
         graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
+
     graphics_->SetViewport(viewport);
     graphics_->SetColorWrite(useColorWrite);
 }
@@ -1865,8 +1871,8 @@ void View::RenderQuad(RenderPathCommand& command)
 
         String invSizeName = rtInfo.name_ + "InvSize";
         String offsetsName = rtInfo.name_ + "Offsets";
-        auto width = (float)renderTargets_[nameHash]->GetWidth();
-        auto height = (float)renderTargets_[nameHash]->GetHeight();
+        auto width  = static_cast<float>(renderTargets_[nameHash]->GetWidth());
+        auto height = static_cast<float>(renderTargets_[nameHash]->GetHeight());
 
         const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
         graphics_->SetShaderParameter(invSizeName, Vector2(1.0f / width, 1.0f / height));
@@ -1946,12 +1952,12 @@ void View::AllocateScreenBuffers()
     View* actualView = sourceView_ ? sourceView_ : this;
 
     bool hasScenePassToRTs = false;
-    bool hasCustomDepth = false;
-    bool hasViewportRead = false;
-    bool hasPingpong = false;
-    bool needSubstitute = false;
+    bool hasCustomDepth    = false;
+    bool hasViewportRead   = false;
+    bool hasPingpong       = false;
+    bool needSubstitute    = false;
     unsigned numViewportTextures = 0;
-    depthOnlyDummyTexture_ = nullptr;
+    depthOnlyDummyTexture_  = nullptr;
     lastCustomDepthSurface_ = nullptr;
 
     // Check for commands with special meaning: has custom depth, renders a scene pass to other than the destination viewport,
@@ -2064,18 +2070,18 @@ void View::AllocateScreenBuffers()
         if (!rtInfo.enabled_)
             continue;
 
-        float width = rtInfo.size_.x_;
+        float width  = rtInfo.size_.x_;
         float height = rtInfo.size_.y_;
 
         if (rtInfo.sizeMode_ == SIZE_VIEWPORTDIVISOR)
         {
-            width = (float)viewSize_.x_ / Max(width, M_EPSILON);
-            height = (float)viewSize_.y_ / Max(height, M_EPSILON);
+            width  = viewSize_.x_ / Max(width, M_EPSILON);
+            height = viewSize_.y_ / Max(height, M_EPSILON);
         }
         else if (rtInfo.sizeMode_ == SIZE_VIEWPORTMULTIPLIER)
         {
-            width = (float)viewSize_.x_ * width;
-            height = (float)viewSize_.y_ * height;
+            width  = viewSize_.x_ * width;
+            height = viewSize_.y_ * height;
         }
 
         auto intWidth = RoundToInt(width);
@@ -2085,7 +2091,7 @@ void View::AllocateScreenBuffers()
         renderTargets_[rtInfo.name_] =
             renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.multiSample_, rtInfo.autoResolve_,
                 rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_, rtInfo.persistent_ ? StringHash(rtInfo.name_).Value()
-                + (unsigned)(size_t)this : 0);
+                + static_cast<unsigned>((size_t)this) : 0);
     }
 }
 
@@ -2099,11 +2105,13 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     // If blitting to the destination rendertarget, use the actual viewport. Intermediate textures on the other hand
     // are always viewport-sized
     IntVector2 srcSize(source->GetWidth(), source->GetHeight());
-    IntVector2 destSize = destination ? IntVector2(destination->GetWidth(), destination->GetHeight()) : IntVector2(
-        graphics_->GetWidth(), graphics_->GetHeight());
+    IntVector2 destSize = destination ? IntVector2(destination->GetWidth(), destination->GetHeight())
+                                      : IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
 
-    IntRect srcRect = (GetRenderSurfaceFromTexture(source) == renderTarget_) ? viewRect_ : IntRect(0, 0, srcSize.x_, srcSize.y_);
-    IntRect destRect = (destination == renderTarget_) ? viewRect_ : IntRect(0, 0, destSize.x_, destSize.y_);
+    IntRect srcRect  = (GetRenderSurfaceFromTexture(source) == renderTarget_) ? viewRect_
+                                                                              : IntRect(0, 0, srcSize.x_, srcSize.y_);
+    IntRect destRect = (destination == renderTarget_) ? viewRect_
+                                                      : IntRect(0, 0, destSize.x_, destSize.y_);
 
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -2114,8 +2122,10 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, destination);
+
     for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
         graphics_->SetRenderTarget(i, (RenderSurface*)nullptr);
+
     graphics_->SetDepthStencil(GetDepthStencil(destination));
     graphics_->SetViewport(destRect);
 
@@ -2152,7 +2162,9 @@ void View::DrawFullscreenQuad(bool setIdentityProjection)
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
     }
     else
+    {
         graphics_->SetShaderParameter(VSP_MODEL, Light::GetFullscreenQuadTransform(camera_));
+    }
 
     graphics_->SetCullMode(CULL_NONE);
     graphics_->ClearTransformSources();
@@ -2194,10 +2206,14 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
                     compare *= diagonal;    // size^2
             }
             else
+            {
                 compare = diagonal * invOrthoSize;
+            }
 
             if (compare < occluderSizeThreshold_)
+            {
                 erase = true;
+            }
             else
             {
                 // Best occluders have big triangles (low density)
@@ -2207,7 +2223,9 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
             }
         }
         else
+        {
             erase = true;
+        }
 
         if (erase)
             i = occluders.Erase(i);
@@ -2222,7 +2240,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
 
 void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders)
 {
-    buffer->SetMaxTriangles((unsigned)maxOccluderTriangles_);
+    buffer->SetMaxTriangles(static_cast<unsigned>(maxOccluderTriangles_));
     buffer->Clear();
 
     if (!buffer->IsThreaded())
@@ -2482,7 +2500,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
 
 IntRect View::GetShadowMapViewport(Light* light, int splitIndex, Texture2D* shadowMap)
 {
-    int width = shadowMap->GetWidth();
+    int width  = shadowMap->GetWidth();
     int height = shadowMap->GetHeight();
 
     switch (light->GetLightType())
@@ -2671,7 +2689,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
     const BoundingBox& shadowCasterBox)
 {
     const FocusParameters& parameters = light->GetShadowFocus();
-    auto shadowMapWidth = (float)(shadowViewport.Width());
+    auto shadowMapWidth = static_cast<float>(shadowViewport.Width());
     LightType type = light->GetLightType();
 
     if (type == LIGHT_DIRECTIONAL)
@@ -2690,7 +2708,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
     {
         float viewSizeX = Max(Abs(shadowCasterBox.min_.x_), Abs(shadowCasterBox.max_.x_));
         float viewSizeY = Max(Abs(shadowCasterBox.min_.y_), Abs(shadowCasterBox.max_.y_));
-        float viewSize = Max(viewSizeX, viewSizeY);
+        float viewSize  = Max(viewSizeX, viewSizeY);
         // Scale the quantization parameters, because view size is in projection space (-1.0 - 1.0)
         float invOrthoSize = 1.0f / shadowCamera->GetOrthoSize();
         float quantize = parameters.quantize_ * invOrthoSize;
@@ -2706,7 +2724,9 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
     if (shadowCamera->GetZoom() >= 1.0f)
     {
         if (light->GetLightType() != LIGHT_POINT)
+        {
             shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 2.0f) / shadowMapWidth));
+        }
         else
         {
 #ifdef URHO3D_OPENGL
@@ -2723,7 +2743,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
 {
     Node* shadowCameraNode = shadowCamera->GetNode();
     const FocusParameters& parameters = light->GetShadowFocus();
-    auto shadowMapWidth = (float)(shadowViewport.Width());
+    auto shadowMapWidth = static_cast<float>(shadowViewport.Width());
 
     float minX = viewBox.min_.x_;
     float minY = viewBox.min_.y_;
@@ -2784,13 +2804,16 @@ void View::FindZone(Drawable* drawable)
 
     if (lastZone && (lastZone->GetViewMask() & cullCamera_->GetViewMask()) && lastZone->GetPriority() >= highestZonePriority_ &&
         (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->IsInside(center))
+    {
         newZone = lastZone;
+    }
     else
     {
         for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
+
             if (priority > bestPriority && (drawable->GetZoneMask() & zone->GetZoneMask()) && zone->IsInside(center))
             {
                 newZone = zone;
@@ -2810,7 +2833,9 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
     const Vector<TechniqueEntry>& techniques = material->GetTechniques();
     // If only one technique, no choice
     if (techniques.Size() == 1)
+    {
         return techniques[0].technique_;
+    }
     else
     {
         float lodDistance = drawable->GetLodDistance();
@@ -2874,6 +2899,7 @@ void View::SetQueueShaderDefines(BatchQueue& queue, const RenderPathCommand& com
 {
     String vsDefines = command.vertexShaderDefines_.Trimmed();
     String psDefines = command.pixelShaderDefines_.Trimmed();
+
     if (vsDefines.Length() || psDefines.Length())
     {
         queue.hasExtraDefines_ = true;
@@ -2883,7 +2909,9 @@ void View::SetQueueShaderDefines(BatchQueue& queue, const RenderPathCommand& com
         queue.psExtraDefinesHash_ = StringHash(psDefines);
     }
     else
+    {
         queue.hasExtraDefines_ = false;
+    }
 }
 
 void View::AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, bool allowInstancing, bool allowShadows)
@@ -2914,7 +2942,7 @@ void View::AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, boo
         int oldSize = i->second_.instances_.Size();
         i->second_.AddTransforms(batch);
         // Convert to using instancing shaders when the instancing limit is reached
-        if (oldSize < minInstances_ && (int)i->second_.instances_.Size() >= minInstances_)
+        if (oldSize < minInstances_ && static_cast<int>(i->second_.instances_.Size()) >= minInstances_)
         {
             i->second_.geometryType_ = GEOM_INSTANCED;
             renderer_->SetBatchShaders(i->second_, tech, allowShadows, queue);
@@ -2939,7 +2967,9 @@ void View::AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, boo
             }
         }
         else
+        {
             queue.batches_.Push(batch);
+        }
     }
 }
 
@@ -2985,6 +3015,7 @@ void View::PrepareInstancingBuffer()
     {
         for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
             i->shadowSplits_[j].shadowBatches_.SetInstancingData(dest, stride, freeIndex);
+
         i->litBaseBatches_.SetInstancingData(dest, stride, freeIndex);
         i->litBatches_.SetInstancingData(dest, stride, freeIndex);
     }
@@ -3035,6 +3066,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     }
 
     graphics_->SetScissorTest(false);
+
     if (!noStencil_)
         graphics_->SetStencilTest(true, CMP_NOTEQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
     else
@@ -3102,7 +3134,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
                 Max(shadowQueue.shadowCamera_->GetFarClip() / queue.shadowSplits_[0].shadowCamera_->GetFarClip(), 1.0f);
             multiplier = 1.0f + (multiplier - 1.0f) * queue.light_->GetShadowCascade().biasAutoAdjust_;
             // Quantize multiplier to prevent creation of too many rasterizer states on D3D11
-            multiplier = (int)(multiplier * 10.0f) / 10.0f;
+            multiplier = static_cast<int>(multiplier * 10.0f) / 10.0f;
         }
 
         // Perform further modification of depth bias on OpenGL ES, as shadow calculations' precision is limited
@@ -3163,11 +3195,11 @@ void View::SendViewEvent(StringHash eventType)
 
     VariantMap& eventData = GetEventDataMap();
 
-    eventData[P_VIEW] = this;
+    eventData[P_VIEW]    = this;
     eventData[P_SURFACE] = renderTarget_;
-    eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : nullptr);
-    eventData[P_SCENE] = scene_;
-    eventData[P_CAMERA] = cullCamera_;
+    eventData[P_TEXTURE] = renderTarget_ ? renderTarget_->GetParentTexture() : nullptr;
+    eventData[P_SCENE]   = scene_;
+    eventData[P_CAMERA]  = cullCamera_;
 
     renderer_->SendEvent(eventType, eventData);
 }

@@ -146,13 +146,13 @@ Ray Viewport::GetScreenRay(int x, int y) const
     if (rect_ == IntRect::ZERO)
     {
         auto* graphics = GetSubsystem<Graphics>();
-        screenX = (float)x / (float)graphics->GetWidth();
-        screenY = (float)y / (float)graphics->GetHeight();
+        screenX = static_cast<float>(x) / graphics->GetWidth();
+        screenY = static_cast<float>(y) / graphics->GetHeight();
     }
     else
     {
-        screenX = float(x - rect_.left_) / (float)rect_.Width();
-        screenY = float(y - rect_.top_) / (float)rect_.Height();
+        screenX = static_cast<float>(x - rect_.left_) / rect_.Width();
+        screenY = static_cast<float>(y - rect_.top_ ) / rect_.Height();
     }
 
     return camera_->GetScreenRay(screenX, screenY);
@@ -171,13 +171,13 @@ IntVector2 Viewport::WorldToScreenPoint(const Vector3& worldPos) const
     {
         /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
         auto* graphics = GetSubsystem<Graphics>();
-        x = (int)(screenPoint.x_ * graphics->GetWidth());
-        y = (int)(screenPoint.y_ * graphics->GetHeight());
+        x = static_cast<int>(screenPoint.x_ * graphics->GetWidth());
+        y = static_cast<int>(screenPoint.y_ * graphics->GetHeight());
     }
     else
     {
-        x = (int)(rect_.left_ + screenPoint.x_ * rect_.Width());
-        y = (int)(rect_.top_ + screenPoint.y_ * rect_.Height());
+        x = static_cast<int>(rect_.left_ + screenPoint.x_ * rect_.Width());
+        y = static_cast<int>(rect_.top_ + screenPoint.y_ * rect_.Height());
     }
 
     return IntVector2(x, y);
@@ -195,13 +195,13 @@ Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
     {
         /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
         auto* graphics = GetSubsystem<Graphics>();
-        screenX = (float)x / (float)graphics->GetWidth();
-        screenY = (float)y / (float)graphics->GetHeight();
+        screenX = static_cast<float>(x) / graphics->GetWidth();
+        screenY = static_cast<float>(y) / graphics->GetHeight();
     }
     else
     {
-        screenX = float(x - rect_.left_) / (float)rect_.Width();
-        screenY = float(y - rect_.top_) / (float)rect_.Height();
+        screenX = static_cast<float>(x - rect_.left_) / rect_.Width();
+        screenY = static_cast<float>(y - rect_.top_ ) / rect_.Height();
     }
 
     return camera_->ScreenToWorldPoint(Vector3(screenX, screenY, depth));

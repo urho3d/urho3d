@@ -117,6 +117,7 @@ void Texture::UpdateParameters()
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         else
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         break;
 
@@ -125,6 +126,7 @@ void Texture::UpdateParameters()
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         else
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         break;
 
@@ -134,6 +136,7 @@ void Texture::UpdateParameters()
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         else
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         break;
 
@@ -142,6 +145,7 @@ void Texture::UpdateParameters()
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         else
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         break;
 
@@ -155,7 +159,7 @@ void Texture::UpdateParameters()
     {
         unsigned maxAnisotropy = anisotropy_ ? anisotropy_ : graphics_->GetDefaultTextureAnisotropy();
         glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-            (filterMode == FILTER_ANISOTROPIC || filterMode == FILTER_NEAREST_ANISOTROPIC) ? (float)maxAnisotropy : 1.0f);
+            (filterMode == FILTER_ANISOTROPIC || filterMode == FILTER_NEAREST_ANISOTROPIC) ? static_cast<float>(maxAnisotropy) : 1.0f);
     }
 
     // Shadow compare
@@ -165,7 +169,9 @@ void Texture::UpdateParameters()
         glTexParameteri(target_, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     }
     else
+    {
         glTexParameteri(target_, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    }
 
     glTexParameterfv(target_, GL_TEXTURE_BORDER_COLOR, borderColor_.Data());
 #endif
@@ -193,13 +199,13 @@ unsigned Texture::GetRowDataSize(int width) const
     {
     case GL_ALPHA:
     case GL_LUMINANCE:
-        return (unsigned)width;
+        return static_cast<unsigned>(width);
 
     case GL_LUMINANCE_ALPHA:
-        return (unsigned)(width * 2);
+        return static_cast<unsigned>(width) * 2;
 
     case GL_RGB:
-        return (unsigned)(width * 3);
+        return static_cast<unsigned>(width) * 3;
 
     case GL_RGBA:
 #ifndef GL_ES_VERSION_2_0
@@ -208,45 +214,45 @@ unsigned Texture::GetRowDataSize(int width) const
     case GL_RG16F:
     case GL_R32F:
 #endif
-        return (unsigned)(width * 4);
+        return static_cast<unsigned>(width) * 4;
 
 #ifndef GL_ES_VERSION_2_0
     case GL_R8:
-        return (unsigned)width;
+        return static_cast<unsigned>(width);
 
     case GL_RG8:
     case GL_R16F:
-        return (unsigned)(width * 2);
+        return static_cast<unsigned>(width) * 2;
 
     case GL_RGBA16:
     case GL_RGBA16F_ARB:
-        return (unsigned)(width * 8);
+        return static_cast<unsigned>(width) * 8;
 
     case GL_RGBA32F_ARB:
-        return (unsigned)(width * 16);
+        return static_cast<unsigned>(width) * 16;
 #endif
 
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-        return ((unsigned)(width + 3) >> 2u) * 8;
+        return (static_cast<unsigned>(width + 3) >> 2u) * 8;
 
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-        return ((unsigned)(width + 3) >> 2u) * 16;
+        return (static_cast<unsigned>(width + 3) >> 2u) * 16;
 
     case GL_ETC1_RGB8_OES:
     case GL_ETC2_RGB8_OES:
-        return ((unsigned)(width + 3) >> 2u) * 8;
+        return (static_cast<unsigned>(width + 3) >> 2u) * 8;
 
     case GL_ETC2_RGBA8_OES:
-        return ((unsigned)(width + 3) >> 2u) * 16;
+        return (static_cast<unsigned>(width + 3) >> 2u) * 16;
 
     case COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
-        return ((unsigned)(width + 3) >> 2u) * 8;
+        return (static_cast<unsigned>(width + 3) >> 2u) * 8;
 
     case COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
-        return ((unsigned)(width + 7) >> 3u) * 8;
+        return (static_cast<unsigned>(width + 7) >> 3u) * 8;
 
     default:
         return 0;

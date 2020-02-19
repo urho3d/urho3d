@@ -337,9 +337,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
-                unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
+                unsigned error = static_cast<unsigned>(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
                 if (refreshRate != 0)
-                    error += (unsigned)Abs(resolutions[i].z_ - refreshRate);
+                    error += static_cast<unsigned>(Abs(resolutions[i].z_ - refreshRate));
+
                 if (error < bestError)
                 {
                     best = i;
@@ -1100,7 +1101,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
         impl_->dirtyConstantBuffers_.Push(buffer);
-    buffer->SetParameter(i->second_.offset_, (unsigned)(count * sizeof(float)), data);
+    buffer->SetParameter(i->second_.offset_, static_cast<unsigned>(count * sizeof(float)), data);
 }
 
 void Graphics::SetShaderParameter(StringHash param, float value)
@@ -1225,13 +1226,15 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
+    if (static_cast<unsigned>((size_t)shaderParameterSources_[group]) == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
     {
         shaderParameterSources_[group] = source;
         return true;
     }
     else
+    {
         return false;
+    }
 }
 
 bool Graphics::HasShaderParameter(StringHash param)
@@ -1446,16 +1449,17 @@ void Graphics::SetViewport(const IntRect& rect)
         rectCopy.right_ = rectCopy.left_ + 1;
     if (rectCopy.bottom_ <= rectCopy.top_)
         rectCopy.bottom_ = rectCopy.top_ + 1;
+
     rectCopy.left_ = Clamp(rectCopy.left_, 0, size.x_);
     rectCopy.top_ = Clamp(rectCopy.top_, 0, size.y_);
     rectCopy.right_ = Clamp(rectCopy.right_, 0, size.x_);
     rectCopy.bottom_ = Clamp(rectCopy.bottom_, 0, size.y_);
 
     static D3D11_VIEWPORT d3dViewport;
-    d3dViewport.TopLeftX = (float)rectCopy.left_;
-    d3dViewport.TopLeftY = (float)rectCopy.top_;
-    d3dViewport.Width = (float)(rectCopy.right_ - rectCopy.left_);
-    d3dViewport.Height = (float)(rectCopy.bottom_ - rectCopy.top_);
+    d3dViewport.TopLeftX = static_cast<float>(rectCopy.left_);
+    d3dViewport.TopLeftY = static_cast<float>(rectCopy.top_);
+    d3dViewport.Width  = static_cast<float>(rectCopy.right_  - rectCopy.left_);
+    d3dViewport.Height = static_cast<float>(rectCopy.bottom_ - rectCopy.top_);
     d3dViewport.MinDepth = 0.0f;
     d3dViewport.MaxDepth = 1.0f;
 
@@ -1558,10 +1562,10 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         IntRect intRect;
         int expand = borderInclusive ? 1 : 0;
 
-        intRect.left_ = Clamp((int)((rect.min_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_, 0, rtSize.x_ - 1);
-        intRect.top_ = Clamp((int)((-rect.max_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_, 0, rtSize.y_ - 1);
-        intRect.right_ = Clamp((int)((rect.max_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_ + expand, 0, rtSize.x_);
-        intRect.bottom_ = Clamp((int)((-rect.min_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_ + expand, 0, rtSize.y_);
+        intRect.left_   = Clamp(static_cast<int>(( rect.min_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_, 0, rtSize.x_ - 1);
+        intRect.top_    = Clamp(static_cast<int>((-rect.max_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_, 0, rtSize.y_ - 1);
+        intRect.right_  = Clamp(static_cast<int>(( rect.max_.x_ + 1.0f) * 0.5f * viewSize.x_) + viewPos.x_ + expand, 0, rtSize.x_);
+        intRect.bottom_ = Clamp(static_cast<int>((-rect.min_.y_ + 1.0f) * 0.5f * viewSize.y_) + viewPos.y_ + expand, 0, rtSize.y_);
 
         if (intRect.right_ == intRect.left_)
             intRect.right_++;
@@ -1793,17 +1797,17 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
 
     if (renderTargets_[0])
     {
-        width = renderTargets_[0]->GetWidth();
+        width  = renderTargets_[0]->GetWidth();
         height = renderTargets_[0]->GetHeight();
     }
     else if (depthStencil_) // Depth-only rendering
     {
-        width = depthStencil_->GetWidth();
+        width  = depthStencil_->GetWidth();
         height = depthStencil_->GetHeight();
     }
     else
     {
-        width = width_;
+        width  = width_;
         height = height_;
     }
 
@@ -2056,7 +2060,9 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
     }
     else
+    {
         window_ = SDL_CreateWindowFrom(externalWindow_, 0);
+    }
 
     if (!window_)
     {
@@ -2178,8 +2184,9 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
             if (width != modes[i].Width || height != modes[i].Height)
                 continue;
 
-            float rate = (float)modes[i].RefreshRate.Numerator / modes[i].RefreshRate.Denominator;
-            unsigned error = (unsigned)(Abs(rate - refreshRate_));
+            float rate = static_cast<float>(modes[i].RefreshRate.Numerator) / modes[i].RefreshRate.Denominator;
+            unsigned error = static_cast<unsigned>(Abs(rate - refreshRate_));
+
             if (error < bestError)
             {
                 bestMatchingRateIndex = i;
@@ -2268,6 +2275,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     impl_->depthStencilView_ = nullptr;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         impl_->renderTargetViews_[i] = nullptr;
+
     impl_->renderTargetsDirty_ = true;
 
     impl_->swapChain_->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
@@ -2335,17 +2343,17 @@ bool Graphics::UpdateSwapChain(int width, int height)
 
 void Graphics::CheckFeatureSupport()
 {
-    anisotropySupport_ = true;
-    dxtTextureSupport_ = true;
-    lightPrepassSupport_ = true;
-    deferredSupport_ = true;
+    anisotropySupport_     = true;
+    dxtTextureSupport_     = true;
+    lightPrepassSupport_   = true;
+    deferredSupport_       = true;
     hardwareShadowSupport_ = true;
-    instancingSupport_ = true;
-    shadowMapFormat_ = DXGI_FORMAT_R16_TYPELESS;
-    hiresShadowMapFormat_ = DXGI_FORMAT_R32_TYPELESS;
-    dummyColorFormat_ = DXGI_FORMAT_UNKNOWN;
-    sRGBSupport_ = true;
-    sRGBWriteSupport_ = true;
+    instancingSupport_     = true;
+    shadowMapFormat_       = DXGI_FORMAT_R16_TYPELESS;
+    hiresShadowMapFormat_  = DXGI_FORMAT_R32_TYPELESS;
+    dummyColorFormat_      = DXGI_FORMAT_UNKNOWN;
+    sRGBSupport_           = true;
+    sRGBWriteSupport_      = true;
 }
 
 void Graphics::ResetCachedState()
@@ -2445,7 +2453,9 @@ void Graphics::PrepareDraw()
         // backbuffer rendering with a custom depth stencil
         if (!renderTargets_[0] &&
             (!depthStencil_ || (depthStencil_ && depthStencil_->GetWidth() == width_ && depthStencil_->GetHeight() == height_)))
+        {
             impl_->renderTargetViews_[0] = impl_->defaultRenderTargetView_;
+        }
 
         impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &impl_->renderTargetViews_[0], impl_->depthStencilView_);
         impl_->renderTargetsDirty_ = false;
@@ -2507,7 +2517,7 @@ void Graphics::PrepareDraw()
 
     if (impl_->blendStateDirty_)
     {
-        unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (alphaToCoverage_ ? 2 : 0) | (blendMode_ << 2));
+        unsigned newBlendStateHash = static_cast<unsigned>((colorWrite_ ? 1 : 0) | (alphaToCoverage_ ? 2 : 0) | (blendMode_ << 2));
         if (newBlendStateHash != impl_->blendStateHash_)
         {
             HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Find(newBlendStateHash);
@@ -2565,8 +2575,8 @@ void Graphics::PrepareDraw()
                 stateDesc.DepthWriteMask = depthWrite_ ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
                 stateDesc.DepthFunc = d3dCmpFunc[depthTestMode_];
                 stateDesc.StencilEnable = stencilTest_ ? TRUE : FALSE;
-                stateDesc.StencilReadMask = (unsigned char)stencilCompareMask_;
-                stateDesc.StencilWriteMask = (unsigned char)stencilWriteMask_;
+                stateDesc.StencilReadMask = static_cast<unsigned char>(stencilCompareMask_);
+                stateDesc.StencilWriteMask = static_cast<unsigned char>(stencilWriteMask_);
                 stateDesc.FrontFace.StencilFailOp = d3dStencilOp[stencilFail_];
                 stateDesc.FrontFace.StencilDepthFailOp = d3dStencilOp[stencilZFail_];
                 stateDesc.FrontFace.StencilPassOp = d3dStencilOp[stencilPass_];
@@ -2600,11 +2610,12 @@ void Graphics::PrepareDraw()
         unsigned depthBits = 24;
         if (depthStencil_ && depthStencil_->GetParentTexture()->GetFormat() == DXGI_FORMAT_R16_TYPELESS)
             depthBits = 16;
-        int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
+        int scaledDepthBias = static_cast<int>(constantDepthBias_ * (1 << depthBits));
 
         unsigned newRasterizerStateHash =
             (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) |
-            ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
+            ((scaledDepthBias & 0x1fff) << 6) | ((static_cast<int>(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
+
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
@@ -2686,22 +2697,22 @@ void Graphics::CreateResolveTexture()
 
 void Graphics::SetTextureUnitMappings()
 {
-    textureUnits_["DiffMap"] = TU_DIFFUSE;
-    textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
-    textureUnits_["NormalMap"] = TU_NORMAL;
-    textureUnits_["SpecMap"] = TU_SPECULAR;
-    textureUnits_["EmissiveMap"] = TU_EMISSIVE;
-    textureUnits_["EnvMap"] = TU_ENVIRONMENT;
-    textureUnits_["EnvCubeMap"] = TU_ENVIRONMENT;
-    textureUnits_["LightRampMap"] = TU_LIGHTRAMP;
-    textureUnits_["LightSpotMap"] = TU_LIGHTSHAPE;
-    textureUnits_["LightCubeMap"] = TU_LIGHTSHAPE;
-    textureUnits_["ShadowMap"] = TU_SHADOWMAP;
-    textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
+    textureUnits_["DiffMap"]            = TU_DIFFUSE;
+    textureUnits_["DiffCubeMap"]        = TU_DIFFUSE;
+    textureUnits_["NormalMap"]          = TU_NORMAL;
+    textureUnits_["SpecMap"]            = TU_SPECULAR;
+    textureUnits_["EmissiveMap"]        = TU_EMISSIVE;
+    textureUnits_["EnvMap"]             = TU_ENVIRONMENT;
+    textureUnits_["EnvCubeMap"]         = TU_ENVIRONMENT;
+    textureUnits_["LightRampMap"]       = TU_LIGHTRAMP;
+    textureUnits_["LightSpotMap"]       = TU_LIGHTSHAPE;
+    textureUnits_["LightCubeMap"]       = TU_LIGHTSHAPE;
+    textureUnits_["ShadowMap"]          = TU_SHADOWMAP;
+    textureUnits_["FaceSelectCubeMap"]  = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
-    textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
-    textureUnits_["ZoneCubeMap"] = TU_ZONE;
-    textureUnits_["ZoneVolumeMap"] = TU_ZONE;
+    textureUnits_["VolumeMap"]          = TU_VOLUMEMAP;
+    textureUnits_["ZoneCubeMap"]        = TU_ZONE;
+    textureUnits_["ZoneVolumeMap"]      = TU_ZONE;
 }
 
 }
