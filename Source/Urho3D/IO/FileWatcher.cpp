@@ -323,7 +323,7 @@ void FileWatcher::ThreadFunction()
                 {
                     String fileName;
                     fileName = dirHandle_[event->wd] + event->name;
-                    AddChange(fileName);
+                    AddChange({fileName, FILECHANGE_UNKNOWN});
                 }
             }
 
@@ -340,7 +340,7 @@ void FileWatcher::ThreadFunction()
         {
             Vector<String> fileNames = changes.Split(1);
             for (unsigned i = 0; i < fileNames.Size(); ++i)
-                AddChange(fileNames[i]);
+                AddChange({fileNames[i], FILECHANGE_UNKNOWN});
         }
     }
 #endif
