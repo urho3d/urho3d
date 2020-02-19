@@ -58,7 +58,8 @@ Context* GetContext(lua_State* L)
         return (L == L1) ? nullptr : GetContext(L1);
     }
     tolua_Error error;      // Ensure we are indeed getting a Context object before casting
-    return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, nullptr)) : nullptr;
+    return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, nullptr))
+                                                         : nullptr;
 }
 
 // Explicit template specialization for StringVector
@@ -74,7 +75,7 @@ template <> void* ToluaToVector<String>(lua_State* L, int narg, void* /*def*/)
         return nullptr;
     static Vector<String> result;
     result.Clear();
-    result.Resize((unsigned)lua_objlen(L, narg));
+    result.Resize(static_cast<unsigned>(lua_objlen(L, narg)));
     for (unsigned i = 0; i < result.Size(); ++i)
     {
         lua_rawgeti(L, narg, i + 1);
@@ -109,11 +110,11 @@ template <> void* ToluaToPODVector<bool>(double /*overload*/, lua_State* L, int 
         return nullptr;
     static PODVector<bool> result;
     result.Clear();
-    result.Resize((unsigned)lua_objlen(L, narg));
+    result.Resize(static_cast<unsigned>(lua_objlen(L, narg)));
     for (unsigned i = 0; i < result.Size(); ++i)
     {
         lua_rawgeti(L, narg, i + 1);
-        result[i] = (bool)tolua_toboolean(L, -1, 0);
+        result[i] = static_cast<bool>(tolua_toboolean(L, -1, 0));
         lua_pop(L, 1);
     }
     return &result;
@@ -139,7 +140,7 @@ template <> void* ToluaToVector<SharedPtr<IndexBuffer> >(lua_State* L, int narg,
         return nullptr;
     static Vector<SharedPtr<IndexBuffer> > result;
     result.Clear();
-    result.Resize((unsigned)lua_objlen(L, narg));
+    result.Resize(static_cast<unsigned>(lua_objlen(L, narg)));
     for (unsigned i = 0; i < result.Size(); ++i)
     {
         lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
@@ -155,7 +156,7 @@ template <> void* ToluaToVector<SharedPtr<VertexBuffer> >(lua_State* L, int narg
         return nullptr;
     static Vector<SharedPtr<VertexBuffer> > result;
     result.Clear();
-    result.Resize((unsigned)lua_objlen(L, narg));
+    result.Resize(static_cast<unsigned>(lua_objlen(L, narg)));
     for (unsigned i = 0; i < result.Size(); ++i)
     {
         lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
@@ -184,7 +185,7 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
         break;
 
     case LUA_TBOOLEAN:
-        variant = (bool)lua_toboolean(L, narg);     // Still need to cast to bool as Lua/LuaJIT return it as int
+        variant = static_cast<bool>(lua_toboolean(L, narg));     // Still need to cast to bool as Lua/LuaJIT return it as int
         break;
 
     case LUA_TNUMBER:
@@ -195,11 +196,11 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
             switch (variant.GetType())
             {
             case VAR_INT:
-                variant = (int)value;
+                variant = static_cast<int>(value);
                 break;
 
             case VAR_INT64:
-                variant = (long long)value;
+                variant = static_cast<long long>(value);
                 break;
 
             case VAR_BOOL:
@@ -207,7 +208,7 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                 break;
 
             case VAR_FLOAT:
-                variant = (float)value;
+                variant = static_cast<float>(value);
                 break;
 
             default:
@@ -351,7 +352,7 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
         break;
 
     case VAR_BOOL:
-        tolua_pushboolean(L, (int)variant->GetBool());
+        tolua_pushboolean(L, static_cast<int>(variant->GetBool()));
         break;
 
     case VAR_FLOAT:

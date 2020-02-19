@@ -223,7 +223,7 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
         if (i >= iterations - 1)
         {
             float curTheta =0;
-            if (Abs(endTheta - startTheta) < (2*M_PI))
+            if (Abs(endTheta - startTheta) < (2 * M_PI))
                 curTheta = endTheta;
             float curX = radius * cos(curTheta);
             float curY = radius * sin(curTheta);
@@ -235,8 +235,8 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
 
 Vector<Vector3> CustomGeometry::GetSquareShape(float size)
 {
-    Vector<Vector3> mSquareList = { Urho3D::Vector3(-(size / 2.0f),0,(size / 2.0f)),Urho3D::Vector3(-(size / 2.0f),0,-(size / 2.0f)),
-        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)),Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f)) };
+    Vector<Vector3> mSquareList = { Urho3D::Vector3(-(size / 2.0f), 0, (size / 2.0f)), Urho3D::Vector3(-(size / 2.0f), 0, -(size / 2.0f)),
+        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)), Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f)) };
     return mSquareList;
 }
 
