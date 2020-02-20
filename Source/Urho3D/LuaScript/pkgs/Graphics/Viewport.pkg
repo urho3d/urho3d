@@ -12,7 +12,7 @@ class Viewport
     void SetCullCamera(Camera* camera);
     void SetRect(const IntRect& rect);
     void SetRenderPath(RenderPath* path);
-    void SetRenderPath(XMLFile* file);
+    bool SetRenderPath(XMLFile* file);
     void SetDrawDebug(bool enable);
     
     Scene* GetScene() const;

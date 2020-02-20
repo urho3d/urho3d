@@ -202,6 +202,30 @@ public:
     /// Return float data.
     const float* Data() const { return &m00_; }
 
+    /// Return whether any element is NaN.
+    bool IsNaN() const
+    {
+        const float* data = Data();
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            if (Urho3D::IsNaN(data[i]))
+                return true;
+        }
+        return false;
+    }
+
+    /// Return whether any element is Inf.
+    bool IsInf() const
+    {
+        const float* data = Data();
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            if (Urho3D::IsInf(data[i]))
+                return true;
+        }
+        return false;
+    }
+
     /// Return as string.
     String ToString() const;
 
