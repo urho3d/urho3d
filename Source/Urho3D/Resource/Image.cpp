@@ -216,7 +216,7 @@ struct DDSurfaceDesc2
     unsigned dwTextureStage_;
 };
 
-bool CompressedLevel::Decompress(unsigned char* dest)
+bool CompressedLevel::Decompress(unsigned char* dest) const
 {
     if (!data_)
         return false;
@@ -2092,6 +2092,20 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             ++i;
         }
     }
+}
+
+SharedPtr<Image> Image::GetDecompressedImage() const
+{
+    if (!IsCompressed())
+        return ConvertToRGBA();
+
+    const CompressedLevel compressedLevel = GetCompressedLevel(0);
+
+    auto decompressedImage = MakeShared<Image>(context_);
+    decompressedImage->SetSize(compressedLevel.width_, compressedLevel.height_, 4);
+    compressedLevel.Decompress(decompressedImage->GetData());
+
+    return decompressedImage;
 }
 
 Image* Image::GetSubimage(const IntRect& rect) const

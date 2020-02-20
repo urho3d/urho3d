@@ -110,6 +110,12 @@ public:
         FromEulerAngles(x, y, z);
     }
 
+    /// Construct from Euler angles (in degrees.)
+    explicit Quaternion(const Vector3& angles) noexcept
+    {
+        FromEulerAngles(angles.x_, angles.y_, angles.z_);
+    }
+
     /// Construct from the rotation difference between two direction vectors.
     Quaternion(const Vector3& start, const Vector3& end) noexcept
     {
@@ -409,8 +415,11 @@ public:
         return Urho3D::Equals(w_, rhs.w_) && Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_);
     }
 
-    /// Return whether is NaN.
+    /// Return whether any element is NaN.
     bool IsNaN() const { return Urho3D::IsNaN(w_) || Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_); }
+
+    /// Return whether any element is Inf.
+    bool IsInf() const { return Urho3D::IsInf(w_) || Urho3D::IsInf(x_) || Urho3D::IsInf(y_) || Urho3D::IsInf(z_); }
 
     /// Return conjugate.
     Quaternion Conjugate() const

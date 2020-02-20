@@ -55,7 +55,7 @@ enum CompressedFormat
 struct CompressedLevel
 {
     /// Decompress to RGBA. The destination buffer required is width * height * 4 bytes. Return true if successful.
-    bool Decompress(unsigned char* dest);
+    bool Decompress(unsigned char* dest) const;
 
     /// Compressed image data.
     unsigned char* data_{};
@@ -187,6 +187,8 @@ public:
     SharedPtr<Image> ConvertToRGBA() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
+    /// Return decompressed image data in RGBA format.
+    SharedPtr<Image> GetDecompressedImage() const;
     /// Return subimage from the image by the defined rect or null if failed. 3D images are not supported. You must free the subimage yourself.
     Image* GetSubimage(const IntRect& rect) const;
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.

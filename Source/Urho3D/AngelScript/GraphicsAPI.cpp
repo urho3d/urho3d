@@ -456,7 +456,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f()", asFUNCTION(ConstructViewport), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, RenderPath@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, RenderPath@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL);
-    engine->RegisterObjectMethod("Viewport", "void SetRenderPath(XMLFile@+)", asMETHODPR(Viewport, SetRenderPath, (XMLFile*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "bool SetRenderPath(XMLFile@+)", asMETHODPR(Viewport, SetRenderPath, (XMLFile*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asMETHOD(Viewport, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asMETHOD(Viewport, GetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
