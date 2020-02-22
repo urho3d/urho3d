@@ -460,6 +460,20 @@ float RaycastVehicle::GetWheelSuspensionStiffness(int wheel) const
     return whInfo.m_suspensionStiffness;
 }
 
+void RaycastVehicle::SetWheelMaxSuspensionForce(int wheel, float force)
+{
+    btRaycastVehicle* vehicle = vehicleData_->Get();
+    btWheelInfo& whInfo = vehicle->getWheelInfo(wheel);
+    whInfo.m_maxSuspensionForce = force;
+}
+
+float RaycastVehicle::GetWheelMaxSuspensionForce(int wheel) const
+{
+    btRaycastVehicle* vehicle = vehicleData_->Get();
+    btWheelInfo whInfo = vehicle->getWheelInfo(wheel);
+    return whInfo.m_maxSuspensionForce;
+}
+
 void RaycastVehicle::SetWheelDampingRelaxation(int wheel, float damping)
 {
     btRaycastVehicle* vehicle = vehicleData_->Get();

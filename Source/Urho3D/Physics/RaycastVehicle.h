@@ -59,6 +59,8 @@ public:
     void SetSteeringValue(int wheel, float steeringValue);
     /// Set suspension stiffness for particular wheel.
     void SetWheelSuspensionStiffness(int wheel, float stiffness);
+    /// Set wheel max suspension force. Good results are often obtained by a value that is about 3x to 4x the vehicle weight. 
+    void SetWheelMaxSuspensionForce(int wheel, float force);
     /// Set wheel damping relaxation.
     void SetWheelDampingRelaxation(int wheel, float damping);
     /// Set wheel damping compression.
@@ -116,6 +118,8 @@ public:
     float GetSteeringValue(int wheel) const;
     /// Get suspension stiffness for particular wheel.
     float GetWheelSuspensionStiffness(int wheel) const;
+    /// Get wheel max suspension force. 
+    float GetWheelMaxSuspensionForce(int wheel) const;
     /// Get wheel damping relaxation.
     float GetWheelDampingRelaxation(int wheel) const;
     /// Get wheel damping compression.
