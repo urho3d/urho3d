@@ -91,7 +91,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
 
     // SDL uses power of two audio fragments. Determine the closest match
     int bufferSamples = mixRate * bufferLengthMSec / 1000;
-    desired.samples = (Uint16)NextPowerOfTwo((unsigned)bufferSamples);
+    desired.samples = (Uint16)NextPowerOfTwo(static_cast<unsigned>(bufferSamples));
     if (Abs((int)desired.samples / 2 - bufferSamples) < Abs((int)desired.samples - bufferSamples))
         desired.samples /= 2;
 
@@ -113,9 +113,9 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     }
 
     stereo_ = obtained.channels == 2;
-    sampleSize_ = (unsigned)(stereo_ ? sizeof(int) : sizeof(short));
+    sampleSize_ = static_cast<unsigned>(stereo_ ? sizeof(int) : sizeof(short));
     // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
-    fragmentSize_ = Min(NextPowerOfTwo((unsigned)mixRate >> 6u), (unsigned)obtained.samples);
+    fragmentSize_ = Min(NextPowerOfTwo(static_cast<unsigned>(mixRate) >> 6u), (unsigned)obtained.samples);
     mixRate_ = obtained.freq;
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1u : fragmentSize_];

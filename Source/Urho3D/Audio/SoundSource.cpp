@@ -156,12 +156,12 @@ void SoundSource::Seek(float seekTime)
     if (!soundStream_)
     {
         // Raw or wav format
-        SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
+        SetPositionAttr(static_cast<int>(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
     }
     else
     {
         // Ogg format
-        if (soundStream_->Seek((unsigned)(seekTime * soundStream_->GetFrequency())))
+        if (soundStream_->Seek(static_cast<unsigned>(seekTime * soundStream_->GetFrequency())))
         {
             timePosition_ = seekTime;
         }
@@ -503,7 +503,7 @@ ResourceRef SoundSource::GetSoundAttr() const
 int SoundSource::GetPositionAttr() const
 {
     if (sound_ && position_)
-        return (int)(GetPlayPosition() - sound_->GetStart());
+        return static_cast<int>(GetPlayPosition() - sound_->GetStart());
     else
         return 0;
 }
@@ -831,9 +831,9 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = masterGain_ * attenuation_ * gain_;
-    auto leftVol = static_cast<int>((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    auto rightVol = static_cast<int>((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    const float totalGain{ masterGain_ * attenuation_ * gain_ };
+    const auto leftVol = FloorToInt((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
+    const auto rightVol = FloorToInt((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
@@ -841,8 +841,8 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     }
 
     float add = frequency_ / mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = (int)((add - floorf(add)) * 65536.0f);
+    auto intAdd = FloorToInt(add);
+    auto fractAdd = FloorToInt((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
@@ -1003,8 +1003,8 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
     }
 
     float add = frequency_ / mixRate;
-    auto intAdd = (int)add;
-    auto fractAdd = static_cast<int>((add - floorf(add)) * 65536.0f);
+    auto intAdd = FloorToInt(add);
+    auto fractAdd = FloorToInt((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
 
     if (sound->IsSixteenBit())
