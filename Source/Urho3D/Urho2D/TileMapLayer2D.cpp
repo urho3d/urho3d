@@ -122,15 +122,15 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                         pivot += halfSize;
                     }
 
-                    for (unsigned i = 0; i < 360; i += 30)
+                    for (unsigned i = 0; i < 360u; i += 30u)
                     {
-                        unsigned j = i + 30;
-                        float x1 = halfSize.x_ * Cos((float)i);
-                        float y1 = halfSize.y_ * Sin((float)i);
-                        float x2 = halfSize.x_ * Cos((float)j);
-                        float y2 = halfSize.y_ * Sin((float)j);
-                        Vector2 point1 = Vector2(x1, - y1);
-                        Vector2 point2 = Vector2(x2, - y2);
+                        const unsigned j{ i + 30u };
+                        const float x1{ halfSize.x_ * Cos(static_cast<float>(i)) };
+                        const float y1{ halfSize.y_ * Sin(static_cast<float>(i)) };
+                        const float x2{ halfSize.x_ * Cos(static_cast<float>(j)) };
+                        const float y2{ halfSize.y_ * Sin(static_cast<float>(j)) };
+                        Vector2 point1{ Vector2(x1, - y1) };
+                        Vector2 point2{ Vector2(x2, - y2) };
 
                         if (info.orientation_ == O_ISOMETRIC)
                         {
@@ -339,11 +339,11 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 {
     tileLayer_ = tileLayer;
 
-    int width = tileLayer->GetWidth();
-    int height = tileLayer->GetHeight();
-    nodes_.Resize((unsigned)(width * height));
+    const int width{ tileLayer->GetWidth() };
+    const int height{ tileLayer->GetHeight() };
+    nodes_.Resize(static_cast<unsigned>(width * height));
 
-    const TileMapInfo2D& info = tileMap_->GetInfo();
+    const TileMapInfo2D& info{ tileMap_->GetInfo() };
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
@@ -388,7 +388,7 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
             staticSprite->SetSprite(object->GetTileSprite());
             staticSprite->SetFlip(object->GetTileFlipX(), object->GetTileFlipY(), object->GetTileSwapXY());
             staticSprite->SetLayer(drawOrder_);
-            staticSprite->SetOrderInLayer((int)((10.0f - object->GetPosition().y_) * 100));
+            staticSprite->SetOrderInLayer(static_cast<int>((10.0f - object->GetPosition().y_) * 100));
 
             if (tmxFile->GetInfo().orientation_ == O_ISOMETRIC)
             {

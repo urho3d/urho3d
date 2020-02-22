@@ -128,9 +128,11 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
         }
     }
     else
+    {
         encoding = XML;
+    }
 
-    tiles_.Resize((unsigned)(width_ * height_));
+    tiles_.Resize(static_cast<unsigned>(width_ * height_));
     if (encoding == XML)
     {
         XMLElement tileElem = dataElem.GetChild("tile");
@@ -193,10 +195,10 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
             for (int x = 0; x < width_; ++x)
             {
                 // buffer contains 32-bit integers in little-endian format
-                unsigned gid = ((unsigned)buffer[currentIndex+3] << 24u)
-                             | ((unsigned)buffer[currentIndex+2] << 16u)
-                             | ((unsigned)buffer[currentIndex+1] << 8u)
-                             | (unsigned)buffer[currentIndex];
+                const unsigned gid{ (static_cast<unsigned>(buffer[currentIndex + 3]) << 24u)
+                                  | (static_cast<unsigned>(buffer[currentIndex + 2]) << 16u)
+                                  | (static_cast<unsigned>(buffer[currentIndex + 1]) << 8u)
+                                  |  static_cast<unsigned>(buffer[currentIndex]) };
                 if (gid > 0)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());
@@ -656,9 +658,11 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         XMLElement imageElem = tileSetElem.GetChild("image");
         // Tileset based on single tileset image
         if (imageElem.NotNull()) {
+
             isSingleTileSet = true;
             String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
             SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+
             if (!texture)
             {
                 URHO3D_LOGERROR("Could not load texture " + textureFilePath);
@@ -666,12 +670,12 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             }
 
             // Set hot spot at left bottom
-            Vector2 hotSpot(0.0f, 0.0f);
+            Vector2 hotSpot{ Vector2::ZERO };
             if (tileSetElem.HasChild("tileoffset"))
             {
-                XMLElement offsetElem = tileSetElem.GetChild("tileoffset");
-                hotSpot.x_ += offsetElem.GetFloat("x") / (float)tileWidth;
-                hotSpot.y_ += offsetElem.GetFloat("y") / (float)tileHeight;
+                const XMLElement offsetElem{ tileSetElem.GetChild("tileoffset") };
+                hotSpot.x_ += offsetElem.GetFloat("x") / tileWidth;
+                hotSpot.y_ += offsetElem.GetFloat("y") / tileHeight;
             }
 
             imageWidth = imageElem.GetInt("width");
@@ -762,7 +766,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         texture->SetNumLevels(1);
         texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
 
-        auto textureDataSize = (unsigned)allocator.GetWidth() * allocator.GetHeight() * 4;
+        auto textureDataSize{ allocator.GetWidth() * allocator.GetHeight() * 4u };
         SharedArrayPtr<unsigned char> textureData(new unsigned char[textureDataSize]);
         memset(textureData.Get(), 0, textureDataSize);
 

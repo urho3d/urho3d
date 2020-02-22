@@ -216,13 +216,14 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
 
     Vector3 p = ToVector3(center);
     Color c = ToColor(color);
-    for (unsigned i = 0; i < 360; i += 30)
+
+    for (unsigned i = 0; i < 360u; i += 30u)
     {
-        unsigned j = i + 30;
-        float x1 = radius * Cos((float)i);
-        float y1 = radius * Sin((float)i);
-        float x2 = radius * Cos((float)j);
-        float y2 = radius * Sin((float)j);
+        const unsigned j{ i + 30u };
+        const float x1{ radius * Cos(static_cast<float>(i)) };
+        const float y1{ radius * Sin(static_cast<float>(i)) };
+        const float x2{ radius * Cos(static_cast<float>(j)) };
+        const float y2{ radius * Sin(static_cast<float>(j)) };
 
         debugRenderer_->AddLine(p + Vector3(x1, y1, 0.0f), p + Vector3(x2, y2, 0.0f), c, debugDepthTest_);
     }
@@ -243,13 +244,13 @@ void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const
     Vector3 p = ToVector3(center);
     Color c(color.r, color.g, color.b, 0.5f);
 
-    for (unsigned i = 0; i < 360; i += 30)
+    for (unsigned i = 0; i < 360u; i += 30u)
     {
-        unsigned j = i + 30;
-        float x1 = radius * Cos((float)i);
-        float y1 = radius * Sin((float)i);
-        float x2 = radius * Cos((float)j);
-        float y2 = radius * Sin((float)j);
+        const unsigned j{ i + 30u };
+        const float x1{ radius * Cos(static_cast<float>(i)) };
+        const float y1{ radius * Sin(static_cast<float>(i)) };
+        const float x2{ radius * Cos(static_cast<float>(j)) };
+        const float y2{ radius * Sin(static_cast<float>(j)) };
 
         debugRenderer_->AddTriangle(p, p + Vector3(x1, y1, 0.0f), p + Vector3(x2, y2, 0.0f), c, debugDepthTest_);
     }
