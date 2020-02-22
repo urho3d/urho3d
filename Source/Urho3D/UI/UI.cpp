@@ -351,7 +351,7 @@ void UI::Update(float timeStep)
                 continue;
             }
 
-            if (dragData->dragBeginTimer.GetMSec(false) >= (unsigned)(dragBeginInterval_ * 1000))
+            if (dragData->dragBeginTimer.GetMSec(false) >= static_cast<unsigned>(dragBeginInterval_ * 1000))
             {
                 dragData->dragBeginPending = false;
                 IntVector2 beginSendPos = dragData->dragBeginSumPos / dragData->numDragButtons;
@@ -382,8 +382,8 @@ void UI::Update(float timeStep)
     {
         TouchState* touch = input->GetTouch(i);
         IntVector2 touchPos = touch->position_;
-        touchPos.x_ = (int)(touchPos.x_ / uiScale_);
-        touchPos.y_ = (int)(touchPos.y_ / uiScale_);
+        touchPos.x_ = FloorToInt(touchPos.x_ / uiScale_);
+        touchPos.y_ = FloorToInt(touchPos.y_ / uiScale_);
         ProcessHover(touchPos, MakeTouchIDMask(touch->touchID_), QUAL_NONE, nullptr);
     }
 
@@ -663,7 +663,7 @@ void UI::SetDefaultToolTipDelay(float delay)
 
 void UI::SetMaxFontTextureSize(int size)
 {
-    if (IsPowerOfTwo((unsigned)size) && size >= FONT_TEXTURE_MIN_SIZE)
+    if (IsPowerOfTwo(static_cast<unsigned>(size)) && size >= FONT_TEXTURE_MIN_SIZE)
     {
         if (size != maxFontTextureSize_)
         {
@@ -745,13 +745,13 @@ void UI::SetScale(float scale)
 void UI::SetWidth(float width)
 {
     IntVector2 size = GetEffectiveRootElementSize(false);
-    SetScale((float)size.x_ / width);
+    SetScale(size.x_ / width);
 }
 
 void UI::SetHeight(float height)
 {
     IntVector2 size = GetEffectiveRootElementSize(false);
-    SetScale((float)size.y_ / height);
+    SetScale(size.y_ / height);
 }
 
 void UI::SetCustomSize(const IntVector2& size)
@@ -989,7 +989,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     unsigned alphaFormat = Graphics::GetAlphaFormat();
     RenderSurface* surface = graphics_->GetRenderTarget(0);
     IntVector2 viewSize = graphics_->GetViewport().Size();
-    Vector2 invScreenSize(1.0f / (float)viewSize.x_, 1.0f / (float)viewSize.y_);
+    Vector2 invScreenSize(1.0f / viewSize.x_, 1.0f / viewSize.y_);
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
     Vector2 offset(-1.0f, 1.0f);
 
@@ -1097,10 +1097,10 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
 
         IntRect scissor = batch.scissor_;
-        scissor.left_ = (int)(scissor.left_ * uiScale_);
-        scissor.top_ = (int)(scissor.top_ * uiScale_);
-        scissor.right_ = (int)(scissor.right_ * uiScale_);
-        scissor.bottom_ = (int)(scissor.bottom_ * uiScale_);
+        scissor.left_ = FloorToInt(scissor.left_ * uiScale_);
+        scissor.top_ = FloorToInt(scissor.top_ * uiScale_);
+        scissor.right_ = FloorToInt(scissor.right_ * uiScale_);
+        scissor.bottom_ = FloorToInt(scissor.bottom_ * uiScale_);
 
         // Flip scissor vertically if using OpenGL texture rendering
 #ifdef URHO3D_OPENGL
@@ -1118,7 +1118,8 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         if (!batch.customMaterial_)
         {
             graphics_->SetTexture(0, batch.texture_);
-        } else
+        }
+        else
         {
             // Update custom shader parameters if needed
             if (graphics_->NeedParameterUpdate(SP_MATERIAL, reinterpret_cast<const void*>(batch.customMaterial_->GetShaderParameterHash())))
@@ -1247,14 +1248,15 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 {
                     if (!i)
                     {
-                        int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
-                            element->GetScreenPosition().y_;
+                        int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_
+                                                                            : element->GetScreenPosition().y_;
+
                         int layoutMaxSize = current->GetLayoutElementMaxSize();
                         int spacing = current->GetLayoutSpacing();
 
                         if (screenPos < 0 && layoutMaxSize > 0)
                         {
-                            auto toSkip = (unsigned)(-screenPos / (layoutMaxSize + spacing));
+                            auto toSkip = static_cast<unsigned>(-screenPos / (layoutMaxSize + spacing));
                             if (toSkip > 0)
                                 i += (toSkip - 1);
                         }
@@ -1298,7 +1300,9 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
         visible = true;
     }
     else if (GetSubsystem<Input>()->GetMouseMode() == MM_RELATIVE)
+    {
         visible = true;
+    }
     else
     {
         auto* input = GetSubsystem<Input>();
@@ -1309,8 +1313,8 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
             pos = cursor_->GetPosition();
     }
 
-    pos.x_ = (int)(pos.x_ / uiScale_);
-    pos.y_ = (int)(pos.y_ / uiScale_);
+    pos.x_ = FloorToInt(pos.x_ / uiScale_);
+    pos.y_ = FloorToInt(pos.y_ / uiScale_);
 }
 
 void UI::SetCursorShape(CursorShape shape)
@@ -1448,7 +1452,8 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
 
             // Fire double click event if element matches and is in time and is within max distance from the original click
             if (doubleClickElement_ && element == doubleClickElement_ &&
-                (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000)) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
+                (clickTimer_.GetMSec(true) < static_cast<unsigned>(doubleClickInterval_ * 1000)) &&
+                lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
@@ -1493,8 +1498,11 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
                 SetFocusElement(nullptr);
             SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
-            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
+            if (clickTimer_.GetMSec(true) < static_cast<unsigned>(doubleClickInterval_ * 1000) &&
+                lastMouseButtons_ == buttons && (windowCursorPos - doubleClickFirstPos_).Length() < maxDoubleClickDist_)
+            {
                 SendDoubleClickEvent(nullptr, element, doubleClickFirstPos_, cursorPos, button, buttons, qualifiers);
+            }
         }
 
         lastMouseButtons_ = buttons;
@@ -2134,12 +2142,13 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
             auto mouseButton = static_cast<MouseButton>(1u << i); // NOLINT(misc-misplaced-widening-cast)
             if (buttons & mouseButton)
             {
-                TouchState* ts = input->GetTouch((unsigned)i);
+                TouchState* ts = input->GetTouch(i);
                 if (!ts)
                     break;
+
                 IntVector2 pos = ts->position_;
-                dragData->sumPos.x_ += (int)(pos.x_ / uiScale_);
-                dragData->sumPos.y_ += (int)(pos.y_ / uiScale_);
+                dragData->sumPos.x_ += FloorToInt(pos.x_ / uiScale_);
+                dragData->sumPos.y_ += FloorToInt(pos.y_ / uiScale_);
             }
         }
         sendPos.x_ = dragData->sumPos.x_ / dragData->numDragButtons;
@@ -2164,8 +2173,8 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
 
     if (applyScale)
     {
-        size.x_ = RoundToInt((float)size.x_ / uiScale_);
-        size.y_ = RoundToInt((float)size.y_ / uiScale_);
+        size.x_ = RoundToInt(size.x_ / uiScale_);
+        size.y_ = RoundToInt(size.y_ / uiScale_);
     }
 
     return size;

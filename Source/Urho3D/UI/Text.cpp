@@ -201,14 +201,15 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
                 // Adding to thickness helps with thickness of 1 not having enought samples for this formula
                 // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
-                int thickness = Min(strokeThickness_, fontSize_);
-                int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
-                float angle = 360.f / samples;
-                auto floatThickness = (float)thickness;
+                const int thickness = Min(strokeThickness_, fontSize_);
+                const int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
+                const float angle = 360.f / samples;
+                const auto floatThickness = static_cast<float>(thickness);
+
                 for (int i = 0; i < samples; ++i)
                 {
-                    float x = Cos(angle * i) * floatThickness;
-                    float y = Sin(angle * i) * floatThickness;
+                    const float x = Cos(angle * i) * floatThickness;
+                    const float y = Sin(angle * i) * floatThickness;
                     ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
                 }
             }

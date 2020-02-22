@@ -145,15 +145,15 @@ void ProgressBar::UpdateProgressBar()
     {
         if (orientation_ == O_HORIZONTAL)
         {
-            auto loadingBarLength = (int) Max((float) GetWidth() * value_ / range_,
-                                             (float) (border.left_ + border.right_));
+            const auto loadingBarLength = FloorToInt(Max(GetWidth() * value_ / range_,
+                                                         static_cast<float>(border.left_ + border.right_)));
             knob_->SetSize(loadingBarLength, GetHeight());
             knob_->SetPosition(Clamp(0, 0, GetWidth() - knob_->GetWidth()), 0);
         }
         else
         {
-            auto loadingBarLength = (int) Max((float) GetHeight() * value_ / range_,
-                                             (float) (border.top_ + border.bottom_));
+            const auto loadingBarLength = FloorToInt(Max(GetHeight() * value_ / range_,
+                                                         static_cast<float>(border.top_ + border.bottom_)));
             knob_->SetSize(GetWidth(), loadingBarLength);
             knob_->SetPosition(0, Clamp(GetHeight() - knob_->GetHeight(), 0, GetHeight() - knob_->GetHeight()));
         }

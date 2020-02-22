@@ -160,8 +160,8 @@ void ScrollView::Update(float timeStep)
 
     // Update view position
     IntVector2 newPosition = viewPosition_;
-    newPosition.x_ += (int)touchScrollSpeed_.x_;
-    newPosition.y_ += (int)touchScrollSpeed_.y_;
+    newPosition.x_ += FloorToInt(touchScrollSpeed_.x_);
+    newPosition.y_ += FloorToInt(touchScrollSpeed_.y_);
     SetViewPosition(newPosition);
 
     // Smooth deceleration
@@ -474,23 +474,23 @@ void ScrollView::UpdateScrollBars()
     ignoreEvents_ = true;
 
     IntVector2 size = scrollPanel_->GetSize();
-    IntRect panelBorder = scrollPanel_->GetClipBorder();
+    const IntRect panelBorder{ scrollPanel_->GetClipBorder() };
     size.x_ -= panelBorder.left_ + panelBorder.right_;
     size.y_ -= panelBorder.top_ + panelBorder.bottom_;
 
     if (size.x_ > 0 && viewSize_.x_ > 0)
     {
-        float range = (float)viewSize_.x_ / (float)size.x_ - 1.0f;
+        const float range{ static_cast<float>(viewSize_.x_) / size.x_ - 1.0f };
         horizontalScrollBar_->SetRange(range);
-        horizontalScrollBar_->SetValue((float)viewPosition_.x_ / (float)size.x_);
-        horizontalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.x_);
+        horizontalScrollBar_->SetValue(static_cast<float>(viewPosition_.x_) / size.x_);
+        horizontalScrollBar_->SetStepFactor(STEP_FACTOR / size.x_);
     }
     if (size.y_ > 0 && viewSize_.y_ > 0)
     {
-        float range = (float)viewSize_.y_ / (float)size.y_ - 1.0f;
+        const float range{ static_cast<float>(viewSize_.y_) / size.y_ - 1.0f };
         verticalScrollBar_->SetRange(range);
-        verticalScrollBar_->SetValue((float)viewPosition_.y_ / (float)size.y_);
-        verticalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.y_);
+        verticalScrollBar_->SetValue(static_cast<float>(viewPosition_.y_) / size.y_);
+        verticalScrollBar_->SetStepFactor(STEP_FACTOR / size.y_);
     }
 
     ignoreEvents_ = false;
@@ -524,14 +524,12 @@ void ScrollView::HandleScrollBarChanged(StringHash eventType, VariantMap& eventD
     if (!ignoreEvents_)
     {
         IntVector2 size = scrollPanel_->GetSize();
-        IntRect panelBorder = scrollPanel_->GetClipBorder();
+        const IntRect panelBorder = scrollPanel_->GetClipBorder();
         size.x_ -= panelBorder.left_ + panelBorder.right_;
         size.y_ -= panelBorder.top_ + panelBorder.bottom_;
 
-        UpdateView(IntVector2(
-            (int)(horizontalScrollBar_->GetValue() * (float)size.x_),
-            (int)(verticalScrollBar_->GetValue() * (float)size.y_)
-        ));
+        UpdateView(IntVector2{ FloorToInt(horizontalScrollBar_->GetValue() * size.x_),
+                               FloorToInt(verticalScrollBar_->GetValue() * size.y_) });
     }
 }
 
@@ -556,11 +554,12 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     {
         scrollTouchDown_ = true;
         // Take new scrolling speed if it's faster than the current accumulated value
-        auto dX = (float)-eventData[P_DX].GetInt();
-        auto dY = (float)-eventData[P_DY].GetInt();
+        const auto dX = static_cast<float>(-eventData[P_DX].GetInt());
+        const auto dY = static_cast<float>(-eventData[P_DY].GetInt());
 
         if (Abs(dX) > Abs(touchScrollSpeed_.x_))
             touchScrollSpeed_.x_ = dX;
+
         if (Abs(dY) > Abs(touchScrollSpeed_.y_))
             touchScrollSpeed_.y_ = dY;
 

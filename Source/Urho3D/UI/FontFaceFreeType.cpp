@@ -265,10 +265,10 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                 {
                     unsigned numKerningPairs = deserializer.ReadUShort();
                     // Skip searchRange, entrySelector and rangeShift
-                    deserializer.Seek((unsigned)(deserializer.GetPosition() + 3 * sizeof(unsigned short)));
+                    deserializer.Seek(static_cast<unsigned>(deserializer.GetPosition() + 3 * sizeof(unsigned short)));
 
                     // x_scale is a 16.16 fixed-point value that converts font units -> 26.6 pixels (oversampled!)
-                    auto xScale = (float)face->size->metrics.x_scale / (1u << 22u) / oversampling_;
+                    const auto xScale{ static_cast<float>(face->size->metrics.x_scale) / (1u << 22u) / oversampling_ };
 
                     for (unsigned j = 0; j < numKerningPairs; ++j)
                     {
@@ -288,12 +288,14 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                 else
                 {
                     // Kerning table contains information we do not support; skip and move to the next (length includes header)
-                    deserializer.Seek((unsigned)(deserializer.GetPosition() + length - 3 * sizeof(unsigned short)));
+                    deserializer.Seek(static_cast<unsigned>(deserializer.GetPosition() + length - 3 * sizeof(unsigned short)));
                 }
             }
         }
         else
+        {
             URHO3D_LOGWARNING("Can not read kerning information: not version 0");
+        }
     }
 
     if (!hasMutableGlyph_)
@@ -491,13 +493,13 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         {
             fontGlyph.page_ = 0;
             dest = image->GetData() + fontGlyph.y_ * image->GetWidth() + fontGlyph.x_;
-            pitch = (unsigned)image->GetWidth();
+            pitch = static_cast<unsigned>(image->GetWidth());
         }
         else
         {
             fontGlyph.page_ = textures_.Size() - 1;
             dest = new unsigned char[fontGlyph.texWidth_ * fontGlyph.texHeight_];
-            pitch = (unsigned)fontGlyph.texWidth_;
+            pitch = static_cast<unsigned>(fontGlyph.texWidth_);
         }
 
         if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
@@ -509,7 +511,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
 
                 // Don't do any oversampling, just unpack the bits directly.
                 for (unsigned x = 0; x < (unsigned)slot->bitmap.width; ++x)
-                    rowDest[x] = (unsigned char)((src[x >> 3u] & (0x80u >> (x & 7u))) ? 255 : 0);
+                    rowDest[x] = static_cast<unsigned char>((src[x >> 3u] & (0x80u >> (x & 7u))) ? 255 : 0);
             }
         }
         else

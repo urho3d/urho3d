@@ -112,7 +112,9 @@ public:
             rect.bottom_ = graphics->GetHeight();
         }
 
-        Ray ray(camera->GetScreenRay((float)screenPos.x_ / rect.Width(), (float)screenPos.y_ / rect.Height()));
+        Ray ray(camera->GetScreenRay(static_cast<float>(screenPos.x_) / rect.Width(),
+                                     static_cast<float>(screenPos.y_) / rect.Height()));
+
         PODVector<RayQueryResult> queryResultVector;
         RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
 
@@ -129,12 +131,13 @@ public:
                 // ignore billboard sets by default
                 if (queryResult.drawable_->GetTypeInfo()->IsTypeOf(BillboardSet::GetTypeStatic()))
                     continue;
+
                 return result;
             }
 
-            Vector2& uv = queryResult.textureUV_;
-            result = IntVector2(static_cast<int>(uv.x_ * GetWidth()),
-                static_cast<int>(uv.y_ * GetHeight()));
+            const Vector2& uv = queryResult.textureUV_;
+            result = IntVector2(FloorToInt(uv.x_ * GetWidth()),
+                                FloorToInt(uv.y_ * GetHeight()));
             return result;
         }
         return result;

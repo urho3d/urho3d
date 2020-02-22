@@ -48,7 +48,7 @@ void UISelectable::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& ver
         UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
         batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
             (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
-        batch.AddQuad(0.f, 0.f, (float)GetWidth(), (float)GetHeight(), 0, 0);
+        batch.AddQuad(0.0f, 0.0f, static_cast<float>(GetWidth()), static_cast<float>(GetHeight()), 0, 0);
         UIBatch::AddOrMerge(batch, batches);
     }
 

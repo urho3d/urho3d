@@ -101,7 +101,7 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     XMLElement keyFrameElem = source.GetChild("keyframe");
     while (keyFrameElem)
     {
-        float time =    keyFrameElem.GetFloat("time");
+        float time    = keyFrameElem.GetFloat("time");
         Variant value = keyFrameElem.GetVariant();
         SetKeyFrame(time, value);
 

@@ -111,9 +111,9 @@ void Cursor::RegisterObject(Context* context)
 
 void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    unsigned initialSize = vertexData.Size();
+    const unsigned initialSize = vertexData.Size();
     const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
-    Vector2 floatOffset(-(float)offset.x_, -(float)offset.y_);
+    const Vector2 floatOffset{ -offset };
 
     BorderImage::GetBatches(batches, vertexData, currentScissor);
     for (unsigned i = initialSize; i < vertexData.Size(); i += 6)

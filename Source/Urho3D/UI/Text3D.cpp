@@ -583,11 +583,11 @@ void Text3D::UpdateTextBatches()
         break;
 
     case HA_CENTER:
-        offset.x_ -= (float)text_.GetWidth() * 0.5f;
+        offset.x_ -= text_.GetWidth() * 0.5f;
         break;
 
     case HA_RIGHT:
-        offset.x_ -= (float)text_.GetWidth();
+        offset.x_ -= static_cast<float>(text_.GetWidth());
         break;
     }
 
@@ -597,11 +597,11 @@ void Text3D::UpdateTextBatches()
         break;
 
     case VA_CENTER:
-        offset.y_ -= (float)text_.GetHeight() * 0.5f;
+        offset.y_ -= text_.GetHeight() * 0.5f;
         break;
 
     case VA_BOTTOM:
-        offset.y_ -= (float)text_.GetHeight();
+        offset.y_ -= static_cast<float>(text_.GetHeight());
         break;
     }
 
@@ -619,7 +619,9 @@ void Text3D::UpdateTextBatches()
         }
     }
     else
+    {
         boundingBox_.Define(Vector3::ZERO, Vector3::ZERO);
+    }
 
     textDirty_ = false;
     geometryDirty_ = true;

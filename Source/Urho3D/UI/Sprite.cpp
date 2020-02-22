@@ -95,16 +95,16 @@ const IntVector2& Sprite::GetScreenPosition() const
 
 IntVector2 Sprite::ScreenToElement(const IntVector2& screenPosition)
 {
-    Vector3 floatPos((float)screenPosition.x_, (float)screenPosition.y_, 0.0f);
-    Vector3 transformedPos = GetTransform().Inverse() * floatPos;
-    return IntVector2((int)transformedPos.x_, (int)transformedPos.y_);
+    const Vector3 floatPos{ static_cast<float>(screenPosition.x_), static_cast<float>(screenPosition.y_), 0.0f };
+    const Vector3 transformedPos{ GetTransform().Inverse() * floatPos };
+    return IntVector2{ FloorToInt(transformedPos.x_), FloorToInt(transformedPos.y_) };
 }
 
 IntVector2 Sprite::ElementToScreen(const IntVector2& position)
 {
-    Vector3 floatPos((float)position.x_, (float)position.y_, 0.0f);
-    Vector3 transformedPos = GetTransform() * floatPos;
-    return IntVector2((int)transformedPos.x_, (int)transformedPos.y_);
+    const Vector3 floatPos{ static_cast<float>(position.x_), static_cast<float>(position.y_), 0.0f };
+    const Vector3 transformedPos{ GetTransform() * floatPos };
+    return IntVector2{ FloorToInt(transformedPos.x_), FloorToInt(transformedPos.y_) };
 }
 
 void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
@@ -130,7 +130,7 @@ void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
 void Sprite::OnPositionSet(const IntVector2& newPosition)
 {
     // If the integer position was set (layout update?), copy to the float position
-    floatPosition_ = Vector2((float)newPosition.x_, (float)newPosition.y_);
+    floatPosition_ = Vector2{ newPosition };
 }
 
 void Sprite::SetPosition(const Vector2& position)
@@ -139,7 +139,7 @@ void Sprite::SetPosition(const Vector2& position)
     {
         floatPosition_ = position;
         // Copy to the integer position
-        position_ = IntVector2((int)position.x_, (int)position.y_);
+        position_ = IntVector2{ static_cast<int>(position.x_), static_cast<int>(position.y_) };
         MarkDirty();
     }
 }
@@ -227,12 +227,14 @@ const Matrix3x4& Sprite::GetTransform() const
         {
             auto* parentSprite = dynamic_cast<Sprite*>(parent_);
             if (parentSprite)
+            {
                 parentTransform = parentSprite->GetTransform();
+            }
             else
             {
                 const IntVector2& parentScreenPos = parent_->GetScreenPosition() + parent_->GetChildOffset();
                 parentTransform = Matrix3x4::IDENTITY;
-                parentTransform.SetTranslation(Vector3((float)parentScreenPos.x_, (float)parentScreenPos.y_, 0.0f));
+                parentTransform.SetTranslation(Vector3{ Vector2{ parentScreenPos }, 0.0f });
             }
 
             switch (GetHorizontalAlignment())
@@ -241,11 +243,11 @@ const Matrix3x4& Sprite::GetTransform() const
                 break;
 
             case HA_CENTER:
-                pos.x_ += (float)parent_->GetSize().x_ / 2.f;
+                pos.x_ += parent_->GetSize().x_ / 2.0f;
                 break;
 
             case HA_RIGHT:
-                pos.x_ += (float)parent_->GetSize().x_;
+                pos.x_ += static_cast<float>(parent_->GetSize().x_);
                 break;
             }
             switch (GetVerticalAlignment())
@@ -254,19 +256,21 @@ const Matrix3x4& Sprite::GetTransform() const
                 break;
 
             case VA_CENTER:
-                pos.y_ += (float)parent_->GetSize().y_ / 2.f;
+                pos.y_ += parent_->GetSize().y_ / 2.0f;
                 break;
 
             case VA_BOTTOM:
-                pos.y_ += (float)(parent_->GetSize().y_);
+                pos.y_ += static_cast<float>(parent_->GetSize().y_);
                 break;
             }
         }
         else
+        {
             parentTransform = Matrix3x4::IDENTITY;
+        }
 
         Matrix3x4 hotspotAdjust(Matrix3x4::IDENTITY);
-        hotspotAdjust.SetTranslation(Vector3((float)-hotSpot_.x_, (float)-hotSpot_.y_, 0.0f));
+        hotspotAdjust.SetTranslation(Vector3{ Vector2{ -hotSpot_ }, 0.0f });
 
         Matrix3x4 mainTransform(Vector3(pos, 0.0f), Quaternion(rotation_, Vector3::FORWARD), Vector3(scale_, 1.0f));
 
@@ -274,8 +278,8 @@ const Matrix3x4& Sprite::GetTransform() const
         positionDirty_ = false;
 
         // Calculate an approximate screen position for GetElementAt(), or pixel-perfect child elements
-        Vector3 topLeftCorner = transform_ * Vector3::ZERO;
-        screenPosition_ = IntVector2((int)topLeftCorner.x_, (int)topLeftCorner.y_);
+        const Vector3 topLeftCorner{ transform_ * Vector3::ZERO };
+        screenPosition_ = IntVector2{ FloorToInt(topLeftCorner.x_), FloorToInt(topLeftCorner.y_) };
     }
 
     return transform_;

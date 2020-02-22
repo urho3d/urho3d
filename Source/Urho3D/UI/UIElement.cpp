@@ -403,10 +403,10 @@ const IntVector2& UIElement::GetScreenPosition() const
         {
             const IntVector2& parentScreenPos = parent->GetScreenPosition();
 
-            pos.x_ += parentScreenPos.x_ + (int)Lerp(0.0f, (float)parent->size_.x_, anchorMin_.x_);
-            pos.y_ += parentScreenPos.y_ + (int)Lerp(0.0f, (float)parent->size_.y_, anchorMin_.y_);
-            pos.x_ -= (int)(size_.x_ * pivot_.x_);
-            pos.y_ -= (int)(size_.y_ * pivot_.y_);
+            pos.x_ += parentScreenPos.x_ + FloorToInt(Lerp(0.0f, static_cast<float>(parent->size_.x_), anchorMin_.x_));
+            pos.y_ += parentScreenPos.y_ + FloorToInt(Lerp(0.0f, static_cast<float>(parent->size_.y_), anchorMin_.y_));
+            pos.x_ -= FloorToInt(size_.x_ * pivot_.x_);
+            pos.y_ -= FloorToInt(size_.y_ * pivot_.y_);
 
             pos += parent_->childOffset_;
         }
@@ -1116,8 +1116,9 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
+
             positions.Push(baseIndentWidth);
-            auto indent = (unsigned)children_[i]->GetIndentWidth();
+            const auto indent{ static_cast<unsigned>(children_[i]->GetIndentWidth()) };
             sizes.Push(children_[i]->GetWidth() + indent);
             minSizes.Push(children_[i]->GetEffectiveMinSize().x_ + indent);
             maxSizes.Push(children_[i]->GetMaxWidth() + indent);
@@ -1143,6 +1144,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
+
             children_[i]->SetPosition(positions[j], GetLayoutChildPosition(children_[i]).y_);
             children_[i]->SetSize(sizes[j], height - layoutBorder_.top_ - layoutBorder_.bottom_);
             ++j;
@@ -1156,6 +1158,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
+
             positions.Push(0);
             sizes.Push(children_[i]->GetHeight());
             minSizes.Push(children_[i]->GetEffectiveMinSize().y_);
@@ -1181,6 +1184,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
+
             children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_ + baseIndentWidth, positions[j]);
             children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
@@ -1825,8 +1829,8 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
 void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     IntRect currentScissor)
 {
-    Vector2 floatOffset((float)offset.x_, (float)offset.y_);
-    unsigned initialSize = vertexData.Size();
+    const Vector2 floatOffset(offset);
+    const unsigned initialSize = vertexData.Size();
 
     GetBatches(batches, vertexData, currentScissor);
     for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
@@ -2034,12 +2038,13 @@ void UIElement::UpdateAnchoring()
 {
     if (parent_ && enableAnchor_)
     {
-        IntVector2 newSize;
-        newSize.x_ = (int)(parent_->size_.x_ * Clamp(anchorMax_.x_ - anchorMin_.x_, 0.0f, 1.0f)) + maxOffset_.x_ - minOffset_.x_;
-        newSize.y_ = (int)(parent_->size_.y_ * Clamp(anchorMax_.y_ - anchorMin_.y_, 0.0f, 1.0f)) + maxOffset_.y_ - minOffset_.y_;
+        IntVector2 newSize{};
+        newSize.x_ = FloorToInt(parent_->size_.x_ * Clamp(anchorMax_.x_ - anchorMin_.x_, 0.0f, 1.0f)) + maxOffset_.x_ - minOffset_.x_;
+        newSize.y_ = FloorToInt(parent_->size_.y_ * Clamp(anchorMax_.y_ - anchorMin_.y_, 0.0f, 1.0f)) + maxOffset_.y_ - minOffset_.y_;
 
         if (position_ != minOffset_)
             SetPosition(minOffset_);
+
         if (size_ != newSize)
             SetSize(newSize);
     }
@@ -2087,21 +2092,21 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
 void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
     const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
-    unsigned numChildren = sizes.Size();
+    const unsigned numChildren = sizes.Size();
     if (!numChildren)
         return;
     int targetTotalSize = targetSize - begin - end - (numChildren - 1) * spacing;
     if (targetTotalSize < 0)
         targetTotalSize = 0;
-    int targetChildSize = targetTotalSize / numChildren;
+    const int targetChildSize = targetTotalSize / numChildren;
     int remainder = targetTotalSize % numChildren;
-    float add = (float)remainder / numChildren;
+    float add = static_cast<float>(remainder) / numChildren;
     float acc = 0.0f;
 
     // Initial pass
     for (unsigned i = 0; i < numChildren; ++i)
     {
-        auto targetSize = (int)(targetChildSize * flexScales[i]);
+        auto targetSize = FloorToInt(targetChildSize * flexScales[i]);
         if (remainder)
         {
             acc += add;
@@ -2141,7 +2146,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         int numResizable = resizable.Size();
         int errorPerChild = error / numResizable;
         remainder = (abs(error)) % numResizable;
-        add = (float)remainder / numResizable;
+        add = static_cast<float>(remainder) / numResizable;
         acc = 0.0f;
 
         for (int i = 0; i < numResizable; ++i)

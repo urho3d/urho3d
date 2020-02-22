@@ -43,7 +43,7 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
     blendMode_(blendMode),
     scissor_(scissor),
     texture_(texture),
-    invTextureSize_(texture ? Vector2(1.0f / (float)texture->GetWidth(), 1.0f / (float)texture->GetHeight()) : Vector2::ONE),
+    invTextureSize_(texture ? Vector2{ 1.0f / texture->GetWidth(), 1.0f / texture->GetHeight() } : Vector2::ONE),
     vertexData_(vertexData),
     vertexStart_(vertexData->Size()),
     vertexEnd_(vertexData->Size())
@@ -182,15 +182,15 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
         bottomRightColor = GetInterpolatedColor(x + width, y + height);
     }
 
-    Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f)) - posAdjust;
+    const Vector3 v1{ (transform * Vector3(static_cast<float>(x),  static_cast<float>(y), 0.0f)) - posAdjust };
+    const Vector3 v2{ (transform * Vector3(static_cast<float>(x) + static_cast<float>(width), static_cast<float>(y), 0.0f)) - posAdjust };
+    const Vector3 v3{ (transform * Vector3(static_cast<float>(x),  static_cast<float>(y + height), 0.0f)) - posAdjust };
+    const Vector3 v4{ (transform * Vector3(static_cast<float>(x) + static_cast<float>(width), static_cast<float>(y + height), 0.0f)) - posAdjust };
 
-    float leftUV = ((float)texOffsetX) * invTextureSize_.x_;
-    float topUV = ((float)texOffsetY) * invTextureSize_.y_;
-    float rightUV = ((float)(texOffsetX + (texWidth ? texWidth : width))) * invTextureSize_.x_;
-    float bottomUV = ((float)(texOffsetY + (texHeight ? texHeight : height))) * invTextureSize_.y_;
+    const float leftUV{ texOffsetX * invTextureSize_.x_ };
+    const float topUV{ texOffsetY * invTextureSize_.y_ };
+    const float rightUV{ texOffsetX + (texWidth ? texWidth : width) * invTextureSize_.x_ };
+    const float bottomUV{ texOffsetY + (texHeight ? texHeight : height) * invTextureSize_.y_ };
 
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
@@ -277,15 +277,15 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d,
     const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD)
 {
-    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f)) - posAdjust;
+    const Vector3 v1{ transform * Vector3(static_cast<float>(a.x_), static_cast<float>(a.y_), 0.0f) - posAdjust };
+    const Vector3 v2{ transform * Vector3(static_cast<float>(b.x_), static_cast<float>(b.y_), 0.0f) - posAdjust };
+    const Vector3 v3{ transform * Vector3(static_cast<float>(c.x_), static_cast<float>(c.y_), 0.0f) - posAdjust };
+    const Vector3 v4{ transform * Vector3(static_cast<float>(d.x_), static_cast<float>(d.y_), 0.0f) - posAdjust };
 
-    Vector2 uv1((float)texA.x_ * invTextureSize_.x_, (float)texA.y_ * invTextureSize_.y_);
-    Vector2 uv2((float)texB.x_ * invTextureSize_.x_, (float)texB.y_ * invTextureSize_.y_);
-    Vector2 uv3((float)texC.x_ * invTextureSize_.x_, (float)texC.y_ * invTextureSize_.y_);
-    Vector2 uv4((float)texD.x_ * invTextureSize_.x_, (float)texD.y_ * invTextureSize_.y_);
+    const Vector2 uv1{ texA.x_ * invTextureSize_.x_, texA.y_ * invTextureSize_.y_ };
+    const Vector2 uv2{ texB.x_ * invTextureSize_.x_, texB.y_ * invTextureSize_.y_ };
+    const Vector2 uv3{ texC.x_ * invTextureSize_.x_, texC.y_ * invTextureSize_.y_ };
+    const Vector2 uv4{ texD.x_ * invTextureSize_.x_, texD.y_ * invTextureSize_.y_ };
 
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
@@ -339,20 +339,20 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD, const Color& colA,
     const Color& colB, const Color& colC, const Color& colD)
 {
-    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f)) - posAdjust;
+    const Vector3 v1{ transform * Vector3{ static_cast<float>(a.x_), static_cast<float>(a.y_), 0.0f } - posAdjust };
+    const Vector3 v2{ transform * Vector3{ static_cast<float>(b.x_), static_cast<float>(b.y_), 0.0f } - posAdjust };
+    const Vector3 v3{ transform * Vector3{ static_cast<float>(c.x_), static_cast<float>(c.y_), 0.0f } - posAdjust };
+    const Vector3 v4{ transform * Vector3{ static_cast<float>(d.x_), static_cast<float>(d.y_), 0.0f } - posAdjust };
 
-    Vector2 uv1((float)texA.x_ * invTextureSize_.x_, (float)texA.y_ * invTextureSize_.y_);
-    Vector2 uv2((float)texB.x_ * invTextureSize_.x_, (float)texB.y_ * invTextureSize_.y_);
-    Vector2 uv3((float)texC.x_ * invTextureSize_.x_, (float)texC.y_ * invTextureSize_.y_);
-    Vector2 uv4((float)texD.x_ * invTextureSize_.x_, (float)texD.y_ * invTextureSize_.y_);
+    const Vector2 uv1{ texA.x_ * invTextureSize_.x_, texA.y_ * invTextureSize_.y_ };
+    const Vector2 uv2{ texB.x_ * invTextureSize_.x_, texB.y_ * invTextureSize_.y_ };
+    const Vector2 uv3{ texC.x_ * invTextureSize_.x_, texC.y_ * invTextureSize_.y_ };
+    const Vector2 uv4{ texD.x_ * invTextureSize_.x_, texD.y_ * invTextureSize_.y_ };
 
-    unsigned c1 = colA.ToUInt();
-    unsigned c2 = colB.ToUInt();
-    unsigned c3 = colC.ToUInt();
-    unsigned c4 = colD.ToUInt();
+    const unsigned c1{ colA.ToUInt() };
+    const unsigned c2{ colB.ToUInt() };
+    const unsigned c3{ colC.ToUInt() };
+    const unsigned c4{ colD.ToUInt() };
 
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
@@ -421,8 +421,8 @@ unsigned UIBatch::GetInterpolatedColor(float x, float y)
 
     if (size.x_ && size.y_)
     {
-        float cLerpX = Clamp(x / (float)size.x_, 0.0f, 1.0f);
-        float cLerpY = Clamp(y / (float)size.y_, 0.0f, 1.0f);
+        const float cLerpX{ Clamp(x / size.x_, 0.0f, 1.0f) };
+        const float cLerpY{ Clamp(y / size.y_, 0.0f, 1.0f) };
 
         Color topColor = element_->GetColor(C_TOPLEFT).Lerp(element_->GetColor(C_TOPRIGHT), cLerpX);
         Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
