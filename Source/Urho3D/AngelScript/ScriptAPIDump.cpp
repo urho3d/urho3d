@@ -300,7 +300,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 Vector<String> nameParts = attrs[j].name_.Split(' ');
                 for (unsigned k = 0; k < nameParts.Size(); ++k)
                 {
-                    if (nameParts[k].Length() > 1 && IsAlpha((unsigned)nameParts[k][0]))
+                    if (nameParts[k].Length() > 1u && IsAlpha(static_cast<unsigned>(nameParts[k][0])))
                         nameParts[k] = "%" + nameParts[k];
                 }
                 String name;
@@ -308,7 +308,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 String type = Variant::GetTypeName(attrs[j].type_);
                 // Variant typenames are all uppercase. Convert primitive types to the proper lowercase form for the documentation
                 if (type == "Int" || type == "Bool" || type == "Float")
-                    type[0] = (char)ToLower((unsigned)type[0]);
+                    type[0] = static_cast<char>(ToLower(static_cast<unsigned>(type[0])));
 
                 Log::WriteRaw("- " + name + " : " + type + "\n");
             }

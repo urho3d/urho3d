@@ -716,7 +716,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     unsigned pos = 0;
     while (pos < dataSize)
     {
-        unsigned len;
+        unsigned len{};
         asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
         if (t == asTC_COMMENT || t == asTC_WHITESPACE)
         {
@@ -730,7 +730,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
             if (t == asTC_IDENTIFIER)
             {
-                String token(&buffer[pos], (unsigned)len);
+                String token(&buffer[pos], len);
                 if (token == "include")
                 {
                     pos += len;
@@ -744,7 +744,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                     if (t == asTC_VALUE && len > 2 && buffer[pos] == '"')
                     {
                         // Get the include file
-                        String includeFile(&buffer[pos + 1], (unsigned)(len - 2));
+                        String includeFile(&buffer[pos + 1], len - 2u);
                         pos += len;
 
                         // If the file is not found as it is, add the path of current file but only if it is found there

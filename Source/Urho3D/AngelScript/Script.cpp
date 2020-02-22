@@ -328,9 +328,9 @@ const char **Script::GetEnumValues(int asTypeID)
     enumValues_[asTypeID].Resize(count + 1);
     for (unsigned i = 0; i < count; ++i)
     {
-        int val = -1;
-        const char* name = type->GetEnumValueByIndex(i,&val);
-        if ((unsigned)val >= count)// use unsigned for val so negative values will be flagged as invalid
+        int val{ -1 };
+        const char* name = type->GetEnumValueByIndex(i, &val);
+        if (static_cast<unsigned>(val) >= count)// use unsigned for val so negative values will be flagged as invalid
         {
             URHO3D_LOGDEBUGF("Could not register enum attribute names for type %d."
                       "%s has value of %d, which is outside of the range [0,%d) for a 0-based enum.",
