@@ -60,7 +60,7 @@ private:
     /// Seek within the object's data.
     static Sint64 Seek(SDL_RWops* context, Sint64 offset, int whence)
     {
-        const auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
+        auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
         auto* des{ dynamic_cast<Deserializer*>(object) };
 
         if (!des)
@@ -101,7 +101,7 @@ private:
     /// Read from the object. Return number of "packets" read.
     static size_t Read(SDL_RWops* context, void* ptr, size_t size, size_t maxNum)
     {
-        const auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
+        auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
         auto* des{ dynamic_cast<Deserializer*>(object) };
         return des ? static_cast<size_t>(des->Read(ptr, static_cast<unsigned>(size * maxNum)) / size) : 0;
     }
@@ -109,7 +109,7 @@ private:
     /// Write to the object. Return number of "packets" written.
     static size_t Write(SDL_RWops* context, const void* ptr, size_t size, size_t maxNum)
     {
-        const auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
+        auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
         auto* ser{ dynamic_cast<Serializer*>(object) };
         return ser ? static_cast<size_t>(ser->Write(ptr, static_cast<unsigned>(size * maxNum)) / size) : 0;
     }

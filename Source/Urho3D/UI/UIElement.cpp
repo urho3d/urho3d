@@ -427,7 +427,7 @@ void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screen
     Cursor* cursor)
 {
     dragButtonCombo_ = buttons;
-    dragButtonCount_ = CountSetBits((unsigned)dragButtonCombo_);
+    dragButtonCount_ = CountSetBits(static_cast<unsigned>(dragButtonCombo_));
 }
 
 void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,

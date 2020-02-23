@@ -619,16 +619,16 @@ void LineEdit::UpdateCursor()
 
 unsigned LineEdit::GetCharIndex(const IntVector2& position)
 {
-    IntVector2 screenPosition = ElementToScreen(position);
-    IntVector2 textPosition = text_->ScreenToElement(screenPosition);
+    const IntVector2 screenPosition{ ElementToScreen(position) };
+    const IntVector2 textPosition{ text_->ScreenToElement(screenPosition) };
 
     if (textPosition.x_ < 0)
         return 0;
 
     for (int i = text_->GetNumChars(); i >= 0; --i)
     {
-        if (textPosition.x_ >= text_->GetCharPosition((unsigned)i).x_)
-            return (unsigned)i;
+        if (textPosition.x_ >= text_->GetCharPosition(static_cast<unsigned>(i)).x_)
+            return static_cast<unsigned>(i);
     }
 
     return M_MAX_UNSIGNED;

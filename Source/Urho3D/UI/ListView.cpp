@@ -260,7 +260,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
                 if (selection == M_MAX_UNSIGNED)
                     selection = 0;      // Assume as if first item is selected
-                int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - contentElement_->GetChild(selection)->GetHeight();
+                int stepPixels{ static_cast<int>(pageStep_ * scrollPanel_->GetHeight()) - contentElement_->GetChild(selection)->GetHeight() };
                 unsigned newSelection = selection;
                 unsigned okSelection = selection;
                 unsigned invisible = 0;
@@ -285,7 +285,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
             break;
 
         case KEY_HOME:
-            delta = -(int)GetNumItems();
+            delta = -static_cast<int>(GetNumItems());
             break;
 
         case KEY_END:
@@ -781,9 +781,9 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
 
     UIElement* item = GetItem(index++);
     SetItemExpanded(item, enable);
-    int baseIndent = item->GetIndent();
+    const int baseIndent{ item->GetIndent() };
 
-    PODVector<bool> expanded((unsigned)(baseIndent + 1));
+    PODVector<bool> expanded(static_cast<unsigned>(baseIndent + 1));
     expanded[baseIndent] = enable;
 
     contentElement_->DisableLayoutUpdate();
@@ -803,8 +803,9 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
         bool visible = enable && expanded[indent - 1];
         item->SetVisible(visible);
 
-        if (indent >= (int)expanded.Size())
-            expanded.Resize((unsigned)(indent + 1));
+        if (indent >= static_cast<int>(expanded.Size()))
+            expanded.Resize(static_cast<unsigned>(indent + 1));
+
         expanded[indent] = visible && GetItemExpanded(item);
     }
 
@@ -861,9 +862,11 @@ unsigned ListView::FindItem(UIElement* item) const
         int right = children.Size() - 1;
         while (right >= left)
         {
-            int mid = (left + right) / 2;
+            const int mid{ (left + right) / 2 };
+
             if (children[mid] == item)
-                return (unsigned)mid;
+                return static_cast<unsigned>(mid);
+
             if (itemY < children[mid]->GetScreenPosition().y_)
                 right = mid - 1;
             else
@@ -1069,7 +1072,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                     }
                     else if (i < last)
                     {
-                        if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
+                        if ((abs(static_cast<int>(i) - static_cast<int>(first))) <= (abs(static_cast<int>(i) - static_cast<int>(last))))
                         {
                             for (unsigned j = first; j <= i; ++j)
                                 newSelections.Push(j);

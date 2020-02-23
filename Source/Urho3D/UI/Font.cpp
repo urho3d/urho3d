@@ -44,7 +44,7 @@ namespace
     /// Convert float to 26.6 fixed-point (as used internally by FreeType)
     inline int FloatToFixed(float value)
     {
-        return (int)(value * 64);
+        return static_cast<int>(value * 64);
     }
 }
 

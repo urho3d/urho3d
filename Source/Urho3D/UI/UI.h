@@ -158,7 +158,7 @@ public:
     const Vector<UIElement*> GetDragElements();
 
     /// Return the number of currently dragged elements.
-    unsigned GetNumDragElements() const { return (unsigned)dragConfirmedCount_; }
+    unsigned GetNumDragElements() const { return static_cast<unsigned>(dragConfirmedCount_); }
 
     /// Return the drag element at index.
     UIElement* GetDragElement(unsigned index);

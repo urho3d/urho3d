@@ -131,13 +131,13 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         int id = charElem.GetInt("id");
 
         FontGlyph glyph;
-        glyph.x_ = (short)charElem.GetInt("x");
-        glyph.y_ = (short)charElem.GetInt("y");
-        glyph.width_ = glyph.texWidth_ = (short)charElem.GetInt("width");
-        glyph.height_ = glyph.texHeight_ = (short)charElem.GetInt("height");
-        glyph.offsetX_ = (short)charElem.GetInt("xoffset");
-        glyph.offsetY_ = (short)charElem.GetInt("yoffset");
-        glyph.advanceX_ = (short)charElem.GetInt("xadvance");
+        glyph.x_ = static_cast<short>(charElem.GetInt("x"));
+        glyph.y_ = static_cast<short>(charElem.GetInt("y"));
+        glyph.width_ = glyph.texWidth_ = static_cast<short>(charElem.GetInt("width"));
+        glyph.height_ = glyph.texHeight_ = static_cast<short>(charElem.GetInt("height"));
+        glyph.offsetX_ = static_cast<short>(charElem.GetInt("xoffset"));
+        glyph.offsetY_ = static_cast<short>(charElem.GetInt("yoffset"));
+        glyph.advanceX_ = static_cast<short>(charElem.GetInt("xadvance"));
         glyph.page_ = charElem.GetUInt("page");
 
         glyphMapping_[id] = glyph;
@@ -151,10 +151,10 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         XMLElement kerningElem = kerningsElem.GetChild("kerning");
         while (!kerningElem.IsNull())
         {
-            unsigned first = kerningElem.GetInt("first");
-            unsigned second = kerningElem.GetInt("second");
-            unsigned value = first << 16u | second;
-            kerningMapping_[value] = (short)kerningElem.GetInt("amount");
+            const unsigned first{ static_cast<unsigned>(kerningElem.GetInt("first")) };
+            const unsigned second{ static_cast<unsigned>(kerningElem.GetInt("second")) };
+            const unsigned value{ first << 16u | second };
+            kerningMapping_[value] = static_cast<short>(kerningElem.GetInt("amount"));
 
             kerningElem = kerningElem.GetNext("kerning");
         }
@@ -205,8 +205,8 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
                 return false;
         }
 
-        fontGlyph.x_ = (short)x;
-        fontGlyph.y_ = (short)y;
+        fontGlyph.x_ = static_cast<short>(x);
+        fontGlyph.y_ = static_cast<short>(y);
         fontGlyph.page_ = numPages - 1;
 
         glyphMapping_[i->first_] = fontGlyph;

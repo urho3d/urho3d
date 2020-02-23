@@ -143,7 +143,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     face_ = face;
 
-    auto numGlyphs = (unsigned)face->num_glyphs;
+    const auto numGlyphs{ static_cast<unsigned>(face->num_glyphs) };
     URHO3D_LOGDEBUGF("Font face %s (%fpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
 
     PODVector<unsigned> charCodes(numGlyphs + 1, 0);
@@ -157,7 +157,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     while (glyphIndex != 0)
     {
         if (glyphIndex < numGlyphs)
-            charCodes[glyphIndex + 1] = (unsigned)charCode;
+            charCodes[glyphIndex + 1] = static_cast<unsigned>(charCode);
 
         charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
@@ -249,7 +249,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         // Convert big endian to little endian
         for (unsigned i = 0; i < kerningTableSize; i += 2)
             Swap(kerningTable[i], kerningTable[i + 1]);
-        MemoryBuffer deserializer(kerningTable, (unsigned)kerningTableSize);
+        MemoryBuffer deserializer(kerningTable, static_cast<unsigned>(kerningTableSize));
 
         unsigned short version = deserializer.ReadUShort();
         if (version == 0)
@@ -484,8 +484,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             }
         }
 
-        fontGlyph.x_ = (short)x;
-        fontGlyph.y_ = (short)y;
+        fontGlyph.x_ = static_cast<short>(x);
+        fontGlyph.y_ = static_cast<short>(y);
 
         unsigned char* dest = nullptr;
         unsigned pitch = 0;
@@ -504,21 +504,21 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
 
         if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
         {
-            for (unsigned y = 0; y < (unsigned)slot->bitmap.rows; ++y)
+            for (unsigned y = 0; y < static_cast<unsigned>(slot->bitmap.rows); ++y)
             {
-                unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+                const unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                 unsigned char* rowDest = dest + (oversampling_ - 1)/2 + y * pitch;
 
                 // Don't do any oversampling, just unpack the bits directly.
-                for (unsigned x = 0; x < (unsigned)slot->bitmap.width; ++x)
+                for (unsigned x = 0; x < static_cast<unsigned>(slot->bitmap.width); ++x)
                     rowDest[x] = static_cast<unsigned char>((src[x >> 3u] & (0x80u >> (x & 7u))) ? 255 : 0);
             }
         }
         else
         {
-            for (unsigned y = 0; y < (unsigned)slot->bitmap.rows; ++y)
+            for (unsigned y = 0; y < static_cast<unsigned>(slot->bitmap.rows); ++y)
             {
-                unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+                const unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                 unsigned char* rowDest = dest + y * pitch;
                 BoxFilter(rowDest, fontGlyph.texWidth_, src, slot->bitmap.width);
             }
