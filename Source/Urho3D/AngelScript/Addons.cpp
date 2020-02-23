@@ -585,7 +585,7 @@ void CScriptArray::Resize(asUINT numElements)
     if( !CheckMaxSize(numElements) )
         return;
 
-    Resize((int)numElements - (int)buffer->numElements, (asUINT)-1);
+    Resize(static_cast<int>(numElements) - static_cast<int>(buffer->numElements), -1u);
 }
 
 // Internal
@@ -593,8 +593,9 @@ void CScriptArray::Resize(int delta, asUINT at)
 {
     if( delta < 0 )
     {
-        if( -delta > (int)buffer->numElements )
-            delta = -(int)buffer->numElements;
+        if( -delta > static_cast<int>(buffer->numElements))
+            delta = -static_cast<int>(buffer->numElements);
+
         if( at > buffer->numElements + delta )
             at = buffer->numElements + delta;
     }
@@ -912,7 +913,7 @@ bool CScriptArray::Less(const void *a, const void *b, bool asc, asIScriptContext
 
             if( r == asEXECUTION_FINISHED )
             {
-                return (int)ctx->GetReturnDWord() < 0;
+                return static_cast<int>(ctx->GetReturnDWord()) < 0;
             }
         }
     }
@@ -1071,7 +1072,7 @@ bool CScriptArray::Equals(const void *a, const void *b, asIScriptContext *ctx, S
             r = ctx->Execute();
 
             if( r == asEXECUTION_FINISHED )
-                return (int)ctx->GetReturnDWord() == 0;
+                return static_cast<int>(ctx->GetReturnDWord()) == 0;
 
             return false;
         }
@@ -1188,7 +1189,7 @@ int CScriptArray::Find(asUINT startAt, void *value) const
     }
 
     // Find the matching element
-    int ret = -1;
+    int ret{ -1 };
     asUINT size = GetSize();
 
     for( asUINT i = startAt; i < size; i++ )
@@ -1196,7 +1197,7 @@ int CScriptArray::Find(asUINT startAt, void *value) const
         // value passed by reference
         if( Equals(At(i), value, cmpContext, cache) )
         {
-            ret = (int)i;
+            ret = static_cast<int>(i);
             break;
         }
     }
@@ -1319,11 +1320,11 @@ void CScriptArray::Sort(asUINT startAt, asUINT count, bool asc)
         return;
     }
 
-    int start = startAt;
-    int end = startAt + count;
+    const int start{ startAt };
+    const int end{ startAt + count };
 
     // Check if we could access invalid item while sorting
-    if( start >= (int)buffer->numElements || end > (int)buffer->numElements )
+    if( start >= static_cast<int>(buffer->numElements) || end > static_cast<int>(buffer->numElements) )
     {
         asIScriptContext *ctx = asGetActiveContext();
 
