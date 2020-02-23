@@ -64,7 +64,7 @@ namespace Urho3D
     } \
 
 #define INC_POS_STEREO_LOOPED() \
-    pos += ((unsigned)intAdd << 1u); \
+    pos += (static_cast<unsigned>(intAdd) << 1u); \
     fractPos += fractAdd; \
     if (fractPos > 65535) \
     { \
@@ -75,7 +75,7 @@ namespace Urho3D
         pos -= (end - repeat); \
 
 #define INC_POS_STEREO_ONESHOT() \
-    pos += ((unsigned)intAdd << 1u); \
+    pos += (static_cast<unsigned>(intAdd) << 1u); \
     fractPos += fractAdd; \
     if (fractPos > 65535) \
     { \
@@ -88,11 +88,11 @@ namespace Urho3D
         break; \
     } \
 
-#define GET_IP_SAMPLE() (((((int)pos[1] - (int)pos[0]) * fractPos) / 65536) + (int)pos[0])
+#define GET_IP_SAMPLE() ((((static_cast<int>(pos[1]) - pos[0]) * fractPos) / 65536) + pos[0])
 
-#define GET_IP_SAMPLE_LEFT() (((((int)pos[2] - (int)pos[0]) * fractPos) / 65536) + (int)pos[0])
+#define GET_IP_SAMPLE_LEFT() ((((static_cast<int>(pos[2]) - pos[0]) * fractPos) / 65536) + pos[0])
 
-#define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
+#define GET_IP_SAMPLE_RIGHT() ((((static_cast<int>(pos[3]) - pos[1]) * fractPos) / 65536) + pos[1])
 
 static const int STREAM_SAFETY_SAMPLES = 4;
 
@@ -940,7 +940,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         {
             while (samples--)
             {
-                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                const int s{ (static_cast<int>(pos[0]) + pos[1]) / 2 };
                 *dest = *dest + (s * vol) / 256;
                 ++dest;
                 INC_POS_STEREO_LOOPED();
@@ -951,7 +951,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         {
             while (samples--)
             {
-                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                const int s{ (static_cast<int>(pos[0]) + pos[1]) / 2 };
                 *dest = *dest + (s * vol) / 256;
                 ++dest;
                 INC_POS_STEREO_ONESHOT();
@@ -969,7 +969,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         {
             while (samples--)
             {
-                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                const int s{ (static_cast<int>(pos[0]) + pos[1]) / 2 };
                 *dest = *dest + s * vol;
                 ++dest;
                 INC_POS_STEREO_LOOPED();
@@ -980,7 +980,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         {
             while (samples--)
             {
-                int s = ((int)pos[0] + (int)pos[1]) / 2;
+                const int s{ (static_cast<int>(pos[0]) + pos[1]) / 2 };
                 *dest = *dest + s * vol;
                 ++dest;
                 INC_POS_STEREO_ONESHOT();

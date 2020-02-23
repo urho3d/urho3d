@@ -76,8 +76,8 @@ unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)
 
     auto* vorbis = static_cast<stb_vorbis*>(decoder_);
 
-    unsigned channels = stereo_ ? 2 : 1;
-    auto outSamples = (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)dest, numBytes >> 1u);
+    const unsigned channels{ (stereo_ ? 2 : 1) };
+    auto outSamples{ static_cast<unsigned>(stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)dest, numBytes >> 1u)) };
     unsigned outBytes = (outSamples * channels) << 1u;
 
     // Rewind and retry if is looping and produced less output than should have
@@ -85,8 +85,8 @@ unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)
     {
         numBytes -= outBytes;
         stb_vorbis_seek_start(vorbis);
-        outSamples =
-            (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)(dest + outBytes), numBytes >> 1u);
+        outSamples = static_cast<unsigned>(stb_vorbis_get_samples_short_interleaved(
+                                               vorbis, channels, (short*)(dest + outBytes), numBytes >> 1u));
         outBytes += (outSamples * channels) << 1u;
     }
 

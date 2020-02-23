@@ -357,7 +357,7 @@ void Sound::LoadParameters()
         if (name == "format" && !compressed_)
         {
             if (paramElem.HasAttribute("frequency"))
-                frequency_ = (unsigned)paramElem.GetInt("frequency");
+                frequency_ = static_cast<unsigned>(paramElem.GetInt("frequency"));
             if (paramElem.HasAttribute("sixteenbit"))
                 sixteenBit_ = paramElem.GetBool("sixteenbit");
             if (paramElem.HasAttribute("16bit"))
@@ -371,7 +371,7 @@ void Sound::LoadParameters()
             if (paramElem.HasAttribute("enable"))
                 SetLooped(paramElem.GetBool("enable"));
             if (paramElem.HasAttribute("start") && paramElem.HasAttribute("end"))
-                SetLoop((unsigned)paramElem.GetInt("start"), (unsigned)paramElem.GetInt("end"));
+                SetLoop(static_cast<unsigned>(paramElem.GetInt("start")), static_cast<unsigned>(paramElem.GetInt("end")));
         }
     }
 }
