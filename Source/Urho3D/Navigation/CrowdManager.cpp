@@ -284,7 +284,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned queryFilterType = 0;
-    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
+    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), static_cast<unsigned>(DT_CROWD_MAX_QUERY_FILTER_TYPE)) : 0;
 
     while (queryFilterType < numQueryFilterTypes_)
     {
@@ -292,10 +292,10 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
         {
             dtQueryFilter* filter = crowd_->getEditableFilter(queryFilterType);
             assert(filter);
-            filter->setIncludeFlags((unsigned short)value[index++].GetUInt());
-            filter->setExcludeFlags((unsigned short)value[index++].GetUInt());
-            unsigned prevNumAreas = numAreas_[queryFilterType];
-            numAreas_[queryFilterType] = Min(value[index++].GetUInt(), (unsigned)DT_MAX_AREAS);
+            filter->setIncludeFlags(static_cast<unsigned short>(value[index++].GetUInt()));
+            filter->setExcludeFlags(static_cast<unsigned short>(value[index++].GetUInt()));
+            const unsigned prevNumAreas{ numAreas_[queryFilterType] };
+            numAreas_[queryFilterType] = Min(value[index++].GetUInt(), static_cast<unsigned>(DT_MAX_AREAS));
 
             // Must loop through based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
             if (index + prevNumAreas <= value.Size())
@@ -335,13 +335,17 @@ void CrowdManager::SetExcludeFlags(unsigned queryFilterType, unsigned short flag
 void CrowdManager::SetAreaCost(unsigned queryFilterType, unsigned areaID, float cost)
 {
     auto* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(queryFilterType));
+
     if (filter && areaID < DT_MAX_AREAS)
     {
-        filter->setAreaCost((int)areaID, cost);
+        filter->setAreaCost(static_cast<int>(areaID), cost);
+
         if (numQueryFilterTypes_ < queryFilterType + 1)
             numQueryFilterTypes_ = queryFilterType + 1;
+
         if (numAreas_[queryFilterType] < areaID + 1)
             numAreas_[queryFilterType] = areaID + 1;
+
         MarkNetworkUpdate();
     }
 }
@@ -353,7 +357,7 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned obstacleAvoidanceType = 0;
-    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
+    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), static_cast<unsigned>(DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)) : 0u;
 
     while (obstacleAvoidanceType < numObstacleAvoidanceTypes_)
     {
@@ -366,10 +370,10 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
             params.weightSide = value[index++].GetFloat();
             params.weightToi = value[index++].GetFloat();
             params.horizTime = value[index++].GetFloat();
-            params.gridSize = (unsigned char)value[index++].GetUInt();
-            params.adaptiveDivs = (unsigned char)value[index++].GetUInt();
-            params.adaptiveRings = (unsigned char)value[index++].GetUInt();
-            params.adaptiveDepth = (unsigned char)value[index++].GetUInt();
+            params.gridSize = static_cast<unsigned char>(value[index++].GetUInt());
+            params.adaptiveDivs = static_cast<unsigned char>(value[index++].GetUInt());
+            params.adaptiveRings = static_cast<unsigned char>(value[index++].GetUInt());
+            params.adaptiveDepth = static_cast<unsigned char>(value[index++].GetUInt());
             crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, &params);
         }
         ++obstacleAvoidanceType;
@@ -486,7 +490,7 @@ unsigned short CrowdManager::GetIncludeFlags(unsigned queryFilterType) const
         URHO3D_LOGWARNINGF("Query filter type %d is not configured yet, returning the default include flags initialized by dtCrowd",
             queryFilterType);
     const dtQueryFilter* filter = GetDetourQueryFilter(queryFilterType);
-    return (unsigned short)(filter ? filter->getIncludeFlags() : 0xffff);
+    return static_cast<unsigned short>(filter ? filter->getIncludeFlags() : 0xffff);
 }
 
 unsigned short CrowdManager::GetExcludeFlags(unsigned queryFilterType) const
@@ -495,7 +499,7 @@ unsigned short CrowdManager::GetExcludeFlags(unsigned queryFilterType) const
         URHO3D_LOGWARNINGF("Query filter type %d is not configured yet, returning the default exclude flags initialized by dtCrowd",
             queryFilterType);
     const dtQueryFilter* filter = GetDetourQueryFilter(queryFilterType);
-    return (unsigned short)(filter ? filter->getExcludeFlags() : 0);
+    return static_cast<unsigned short>(filter ? filter->getExcludeFlags() : 0);
 }
 
 float CrowdManager::GetAreaCost(unsigned queryFilterType, unsigned areaID) const
@@ -505,7 +509,7 @@ float CrowdManager::GetAreaCost(unsigned queryFilterType, unsigned areaID) const
             "Query filter type %d and/or area id %d are not configured yet, returning the default area cost initialized by dtCrowd",
             queryFilterType, areaID);
     const dtQueryFilter* filter = GetDetourQueryFilter(queryFilterType);
-    return filter ? filter->getAreaCost((int)areaID) : 1.f;
+    return filter ? filter->getAreaCost(static_cast<int>(areaID)) : 1.f;
 }
 
 VariantVector CrowdManager::GetObstacleAvoidanceTypesAttr() const
@@ -616,14 +620,18 @@ int CrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
 {
     if (!crowd_ || !navigationMesh_ || !agent)
         return -1;
+
     dtCrowdAgentParams params{};
     params.userData = agent;
+
     if (agent->radius_ == 0.f)
         agent->radius_ = navigationMesh_->GetAgentRadius();
+
     if (agent->height_ == 0.f)
         agent->height_ = navigationMesh_->GetAgentHeight();
+
     // dtCrowd::addAgent() requires the query filter type to find the nearest position on navmesh as the initial agent's position
-    params.queryFilterType = (unsigned char)agent->GetQueryFilterType();
+    params.queryFilterType = static_cast<unsigned char>(agent->GetQueryFilterType());
     return crowd_->addAgent(pos.Data(), &params);
 }
 

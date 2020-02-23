@@ -128,8 +128,8 @@ void CrowdAgent::ApplyAttributes()
     maxSpeed_ = Max(0.f, maxSpeed_);
     radius_ = Max(0.f, radius_);
     height_ = Max(0.f, height_);
-    queryFilterType_ = Min(queryFilterType_, (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
-    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
+    queryFilterType_ = Min(queryFilterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1u);
+    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1u);
 
     UpdateParameters();
 
@@ -259,8 +259,8 @@ void CrowdAgent::UpdateParameters(unsigned scope)
             params.maxAcceleration = maxAccel_;
             params.maxSpeed = maxSpeed_;
             params.pathOptimizationRange = radius_ * 30.0f;
-            params.queryFilterType = (unsigned char)queryFilterType_;
-            params.obstacleAvoidanceType = (unsigned char)obstacleAvoidanceType_;
+            params.queryFilterType = static_cast<unsigned char>(queryFilterType_);
+            params.obstacleAvoidanceType = static_cast<unsigned char>(obstacleAvoidanceType_);
         }
 
         crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);

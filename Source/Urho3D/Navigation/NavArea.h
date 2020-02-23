@@ -44,7 +44,7 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Get the area id for this volume.
-    unsigned GetAreaID() const { return (unsigned)areaID_; }
+    unsigned GetAreaID() const { return static_cast<unsigned>(areaID_); }
 
     /// Set the area id for this volume.
     void SetAreaID(unsigned newID);
