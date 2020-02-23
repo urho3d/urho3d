@@ -223,7 +223,7 @@ bool UnknownComponent::SaveJSON(JSONValue& dest) const
 
     // Write type and ID
     dest.Set("type", GetTypeName());
-    dest.Set("id", (int) id_);
+    dest.Set("id", static_cast<int>(id_));
 
     JSONArray attributesArray;
     attributesArray.Reserve(xmlAttributeInfos_.Size());

@@ -63,8 +63,9 @@ struct URHO3D_API DirtyBits
     {
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
-            unsigned byteIndex = index >> 3u;
-            auto bit = (unsigned)(1u << (index & 7u));
+            const unsigned byteIndex{ index >> 3u };
+            const unsigned bit{ 1u << (index & 7u) };
+
             if ((data_[byteIndex] & bit) == 0)
             {
                 data_[byteIndex] |= bit;
@@ -78,8 +79,9 @@ struct URHO3D_API DirtyBits
     {
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
-            unsigned byteIndex = index >> 3u;
-            auto bit = (unsigned)(1u << (index & 7u));
+            const unsigned byteIndex{ index >> 3u };
+            const unsigned bit{ 1u << (index & 7u) };
+
             if ((data_[byteIndex] & bit) != 0)
             {
                 data_[byteIndex] &= ~bit;
@@ -100,12 +102,15 @@ struct URHO3D_API DirtyBits
     {
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
-            unsigned byteIndex = index >> 3u;
-            auto bit = (unsigned)(1u << (index & 7u));
+            const unsigned byteIndex{ index >> 3u };
+            const unsigned bit{ 1u << (index & 7u) };
+
             return (data_[byteIndex] & bit) != 0;
         }
         else
+        {
             return false;
+        }
     }
 
     /// Return number of set bits.

@@ -827,8 +827,8 @@ bool Serializable::ReadDeltaUpdate(Deserializer& source)
     DirtyBits attributeBits;
     bool changed = false;
 
-    unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
-    unsigned char timeStamp = source.ReadUByte();
+    const unsigned long long interceptMask{ (networkState_ ? networkState_->interceptMask_ : 0ull) };
+    const unsigned char timeStamp{ source.ReadUByte() };
     source.Read(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
@@ -836,7 +836,7 @@ bool Serializable::ReadDeltaUpdate(Deserializer& source)
         if (attributeBits.IsSet(i))
         {
             const AttributeInfo& attr = attributes->At(i);
-            if (!(interceptMask & (1ULL << i)))
+            if (!(interceptMask & (1ull << i)))
             {
                 OnSetAttribute(attr, source.ReadVariant(attr.type_));
                 changed = true;
@@ -847,7 +847,7 @@ bool Serializable::ReadDeltaUpdate(Deserializer& source)
 
                 VariantMap& eventData = GetEventDataMap();
                 eventData[P_SERIALIZABLE] = this;
-                eventData[P_TIMESTAMP] = (unsigned)timeStamp;
+                eventData[P_TIMESTAMP] = static_cast<unsigned>(timeStamp);
                 eventData[P_INDEX] = RemapAttributeIndex(GetAttributes(), attr, i);
                 eventData[P_NAME] = attr.name_;
                 eventData[P_VALUE] = source.ReadVariant(attr.type_);
@@ -868,15 +868,15 @@ bool Serializable::ReadLatestDataUpdate(Deserializer& source)
     unsigned numAttributes = attributes->Size();
     bool changed = false;
 
-    unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
-    unsigned char timeStamp = source.ReadUByte();
+    const unsigned long long interceptMask{ (networkState_ ? networkState_->interceptMask_ : 0ull) };
+    const unsigned char timeStamp{ source.ReadUByte() };
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if (attr.mode_ & AM_LATESTDATA)
         {
-            if (!(interceptMask & (1ULL << i)))
+            if (!(interceptMask & (1ull << i)))
             {
                 OnSetAttribute(attr, source.ReadVariant(attr.type_));
                 changed = true;
@@ -887,7 +887,7 @@ bool Serializable::ReadLatestDataUpdate(Deserializer& source)
 
                 VariantMap& eventData = GetEventDataMap();
                 eventData[P_SERIALIZABLE] = this;
-                eventData[P_TIMESTAMP] = (unsigned)timeStamp;
+                eventData[P_TIMESTAMP] = static_cast<unsigned>(timeStamp);
                 eventData[P_INDEX] = RemapAttributeIndex(GetAttributes(), attr, i);
                 eventData[P_NAME] = attr.name_;
                 eventData[P_VALUE] = source.ReadVariant(attr.type_);
