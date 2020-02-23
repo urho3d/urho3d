@@ -745,8 +745,9 @@ void RigidBody::UpdateMass()
     principal.setRotation(btQuaternion::getIdentity());
     principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
 
+    const auto numShapes{ static_cast<unsigned>(compoundShape_->getNumChildShapes()) };
+
     // Calculate center of mass shift from all the collision shapes
-    auto numShapes = (unsigned)compoundShape_->getNumChildShapes();
     if (numShapes)
     {
         PODVector<float> masses(numShapes);
@@ -763,6 +764,7 @@ void RigidBody::UpdateMass()
     // Add child shapes to shifted compound shape with adjusted offset
     while (shiftedCompoundShape_->getNumChildShapes())
         shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
+
     for (unsigned i = 0; i < numShapes; ++i)
     {
         btTransform adjusted = compoundShape_->getChildTransform(i);
@@ -773,6 +775,7 @@ void RigidBody::UpdateMass()
     // If shifted compound shape has only one child with no offset/rotation, use the child shape
     // directly as the rigid body collision shape for better collision detection performance
     bool useCompound = !numShapes || numShapes > 1;
+
     if (!useCompound)
     {
         const btTransform& childTransform = shiftedCompoundShape_->getChildTransform(0);

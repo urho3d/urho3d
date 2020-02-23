@@ -257,21 +257,26 @@ void PhysicsWorld::Update(float timeStep)
 {
     URHO3D_PROFILE(UpdatePhysics);
 
-    float internalTimeStep = 1.0f / fps_;
-    int maxSubSteps = (int)(timeStep * fps_) + 1;
+    float internalTimeStep{ 1.0f / fps_ };
+    int maxSubSteps{ static_cast<int>(timeStep * fps_) + 1 };
+
     if (maxSubSteps_ < 0)
     {
         internalTimeStep = timeStep;
         maxSubSteps = 1;
     }
     else if (maxSubSteps_ > 0)
+    {
         maxSubSteps = Min(maxSubSteps, maxSubSteps_);
+    }
 
     delayedWorldTransforms_.Clear();
     simulating_ = true;
 
     if (interpolation_)
+    {
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
+    }
     else
     {
         timeAcc_ += timeStep;
@@ -300,7 +305,9 @@ void PhysicsWorld::Update(float timeStep)
                 i = delayedWorldTransforms_.Erase(i);
             }
             else
+            {
                 ++i;
+            }
         }
     }
 }
@@ -312,7 +319,7 @@ void PhysicsWorld::UpdateCollisions()
 
 void PhysicsWorld::SetFps(int fps)
 {
-    fps_ = (unsigned)Clamp(fps, 1, 1000);
+    fps_ = static_cast<unsigned>(Clamp(fps, 1, 1000));
 
     MarkNetworkUpdate();
 }

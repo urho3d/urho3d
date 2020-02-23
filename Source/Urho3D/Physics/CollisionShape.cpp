@@ -356,11 +356,11 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
             heightData_ = lodHeightData;
         }
 
-        auto points = (unsigned)(size_.x_ * size_.y_);
-        float* data = heightData_.Get();
-
+        const auto points{ static_cast<unsigned>(size_.x_ * size_.y_) };
+        const float* data{ heightData_.Get() };
         minHeight_ = maxHeight_ = data[0];
-        for (unsigned i = 1; i < points; ++i)
+
+        for (unsigned i{1}; i < points; ++i)
         {
             minHeight_ = Min(minHeight_, data[i]);
             maxHeight_ = Max(maxHeight_, data[i]);
