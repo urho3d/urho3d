@@ -1320,8 +1320,8 @@ void CScriptArray::Sort(asUINT startAt, asUINT count, bool asc)
         return;
     }
 
-    const int start{ startAt };
-    const int end{ startAt + count };
+    const int start{ static_cast<int>(startAt) };
+    const int end{ static_cast<int>(startAt + count) };
 
     // Check if we could access invalid item while sorting
     if( start >= static_cast<int>(buffer->numElements) || end > static_cast<int>(buffer->numElements) )
