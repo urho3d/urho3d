@@ -97,9 +97,9 @@ bool ToBool(const char* source)
 {
     unsigned length = String::CStringLength(source);
 
-    for (unsigned i = 0; i < length; ++i)
+    for (unsigned i{0}; i < length; ++i)
     {
-        auto c = (char)tolower(source[i]);
+        char c{ static_cast<char>(tolower(source[i])) };
 
         if (c == 't' || c == 'y' || c == '1')
             return true;
@@ -615,14 +615,14 @@ void BufferToString(String& dest, const void* data, unsigned size)
         }
         else if (bytes[i] < 100)
         {
-            dest[index++] = (char)('0' + bytes[i] / 10);
-            dest[index++] = (char)('0' + bytes[i] % 10);
+            dest[index++] = static_cast<char>('0' + bytes[i] / 10);
+            dest[index++] = static_cast<char>('0' + bytes[i] % 10);
         }
         else
         {
-            dest[index++] = (char)('0' + bytes[i] / 100);
-            dest[index++] = (char)('0' + bytes[i] % 100 / 10);
-            dest[index++] = (char)('0' + bytes[i] % 10);
+            dest[index++] = static_cast<char>('0' + bytes[i] / 100);
+            dest[index++] = static_cast<char>('0' + bytes[i] % 100 / 10);
+            dest[index++] = static_cast<char>('0' + bytes[i] % 10);
         }
     }
 }

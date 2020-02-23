@@ -72,13 +72,13 @@ Time::~Time()
 static unsigned Tick()
 {
 #ifdef _WIN32
-    return (unsigned)timeGetTime();
+    return static_cast<unsigned>(timeGetTime());
 #elif __EMSCRIPTEN__
-    return (unsigned)emscripten_get_now();
+    return static_cast<unsigned>(emscripten_get_now());
 #else
     struct timeval time{};
     gettimeofday(&time, nullptr);
-    return (unsigned)(time.tv_sec * 1000 + time.tv_usec / 1000);
+    return static_cast<unsigned>(time.tv_sec * 1000 + time.tv_usec / 1000);
 #endif
 }
 
@@ -94,7 +94,7 @@ static long long HiresTick()
     else
         return timeGetTime();
 #elif __EMSCRIPTEN__
-    return (long long)(emscripten_get_now()*1000.0);
+    return static_cast<long long>(emscripten_get_now() * 1000.0);
 #else
     struct timeval time{};
     gettimeofday(&time, nullptr);
@@ -166,7 +166,7 @@ unsigned Time::GetSystemTime()
 
 unsigned Time::GetTimeSinceEpoch()
 {
-    return (unsigned)time(nullptr);
+    return static_cast<unsigned>(time(nullptr));
 }
 
 String Time::GetTimeStamp()

@@ -231,14 +231,17 @@ Variant Spline::CatmullRomInterpolation(const Vector<Variant>& knots, float t) c
 Variant Spline::LinearInterpolation(const Vector<Variant>& knots, float t) const
 {
     if (knots.Size() < 2)
+    {
         return Variant::EMPTY;
+    }
     else
     {
-        if (t >= 1.f)
+        if (t >= 1.0f)
             return knots.Back();
 
-        int originIndex = Clamp((int)(t * (knots.Size() - 1)), 0, (int)(knots.Size() - 2));
-        t = fmodf(t * (knots.Size() - 1), 1.f);
+        const int originIndex{ Clamp(static_cast<int>(t * (knots.Size() - 1)), 0, static_cast<int>(knots.Size() - 2)) };
+        t = fmodf(t * (knots.Size() - 1), 1.0f);
+
         return LinearInterpolation(knots[originIndex], knots[originIndex + 1], t);
     }
 }

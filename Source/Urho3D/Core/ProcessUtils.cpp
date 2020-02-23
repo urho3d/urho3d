@@ -334,7 +334,7 @@ const Vector<String>& GetArguments()
 
 String GetConsoleInput()
 {
-    String ret;
+    String ret{};
 #ifdef URHO3D_TESTING
     // When we are running automated tests, reading the console may block. Just return empty in that case
     return ret;
@@ -393,9 +393,10 @@ String GetConsoleInput()
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     for (;;)
     {
-        int ch = fgetc(stdin);
+        const int ch{ fgetc(stdin) };
+
         if (ch >= 0 && ch != '\n')
-            ret += (char)ch;
+            ret += static_cast<char>(ch);
         else
             break;
     }
@@ -458,7 +459,7 @@ unsigned GetNumPhysicalCPUs()
 #else
     struct cpu_id_t data;
     GetCPUData(&data);
-    return (unsigned)data.num_cores;
+    return static_cast<unsigned>(data.num_cores);
 #endif
 }
 
@@ -491,7 +492,7 @@ unsigned GetNumLogicalCPUs()
 #else
     struct cpu_id_t data;
     GetCPUData(&data);
-    return (unsigned)data.num_logical_cpus;
+    return static_cast<unsigned>(data.num_logical_cpus);
 #endif
 }
 

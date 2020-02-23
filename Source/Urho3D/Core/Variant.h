@@ -342,19 +342,19 @@ public:
     /// Construct from unsigned integer.
     Variant(unsigned value)             // NOLINT(google-explicit-constructor)
     {
-        *this = (int)value;
+        *this = static_cast<int>(value);
     }
 
     /// Construct from unsigned integer.
     Variant(unsigned long long value)   // NOLINT(google-explicit-constructor)
     {
-        *this = (long long)value;
+        *this = static_cast<long long>(value);
     }
 
     /// Construct from a string hash (convert to integer).
     Variant(const StringHash& value)    // NOLINT(google-explicit-constructor)
     {
-        *this = (int)value.Value();
+        *this = static_cast<int>(value.Value());
     }
 
     /// Construct from a bool.
@@ -593,7 +593,7 @@ public:
     Variant& operator =(unsigned rhs)
     {
         SetType(VAR_INT);
-        value_.int_ = (int)rhs;
+        value_.int_ = static_cast<int>(rhs);
         return *this;
     }
 
@@ -601,7 +601,7 @@ public:
     Variant& operator =(const StringHash& rhs)
     {
         SetType(VAR_INT);
-        value_.int_ = (int)rhs.Value();
+        value_.int_ = static_cast<int>(rhs.Value());
         return *this;
     }
 
