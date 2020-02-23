@@ -99,7 +99,7 @@ void ParticleEmitter2D::SetEffect(ParticleEffect2D* effect)
 
     SetSprite(effect_->GetSprite());
     SetBlendMode(effect_->GetBlendMode());
-    SetMaxParticles(static_cast<unsigned>(effect_->GetMaxParticles)());
+    SetMaxParticles(static_cast<unsigned>(effect_->GetMaxParticles()));
 
     emitParticleTime_ = 0.0f;
     emissionTime_ = effect_->GetDuration();
