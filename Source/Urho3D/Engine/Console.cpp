@@ -201,7 +201,7 @@ void Console::SetNumBufferedRows(unsigned rows)
     {
         // We have more, remove oldest rows first
         for (int i = 0; i < delta; ++i)
-            rowContainer_->RemoveItem((unsigned)0);
+            rowContainer_->RemoveItem(0u);
     }
     else
     {
@@ -276,7 +276,7 @@ void Console::UpdateElements()
     const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetClipBorder();
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
     rowContainer_->SetFixedHeight(
-        displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_ +
+        displayedRows_ * rowContainer_->GetItem(0u)->GetHeight() + panelBorder.top_ + panelBorder.bottom_ +
         (rowContainer_->GetHorizontalScrollBar()->IsVisible() ? rowContainer_->GetHorizontalScrollBar()->GetHeight() : 0));
     background_->SetFixedWidth(width);
     background_->SetHeight(background_->GetMinHeight());
@@ -566,7 +566,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     Text* text = nullptr;
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
-        rowContainer_->RemoveItem((unsigned)0);
+        rowContainer_->RemoveItem(0u);
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
 

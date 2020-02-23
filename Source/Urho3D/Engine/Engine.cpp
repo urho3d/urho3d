@@ -557,22 +557,22 @@ DebugHud* Engine::CreateDebugHud()
 
 void Engine::SetTimeStepSmoothing(int frames)
 {
-    timeStepSmoothing_ = (unsigned)Clamp(frames, 1, 20);
+    timeStepSmoothing_ = static_cast<unsigned>(Clamp(frames, 1, 20));
 }
 
 void Engine::SetMinFps(int fps)
 {
-    minFps_ = (unsigned)Max(fps, 0);
+    minFps_ = static_cast<unsigned>(Max(fps, 0));
 }
 
 void Engine::SetMaxFps(int fps)
 {
-    maxFps_ = (unsigned)Max(fps, 0);
+    maxFps_ = static_cast<unsigned>(Max(fps, 0));
 }
 
 void Engine::SetMaxInactiveFps(int fps)
 {
-    maxInactiveFps_ = (unsigned)Max(fps, 0);
+    maxInactiveFps_ = static_cast<unsigned>(Max(fps, 0));
 }
 
 void Engine::SetPauseMinimized(bool enable)
@@ -664,9 +664,9 @@ void Engine::DumpMemory()
         if (block->nBlockUse > 0)
         {
             if (block->szFileName)
-                URHO3D_LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
+                URHO3D_LOGRAW("Block " + String(static_cast<int>(block->lRequest)) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
             else
-                URHO3D_LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
+                URHO3D_LOGRAW("Block " + String(static_cast<int>(block->lRequest)) + ": " + String(block->nDataSize) + " bytes\n");
 
             total += block->nDataSize;
             ++blocks;
@@ -743,7 +743,7 @@ void Engine::ApplyFrameLimit()
     {
         URHO3D_PROFILE(ApplyFrameLimit);
 
-        long long targetMax = 1000000LL / maxFps;
+        const long long targetMax{ 1000000ll / maxFps };
 
         for (;;)
         {
@@ -752,9 +752,9 @@ void Engine::ApplyFrameLimit()
                 break;
 
             // Sleep if 1 ms or more off the frame limiting goal
-            if (targetMax - elapsed >= 1000LL)
+            if (targetMax - elapsed >= 1000ll)
             {
-                auto sleepTime = (unsigned)((targetMax - elapsed) / 1000LL);
+                const auto sleepTime{ static_cast<unsigned>((targetMax - elapsed) / 1000ll) };
                 Time::Sleep(sleepTime);
             }
         }
