@@ -502,7 +502,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     if (!fromPackage)
     {
         fseek((FILE*)handle_, 0, SEEK_END);
-        long size = ftell((FILE*)handle_);
+        const long size{ ftell((FILE*)handle_) };
         fseek((FILE*)handle_, 0, SEEK_SET);
         if (size > M_MAX_UNSIGNED)
         {
@@ -511,7 +511,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
             size_ = 0;
             return false;
         }
-        size_ = (unsigned)size;
+        size_ = static_cast<unsigned>(size);
         offset_ = 0;
     }
 

@@ -114,7 +114,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     }
 #elif defined(__linux__)
     int flags = IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO;
-    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (unsigned)flags);
+    int handle = inotify_add_watch(watchHandle_, pathName.CString(), static_cast<unsigned>(flags));
 
     if (handle < 0)
     {
@@ -140,7 +140,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
                 // Don't watch ./ or ../ sub-directories
                 if (!subDirFullPath.EndsWith("./"))
                 {
-                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (unsigned)flags);
+                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), static_cast<unsigned>(flags));
                     if (handle < 0)
                         URHO3D_LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
                     else
@@ -283,8 +283,8 @@ void FileWatcher::ThreadFunction()
 
     while (shouldRun_)
     {
-        int i = 0;
-        auto length = (int)read(watchHandle_, buffer, sizeof(buffer));
+        int i{0};
+        const auto length{ static_cast<int>(read(watchHandle_, buffer, sizeof(buffer))) };
 
         if (length < 0)
             return;
@@ -335,10 +335,12 @@ bool FileWatcher::GetNextChange(String& dest)
 {
     MutexLock lock(changesMutex_);
 
-    auto delayMsec = (unsigned)(delay_ * 1000.0f);
+    const auto delayMsec{ static_cast<unsigned>(delay_ * 1000.0f) };
 
     if (changes_.Empty())
+    {
         return false;
+    }
     else
     {
         for (HashMap<String, Timer>::Iterator i = changes_.Begin(); i != changes_.End(); ++i)

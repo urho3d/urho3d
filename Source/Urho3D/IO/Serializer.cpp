@@ -75,7 +75,7 @@ bool Serializer::WriteUByte(unsigned char value)
 
 bool Serializer::WriteBool(bool value)
 {
-    return WriteUByte((unsigned char)(value ? 1 : 0)) == 1;
+    return WriteUByte(static_cast<unsigned char>(value));
 }
 
 bool Serializer::WriteFloat(float value)
@@ -236,10 +236,10 @@ bool Serializer::WriteResourceRefList(const ResourceRefList& value)
 
 bool Serializer::WriteVariant(const Variant& value)
 {
-    bool success = true;
-    VariantType type = value.GetType();
+    bool success{ true };
+    const VariantType type{ value.GetType() };
 
-    success &= WriteUByte((unsigned char)type);
+    success &= WriteUByte(static_cast<unsigned char>(type));
     success &= WriteVariantData(value);
     return success;
 }
@@ -367,26 +367,28 @@ bool Serializer::WriteVLE(unsigned value)
     unsigned char data[4];
 
     if (value < 0x80)
-        return WriteUByte((unsigned char)value);
+    {
+        return WriteUByte(static_cast<unsigned char>(value));
+    }
     else if (value < 0x4000)
     {
-        data[0] = (unsigned char)(value | 0x80u);
-        data[1] = (unsigned char)(value >> 7u);
+        data[0] = static_cast<unsigned char>(value | 0x80u);
+        data[1] = static_cast<unsigned char>(value >> 7u);
         return Write(data, 2) == 2;
     }
     else if (value < 0x200000)
     {
-        data[0] = (unsigned char)(value | 0x80u);
-        data[1] = (unsigned char)(value >> 7u | 0x80u);
-        data[2] = (unsigned char)(value >> 14u);
+        data[0] = static_cast<unsigned char>(value | 0x80u);
+        data[1] = static_cast<unsigned char>(value >> 7u | 0x80u);
+        data[2] = static_cast<unsigned char>(value >> 14u);
         return Write(data, 3) == 3;
     }
     else
     {
-        data[0] = (unsigned char)(value | 0x80u);
-        data[1] = (unsigned char)(value >> 7u | 0x80u);
-        data[2] = (unsigned char)(value >> 14u | 0x80u);
-        data[3] = (unsigned char)(value >> 21u);
+        data[0] = static_cast<unsigned char>(value | 0x80u);
+        data[1] = static_cast<unsigned char>(value >> 7u | 0x80u);
+        data[2] = static_cast<unsigned char>(value >> 14u | 0x80u);
+        data[3] = static_cast<unsigned char>(value >> 21u);
         return Write(data, 4) == 4;
     }
 }

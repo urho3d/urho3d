@@ -285,10 +285,12 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
     if (readHandle_ != -1)
     {
         ssize_t readNow = read(readHandle_, dest, size);
-        return readNow < 0 ? 0 : (unsigned)readNow;
+        return readNow < 0 ? 0u : static_cast<unsigned>(readNow);
     }
     else
+    {
         return 0;
+    }
 }
 
 unsigned NamedPipe::Write(const void* data, unsigned size)
@@ -314,10 +316,12 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
             written += writtenNow;
         }
 
-        return (unsigned)written;
+        return static_cast<unsigned>(written);
     }
     else
+    {
         return 0;
+    }
 }
 
 void NamedPipe::Close()

@@ -36,7 +36,7 @@ namespace Urho3D
 
 unsigned EstimateCompressBound(unsigned srcSize)
 {
-    return (unsigned)LZ4_compressBound(srcSize);
+    return static_cast<unsigned>(LZ4_compressBound(srcSize));
 }
 
 unsigned CompressData(void* dest, const void* src, unsigned srcSize)
@@ -44,7 +44,7 @@ unsigned CompressData(void* dest, const void* src, unsigned srcSize)
     if (!dest || !src || !srcSize)
         return 0;
     else
-        return (unsigned)LZ4_compress_HC((const char*)src, (char*)dest, srcSize, LZ4_compressBound(srcSize), 0);
+        return static_cast<unsigned>(LZ4_compress_HC((const char*)src, (char*)dest, srcSize, LZ4_compressBound(srcSize), 0));
 }
 
 unsigned DecompressData(void* dest, const void* src, unsigned destSize)
@@ -52,12 +52,12 @@ unsigned DecompressData(void* dest, const void* src, unsigned destSize)
     if (!dest || !src || !destSize)
         return 0;
     else
-        return (unsigned)LZ4_decompress_fast((const char*)src, (char*)dest, destSize);
+        return static_cast<unsigned>(LZ4_decompress_fast((const char*)src, (char*)dest, destSize));
 }
 
 bool CompressStream(Serializer& dest, Deserializer& src)
 {
-    unsigned srcSize = src.GetSize() - src.GetPosition();
+    const unsigned srcSize{ src.GetSize() - src.GetPosition() };
     // Prepend the source and dest. data size in the stream so that we know to buffer & uncompress the right amount
     if (!srcSize)
     {
@@ -66,14 +66,14 @@ bool CompressStream(Serializer& dest, Deserializer& src)
         return true;
     }
 
-    auto maxDestSize = (unsigned)LZ4_compressBound(srcSize);
+    const auto maxDestSize{ static_cast<unsigned>(LZ4_compressBound(srcSize)) };
     SharedArrayPtr<unsigned char> srcBuffer(new unsigned char[srcSize]);
     SharedArrayPtr<unsigned char> destBuffer(new unsigned char[maxDestSize]);
 
     if (src.Read(srcBuffer, srcSize) != srcSize)
         return false;
 
-    auto destSize = (unsigned)LZ4_compress_HC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize, LZ4_compressBound(srcSize), 0);
+    const auto destSize{ static_cast<unsigned>(LZ4_compress_HC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize, LZ4_compressBound(srcSize), 0)) };
     bool success = true;
     success &= dest.WriteUInt(srcSize);
     success &= dest.WriteUInt(destSize);

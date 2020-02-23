@@ -60,23 +60,24 @@ private:
     /// Seek within the object's data.
     static Sint64 Seek(SDL_RWops* context, Sint64 offset, int whence)
     {
-        auto* object = reinterpret_cast<T*>(context->hidden.unknown.data1);
-        auto* des = dynamic_cast<Deserializer*>(object);
+        const auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
+        auto* des{ dynamic_cast<Deserializer*>(object) };
+
         if (!des)
             return 0;
 
         switch (whence)
         {
         case RW_SEEK_SET:
-            des->Seek((unsigned)offset);
+            des->Seek(static_cast<unsigned>(offset));
             break;
 
         case RW_SEEK_CUR:
-            des->Seek((unsigned)(des->GetPosition() + offset));
+            des->Seek(static_cast<unsigned>(des->GetPosition() + offset));
             break;
 
         case RW_SEEK_END:
-            des->Seek((unsigned)(des->GetSize() + offset));
+            des->Seek(static_cast<unsigned>(des->GetSize() + offset));
             break;
 
         default:
@@ -100,17 +101,17 @@ private:
     /// Read from the object. Return number of "packets" read.
     static size_t Read(SDL_RWops* context, void* ptr, size_t size, size_t maxNum)
     {
-        auto* object = reinterpret_cast<T*>(context->hidden.unknown.data1);
-        auto* des = dynamic_cast<Deserializer*>(object);
-        return des ? (size_t)(des->Read(ptr, (unsigned)(size * maxNum)) / size) : 0;
+        const auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
+        auto* des{ dynamic_cast<Deserializer*>(object) };
+        return des ? static_cast<size_t>(des->Read(ptr, static_cast<unsigned>(size * maxNum)) / size) : 0;
     }
 
     /// Write to the object. Return number of "packets" written.
     static size_t Write(SDL_RWops* context, const void* ptr, size_t size, size_t maxNum)
     {
-        auto* object = reinterpret_cast<T*>(context->hidden.unknown.data1);
-        auto* ser = dynamic_cast<Serializer*>(object);
-        return ser ? (size_t)(ser->Write(ptr, (unsigned)(size * maxNum)) / size) : 0;
+        const auto* object{ reinterpret_cast<T*>(context->hidden.unknown.data1) };
+        auto* ser{ dynamic_cast<Serializer*>(object) };
+        return ser ? static_cast<size_t>(ser->Write(ptr, static_cast<unsigned>(size * maxNum)) / size) : 0;
     }
 
     /// SDL RWOps structure associated with the object.

@@ -578,13 +578,13 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
 #ifdef _WIN32
     struct _stat st;
     if (!_stat(fileName.CString(), &st))
-        return (unsigned)st.st_mtime;
+        return static_cast<unsigned>(st.st_mtime);
     else
         return 0;
 #else
     struct stat st{};
     if (!stat(fileName.CString(), &st))
-        return (unsigned)st.st_mtime;
+        return static_cast<unsigned>(st.st_mtime);
     else
         return 0;
 #endif

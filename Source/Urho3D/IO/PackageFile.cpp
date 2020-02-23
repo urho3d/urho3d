@@ -58,16 +58,18 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
 
     // Check ID, then read the directory
     file->Seek(startOffset);
-    String id = file->ReadFileID();
+    String id{ file->ReadFileID() };
+
     if (id != "UPAK" && id != "ULZ4")
     {
         // If start offset has not been explicitly specified, also try to read package size from the end of file
         // to know how much we must rewind to find the package start
         if (!startOffset)
         {
-            unsigned fileSize = file->GetSize();
-            file->Seek((unsigned)(fileSize - sizeof(unsigned)));
-            unsigned newStartOffset = fileSize - file->ReadUInt();
+            const unsigned fileSize{ file->GetSize() };
+            file->Seek(static_cast<unsigned>(fileSize - sizeof(unsigned)));
+            const unsigned newStartOffset{ fileSize - file->ReadUInt() };
+
             if (newStartOffset < fileSize)
             {
                 startOffset = newStartOffset;
