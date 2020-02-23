@@ -218,7 +218,7 @@ public:
     HashMap()
     {
         // Reserve the tail node
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node));
+        allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(Node)));
         head_ = tail_ = ReserveNode();
     }
 
@@ -226,7 +226,7 @@ public:
     HashMap(const HashMap<T, U>& map)
     {
         // Reserve the tail node + initial capacity according to the map's size
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node), map.Size() + 1);
+        allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(Node)), map.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = map;
     }

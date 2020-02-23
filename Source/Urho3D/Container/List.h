@@ -168,7 +168,7 @@ public:
     /// Construct empty.
     List()
     {
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node));
+        allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(Node)));
         head_ = tail_ = ReserveNode();
     }
 
@@ -176,7 +176,7 @@ public:
     List(const List<T>& list)
     {
         // Reserve the tail node + initial capacity according to the list's size
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node), list.Size() + 1);
+        allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(Node)), list.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = list;
     }

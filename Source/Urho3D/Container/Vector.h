@@ -446,7 +446,7 @@ public:
 
             if (capacity_)
             {
-                newBuffer = reinterpret_cast<T*>(AllocateBuffer((unsigned)(capacity_ * sizeof(T))));
+                newBuffer = reinterpret_cast<T*>(AllocateBuffer(static_cast<unsigned>(capacity_ * sizeof(T))));
                 // Move the data into the new buffer
                 ConstructElements(newBuffer, Begin(), End(), MoveTag{});
             }
@@ -1040,7 +1040,7 @@ public:
                     capacity_ += (capacity_ + 1) >> 1;
             }
 
-            unsigned char* newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
+            unsigned char* newBuffer = AllocateBuffer(static_cast<unsigned>(capacity_ * sizeof(T)));
             // Move the data into the new buffer and delete the old
             if (buffer_)
             {
@@ -1066,7 +1066,7 @@ public:
 
             if (capacity_)
             {
-                newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
+                newBuffer = AllocateBuffer(static_cast<unsigned>(capacity_ * sizeof(T)));
                 // Move the data into the new buffer
                 CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
             }

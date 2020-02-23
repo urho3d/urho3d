@@ -197,7 +197,7 @@ public:
     RefCount* RefCountPtr() const { return ptr_ ? ptr_->RefCountPtr() : nullptr; }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
+    unsigned ToHash() const { return static_cast<unsigned>((size_t)ptr_ / sizeof(T)); }
 
 private:
     template <class U> friend class SharedPtr;
@@ -456,7 +456,7 @@ public:
     RefCount* RefCountPtr() const { return refCount_; }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
+    unsigned ToHash() const { return static_cast<unsigned>((size_t)ptr_ / sizeof(T)); }
 
 private:
     template <class U> friend class WeakPtr;
@@ -611,7 +611,7 @@ public:
     }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
+    unsigned ToHash() const { return static_cast<unsigned>((size_t)ptr_ / sizeof(T)); }
 
     /// Destruct.
     ~UniquePtr()

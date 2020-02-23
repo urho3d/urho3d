@@ -168,7 +168,7 @@ public:
     RefCount* RefCountPtr() const { return refCount_; }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
+    unsigned ToHash() const { return static_cast<unsigned>((size_t)ptr_ / sizeof(T)); }
 
 private:
     /// Prevent direct assignment from a shared array pointer of different type.
@@ -388,7 +388,7 @@ public:
     RefCount* RefCountPtr() const { return refCount_; }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
+    unsigned ToHash() const { return static_cast<unsigned>((size_t)ptr_ / sizeof(T)); }
 
 private:
     /// Prevent direct assignment from a weak array pointer of different type.

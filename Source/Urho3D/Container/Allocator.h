@@ -76,7 +76,7 @@ public:
         allocator_(nullptr)
     {
         if (initialCapacity)
-            allocator_ = AllocatorInitialize((unsigned)sizeof(T), initialCapacity);
+            allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(T)), initialCapacity);
     }
 
     /// Destruct.
@@ -94,7 +94,7 @@ public:
     T* Reserve()
     {
         if (!allocator_)
-            allocator_ = AllocatorInitialize((unsigned)sizeof(T));
+            allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(T)));
         auto* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T();
 
@@ -105,7 +105,7 @@ public:
     T* Reserve(const T& object)
     {
         if (!allocator_)
-            allocator_ = AllocatorInitialize((unsigned)sizeof(T));
+            allocator_ = AllocatorInitialize(static_cast<unsigned>(sizeof(T)));
         auto* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T(object);
 

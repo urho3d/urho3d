@@ -239,7 +239,7 @@ void String::Replace(char replaceThis, char replaceWith, bool caseSensitive)
     }
     else
     {
-        replaceThis = (char)tolower(replaceThis);
+        replaceThis = static_cast<char>(tolower(replaceThis));
         for (unsigned i = 0; i < length_; ++i)
         {
             if (tolower(buffer_[i]) == replaceThis)
@@ -544,7 +544,7 @@ String String::ToLower() const
 {
     String ret(*this);
     for (unsigned i = 0; i < ret.length_; ++i)
-        ret[i] = (char)tolower(buffer_[i]);
+        ret[i] = static_cast<char>(tolower(buffer_[i]));
 
     return ret;
 }
@@ -553,7 +553,7 @@ String String::ToUpper() const
 {
     String ret(*this);
     for (unsigned i = 0; i < ret.length_; ++i)
-        ret[i] = (char)toupper(buffer_[i]);
+        ret[i] = static_cast<char>(toupper(buffer_[i]));
 
     return ret;
 }
@@ -580,7 +580,7 @@ unsigned String::Find(char c, unsigned startPos, bool caseSensitive) const
     }
     else
     {
-        c = (char)tolower(c);
+        c = static_cast<char>(tolower(c));
         for (unsigned i = startPos; i < length_; ++i)
         {
             if (tolower(buffer_[i]) == c)
@@ -598,13 +598,13 @@ unsigned String::Find(const String& str, unsigned startPos, bool caseSensitive) 
 
     char first = str.buffer_[0];
     if (!caseSensitive)
-        first = (char)tolower(first);
+        first = static_cast<char>(tolower(first));
 
     for (unsigned i = startPos; i <= length_ - str.length_; ++i)
     {
         char c = buffer_[i];
         if (!caseSensitive)
-            c = (char)tolower(c);
+            c = static_cast<char>(tolower(c));
 
         if (c == first)
         {
@@ -616,8 +616,8 @@ unsigned String::Find(const String& str, unsigned startPos, bool caseSensitive) 
                 char d = str.buffer_[j];
                 if (!caseSensitive)
                 {
-                    c = (char)tolower(c);
-                    d = (char)tolower(d);
+                    c = static_cast<char>(tolower(c));
+                    d = static_cast<char>(tolower(d));
                 }
 
                 if (skip == NPOS && c == first)
@@ -654,7 +654,7 @@ unsigned String::FindLast(char c, unsigned startPos, bool caseSensitive) const
     }
     else
     {
-        c = (char)tolower(c);
+        c = static_cast<char>(tolower(c));
         for (unsigned i = startPos; i < length_; --i)
         {
             if (tolower(buffer_[i]) == c)
@@ -674,13 +674,13 @@ unsigned String::FindLast(const String& str, unsigned startPos, bool caseSensiti
 
     char first = str.buffer_[0];
     if (!caseSensitive)
-        first = (char)tolower(first);
+        first = static_cast<char>(tolower(first));
 
     for (unsigned i = startPos; i < length_; --i)
     {
         char c = buffer_[i];
         if (!caseSensitive)
-            c = (char)tolower(c);
+            c = static_cast<char>(tolower(c));
 
         if (c == first)
         {
@@ -691,8 +691,8 @@ unsigned String::FindLast(const String& str, unsigned startPos, bool caseSensiti
                 char d = str.buffer_[j];
                 if (!caseSensitive)
                 {
-                    c = (char)tolower(c);
-                    d = (char)tolower(d);
+                    c = static_cast<char>(tolower(c));
+                    d = static_cast<char>(tolower(d));
                 }
 
                 if (c != d)
@@ -742,7 +742,7 @@ void String::SetUTF8FromLatin1(const char* str)
     while (*str)
     {
         char* dest = temp;
-        EncodeUTF8(dest, (unsigned)*str++);
+        EncodeUTF8(dest, static_cast<unsigned>(*str++));
         *dest = 0;
         Append(temp);
     }
@@ -770,7 +770,7 @@ void String::SetUTF8FromWChar(const wchar_t* str)
     while (*str)
     {
         char* dest = temp;
-        EncodeUTF8(dest, (unsigned)*str++);
+        EncodeUTF8(dest, static_cast<unsigned>(*str++));
         *dest = 0;
         Append(temp);
     }
@@ -895,45 +895,47 @@ String String::SubstringUTF8(unsigned pos, unsigned length) const
 void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
 {
     if (unicodeChar < 0x80)
+    {
         *dest++ = unicodeChar;
+    }
     else if (unicodeChar < 0x800)
     {
-        dest[0] = (char)(0xc0u | ((unicodeChar >> 6u) & 0x1fu));
-        dest[1] = (char)(0x80u | (unicodeChar & 0x3fu));
+        dest[0] = static_cast<char>(0xc0u | ((unicodeChar >> 6u) & 0x1fu));
+        dest[1] = static_cast<char>(0x80u | (unicodeChar & 0x3fu));
         dest += 2;
     }
     else if (unicodeChar < 0x10000)
     {
-        dest[0] = (char)(0xe0u | ((unicodeChar >> 12u) & 0xfu));
-        dest[1] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
-        dest[2] = (char)(0x80u | (unicodeChar & 0x3fu));
+        dest[0] = static_cast<char>(0xe0u | ((unicodeChar >> 12u) & 0xfu));
+        dest[1] = static_cast<char>(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[2] = static_cast<char>(0x80u | (unicodeChar & 0x3fu));
         dest += 3;
     }
     else if (unicodeChar < 0x200000)
     {
-        dest[0] = (char)(0xf0u | ((unicodeChar >> 18u) & 0x7u));
-        dest[1] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
-        dest[2] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
-        dest[3] = (char)(0x80u | (unicodeChar & 0x3fu));
+        dest[0] = static_cast<char>(0xf0u | ((unicodeChar >> 18u) & 0x7u));
+        dest[1] = static_cast<char>(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[2] = static_cast<char>(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[3] = static_cast<char>(0x80u | (unicodeChar & 0x3fu));
         dest += 4;
     }
     else if (unicodeChar < 0x4000000)
     {
-        dest[0] = (char)(0xf8u | ((unicodeChar >> 24u) & 0x3u));
-        dest[1] = (char)(0x80u | ((unicodeChar >> 18u) & 0x3fu));
-        dest[2] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
-        dest[3] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
-        dest[4] = (char)(0x80u | (unicodeChar & 0x3fu));
+        dest[0] = static_cast<char>(0xf8u | ((unicodeChar >> 24u) & 0x3u));
+        dest[1] = static_cast<char>(0x80u | ((unicodeChar >> 18u) & 0x3fu));
+        dest[2] = static_cast<char>(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[3] = static_cast<char>(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[4] = static_cast<char>(0x80u | (unicodeChar & 0x3fu));
         dest += 5;
     }
     else
     {
-        dest[0] = (char)(0xfcu | ((unicodeChar >> 30u) & 0x1u));
-        dest[1] = (char)(0x80u | ((unicodeChar >> 24u) & 0x3fu));
-        dest[2] = (char)(0x80u | ((unicodeChar >> 18u) & 0x3fu));
-        dest[3] = (char)(0x80u | ((unicodeChar >> 12u) & 0x3fu));
-        dest[4] = (char)(0x80u | ((unicodeChar >> 6u) & 0x3fu));
-        dest[5] = (char)(0x80u | (unicodeChar & 0x3fu));
+        dest[0] = static_cast<char>(0xfcu | ((unicodeChar >> 30u) & 0x1u));
+        dest[1] = static_cast<char>(0x80u | ((unicodeChar >> 24u) & 0x3fu));
+        dest[2] = static_cast<char>(0x80u | ((unicodeChar >> 18u) & 0x3fu));
+        dest[3] = static_cast<char>(0x80u | ((unicodeChar >> 12u) & 0x3fu));
+        dest[4] = static_cast<char>(0x80u | ((unicodeChar >> 6u) & 0x3fu));
+        dest[5] = static_cast<char>(0x80u | (unicodeChar & 0x3fu));
         dest += 6;
     }
 }
@@ -945,53 +947,55 @@ unsigned String::DecodeUTF8(const char*& src)
     if (src == nullptr)
         return 0;
 
-    unsigned char char1 = *src++;
+    const unsigned char char1{ *src++ };
 
     // Check if we are in the middle of a UTF8 character
     if (char1 >= 0x80 && char1 < 0xc0)
     {
-        while ((unsigned char)*src >= 0x80 && (unsigned char)*src < 0xc0)
+        while (static_cast<unsigned char>(*src) >= 0x80 && static_cast<unsigned char>(*src) < 0xc0)
             ++src;
         return '?';
     }
 
     if (char1 < 0x80)
+    {
         return char1;
+    }
     else if (char1 < 0xe0)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char2 & 0x3fu) | ((char1 & 0x1fu) << 6u));
+        const unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        return static_cast<unsigned>((char2 & 0x3fu) | ((char1 & 0x1fu) << 6u));
     }
     else if (char1 < 0xf0)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char3 & 0x3fu) | ((char2 & 0x3fu) << 6u) | ((char1 & 0xfu) << 12u));
+        const unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        return static_cast<unsigned>((char3 & 0x3fu) | ((char2 & 0x3fu) << 6u) | ((char1 & 0xfu) << 12u));
     }
     else if (char1 < 0xf8)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char4 & 0x3fu) | ((char3 & 0x3fu) << 6u) | ((char2 & 0x3fu) << 12u) | ((char1 & 0x7u) << 18u));
+        const unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        return static_cast<unsigned>((char4 & 0x3fu) | ((char3 & 0x3fu) << 6u) | ((char2 & 0x3fu) << 12u) | ((char1 & 0x7u) << 18u));
     }
     else if (char1 < 0xfc)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char5 & 0x3fu) | ((char4 & 0x3fu) << 6u) | ((char3 & 0x3fu) << 12u) | ((char2 & 0x3fu) << 18u) |
+        const unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
+        return static_cast<unsigned>((char5 & 0x3fu) | ((char4 & 0x3fu) << 6u) | ((char3 & 0x3fu) << 12u) | ((char2 & 0x3fu) << 18u) |
                           ((char1 & 0x3u) << 24u));
     }
     else
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char6 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char6 & 0x3fu) | ((char5 & 0x3fu) << 6u) | ((char4 & 0x3fu) << 12u) | ((char3 & 0x3fu) << 18u) |
+        const unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
+        const unsigned char char6 = GET_NEXT_CONTINUATION_BYTE(src);
+        return static_cast<unsigned>((char6 & 0x3fu) | ((char5 & 0x3fu) << 6u) | ((char4 & 0x3fu) << 12u) | ((char3 & 0x3fu) << 18u) |
                           ((char2 & 0x3fu) << 24u) | ((char1 & 0x1u) << 30u));
     }
 }
@@ -1087,13 +1091,13 @@ String& String::AppendWithFormat(const char* formatString, ...)
 String& String::AppendWithFormatArgs(const char* formatString, va_list args)
 {
     int pos = 0, lastPos = 0;
-    auto length = (int)strlen(formatString);
+    const auto length{ static_cast<int>(strlen(formatString)) };
 
     while (true)
     {
         // Scan the format string and find %a argument where a is one of d, f, s ...
         while (pos < length && formatString[pos] != '%') pos++;
-        Append(formatString + lastPos, (unsigned)(pos - lastPos));
+        Append(formatString + lastPos, static_cast<unsigned>(pos - lastPos));
         if (pos >= length)
             return *this;
 
@@ -1140,7 +1144,7 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
         case 'c':
             {
                 int arg = va_arg(args, int);
-                Append((char)arg);
+                Append(static_cast<char>(arg));
                 break;
             }
 
@@ -1158,7 +1162,7 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
                 char buf[CONVERSION_BUFFER_LENGTH];
                 int arg = va_arg(args, int);
                 int arglen = ::sprintf(buf, "%x", arg);
-                Append(buf, (unsigned)arglen);
+                Append(buf, static_cast<unsigned>(arglen));
                 break;
             }
 
@@ -1168,7 +1172,7 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
                 char buf[CONVERSION_BUFFER_LENGTH];
                 int arg = va_arg(args, int);
                 int arglen = ::sprintf(buf, "%p", reinterpret_cast<void*>(arg));
-                Append(buf, (unsigned)arglen);
+                Append(buf, static_cast<unsigned>(arglen));
                 break;
             }
 
@@ -1191,13 +1195,15 @@ int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
         return lhs ? 1 : (rhs ? -1 : 0);
 
     if (caseSensitive)
+    {
         return strcmp(lhs, rhs);
+    }
     else
     {
         for (;;)
         {
-            auto l = (char)tolower(*lhs);
-            auto r = (char)tolower(*rhs);
+            auto l = static_cast<char>(tolower(*lhs));
+            auto r = static_cast<char>(tolower(*rhs));
             if (!l || !r)
                 return l ? 1 : (r ? -1 : 0);
             if (l < r)
@@ -1213,7 +1219,7 @@ int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
 
 void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)
 {
-    int delta = (int)srcLength - (int)length;
+    const int delta{ static_cast<int>(srcLength) - static_cast<int>(length) };
 
     if (pos + length < length_)
     {
@@ -1229,7 +1235,9 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
         }
     }
     else
+    {
         Resize(length_ + delta);
+    }
 
     CopyChars(buffer_ + pos, srcStart, srcLength);
 }

@@ -495,7 +495,7 @@ public:
 #endif
 
     /// Return length of a C string.
-    static unsigned CStringLength(const char* str) { return str ? (unsigned)strlen(str) : 0; }
+    static unsigned CStringLength(const char* str) { return str ? static_cast<unsigned>(strlen(str)) : 0; }
 
     /// Append to string using formatting.
     String& AppendWithFormat(const char* formatString, ...);
