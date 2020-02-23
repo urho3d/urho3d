@@ -99,35 +99,35 @@ bool TileMapInfo2D::PositionToTileIndex(int& x, int& y, const Vector2& position)
     {
     case O_ISOMETRIC:
     {
-        float ox = position.x_ / tileWidth_ - height_ * 0.5f;
-        float oy = position.y_ / tileHeight_;
+        const float ox{ position.x_ / tileWidth_ - height_ * 0.5f };
+        const float oy{ position.y_ / tileHeight_ };
 
-        x = (int)(width_ - oy + ox);
-        y = (int)(height_ - oy - ox);
+        x = static_cast<int>(width_ - oy + ox);
+        y = static_cast<int>(height_ - oy - ox);
     }
         break;
 
     case O_STAGGERED:
-        y = (int)(height_ - 1 - position.y_ * 2.0f / tileHeight_);
+        y = static_cast<int>(height_ - 1 - position.y_ * 2.0f / tileHeight_);
         if (y % 2 == 0)
-            x = (int)(position.x_ / tileWidth_);
+            x = static_cast<int>(position.x_ / tileWidth_);
         else
-            x = (int)(position.x_ / tileWidth_ - 0.5f);
+            x = static_cast<int>(position.x_ / tileWidth_ - 0.5f);
 
         break;
 
     case O_HEXAGONAL:
-        y = (int)(height_ - 1 - position.y_ / 0.75f / tileHeight_);
+        y = static_cast<int>(height_ - 1 - position.y_ / 0.75f / tileHeight_);
         if (y % 2 == 0)
-            x = (int)(position.x_ / tileWidth_);
+            x = static_cast<int>(position.x_ / tileWidth_);
         else
-            x = (int)(position.x_ / tileWidth_ - 0.75f);
+            x = static_cast<int>(position.x_ / tileWidth_ - 0.75f);
         break;
 
     case O_ORTHOGONAL:
     default:
-        x = (int)(position.x_ / tileWidth_);
-        y = height_ - 1 - int(position.y_ / tileHeight_);
+        x = static_cast<int>(position.x_ / tileWidth_);
+        y = height_ - 1 - static_cast<int>(position.y_ / tileHeight_);
         break;
 
     }

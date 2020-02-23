@@ -55,7 +55,7 @@ bool SpriterInstance::SetEntity(int index)
     if (!spriterData_)
         return false;
 
-    if (index < (int)spriterData_->entities_.Size())
+    if (index < static_cast<int>(spriterData_->entities_.Size()))
     {
         OnSetEntity(spriterData_->entities_[index]);
         return true;
@@ -86,7 +86,7 @@ bool SpriterInstance::SetAnimation(int index, LoopMode loopMode)
     if (!entity_)
         return false;
 
-    if (index < (int)entity_->animations_.Size())
+    if (index < static_cast<int>(entity_->animations_.Size()))
     {
         OnSetAnimation(entity_->animations_[index], loopMode);
         return true;

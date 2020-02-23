@@ -274,7 +274,7 @@ bool ParticleEffect2D::Save(Serializer& dest) const
     if (duration == M_INFINITY)
         duration = -1.0f;
     WriteFloat(rootElem, "duration", duration);
-    WriteInt(rootElem, "emitterType", (int)emitterType_);
+    WriteInt(rootElem, "emitterType", static_cast<int>(emitterType_));
 
     WriteFloat(rootElem, "maxRadius", maxRadius_);
     WriteFloat(rootElem, "maxRadiusVariance", maxRadiusVariance_);

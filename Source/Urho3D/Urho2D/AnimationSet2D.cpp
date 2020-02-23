@@ -157,7 +157,7 @@ unsigned AnimationSet2D::GetNumAnimations() const
 {
 #ifdef URHO3D_SPINE
     if (skeletonData_)
-        return (unsigned)skeletonData_->animationsCount;
+        return static_cast<unsigned>(skeletonData_->animationsCount);
 #endif
     if (spriterData_ && !spriterData_->entities_.Empty())
         return spriterData_->entities_[0]->animations_.Size();
@@ -454,7 +454,7 @@ bool AnimationSet2D::EndLoadSpriter()
             texture->SetNumLevels(1);
             texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
 
-            auto textureDataSize = (unsigned)allocator.GetWidth() * allocator.GetHeight() * 4;
+            const unsigned textureDataSize{ allocator.GetWidth() * allocator.GetHeight() * 4u };
             SharedArrayPtr<unsigned char> textureData(new unsigned char[textureDataSize]);
             memset(textureData.Get(), 0, textureDataSize);
 

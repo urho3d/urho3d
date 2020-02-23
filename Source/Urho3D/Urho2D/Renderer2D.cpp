@@ -284,7 +284,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
 {
     SharedPtr<Material> newMaterial = material_->Clone();
 
-    HashMap<int, SharedPtr<Technique> >::Iterator techIt = cachedTechniques_.Find((int)blendMode);
+    HashMap<int, SharedPtr<Technique> >::Iterator techIt = cachedTechniques_.Find(static_cast<int>(blendMode));
     if (techIt == cachedTechniques_.End())
     {
         SharedPtr<Technique> tech(new Technique(context_));
@@ -293,7 +293,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
         pass->SetPixelShader("Urho2D");
         pass->SetDepthWrite(false);
         pass->SetBlendMode(blendMode);
-        techIt = cachedTechniques_.Insert(MakePair((int)blendMode, tech));
+        techIt = cachedTechniques_.Insert(MakePair(static_cast<int>(blendMode), tech));
     }
 
     newMaterial->SetTechnique(0, techIt->second_.Get());

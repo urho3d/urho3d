@@ -99,7 +99,7 @@ void ParticleEmitter2D::SetEffect(ParticleEffect2D* effect)
 
     SetSprite(effect_->GetSprite());
     SetBlendMode(effect_->GetBlendMode());
-    SetMaxParticles((unsigned)effect_->GetMaxParticles());
+    SetMaxParticles(static_cast<unsigned>(effect_->GetMaxParticles)());
 
     emitParticleTime_ = 0.0f;
     emissionTime_ = effect_->GetDuration();
@@ -362,7 +362,7 @@ void ParticleEmitter2D::Update(float timeStep)
 
 bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
 {
-    if (numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
+    if (numParticles_ >= static_cast<unsigned>(effect_->GetMaxParticles()) || numParticles_ >= particles_.Size())
         return false;
 
     float lifespan = effect_->GetParticleLifeSpan() + effect_->GetParticleLifespanVariance() * Random(-1.0f, 1.0f);

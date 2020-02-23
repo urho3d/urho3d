@@ -368,7 +368,7 @@ void WorkQueue::PurgeCompleted(unsigned priority)
 void WorkQueue::PurgePool()
 {
     const unsigned currentSize{ poolItems_.Size() };
-    const int difference{ lastSize_ - currentSize };
+    const int difference{ static_cast<int>(lastSize_ - currentSize) };
 
     // Difference tolerance, should be fairly significant to reduce the pool size.
     for (unsigned i{0}; poolItems_.Size() > 0 && difference > tolerance_ && i < static_cast<unsigned>(difference); i++)
