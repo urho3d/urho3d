@@ -947,7 +947,7 @@ unsigned String::DecodeUTF8(const char*& src)
     if (src == nullptr)
         return 0;
 
-    const unsigned char char1{ *src++ };
+    const unsigned char char1{ static_cast<unsigned char>(*src++) };
 
     // Check if we are in the middle of a UTF8 character
     if (char1 >= 0x80 && char1 < 0xc0)
