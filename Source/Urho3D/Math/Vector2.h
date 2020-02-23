@@ -55,8 +55,8 @@ public:
 
     /// Construct from an float array.
     explicit IntVector2(const float* data) :
-        x_((int)data[0]),
-        y_((int)data[1])
+        x_{ static_cast<int>(data[0]) },
+        y_{ static_cast<int>(data[1]) }
     {
     }
     /// Copy-construct from another vector.

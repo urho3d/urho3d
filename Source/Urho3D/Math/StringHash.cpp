@@ -75,7 +75,7 @@ unsigned StringHash::Calculate(const char* str, unsigned hash)
 
     while (*str)
     {
-        hash = SDBMHash(hash, (unsigned char)*str++);
+        hash = SDBMHash(hash, static_cast<unsigned char>(*str++));
     }
 
     return hash;
