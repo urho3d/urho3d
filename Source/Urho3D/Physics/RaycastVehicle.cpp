@@ -173,6 +173,7 @@ static const StringVector wheelElementNames =
     "   Contact position",
     "   Contact normal",
     "   Suspension stiffness",
+	"   Max suspension force",
     "   Damping relaxation",
     "   Damping compression",
     "   Friction slip",
@@ -228,6 +229,7 @@ void RaycastVehicle::ApplyAttributes()
         Vector3 contactPosition = value[index++].GetVector3();
         Vector3 contactNormal = value[index++].GetVector3();
         float suspensionStiffness = value[index++].GetFloat();
+		float maxSuspensionForce = value[index++].GetFloat();
         float dampingRelaxation = value[index++].GetFloat();
         float dampingCompression = value[index++].GetFloat();
         float frictionSlip = value[index++].GetFloat();
@@ -262,6 +264,7 @@ void RaycastVehicle::ApplyAttributes()
         wheel.m_raycastInfo.m_contactNormalWS = btVector3(contactNormal.x_, contactNormal.y_, contactNormal.z_);
         wheel.m_raycastInfo.m_contactPointWS = btVector3(contactPosition.x_, contactPosition.y_, contactPosition.z_);
         wheel.m_suspensionStiffness = suspensionStiffness;
+		wheel.m_maxSuspensionForce = maxSuspensionForce;
         wheel.m_wheelsDampingRelaxation = dampingRelaxation;
         wheel.m_wheelsDampingCompression = dampingCompression;
         wheel.m_frictionSlip = frictionSlip;
@@ -739,6 +742,7 @@ VariantVector RaycastVehicle::GetWheelDataAttr() const
         ret.Push(GetContactPosition(i));
         ret.Push(GetContactNormal(i));       // 14
         ret.Push(GetWheelSuspensionStiffness(i));
+		ret.Push(GetWheelMaxSuspensionForce(i));
         ret.Push(GetWheelDampingRelaxation(i));
         ret.Push(GetWheelDampingCompression(i));
         ret.Push(GetWheelFrictionSlip(i));
