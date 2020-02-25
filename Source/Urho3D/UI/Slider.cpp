@@ -44,11 +44,11 @@ extern const char* UI_CATEGORY;
 
 Slider::Slider(Context* context) :
     BorderImage(context),
-    orientation_{O_HORIZONTAL},
-    range_{1.0f},
-    value_{0.0f},
-    dragSlider_{false},
-    repeatRate_{0.0f}
+    orientation_{ O_HORIZONTAL },
+    range_{ 1.0f },
+    value_{ 0.0f },
+    dragSlider_{ false },
+    repeatRate_{ 0.0f }
 {
     SetEnabled(true);
     knob_ = CreateChild<BorderImage>("S_Knob");
@@ -98,6 +98,7 @@ void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPo
 {
     selected_ = true;
     hovering_ = knob_->IsInside(screenPosition, true);
+
     if (!hovering_ && button == MOUSEB_LEFT)
         Page(position, true);
 }
@@ -106,6 +107,7 @@ void Slider::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
     Cursor* cursor, UIElement* beginElement)
 {
     hovering_ = knob_->IsInside(screenPosition, true);
+
     if (!hovering_ && button == MOUSEB_LEFT)
         Page(position, false);
 }
@@ -129,17 +131,17 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         return;
 
     float newValue;
-    const IntVector2 delta{position - dragBeginCursor_};
+    const IntVector2 delta{ position - dragBeginCursor_ };
 
     if (orientation_ == O_HORIZONTAL)
     {
-        const int newX{Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth())};
+        const int newX{ Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth()) };
         knob_->SetPosition(newX, 0);
         newValue = newX * range_ / (GetWidth() - knob_->GetWidth());
     }
     else
     {
-        const int newY{Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight())};
+        const int newY{ Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight()) };
         knob_->SetPosition(0, newY);
         newValue = newY * range_ / (GetHeight() - knob_->GetHeight());
     }
@@ -172,6 +174,7 @@ void Slider::SetOrientation(Orientation orientation)
 void Slider::SetRange(float range)
 {
     range = Max(range, 0.0f);
+
     if (range != range_)
     {
         range_ = range;
@@ -182,6 +185,7 @@ void Slider::SetRange(float range)
 void Slider::SetValue(float value)
 {
     value = Clamp(value, 0.0f, range_);
+
     if (value != value_)
     {
         value_ = value;
@@ -189,7 +193,7 @@ void Slider::SetValue(float value)
 
         using namespace SliderChanged;
 
-        VariantMap& eventData{GetEventDataMap()};
+        VariantMap& eventData{ GetEventDataMap() };
         eventData[P_ELEMENT] = this;
         eventData[P_VALUE] = value_;
         SendEvent(E_SLIDERCHANGED, eventData);
@@ -233,11 +237,11 @@ void Slider::UpdateSlider()
     {
         if (orientation_ == O_HORIZONTAL)
         {
-            const int sliderLength{knob_->IsFixedWidth() ? knob_->GetWidth()
-                                                         : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
-                                                               border.left_ + border.right_)};
+            const int sliderLength{ knob_->IsFixedWidth() ? knob_->GetWidth()
+                                                          : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
+                                                                border.left_ + border.right_) };
 
-            const float sliderPos{(GetWidth() - sliderLength) * value_ / range_};
+            const float sliderPos{ (GetWidth() - sliderLength) * value_ / range_ };
 
             if (!knob_->IsFixedSize())
             {
@@ -251,11 +255,11 @@ void Slider::UpdateSlider()
         }
         else
         {
-            const int sliderLength{(knob_->IsFixedHeight() ? knob_->GetHeight()
+            const int sliderLength{ (knob_->IsFixedHeight() ? knob_->GetHeight()
                                                             : Max(static_cast<float>(GetHeight() / (range_ + 1.0f)),
-                                                                  border.top_ + border.bottom_))};
+                                                                  border.top_ + border.bottom_)) };
 
-            const float sliderPos{(GetHeight() - sliderLength) * value_ / range_};
+            const float sliderPos{ (GetHeight() - sliderLength) * value_ / range_ };
 
             if (!knob_->IsFixedSize())
             {
@@ -279,15 +283,16 @@ void Slider::UpdateSlider()
 
 void Slider::Page(const IntVector2& position, bool pressed)
 {
+    using namespace SliderPaged;
+
     if (!editable_)
         return;
 
-    const IntVector2 offsetXY{position - knob_->GetPosition() - knob_->GetSize() / 2};
-    const int offset{orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_};
-    const int length{orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight()};
+    const IntVector2 offsetXY{ position - knob_->GetPosition() - knob_->GetSize() / 2 };
+    const int offset{ orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_ };
+    const int length{ orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight() };
 
-    using namespace SliderPaged;
-    VariantMap& eventData{GetEventDataMap()};
+    VariantMap& eventData{ GetEventDataMap() };
     eventData[P_ELEMENT] = this;
     eventData[P_OFFSET] = offset;
 
@@ -303,7 +308,6 @@ void Slider::Page(const IntVector2& position, bool pressed)
     }
 
     eventData[P_PRESSED] = pressed;
-
     SendEvent(E_SLIDERPAGED, eventData);
 }
 

@@ -37,13 +37,13 @@ extern const char* UI_CATEGORY;
 
 BorderImage::BorderImage(Context* context) :
     UIElement(context),
-    imageRect_{IntRect::ZERO},
-    border_{IntRect::ZERO},
-    imageBorder_{IntRect::ZERO},
-    hoverOffset_{IntVector2::ZERO},
-    disabledOffset_{IntVector2::ZERO},
-    blendMode_{BLEND_REPLACE},
-    tiled_{false}
+    imageRect_{ IntRect::ZERO },
+    border_{ IntRect::ZERO },
+    imageBorder_{ IntRect::ZERO },
+    hoverOffset_{ IntVector2::ZERO },
+    disabledOffset_{ IntVector2::ZERO },
+    blendMode_{ BLEND_REPLACE },
+    tiled_{ false }
 {
 }
 
@@ -78,6 +78,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 void BorderImage::SetTexture(Texture* texture)
 {
     texture_ = texture;
+
     if (imageRect_ == IntRect::ZERO)
         SetFullImageRect();
 }
@@ -143,69 +144,82 @@ void BorderImage::SetTiled(bool enable)
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor,
     const IntVector2& offset)
 {
-    bool allOpaque{true};
+    bool allOpaque{ true };
 
     if (GetDerivedOpacity() < 1.0f || colors_[C_TOPLEFT].a_ < 1.0f || colors_[C_TOPRIGHT].a_ < 1.0f ||
         colors_[C_BOTTOMLEFT].a_ < 1.0f || colors_[C_BOTTOMRIGHT].a_ < 1.0f)
     {
         allOpaque = false;
     }
-    UIBatch batch{this, blendMode_ == BLEND_REPLACE && !allOpaque ?
-                    BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData};
+    UIBatch batch{ this, blendMode_ == BLEND_REPLACE && !allOpaque ?
+                   BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData };
 
     if (material_)
         batch.customMaterial_ = material_;
 
     // Calculate size of the inner rect, and texture dimensions of the inner rect
-    const IntRect& uvBorder{imageBorder_ == IntRect::ZERO ? border_ : imageBorder_};
-    const IntVector2 uvTopLeft{imageRect_.Min() + offset};
-    const int x{GetIndentWidth()};
-    const IntVector2 size{GetWidth() - x, GetHeight()};
-    const IntVector2 innerSize{Max(size.x_ - border_.left_ - border_.right_, 0),
-                               Max(size.y_ - border_.top_ - border_.bottom_, 0)};
-    const IntVector2 innerUvSize{Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0),
-                                 Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0)};
+    const IntRect& uvBorder{ imageBorder_ == IntRect::ZERO ? border_ : imageBorder_ };
+    const IntVector2 uvTopLeft{ imageRect_.Min() + offset };
+    const int x{ GetIndentWidth() };
+    const IntVector2 size{ GetWidth() - x, GetHeight() };
+    const IntVector2 innerSize{ Max(size.x_ - border_.left_ - border_.right_, 0),
+                                Max(size.y_ - border_.top_ - border_.bottom_, 0) };
+    const IntVector2 innerUvSize{ Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0),
+                                  Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0) };
 
     // Top
     if (border_.top_)
     {
         if (border_.left_)
-            batch.AddQuad(x, 0, border_.left_, border_.top_, uvTopLeft.x_, uvTopLeft.y_, uvBorder.left_, uvBorder.top_);
+            batch.AddQuad(x, 0, border_.left_, border_.top_,
+                          uvTopLeft.x_, uvTopLeft.y_,
+                          uvBorder.left_, uvBorder.top_);
+
         if (innerSize.x_)
-            batch.AddQuad(x + border_.left_, 0, innerSize.x_, border_.top_, uvTopLeft.x_ + uvBorder.left_, uvTopLeft.y_,
-                innerUvSize.x_, uvBorder.top_, tiled_);
+            batch.AddQuad(x + border_.left_, 0, innerSize.x_, border_.top_,
+                          uvTopLeft.x_ + uvBorder.left_, uvTopLeft.y_,
+                          innerUvSize.x_, uvBorder.top_, tiled_);
+
         if (border_.right_)
             batch.AddQuad(x + border_.left_ + innerSize.x_, 0, border_.right_, border_.top_,
-                uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_, uvBorder.right_, uvBorder.top_);
+                          uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_,
+                          uvBorder.right_, uvBorder.top_);
     }
     // Middle
     if (innerSize.y_)
     {
         if (border_.left_)
-            batch.AddQuad(x, border_.top_, border_.left_, innerSize.y_, uvTopLeft.x_, uvTopLeft.y_ + uvBorder.top_,
-                uvBorder.left_, innerUvSize.y_, tiled_);
+            batch.AddQuad(x, border_.top_, border_.left_, innerSize.y_,
+                          uvTopLeft.x_, uvTopLeft.y_ + uvBorder.top_,
+                          uvBorder.left_, innerUvSize.y_, tiled_);
+
         if (innerSize.x_)
-            batch.AddQuad(x + border_.left_, border_.top_, innerSize.x_, innerSize.y_, uvTopLeft.x_ + uvBorder.left_,
-                uvTopLeft.y_ + uvBorder.top_, innerUvSize.x_, innerUvSize.y_, tiled_);
+            batch.AddQuad(x + border_.left_, border_.top_, innerSize.x_, innerSize.y_,
+                          uvTopLeft.x_ + uvBorder.left_, uvTopLeft.y_ + uvBorder.top_,
+                          innerUvSize.x_, innerUvSize.y_, tiled_);
+
         if (border_.right_)
             batch.AddQuad(x + border_.left_ + innerSize.x_, border_.top_, border_.right_, innerSize.y_,
-                uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_ + uvBorder.top_, uvBorder.right_, innerUvSize.y_,
-                tiled_);
+                          uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_ + uvBorder.top_,
+                          uvBorder.right_, innerUvSize.y_, tiled_);
     }
     // Bottom
     if (border_.bottom_)
     {
         if (border_.left_)
-            batch.AddQuad(x, border_.top_ + innerSize.y_, border_.left_, border_.bottom_, uvTopLeft.x_,
-                uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_, uvBorder.left_, uvBorder.bottom_);
+            batch.AddQuad(x, border_.top_ + innerSize.y_, border_.left_, border_.bottom_,
+                          uvTopLeft.x_, uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_,
+                          uvBorder.left_, uvBorder.bottom_);
+
         if (innerSize.x_)
             batch.AddQuad(x + border_.left_, border_.top_ + innerSize.y_, innerSize.x_, border_.bottom_,
-                uvTopLeft.x_ + uvBorder.left_, uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_, innerUvSize.x_, uvBorder.bottom_,
-                tiled_);
+                          uvTopLeft.x_ + uvBorder.left_, uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_,
+                          innerUvSize.x_, uvBorder.bottom_, tiled_);
+
         if (border_.right_)
             batch.AddQuad(x + border_.left_ + innerSize.x_, border_.top_ + innerSize.y_, border_.right_, border_.bottom_,
-                uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_, uvBorder.right_,
-                uvBorder.bottom_);
+                          uvTopLeft.x_ + uvBorder.left_ + innerUvSize.x_, uvTopLeft.y_ + uvBorder.top_ + innerUvSize.y_,
+                          uvBorder.right_, uvBorder.bottom_);
     }
 
     UIBatch::AddOrMerge(batch, batches);
@@ -216,7 +230,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 
 void BorderImage::SetTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache{GetSubsystem<ResourceCache>()};
+    ResourceCache* cache{ GetSubsystem<ResourceCache>() };
     SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 
@@ -227,7 +241,7 @@ ResourceRef BorderImage::GetTextureAttr() const
 
 void BorderImage::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache{GetSubsystem<ResourceCache>()};
+    ResourceCache* cache{ GetSubsystem<ResourceCache>() };
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
