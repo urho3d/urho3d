@@ -90,7 +90,7 @@ void Slider::OnHover(const IntVector2& position, const IntVector2& screenPositio
 
     // If not hovering on the knob, send it as page event
     if (!hovering_)
-        Page(position, (bool)(buttons & MOUSEB_LEFT));
+        Page(position, (buttons & MOUSEB_LEFT) != 0);
 }
 
 void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
@@ -129,19 +129,19 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         return;
 
     float newValue;
-    IntVector2 delta = position - dragBeginCursor_;
+    const IntVector2 delta{ position - dragBeginCursor_ };
 
     if (orientation_ == O_HORIZONTAL)
     {
-        int newX = Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth());
+        const int newX{ Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth()) };
         knob_->SetPosition(newX, 0);
-        newValue = (float)newX * range_ / (float)(GetWidth() - knob_->GetWidth());
+        newValue = newX * range_ / (GetWidth() - knob_->GetWidth());
     }
     else
     {
-        int newY = Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight());
+        const int newY{ Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight()) };
         knob_->SetPosition(0, newY);
-        newValue = (float)newY * range_ / (float)(GetHeight() - knob_->GetHeight());
+        newValue = newY * range_ / (GetHeight() - knob_->GetHeight());
     }
 
     SetValue(newValue);
@@ -189,7 +189,7 @@ void Slider::SetValue(float value)
 
         using namespace SliderChanged;
 
-        VariantMap& eventData = GetEventDataMap();
+        VariantMap& eventData{ GetEventDataMap() };
         eventData[P_ELEMENT] = this;
         eventData[P_VALUE] = value_;
         SendEvent(E_SLIDERCHANGED, eventData);
@@ -211,7 +211,8 @@ bool Slider::FilterImplicitAttributes(XMLElement& dest) const
     if (!BorderImage::FilterImplicitAttributes(dest))
         return false;
 
-    XMLElement childElem = dest.GetChild("element");
+    XMLElement childElem{ dest.GetChild("element") };
+
     if (!childElem)
         return false;
     if (!RemoveChildXML(childElem, "Name", "S_Knob"))
@@ -226,18 +227,17 @@ bool Slider::FilterImplicitAttributes(XMLElement& dest) const
 
 void Slider::UpdateSlider()
 {
-    const IntRect& border = knob_->GetBorder();
+    const IntRect& border{ knob_->GetBorder() };
 
     if (range_ > 0.0f)
     {
         if (orientation_ == O_HORIZONTAL)
         {
-            auto sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
+            const int sliderLength{ (knob_->IsFixedWidth() ? knob_->GetWidth()
+                                                           : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
+                                                                 border.left_ + border.right_)) };
 
-            if (knob_->IsFixedWidth())
-                sliderLength = knob_->GetWidth();
-
-            float sliderPos = (float)(GetWidth() - sliderLength) * value_ / range_;
+            const float sliderPos{ (GetWidth() - sliderLength) * value_ / range_ };
 
             if (!knob_->IsFixedSize())
             {
@@ -245,16 +245,17 @@ void Slider::UpdateSlider()
                 knob_->SetPosition(Clamp(RoundToInt(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
             }
             else
-                knob_->SetPosition(Clamp((int)(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
+            {
+                knob_->SetPosition(Clamp(static_cast<int>(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
+            }
         }
         else
         {
-            auto sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
+            const int sliderLength{ (knob_->IsFixedHeight() ? knob_->GetHeight()
+                                                            : Max(static_cast<float>(GetHeight() / (range_ + 1.0f)),
+                                                                  border.top_ + border.bottom_)) };
 
-            if (knob_->IsFixedHeight())
-                sliderLength = knob_->GetHeight();
-
-            float sliderPos = (float)(GetHeight() - sliderLength) * value_ / range_;
+            const float sliderPos{ (GetHeight() - sliderLength) * value_ / range_ };
 
             if (!knob_->IsFixedSize())
             {
@@ -262,7 +263,9 @@ void Slider::UpdateSlider()
                 knob_->SetPosition(0, Clamp(RoundToInt(sliderPos), 0, GetHeight() - knob_->GetHeight()));
             }
             else
+            {
                 knob_->SetPosition(0, Clamp(RoundToInt(sliderPos), 0, GetHeight() - knob_->GetHeight()));
+            }
         }
     }
     else
@@ -279,22 +282,25 @@ void Slider::Page(const IntVector2& position, bool pressed)
     if (!editable_)
         return;
 
-    IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
-    int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
-    auto length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
+    const IntVector2 offsetXY{ position - knob_->GetPosition() - knob_->GetSize() / 2 };
+    const int offset{ (orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_) };
+    const int length{ (orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight()) };
 
     using namespace SliderPaged;
-
-    VariantMap& eventData = GetEventDataMap();
+    VariantMap& eventData{ GetEventDataMap() };
     eventData[P_ELEMENT] = this;
     eventData[P_OFFSET] = offset;
 
     // Start transmitting repeated pages after the initial press
-    if (selected_ && pressed && repeatRate_ > 0.0f &&
-        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0.0f, Abs(offset) / length))
+    if (selected_ && pressed && repeatRate_ > 0.0f && repeatTimer_.GetMSec(false) >=
+        Lerp(1000.0f / repeatRate_, 0.0f, static_cast<float>(Abs(offset)) / length))
+    {
         repeatTimer_.Reset();
+    }
     else
+    {
         pressed = false;
+    }
 
     eventData[P_PRESSED] = pressed;
 
