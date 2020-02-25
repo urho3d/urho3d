@@ -11,6 +11,7 @@ class RaycastVehicle : public LogicComponent
     void UpdateWheelTransform(int wheel, bool interpolated);
     void SetSteeringValue(int wheel, float steeringValue);
     void SetWheelSuspensionStiffness(int wheel, float stiffness);
+    void SetWheelMaxSuspensionForce(int wheel, float force);
     void SetWheelDampingRelaxation(int wheel, float damping);
     void SetWheelDampingCompression(int wheel, float compression);
     void SetWheelFrictionSlip(int wheel, float slip);
@@ -38,6 +39,7 @@ class RaycastVehicle : public LogicComponent
     Node *GetWheelNode(int wheel);
     float GetSteeringValue(int wheel) const;
     float GetWheelSuspensionStiffness(int wheel) const;
+    float GetWheelMaxSuspensionForce(int wheel) const;
     float GetWheelDampingRelaxation(int wheel) const;
     float GetWheelDampingCompression(int wheel) const;
     float GetWheelFrictionSlip(int wheel) const;
