@@ -89,7 +89,7 @@ Cursor::Cursor(Context* context) :
 
 Cursor::~Cursor()
 {
-    for (auto* i = shapeInfos_.Begin(); i != shapeInfos_.End(); ++i)
+    for (HashMap<String, CursorShapeInfo>::Iterator i = shapeInfos_.Begin(); i != shapeInfos_.End(); ++i)
     {
         if (i->second_.osCursor_)
         {
@@ -113,7 +113,7 @@ void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
 {
     const unsigned initialSize{vertexData.Size()};
     const IntVector2& offset{shapeInfos_[shape_].hotSpot_};
-    Vector2 floatOffset{-offset};
+    const Vector2 floatOffset{-offset};
 
     BorderImage::GetBatches(batches, vertexData, currentScissor);
 
@@ -219,9 +219,9 @@ void Cursor::SetShapesAttr(const VariantVector& value)
     if (!value.Size())
         return;
 
-    for (auto* i = value.Begin(); i != value.End(); ++i)
+    for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        const VariantVector& shapeVector{i->GetVariantVector()};
+        const VariantVector& shapeVector = i->GetVariantVector();
 
         if (shapeVector.Size() >= 4)
         {
@@ -241,7 +241,7 @@ VariantVector Cursor::GetShapesAttr() const
 {
     VariantVector ret{};
 
-    for (auto* i = shapeInfos_.Begin(); i != shapeInfos_.End(); ++i)
+    for (HashMap<String, CursorShapeInfo>::ConstIterator i = shapeInfos_.Begin(); i != shapeInfos_.End(); ++i)
     {
         if (i->second_.imageRect_ != IntRect::ZERO)
         {
