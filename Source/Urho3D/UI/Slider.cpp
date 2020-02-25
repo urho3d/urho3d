@@ -238,8 +238,8 @@ void Slider::UpdateSlider()
         if (orientation_ == O_HORIZONTAL)
         {
             const int sliderLength{knob_->IsFixedWidth() ? knob_->GetWidth()
-                                                          : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
-                                                                border.left_ + border.right_)};
+                                                         : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
+                                                               border.left_ + border.right_)};
 
             const float sliderPos{(GetWidth() - sliderLength) * value_ / range_};
 
@@ -255,9 +255,9 @@ void Slider::UpdateSlider()
         }
         else
         {
-            const int sliderLength{(knob_->IsFixedHeight() ? knob_->GetHeight()
-                                                            : Max(static_cast<float>(GetHeight() / (range_ + 1.0f)),
-                                                                  border.top_ + border.bottom_))};
+            const int sliderLength{knob_->IsFixedHeight() ? knob_->GetHeight()
+                                                          : Max(static_cast<float>(GetHeight() / (range_ + 1.0f)),
+                                                                border.top_ + border.bottom_)};
 
             const float sliderPos{(GetHeight() - sliderLength) * value_ / range_};
 

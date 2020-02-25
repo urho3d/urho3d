@@ -152,7 +152,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
         allOpaque = false;
     }
     UIBatch batch{this, blendMode_ == BLEND_REPLACE && !allOpaque ?
-                   BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData};
+                  BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData};
 
     if (material_)
         batch.customMaterial_ = material_;
@@ -163,9 +163,9 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     const int x{GetIndentWidth()};
     const IntVector2 size{GetWidth() - x, GetHeight()};
     const IntVector2 innerSize{Max(size.x_ - border_.left_ - border_.right_, 0),
-                                Max(size.y_ - border_.top_ - border_.bottom_, 0)};
+                               Max(size.y_ - border_.top_ - border_.bottom_, 0)};
     const IntVector2 innerUvSize{Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0),
-                                  Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0)};
+                                 Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0)};
 
     // Top
     if (border_.top_)
