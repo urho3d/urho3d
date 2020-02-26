@@ -29,7 +29,7 @@
 namespace Urho3D
 {
 
-static const float DEFAULT_FONT_SIZE = 12;
+static const float DEFAULT_FONT_SIZE{ 12 };
 
 class Font;
 class FontFace;
@@ -57,9 +57,9 @@ struct GlyphLocation
 {
     /// Construct.
     GlyphLocation(float x, float y, const FontGlyph* glyph) :
-        x_(x),
-        y_(y),
-        glyph_(glyph)
+        x_{ x },
+        y_{ y },
+        glyph_{ glyph }
     {
     }
 
@@ -211,10 +211,8 @@ protected:
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Construct batch.
-    void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
-            float depthBias = 0.0f);
-
+    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation,
+                        float dx = 0, float dy = 0, Color* color = nullptr, float depthBias = 0.0f);
     /// Font.
     SharedPtr<Font> font_;
     /// Current face.
