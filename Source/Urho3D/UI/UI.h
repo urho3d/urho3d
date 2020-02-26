@@ -147,7 +147,7 @@ public:
     /// Return UI element at global screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Get a child element at element's screen position relative to specified root element.
-    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly=true);
+    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly = true);
 
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
@@ -158,7 +158,7 @@ public:
     const Vector<UIElement*> GetDragElements();
 
     /// Return the number of currently dragged elements.
-    unsigned GetNumDragElements() const { return (unsigned)dragConfirmedCount_; }
+    unsigned GetNumDragElements() const { return static_cast<unsigned>(dragConfirmedCount_); }
 
     /// Return the drag element at index.
     UIElement* GetDragElement(unsigned index);
