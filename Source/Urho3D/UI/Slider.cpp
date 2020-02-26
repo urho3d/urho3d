@@ -44,11 +44,11 @@ extern const char* UI_CATEGORY;
 
 Slider::Slider(Context* context) :
     BorderImage(context),
-    orientation_{O_HORIZONTAL},
-    range_{1.0f},
-    value_{0.0f},
-    dragSlider_{false},
-    repeatRate_{0.0f}
+    orientation_{ O_HORIZONTAL },
+    range_{ 1.0f },
+    value_{ 0.0f },
+    dragSlider_{ false },
+    repeatRate_{ 0.0f }
 {
     SetEnabled(true);
     knob_ = CreateChild<BorderImage>("S_Knob");
@@ -131,17 +131,17 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         return;
 
     float newValue;
-    const IntVector2 delta{position - dragBeginCursor_};
+    const IntVector2 delta{ position - dragBeginCursor_ };
 
     if (orientation_ == O_HORIZONTAL)
     {
-        const int newX{Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth())};
+        const int newX{ Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth()) };
         knob_->SetPosition(newX, 0);
         newValue = newX * range_ / (GetWidth() - knob_->GetWidth());
     }
     else
     {
-        const int newY{Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight())};
+        const int newY{ Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight()) };
         knob_->SetPosition(0, newY);
         newValue = newY * range_ / (GetHeight() - knob_->GetHeight());
     }
@@ -193,7 +193,7 @@ void Slider::SetValue(float value)
 
         using namespace SliderChanged;
 
-        VariantMap& eventData{GetEventDataMap()};
+        VariantMap& eventData{ GetEventDataMap() };
         eventData[P_ELEMENT] = this;
         eventData[P_VALUE] = value_;
         SendEvent(E_SLIDERCHANGED, eventData);
@@ -215,7 +215,7 @@ bool Slider::FilterImplicitAttributes(XMLElement& dest) const
     if (!BorderImage::FilterImplicitAttributes(dest))
         return false;
 
-    XMLElement childElem{dest.GetChild("element")};
+    XMLElement childElem{ dest.GetChild("element") };
 
     if (!childElem)
         return false;
@@ -231,17 +231,17 @@ bool Slider::FilterImplicitAttributes(XMLElement& dest) const
 
 void Slider::UpdateSlider()
 {
-    const IntRect& border{knob_->GetBorder()};
+    const IntRect& border{ knob_->GetBorder() };
 
     if (range_ > 0.0f)
     {
         if (orientation_ == O_HORIZONTAL)
         {
-            const int sliderLength{knob_->IsFixedWidth() ? knob_->GetWidth()
-                                                         : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
-                                                               border.left_ + border.right_)};
+            const int sliderLength{ knob_->IsFixedWidth() ? knob_->GetWidth()
+                                                          : Max(static_cast<int>(GetWidth() / (range_ + 1.0f)),
+                                                                border.left_ + border.right_) };
 
-            const float sliderPos{(GetWidth() - sliderLength) * value_ / range_};
+            const float sliderPos{ (GetWidth() - sliderLength) * value_ / range_ };
 
             if (!knob_->IsFixedSize())
             {
@@ -255,11 +255,11 @@ void Slider::UpdateSlider()
         }
         else
         {
-            const int sliderLength{knob_->IsFixedHeight() ? knob_->GetHeight()
+            const int sliderLength{ knob_->IsFixedHeight() ? knob_->GetHeight()
                                                           : Max(static_cast<int>(GetHeight() / (range_ + 1.0f)),
-                                                                border.top_ + border.bottom_)};
+                                                                border.top_ + border.bottom_) };
 
-            const float sliderPos{(GetHeight() - sliderLength) * value_ / range_};
+            const float sliderPos{ (GetHeight() - sliderLength) * value_ / range_ };
 
             if (!knob_->IsFixedSize())
             {
@@ -288,11 +288,11 @@ void Slider::Page(const IntVector2& position, bool pressed)
     if (!editable_)
         return;
 
-    const IntVector2 offsetXY{position - knob_->GetPosition() - knob_->GetSize() / 2};
-    const int offset{orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_};
-    const int length{orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight()};
+    const IntVector2 offsetXY{ position - knob_->GetPosition() - knob_->GetSize() / 2 };
+    const int offset{ orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_ };
+    const int length{ orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight() };
 
-    VariantMap& eventData{GetEventDataMap()};
+    VariantMap& eventData{ GetEventDataMap() };
     eventData[P_ELEMENT] = this;
     eventData[P_OFFSET] = offset;
 

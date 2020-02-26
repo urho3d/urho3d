@@ -75,12 +75,12 @@ extern const char* UI_CATEGORY;
 
 Cursor::Cursor(Context* context) :
     BorderImage(context),
-    shape_{shapeNames[CS_NORMAL]},
-    useSystemShapes_{false},
-    osShapeDirty_{false}
+    shape_{ shapeNames[CS_NORMAL] },
+    useSystemShapes_{ false },
+    osShapeDirty_{ false }
 {
     // Define the defaults for system cursor usage.
-    for (unsigned i{0}; i < CS_MAX_SHAPES; i++)
+    for (unsigned i{ 0 }; i < CS_MAX_SHAPES; i++)
         shapeInfos_[shapeNames[i]] = CursorShapeInfo(i);
 
     // Subscribe to OS mouse cursor visibility changes to be able to reapply the cursor shape
@@ -111,13 +111,13 @@ void Cursor::RegisterObject(Context* context)
 
 void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    const unsigned initialSize{vertexData.Size()};
-    const IntVector2& offset{shapeInfos_[shape_].hotSpot_};
-    const Vector2 floatOffset{-offset};
+    const unsigned initialSize{ vertexData.Size() };
+    const IntVector2& offset{ shapeInfos_[shape_].hotSpot_ };
+    const Vector2 floatOffset{ -offset };
 
     BorderImage::GetBatches(batches, vertexData, currentScissor);
 
-    for (unsigned i{initialSize}; i < vertexData.Size(); i += 6)
+    for (unsigned i{ initialSize }; i < vertexData.Size(); i += 6)
     {
         vertexData[i] += floatOffset.x_;
         vertexData[i + 1] += floatOffset.y_;
@@ -140,15 +140,15 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
     if (!image)
         return;
 
-    ResourceCache* cache{GetSubsystem<ResourceCache>()};
-
     if (!shapeInfos_.Contains(shape))
         shapeInfos_[shape] = CursorShapeInfo();
 
-    CursorShapeInfo& info{shapeInfos_[shape]};
+    CursorShapeInfo& info{ shapeInfos_[shape] };
 
     // Prefer to get the texture with same name from cache to prevent creating several copies of the texture
+    auto* cache = GetSubsystem<ResourceCache>();
     info.texture_ = cache->GetResource<Texture2D>(image->GetName(), false);
+
     if (!info.texture_)
     {
         auto* texture = new Texture2D(context_);
@@ -183,7 +183,7 @@ void Cursor::SetShape(const String& shape)
 
     shape_ = shape;
 
-    const CursorShapeInfo& info{shapeInfos_[shape_]};
+    const CursorShapeInfo& info{ shapeInfos_[shape_] };
     texture_ = info.texture_;
     imageRect_ = info.imageRect_;
     SetSize(imageRect_.Size());
@@ -225,13 +225,12 @@ void Cursor::SetShapesAttr(const VariantVector& value)
 
         if (shapeVector.Size() >= 4)
         {
-            ResourceCache* cache{GetSubsystem<ResourceCache>()};
+            const String shape{ shapeVector[0].GetString() };
+            const ResourceRef ref{ shapeVector[1].GetResourceRef() };
+            const IntRect imageRect{ shapeVector[2].GetIntRect() };
+            const IntVector2 hotSpot{ shapeVector[3].GetIntVector2() };
 
-            const String shape{shapeVector[0].GetString()};
-            const ResourceRef ref{shapeVector[1].GetResourceRef()};
-            const IntRect imageRect{shapeVector[2].GetIntRect()};
-            const IntVector2 hotSpot{shapeVector[3].GetIntVector2()};
-
+            auto* cache = GetSubsystem<ResourceCache>();
             DefineShape(shape, cache->GetResource<Image>(ref.name_), imageRect, hotSpot);
         }
     }
@@ -265,7 +264,7 @@ void Cursor::ApplyOSCursorShape()
     if (!osShapeDirty_ || !GetSubsystem<Input>()->IsMouseVisible() || GetSubsystem<UI>()->GetCursor() != this)
         return;
 
-    CursorShapeInfo& info{shapeInfos_[shape_]};
+    CursorShapeInfo& info{ shapeInfos_[shape_] };
 
     // Remove existing SDL cursor if is not a system shape while we should be using those, or vice versa
     if (info.osCursor_ && info.systemDefined_ != useSystemShapes_)
@@ -289,7 +288,7 @@ void Cursor::ApplyOSCursorShape()
         // Create from image
         else if (info.image_)
         {
-            SDL_Surface* surface{info.image_->GetSDLSurface(info.imageRect_)};
+            SDL_Surface* surface{ info.image_->GetSDLSurface(info.imageRect_) };
 
             if (surface)
             {
