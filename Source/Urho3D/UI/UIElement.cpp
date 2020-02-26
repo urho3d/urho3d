@@ -289,6 +289,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     {
         if (!styleFile)
             styleFile = GetDefaultStyle();
+
         if (!child->LoadXML(childElem, styleFile))
         {
             RemoveChild(child, index);
@@ -392,6 +393,7 @@ bool UIElement::IsWithinScissor(const IntRect& currentScissor)
         return false;
 
     const IntVector2& screenPos{ GetScreenPosition() };
+
     return screenPos.x_ < currentScissor.right_ && screenPos.x_ + GetWidth() > currentScissor.left_ &&
            screenPos.y_ < currentScissor.bottom_ && screenPos.y_ + GetHeight() > currentScissor.top_;
 }
@@ -1038,6 +1040,7 @@ bool UIElement::SetStyle(const String& styleName, XMLFile* file)
 
     styleXPathQuery_.SetVariable("typeName", actualStyleName);
     const XMLElement styleElem{ file->GetRoot().SelectSinglePrepared(styleXPathQuery_) };
+
     return styleElem && SetStyle(styleElem);
 }
 
@@ -1049,6 +1052,7 @@ bool UIElement::SetStyle(const XMLElement& element)
     SetInstanceDefault(true);
     const bool success{ LoadXML(element) };
     SetInstanceDefault(false);
+
     return success;
 }
 
@@ -1066,8 +1070,8 @@ void UIElement::SetLayout(LayoutMode mode, int spacing, const IntRect& border)
 {
     layoutMode_ = mode;
     layoutSpacing_ = Max(spacing, 0);
-    layoutBorder_ = IntRect{ Max(border.left_, 0), Max(border.top_, 0), Max(border.right_, 0), Max(border.bottom_, 0) };
-
+    layoutBorder_ = IntRect{ Max(border.left_, 0), Max(border.top_, 0),
+                             Max(border.right_, 0), Max(border.bottom_, 0) };
     VerifyChildAlignment();
     UpdateLayout();
 }
@@ -1089,8 +1093,8 @@ void UIElement::SetLayoutSpacing(int spacing)
 
 void UIElement::SetLayoutBorder(const IntRect& border)
 {
-    layoutBorder_ = IntRect{ Max(border.left_, 0), Max(border.top_, 0), Max(border.right_, 0), Max(border.bottom_, 0) };
-
+    layoutBorder_ = IntRect{ Max(border.left_, 0), Max(border.top_, 0),
+                             Max(border.right_, 0), Max(border.bottom_, 0) };
     UpdateLayout();
 }
 
@@ -1294,10 +1298,11 @@ void UIElement::BringToFront()
     {
         ptr->SetPriority(maxPriority);
 
-        int minPriority{ maxPriority };
-
-        while (usedPriorities.Contains(minPriority))
-            --minPriority;
+        const int minPriority{ [&]{
+                int priority{ maxPriority };
+                while (usedPriorities.Contains(priority))
+                    --priority;
+                return priority; }() };
 
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
         {
@@ -2194,9 +2199,9 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     if (!numChildren)
         return;
 
-    const int targetTotalSize{ Max(targetSize - begin - end - static_cast<int>(numChildren - 1) * spacing, 0) };
-    const int targetChildSize{ targetTotalSize / numChildren };
-    int remainder{ targetTotalSize % numChildren };
+    const int targetTotalSize{ Max(targetSize - begin - end - static_cast<int>(numChildren - 1u) * spacing, 0) };
+    const int targetChildSize{ targetTotalSize / static_cast<int>(numChildren) };
+    int remainder{ targetTotalSize % static_cast<int>(numChildren) };
     float add{ static_cast<float>(remainder) / numChildren };
     float acc{ 0.0f };
 
@@ -2222,10 +2227,11 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     // Error correction passes
     for (;;)
     {
-        int actualTotalSize{ 0 };
-
-        for (unsigned i{ 0 }; i < numChildren; ++i)
-            actualTotalSize += sizes[i];
+        const int actualTotalSize{ [&]{
+                int size{ 0 };
+                for (unsigned i{ 0 }; i < numChildren; ++i)
+                    size += sizes[i];
+                return size; }() };
 
         const int error{ targetTotalSize - actualTotalSize };
 
