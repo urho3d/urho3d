@@ -55,7 +55,7 @@ struct URHO3D_API FontGlyph
     /// Horizontal advance.
     float advanceX_{};
     /// Texture page. M_MAX_UNSIGNED if not yet resident on any texture.
-    unsigned page_{M_MAX_UNSIGNED};
+    unsigned page_{ M_MAX_UNSIGNED };
     /// Used flag.
     bool used_{};
 };
@@ -75,21 +75,17 @@ public:
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
-
-    /// Return if font face uses mutable glyphs.
-    virtual bool HasMutableGlyphs() const { return false; }
-
     /// Return the kerning for a character and the next character.
     float GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
     bool IsDataLost() const;
+    /// Return if font face uses mutable glyphs.
+    virtual bool HasMutableGlyphs() const { return false; }
 
     /// Return point size.
     float GetPointSize() const { return pointSize_; }
-
     /// Return row height.
     float GetRowHeight() const { return rowHeight_; }
-
     /// Return textures.
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
 
@@ -101,7 +97,7 @@ protected:
     SharedPtr<Texture2D> LoadFaceTexture(const SharedPtr<Image>& image);
 
     /// Parent font.
-    Font* font_{};
+    Font* font_;
     /// Glyph mapping.
     HashMap<unsigned, FontGlyph> glyphMapping_;
     /// Kerning mapping.

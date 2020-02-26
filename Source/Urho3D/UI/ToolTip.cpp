@@ -33,8 +33,8 @@ extern const char* UI_CATEGORY;
 
 ToolTip::ToolTip(Context* context) :
     UIElement(context),
-    delay_(0.0f),
-    hovered_(false)
+    delay_{ 0.0f },
+    hovered_{ false }
 {
     SetVisible(false);
 }
@@ -49,13 +49,15 @@ void ToolTip::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Delay", GetDelay, SetDelay, float, 0.0f, AM_FILE);
 }
 
-void ToolTip::Update(float timeStep)
+void ToolTip::Update(float /*timeStep*/)
 {
     // Track the element we are parented to for hovering. When we display, we move ourself to the root element
     // to ensure displaying on top
-    UIElement* root = GetRoot();
+    UIElement* root{ GetRoot() };
+
     if (!root)
         return;
+
     if (parent_ != root)
         target_ = parent_;
 
@@ -66,12 +68,14 @@ void ToolTip::Update(float timeStep)
         return;
     }
 
-    bool hovering = target_->IsHovering() && target_->IsVisibleEffective();
+    bool hovering{ target_->IsHovering() && target_->IsVisibleEffective() };
+
     if (!hovering)
     {
         for (auto it = altTargets_.Begin(); it != altTargets_.End();)
         {
-            SharedPtr<UIElement> target = it->Lock();
+            SharedPtr<UIElement> target{ it->Lock() };
+
             if (!target)
                 it = altTargets_.Erase(it);
             else if (hovering = target->IsHovering() && target->IsVisibleEffective())
@@ -83,17 +87,19 @@ void ToolTip::Update(float timeStep)
 
     if (hovering)
     {
-        float effectiveDelay = delay_ > 0.0f ? delay_ : GetSubsystem<UI>()->GetDefaultToolTipDelay();
+        const float effectiveDelay{ delay_ > 0.0f ? delay_ : GetSubsystem<UI>()->GetDefaultToolTipDelay() };
 
         if (!hovered_)
         {
             hovered_ = true;
             displayAt_.Reset();
         }
-        else if (displayAt_.GetMSec(false) >= (unsigned)(effectiveDelay * 1000.0f) && parent_ == target_)
+        else if (displayAt_.GetMSec(false) >= static_cast<unsigned>(effectiveDelay * 1000.0f)
+                 && parent_ == target_)
         {
             originalPosition_ = GetPosition();
-            IntVector2 screenPosition = GetScreenPosition();
+            const IntVector2 screenPosition{ GetScreenPosition() };
+
             SetParent(root);
             SetPosition(screenPosition);
             SetVisible(true);
@@ -116,6 +122,7 @@ void ToolTip::Reset()
         SetPosition(originalPosition_);
         SetVisible(false);
     }
+
     hovered_ = false;
     displayAt_.Reset();
 }

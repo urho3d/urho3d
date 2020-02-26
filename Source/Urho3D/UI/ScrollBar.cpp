@@ -32,21 +32,21 @@
 namespace Urho3D
 {
 
-static const float DEFAULT_SCROLL_STEP = 0.1f;
-static const float DEFAULT_REPEAT_DELAY = 0.4f;
-static const float DEFAULT_REPEAT_RATE = 20.0f;
+static const float DEFAULT_SCROLL_STEP{ 0.1f };
+static const float DEFAULT_REPEAT_DELAY{ 0.4f };
+static const float DEFAULT_REPEAT_RATE{ 20.0f };
 
 extern const char* orientations[];
 extern const char* UI_CATEGORY;
 
 ScrollBar::ScrollBar(Context* context) :
     BorderImage(context),
-    scrollStep_(DEFAULT_SCROLL_STEP),
-    stepFactor_(1.0f),
-    leftRect_(IntRect::ZERO),
-    rightRect_(IntRect::ZERO),
-    upRect_(IntRect::ZERO),
-    downRect_(IntRect::ZERO)
+    scrollStep_{ DEFAULT_SCROLL_STEP },
+    stepFactor_{ 1.0f },
+    leftRect_{ IntRect::ZERO },
+    rightRect_{ IntRect::ZERO },
+    upRect_{ IntRect::ZERO },
+    downRect_{ IntRect::ZERO }
 {
     SetEnabled(true);
 
@@ -63,7 +63,7 @@ ScrollBar::ScrollBar(Context* context) :
     forwardButton_->SetFocusMode(FM_NOTFOCUSABLE);
 
     // For backward compatibility
-    SetColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+    SetColor(Color{ 0.0f, 0.0f, 0.0f, 0.0f });
 
     SubscribeToEvent(backButton_, E_PRESSED, URHO3D_HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, URHO3D_HANDLER(ScrollBar, HandleForwardButtonPressed));
@@ -110,12 +110,12 @@ void ScrollBar::ApplyAttributes()
     }
 }
 
-void ScrollBar::OnResize(const IntVector2& newSize, const IntVector2& delta)
+void ScrollBar::OnResize(const IntVector2& newSize, const IntVector2& /*delta*/)
 {
     if (slider_->GetOrientation() == O_HORIZONTAL)
     {
-        int height = newSize.y_;
-        int sliderWidth = Max(GetWidth() - 2 * height, 0);
+        const int height{ newSize.y_ };
+        const int sliderWidth{ Max(GetWidth() - 2 * height, 0) };
 
         backButton_->SetSize(height, height);
         slider_->SetSize(sliderWidth, height);
@@ -127,8 +127,8 @@ void ScrollBar::OnResize(const IntVector2& newSize, const IntVector2& delta)
     }
     else
     {
-        int width = newSize.x_;
-        int sliderHeight = Max(GetHeight() - 2 * width, 0);
+        const int width{ newSize.x_ };
+        const int sliderHeight{ Max(GetHeight() - 2 * width, 0) };
 
         backButton_->SetSize(width, width);
         slider_->SetSize(width, sliderHeight);
@@ -226,13 +226,16 @@ bool ScrollBar::FilterImplicitAttributes(XMLElement& dest) const
     if (!RemoveChildXML(dest, "Layout Mode"))
         return false;
 
-    XMLElement childElem = dest.GetChild("element");
+    XMLElement childElem{ dest.GetChild("element") };
+
     if (!FilterButtonImplicitAttributes(childElem, "SB_Back"))
         return false;
 
     childElem = childElem.GetNext("element");
+
     if (!childElem)
         return false;
+
     if (!RemoveChildXML(childElem, "Name", "SB_Slider"))
         return false;
     if (!RemoveChildXML(childElem, "Repeat Rate", String(DEFAULT_REPEAT_RATE)))
@@ -245,14 +248,15 @@ bool ScrollBar::FilterImplicitAttributes(XMLElement& dest) const
         return false;
 
     childElem = childElem.GetNext("element");
-    return FilterButtonImplicitAttributes(childElem, "SB_Forward");
 
+    return FilterButtonImplicitAttributes(childElem, "SB_Forward");
 }
 
 bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& name) const
 {
     if (!dest)
         return false;
+
     if (!RemoveChildXML(dest, "Name", name))
         return false;
     if (!RemoveChildXML(dest, "Repeat Delay", String(DEFAULT_REPEAT_DELAY)))
@@ -271,55 +275,57 @@ bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& n
     return true;
 }
 
-void ScrollBar::HandleBackButtonPressed(StringHash eventType, VariantMap& eventData)
+void ScrollBar::HandleBackButtonPressed(StringHash /*eventType*/, VariantMap& /*eventData*/)
 {
     if (editable_)
         StepBack();
 }
 
-void ScrollBar::HandleForwardButtonPressed(StringHash eventType, VariantMap& eventData)
+void ScrollBar::HandleForwardButtonPressed(StringHash /*eventType*/, VariantMap& /*eventData*/)
 {
     if (editable_)
         StepForward();
 }
 
-void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
+void ScrollBar::HandleSliderChanged(StringHash /*eventType*/, VariantMap& /*eventData*/)
 {
     // Send the event forward
-    VariantMap& newEventData = GetEventDataMap();
+    VariantMap& newEventData{ GetEventDataMap() };
     newEventData[ScrollBarChanged::P_ELEMENT] = this;
     newEventData[ScrollBarChanged::P_VALUE] = slider_->GetValue();
     SendEvent(E_SCROLLBARCHANGED, newEventData);
 }
 
-void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
+void ScrollBar::HandleSliderPaged(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace SliderPaged;
 
     // Synthesize hover event to the forward/back buttons
     if (eventData[P_OFFSET].GetInt() < 0)
-        backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), 0, 0, nullptr);
+        backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
+                             0, 0, nullptr);
     else
-        forwardButton_->OnHover(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), 0, 0, nullptr);
+        forwardButton_->OnHover(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
+                                0, 0, nullptr);
 
     // Synthesize click / release events to the buttons
     if (eventData[P_PRESSED].GetBool())
     {
         if (eventData[P_OFFSET].GetInt() < 0)
             backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, MOUSEB_LEFT, 0, nullptr);
+                                      MOUSEB_LEFT, MOUSEB_LEFT, 0, nullptr);
         else
             forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, MOUSEB_LEFT, 0, nullptr);
+                                         MOUSEB_LEFT, MOUSEB_LEFT, 0, nullptr);
     }
     else
     {
         if (eventData[P_OFFSET].GetInt() < 0)
             backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, 0, 0, nullptr, backButton_);
+                                    MOUSEB_LEFT, 0, 0, nullptr, backButton_);
         else
             forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, 0, 0, nullptr, forwardButton_);
+                                       MOUSEB_LEFT, 0, 0, nullptr, forwardButton_);
     }
 }
 
