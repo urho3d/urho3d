@@ -37,13 +37,13 @@ extern const char* UI_CATEGORY;
 
 BorderImage::BorderImage(Context* context) :
     UIElement(context),
-    imageRect_{IntRect::ZERO},
-    border_{IntRect::ZERO},
-    imageBorder_{IntRect::ZERO},
-    hoverOffset_{IntVector2::ZERO},
-    disabledOffset_{IntVector2::ZERO},
-    blendMode_{BLEND_REPLACE},
-    tiled_{false}
+    imageRect_{ IntRect::ZERO },
+    border_{ IntRect::ZERO },
+    imageBorder_{ IntRect::ZERO },
+    hoverOffset_{ IntVector2::ZERO },
+    disabledOffset_{ IntVector2::ZERO },
+    blendMode_{ BLEND_REPLACE },
+    tiled_{ false }
 {
 }
 
@@ -92,7 +92,7 @@ void BorderImage::SetImageRect(const IntRect& rect)
 void BorderImage::SetFullImageRect()
 {
     if (texture_)
-        SetImageRect(IntRect{0, 0, texture_->GetWidth(), texture_->GetHeight()});
+        SetImageRect(IntRect{ 0, 0, texture_->GetWidth(), texture_->GetHeight() });
 }
 
 void BorderImage::SetBorder(const IntRect& rect)
@@ -118,7 +118,7 @@ void BorderImage::SetHoverOffset(const IntVector2& offset)
 
 void BorderImage::SetHoverOffset(int x, int y)
 {
-    hoverOffset_ = IntVector2{x, y};
+    hoverOffset_ = IntVector2{ x, y };
 }
 
 void BorderImage::SetDisabledOffset(const IntVector2& offset)
@@ -128,7 +128,7 @@ void BorderImage::SetDisabledOffset(const IntVector2& offset)
 
 void BorderImage::SetDisabledOffset(int x, int y)
 {
-    disabledOffset_ = IntVector2{x, y};
+    disabledOffset_ = IntVector2{ x, y };
 }
 
 void BorderImage::SetBlendMode(BlendMode mode)
@@ -144,28 +144,29 @@ void BorderImage::SetTiled(bool enable)
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor,
     const IntVector2& offset)
 {
-    bool allOpaque{true};
+    bool allOpaque{ true };
 
     if (GetDerivedOpacity() < 1.0f || colors_[C_TOPLEFT].a_ < 1.0f || colors_[C_TOPRIGHT].a_ < 1.0f ||
         colors_[C_BOTTOMLEFT].a_ < 1.0f || colors_[C_BOTTOMRIGHT].a_ < 1.0f)
     {
         allOpaque = false;
     }
-    UIBatch batch{this, blendMode_ == BLEND_REPLACE && !allOpaque ?
-                  BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData};
+    UIBatch batch{ this, blendMode_ == BLEND_REPLACE && !allOpaque ?
+                   BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData };
 
     if (material_)
         batch.customMaterial_ = material_;
 
     // Calculate size of the inner rect, and texture dimensions of the inner rect
-    const IntRect& uvBorder{imageBorder_ == IntRect::ZERO ? border_ : imageBorder_};
-    const IntVector2 uvTopLeft{imageRect_.Min() + offset};
-    const int x{GetIndentWidth()};
-    const IntVector2 size{GetWidth() - x, GetHeight()};
-    const IntVector2 innerSize{Max(size.x_ - border_.left_ - border_.right_, 0),
-                               Max(size.y_ - border_.top_ - border_.bottom_, 0)};
-    const IntVector2 innerUvSize{Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0),
-                                 Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0)};
+    const int x{ GetIndentWidth() };
+    const IntVector2 size{ GetWidth() - x, GetHeight() };
+    const IntVector2 innerSize{ Max(size.x_ - border_.left_ - border_.right_, 0),
+                                Max(size.y_ - border_.top_ - border_.bottom_, 0) };
+
+    const IntRect& uvBorder{ imageBorder_ == IntRect::ZERO ? border_ : imageBorder_ };
+    const IntVector2 uvTopLeft{ imageRect_.Min() + offset };
+    const IntVector2 innerUvSize{ Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0),
+                                  Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0) };
 
     // Top
     if (border_.top_)
@@ -230,7 +231,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 
 void BorderImage::SetTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache{GetSubsystem<ResourceCache>()};
+    ResourceCache* cache{ GetSubsystem<ResourceCache>() };
     SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 
@@ -241,7 +242,7 @@ ResourceRef BorderImage::GetTextureAttr() const
 
 void BorderImage::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache{GetSubsystem<ResourceCache>()};
+    ResourceCache* cache{ GetSubsystem<ResourceCache>() };
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
