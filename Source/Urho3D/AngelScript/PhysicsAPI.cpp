@@ -351,6 +351,7 @@ void RegisterRaycastVehicleAPI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "void UpdateWheelTransform(int, bool)", asMETHOD(RaycastVehicle, UpdateWheelTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetSteeringValue(int, float)", asMETHOD(RaycastVehicle, SetSteeringValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelSuspensionStiffness(int, float)", asMETHOD(RaycastVehicle, SetWheelSuspensionStiffness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelMaxSuspensionForce(int, float)", asMETHOD(RaycastVehicle, SetWheelMaxSuspensionForce), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelDampingRelaxation(int, float)", asMETHOD(RaycastVehicle, SetWheelDampingRelaxation), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelDampingCompression(int, float)", asMETHOD(RaycastVehicle, SetWheelDampingCompression), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelFrictionSlip(int, float)", asMETHOD(RaycastVehicle, SetWheelFrictionSlip), asCALL_THISCALL);
@@ -373,6 +374,7 @@ void RegisterRaycastVehicleAPI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "Node@+ GetWheelNode(int)", asMETHOD(RaycastVehicle, GetWheelNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetSteeringValue(int)", asMETHOD(RaycastVehicle, GetSteeringValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelSuspensionStiffness(int)", asMETHOD(RaycastVehicle, GetWheelSuspensionStiffness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelMaxSuspensionForce(int)", asMETHOD(RaycastVehicle, GetWheelMaxSuspensionForce), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelDampingRelaxation(int)", asMETHOD(RaycastVehicle, GetWheelDampingRelaxation), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelDampingCompression(int)", asMETHOD(RaycastVehicle, GetWheelDampingCompression), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelFrictionSlip(int)", asMETHOD(RaycastVehicle, GetWheelFrictionSlip), asCALL_THISCALL);
