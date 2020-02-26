@@ -256,8 +256,8 @@ void Slider::UpdateSlider()
         else
         {
             const int sliderLength{ knob_->IsFixedHeight() ? knob_->GetHeight()
-                                                          : Max(static_cast<int>(GetHeight() / (range_ + 1.0f)),
-                                                                border.top_ + border.bottom_) };
+                                                           : Max(static_cast<int>(GetHeight() / (range_ + 1.0f)),
+                                                                 border.top_ + border.bottom_) };
 
             const float sliderPos{ (GetHeight() - sliderLength) * value_ / range_ };
 
