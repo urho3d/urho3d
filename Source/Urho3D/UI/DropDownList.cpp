@@ -41,12 +41,12 @@ extern const char* UI_CATEGORY;
 
 DropDownList::DropDownList(Context* context) :
     Menu(context),
-    resizePopup_(false),
-    selectionAttr_(0)
+    resizePopup_{ false },
+    selectionAttr_{ 0u }
 {
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
-    auto* window = new Window(context_);
+    auto* const window{ new Window(context_) };
     window->SetInternal(true);
     SetPopup(window);
 
@@ -55,9 +55,10 @@ DropDownList::DropDownList(Context* context) :
     listView_->SetScrollBarsVisible(false, false);
     popup_->SetLayout(LM_VERTICAL);
     popup_->AddChild(listView_);
+
     placeholder_ = CreateChild<UIElement>("DDL_Placeholder");
     placeholder_->SetInternal(true);
-    auto* text = placeholder_->CreateChild<Text>("DDL_Placeholder_Text");
+    Text* const text{ placeholder_->CreateChild<Text>("DDL_Placeholder_Text") };
     text->SetInternal(true);
     text->SetVisible(false);
 
@@ -91,17 +92,18 @@ void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& ver
     if (!placeholder_->IsVisible())
         return;
 
-    UIElement* selectedItem = GetSelectedItem();
+    UIElement* selectedItem{ GetSelectedItem() };
+
     if (selectedItem)
     {
         // Can not easily copy the selected item. However, it can be re-rendered on the placeholder's position
-        const IntVector2& targetPos = placeholder_->GetScreenPosition();
-        const IntVector2& originalPos = selectedItem->GetScreenPosition();
-        IntVector2 offset = targetPos - originalPos;
+        const IntVector2& targetPos{ placeholder_->GetScreenPosition() };
+        const IntVector2& originalPos{ selectedItem->GetScreenPosition() };
+        const IntVector2 offset{ targetPos - originalPos };
 
         // GetBatches() usually resets the hover flag. Therefore get its value and then reset it for the real rendering
         // Render the selected item without its selection color, so temporarily reset the item's selected attribute
-        bool hover = selectedItem->IsHovering();
+        const bool hover{ selectedItem->IsHovering() };
         selectedItem->SetSelected(false);
         selectedItem->SetHovering(false);
         selectedItem->GetBatchesWithOffset(offset, batches, vertexData, currentScissor);
@@ -113,22 +115,31 @@ void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& ver
 void DropDownList::OnShowPopup()
 {
     // Resize the popup to match the size of the list content, and optionally match the button width
-    UIElement* content = listView_->GetContentElement();
+    UIElement* const content{ listView_->GetContentElement() };
+
     content->UpdateLayout();
-    const IntVector2& contentSize = content->GetSize();
-    const IntRect& border = popup_->GetLayoutBorder();
+
+    const IntVector2& contentSize{ content->GetSize() };
+    const IntRect& border{ popup_->GetLayoutBorder() };
+
     popup_->SetSize(resizePopup_ ? GetWidth() : contentSize.x_ + border.left_ + border.right_,
-        contentSize.y_ + border.top_ + border.bottom_);
+                    contentSize.y_ + border.top_ + border.bottom_);
 
     // Check if popup fits below the button. If not, show above instead
-    bool showAbove = false;
-    UIElement* root = GetRoot();
+    bool showAbove{ false };
+    UIElement* root{ GetRoot() };
+
     if (root)
     {
-        const IntVector2& screenPos = GetScreenPosition();
-        if (screenPos.y_ + GetHeight() + popup_->GetHeight() > root->GetHeight() && screenPos.y_ - popup_->GetHeight() >= 0)
+        const IntVector2& screenPos{ GetScreenPosition() };
+
+        if (screenPos.y_ + GetHeight() + popup_->GetHeight() > root->GetHeight() &&
+            screenPos.y_ - popup_->GetHeight() >= 0)
+        {
             showAbove = true;
+        }
     }
+
     SetPopupOffset(0, showAbove ? -popup_->GetHeight() : GetHeight());
 
     // Focus the ListView to allow making the selection with keys
@@ -140,7 +151,7 @@ void DropDownList::OnHidePopup()
     // When the popup is hidden, propagate the selection
     using namespace ItemSelected;
 
-    VariantMap& eventData = GetEventDataMap();
+    VariantMap& eventData{ GetEventDataMap() };
     eventData[P_ELEMENT] = this;
     eventData[P_SELECTION] = GetSelection();
     SendEvent(E_ITEMSELECTED, eventData);
@@ -241,7 +252,8 @@ bool DropDownList::FilterImplicitAttributes(XMLElement& dest) const
     if (!RemoveChildXML(dest, "Popup Offset"))
         return false;
 
-    XMLElement childElem = dest.GetChild("element");
+    XMLElement childElem{ dest.GetChild("element") };
+
     if (!childElem)
         return false;
     if (!RemoveChildXML(childElem, "Name", "DDL_Placeholder"))
@@ -250,6 +262,7 @@ bool DropDownList::FilterImplicitAttributes(XMLElement& dest) const
         return false;
 
     childElem = childElem.GetChild("element");
+
     if (!childElem)
         return false;
     if (!RemoveChildXML(childElem, "Name", "DDL_Placeholder_Text"))
@@ -274,7 +287,8 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
         return false;
 
     // ListView
-    XMLElement childElem = dest.GetChild("element");
+    XMLElement childElem{ dest.GetChild("element") };
+
     if (!childElem)
         return false;
     if (!listView_->FilterAttributes(childElem))
@@ -287,11 +301,11 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
         return false;
 
     // Horizontal scroll bar
-    XMLElement hScrollElem = childElem.GetChild("element");
+    XMLElement hScrollElem{ childElem.GetChild("element") };
     // Vertical scroll bar
-    XMLElement vScrollElem = hScrollElem.GetNext("element");
+    XMLElement vScrollElem{ hScrollElem.GetNext("element") };
     // Scroll panel
-    XMLElement panelElem = vScrollElem.GetNext("element");
+    XMLElement panelElem{ vScrollElem.GetNext("element") };
 
     if (hScrollElem && !hScrollElem.GetParent().RemoveChild(hScrollElem))
         return false;
@@ -302,8 +316,10 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
     {
         if (panelElem.GetAttribute("style").Empty() && !panelElem.SetAttribute("style", "none"))
             return false;
+
         // Item container
-        XMLElement containerElem = panelElem.GetChild("element");
+        XMLElement containerElem{ panelElem.GetChild("element") };
+
         if (containerElem)
         {
             if (containerElem.GetAttribute("style").Empty() && !containerElem.SetAttribute("style", "none"))
@@ -314,16 +330,18 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
     return true;
 }
 
-void DropDownList::HandleItemClicked(StringHash eventType, VariantMap& eventData)
+void DropDownList::HandleItemClicked(StringHash /*eventType*/, VariantMap& /*eventData*/)
 {
     // Resize the selection placeholder to match the selected item
-    UIElement* selectedItem = GetSelectedItem();
+    const UIElement* const selectedItem{ GetSelectedItem() };
+
     if (selectedItem)
         placeholder_->SetSize(selectedItem->GetSize());
 
     // Close and defocus the popup. This will actually send the selection forward
     if (listView_->HasFocus())
         GetSubsystem<UI>()->SetFocusElement(focusMode_ < FM_FOCUSABLE ? nullptr : this);
+
     ShowPopup(false);
 }
 
@@ -332,7 +350,8 @@ void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData
     using namespace UnhandledKey;
 
     // If enter pressed in the list view, close and propagate selection
-    int key = eventData[P_KEY].GetInt();
+    const int key{ eventData[P_KEY].GetInt() };
+
     if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
         HandleItemClicked(eventType, eventData);
 }

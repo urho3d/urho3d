@@ -32,8 +32,8 @@ namespace Urho3D
 
 class FontFace;
 
-static const int FONT_TEXTURE_MIN_SIZE = 128;
-static const int FONT_DPI = 96;
+static const int FONT_TEXTURE_MIN_SIZE{ 128 };
+static const int FONT_DPI{ 96 };
 
 /// %Font file type.
 enum FontType

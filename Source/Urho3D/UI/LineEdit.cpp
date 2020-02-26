@@ -42,17 +42,17 @@ extern const char* UI_CATEGORY;
 
 LineEdit::LineEdit(Context* context) :
     BorderImage(context),
-    lastFont_(nullptr),
-    lastFontSize_(0),
-    cursorPosition_(0),
-    dragBeginCursor_(M_MAX_UNSIGNED),
-    cursorBlinkRate_(1.0f),
-    cursorBlinkTimer_(0.0f),
-    maxLength_(0),
-    echoCharacter_(0),
-    cursorMovable_(true),
-    textSelectable_(true),
-    textCopyable_(true)
+    lastFont_{ nullptr },
+    lastFontSize_{ 0 },
+    cursorPosition_{ 0 },
+    dragBeginCursor_{ M_MAX_UNSIGNED },
+    cursorBlinkRate_{ 1.0f },
+    cursorBlinkTimer_{ 0.0f },
+    maxLength_{ 0 },
+    echoCharacter_{ 0 },
+    cursorMovable_{ true },
+    textSelectable_{ true },
+    textCopyable_{ true }
 {
     clipChildren_ = true;
     SetEnabled(true);
@@ -111,16 +111,16 @@ void LineEdit::Update(float timeStep)
         UpdateCursor();
     }
 
-    bool cursorVisible = HasFocus() ? cursorBlinkTimer_ < 0.5f : false;
-    cursor_->SetVisible(cursorVisible);
+    cursor_->SetVisible(HasFocus() ? cursorBlinkTimer_ < 0.5f : false);
 }
 
-void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
-    Cursor* cursor)
+void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& /*screenPosition*/,
+                            int button, int /*buttons*/, int /*qualifiers*/, Cursor* /*cursor*/)
 {
     if (button == MOUSEB_LEFT && cursorMovable_)
     {
-        unsigned pos = GetCharIndex(position);
+        const unsigned pos{ GetCharIndex(position) };
+
         if (pos != M_MAX_UNSIGNED)
         {
             SetCursorPosition(pos);
@@ -129,34 +129,36 @@ void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screen
     }
 }
 
-void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
-    Cursor* cursor)
+void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition,
+                             int button, int buttons, int qualifiers, Cursor* cursor)
 {
     if (button == MOUSEB_LEFT)
         text_->SetSelection(0);
 }
 
-void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers,
-    Cursor* cursor)
+void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition,
+                           int buttons, int qualifiers, Cursor* cursor)
 {
     UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
 
     dragBeginCursor_ = GetCharIndex(position);
 }
 
-void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
-    int qualifiers, Cursor* cursor)
+void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& /*screenPosition*/,
+                          const IntVector2& /*deltaPos*/, int /*buttons*/, int /*qualifiers*/, Cursor* /*cursor*/)
 {
     if (cursorMovable_ && textSelectable_)
     {
-        unsigned start = dragBeginCursor_;
-        unsigned current = GetCharIndex(position);
+        const unsigned start{ dragBeginCursor_ };
+        const unsigned current{ GetCharIndex(position) };
+
         if (start != M_MAX_UNSIGNED && current != M_MAX_UNSIGNED)
         {
             if (start < current)
                 text_->SetSelection(start, current - start);
             else
                 text_->SetSelection(current, start - current);
+
             SetCursorPosition(current);
         }
     }
@@ -168,7 +170,8 @@ bool LineEdit::OnDragDropTest(UIElement* source)
     {
         if (source->GetVars().Contains(VAR_DRAGDROPCONTENT))
             return true;
-        StringHash sourceType = source->GetType();
+
+        const StringHash sourceType{ source->GetType() };
         return sourceType == LineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
     }
 
@@ -186,17 +189,16 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
             return true;
         }
 
-        StringHash sourceType = source->GetType();
+        const StringHash sourceType{ source->GetType() };
+
         if (sourceType == LineEdit::GetTypeStatic())
         {
-            auto* sourceLineEdit = static_cast<LineEdit*>(source);
-            SetText(sourceLineEdit->GetText());
+            SetText(static_cast<LineEdit*>(source)->GetText());
             return true;
         }
         else if (sourceType == Text::GetTypeStatic())
         {
-            auto* sourceText = static_cast<Text*>(source);
-            SetText(sourceText->GetText());
+            SetText(static_cast<Text*>(source)->GetText());
             return true;
         }
     }
@@ -206,8 +208,8 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
 
 void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
-    bool changed = false;
-    bool cursorMoved = false;
+    bool changed{ false };
+    bool cursorMoved{ false };
 
     switch (key)
     {
@@ -215,8 +217,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
     case KEY_C:
         if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
-            unsigned start = text_->GetSelectionStart();
-            unsigned length = text_->GetSelectionLength();
+            const unsigned start{ text_->GetSelectionStart() };
+            const unsigned length{ text_->GetSelectionLength() };
 
             if (text_->GetSelectionLength())
                 GetSubsystem<UI>()->SetClipboardText(line_.SubstringUTF8(start, length));
@@ -227,6 +229,7 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                 else
                     line_ = line_.SubstringUTF8(0, start);
+
                 text_->ClearSelection();
                 cursorPosition_ = start;
                 changed = true;
@@ -237,25 +240,30 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
     case KEY_V:
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
-            const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();
+            const String& clipBoard{ GetSubsystem<UI>()->GetClipboardText() };
+
             if (!clipBoard.Empty())
             {
                 // Remove selected text first
                 if (text_->GetSelectionLength() > 0)
                 {
-                    unsigned start = text_->GetSelectionStart();
-                    unsigned length = text_->GetSelectionLength();
+                    const unsigned start{ text_->GetSelectionStart() };
+                    const unsigned length{ text_->GetSelectionLength() };
+
                     if (start + length < line_.LengthUTF8())
                         line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                     else
                         line_ = line_.SubstringUTF8(0, start);
+
                     text_->ClearSelection();
                     cursorPosition_ = start;
                 }
+
                 if (cursorPosition_ < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, cursorPosition_) + clipBoard + line_.SubstringUTF8(cursorPosition_);
                 else
                     line_ += clipBoard;
+
                 cursorPosition_ += clipBoard.LengthUTF8();
                 changed = true;
             }
@@ -278,20 +286,24 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                 cursorPosition_ = text_->GetSelectionStart();
             else
                 --cursorPosition_;
+
             cursorMoved = true;
 
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
-                unsigned start = dragBeginCursor_;
-                unsigned current = cursorPosition_;
+                const unsigned start{ dragBeginCursor_ };
+                const unsigned current{ cursorPosition_ };
+
                 if (start < current)
                     text_->SetSelection(start, current - start);
                 else
                     text_->SetSelection(current, start - current);
             }
         }
+
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
+
         break;
 
     case KEY_END:
@@ -310,20 +322,24 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                 cursorPosition_ = text_->GetSelectionStart() + text_->GetSelectionLength();
             else
                 ++cursorPosition_;
+
             cursorMoved = true;
 
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
-                unsigned start = dragBeginCursor_;
-                unsigned current = cursorPosition_;
+                const unsigned start{ dragBeginCursor_ };
+                const unsigned current{ cursorPosition_ };
+
                 if (start < current)
                     text_->SetSelection(start, current - start);
                 else
                     text_->SetSelection(current, start - current);
             }
         }
+
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
+
         break;
 
     case KEY_DELETE:
@@ -340,12 +356,14 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
             else
             {
                 // If a selection exists, erase it
-                unsigned start = text_->GetSelectionStart();
-                unsigned length = text_->GetSelectionLength();
+                const unsigned start{ text_->GetSelectionStart() };
+                const unsigned length{ text_->GetSelectionLength() };
+
                 if (start + length < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                 else
                     line_ = line_.SubstringUTF8(0, start);
+
                 text_->ClearSelection();
                 cursorPosition_ = start;
                 changed = true;
@@ -360,11 +378,11 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
         {
             using namespace UnhandledKey;
 
-            VariantMap& eventData = GetEventDataMap();
+            VariantMap& eventData{ GetEventDataMap() };
             eventData[P_ELEMENT] = this;
             eventData[P_KEY] = key;
-            eventData[P_BUTTONS] = (unsigned)buttons;
-            eventData[P_QUALIFIERS] = (unsigned)qualifiers;
+            eventData[P_BUTTONS] = static_cast<unsigned>(buttons);
+            eventData[P_QUALIFIERS] = static_cast<unsigned>(qualifiers);
             SendEvent(E_UNHANDLEDKEY, eventData);
         }
         return;
@@ -380,6 +398,7 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                         line_ = line_.SubstringUTF8(0, cursorPosition_ - 1) + line_.SubstringUTF8(cursorPosition_);
                     else
                         line_ = line_.SubstringUTF8(0, cursorPosition_ - 1);
+
                     --cursorPosition_;
                     changed = true;
                 }
@@ -387,12 +406,14 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
             else
             {
                 // If a selection exists, erase it
-                unsigned start = text_->GetSelectionStart();
-                unsigned length = text_->GetSelectionLength();
+                const unsigned start{ text_->GetSelectionStart() };
+                const unsigned length{ text_->GetSelectionLength() };
+
                 if (start + length < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                 else
                     line_ = line_.SubstringUTF8(0, start);
+
                 text_->ClearSelection();
                 cursorPosition_ = start;
                 changed = true;
@@ -410,7 +431,7 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
             using namespace TextFinished;
 
-            VariantMap& eventData = GetEventDataMap();
+            VariantMap& eventData{ GetEventDataMap() };
             eventData[P_ELEMENT] = this;
             eventData[P_TEXT] = line_;
             SendEvent(E_TEXTFINISHED, eventData);
@@ -434,17 +455,18 @@ void LineEdit::OnTextInput(const String& text)
     if (!editable_)
         return;
 
-    bool changed = false;
+    bool changed{ false };
 
     // Send text entry as an event to allow changing it
     using namespace TextEntry;
 
-    VariantMap& eventData = GetEventDataMap();
+    VariantMap& eventData{ GetEventDataMap() };
     eventData[P_ELEMENT] = this;
     eventData[P_TEXT] = text;
     SendEvent(E_TEXTENTRY, eventData);
 
-    const String newText = eventData[P_TEXT].GetString().SubstringUTF8(0);
+    const String newText{ eventData[P_TEXT].GetString().SubstringUTF8(0) };
+
     if (!newText.Empty() && (!maxLength_ || line_.LengthUTF8() + newText.LengthUTF8() <= maxLength_))
     {
         if (!text_->GetSelectionLength())
@@ -453,17 +475,20 @@ void LineEdit::OnTextInput(const String& text)
                 line_ += newText;
             else
                 line_ = line_.SubstringUTF8(0, cursorPosition_) + newText + line_.SubstringUTF8(cursorPosition_);
+
             cursorPosition_ += newText.LengthUTF8();
         }
         else
         {
             // If a selection exists, erase it first
-            unsigned start = text_->GetSelectionStart();
-            unsigned length = text_->GetSelectionLength();
+            const unsigned start{ text_->GetSelectionStart() };
+            const unsigned length{ text_->GetSelectionLength() };
+
             if (start + length < line_.LengthUTF8())
                 line_ = line_.SubstringUTF8(0, start) + newText + line_.SubstringUTF8(start + length);
             else
                 line_ = line_.SubstringUTF8(0, start) + newText;
+
             cursorPosition_ = start + newText.LengthUTF8();
         }
         changed = true;
@@ -539,7 +564,8 @@ bool LineEdit::FilterImplicitAttributes(XMLElement& dest) const
     if (!BorderImage::FilterImplicitAttributes(dest))
         return false;
 
-    XMLElement childElem = dest.GetChild("element");
+    XMLElement childElem{ dest.GetChild("element") };
+
     if (!childElem)
         return false;
     if (!RemoveChildXML(childElem, "Name", "LE_Text"))
@@ -548,6 +574,7 @@ bool LineEdit::FilterImplicitAttributes(XMLElement& dest) const
         return false;
 
     childElem = childElem.GetNext("element");
+
     if (!childElem)
         return false;
     if (!RemoveChildXML(childElem, "Name", "LE_Cursor"))
@@ -564,15 +591,19 @@ bool LineEdit::FilterImplicitAttributes(XMLElement& dest) const
 
 void LineEdit::UpdateText()
 {
-    unsigned utf8Length = line_.LengthUTF8();
+    const unsigned utf8Length{ line_.LengthUTF8() };
 
     if (!echoCharacter_)
+    {
         text_->SetText(line_);
+    }
     else
     {
-        String echoText;
-        for (unsigned i = 0; i < utf8Length; ++i)
+        String echoText{};
+
+        for (unsigned i{ 0 }; i < utf8Length; ++i)
             echoText.AppendUTF8(echoCharacter_);
+
         text_->SetText(echoText);
     }
     if (cursorPosition_ > utf8Length)
@@ -583,7 +614,7 @@ void LineEdit::UpdateText()
 
     using namespace TextChanged;
 
-    VariantMap& eventData = GetEventDataMap();
+    VariantMap& eventData{ GetEventDataMap() };
     eventData[P_ELEMENT] = this;
     eventData[P_TEXT] = line_;
     SendEvent(E_TEXTCHANGED, eventData);
@@ -591,27 +622,29 @@ void LineEdit::UpdateText()
 
 void LineEdit::UpdateCursor()
 {
-    int x = text_->GetCharPosition(cursorPosition_).x_;
+    const int x{ static_cast<int>(text_->GetCharPosition(cursorPosition_).x_) };
 
     text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
-    cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
+    cursor_->SetPosition(text_->GetPosition() + IntVector2{ x, 0 });
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
 
-    IntVector2 screenPosition = ElementToScreen(cursor_->GetPosition());
-    SDL_Rect rect = {screenPosition.x_, screenPosition.y_, cursor_->GetSize().x_, cursor_->GetSize().y_};
+    const IntVector2 screenPosition{ ElementToScreen(cursor_->GetPosition()) };
+    SDL_Rect rect{ screenPosition.x_, screenPosition.y_, cursor_->GetSize().x_, cursor_->GetSize().y_ };
     SDL_SetTextInputRect(&rect);
 
     // Scroll if necessary
-    int sx = -GetChildOffset().x_;
-    int left = clipBorder_.left_;
-    int right = GetWidth() - clipBorder_.left_ - clipBorder_.right_ - cursor_->GetWidth();
+    int sx{ -GetChildOffset().x_ };
+    const int left{ clipBorder_.left_ };
+    const int right{ GetWidth() - clipBorder_.left_ - clipBorder_.right_ - cursor_->GetWidth() };
+
     if (x - sx > right)
         sx = x - right;
     if (x - sx < left)
         sx = x - left;
     if (sx < 0)
         sx = 0;
-    SetChildOffset(IntVector2(-sx, 0));
+
+    SetChildOffset(IntVector2{ -sx, 0 });
 
     // Restart blinking
     cursorBlinkTimer_ = 0.0f;
@@ -619,16 +652,16 @@ void LineEdit::UpdateCursor()
 
 unsigned LineEdit::GetCharIndex(const IntVector2& position)
 {
-    IntVector2 screenPosition = ElementToScreen(position);
-    IntVector2 textPosition = text_->ScreenToElement(screenPosition);
+    const IntVector2 screenPosition{ ElementToScreen(position) };
+    const IntVector2 textPosition{ text_->ScreenToElement(screenPosition) };
 
     if (textPosition.x_ < 0)
         return 0;
 
-    for (int i = text_->GetNumChars(); i >= 0; --i)
+    for (int i{ static_cast<int>(text_->GetNumChars()) }; i >= 0; --i)
     {
-        if (textPosition.x_ >= text_->GetCharPosition((unsigned)i).x_)
-            return (unsigned)i;
+        if (textPosition.x_ >= text_->GetCharPosition(static_cast<unsigned>(i)).x_)
+            return static_cast<unsigned>(i);
     }
 
     return M_MAX_UNSIGNED;

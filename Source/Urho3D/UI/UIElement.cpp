@@ -1907,7 +1907,7 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData,
+void UIElement::GetBatchesWithOffset(const IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     IntRect currentScissor)
 {
     const Vector2 floatOffset{ offset };
