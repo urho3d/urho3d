@@ -56,21 +56,21 @@ struct URHO3D_API CursorShapeInfo
 {
     /// Construct with defaults.
     CursorShapeInfo() :
-        imageRect_(IntRect::ZERO),
-        hotSpot_(IntVector2::ZERO),
-        osCursor_(nullptr),
-        systemDefined_(false),
-        systemCursor_(-1)
+        imageRect_{IntRect::ZERO},
+        hotSpot_{IntVector2::ZERO},
+        osCursor_{nullptr},
+        systemDefined_{false},
+        systemCursor_{-1}
     {
     }
 
     /// Construct with system cursor.
     explicit CursorShapeInfo(int systemCursor) :
-        imageRect_(IntRect::ZERO),
-        hotSpot_(IntVector2::ZERO),
-        osCursor_(nullptr),
-        systemDefined_(false),
-        systemCursor_(systemCursor)
+        imageRect_{IntRect::ZERO},
+        hotSpot_{IntVector2::ZERO},
+        osCursor_{nullptr},
+        systemDefined_{false},
+        systemCursor_{systemCursor}
     {
     }
 
