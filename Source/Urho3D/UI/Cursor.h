@@ -58,8 +58,8 @@ struct URHO3D_API CursorShapeInfo
     CursorShapeInfo() :
         imageRect_{ IntRect::ZERO },
         hotSpot_{ IntVector2::ZERO },
-        osCursor_{ nullptr},
-        systemDefined_{ false},
+        osCursor_{ nullptr },
+        systemDefined_{ false },
         systemCursor_{ -1 }
     {
     }
