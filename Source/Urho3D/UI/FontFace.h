@@ -75,12 +75,13 @@ public:
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
+    /// Return if font face uses mutable glyphs.
+    virtual bool HasMutableGlyphs() const { return false; }
+
     /// Return the kerning for a character and the next character.
     float GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
     bool IsDataLost() const;
-    /// Return if font face uses mutable glyphs.
-    virtual bool HasMutableGlyphs() const { return false; }
 
     /// Return point size.
     float GetPointSize() const { return pointSize_; }
@@ -91,6 +92,7 @@ public:
 
 protected:
     friend class FontFaceBitmap;
+
     /// Create a texture for font rendering.
     SharedPtr<Texture2D> CreateFaceTexture();
     /// Load font face texture from image resource.
