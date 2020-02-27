@@ -221,7 +221,7 @@ void Cursor::SetShapesAttr(const VariantVector& value)
 
     for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        const VariantVector& shapeVector = i->GetVariantVector();
+        const VariantVector& shapeVector{ i->GetVariantVector() };
 
         if (shapeVector.Size() >= 4)
         {
