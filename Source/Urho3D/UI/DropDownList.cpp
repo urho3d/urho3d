@@ -127,7 +127,7 @@ void DropDownList::OnShowPopup()
 
     // Check if popup fits below the button. If not, show above instead
     bool showAbove{ false };
-    UIElement* root{ GetRoot() };
+    const UIElement* const root{ GetRoot() };
 
     if (root)
     {
