@@ -165,9 +165,8 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 
     const IntRect& uvBorder{ imageBorder_ == IntRect::ZERO ? border_ : imageBorder_ };
     const IntVector2 uvTopLeft{ imageRect_.Min() + offset };
-    const int uvW{ Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0) };
-    const int uvH{ Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0) };
-    const IntVector2 innerUvSize{ uvW, uvH };
+    const IntVector2 innerUvSize{ Max(imageRect_.right_ - imageRect_.left_ - uvBorder.left_ - uvBorder.right_, 0),
+                                  Max(imageRect_.bottom_ - imageRect_.top_ - uvBorder.top_ - uvBorder.bottom_, 0) };
 
     // Top
     if (border_.top_)
