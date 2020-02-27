@@ -216,8 +216,8 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
                 for (int i{ 0 }; i < samples; ++i)
                 {
-                    const float x{ Cos(angle * i) * static_cast<float>(thickness) };
-                    const float y{ Sin(angle * i) * static_cast<float>(thickness) };
+                    const float x{ Cos(angle * i) * thickness };
+                    const float y{ Sin(angle * i) * thickness };
                     ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
                 }
             }
