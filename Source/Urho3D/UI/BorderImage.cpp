@@ -42,7 +42,7 @@ BorderImage::BorderImage(Context* context) :
     imageBorder_(IntRect::ZERO),
     hoverOffset_(IntVector2::ZERO),
     disabledOffset_(IntVector2::ZERO),
-    rotate_(0),
+    rotate_(false),
     flipH_(false),
     flipV_(false),
     blendMode_(BLEND_REPLACE),
