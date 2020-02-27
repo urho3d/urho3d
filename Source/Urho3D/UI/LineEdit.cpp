@@ -599,11 +599,10 @@ void LineEdit::UpdateText()
     }
     else
     {
-        const String echoText{ [&]{
-                String text{};
-                for (unsigned i{ 0 }; i < utf8Length; ++i)
-                    text.AppendUTF8(echoCharacter_);
-                return text; }() };
+        String echoText{};
+
+        for (unsigned i{ 0 }; i < utf8Length; ++i)
+            echoText.AppendUTF8(echoCharacter_);
 
         text_->SetText(echoText);
     }

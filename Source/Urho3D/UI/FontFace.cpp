@@ -44,11 +44,10 @@ FontFace::~FontFace()
     if (font_)
     {
         // When a face is unloaded, deduct the used texture data size from the parent font
-        const unsigned totalTextureSize{ [&]{
-                unsigned textureSize{ 0 };
-                for (unsigned i{ 0 }; i < textures_.Size(); ++i)
-                    textureSize += textures_[i]->GetWidth() * textures_[i]->GetHeight();
-                return textureSize; }() };
+        unsigned totalTextureSize{ 0 };
+
+        for (unsigned i{ 0 }; i < textures_.Size(); ++i)
+            totalTextureSize += textures_[i]->GetWidth() * textures_[i]->GetHeight();
 
         font_->SetMemoryUse(font_->GetMemoryUse() - totalTextureSize);
     }

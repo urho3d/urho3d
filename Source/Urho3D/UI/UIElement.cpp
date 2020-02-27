@@ -1300,11 +1300,10 @@ void UIElement::BringToFront()
     {
         ptr->SetPriority(maxPriority);
 
-        const int minPriority{ [&]{
-                int priority{ maxPriority };
-                while (usedPriorities.Contains(priority))
-                    --priority;
-                return priority; }() };
+        int minPriority{ maxPriority };
+
+        while (usedPriorities.Contains(priority))
+            --minPriority;
 
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
         {
@@ -2229,11 +2228,10 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     // Error correction passes
     for (;;)
     {
-        const int actualTotalSize{ [&]{
-                int size{ 0 };
-                for (unsigned i{ 0 }; i < numChildren; ++i)
-                    size += sizes[i];
-                return size; }() };
+        int actualTotalSize{ 0 };
+
+        for (unsigned i{ 0 }; i < numChildren; ++i)
+            actualTotalSize += sizes[i];
 
         const int error{ targetTotalSize - actualTotalSize };
 
