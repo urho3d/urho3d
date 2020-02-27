@@ -1167,6 +1167,7 @@ void UIElement::UpdateLayout()
 
         layoutMinSize_.x_ = CalculateLayoutParentSize(minSizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
         layoutMinSize_.y_ = minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_;
+
         SetSize(width, height);
 
         // Validate the size before resizing child elements, in case of min/max limits
@@ -1204,11 +1205,12 @@ void UIElement::UpdateLayout()
         CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetHeight(),
                         layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
 
-        int height{ CalculateLayoutParentSize(sizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_) };
         int width{ Max(GetWidth(), minChildWidth + layoutBorder_.left_ + layoutBorder_.right_) };
+        int height{ CalculateLayoutParentSize(sizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_) };
 
-        layoutMinSize_.y_ = CalculateLayoutParentSize(minSizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
         layoutMinSize_.x_ = minChildWidth + layoutBorder_.left_ + layoutBorder_.right_;
+        layoutMinSize_.y_ = CalculateLayoutParentSize(minSizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
+
         SetSize(width, height);
 
         width = size_.x_;
