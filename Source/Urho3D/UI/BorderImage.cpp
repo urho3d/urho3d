@@ -151,6 +151,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     {
         allOpaque = false;
     }
+
     UIBatch batch{ this, blendMode_ == BLEND_REPLACE && !allOpaque ?
                    BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData };
 
