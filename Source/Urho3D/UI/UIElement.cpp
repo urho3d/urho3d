@@ -216,13 +216,13 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
 
     while (childElem)
     {
+        UIElement* child{ nullptr };
         String typeName{ childElem.GetAttribute("type") };
 
         if (typeName.Empty())
             typeName = "UIElement";
 
         const bool internalElem{ childElem.GetBool("internal") };
-        UIElement* child{ nullptr };
         const unsigned index{ childElem.HasAttribute("index") ? childElem.GetUInt("index")
                                                               : M_MAX_UNSIGNED };
         if (!internalElem)
