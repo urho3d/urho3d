@@ -15425,7 +15425,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 Vector3 ScreenToWorldPoint(int, int, float) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetRenderPath(XMLFile);
+bool SetRenderPath(XMLFile);
 IntVector2 WorldToScreenPoint(const Vector3&) const;
 
 // Properties:
