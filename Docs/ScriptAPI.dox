@@ -453,12 +453,10 @@ namespace Urho3D
 - %Port : int
 
 ### NetworkNatMasterConnectionFailed
-- %Address : String
-- %Port : int
 
 ### NetworkNatMasterConnectionSucceeded
-- %Address : String
-- %Port : int
+
+### NetworkNatMasterDisconnected
 
 ## %Physics2D events
 
