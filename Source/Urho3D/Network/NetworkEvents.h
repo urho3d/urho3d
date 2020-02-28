@@ -137,15 +137,16 @@ URHO3D_EVENT(E_NETWORKNATPUNCHTROUGHFAILED, NetworkNatPunchtroughFailed)
 /// Connecting to NAT master server failed.
 URHO3D_EVENT(E_NATMASTERCONNECTIONFAILED, NetworkNatMasterConnectionFailed)
 {
-    URHO3D_PARAM(P_ADDRESS, Address);   // String
-    URHO3D_PARAM(P_PORT, Port);         // int
 }
 
 /// Connecting to NAT master server succeeded.
 URHO3D_EVENT(E_NATMASTERCONNECTIONSUCCEEDED, NetworkNatMasterConnectionSucceeded)
 {
-    URHO3D_PARAM(P_ADDRESS, Address);   // String
-    URHO3D_PARAM(P_PORT, Port);         // int
+}
+
+/// Disconnected from NAT master server.
+URHO3D_EVENT(E_NATMASTERDISCONNECTED, NetworkNatMasterDisconnected)
+{
 }
 
 }

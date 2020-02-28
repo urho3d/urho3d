@@ -23,27 +23,21 @@
 #include <Urho3D/Audio/Audio.h>
 #include <Urho3D/Audio/Sound.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
-#include <Urho3D/IO/IOEvents.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/IO/MemoryBuffer.h>
 #include <Urho3D/IO/VectorBuffer.h>
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/LineEdit.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
-#include <Urho3D/UI/UIEvents.h>
 
 #include "NATPunchtrough.h"
-
-#include <Urho3D/DebugNew.h>
 
 // Undefine Windows macro, as our Connection class has a function called SendMessage
 #ifdef SendMessage
@@ -79,28 +73,6 @@ void NATPunchtrough::CreateUI()
 {
     SetLogoVisible(true); // We need the full rendering window
 
-    // logHistory.Resize(20);
-
-    // // Create NAT server config fields
-    // int marginTop = 40;
-    // CreateLabel("1. Run NAT server somewhere, enter NAT server info and press 'Save NAT settings'", IntVector2(20, marginTop-20));
-    // natServerAddress = CreateLineEdit("127.0.0.1", 200, IntVector2(20, marginTop));
-    // natServerPort = CreateLineEdit("61111", 100, IntVector2(240, marginTop));
-    // saveNatSettingsButton = CreateButton("Save NAT settings", 160, IntVector2(360, marginTop));
-
-    // // Create server start button
-    // marginTop = 120;
-    // CreateLabel("2. Create server and give others your server GUID", IntVector2(20, marginTop-20));
-    // guid = CreateLineEdit("Your server GUID", 200, IntVector2(20, marginTop));
-    // startServerButton = CreateButton("Start server", 160, IntVector2(240, marginTop));
-
-    // // Create client connection related fields
-    // marginTop = 200;
-    // CreateLabel("3. Input local or remote server GUID", IntVector2(20, marginTop-20));
-    // serverGuid = CreateLineEdit("Remote server GUID", 200, IntVector2(20, marginTop));
-    // connectButton = CreateButton("Connect", 160, IntVector2(240, marginTop));
-
-    auto* graphics = GetSubsystem<Graphics>();
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     auto* cache = GetSubsystem<ResourceCache>();
     auto* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
@@ -110,7 +82,8 @@ void NATPunchtrough::CreateUI()
     auto* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
     logHistoryText_ = root->CreateChild<Text>();
     logHistoryText_->SetFont(font, 12);
-    logHistoryText_->SetPosition(20, 200);
+    logHistoryText_->SetPosition(20, -20);
+    logHistoryText_->SetVerticalAlignment(VA_BOTTOM);
     logHistory_.Resize(20);
 
     // Create NAT server config fields
@@ -138,8 +111,6 @@ void NATPunchtrough::CreateUI()
 
 void NATPunchtrough::SubscribeToEvents()
 {
-    // Subscribe HandleUpdate() function for processing update events
-    // SubscribeToEvent(E_NETWORKMESSAGE, URHO3D_HANDLER(Chat, HandleNetworkMessage));
     SubscribeToEvent(E_SERVERCONNECTED, URHO3D_HANDLER(NATPunchtrough, HandleServerConnected));
     SubscribeToEvent(E_SERVERDISCONNECTED, URHO3D_HANDLER(NATPunchtrough, HandleServerDisconnected));
     SubscribeToEvent(E_CONNECTFAILED, URHO3D_HANDLER(NATPunchtrough, HandleConnectFailed));
@@ -147,6 +118,7 @@ void NATPunchtrough::SubscribeToEvents()
     // NAT server connection related events
     SubscribeToEvent(E_NATMASTERCONNECTIONFAILED, URHO3D_HANDLER(NATPunchtrough, HandleNatConnectionFailed));
     SubscribeToEvent(E_NATMASTERCONNECTIONSUCCEEDED, URHO3D_HANDLER(NATPunchtrough, HandleNatConnectionSucceeded));
+    SubscribeToEvent(E_NATMASTERDISCONNECTED, URHO3D_HANDLER(NATPunchtrough, HandleNatDisconnected));
 
     // NAT punchtrough request events
     SubscribeToEvent(E_NETWORKNATPUNCHTROUGHSUCCEEDED, URHO3D_HANDLER(NATPunchtrough, HandleNatPunchtroughSucceeded));
@@ -237,6 +209,11 @@ void NATPunchtrough::HandleConnectFailed(StringHash eventType, VariantMap& event
     ShowLogMessage("Client: Connection failed!");
 }
 
+void NATPunchtrough::HandleNatDisconnected(StringHash eventType, VariantMap& eventData)
+{
+    ShowLogMessage("Disconnected from NAT master server");
+}
+
 void NATPunchtrough::HandleStartServer(StringHash eventType, VariantMap& eventData)
 {
     GetSubsystem<Network>()->StartServer(SERVER_PORT);
@@ -248,6 +225,7 @@ void NATPunchtrough::HandleStartServer(StringHash eventType, VariantMap& eventDa
 
     // Output our assigned GUID which others will use to connect to our server
     guid_->SetText(GetSubsystem<Network>()->GetGUID());
+    serverGuid_->SetText(GetSubsystem<Network>()->GetGUID());
 }
 
 void NATPunchtrough::HandleConnect(StringHash eventType, VariantMap& eventData)
