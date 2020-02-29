@@ -228,7 +228,7 @@ bool CompressedLevel::Decompress(unsigned char* dest) const
     case CF_DXT5:
         DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
         return true;
-	
+
     // ETC2 format is compatible with ETC1, so we just use the same function.
     case CF_ETC1:
     case CF_ETC2_RGB:
