@@ -79,9 +79,9 @@ private:
     /// Start server
     void HandleStartServer(StringHash eventType, VariantMap& eventData);
     /// Stop server
-	void HandleStopServer(StringHash eventType, VariantMap& eventData);
-	/// Start network discovery
-	void HandleDoNetworkDiscovery(StringHash eventType, VariantMap& eventData);
+    void HandleStopServer(StringHash eventType, VariantMap& eventData);
+    /// Start network discovery
+    void HandleDoNetworkDiscovery(StringHash eventType, VariantMap& eventData);
     /// Start server
     SharedPtr<Button> startServer_;
     /// Stop server
@@ -89,5 +89,5 @@ private:
     /// Redo LAN discovery
     SharedPtr<Button> refreshServerList_;
     /// Found server list
-	SharedPtr<Text> serverList_;
+    SharedPtr<Text> serverList_;
 };
