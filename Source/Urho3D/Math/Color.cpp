@@ -33,11 +33,11 @@ namespace Urho3D
 
 unsigned Color::ToUInt() const
 {
-    auto r = (unsigned)Clamp(((int)(r_ * 255.0f)), 0, 255);
-    auto g = (unsigned)Clamp(((int)(g_ * 255.0f)), 0, 255);
-    auto b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
-    auto a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
-    return (a << 24u) | (b << 16u) | (g << 8u) | r;
+    const auto r = static_cast<unsigned>(Clamp(static_cast<int>(r_ * 255.0f), 0, 255));
+    const auto g = static_cast<unsigned>(Clamp(static_cast<int>(g_ * 255.0f), 0, 255));
+    const auto b = static_cast<unsigned>(Clamp(static_cast<int>(b_ * 255.0f), 0, 255));
+    const auto a = static_cast<unsigned>(Clamp(static_cast<int>(a_ * 255.0f), 0, 255));
+    return a << 24u | b << 16u | g << 8u | r;
 }
 
 unsigned Color::ToUIntMask(const ChannelMask& mask) const
@@ -55,11 +55,11 @@ Vector3 Color::ToHSL() const
     float min, max;
     Bounds(&min, &max, true);
 
-    float h = Hue(min, max);
-    float s = SaturationHSL(min, max);
-    float l = (max + min) * 0.5f;
+    const float h{ Hue(min, max) };
+    const float s{ SaturationHSL(min, max) };
+    const float l{ (max + min) * 0.5f };
 
-    return Vector3(h, s, l);
+    return Vector3{ h, s, l };
 }
 
 Vector3 Color::ToHSV() const
@@ -67,19 +67,19 @@ Vector3 Color::ToHSV() const
     float min, max;
     Bounds(&min, &max, true);
 
-    float h = Hue(min, max);
-    float s = SaturationHSV(min, max);
-    float v = max;
+    const float h{ Hue(min, max) };
+    const float s{ SaturationHSV(min, max) };
+    const float v{ max };
 
-    return Vector3(h, s, v);
+    return Vector3{ h, s, v };
 }
 
 void Color::FromUInt(unsigned color)
 {
-    a_ = ((color >> 24u) & 0xffu) / 255.0f;
-    b_ = ((color >> 16u) & 0xffu) / 255.0f;
-    g_ = ((color >> 8u)  & 0xffu) / 255.0f;
-    r_ = ((color >> 0u)  & 0xffu) / 255.0f;
+    a_ = (color >> 24u & 0xffu) / 255.0f;
+    b_ = (color >> 16u & 0xffu) / 255.0f;
+    g_ = (color >> 8u  & 0xffu) / 255.0f;
+    r_ = (color >> 0u  & 0xffu) / 255.0f;
 }
 
 void Color::FromUIntMask(unsigned color, const ChannelMask& mask)
