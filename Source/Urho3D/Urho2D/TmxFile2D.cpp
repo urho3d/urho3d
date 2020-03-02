@@ -375,7 +375,14 @@ Sprite2D* TmxImageLayer2D::GetSprite() const
 
 TmxFile2D::TmxFile2D(Context* context) :
     Resource(context),
-    edgeOffset_(0.f)
+    loadXMLFile_{ nullptr },
+    tsxXMLFiles_{},
+    info_{},
+    gidToSpriteMapping_{},
+    gidToPropertySetMapping_{},
+    gidToCollisionShapeMapping_{},
+    layers_{},
+    edgeOffset_{ 0.0f }
 {
 }
 

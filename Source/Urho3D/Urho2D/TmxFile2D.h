@@ -215,7 +215,7 @@ private:
     /// TSX name to XML file mapping.
     HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
     /// Tile map information.
-    TileMapInfo2D info_{};
+    TileMapInfo2D info_;
     /// Gid to tile sprite mapping.
     HashMap<unsigned, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.
