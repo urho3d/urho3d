@@ -453,15 +453,17 @@ bool TmxFile2D::EndLoad()
     if (!loadXMLFile_)
         return false;
 
-    XMLElement rootElem = loadXMLFile_->GetRoot("map");
-    String version = rootElem.GetAttribute("version");
-    if (version != "1.0")
+    const XMLElement rootElem{ loadXMLFile_->GetRoot("map") };
+    const String version{ rootElem.GetAttribute("version") };
+
+    if (!version.StartsWith("1."))
     {
         URHO3D_LOGERROR("Invalid version");
         return false;
     }
 
-    String orientation = rootElem.GetAttribute("orientation");
+    const String orientation{ rootElem.GetAttribute("orientation") };
+
     if (orientation == "orthogonal")
         info_.orientation_ = O_ORTHOGONAL;
     else if (orientation == "isometric")
@@ -481,16 +483,20 @@ bool TmxFile2D::EndLoad()
     info_.tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
     info_.tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
-    for (unsigned i = 0; i < layers_.Size(); ++i)
+    for (unsigned i{ 0 }; i < layers_.Size(); ++i)
         delete layers_[i];
+
     layers_.Clear();
 
-    for (XMLElement childElement = rootElem.GetChild(); childElement; childElement = childElement.GetNext())
+    for (XMLElement childElement{ rootElem.GetChild() }; childElement; childElement = childElement.GetNext())
     {
-        bool ret = true;
-        String name = childElement.GetName();
+        bool ret{ true };
+        const String name{ childElement.GetName() };
+
         if (name == "tileset")
+        {
             ret = LoadTileSet(childElement);
+        }
         else if (name == "layer")
         {
             auto* tileLayer = new TmxTileLayer2D(this);
