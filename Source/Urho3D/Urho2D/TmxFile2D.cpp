@@ -375,7 +375,8 @@ Sprite2D* TmxImageLayer2D::GetSprite() const
 
 TmxFile2D::TmxFile2D(Context* context) :
     Resource(context),
-    edgeOffset_(0.f)
+    info_{},
+    edgeOffset_{ 0.f }
 {
 }
 
@@ -453,13 +454,10 @@ bool TmxFile2D::EndLoad()
     if (!loadXMLFile_)
         return false;
 
-    XMLElement rootElem = loadXMLFile_->GetRoot("map");
-    String version = rootElem.GetAttribute("version");
-    if (version != "1.0")
-    {
-        URHO3D_LOGERROR("Invalid version");
+    const XMLElement rootElem{ loadXMLFile_->GetRoot("map") };
+
+    if (!IsCorrectVersion(rootElem))
         return false;
-    }
 
     String orientation = rootElem.GetAttribute("orientation");
     if (orientation == "orthogonal")
@@ -525,6 +523,17 @@ bool TmxFile2D::EndLoad()
     loadXMLFile_.Reset();
     tsxXMLFiles_.Clear();
     return true;
+}
+
+bool TmxFile2D::IsCorrectVersion(const XMLElement& element) const
+{
+    const String version{ element.GetAttribute("version") };
+
+    if (version.StartsWith("1."))
+        return true;
+
+    URHO3D_LOGERROR("Invalid TMX version");
+    return false;
 }
 
 bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight)
