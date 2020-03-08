@@ -124,6 +124,17 @@ struct ScreenModeParams
     bool operator !=(const ScreenModeParams& rhs) const { return !(*this == rhs); }
 };
 
+/// Window mode parameters.
+struct WindowModeParams
+{
+    /// Width of the window. 0 to pick automatically.
+    int width_{};
+    /// Height of the window. 0 to pick automatically.
+    int height_{};
+    /// Screen mode parameters.
+    ScreenModeParams screenParams_;
+};
+
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class URHO3D_API Graphics : public Object
 {
@@ -146,10 +157,17 @@ public:
     /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
+    /// Don't use SetScreenMode if ToggleFullscreen is used directly or indirectly.
     bool SetScreenMode(int width, int height, const ScreenModeParams& params, bool maximize = false);
     /// Set screen resolution only. Return true if successful.
+    /// Don't use SetScreenMode if ToggleFullscreen is used directly or indirectly.
     bool SetScreenMode(int width, int height);
-    /// Set screen mode. Deprecated. Return true if successful.
+    /// Set window modes to be rotated by ToggleFullscreen. Apply primary window settings immeditally.
+    /// Window may be maximized if requested and possible. Return true if successful.
+    bool SetWindowModes(const WindowModeParams& windowMode, const WindowModeParams& secondaryWindowMode, bool maximize = false);
+    /// Set default window modes. Return true if successful.
+    bool SetDefaultWindowModes(int width, int height, const ScreenModeParams& params);
+    /// Set default window modes. Deprecated. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable,
         bool highDPI, bool vsync, bool tripleBuffer, int multiSample, int monitor, int refreshRate);
     /// Set screen resolution only. Deprecated. Return true if successful.
@@ -698,6 +716,11 @@ private:
     WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_{};
+    /// Most recently applied window mode. It may not represent actual window state
+    /// if window was resized by user or Graphics::SetScreenMode was explicitly called.
+    WindowModeParams primaryWindowMode_;
+    /// Secondary window mode to be applied on Graphics::ToggleFullscreen.
+    WindowModeParams secondaryWindowMode_;
     /// Window width in pixels.
     int width_{};
     /// Window height in pixels.

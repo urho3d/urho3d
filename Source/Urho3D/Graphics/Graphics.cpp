@@ -108,36 +108,68 @@ bool Graphics::SetScreenMode(int width, int height)
     return SetScreenMode(width, height, screenParams_);
 }
 
+bool Graphics::SetWindowModes(const WindowModeParams& windowMode, const WindowModeParams& secondaryWindowMode, bool maximize)
+{
+    primaryWindowMode_ = windowMode;
+    secondaryWindowMode_ = secondaryWindowMode;
+    return SetScreenMode(primaryWindowMode_.width_, primaryWindowMode_.height_, primaryWindowMode_.screenParams_, maximize);
+}
+
+bool Graphics::SetDefaultWindowModes(int width, int height, const ScreenModeParams& params)
+{
+    // Fill window mode to be applied now
+    WindowModeParams primaryWindowMode;
+    primaryWindowMode.width_ = width;
+    primaryWindowMode.height_ = height;
+    primaryWindowMode.screenParams_ = params;
+
+    // Fill window mode to be applied on Graphics::ToggleFullscreen
+    WindowModeParams secondaryWindowMode = primaryWindowMode;
+
+    // Pick resolution automatically
+    secondaryWindowMode.width_ = 0;
+    secondaryWindowMode.height_ = 0;
+
+    if (params.fullscreen_ || params.borderless_)
+    {
+        secondaryWindowMode.screenParams_.fullscreen_ = false;
+        secondaryWindowMode.screenParams_.borderless_ = false;
+    }
+    else
+    {
+        secondaryWindowMode.screenParams_.borderless_ = true;
+    }
+
+    const bool maximize = (!width || !height) && !params.fullscreen_ && !params.borderless_ && params.resizable_;
+    return SetWindowModes(primaryWindowMode, secondaryWindowMode, maximize);
+}
+
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable,
     bool highDPI, bool vsync, bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
-    ScreenModeParams newParams;
-    newParams.fullscreen_ = fullscreen;
-    newParams.borderless_ = borderless;
-    newParams.resizable_ = resizable;
-    newParams.highDPI_ = highDPI;
-    newParams.vsync_ = vsync;
-    newParams.tripleBuffer_ = tripleBuffer;
-    newParams.multiSample_ = multiSample;
-    newParams.monitor_ = monitor;
-    newParams.refreshRate_ = refreshRate;
+    ScreenModeParams params;
+    params.fullscreen_ = fullscreen;
+    params.borderless_ = borderless;
+    params.resizable_ = resizable;
+    params.highDPI_ = highDPI;
+    params.vsync_ = vsync;
+    params.tripleBuffer_ = tripleBuffer;
+    params.multiSample_ = multiSample;
+    params.monitor_ = monitor;
+    params.refreshRate_ = refreshRate;
 
-    const bool maximize = (!width || !height) && !fullscreen && !borderless && resizable;
-    return SetScreenMode(width, height, newParams, maximize);
+    return SetDefaultWindowModes(width, height, params);
 }
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, screenParams_.fullscreen_, screenParams_.borderless_, screenParams_.resizable_,
-        screenParams_.highDPI_, screenParams_.vsync_, screenParams_.tripleBuffer_,
-        screenParams_.multiSample_, screenParams_.monitor_, screenParams_.refreshRate_);
+    return SetDefaultWindowModes(width, height, screenParams_);
 }
 
 bool Graphics::ToggleFullscreen()
 {
-    ScreenModeParams newParams = screenParams_;
-    newParams.fullscreen_ = !newParams.fullscreen_;
-    return SetScreenMode(width_, height_, newParams);
+    Swap(primaryWindowMode_, secondaryWindowMode_);
+    return SetScreenMode(primaryWindowMode_.width_, primaryWindowMode_.height_, primaryWindowMode_.screenParams_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Variant& value)
