@@ -276,7 +276,7 @@ PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
     return ret;
 }
 
-unsigned Graphics::FindBestResolution(int monitor, int width, int height, int refreshRate) const
+unsigned Graphics::FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const
 {
     const PODVector<IntVector3> resolutions = GetResolutions(monitor);
     if (resolutions.Empty())
@@ -549,7 +549,7 @@ void Graphics::AdjustScreenMode(int& newWidth, int& newHeight, ScreenModeParams&
         const PODVector<IntVector3> resolutions = GetResolutions(params.monitor_);
         if (!resolutions.Empty())
         {
-            const unsigned bestResolution = FindBestResolution(params.monitor_,
+            const unsigned bestResolution = FindBestResolutionIndex(params.monitor_,
                 newWidth, newHeight, params.refreshRate_);
             newWidth = resolutions[bestResolution].x_;
             newHeight = resolutions[bestResolution].y_;

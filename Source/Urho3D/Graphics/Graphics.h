@@ -350,7 +350,7 @@ public:
     /// Return screen mode parameters.
     const ScreenModeParams& GetScreenModeParams() const { return screenParams_; }
 
-    /// Return multisample mode (1 = no multisampling.)
+    /// Return multisample mode (1 = no multisampling).
     int GetMultiSample() const { return screenParams_.multiSample_; }
 
     /// Return window size in pixels.
@@ -440,7 +440,7 @@ public:
     /// Return supported fullscreen resolutions (third component is refreshRate). Will be empty if listing the resolutions is not supported on the platform (e.g. Web).
     PODVector<IntVector3> GetResolutions(int monitor) const;
     /// Return index of the best resolution for requested width, height and refresh rate.
-    unsigned FindBestResolution(int monitor, int width, int height, int refreshRate) const;
+    unsigned FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
     /// Return the desktop resolution.
