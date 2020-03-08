@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -161,6 +161,9 @@ void RigidBody::getWorldTransform(btTransform& worldTrans) const
 
 void RigidBody::setWorldTransform(const btTransform& worldTrans)
 {
+    if (!body_->isActive()) // Fix #2491
+        return;
+
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
     Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMass_;
     RigidBody* parentRigidBody = nullptr;

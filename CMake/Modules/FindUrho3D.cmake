@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -103,10 +103,6 @@ else ()
         if (NOT CMAKE_FIND_LIBRARY_SUFFIXES MATCHES ^\\.\(a|lib\))
             list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
         endif ()
-        # Cater for the shared library extension in Emscripten build which is ".bc" instead of ".so", and also cater for the module library extension
-        if (EMSCRIPTEN)
-            string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES};.js")   # Stringify for string replacement
-        endif ()
         # If library type is specified then only search for the requested library type
         if (NOT MSVC AND URHO3D_LIB_TYPE)      # MSVC static lib and import lib have a same extension, so cannot use it for searches
             if (URHO3D_LIB_TYPE STREQUAL STATIC)
@@ -116,13 +112,9 @@ else ()
                     set (CMAKE_FIND_LIBRARY_SUFFIXES .dll.a)
                 elseif (APPLE)
                     set (CMAKE_FIND_LIBRARY_SUFFIXES .dylib)
-                elseif (EMSCRIPTEN)
-                    set (CMAKE_FIND_LIBRARY_SUFFIXES .bc)
                 else ()
                     set (CMAKE_FIND_LIBRARY_SUFFIXES .so)
                 endif ()
-            elseif (URHO3D_LIB_TYPE STREQUAL MODULE AND EMSCRIPTEN)
-                set (CMAKE_FIND_LIBRARY_SUFFIXES .js)
             else ()
                 message (FATAL_ERROR "Library type: '${URHO3D_LIB_TYPE}' is not supported")
             endif ()
@@ -200,11 +192,7 @@ else ()
                 # For Non-MSVC compiler the static define is not baked into the export header file so we need to define it for the try_compile below
                 set (COMPILER_STATIC_DEFINE COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
             else ()
-                if (EXT STREQUAL .js)
-                    set (URHO3D_LIB_TYPE MODULE)
-                else ()
-                    set (URHO3D_LIB_TYPE SHARED)
-                endif ()
+                set (URHO3D_LIB_TYPE SHARED)
                 unset (COMPILER_STATIC_DEFINE)
             endif ()
         endif ()
@@ -240,7 +228,6 @@ else ()
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
             if (SKIP_COMPILE_TEST
-                OR URHO3D_LIB_TYPE STREQUAL MODULE                  # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
                 OR CMAKE_PROJECT_NAME STREQUAL Urho3D-Launcher)     # Workaround initial IDE "gradle sync" error due to library has not been built yet
                 set (URHO3D_COMPILE_RESULT 1)
             else ()

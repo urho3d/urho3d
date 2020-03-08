@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,14 +63,14 @@ Sample2D::Sample2D(Context* context) :
 {
 }
 
-void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info)
+void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, const TileMapInfo2D& info)
 {
     // Create rigid body to the root node
     auto* body = tileMapNode->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
 
     // Generate physics collision shapes and rigid bodies from the tmx file's objects located in "Physics" layer
-    for (int i = 0; i < tileMapLayer->GetNumObjects(); ++i)
+    for (unsigned i = 0; i < tileMapLayer->GetNumObjects(); ++i)
     {
         TileMapObject2D* tileMapObject = tileMapLayer->GetObject(i); // Get physics objects
 
@@ -104,7 +104,7 @@ void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLay
     }
 }
 
-CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* object, Vector2 size, TileMapInfo2D info)
+CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* object, const Vector2& size, const TileMapInfo2D& info)
 {
     auto* shape = node->CreateComponent<CollisionBox2D>();
     shape->SetSize(size);
@@ -121,7 +121,7 @@ CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* obje
     return shape;
 }
 
-CollisionCircle2D* Sample2D::CreateCircleShape(Node* node, TileMapObject2D* object, float radius, TileMapInfo2D info)
+CollisionCircle2D* Sample2D::CreateCircleShape(Node* node, TileMapObject2D* object, float radius, const TileMapInfo2D& info)
 {
     auto* shape = node->CreateComponent<CollisionCircle2D>();
     Vector2 size = object->GetSize();
@@ -165,7 +165,7 @@ CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* obj
     return shape;
 }
 
-Node* Sample2D::CreateCharacter(TileMapInfo2D info, float friction, Vector3 position, float scale)
+Node* Sample2D::CreateCharacter(const TileMapInfo2D& info, float friction, const Vector3& position, float scale)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     Node* spriteNode = scene_->CreateChild("Imp");
@@ -269,7 +269,7 @@ void Sample2D::PopulateMovingEntities(TileMapLayer2D* movingEntitiesLayer)
     Node* platformNode = CreateMovingPlatform();
 
     // Instantiate enemies and moving platforms at each placeholder (placeholders are Poly Line objects defining a path from points)
-    for (int i=0; i < movingEntitiesLayer->GetNumObjects(); ++i)
+    for (unsigned i=0; i < movingEntitiesLayer->GetNumObjects(); ++i)
     {
         // Get placeholder object
         TileMapObject2D* movingObject = movingEntitiesLayer->GetObject(i); // Get placeholder object
@@ -316,7 +316,7 @@ void Sample2D::PopulateCoins(TileMapLayer2D* coinsLayer)
     Node* coinNode = CreateCoin();
 
     // Instantiate coins to pick at each placeholder
-    for (int i=0; i < coinsLayer->GetNumObjects(); ++i)
+    for (unsigned i=0; i < coinsLayer->GetNumObjects(); ++i)
     {
         TileMapObject2D* coinObject = coinsLayer->GetObject(i); // Get placeholder object
         Node* coinClone = coinNode->Clone();
@@ -334,7 +334,7 @@ void Sample2D::PopulateTriggers(TileMapLayer2D* triggersLayer)
     Node* triggerNode = CreateTrigger();
 
     // Instantiate triggers at each placeholder (Rectangle objects)
-    for (int i=0; i < triggersLayer->GetNumObjects(); ++i)
+    for (unsigned i=0; i < triggersLayer->GetNumObjects(); ++i)
     {
         TileMapObject2D* triggerObject = triggersLayer->GetObject(i); // Get placeholder object
         if (triggerObject->GetObjectType() == OT_RECTANGLE)
@@ -374,10 +374,10 @@ float Sample2D::Zoom(Camera* camera)
     return zoom_;
 }
 
-PODVector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, Vector2 offset)
+PODVector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset)
 {
     PODVector<Vector2> path;
-    for (int i=0; i < object->GetNumPoints(); ++i)
+    for (unsigned i=0; i < object->GetNumPoints(); ++i)
         path.Push(object->GetPoint(i) + offset);
     return path;
 }
@@ -496,7 +496,7 @@ void Sample2D::SaveScene(bool initial)
     scene_->SaveXML(saveFile);
 }
 
-void Sample2D::CreateBackgroundSprite(TileMapInfo2D info, float scale, const String& texture, bool animate)
+void Sample2D::CreateBackgroundSprite(const TileMapInfo2D& info, float scale, const String& texture, bool animate)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("Background");
@@ -523,7 +523,7 @@ void Sample2D::SpawnEffect(Node* node)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     Node* particleNode = node->CreateChild("Emitter");
-    particleNode->SetScale(0.5 / node->GetScale().x_);
+    particleNode->SetScale(0.5f / node->GetScale().x_);
     auto* particleEmitter = particleNode->CreateComponent<ParticleEmitter2D>();
     particleEmitter->SetLayer(2);
     particleEmitter->SetEffect(cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex"));

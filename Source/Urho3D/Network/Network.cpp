@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -569,7 +569,7 @@ void Network::Disconnect(int waitMSec)
     isServer_ = false;
 }
 
-bool Network::StartServer(unsigned short port)
+bool Network::StartServer(unsigned short port, unsigned int maxConnections)
 {
     if (IsServerRunning())
         return true;
@@ -580,11 +580,13 @@ bool Network::StartServer(unsigned short port)
     socket.port = port;
     socket.socketFamily = AF_INET;
     // Startup local connection with max 128 incoming connection(first param) and 1 socket description (third param)
-    SLNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
+    SLNet::StartupResult startResult = rakPeer_->Startup(maxConnections, &socket, 1);
+    allowedConnectionCount_ = maxConnections;
+
     if (startResult == SLNet::RAKNET_STARTED)
     {
         URHO3D_LOGINFO("Started server on port " + String(port));
-        rakPeer_->SetMaximumIncomingConnections(allowedConnectionCount_);
+        rakPeer_->SetMaximumIncomingConnections(maxConnections);
         isServer_ = true;
         rakPeer_->SetOccasionalPing(true);
         rakPeer_->SetUnreliableTimeout(1000);
@@ -674,16 +676,10 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 {
     if (!rakPeer_)
         return;
-    /* Make sure not to use SLikeNet(RakNet) internal message ID's
-     and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
-    if (msgID < ID_USER_PACKET_ENUM || msgID >= 255)
-    {
-        URHO3D_LOGERROR("Can not send message with reserved ID");
-        return;
-    }
 
     VectorBuffer msgData;
-    msgData.WriteUByte((unsigned char)msgID);
+    msgData.WriteUByte((unsigned char)ID_USER_PACKET_ENUM);
+    msgData.WriteUInt((unsigned int)msgID);
     msgData.Write(data, numBytes);
 
     if (isServer_ || networkMode_ == PEER_TO_PEER) {
@@ -994,14 +990,15 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
                     rakPeer_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
                 }
             }
-        } else if (isServer)
+        }
+        else if (isServer)
         {
             ClientDisconnected(packet->guid);
         }
         else
         {
             if (networkMode_ == SERVER_CLIENT) {
-                OnServerDisconnected();
+                OnServerDisconnected(packet->systemAddress);
             } else {
                 ClientDisconnected(packet->guid);
             }
@@ -1018,7 +1015,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 
             if (!isServer)
             {
-                OnServerDisconnected();
+                OnServerDisconnected(packet->systemAddress);
             }
         }
         packetHandled = true;
@@ -1223,6 +1220,8 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     // Urho3D messages
     if (packetID >= ID_USER_PACKET_ENUM)
     {
+        unsigned int messageID = *(unsigned int*)(packet->data + dataStart);
+        dataStart += sizeof(unsigned int);
         //URHO3D_LOGINFOF("ID_USER_PACKET_ENUM %i", packetID);
         if (packetID == MSG_P2P_JOIN_REQUEST) {
             URHO3D_LOGINFO("MSG_P2P_JOIN_REQUEST");
@@ -1235,21 +1234,22 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 //                ClientDisconnected(packet->guid);
 //                URHO3D_LOGWARNING("StartVerifiedJoin FAILED");
 //            }
-        } else if (networkMode_ == PEER_TO_PEER && IsHostSystem())
+        }
+        else if (networkMode_ == PEER_TO_PEER && IsHostSystem())
         {
             // We are the host in the P2P server, parse the message accordingly
-            HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+            HandleMessage(packet->guid, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
         }
         else if (networkMode_ == SERVER_CLIENT && isServer_) {
             // We are the server in the server-client connection
-            HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+            HandleMessage(packet->systemAddress, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
         }
         else {
             // we are client in either P2P or server-client mode
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            if (serverConnection_ && !serverConnection_->ProcessMessage(packetID, buffer))
-            {
-                HandleMessage(packet->guid, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+            bool processed = serverConnection_->ProcessMessage(messageID, buffer);
+            if (!processed) {
+                HandleMessage(packet->guid, 0, messageID, (const char *) (packet->data + dataStart), packet->length - dataStart);
             }
         }
         packetHandled = true;
@@ -1392,13 +1392,18 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
     SendEvent(E_SERVERCONNECTED);
 }
 
-void Network::OnServerDisconnected()
+void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
 {
     if (networkMode_ == PEER_TO_PEER) {
         return;
     }
 
     if (!serverConnection_) {
+        return;
+    }
+
+    if (natPunchServerAddress_ && *natPunchServerAddress_ == address.systemAddress) {
+        SendEvent(E_NATMASTERDISCONNECTED);
         return;
     }
 

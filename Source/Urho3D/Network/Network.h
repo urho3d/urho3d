@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,6 @@ public:
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address = nullptr);
     /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
-
     /// Set the data that will be used for a reply to attempts at host discovery on LAN/subnet.
     void SetDiscoveryBeacon(const VariantMap& data);
     /// Scan the LAN/subnet for available hosts.
@@ -70,9 +69,6 @@ public:
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
-    /// Start a server on a port using UDP protocol. Return true if successful.
-    bool StartServer(unsigned short port);
-
     /// Start P2P session
     bool StartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Join existing P2P session
@@ -97,7 +93,8 @@ public:
     void SetNATAutoReconnect(bool retry);
     /// Get NAT server auto reconnect
     const bool GetNATAutoReconnect() const { return natAutoReconnect_; }
-
+    /// Start a server on a port using UDP protocol. Return true if successful.
+    bool StartServer(unsigned short port, unsigned int maxConnections = 128);
     /// Stop the server.
     void StopServer();
     /// Start NAT punchtrough client to allow remote connections.
@@ -191,7 +188,7 @@ private:
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
-    void OnServerDisconnected();
+    void OnServerDisconnected(const SLNet::AddressOrGUID& address);
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.

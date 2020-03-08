@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@ task :cmake do
     case option
     when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2015', 'vs2017', 'xcode'
+    when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2015', 'vs2017', 'vs2019', 'xcode'
       script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
@@ -103,7 +103,7 @@ task :make do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2015', 'vs2017', 'xcode'
+    when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2015', 'vs2017', 'vs2019', 'xcode'
       # do nothing
     when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
@@ -163,7 +163,7 @@ task :make do
     if numjobs.empty?
       case RUBY_PLATFORM
       when /linux/
-        numjobs = (platform == 'web' ? `grep 'core id' /proc/cpuinfo |sort |uniq |wc -l` : `grep -c processor /proc/cpuinfo`).chomp
+        numjobs = `grep -c processor /proc/cpuinfo`.chomp
       when /darwin/
         numjobs = `sysctl -n hw.#{platform == 'web' ? 'physical' : 'logical'}cpu`.chomp
       when /win32|mingw|mswin/
@@ -309,21 +309,16 @@ task :ci do
     system 'clang --version && emcc --version' or abort 'Failed to find Emscripten compiler toolchain'
   end
   # Show CMake version
-  if ENV['ANDROID']
-    # Android build uses SDK's embedded CMake which is non-vanilla version of CMake
-    system '$ANDROID_HOME/cmake/*/bin/cmake --version' or abort 'Failed to find CMake'
-  else
-    system 'cmake --version' or abort 'Failed to find CMake'
-  end
+  system 'cmake --version' or abort 'Failed to find CMake'
   puts; $stdout.flush
   # Use out-of-source build tree
   ENV['build_tree'] = 'build/ci'
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
   ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
   # When not explicitly specified then use generic generator
-  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2017') : '')
+  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? (ENV['MINGW'] ? 'mingw' : 'vs2019') : '')
   # Cache the initial build tree for next run on platform that is slow to generate the build tree
-  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']} && git diff $(cat #{ENV['HOME']}/initial-build-tree/.sha1) $TRAVIS_COMMIT --name-only |grep -i cmake |xargs -r touch" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/.sha1")
+  system "mkdir -p #{ENV['build_tree']} && cp -rp #{ENV['HOME']}/initial-build-tree/* #{ENV['build_tree']} && git diff $(cat #{ENV['HOME']}/initial-build-tree/.sha1) $TRAVIS_COMMIT --name-only 2>/dev/null |grep -i cmake |xargs touch 2>/dev/null" if (ENV['OSX'] || ENV['WEB']) && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/.sha1")
   system "rake cmake #{generator} URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
   system "bash -c 'cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree 2>/dev/null && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include} 2>/dev/null && echo $TRAVIS_COMMIT >#{ENV['HOME']}/initial-build-tree/.sha1'" if (ENV['OSX'] || ENV['WEB']) && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
@@ -388,7 +383,7 @@ task :ci do
       Dir.chdir scaffolding 'UsingSDK' do
         puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
         # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
-        system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+        system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} && rake make #{test} && rm -rf ~/usr" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
       end
       next if timeup
       # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
@@ -422,24 +417,27 @@ task :ci_site_update do
   next unless File.exist?("#{build_tree}/CMakeCache.txt")
   next if timeup
   puts "Updating site...\n\n"
-  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ~/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
   # Update credits from README.md to about.yml
-  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' ~/urho3d.github.io/_data/about.yml" or abort 'Failed to update credits'
+  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' build/urho3d.github.io/_data/about.yml" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 40, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}, %q{COLS_IN_ALPHA_INDEX} => 3} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' #{build_tree}/Docs/generated/Doxyfile" or abort 'Failed to setup doxygen configuration file'
-  system "cp ~/urho3d.github.io/_includes/Doxygen/minimal-* #{build_tree}/Docs" or abort 'Failed to copy minimal-themed template'
+  system "cp build/urho3d.github.io/_includes/Doxygen/minimal-* #{build_tree}/Docs" or abort 'Failed to copy minimal-themed template'
   release = ENV['RELEASE_TAG'] || 'HEAD'
   unless release == 'HEAD'
-    system "mkdir -p ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to create directory for new document version'
+    system "mkdir -p build/urho3d.github.io/documentation/#{release}" or abort 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' #{build_tree}/Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
     append_new_release release or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
-  system "cd #{build_tree} && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
+  Dir.chdir build_tree do
+    system "make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html" or abort 'Failed to generate doxygen pages'
+  end
+  system "rsync -a --delete #{build_tree}/Docs/html/ build/urho3d.github.io/documentation/#{release}" or abort 'Failed to rsync doxygen pages'
   # TODO: remove below workaround after upgrading to 1.8.14 or greater
-  system "cp ~/urho3d.github.io/documentation/1.7/dynsections.js ~/urho3d.github.io/documentation/#{release}" or abort 'Failed to workaround Doxygen 1.8.13 bug'
+  system "cp build/urho3d.github.io/documentation/1.7/dynsections.js build/urho3d.github.io/documentation/#{release}" or abort 'Failed to workaround Doxygen 1.8.13 bug'
   # Supply GIT credentials to push site documentation changes to urho3d/urho3d.github.io.git
-  system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
+  system "cd build/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
   next if timeup
   # Skip detecting source tree changes when HEAD has moved or it is too late already as a release tag has just been pushed
   unless ENV['RELEASE_TAG'] || `git fetch -qf origin #{ENV['TRAVIS_BRANCH']}; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
@@ -450,7 +448,7 @@ task :ci_site_update do
     if /2008-([0-9]{4}) the Urho3D project/.match(File.read('Rakefile'))[1].to_i != Time.now.year
       # Automatically bump copyright when crossing a new year
       system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
-      ['urho3d.github.io master', 'android-ndk ndk-update-trigger', 'armhf-sysroot sysroot-update-trigger', 'arm64-sysroot sysroot-update-trigger', 'rpi-sysroot sysroot-update-trigger', 'emscripten-sdk sdk-update-trigger', 'dockerized master', 'dockerized native', 'dockerized mingw', 'dockerized android', 'dockerized rpi', 'dockerized arm', 'dockerized web'].each { |var| pair = var.split; system "if [ ! -d ~/#{pair.first} ]; then git clone -q --depth 1 --branch #{pair.last} https://github.com/urho3d/#{pair.first} ~/#{pair.first}; fi" or abort "Failed to clone urho3d/#{pair.first}"; system "cd ~/#{pair.first} && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/#{pair.first} && git add #{bump_copyright_year("~/#{pair.first}").join ' '} 2>/dev/null && git add #{bump_copyright_year("~/#{pair.first}", '2014-[0-9]{4} Yao').join ' '} 2>/dev/null && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ci skip]'; then git push -q >/dev/null 2>&1; fi" or abort "Failed to push copyright update for urho3d/#{pair.first}"; }
+      ['urho3d.github.io master'].each { |var| pair = var.split; system "if [ ! -d build/#{pair.first} ]; then git clone -q --depth 1 --branch #{pair.last} https://github.com/urho3d/#{pair.first} build/#{pair.first}; fi" or abort "Failed to clone urho3d/#{pair.first}"; system "cd build/#{pair.first} && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/#{pair.first} && git add #{bump_copyright_year("build/#{pair.first}").join ' '} 2>/dev/null && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ci skip]'; then git push -q >/dev/null 2>&1; fi" or abort "Failed to push copyright update for urho3d/#{pair.first}" }
     elsif system("git add Docs/*API* && git commit -qm 'Test commit to detect API documentation changes'")
       # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
@@ -467,9 +465,9 @@ task :ci_emscripten_samples_update do
   next if timeup
   build_tree = 'build/ci'
   puts 'Updating Web samples in main website...'
-  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ~/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
-  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md #{build_tree}/bin/ ~/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
-  Dir.chdir('~/urho3d.github.io/samples') {
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md #{build_tree}/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  Dir.chdir('build/urho3d.github.io/samples') {
     next unless system 'git diff --quiet Urho3D.js.data'
     uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
     system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js)
@@ -482,7 +480,7 @@ task :ci_emscripten_samples_update do
   }
   update_web_samples_data or abort 'Failed to update Web json data file'
   root_commit, _ = get_root_commit_and_recipients
-  system "cd ~/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
+  system "cd build/urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
 end
 
 # Usage: NOT intended to be used manually
@@ -651,7 +649,7 @@ def scaffolding dir, project = 'Scaffolding', target = 'Main'
   dir.gsub!(/\//, '\\') if ENV['OS']
   build_script = <<EOF
 # Set CMake minimum version and CMake policy required by UrhoCommon module
-cmake_minimum_required (VERSION 3.2.3)
+cmake_minimum_required (VERSION 3.10.2)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)
@@ -751,7 +749,7 @@ def retry_block retries = 10, retry_interval = 1
     0
 end
 
-def append_new_release release, filename = '~/urho3d.github.io/_data/urho3d.json'
+def append_new_release release, filename = 'build/urho3d.github.io/_data/urho3d.json'
   begin
     urho3d_hash = JSON.parse File.read filename
     unless urho3d_hash['releases'].last == release
@@ -764,7 +762,7 @@ def append_new_release release, filename = '~/urho3d.github.io/_data/urho3d.json
   end
 end
 
-def update_web_samples_data dir = '~/urho3d.github.io/samples', filename = '~/urho3d.github.io/_data/web.json'
+def update_web_samples_data dir = 'build/urho3d.github.io/samples', filename = 'build/urho3d.github.io/_data/web.json'
   begin
     web = { 'samples' => {} }
     Dir.chdir(dir) { web['samples']['Native'] = Dir['*.html'].sort }

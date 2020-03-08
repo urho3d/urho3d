@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    ndkVersion = ndkSideBySideVersion
+    compileSdkVersion(29)
     defaultConfig {
-        minSdkVersion(17)
-        targetSdkVersion(27)
+        minSdkVersion(18)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -46,7 +47,8 @@ android {
                     System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
                     add("-DGRADLE_BUILD_DIR=$buildDir")
                     // Pass along matching Gradle properties as CMake build options
-                    addAll(listOf(
+                    addAll(
+                        listOf(
                             "URHO3D_LIB_TYPE",
                             "URHO3D_ANGELSCRIPT",
                             "URHO3D_LUA",
@@ -63,14 +65,15 @@ android {
                             "URHO3D_FILEWATCHER",
                             "URHO3D_PROFILING",
                             "URHO3D_LOGGING",
-                            "URHO3D_THREADING")
+                            "URHO3D_THREADING"
+                        )
                             .filter { project.hasProperty(it) }
                             .map { "-D$it=${project.property(it)}" }
                     )
                     // In order to get clean module segregation, always exclude player/samples from AAR
                     addAll(listOf(
-                            "URHO3D_PLAYER",
-                            "URHO3D_SAMPLES"
+                        "URHO3D_PLAYER",
+                        "URHO3D_SAMPLES"
                     ).map { "-D$it=0" })
                 }
                 targets.add("Urho3D")
@@ -80,8 +83,11 @@ android {
             abi {
                 isEnable = project.hasProperty("ANDROID_ABI")
                 reset()
-                include(*(project.findProperty("ANDROID_ABI") as String? ?: "")
-                        .split(',').toTypedArray())
+                include(
+                    *(project.findProperty("ANDROID_ABI") as String? ?: "")
+                        .split(',')
+                        .toTypedArray()
+                )
             }
         }
     }
@@ -100,14 +106,20 @@ android {
             setBuildStagingDirectory(".cxx")
         }
     }
+    sourceSets {
+        getByName("main") {
+            java.srcDir("../../Source/ThirdParty/SDL/android-project/app/src/main/java")
+        }
+    }
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-    testImplementation("junit:junit:$junitVersion")
-    androidTestImplementation("com.android.support.test:runner:$testRunnerVersion")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$testEspressoVersion")
+    implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
+    implementation("com.getkeepsafe.relinker:relinker:1.3.1")
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
 
 lateinit var docABI: String
@@ -181,7 +193,7 @@ tasks {
         doLast {
             val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
             named<Exec>("makeDoc") {
-                // This is a hack - expect the first line to contain the path to the embedded CMake executable
+                // This is a hack - expect the first line to contain the path to the CMake executable
                 executable = File(buildTree, "build_command.txt").readLines().first().split(":").last().trim()
                 workingDir = buildTree
             }
@@ -204,9 +216,9 @@ publishing {
             afterEvaluate {
                 // Exclude publishing STATIC-debug AAR because its size exceeds 250MB limit allowed by Bintray
                 android.buildTypes
-                        .map { it.name }
-                        .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
-                        .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
+                    .map { it.name }
+                    .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
+                    .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
             }
             artifact(tasks["sourcesJar"])
             artifact(tasks["documentationZip"])

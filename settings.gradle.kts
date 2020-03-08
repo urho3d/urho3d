@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@ pluginManagement {
         eachPlugin {
             when {
                 requested.id.id.startsWith("com.android.") ->
-                    useModule("com.android.tools.build:gradle:$androidToolsVersion")
+                    useModule("com.android.tools.build:gradle:3.5.3")
                 requested.id.id.startsWith("org.jetbrains.kotlin.") ->
-                    useVersion(kotlinVersion)
+                    useVersion(embeddedKotlinVersion)
                 requested.id.id == "com.jfrog.bintray" ->
-                    useVersion(bintrayVersion)
+                    useVersion("1.8.4")
             }
         }
     }

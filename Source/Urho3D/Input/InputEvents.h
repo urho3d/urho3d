@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ URHO3D_EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
     URHO3D_PARAM(P_BUTTON, Button);                // int
     URHO3D_PARAM(P_BUTTONS, Buttons);              // int
     URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_CLICKS, Clicks);                // int
 }
 
 /// Mouse button released.

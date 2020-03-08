@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,7 @@ BorderImage::BorderImage(Context* context) :
     border_(IntRect::ZERO),
     imageBorder_(IntRect::ZERO),
     hoverOffset_(IntVector2::ZERO),
+    disabledOffset_(IntVector2::ZERO),
     blendMode_(BLEND_REPLACE),
     tiled_(false)
 {
@@ -59,6 +60,7 @@ void BorderImage::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Image Border", GetImageBorder, SetImageBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Tiled", IsTiled, SetTiled, bool, false, AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
@@ -67,7 +69,10 @@ void BorderImage::RegisterObject(Context* context)
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ || HasFocus() ? hoverOffset_ : IntVector2::ZERO);
+    if (enabled_)
+        GetBatches(batches, vertexData, currentScissor, (hovering_ || selected_ || HasFocus()) ? hoverOffset_ : IntVector2::ZERO);
+    else
+        GetBatches(batches, vertexData, currentScissor, disabledOffset_);
 }
 
 void BorderImage::SetTexture(Texture* texture)
@@ -115,6 +120,16 @@ void BorderImage::SetHoverOffset(int x, int y)
     hoverOffset_ = IntVector2(x, y);
 }
 
+void BorderImage::SetDisabledOffset(const IntVector2& offset)
+{
+    disabledOffset_ = offset;
+}
+
+void BorderImage::SetDisabledOffset(int x, int y)
+{
+    disabledOffset_ = IntVector2(x, y);
+}
+
 void BorderImage::SetBlendMode(BlendMode mode)
 {
     blendMode_ = mode;
@@ -137,7 +152,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
         batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
 
     if (material_)
-        batch.custom_material_ = material_;
+        batch.customMaterial_ = material_;
 
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     const IntRect& uvBorder = (imageBorder_ == IntRect::ZERO) ? border_ : imageBorder_;

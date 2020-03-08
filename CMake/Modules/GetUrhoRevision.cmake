@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,14 +40,20 @@ if (FILENAME)
     file (WRITE ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n")
 else ()
     # Output just major.minor.patch number to stdout
-    string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format
+    string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format with possible pre-release identifier
     if (VERSION)
+        string (REGEX MATCH "${VERSION}-([A-Z]+)" PRE_ID ${LIB_REVISION})   # Workaround as CMake's regex does not support look around
+        if (PRE_ID)
+            set (VERSION ${VERSION}-${CMAKE_MATCH_1})
+        endif ()
         string (REGEX MATCH "${VERSION}-([^-]+)" PATCH ${LIB_REVISION})     # Subsequent commits count after a release tag is treated as patch number
         if (PATCH)
             set (VERSION ${VERSION}.${CMAKE_MATCH_1})
+        else ()
+            set (VERSION ${VERSION}.0)
         endif ()
     else ()
-        set (VERSION 0.0)
+        set (VERSION 0.0.0)
     endif ()
     execute_process (COMMAND ${CMAKE_COMMAND} -E echo ${VERSION})
 endif ()

@@ -212,6 +212,7 @@ namespace Urho3D
 <a href="#Class_UI"><b>UI</b></a>
 <a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
+<a href="#Class_UIElement3D"><b>UIElement3D</b></a>
 <a href="#Class_UISelectable"><b>UISelectable</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -681,6 +682,8 @@ Methods:
 - void SetImageBorder(const IntRect& rect)
 - void SetHoverOffset(const IntVector2& offset)
 - void SetHoverOffset(int x, int y)
+- void SetDisabledOffset(const IntVector2& offset)
+- void SetDisabledOffset(int x, int y)
 - void SetBlendMode(BlendMode mode)
 - void SetTiled(bool enable)
 - Texture* GetTexture() const
@@ -688,16 +691,19 @@ Methods:
 - const IntRect& GetBorder() const
 - const IntRect& GetImageBorder() const
 - const IntVector2& GetHoverOffset() const
+- const IntVector2& GetDisabledOffset() const
 - BlendMode GetBlendMode() const
 - bool IsTiled() const
 
 Properties:
 
 - Texture* texture
+- Material* material
 - IntRect& imageRect
 - IntRect& border
 - IntRect& imageBorder
 - IntVector2& hoverOffset
+- IntVector2& disabledOffset
 - BlendMode blendMode
 - bool tiled
 
@@ -775,15 +781,12 @@ Methods:
 - void delete()
 - void SetPressedOffset(const IntVector2& offset)
 - void SetPressedOffset(int x, int y)
-- void SetDisabledOffset(const IntVector2& offset)
-- void SetDisabledOffset(int x, int y)
 - void SetPressedChildOffset(const IntVector2& offset)
 - void SetPressedChildOffset(int x, int y)
 - void SetRepeat(float delay, float rate)
 - void SetRepeatDelay(float delay)
 - void SetRepeatRate(float rate)
 - const IntVector2& GetPressedOffset() const
-- const IntVector2& GetDisabledOffset() const
 - const IntVector2& GetPressedChildOffset() const
 - float GetRepeatDelay() const
 - float GetRepeatRate() const
@@ -792,7 +795,6 @@ Methods:
 Properties:
 
 - IntVector2& pressedOffset
-- IntVector2& disabledOffset
 - IntVector2& pressedChildOffset
 - float repeatDelay
 - float repeatRate
@@ -3167,8 +3169,7 @@ Methods:
 - unsigned GetUInt(unsigned defaultValue = 0) const
 - float GetFloat(float defaultValue = 0) const
 - double GetDouble(double defaultValue = 0) const
-- const String GetString() const
-- const String GetString(const String defaultValue) const
+- const String GetString(const String defaultValue = String::EMPTY) const
 - const JSONArray& GetArray() const
 - const JSONObject& GetObject() const
 - Variant GetVariant() const
@@ -4042,7 +4043,7 @@ Methods:
 - bool Connect(const String address, short port, Scene* scene)
 - bool Connect(const String address, short port, Scene* scene, const VariantMap& identity)
 - void Disconnect(int waitMSec = 0)
-- bool StartServer(short port)
+- bool StartServer(short port, int maxConnections = 128)
 - void StopServer()
 - void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
 - void BroadcastRemoteEvent(StringHash eventType, bool inOrder)
@@ -5081,6 +5082,7 @@ Methods:
 - void UpdateWheelTransform(int wheel, bool interpolated)
 - void SetSteeringValue(int wheel, float steeringValue)
 - void SetWheelSuspensionStiffness(int wheel, float stiffness)
+- void SetWheelMaxSuspensionForce(int wheel, float force)
 - void SetWheelDampingRelaxation(int wheel, float damping)
 - void SetWheelDampingCompression(int wheel, float compression)
 - void SetWheelFrictionSlip(int wheel, float slip)
@@ -5108,6 +5110,7 @@ Methods:
 - Node* GetWheelNode(int wheel)
 - float GetSteeringValue(int wheel) const
 - float GetWheelSuspensionStiffness(int wheel) const
+- float GetWheelMaxSuspensionForce(int wheel) const
 - float GetWheelDampingRelaxation(int wheel) const
 - float GetWheelDampingCompression(int wheel) const
 - float GetWheelFrictionSlip(int wheel) const
@@ -7471,6 +7474,9 @@ Properties:
 - TraversalMode traversalMode
 - bool elementEventSender
 
+<a name="Class_UIElement3D"></a>
+### UIElement3D : UIElement
+
 <a name="Class_UISelectable"></a>
 ### UISelectable : UIElement
 
@@ -7946,7 +7952,7 @@ Methods:
 - void SetCullCamera(Camera* camera)
 - void SetRect(const IntRect& rect)
 - void SetRenderPath(RenderPath* path)
-- void SetRenderPath(XMLFile* file)
+- bool SetRenderPath(XMLFile* file)
 - void SetDrawDebug(bool enable)
 - Scene* GetScene() const
 - Camera* GetCamera() const

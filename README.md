@@ -31,6 +31,7 @@ Urho3D development, contributions and bugfixes by:
 - Danny Boisvert
 - Sergey Bosko
 - Lisandro Bruzzo
+- Steven Burns
 - Thomas Böhm
 - Carlo Carollo
 - Pete Chown
@@ -108,6 +109,7 @@ Urho3D development, contributions and bugfixes by:
 - Fastran
 - Firegorilla
 - Gordon-F
+- Igor Segalla
 - LordGolias
 - Lumak
 - Magic.Lixin
@@ -118,6 +120,7 @@ Urho3D development, contributions and bugfixes by:
 - OvermindDL1
 - Polynominal
 - PredatorMF
+- PsychoCircuitry
 - Scellow
 - Skrylar
 - SuperWangKai
@@ -132,9 +135,11 @@ Urho3D development, contributions and bugfixes by:
 - att-kin9
 - celeron55
 - chenjie199234
+- codexhound
 - cosmy1
 - damu
 - dragonCASTjosh
+- error408
 - feltech
 - fredakilla
 - gleblebedev
@@ -152,7 +157,9 @@ Urho3D development, contributions and bugfixes by:
 - ninjastone
 - orefkov
 - pat2nav
+- pflat
 - proller
+- r-a-sattarov
 - raould
 - rasteron
 - reattiva
@@ -211,7 +218,7 @@ Urho3D uses the following third-party libraries:
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
 - Recast/Detour (https://github.com/recastnavigation/recastnavigation)
-- SDL 2.0.7 (https://www.libsdl.org)
+- SDL 2.0.10+ (https://www.libsdl.org)
 - SQLite 3.20.1 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.18 (https://nothings.org)
@@ -220,8 +227,9 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis 1.13b (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 - WebP (https://chromium.googlesource.com/webm/libwebp)
+- ETCPACK (https://github.com/Ericsson/ETCPACK)
 
-DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
+DXT / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
 Jack and mushroom models from the realXtend project. (https://www.realxtend.org)
 Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 #
 
 # Set CMake minimum version and CMake policy required by UrhoCommon module
-cmake_minimum_required (VERSION 3.2.3)
+cmake_minimum_required (VERSION 3.10.2)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)
@@ -160,8 +160,6 @@ elseif (ARM_ABI_FLAGS)
     string (REGEX REPLACE .*- - CPU_NAME "${CPU_NAME}")
     string (TOUPPER "${CPU_NAME}" CPU_NAME)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}${CPU_NAME})
-elseif (EMSCRIPTEN_WASM)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-WASM)
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
@@ -183,7 +181,7 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2019 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2020 the Urho3D project.")
     endif ()
 endif ()
 

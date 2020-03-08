@@ -1,31 +1,31 @@
 <renderpath>
-    <rendertarget name="blurh" tag="Blur" sizedivisor="2 2" format="rgba" filter="true" />
-    <rendertarget name="blurv" tag="Blur" sizedivisor="2 2" format="rgba" filter="true" />
-    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="blurh">
+    <rendertarget name="BlurH" tag="Blur" sizedivisor="2 2" format="rgba" filter="true" />
+    <rendertarget name="BlurV" tag="Blur" sizedivisor="2 2" format="rgba" filter="true" />
+    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="BlurH">
         <parameter name="BlurDir" value="1.0 0.0" />
         <parameter name="BlurRadius" value="2.0" />
         <parameter name="BlurSigma" value="2.0" />
         <texture unit="diffuse" name="viewport" />
     </command>
-    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="blurv">
+    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="BlurV">
         <parameter name="BlurDir" value="0.0 1.0" />
         <parameter name="BlurRadius" value="2.0" />
         <parameter name="BlurSigma" value="2.0" />
-        <texture unit="diffuse" name="blurh" />
+        <texture unit="diffuse" name="BlurH" />
     </command>
-    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="blurh">
+    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="BlurH">
         <parameter name="BlurDir" value="1.0 0.0" />
         <parameter name="BlurRadius" value="1.0" />
         <parameter name="BlurSigma" value="2.0" />
-        <texture unit="diffuse" name="blurv" />
+        <texture unit="diffuse" name="BlurV" />
     </command>
-    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="blurv">
+    <command type="quad" tag="Blur" vs="Blur" ps="Blur" psdefines="BLUR3" output="BlurV">
         <parameter name="BlurDir" value="0.0 1.0" />
         <parameter name="BlurRadius" value="1.0" />
         <parameter name="BlurSigma" value="2.0" />
-        <texture unit="diffuse" name="blurh" />
+        <texture unit="diffuse" name="BlurH" />
     </command>
     <command type="quad" tag="Blur" vs="CopyFramebuffer" ps="CopyFramebuffer" output="viewport">
-        <texture unit="diffuse" name="blurv" />
+        <texture unit="diffuse" name="BlurV" />
     </command>
 </renderpath>

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -153,6 +153,9 @@ UI::~UI() = default;
 
 void UI::SetCursor(Cursor* cursor)
 {
+    if (cursor_ == cursor)
+        return;
+
     // Remove old cursor (if any) and set new
     if (cursor_)
     {
@@ -1041,7 +1044,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         ShaderVariation* ps;
         ShaderVariation* vs;
 
-        if (!batch.custom_material_)
+        if (!batch.customMaterial_)
         {
             if (!batch.texture_)
             {
@@ -1064,7 +1067,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
             vs = diffTextureVS;
             ps = diffTexturePS;
 
-            Technique* technique = batch.custom_material_->GetTechnique(0);
+            Technique* technique = batch.customMaterial_->GetTechnique(0);
             if (technique)
             {
                 Pass* pass = nullptr;
@@ -1073,8 +1076,8 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
                     pass = technique->GetPass(i);
                     if (pass)
                     {
-                        vs = graphics_->GetShader(VS, pass->GetVertexShader(), batch.custom_material_->GetVertexShaderDefines());
-                        ps = graphics_->GetShader(PS, pass->GetPixelShader(), batch.custom_material_->GetPixelShaderDefines());
+                        vs = graphics_->GetShader(VS, pass->GetVertexShader(), batch.customMaterial_->GetVertexShaderDefines());
+                        ps = graphics_->GetShader(PS, pass->GetPixelShader(), batch.customMaterial_->GetPixelShaderDefines());
                         break;
                     }
                 }
@@ -1112,22 +1115,22 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
 
         graphics_->SetBlendMode(batch.blendMode_);
         graphics_->SetScissorTest(true, scissor);
-        if (!batch.custom_material_)
+        if (!batch.customMaterial_)
         {
             graphics_->SetTexture(0, batch.texture_);
         } else
         {
             // Update custom shader parameters if needed
-            if (graphics_->NeedParameterUpdate(SP_MATERIAL, reinterpret_cast<const void*>(batch.custom_material_->GetShaderParameterHash())))
+            if (graphics_->NeedParameterUpdate(SP_MATERIAL, reinterpret_cast<const void*>(batch.customMaterial_->GetShaderParameterHash())))
             {
-                auto shader_parameters = batch.custom_material_->GetShaderParameters();
+                auto shader_parameters = batch.customMaterial_->GetShaderParameters();
                 for (auto it = shader_parameters.Begin(); it != shader_parameters.End(); ++it)
                 {
                     graphics_->SetShaderParameter(it->second_.name_, it->second_.value_);
                 }
             }
             // Apply custom shader textures
-            auto textures = batch.custom_material_->GetTextures();
+            auto textures = batch.customMaterial_->GetTextures();
             for (auto it = textures.Begin(); it != textures.End(); ++it)
             {
                 graphics_->SetTexture(it->first_, it->second_);
@@ -1137,10 +1140,10 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE,
             (batch.vertexEnd_ - batch.vertexStart_) / UI_VERTEX_SIZE);
 
-        if (batch.custom_material_)
+        if (batch.customMaterial_)
         {
             // Reset textures used by the batch custom material
-            auto textures = batch.custom_material_->GetTextures();
+            auto textures = batch.customMaterial_->GetTextures();
             for (auto it = textures.Begin(); it != textures.End(); ++it)
             {
                 graphics_->SetTexture(it->first_, 0);

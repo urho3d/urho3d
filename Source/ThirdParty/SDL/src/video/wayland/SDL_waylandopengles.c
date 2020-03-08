@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,11 +22,16 @@
 
 #if SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL
 
+#include "../SDL_sysvideo.h"
+#include "../../events/SDL_windowevents_c.h"
 #include "SDL_waylandvideo.h"
 #include "SDL_waylandopengles.h"
 #include "SDL_waylandwindow.h"
 #include "SDL_waylandevents_c.h"
 #include "SDL_waylanddyn.h"
+
+#include "xdg-shell-client-protocol.h"
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 /* EGL implementation of SDL OpenGL ES support */
 
@@ -57,10 +62,45 @@ Wayland_GLES_CreateContext(_THIS, SDL_Window * window)
 int
 Wayland_GLES_SwapWindow(_THIS, SDL_Window *window)
 {
-    if (SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface) < 0) {
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    struct wl_region *region;
+
+    if (SDL_EGL_SwapBuffers(_this, data->egl_surface) < 0) {
         return -1;
     }
-    WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
+
+    // Wayland-EGL forbids drawing calls in-between SwapBuffers and wl_egl_window_resize
+    if (data->resize.pending) {
+        if (data->scale_factor != data->resize.scale_factor) {
+            window->w = 0;
+            window->h = 0;
+        }
+        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESIZED, data->resize.width, data->resize.height);
+        window->w = data->resize.width;
+        window->h = data->resize.height;
+        data->scale_factor = data->resize.scale_factor;
+        wl_surface_set_buffer_scale(data->surface, data->scale_factor);
+        WAYLAND_wl_egl_window_resize(data->egl_window, window->w * data->scale_factor, window->h * data->scale_factor, 0, 0);
+
+        if (data->resize.configure) {
+           if (data->waylandData->shell.xdg) {
+              xdg_surface_ack_configure(data->shell_surface.xdg.surface, data->resize.serial);
+           } else if (data->waylandData->shell.zxdg) {
+              zxdg_surface_v6_ack_configure(data->shell_surface.zxdg.surface, data->resize.serial);
+           }
+           data->resize.configure = SDL_FALSE;
+        }
+
+        region = wl_compositor_create_region(data->waylandData->compositor);
+        wl_region_add(region, 0, 0, window->w, window->h);
+        wl_surface_set_opaque_region(data->surface, region);
+        wl_region_destroy(region);
+
+        data->resize.pending = SDL_FALSE;
+    }
+
+    WAYLAND_wl_display_flush( data->waylandData->display );
+
     return 0;
 }
 
@@ -79,6 +119,23 @@ Wayland_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context)
     WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
     
     return ret;
+}
+
+void
+Wayland_GLES_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h)
+{
+    SDL_WindowData *data;
+    if (window->driverdata) {
+        data = (SDL_WindowData *) window->driverdata;
+
+        if (w) {
+            *w = window->w * data->scale_factor;
+        }
+
+        if (h) {
+            *h = window->h * data->scale_factor;
+        }
+    }
 }
 
 void 

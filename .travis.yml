@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,8 @@
 ---
 
 dist: trusty
-addons: {apt: {packages: docker-ce}}
-cache: {directories: $HOME/urho3d_home_dir/.ccache}
+addons: {apt: {packages: [docker-ce]}}
+cache: {directories: [$HOME/urho3d_home_dir/.ccache]}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -105,6 +105,7 @@ matrix:
 
 branch: {name: MinGW-CI, active: yes, appveyor: yes}
 version: '{build}'
+image: Visual Studio 2019
 platform:
   - x86
   - x64
@@ -169,10 +170,10 @@ cache: ccache
 dist: trusty
 addons:
   apt:
-    packages: libpulse-dev
+    packages: [libpulse-dev]
   coverity_scan:
     project:
-      name: urho3d/Urho3D
+      name: $TRAVIS_REPO_SLUG
       description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
     notification_email: urho3d.travis.ci@gmail.com
     build_command_prepend: rake cmake URHO3D_LUA=0 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_DATABASE_SQLITE=1 URHO3D_LIB_TYPE=SHARED
@@ -200,7 +201,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 dist: trusty
-addons: {apt: {packages: libpulse-dev}}
+addons: {apt: {packages: [libpulse-dev]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -220,7 +221,7 @@ after_script: rake ci_delete_mirror
 
 branch: {name: Android-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
+addons: {apt: {packages: [docker-ce]}}
 cache:
   directories:
     - $HOME/urho3d_home_dir/.android/build-cache
@@ -258,8 +259,8 @@ matrix:
 
 branch: {name: RPI-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
-cache: {directories: $HOME/urho3d_home_dir/.ccache}
+addons: {apt: {packages: [docker-ce]}}
+cache: {directories: [$HOME/urho3d_home_dir/.ccache]}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -290,8 +291,8 @@ matrix:
 
 branch: {name: ARM-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
-cache: {directories: $HOME/urho3d_home_dir/.ccache}
+addons: {apt: {packages: [docker-ce]}}
+cache: {directories: [$HOME/urho3d_home_dir/.ccache]}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -322,7 +323,7 @@ matrix:
 
 branch: {name: Web-CI, active: yes}
 dist: trusty
-addons: {apt: {packages: docker-ce}}
+addons: {apt: {packages: [docker-ce]}}
 cache:
   directories:
     - $HOME/urho3d_home_dir/.ccache
@@ -332,17 +333,12 @@ env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-    - numjobs=2
+    - numjobs=4
     - WEB=1
-    - EMSCRIPTEN_SHARE_DATA=1
     - HOT=/home/travis/urho3d_home_dir/.ccache/.hot
   matrix:
-    - URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=0 numjobs=4
-    - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=0
-    - URHO3D_LIB_TYPE=SHARED EMSCRIPTEN_WASM=0
-    # URHO3D_LIB_TYPE=MODULE numjobs=4
-    - URHO3D_LIB_TYPE=STATIC
-    - URHO3D_LIB_TYPE=SHARED
+    - EMSCRIPTEN_SHARE_DATA=1
+    - EMSCRIPTEN_SHARE_DATA=0
 stage: release build configuration
 before_script:
   - rake ci_timer
@@ -350,24 +346,13 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - if [[ "$URHO3D_LIB_TYPE" != "MODULE" ]] && (echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]); then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
+  - if echo $COMMIT_MESSAGE |grep -cq '\[cache clear\]' || [[ ! -e $HOT ]]; then export URHO3D_SAMPLES=0; else export URHO3D_SAMPLES=1; fi; touch $HOT
+  - if [[ $URHO3D_SAMPLES = 1 ]] && [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export SAMPLE_UPLOAD=1; fi
   - rake ci_setup_cache
-script: script/dockerized.sh web rake ci && if [ $PACKAGE_UPLOAD ]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ ! $EMSCRIPTEN_WASM ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]] && [[ ! $URHO3D_SAMPLES ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi && rake ci_timer
+script: script/dockerized.sh web rake ci && if [[ $EMSCRIPTEN_SHARE_DATA = 1 ]]; then if [[ $PACKAGE_UPLOAD ]]; then script/dockerized.sh web rake ci_package_upload; fi && if [[ $SAMPLE_UPLOAD ]]; then script/dockerized.sh web rake ci_emscripten_samples_update; fi; fi && rake ci_timer
 matrix:
   fast_finish: true
   include: [stage: housekeep]
-
-# Below samples are excluded from build due to build time constraint
-data:
-  excluded_sample:
-    '#4': &shortlisted
-      - 01_HelloWorld
-      - 02_HelloGUI
-      - 03_Sprites
-      - 26_ConsoleInput
-      - 29_SoundSynthesis
-      - 38_SceneAndUILoad
-    '#5': *shortlisted
 
 ---
 
@@ -377,7 +362,7 @@ cache:
   directories:
     - $HOME/.ccache
     - $HOME/initial-build-tree
-osx_image: xcode10.2
+osx_image: xcode11
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -387,10 +372,10 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
   matrix:
-    - XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=11.2 sdk=appletvsimulator
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=11.2 sdk=iphonesimulator
-    - XCODE=1 URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.13 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.13
+    - XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=13.0 sdk=appletvsimulator
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=13.0 sdk=iphonesimulator
+    - XCODE=1 URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.14 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.14
     - MAKEFILE=1 URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
     - MAKEFILE=1 URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
 stage: release build configuration

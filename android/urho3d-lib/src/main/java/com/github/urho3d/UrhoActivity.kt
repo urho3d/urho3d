@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ open class UrhoActivity : SDLActivity() {
 
         @JvmStatic
         fun getLibraryNames(context: Context) = File(context.applicationInfo.nativeLibraryDir)
-                    .listFiles { _, it -> regex.matches(it) }
+                    .listFiles { _, it -> regex.matches(it) }!!
                     .sortedBy { it.lastModified() }
                     .map {
                         regex.find(it.name)?.groupValues?.last() ?: throw IllegalStateException()

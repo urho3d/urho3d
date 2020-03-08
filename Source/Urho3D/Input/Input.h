@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -101,7 +103,7 @@ struct JoystickState
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
 
     /// Return hat position.
-    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
+    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : int(HAT_CENTER); }
 
     /// SDL joystick.
     SDL_Joystick* joystick_{};
@@ -324,7 +326,7 @@ private:
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
-    void SetMouseButton(MouseButton button, bool newState);
+    void SetMouseButton(MouseButton button, bool newState, int clicks);
     /// Handle a key change.
     void SetKey(Key key, Scancode scancode, bool newState);
     /// Handle mouse wheel change.

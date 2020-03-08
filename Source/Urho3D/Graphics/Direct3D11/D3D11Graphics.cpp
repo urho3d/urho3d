@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -313,8 +313,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         fullscreen = false;
 
     // If nothing changes, do not reset the device
-    if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+    if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
+        resizable == resizable_ && vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ &&
+        monitor == monitor_ && refreshRate == refreshRate_)
         return true;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
@@ -337,6 +338,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
                 unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
+                if (refreshRate != 0)
+                    error += (unsigned)Abs(resolutions[i].z_ - refreshRate);
                 if (error < bestError)
                 {
                     best = i;
@@ -377,11 +380,14 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 #ifdef URHO3D_LOGGING
     String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
+    msg.AppendWithFormat("Set screen mode %dx%d rate %d Hz %s monitor %d", width_, height_, refreshRate_,
+        (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
         msg.Append(" resizable");
+    if (highDPI_)
+        msg.Append(" highDPI");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
     URHO3D_LOGINFO(msg);
@@ -2088,11 +2094,13 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_SetWindowSize(window_, newWidth, newHeight);
         }
 
+        // Turn off window fullscreen mode so it gets repositioned to the correct monitor
+        SDL_SetWindowFullscreen(window_, SDL_FALSE);
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
-        SDL_HideWindow(window_);
+        if (!newFullscreen) SDL_HideWindow(window_);
         SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
-        SDL_ShowWindow(window_);
+        if (!newFullscreen) SDL_ShowWindow(window_);
     }
     else
     {
@@ -2145,6 +2153,49 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
         impl_->swapChain_ = nullptr;
     }
 
+    IDXGIDevice* dxgiDevice = nullptr;
+    impl_->device_->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
+    IDXGIAdapter* dxgiAdapter = nullptr;
+    dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
+    IDXGIFactory* dxgiFactory = nullptr;
+    dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
+
+    DXGI_RATIONAL refreshRateRational = {};
+    IDXGIOutput* dxgiOutput = nullptr;
+    UINT numModes = 0;
+    dxgiAdapter->EnumOutputs(monitor_, &dxgiOutput);
+    dxgiOutput->GetDisplayModeList(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, 0);
+
+    // find the best matching refresh rate with the specified resolution
+    if (numModes > 0)
+    {
+        DXGI_MODE_DESC* modes = new DXGI_MODE_DESC[numModes];
+        dxgiOutput->GetDisplayModeList(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, modes);
+        unsigned bestMatchingRateIndex = -1;
+        unsigned bestError = M_MAX_UNSIGNED;
+        for (unsigned i = 0; i < numModes; ++i)
+        {
+            if (width != modes[i].Width || height != modes[i].Height)
+                continue;
+
+            float rate = (float)modes[i].RefreshRate.Numerator / modes[i].RefreshRate.Denominator;
+            unsigned error = (unsigned)(Abs(rate - refreshRate_));
+            if (error < bestError)
+            {
+                bestMatchingRateIndex = i;
+                bestError = error;
+            }
+        }
+        if (bestMatchingRateIndex != -1)
+        {
+            refreshRateRational.Numerator = modes[bestMatchingRateIndex].RefreshRate.Numerator;
+            refreshRateRational.Denominator = modes[bestMatchingRateIndex].RefreshRate.Denominator;
+        }
+        delete[] modes;
+    }
+
+    dxgiOutput->Release();
+
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     memset(&swapChainDesc, 0, sizeof swapChainDesc);
     swapChainDesc.BufferCount = 1;
@@ -2152,18 +2203,14 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.BufferDesc.Height = (UINT)height;
     swapChainDesc.BufferDesc.Format = sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapChainDesc.BufferDesc.RefreshRate.Numerator = refreshRateRational.Numerator;
+    swapChainDesc.BufferDesc.RefreshRate.Denominator = refreshRateRational.Denominator;
     swapChainDesc.OutputWindow = GetWindowHandle(window_);
     swapChainDesc.SampleDesc.Count = (UINT)multiSample;
     swapChainDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(swapChainDesc.BufferDesc.Format, multiSample);
     swapChainDesc.Windowed = TRUE;
     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    IDXGIDevice* dxgiDevice = nullptr;
-    impl_->device_->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
-    IDXGIAdapter* dxgiAdapter = nullptr;
-    dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
-    IDXGIFactory* dxgiFactory = nullptr;
-    dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
     HRESULT hr = dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
     // After creating the swap chain, disable automatic Alt-Enter fullscreen/windowed switching
     // (the application will switch manually if it wants to)

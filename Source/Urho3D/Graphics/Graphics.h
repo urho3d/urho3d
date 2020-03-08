@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -679,6 +679,8 @@ private:
     bool dxtTextureSupport_{};
     /// ETC1 format support flag.
     bool etcTextureSupport_{};
+    /// ETC2 format support flag.
+    bool etc2TextureSupport_{};
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_{};
     /// Hardware shadow map depth compare support flag.

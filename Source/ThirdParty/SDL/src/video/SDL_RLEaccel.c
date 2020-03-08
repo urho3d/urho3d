@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -1220,8 +1220,9 @@ RLEAlphaSurface(SDL_Surface * surface)
 
     /* Now that we have it encoded, release the original pixels */
     if (!(surface->flags & SDL_PREALLOC)) {
-        SDL_free(surface->pixels);
+        SDL_SIMDFree(surface->pixels);
         surface->pixels = NULL;
+        surface->flags &= ~SDL_SIMD_ALIGNED;
     }
 
     /* realloc the buffer to release unused memory */
@@ -1383,8 +1384,9 @@ RLEColorkeySurface(SDL_Surface * surface)
 
     /* Now that we have it encoded, release the original pixels */
     if (!(surface->flags & SDL_PREALLOC)) {
-        SDL_free(surface->pixels);
+        SDL_SIMDFree(surface->pixels);
         surface->pixels = NULL;
+        surface->flags &= ~SDL_SIMD_ALIGNED;
     }
 
     /* realloc the buffer to release unused memory */
@@ -1484,10 +1486,11 @@ UnRLEAlpha(SDL_Surface * surface)
         uncopy_opaque = uncopy_transl = uncopy_32;
     }
 
-    surface->pixels = SDL_malloc(surface->h * surface->pitch);
+    surface->pixels = SDL_SIMDAlloc(surface->h * surface->pitch);
     if (!surface->pixels) {
         return (SDL_FALSE);
     }
+    surface->flags |= SDL_SIMD_ALIGNED;
     /* fill background with transparent pixels */
     SDL_memset(surface->pixels, 0, surface->h * surface->pitch);
 
@@ -1510,8 +1513,9 @@ UnRLEAlpha(SDL_Surface * surface)
             if (run) {
                 srcbuf += uncopy_opaque(dst + ofs, srcbuf, run, df, sf);
                 ofs += run;
-            } else if (!ofs)
-                return (SDL_TRUE);
+            } else if (!ofs) {
+                goto end_function;
+            }
         } while (ofs < w);
 
         /* skip padding if needed */
@@ -1532,7 +1536,8 @@ UnRLEAlpha(SDL_Surface * surface)
         } while (ofs < w);
         dst += surface->pitch >> 2;
     }
-    /* Make the compiler happy */
+
+end_function:
     return (SDL_TRUE);
 }
 
@@ -1547,12 +1552,13 @@ SDL_UnRLESurface(SDL_Surface * surface, int recode)
                 SDL_Rect full;
 
                 /* re-create the original surface */
-                surface->pixels = SDL_malloc(surface->h * surface->pitch);
+                surface->pixels = SDL_SIMDAlloc(surface->h * surface->pitch);
                 if (!surface->pixels) {
                     /* Oh crap... */
                     surface->flags |= SDL_RLEACCEL;
                     return;
                 }
+                surface->flags |= SDL_SIMD_ALIGNED;
 
                 /* fill it with the background color */
                 SDL_FillRect(surface, NULL, surface->map->info.colorkey);

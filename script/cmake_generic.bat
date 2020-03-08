@@ -1,5 +1,5 @@
 ::
-:: Copyright (c) 2008-2019 the Urho3D project.
+:: Copyright (c) 2008-2020 the Urho3D project.
 ::
 :: Permission is hereby granted, free of charge, to any person obtaining a copy
 :: of this software and associated documentation files (the "Software"), to deal
@@ -46,12 +46,12 @@ set "BUILD_OPTS="
 set "arch="
 :loop
 if not "%~1" == "" (
-    if "%~1" == "-DANDROID" if "%~2" == "1" (echo For Android platform, use Gradle build system instead of invoking CMake build system directly! && exit /B 1)
+    if "%~1" == "-DANDROID" if "%~2" == "1" (echo For Android platform, use Gradle build system instead of invoking CMake build tool directly! && exit /B 1)
     if "%~1" == "-DWEB" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Emscripten.cmake""
     if "%~1" == "-DMINGW" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles""
-    if "%~1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch= Win64"
-    if "%~1" == "-DURHO3D_64BIT" if "%~2" == "0" set "arch="
-    if "%~1" == "-VS" set "OPTS=-G "Visual Studio %~2%arch%""
+    if "%~1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch=-A x64"
+    if "%~1" == "-DURHO3D_64BIT" if "%~2" == "0" set "arch=-A Win32"
+    if "%~1" == "-VS" set "OPTS=-G "Visual Studio %~2" %arch% %TOOLSET%"
     if "%~1" == "-G" set "OPTS=%OPTS% %~1 %2"
     set "ARG1=%~1"
     set "ARG2=%~2"

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,9 @@ set (TARGET_NAME WebP)
 define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h)
 
 # Define dependency libs
-#set (INCLUDE_DIRS include)
+if (ANDROID)
+    set (INCLUDE_DIRS ${ANDROID_NDK}/sources/android/cpufeatures)
+endif ()
 
 # Setup target
 setup_library ()

@@ -56,7 +56,7 @@ class JSONValue
     unsigned GetUInt(unsigned defaultValue = 0) const;
     float GetFloat(float defaultValue = 0) const;
     double GetDouble(double defaultValue = 0) const;
-    const String GetString(const String& defaultValue = String("")) const;
+    const String GetString(const String defaultValue = String::EMPTY) const;
     const JSONArray& GetArray() const;
     const JSONObject& GetObject() const;
     Variant GetVariant() const;

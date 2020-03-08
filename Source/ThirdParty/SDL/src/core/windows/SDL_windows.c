@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,9 +31,12 @@
 #ifndef _WIN32_WINNT_VISTA
 #define _WIN32_WINNT_VISTA  0x0600
 #endif
+#ifndef _WIN32_WINNT_WIN7
+#define _WIN32_WINNT_WIN7   0x0601
+#endif
 
 
-/* Sets an error message based on GetLastError() */
+/* Sets an error message based on an HRESULT */
 int
 WIN_SetErrorFromHRESULT(const char *prefix, HRESULT hr)
 {
@@ -121,6 +124,15 @@ BOOL WIN_IsWindowsVistaOrGreater(void)
     return TRUE;
 #else
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
+#endif
+}
+
+BOOL WIN_IsWindows7OrGreater(void)
+{
+#ifdef __WINRT__
+    return TRUE;
+#else
+    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 0);
 #endif
 }
 

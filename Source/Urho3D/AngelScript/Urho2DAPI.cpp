@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,17 +85,6 @@ static void RegisterSpriteSheet2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SpriteSheet2D", "Texture2D@+ get_texture() const", asMETHOD(SpriteSheet2D, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "Sprite2D@+ GetSprite(const String&)", asMETHOD(SpriteSheet2D, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "void DefineSprite(const String&, const IntRect&, const Vector2& hotSpot=Vector2(0.5f, 0.5f), const IntVector2& offset = IntVector2::ZERO)", asMETHOD(SpriteSheet2D, DefineSprite), asCALL_THISCALL);
-}
-
-// Template function for registering a class derived from Drawable2D.
-template <class T> void RegisterDrawable2D(asIScriptEngine* engine, const char* className)
-{
-    RegisterDrawable<T>(engine, className);
-    RegisterSubclass<Drawable2D, T>(engine, "Drawable2D", className);
-    engine->RegisterObjectMethod(className, "void set_layer(int)", asMETHOD(T, SetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_layer() const", asMETHOD(T, GetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_orderInLayer(int)", asMETHOD(T, SetOrderInLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_orderInLayer() const", asMETHOD(T, GetOrderInLayer), asCALL_THISCALL);
 }
 
 static void RegisterDrawable2D(asIScriptEngine* engine)

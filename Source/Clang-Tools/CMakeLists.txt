@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/clang RUNTIME PDB)
 else ()
     # Set CMake minimum version and CMake policy required by UrhoCommon module
-    cmake_minimum_required (VERSION 3.2.3)
+    cmake_minimum_required (VERSION 3.10.2)
     if (COMMAND cmake_policy)
         # Libraries linked via full path no longer produce linker search paths
         cmake_policy (SET CMP0003 NEW)

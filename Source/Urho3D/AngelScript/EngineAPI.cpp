@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MEMORY", (void*)&DEBUGHUD_SHOW_MEMORY);
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL", (void*)&DEBUGHUD_SHOW_ALL);
 
-    RegisterObject<Console>(engine, "DebugHud");
+    RegisterObject<DebugHud>(engine, "DebugHud");
     engine->RegisterObjectMethod("DebugHud", "void Update()", asMETHOD(DebugHud, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void Toggle(uint)", asMETHOD(DebugHud, Toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void ToggleAll()", asMETHOD(DebugHud, ToggleAll), asCALL_THISCALL);

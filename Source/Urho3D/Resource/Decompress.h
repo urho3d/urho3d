@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ namespace Urho3D
 /// Decompress a DXT compressed image to RGBA.
 URHO3D_API void
     DecompressImageDXT(unsigned char* rgba, const void* blocks, int width, int height, int depth, CompressedFormat format);
-/// Decompress an ETC1 compressed image to RGBA.
-URHO3D_API void DecompressImageETC(unsigned char* rgba, const void* blocks, int width, int height);
+/// Decompress an ETC1/ETC2 compressed image to RGBA.
+URHO3D_API void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, int height, bool hasAlpha);
 /// Decompress a PVRTC compressed image to RGBA.
 URHO3D_API void DecompressImagePVRTC(unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format);
 /// Flip a compressed block vertically.

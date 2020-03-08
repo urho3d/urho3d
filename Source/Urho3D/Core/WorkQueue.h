@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@
 #include "../Container/List.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
+
+#include <atomic>
 
 namespace Urho3D
 {
@@ -56,7 +58,7 @@ public:
     /// Whether to send event on completion.
     bool sendEvent_{};
     /// Completed flag.
-    volatile bool completed_{};
+    std::atomic<bool> completed_{};
 
 private:
     bool pooled_{};
@@ -135,9 +137,9 @@ private:
     /// Worker queue mutex.
     Mutex queueMutex_;
     /// Shutting down flag.
-    volatile bool shutDown_;
+    std::atomic<bool> shutDown_;
     /// Pausing flag. Indicates the worker threads should not contend for the queue mutex.
-    volatile bool pausing_;
+    std::atomic<bool> pausing_;
     /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
     bool paused_;
     /// Completing work in the main thread flag.
