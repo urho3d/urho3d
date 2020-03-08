@@ -274,6 +274,9 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
         return true;
     }
 
+    // Track if the window was repositioned and don't update window position in this case
+    bool reposition = false;
+
     // With an external window, only the size can change after initial setup, so do not recreate context
     if (!externalWindow_ || !impl_->context_)
     {
@@ -325,7 +328,7 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
 
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(newParams.monitor_, &display_rect);
-        const bool reposition = newParams.fullscreen_ || (newParams.borderless_ && width >= display_rect.w && height >= display_rect.h);
+        reposition = newParams.fullscreen_ || (newParams.borderless_ && width >= display_rect.w && height >= display_rect.h);
 
         const int x = reposition ? display_rect.x : position_.x_;
         const int y = reposition ? display_rect.y : position_.y_;
@@ -405,7 +408,7 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
     screenParams_ = newParams;
 
     SDL_GL_GetDrawableSize(window_, &width_, &height_);
-    if (!screenParams_.fullscreen_)
+    if (!reposition)
         SDL_GetWindowPosition(window_, &position_.x_, &position_.y_);
 
     int logicalWidth, logicalHeight;
