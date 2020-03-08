@@ -1101,7 +1101,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     {
         if (networkMode_ == SERVER_CLIENT) {
             URHO3D_LOGERROR("Network mode mismatch, disconnecting!");
-            OnServerDisconnected();
+            OnServerDisconnected(packet->systemAddress);
             SendEvent(E_NETWORKMODEMISMATCH);
             packetHandled = true;
         }
