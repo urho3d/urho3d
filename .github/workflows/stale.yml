@@ -16,11 +16,16 @@ jobs:
         days-before-stale: 30
         days-before-close: 15
         operations-per-run: 10
-        stale-issue-message: &stale-message |
+        # Workaround Github YAML document parser that does not support anchors!
+        stale-issue-message: |
           Marking this stale since there has been no activity for 30 days.
           It will be closed if there is no activity for another 15 days.
-        stale-pr-message: *stale-message
-        stale-issue-label: &stale-label 'stale'
-        stale-pr-label: *stale-label
-        exempt-issue-label: &backlog-label 'backlog'
-        exempt-pr-label: *backlog-label
+        stale-pr-message: |
+          Marking this stale since there has been no activity for 30 days.
+          It will be closed if there is no activity for another 15 days.
+        stale-issue-label: 'stale'
+        stale-pr-label: 'stale'
+        exempt-issue-label: 'backlog'
+        exempt-pr-label: 'backlog'
+
+# vi: set ts=2 sw=2 expandtab:
