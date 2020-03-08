@@ -1978,6 +1978,10 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
 {
     if (!externalWindow_)
     {
+        // Keep current window position because it may change in intermediate callbacks
+        const IntVector2 oldPosition = position_;
+        bool reposition = false;
+        bool resizePostponed = false;
         if (!newWidth || !newHeight)
         {
             SDL_MaximizeWindow(window_);
@@ -1988,13 +1992,18 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_Rect display_rect;
             SDL_GetDisplayBounds(monitor, &display_rect);
 
-            if (newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h))
+            reposition = newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h);
+            if (reposition)
             {
                 // Reposition the window on the specified monitor if it's supposed to cover the entire monitor
                 SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
             }
 
-            SDL_SetWindowSize(window_, newWidth, newHeight);
+            // Postpone window resize if exiting fullscreen to avoid redundant resolution change
+            if (!newFullscreen && screenParams_.fullscreen_)
+                resizePostponed = true;
+            else
+                SDL_SetWindowSize(window_, newWidth, newHeight);
         }
 
         // Turn off window fullscreen mode so it gets repositioned to the correct monitor
@@ -2004,6 +2013,16 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
         if (!newFullscreen) SDL_ShowWindow(window_);
+
+        // Resize now if was postponed
+        if (resizePostponed)
+            SDL_SetWindowSize(window_, newWidth, newHeight);
+
+        // Ensure that window keeps its position
+        if (!reposition)
+            SDL_SetWindowPosition(window_, oldPosition.x_, oldPosition.y_);
+        else
+            position_ = oldPosition;
     }
     else
     {
