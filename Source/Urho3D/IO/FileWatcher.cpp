@@ -53,7 +53,8 @@ FileWatcher::FileWatcher(Context* context) :
     Object(context),
     fileSystem_(GetSubsystem<FileSystem>()),
     delay_(1.0f),
-    watchSubDirs_(false)
+    watchSubDirs_(false),
+    fullWatch_(false)
 {
 #ifdef URHO3D_FILEWATCHER
 #ifdef __linux__
@@ -74,7 +75,7 @@ FileWatcher::~FileWatcher()
 #endif
 }
 
-bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
+bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs, bool fullWatch)
 {
     if (!fileSystem_)
     {
@@ -102,6 +103,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
+        fullWatch_ = fullWatch;
         Run();
 
         URHO3D_LOGDEBUG("Started watching path " + pathName);
@@ -241,14 +243,19 @@ void FileWatcher::ThreadFunction()
     unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
 
+    DWORD flags;
+    if (fullWatch_)
+        flags = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_DIR_NAME;
+    else
+        flags = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE;
+
     while (shouldRun_)
     {
         if (ReadDirectoryChangesW((HANDLE)dirHandle_,
             buffer,
             BUFFERSIZE,
             watchSubDirs_,
-            FILE_NOTIFY_CHANGE_FILE_NAME |
-            FILE_NOTIFY_CHANGE_LAST_WRITE,
+            flags,
             &bytesFilled,
             nullptr,
             nullptr))
@@ -259,17 +266,34 @@ void FileWatcher::ThreadFunction()
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
 
-                if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME)
-                {
-                    String fileName;
-                    const wchar_t* src = record->FileName;
-                    const wchar_t* end = src + record->FileNameLength / 2;
-                    while (src < end)
-                        fileName.AppendUTF8(String::DecodeUTF16(src));
+                FileChangeType changeType;
 
-                    fileName = GetInternalPath(fileName);
-                    AddChange(fileName);
+                String fileName;
+                const wchar_t* src = record->FileName;
+                const wchar_t* end = src + record->FileNameLength / 2;
+                while (src < end)
+                    fileName.AppendUTF8(String::DecodeUTF16(src));
+
+                fileName = GetInternalPath(fileName);
+
+                switch (record->Action)
+                {
+                case FILE_ACTION_MODIFIED:
+                    changeType = FILECHANGE_MODIFIED;
+                    break;
+                case FILE_ACTION_ADDED:
+                case FILE_ACTION_RENAMED_NEW_NAME:
+                    changeType = FILECHANGE_ADDED;
+                    break;
+                case FILE_ACTION_REMOVED:
+                case FILE_ACTION_RENAMED_OLD_NAME:
+                    changeType = FILECHANGE_REMOVED;
+                    break;
+                default:
+                    changeType = FILECHANGE_UNKNOWN;
                 }
+
+                AddChange({fileName, changeType});
 
                 if (!record->NextEntryOffset)
                     break;
@@ -299,7 +323,7 @@ void FileWatcher::ThreadFunction()
                 {
                     String fileName;
                     fileName = dirHandle_[event->wd] + event->name;
-                    AddChange(fileName);
+                    AddChange({fileName, FILECHANGE_UNKNOWN});
                 }
             }
 
@@ -316,43 +340,78 @@ void FileWatcher::ThreadFunction()
         {
             Vector<String> fileNames = changes.Split(1);
             for (unsigned i = 0; i < fileNames.Size(); ++i)
-                AddChange(fileNames[i]);
+                AddChange({fileNames[i], FILECHANGE_UNKNOWN});
         }
     }
 #endif
 #endif
 }
 
-void FileWatcher::AddChange(const String& fileName)
+void FileWatcher::AddChange(const FileChange& change)
 {
     MutexLock lock(changesMutex_);
 
-    // Reset the timer associated with the filename. Will be notified once timer exceeds the delay
-    changes_[fileName].Reset();
+    if (fullWatch_)
+    {
+        allChanges_.Resize(allChanges_.Size() + 1);
+
+        TimedFileChange& timedChange = allChanges_.Back();
+        timedChange.change_ = change;
+
+        // Reset the timer associated with the filename. Will be notified once timer exceeds the delay
+        timedChange.timer_.Reset();
+    }
+    else
+    {
+        HashMap<String, TimedFileChange>::Iterator it = fileChanges_.Find(change.fileName_);
+        if (it == fileChanges_.End())
+        {
+            fileChanges_[change.fileName_].change_ = change;
+        }
+        else
+        {
+            // Reset the timer associated with the filename. Will be notified once timer exceeds the delay
+            it->second_.timer_.Reset();
+        }
+    }
 }
 
-bool FileWatcher::GetNextChange(String& dest)
+bool FileWatcher::GetNextChange(FileChange& dest)
 {
     MutexLock lock(changesMutex_);
 
     auto delayMsec = (unsigned)(delay_ * 1000.0f);
 
-    if (changes_.Empty())
-        return false;
+    if (fullWatch_)
+    {
+        if (allChanges_.Empty())
+            return false;
+
+        TimedFileChange& timedChange = allChanges_.Front();
+        if (timedChange.timer_.GetMSec(false) >= delayMsec)
+        {
+            dest = timedChange.change_;
+            allChanges_.PopFront();
+            return true;
+        }
+    }
     else
     {
-        for (HashMap<String, Timer>::Iterator i = changes_.Begin(); i != changes_.End(); ++i)
+        if (fileChanges_.Empty())
+            return false;
+
+        for (HashMap<String, TimedFileChange>::Iterator i = fileChanges_.Begin(); i != fileChanges_.End(); ++i)
         {
-            if (i->second_.GetMSec(false) >= delayMsec)
+            if (i->second_.timer_.GetMSec(false) >= delayMsec)
             {
-                dest = i->first_;
-                changes_.Erase(i);
+                dest = i->second_.change_;
+                fileChanges_.Erase(i);
                 return true;
             }
         }
-
-        return false;
     }
+
+    return false;
 }
 
 }

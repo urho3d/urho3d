@@ -33,6 +33,24 @@ namespace Urho3D
 
 class FileSystem;
 
+/// File change type.
+enum FileChangeType
+{
+    FILECHANGE_UNKNOWN = 0,
+    FILECHANGE_ADDED,
+    FILECHANGE_MODIFIED,
+    FILECHANGE_REMOVED
+};
+
+/// File change information.
+struct FileChange
+{
+    /// Changed file name.
+    String fileName_;
+    /// Changed file type.
+    FileChangeType type_;
+};
+
 /// Watches a directory and its subdirectories for files being modified.
 class URHO3D_API FileWatcher : public Object, public Thread
 {
@@ -48,15 +66,15 @@ public:
     void ThreadFunction() override;
 
     /// Start watching a directory. Return true if successful.
-    bool StartWatching(const String& pathName, bool watchSubDirs);
+    bool StartWatching(const String& pathName, bool watchSubDirs, bool fullWatch);
     /// Stop watching the directory.
     void StopWatching();
     /// Set the delay in seconds before file changes are notified. This (hopefully) avoids notifying when a file save is still in progress. Default 1 second.
     void SetDelay(float interval);
     /// Add a file change into the changes queue.
-    void AddChange(const String& fileName);
+    void AddChange(const FileChange& change);
     /// Return a file change (true if was found, false if not.)
-    bool GetNextChange(String& dest);
+    bool GetNextChange(FileChange& dest);
 
     /// Return the path being watched, or empty if not watching.
     const String& GetPath() const { return path_; }
@@ -65,18 +83,31 @@ public:
     float GetDelay() const { return delay_; }
 
 private:
+    /// File change information with timer.
+    struct TimedFileChange
+    {
+        /// File change information.
+        FileChange change_;
+        /// Timer used to delay reporting change.
+        Timer timer_;
+    };
+
     /// Filesystem.
     SharedPtr<FileSystem> fileSystem_;
     /// The path being watched.
     String path_;
-    /// Pending changes. These will be returned and removed from the list when their timer has exceeded the delay.
-    HashMap<String, Timer> changes_;
+    /// Pending changes. These will be returned and removed from the list when their timer has exceeded the delay. Used in full watch mode.
+    List<TimedFileChange> allChanges_;
+    /// Pending changes. These will be returned and removed from the list when their timer has exceeded the delay. Used in reloading mode.
+    HashMap<String, TimedFileChange> fileChanges_;
     /// Mutex for the change buffer.
     Mutex changesMutex_;
     /// Delay in seconds for notifying changes.
     float delay_;
     /// Watch subdirectories flag.
     bool watchSubDirs_;
+    /// Full watching mode.
+    bool fullWatch_;
 
 #ifdef _WIN32
 

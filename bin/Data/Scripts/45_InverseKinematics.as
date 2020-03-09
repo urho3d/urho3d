@@ -18,7 +18,7 @@ bool drawDebug_ = false;
 
 void Start()
 {
-    cache.autoReloadResources = true;
+    cache.SetAutoReloadResources(true, false);
 
     // Execute the common startup for samples
     SampleStart();

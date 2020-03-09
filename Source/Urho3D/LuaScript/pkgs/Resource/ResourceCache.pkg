@@ -9,7 +9,7 @@ class ResourceCache
     void SetMemoryBudget(StringHash type, unsigned long long budget);
     void SetMemoryBudget(const String type, unsigned long long budget);
     
-    void SetAutoReloadResources(bool enable);
+    void SetAutoReloadResources(bool enable, bool fullResourceWatch);
     void SetReturnFailedResources(bool enable);
     void SetSearchPackagesFirst(bool value);
     void SetFinishBackgroundResourcesMs(int ms);
@@ -29,6 +29,7 @@ class ResourceCache
     String GetResourceFileName(const String name) const;
 
     bool GetAutoReloadResources() const;
+    bool GetFullResourceWatch() const;
     bool GetReturnFailedResources() const;
     bool GetSearchPackagesFirst() const;
     int GetFinishBackgroundResourcesMs() const;
@@ -38,7 +39,6 @@ class ResourceCache
     String SanitateResourceDirName(const String name) const;
 
     tolua_readonly tolua_property__get_set unsigned long long totalMemoryUse;
-    tolua_property__get_set bool autoReloadResources;
     tolua_property__get_set bool returnFailedResources;
     tolua_property__get_set bool searchPackagesFirst;
     tolua_readonly tolua_property__get_set unsigned numBackgroundLoadResources;
