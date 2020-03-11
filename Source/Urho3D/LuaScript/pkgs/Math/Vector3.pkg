@@ -59,6 +59,7 @@ class IntVector3
 {
     IntVector3();
     IntVector3(int x, int y, int z);
+    IntVector3(const Vector3& rhs);
     IntVector3(const IntVector3& rhs);
     ~IntVector3();
 

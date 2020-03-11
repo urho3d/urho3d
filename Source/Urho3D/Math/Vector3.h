@@ -28,6 +28,8 @@
 namespace Urho3D
 {
 
+class Vector3;
+
 /// Three-dimensional vector with integer values.
 class URHO3D_API IntVector3
 {
@@ -55,6 +57,8 @@ public:
         z_(data[2])
     {
     }
+
+    explicit IntVector3(const Vector3& rhs) noexcept;
 
     /// Copy-construct from another vector.
     IntVector3(const IntVector3& rhs) noexcept = default;
@@ -179,6 +183,12 @@ public:
     /// (1,1,1) vector.
     static const IntVector3 ONE;
 };
+
+inline void operator * (const IntVector3& lhs, double rhs) = delete;
+inline void operator * (double lhs, const IntVector3& rhs) = delete;
+inline void operator / (const IntVector3& lhs, double rhs) = delete;
+inline IntVector3& operator *= (IntVector3& lhs, double rhs) = delete;
+inline IntVector3& operator /= (IntVector3& lhs, double rhs) = delete;
 
 /// Three-dimensional vector.
 class URHO3D_API Vector3
@@ -494,6 +504,13 @@ public:
     /// (1,1,1) vector.
     static const Vector3 ONE;
 };
+
+inline IntVector3::IntVector3(const Vector3& rhs) noexcept :
+    x_(static_cast<int>(rhs.x_)),
+    y_(static_cast<int>(rhs.y_)),
+    z_(static_cast<int>(rhs.z_))
+{
+}
 
 /// Multiply Vector3 with a scalar.
 inline Vector3 operator *(float lhs, const Vector3& rhs) { return rhs * lhs; }
