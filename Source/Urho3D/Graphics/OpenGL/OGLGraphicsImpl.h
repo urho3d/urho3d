@@ -80,7 +80,7 @@ class Context;
 using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
 using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
 
-/// Cached state of a frame buffer object
+/// Cached state of a frame buffer object.
 struct FrameBufferObject
 {
     /// Frame buffer handle.

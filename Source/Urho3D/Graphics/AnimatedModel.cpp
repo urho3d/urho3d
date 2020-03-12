@@ -701,7 +701,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
     if (isMaster_)
     {
-        // Check if bone structure has stayed compatible (reloading the model.) In that case retain the old bones and animations
+        // Check if bone structure has stayed compatible (reloading the model). In that case retain the old bones and animations
         if (skeleton_.GetNumBones() == skeleton.GetNumBones())
         {
             Vector<Bone>& destBones = skeleton_.GetModifiableBones();

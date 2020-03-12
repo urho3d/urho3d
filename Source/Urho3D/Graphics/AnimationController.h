@@ -125,7 +125,7 @@ public:
     bool SetLooped(const String& name, bool enable);
     /// Set animation speed. Return true on success.
     bool SetSpeed(const String& name, float speed);
-    /// Set animation autofade at end (non-looped animations only.) Zero time disables. Return true on success.
+    /// Set animation autofade at end (non-looped animations only). Zero time disables. Return true on success.
     bool SetAutoFade(const String& name, float fadeOutTime);
     /// Set whether an animation auto-removes on completion.
     bool SetRemoveOnCompletion(const String& name, bool removeOnCompletion);

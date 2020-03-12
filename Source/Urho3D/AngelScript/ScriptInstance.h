@@ -202,7 +202,7 @@ private:
     Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
-    /// Storage for unapplied node and component ID attributes
+    /// Storage for unapplied node and component ID attributes.
     HashMap<AttributeInfo*, unsigned> idAttributes_;
     /// Storage for attributes while script object is being hot-reloaded.
     HashMap<String, Variant> storedAttributes_;

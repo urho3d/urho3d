@@ -43,7 +43,7 @@ class URHO3D_API SoundSource : public Component
 public:
     /// Construct.
     explicit SoundSource(Context* context);
-    /// Destruct. Remove self from the audio subsystem
+    /// Destruct. Remove self from the audio subsystem.
     ~SoundSource() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
@@ -120,7 +120,7 @@ public:
     void SetPositionAttr(int value);
     /// Return sound attribute.
     ResourceRef GetSoundAttr() const;
-    /// Set sound playing attribute
+    /// Set sound playing attribute.
     void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;

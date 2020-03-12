@@ -53,7 +53,7 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     layer_(0),
     blendingMode_(ABM_LERP)
 {
-    // Set default start bone (use all tracks.)
+    // Set default start bone (use all tracks)
     SetStartBone(nullptr);
 }
 

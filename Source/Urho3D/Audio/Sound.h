@@ -105,7 +105,7 @@ public:
     /// Return whether is compressed.
     bool IsCompressed() const { return compressed_; }
 
-    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.) Called internally, does not normally need to be called, unless the sound data is modified manually on the fly.
+    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot). Called internally, does not normally need to be called, unless the sound data is modified manually on the fly.
     void FixInterpolation();
 
 private:

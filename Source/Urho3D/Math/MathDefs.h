@@ -86,11 +86,11 @@ inline T Min(T lhs, U rhs) { return lhs < rhs ? lhs : rhs; }
 template <class T, class U>
 inline T Max(T lhs, U rhs) { return lhs > rhs ? lhs : rhs; }
 
-/// Return absolute value of a value
+/// Return absolute value of a value.
 template <class T>
 inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 
-/// Return the sign of a float (-1, 0 or 1.)
+/// Return the sign of a float (-1, 0 or 1).
 template <class T>
 inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
 
@@ -112,7 +112,7 @@ inline unsigned FloatToRawIntBits(float value)
 /// Check whether a floating point value is NaN.
 template <class T> inline bool IsNaN(T value) { return std::isnan(value); }
 
-/// Check whether a floating point value is positive or negative infinity
+/// Check whether a floating point value is positive or negative infinity.
 template <class T> inline bool IsInf(T value) { return std::isinf(value); }
 
 /// Clamp a number to a range.
@@ -280,7 +280,7 @@ inline unsigned CountSetBits(unsigned value)
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
 inline constexpr unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6u) + (hash << 16u) - hash; }
 
-/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
+/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive).
 inline float Random() { return Rand() / 32768.0f; }
 
 /// Return a random float between 0.0 and range, inclusive from both ends.

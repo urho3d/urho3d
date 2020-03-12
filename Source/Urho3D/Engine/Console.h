@@ -182,7 +182,7 @@ private:
     Vector<String> autoComplete_;
     /// Command auto complete current position.
     unsigned autoCompletePosition_;
-    /// Store the original line which is being auto-completed
+    /// Store the original line which is being auto-completed.
     String autoCompleteLine_;
 
     /// Flag when printing messages to prevent endless loop.

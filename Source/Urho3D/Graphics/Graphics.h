@@ -194,7 +194,7 @@ public:
     void SetTexture(unsigned index, Texture* texture);
     /// Bind texture unit 0 for update. Called by Texture. Used only on OpenGL.
     void SetTextureForUpdate(Texture* texture);
-    /// Dirty texture parameters of all textures (when global settings change.)
+    /// Dirty texture parameters of all textures (when global settings change).
     void SetTextureParametersDirty();
     /// Set default texture filtering mode. Called by Renderer before rendering.
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
@@ -279,7 +279,7 @@ public:
     /// Return window height in pixels.
     int GetHeight() const { return height_; }
 
-    /// Return multisample mode (1 = no multisampling.)
+    /// Return multisample mode (1 = no multisampling).
     int GetMultiSample() const { return multiSample_; }
 
     /// Return window size in pixels.
@@ -300,10 +300,10 @@ public:
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
 
-    /// Return refresh rate when using vsync in fullscreen
+    /// Return refresh rate when using vsync in fullscreen.
     int GetRefreshRate() const { return refreshRate_; }
 
-    /// Return the current monitor index. Effective on in fullscreen
+    /// Return the current monitor index. Effective on in fullscreen.
     int GetMonitor() const { return monitor_; }
 
     /// Return whether triple buffering is enabled.
@@ -637,7 +637,7 @@ private:
     String windowTitle_;
     /// Window icon image.
     WeakPtr<Image> windowIcon_;
-    /// External window, null if not in use (default.)
+    /// External window, null if not in use (default).
     void* externalWindow_{};
     /// Window width in pixels.
     int width_{};
@@ -657,9 +657,9 @@ private:
     bool highDPI_{};
     /// Vertical sync flag.
     bool vsync_{};
-    /// Refresh rate in Hz. Only used in fullscreen, 0 when windowed
+    /// Refresh rate in Hz. Only used in fullscreen, 0 when windowed.
     int refreshRate_{};
-    /// Monitor index. Only used in fullscreen, 0 when windowed
+    /// Monitor index. Only used in fullscreen, 0 when windowed.
     int monitor_{};
     /// Triple buffering flag.
     bool tripleBuffer_{};

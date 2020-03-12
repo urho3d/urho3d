@@ -40,7 +40,7 @@ public:
     DbConnection(Context* context, const String& connectionString);
     /// Destruct.
     ~DbConnection() override;
-    /// Finalize all prepared statements, close all BLOB handles, and finish all sqlite3_backup objects
+    /// Finalize all prepared statements, close all BLOB handles, and finish all sqlite3_backup objects.
     void Finalize();
 
     /// Execute an SQL statements immediately. Send E_DBCURSOR event for each row in the resultset when useCursorEvent parameter is set to true.

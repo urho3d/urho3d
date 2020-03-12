@@ -317,7 +317,7 @@ private:
     bool specular_{};
     /// Flag for whether is subscribed to animation updates.
     bool subscribed_{};
-    /// Flag to suppress parameter hash and memory use recalculation when setting multiple shader parameters (loading or resetting the material.)
+    /// Flag to suppress parameter hash and memory use recalculation when setting multiple shader parameters (loading or resetting the material).
     bool batchedParameterUpdate_{};
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;

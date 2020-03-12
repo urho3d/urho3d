@@ -55,7 +55,7 @@ public:
     void SetDelay(float interval);
     /// Add a file change into the changes queue.
     void AddChange(const String& fileName);
-    /// Return a file change (true if was found, false if not.)
+    /// Return a file change (true if was found, false if not).
     bool GetNextChange(String& dest);
 
     /// Return the path being watched, or empty if not watching.

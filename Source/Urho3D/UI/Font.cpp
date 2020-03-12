@@ -41,7 +41,7 @@ namespace Urho3D
 
 namespace
 {
-    /// Convert float to 26.6 fixed-point (as used internally by FreeType)
+    // Convert float to 26.6 fixed-point (as used internally by FreeType)
     inline int FloatToFixed(float value)
     {
         return (int)(value * 64);

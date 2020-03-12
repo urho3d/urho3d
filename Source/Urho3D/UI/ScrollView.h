@@ -79,7 +79,7 @@ public:
     /// Set scroll deceleration.
     void SetScrollDeceleration(float deceleration) { scrollDeceleration_ = deceleration; }
 
-    /// Set scroll snap epsilon
+    /// Set scroll snap epsilon.
     void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Set whether child elements should be disabled while touch scrolling.
@@ -121,7 +121,7 @@ public:
     /// Return scroll deceleration.
     float GetScrollDeceleration() const { return scrollDeceleration_; }
 
-    /// Return scroll snap epsilon
+    /// Return scroll snap epsilon.
     float GetScrollSnapEpsilon() const { return scrollSnapEpsilon_; }
 
     /// Return whether child element will be disabled while touch scrolling.
@@ -173,21 +173,21 @@ protected:
     bool ignoreEvents_;
     /// Resize content widget width to match panel. Internal flag, used by the ListView class.
     bool resizeContentWidth_;
-    /// Scroll deceleration
+    /// Scroll deceleration.
     float scrollDeceleration_;
-    /// Scroll snap epsilon
+    /// Scroll snap epsilon.
     float scrollSnapEpsilon_;
-    /// Used to trigger scroll smoothing when false;
+    /// Used to trigger scroll smoothing when false.
     bool scrollTouchDown_;
-    /// Used to prevent touch scroll - scroll bar conflict
+    /// Used to prevent touch scroll - scroll bar conflict.
     bool barScrolling_;
     /// Used to determine if child elements should be disabled while touch scrolling, to prevent their trigger.
     bool autoDisableChildren_;
     /// Used to determine if children have been disabled.
     bool scrollChildrenDisable_;
-    /// Distance moved with touch scrolling
+    /// Distance moved with touch scrolling.
     float touchDistanceSum_;
-    /// Threshold to trigger auto disable children
+    /// Threshold to trigger auto disable children.
     float autoDisableThreshold_;
 
 private:

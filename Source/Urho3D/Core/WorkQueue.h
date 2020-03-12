@@ -132,7 +132,7 @@ private:
     List<SharedPtr<WorkItem> > poolItems_;
     /// Work item collection. Accessed only by the main thread.
     List<SharedPtr<WorkItem> > workItems_;
-    /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems.)
+    /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems).
     List<WorkItem*> queue_;
     /// Worker queue mutex.
     Mutex queueMutex_;

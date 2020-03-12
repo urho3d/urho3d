@@ -83,7 +83,7 @@ public:
     /// Return whether to draw debug geometry.
     bool GetDrawDebug() const { return drawDebug_; }
 
-    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case.)
+    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case).
     Camera* GetCullCamera() const;
 
     /// Return ray corresponding to normalized screen coordinates.

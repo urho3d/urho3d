@@ -65,7 +65,7 @@ public:
     void SetPopupOffset(int x, int y);
     /// Force the popup to show or hide.
     void ShowPopup(bool enable);
-    /// Set accelerator key (set zero key code to disable.)
+    /// Set accelerator key (set zero key code to disable).
     void SetAccelerator(int key, int qualifiers);
 
     /// Return popup element.

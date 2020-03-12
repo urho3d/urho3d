@@ -192,7 +192,7 @@ private:
     void HandleItemFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle focus changed.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
-    /// Update subscription to UI click events
+    /// Update subscription to UI click events.
     void UpdateUIClickSubscription();
 };
 

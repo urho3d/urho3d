@@ -126,7 +126,7 @@ public:
     void UnsubscribeFromEvents(Object* sender);
     /// Unsubscribe from all events.
     void UnsubscribeFromAllEvents();
-    /// Unsubscribe from all events except those listed, and optionally only those with userdata (script registered events.)
+    /// Unsubscribe from all events except those listed, and optionally only those with userdata (script registered events).
     void UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData);
     /// Send event to all subscribers.
     void SendEvent(StringHash eventType);
@@ -142,11 +142,11 @@ public:
 
     /// Return execution context.
     Context* GetContext() const { return context_; }
-    /// Return global variable based on key
+    /// Return global variable based on key.
     const Variant& GetGlobalVar(StringHash key) const;
-    /// Return all global variables
+    /// Return all global variables.
     const VariantMap& GetGlobalVars() const;
-    /// Set global variable with the respective key and value
+    /// Set global variable with the respective key and value.
     void SetGlobalVar(StringHash key, const Variant& value);
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
@@ -293,7 +293,7 @@ protected:
     void* userData_;
 };
 
-/// Template implementation of the event handler invoke helper (stores a function pointer of specific class.)
+/// Template implementation of the event handler invoke helper (stores a function pointer of specific class).
 template <class T> class EventHandlerImpl : public EventHandler
 {
 public:

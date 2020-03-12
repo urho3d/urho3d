@@ -213,7 +213,7 @@ public:
     /// Return whether this RigidBody is acting as a trigger.
     bool IsTrigger() const { return trigger_; }
 
-    /// Return whether rigid body is active (not sleeping.)
+    /// Return whether rigid body is active (not sleeping).
     bool IsActive() const;
 
     /// Return collision layer.
