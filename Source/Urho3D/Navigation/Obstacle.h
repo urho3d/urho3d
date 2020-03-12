@@ -39,12 +39,12 @@ class URHO3D_API Obstacle : public Component
 
 public:
     /// Construct.
-    explicit Obstacle(Context*);
+    explicit Obstacle(Context* context);
     /// Destruct.
     ~Obstacle() override;
 
     /// Register Obstacle with engine context.
-    static void RegisterObject(Context*);
+    static void RegisterObject(Context* context);
 
     /// Update the owning mesh when enabled status has changed.
     void OnSetEnabled() override;
