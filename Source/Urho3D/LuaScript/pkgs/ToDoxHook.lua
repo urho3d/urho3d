@@ -210,8 +210,10 @@ function getCurrentDirectory()
   local path = ""
   local tmpFile = os.tmpname()
   if separator == "\\" then
-    -- Workaround broken os.tmpname() on Windows platform
-    tmpFile = os.getenv('TMP') .. tmpFile
+    if not tmpFile:find(':') then
+      -- Workaround broken os.tmpname()
+      tmpFile = os.getenv('TMP') .. tmpFile
+    end
     os.execute("cd > " .. tmpFile)
   else
     os.execute("pwd > " .. tmpFile)
