@@ -191,7 +191,7 @@ URHO3D_EVENT(E_TOGGLED, Toggled)
     URHO3D_PARAM(P_STATE, State);                  // bool
 }
 
-/// UI slider value changed
+/// UI slider value changed.
 URHO3D_EVENT(E_SLIDERCHANGED, SliderChanged)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -206,7 +206,7 @@ URHO3D_EVENT(E_SLIDERPAGED, SliderPaged)
     URHO3D_PARAM(P_PRESSED, Pressed);              // bool
 }
 
-/// UI progressbar value changed
+/// UI progressbar value changed.
 URHO3D_EVENT(E_PROGRESSBARCHANGED, ProgressBarChanged)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -242,14 +242,14 @@ URHO3D_EVENT(E_TEXTENTRY, TextEntry)
     URHO3D_PARAM(P_TEXT, Text);                    // String [in/out]
 }
 
-/// Editable text changed
+/// Editable text changed.
 URHO3D_EVENT(E_TEXTCHANGED, TextChanged)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
     URHO3D_PARAM(P_TEXT, Text);                    // String
 }
 
-/// Text editing finished (enter pressed on a LineEdit)
+/// Text editing finished (enter pressed on a LineEdit).
 URHO3D_EVENT(E_TEXTFINISHED, TextFinished)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -344,7 +344,7 @@ URHO3D_EVENT(E_ELEMENTREMOVED, ElementRemoved)
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
-/// Hovering on an UI element has started
+/// Hovering on an UI element has started.
 URHO3D_EVENT(E_HOVERBEGIN, HoverBegin)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -354,13 +354,13 @@ URHO3D_EVENT(E_HOVERBEGIN, HoverBegin)
     URHO3D_PARAM(P_ELEMENTY, ElementY);            // int
 }
 
-/// Hovering on an UI element has ended
+/// Hovering on an UI element has ended.
 URHO3D_EVENT(E_HOVEREND, HoverEnd)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
-/// Drag behavior of a UI Element has started
+/// Drag behavior of a UI Element has started.
 URHO3D_EVENT(E_DRAGBEGIN, DragBegin)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -372,7 +372,7 @@ URHO3D_EVENT(E_DRAGBEGIN, DragBegin)
     URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
-/// Drag behavior of a UI Element when the input device has moved
+/// Drag behavior of a UI Element when the input device has moved.
 URHO3D_EVENT(E_DRAGMOVE, DragMove)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -386,7 +386,7 @@ URHO3D_EVENT(E_DRAGMOVE, DragMove)
     URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
-/// Drag behavior of a UI Element has finished
+/// Drag behavior of a UI Element has finished.
 URHO3D_EVENT(E_DRAGEND, DragEnd)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -398,7 +398,7 @@ URHO3D_EVENT(E_DRAGEND, DragEnd)
     URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
-/// Drag of a UI Element was canceled by pressing ESC
+/// Drag of a UI Element was canceled by pressing ESC.
 URHO3D_EVENT(E_DRAGCANCEL, DragCancel)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -410,7 +410,7 @@ URHO3D_EVENT(E_DRAGCANCEL, DragCancel)
     URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
-/// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable
+/// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable.
 URHO3D_EVENT(E_UIDROPFILE, UIDropFile)
 {
     URHO3D_PARAM(P_FILENAME, FileName);            // String

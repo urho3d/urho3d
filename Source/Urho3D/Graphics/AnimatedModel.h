@@ -61,7 +61,7 @@ public:
     void Update(const FrameInfo& frame) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
@@ -162,7 +162,7 @@ public:
     /// Return per-geometry bone mappings.
     const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
-    /// Return per-geometry skin matrices. If empty, uses global skinning
+    /// Return per-geometry skin matrices. If empty, uses global skinning.
     const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
     /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
@@ -185,7 +185,7 @@ private:
     void RemoveRootBone();
     /// Mark animation and skinning to require an update.
     void MarkAnimationDirty();
-    /// Mark animation and skinning to require a forced update (blending order changed.)
+    /// Mark animation and skinning to require a forced update (blending order changed).
     void MarkAnimationOrderDirty();
     /// Mark morphs to require an update.
     void MarkMorphsDirty();

@@ -52,8 +52,8 @@ static const char* shapeNames[] =
     "BusyArrow"
 };
 
-/// OS cursor shape lookup table matching cursor shape enumeration
 #if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
+// OS cursor shape lookup table matching cursor shape enumeration
 static const int osCursorLookup[CS_MAX_SHAPES] =
 {
     SDL_SYSTEM_CURSOR_ARROW,    // CS_NORMAL

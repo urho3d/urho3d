@@ -59,7 +59,7 @@ public:
 private:
     friend class IKSolver;
 
-    /// Intended to be used only by IKSolver
+    /// Intended to be used only by IKSolver.
     void SetIKConstraintNode(ik_node_t* constraintNode);
 
     ik_node_t* ikConstraintNode_;

@@ -214,11 +214,11 @@ public:
     void SetShadowQuality(ShadowQuality quality);
     /// Set shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
     void SetShadowSoftness(float shadowSoftness);
-    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
+    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1].
     void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
-    /// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
+    /// Set VSM shadow map multisampling level. Default 1 (no multisampling).
     void SetVSMMultiSample(int multiSample);
-    /// Set post processing filter to the shadow map
+    /// Set post processing filter to the shadow map.
     void SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
@@ -240,11 +240,11 @@ public:
     void SetOccluderSizeThreshold(float screenSize);
     /// Set whether to thread occluder rendering. Default false.
     void SetThreadedOcclusion(bool enable);
-    /// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+    /// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
     void SetMobileShadowBiasMul(float mul);
-    /// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect.)
+    /// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect).
     void SetMobileShadowBiasAdd(float add);
-    /// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+    /// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
     void SetMobileNormalOffsetMul(float mul);
     /// Force reload of shaders.
     void ReloadShaders();
@@ -375,7 +375,7 @@ public:
     /// Return the shadowed pointlight indirection cube map.
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
 
-    /// Return the instancing vertex buffer
+    /// Return the instancing vertex buffer.
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_.Get() : nullptr; }
 
     /// Return the frame update parameters.
@@ -461,7 +461,7 @@ private:
     void ResetShadowMaps();
     /// Remove all occlusion and screen buffers.
     void ResetBuffers();
-    /// Find variations for shadow shaders
+    /// Find variations for shadow shaders.
     String GetShadowVariations() const;
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -506,9 +506,9 @@ private:
     HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
-    /// Instance of shadow map filter
+    /// Instance of shadow map filter.
     Object* shadowMapFilterInstance_{};
-    /// Function pointer of shadow map filter
+    /// Function pointer of shadow map filter.
     ShadowMapFilter shadowMapFilter_{};
     /// Screen buffers by resolution and format.
     HashMap<unsigned long long, Vector<SharedPtr<Texture> > > screenBuffers_;
@@ -574,9 +574,9 @@ private:
     unsigned numOcclusionBuffers_{};
     /// Number of temporary shadow cameras in use.
     unsigned numShadowCameras_{};
-    /// Number of primitives (3D geometry only.)
+    /// Number of primitives (3D geometry only).
     unsigned numPrimitives_{};
-    /// Number of batches (3D geometry only.)
+    /// Number of batches (3D geometry only).
     unsigned numBatches_{};
     /// Frame number on which shaders last changed.
     unsigned shadersChangedFrameNumber_{M_MAX_UNSIGNED};

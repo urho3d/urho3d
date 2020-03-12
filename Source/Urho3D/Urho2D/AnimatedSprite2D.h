@@ -112,7 +112,7 @@ protected:
     void SetSpineAnimation();
     /// Update spine animation.
     void UpdateSpineAnimation(float timeStep);
-    /// Update vertices for spine animation;
+    /// Update vertices for spine animation.
     void UpdateSourceBatchesSpine();
 #endif
     /// Handle set spriter animation.

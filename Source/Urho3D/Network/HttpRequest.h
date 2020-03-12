@@ -33,7 +33,7 @@
 namespace Urho3D
 {
 
-/// HTTP connection state
+/// HTTP connection state.
 enum HttpRequestState
 {
     HTTP_INITIALIZING = 0,

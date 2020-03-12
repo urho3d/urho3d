@@ -260,9 +260,9 @@ public:
     /// Maximum vector.
     Vector2 max_;
 
-    /// Rect in the range (-1, -1) - (1, 1)
+    /// Rect in the range (-1, -1) - (1, 1).
     static const Rect FULL;
-    /// Rect in the range (0, 0) - (1, 1)
+    /// Rect in the range (0, 0) - (1, 1).
     static const Rect POSITIVE;
     /// Zero-sized rect.
     static const Rect ZERO;

@@ -81,7 +81,7 @@ public:
     void Update(const FrameInfo &frame) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
@@ -197,7 +197,7 @@ private:
     void UpdateBufferSize();
     /// Rewrite RibbonTrail vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
-    /// Update/Rebuild tail mesh only if position changed (called by UpdateBatches())
+    /// Update/Rebuild tail mesh only if position changed (called by UpdateBatches()).
     void UpdateTail(float timeStep);
     /// Geometry.
     SharedPtr<Geometry> geometry_;
@@ -211,7 +211,7 @@ private:
     bool bufferSizeDirty_;
     /// Vertex buffer needs rewrite flag.
     bool bufferDirty_;
-    /// Previous position of tail
+    /// Previous position of tail.
     Vector3 previousPosition_;
     /// Distance between points. Basically is tail length.
     float vertexDistance_;
@@ -229,7 +229,7 @@ private:
     float endScale_;
     /// Last scene timestep.
     float lastTimeStep_;
-    /// Lifetime
+    /// Lifetime.
     float lifetime_;
     /// Number of columns for every tails.
     unsigned tailColumn_;
@@ -241,7 +241,7 @@ private:
     Vector3 previousOffset_;
     /// Trail pointers for sorting.
     Vector<TrailPoint*> sortedPoints_;
-    /// Force update flag (ignore animation LOD momentarily.)
+    /// Force update flag (ignore animation LOD momentarily).
     bool forceUpdate_;
     /// Currently emitting flag.
     bool emitting_;

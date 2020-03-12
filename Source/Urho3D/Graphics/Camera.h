@@ -88,7 +88,7 @@ public:
     void SetOrthographic(bool enable);
     /// Set automatic aspect ratio based on viewport dimensions. Enabled by default.
     void SetAutoAspectRatio(bool enable);
-    /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
+    /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions).
     void SetProjectionOffset(const Vector2& offset);
     /// Set reflection mode.
     void SetUseReflection(bool enable);
@@ -101,7 +101,7 @@ public:
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     /// Set custom projection matrix, which should be specified in D3D convention with depth range 0 - 1. Disables auto aspect ratio.
-    /** Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection.
+    /** Change any of the standard view parameters (FOV, far clip, zoom, etc.) to revert to the standard projection.
         Note that the custom projection is not serialized or replicated through the network.
      */
     void SetProjection(const Matrix4& projection);

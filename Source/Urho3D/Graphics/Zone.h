@@ -47,7 +47,7 @@ public:
 
     /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
-    /// Set ambient color
+    /// Set ambient color.
     void SetAmbientColor(const Color& color);
     /// Set fog color.
     void SetFogColor(const Color& color);

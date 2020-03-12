@@ -66,7 +66,7 @@ public:
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
-    /// Set slider range maximum value (minimum value is always 0.)
+    /// Set slider range maximum value (minimum value is always 0).
     void SetRange(float range);
     /// Set slider current value.
     void SetValue(float value);

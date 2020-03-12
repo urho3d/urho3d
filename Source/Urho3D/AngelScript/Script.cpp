@@ -49,7 +49,7 @@ class ScriptResourceRouter : public ResourceRouter
     {
     }
 
-    /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available)
+    /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available).
     void Route(String& name, ResourceRequest requestType) override
     {
         String extension = GetExtension(name);

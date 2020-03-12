@@ -52,7 +52,7 @@ struct DelayedCall
 class URHO3D_API ScriptEventListener
 {
 public:
-    /// Destruct
+    /// Destruct.
     virtual ~ScriptEventListener() = default;
 
     /// Add a scripted event handler.

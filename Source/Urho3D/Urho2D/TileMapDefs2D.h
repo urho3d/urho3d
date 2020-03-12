@@ -41,7 +41,7 @@ enum Orientation2D
     O_ISOMETRIC,
     /// Staggered.
     O_STAGGERED,
-    /// Hexagonal
+    /// Hexagonal.
     O_HEXAGONAL
 };
 

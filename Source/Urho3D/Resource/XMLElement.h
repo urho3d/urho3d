@@ -201,7 +201,7 @@ public:
     bool HasAttribute(const String& name) const;
     /// Return whether has an attribute.
     bool HasAttribute(const char* name) const;
-    /// Return inner value, or empty if missing for nodes like <node>value</node>
+    /// Return inner value, or empty if missing for nodes like <node>value</node>.
     String GetValue() const;
     /// Return attribute, or empty if missing.
     String GetAttribute(const String& name = String::EMPTY) const;

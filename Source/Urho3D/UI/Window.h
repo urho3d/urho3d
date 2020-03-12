@@ -128,7 +128,7 @@ public:
     bool GetModalAutoDismiss() const { return modalAutoDismiss_; }
 
 protected:
-    /// Identify drag mode (move/resize.)
+    /// Identify drag mode (move/resize).
     WindowDragMode GetDragMode(const IntVector2& position) const;
     /// Set cursor shape based on drag mode.
     void SetCursorShape(WindowDragMode mode, Cursor* cursor) const;

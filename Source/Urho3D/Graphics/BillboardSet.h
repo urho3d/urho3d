@@ -74,7 +74,7 @@ public:
     void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
@@ -91,7 +91,7 @@ public:
     void SetSorted(bool enable);
     /// Set whether billboards have fixed size on screen (measured in pixels) regardless of distance to camera. Default false.
     void SetFixedScreenSize(bool enable);
-    /// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+    /// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
     void SetFaceCameraMode(FaceCameraMode mode);
     /// Set minimal angle between billboard normal and look-at direction.
     void SetMinAngle(float angle);
@@ -191,9 +191,9 @@ private:
     bool bufferSizeDirty_;
     /// Vertex buffer needs rewrite flag.
     bool bufferDirty_;
-    /// Force update flag (ignore animation LOD momentarily.)
+    /// Force update flag (ignore animation LOD momentarily).
     bool forceUpdate_;
-    /// Update billboard geometry type
+    /// Update billboard geometry type.
     bool geometryTypeUpdate_;
     /// Sorting flag. Triggers a vertex buffer rewrite for each view this billboard set is rendered from.
     bool sortThisFrame_;

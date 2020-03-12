@@ -40,11 +40,11 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set base priority. Default 100 (send updates at full frequency.)
+    /// Set base priority. Default 100 (send updates at full frequency).
     void SetBasePriority(float priority);
-    /// Set priority reduction distance factor. Default 0 (no effect.)
+    /// Set priority reduction distance factor. Default 0 (no effect).
     void SetDistanceFactor(float factor);
-    /// Set minimum priority. Default 0 (no updates when far away enough.)
+    /// Set minimum priority. Default 0 (no updates when far away enough).
     void SetMinPriority(float priority);
     /// Set whether updates to owner should be sent always at full rate. Default true.
     void SetAlwaysUpdateOwner(bool enable);
