@@ -32,6 +32,9 @@ struct spAnimationStateData;
 struct spSkeleton;
 #endif
 
+namespace Urho3D
+{
+
 /// Loop mode.
 enum LoopMode2D
 {
@@ -42,9 +45,6 @@ enum LoopMode2D
     /// Force clamped.
     LM_FORCE_CLAMPED
 };
-
-namespace Urho3D
-{
 
 namespace Spriter
 {
