@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -201,7 +201,7 @@ public:
     bool HasAttribute(const String& name) const;
     /// Return whether has an attribute.
     bool HasAttribute(const char* name) const;
-    /// Return inner value, or empty if missing for nodes like <node>value</node>
+    /// Return inner value, or empty if missing for nodes like <node>value</node>.
     String GetValue() const;
     /// Return attribute, or empty if missing.
     String GetAttribute(const String& name = String::EMPTY) const;

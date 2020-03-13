@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -350,6 +350,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 
     if (type_ == VS)
     {
+        unsigned elementHash = 0;
         for (unsigned i = 0; i < shaderDesc.InputParameters; ++i)
         {
             D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
@@ -357,10 +358,11 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames, MAX_VERTEX_ELEMENT_SEMANTICS, true);
             if (semantic != MAX_VERTEX_ELEMENT_SEMANTICS)
             {
-                elementHash_ <<= 4;
-                elementHash_ += ((int)semantic + 1) * (paramDesc.SemanticIndex + 1);
+                CombineHash(elementHash, semantic);
+                CombineHash(elementHash, paramDesc.SemanticIndex);
             }
         }
+        elementHash_ = elementHash;
         elementHash_ <<= 32;
     }
 

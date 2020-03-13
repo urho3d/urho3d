@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -171,7 +173,7 @@ private:
     b2BodyDef bodyDef_;
     /// Box2D mass data.
     b2MassData massData_;
-    /// Use fixture mass (calculate mass & inertia from collision shapes automatically.)
+    /// Use fixture mass (calculate mass & inertia from collision shapes automatically).
     bool useFixtureMass_;
     /// Box2D body.
     b2Body* body_;

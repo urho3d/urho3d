@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -637,7 +637,7 @@ private:
     /// Compare two nodes.
     static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->key_ < rhs->key_; }
 
-    /// Compute a hash based on the key and the bucket size
+    /// Compute a hash based on the key and the bucket size.
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 

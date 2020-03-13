@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@
 
 #include "../DebugNew.h"
 
-extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
+extern "C" int SDL_AddTouch(SDL_TouchID touchID, SDL_TouchDeviceType type, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
 #if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS) && !defined(TVOS)) || (defined(__linux__) && !defined(__ANDROID__))
@@ -387,7 +387,9 @@ Input::Input(Context* context) :
     SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Input, HandleScreenMode));
 
 #if defined(__ANDROID__)
-    SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
+    // Prevent mouse events from being registered as synthetic touch events and vice versa
+    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 #elif defined(__EMSCRIPTEN__)
     emscriptenInput_ = new EmscriptenInput(this);
 #endif
@@ -1199,7 +1201,7 @@ void Input::SetTouchEmulation(bool enable)
 
             // Add a virtual touch device the first time we are enabling emulated touch
             if (!SDL_GetNumTouchDevices())
-                SDL_AddTouch(0, "Emulated Touch");
+                SDL_AddTouch(0, SDL_TOUCH_DEVICE_INDIRECT_RELATIVE, "Emulated Touch");
         }
         else
             ResetTouches();
@@ -1644,9 +1646,9 @@ void Input::ResetState()
     ResetTouches();
 
     // Use SetMouseButton() to reset the state so that mouse events will be sent properly
-    SetMouseButton(MOUSEB_LEFT, false);
-    SetMouseButton(MOUSEB_RIGHT, false);
-    SetMouseButton(MOUSEB_MIDDLE, false);
+    SetMouseButton(MOUSEB_LEFT, false, 0);
+    SetMouseButton(MOUSEB_RIGHT, false, 0);
+    SetMouseButton(MOUSEB_MIDDLE, false, 0);
 
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
@@ -1742,7 +1744,7 @@ void Input::SendInputFocusEvent()
     SendEvent(E_INPUTFOCUS, eventData);
 }
 
-void Input::SetMouseButton(MouseButton button, bool newState)
+void Input::SetMouseButton(MouseButton button, bool newState, int clicks)
 {
     if (newState)
     {
@@ -1765,6 +1767,7 @@ void Input::SetMouseButton(MouseButton button, bool newState)
     eventData[P_BUTTON] = button;
     eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
     eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
+    eventData[P_CLICKS] = clicks;
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
@@ -1932,7 +1935,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (!touchEmulation_)
         {
             const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
-            SetMouseButton(mouseButton, true);
+            SetMouseButton(mouseButton, true, evt.button.clicks);
         }
         else
         {
@@ -1958,7 +1961,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (!touchEmulation_)
         {
             const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
-            SetMouseButton(mouseButton, false);
+            SetMouseButton(mouseButton, false, evt.button.clicks);
         }
         else
         {

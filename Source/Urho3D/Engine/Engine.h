@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ public:
     bool InitializeResourceCache(const VariantMap& parameters, bool removeOld = true);
     /// Run one frame.
     void RunFrame();
-    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
+    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode).
     Console* CreateConsole();
     /// Create the debug hud.
     DebugHud* CreateDebugHud();
@@ -62,7 +62,7 @@ public:
     void SetTimeStepSmoothing(int frames);
     /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
-    /// Set whether to exit automatically on exit request (window close button.)
+    /// Set whether to exit automatically on exit request (window close button).
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);

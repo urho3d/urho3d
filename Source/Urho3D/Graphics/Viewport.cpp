@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,11 +103,15 @@ void Viewport::SetRenderPath(RenderPath* renderPath)
     }
 }
 
-void Viewport::SetRenderPath(XMLFile* file)
+bool Viewport::SetRenderPath(XMLFile* file)
 {
     SharedPtr<RenderPath> newRenderPath(new RenderPath());
     if (newRenderPath->Load(file))
+    {
         renderPath_ = newRenderPath;
+        return true;
+    }
+    return false;
 }
 
 Scene* Viewport::GetScene() const

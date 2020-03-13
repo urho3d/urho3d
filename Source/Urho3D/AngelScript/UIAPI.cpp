@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -654,6 +654,8 @@ static void RegisterFileSelector(asIScriptEngine* engine)
 static void RegisterToolTip(asIScriptEngine* engine)
 {
     RegisterUIElement<ToolTip>(engine, "ToolTip");
+    engine->RegisterObjectMethod("ToolTip", "void Reset()", asMETHOD(ToolTip, Reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ToolTip", "void add_altTarget(UIElement@+)", asMETHOD(ToolTip, AddAltTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "void set_delay(float)", asMETHOD(ToolTip, SetDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "float get_delay() const", asMETHOD(ToolTip, GetDelay), asCALL_THISCALL);
 }

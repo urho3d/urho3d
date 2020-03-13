@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,12 @@
 #ifndef GL_ETC1_RGB8_OES
 #define GL_ETC1_RGB8_OES 0x8d64
 #endif
+#ifndef GL_ETC2_RGB8_OES
+#define GL_ETC2_RGB8_OES 0x9274
+#endif
+#ifndef GL_ETC2_RGBA8_OES
+#define GL_ETC2_RGBA8_OES 0x9278
+#endif
 #ifndef COMPRESSED_RGB_PVRTC_4BPPV1_IMG
 #define COMPRESSED_RGB_PVRTC_4BPPV1_IMG 0x8c00
 #endif
@@ -74,7 +80,7 @@ class Context;
 using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
 using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
 
-/// Cached state of a frame buffer object
+/// Cached state of a frame buffer object.
 struct FrameBufferObject
 {
     /// Frame buffer handle.

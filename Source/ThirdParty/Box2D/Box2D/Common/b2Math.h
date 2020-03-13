@@ -16,34 +16,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef B2_MATH_H
 #define B2_MATH_H
 
 #include "Box2D/Common/b2Settings.h"
-#include <math.h>
+// Urho3D - use C++11 std function
+#include <cmath>
 
 /// This function is used to ensure that a floating point number is not a NaN or infinity.
 inline bool b2IsValid(float32 x)
 {
-	int32 ix = *reinterpret_cast<int32*>(&x);
-	return (ix & 0x7f800000) != 0x7f800000;
-}
-
-/// This is a approximate yet fast inverse square-root.
-inline float32 b2InvSqrt(float32 x)
-{
-	union
-	{
-		float32 x;
-		int32 i;
-	} convert;
-
-	convert.x = x;
-	float32 xhalf = 0.5f * x;
-	convert.i = 0x5f3759df - (convert.i >> 1);
-	x = convert.x;
-	x = x * (1.5f - xhalf * x * x);
-	return x;
+    // Urho3D - use C++11 std function
+	return std::isfinite(x);
 }
 
 #define	b2Sqrt(x)	sqrtf(x)

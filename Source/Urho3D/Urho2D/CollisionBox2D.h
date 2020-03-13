@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ private:
     b2PolygonShape boxShape_;
     /// Size.
     Vector2 size_;
-    /// Center
+    /// Center.
     Vector2 center_;
     /// Angle.
     float angle_;

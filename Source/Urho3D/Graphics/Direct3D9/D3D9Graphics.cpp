@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -304,6 +304,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
+    bool monitorChanged = false;
 
     highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
@@ -347,8 +348,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     // If nothing changes, do not reset the device
     if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && monitor == monitor_ && refreshRate == refreshRate_)
         return true;
+
+    monitorChanged = monitor != monitor_;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
@@ -381,6 +384,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
                 unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
+                if (refreshRate != 0)
+                    error += (unsigned)Abs(resolutions[i].z_ - refreshRate);
                 if (error < bestError)
                 {
                     best = i;
@@ -450,7 +455,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     if (!impl_->device_)
     {
-        unsigned adapter = monitor;
+        unsigned adapter = SDL_Direct3D9GetAdapterIndex(monitor);
         unsigned deviceType = D3DDEVTYPE_HAL;
 
         // Check for PerfHUD adapter
@@ -471,7 +476,33 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             return false;
     }
     else
-        ResetDevice();
+    {
+        if (!monitorChanged)
+            ResetDevice();
+        else
+        {
+            URHO3D_LOGINFO("Destroying D3D9 device");
+            // Monitor changed, re-create the D3D9 device on the new monitor
+            impl_->vertexDeclarations_.Clear();
+            OnDeviceLost();
+            {
+                MutexLock lock(gpuObjectMutex_);
+                // Release all GPU objects that still exist
+                for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+                    (*i)->Release();
+            }
+
+            // destroy previous device
+            URHO3D_SAFE_RELEASE(impl_->device_);
+
+            // create new device on the specified monitor
+            unsigned adapter = SDL_Direct3D9GetAdapterIndex(monitor);
+            unsigned deviceType = D3DDEVTYPE_HAL;
+            if (!CreateDevice(adapter, deviceType))
+                return false;
+            ResetDevice();
+        }
+    }
 
     // Clear the initial window contents to black
     impl_->device_->BeginScene();
@@ -481,16 +512,19 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 #ifdef URHO3D_LOGGING
     D3DADAPTER_IDENTIFIER9 id = {0};
-    HRESULT hr = impl_->interface_->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &id);
+    HRESULT hr = impl_->interface_->GetAdapterIdentifier(SDL_Direct3D9GetAdapterIndex(monitor_), 0, &id);
     if (S_OK == hr)
       URHO3D_LOGINFOF("Adapter used %s", id.Description);
 
     String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
+    msg.AppendWithFormat("Set screen mode %dx%d rate %d Hz %s monitor %d", width_, height_, refreshRate_,
+        (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
         msg.Append(" resizable");
+    if (highDPI_)
+        msg.Append(" highDPI");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
     URHO3D_LOGINFO(msg);
@@ -2342,10 +2376,10 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         }
 
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
-        SDL_HideWindow(window_);
+        if (!newFullscreen) SDL_HideWindow(window_);
         SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
-        SDL_ShowWindow(window_);
+        if (!newFullscreen) SDL_ShowWindow(window_);
     }
     else
     {

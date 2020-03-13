@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ public:
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
-    bool StartServer(unsigned short port);
+    bool StartServer(unsigned short port, unsigned int maxConnections = 128);
     /// Stop the server.
     void StopServer();
     /// Start NAT punchtrough client to allow remote connections.
@@ -140,7 +140,7 @@ private:
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
-    void OnServerDisconnected();
+    void OnServerDisconnected(const SLNet::AddressOrGUID& address);
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.

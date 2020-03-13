@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -289,19 +289,13 @@ void Run(Vector<String>& arguments)
 
             stbrp_context packerContext;
             stbrp_node packerMemory[PACKER_NUM_NODES];
-            stbrp_init_target(&packerContext, textureWidth, textureHeight, packerMemory, packerInfos.Size());
-            stbrp_pack_rects(&packerContext, packerRects, packerInfos.Size());
-
-            // check to see if everything fit
-            for (unsigned i = 0; i < packerInfos.Size(); ++i)
+            stbrp_init_target(&packerContext, textureWidth, textureHeight, packerMemory, PACKER_NUM_NODES);
+            if (!stbrp_pack_rects(&packerContext, packerRects, packerInfos.Size()))
             {
-                stbrp_rect* packerRect = &packerRects[i];
-                if (!packerRect->was_packed)
-                {
-                    fit = false;
-                    break;
-                }
+                // check to see if everything fit
+                fit = false;
             }
+
             if (fit)
             {
                 success = true;

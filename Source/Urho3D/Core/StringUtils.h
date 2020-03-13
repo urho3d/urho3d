@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -107,7 +107,7 @@ URHO3D_API Matrix3x4 ToMatrix3x4(const char* source);
 URHO3D_API Matrix4 ToMatrix4(const String& source);
 /// Parse a Matrix4 from a C string.
 URHO3D_API Matrix4 ToMatrix4(const char* source);
-/// Convert a pointer to string (returns hexadecimal.)
+/// Convert a pointer to string (returns hexadecimal).
 URHO3D_API String ToString(void* value);
 /// Convert an unsigned integer to string as hexadecimal.
 URHO3D_API String ToStringHex(unsigned value);

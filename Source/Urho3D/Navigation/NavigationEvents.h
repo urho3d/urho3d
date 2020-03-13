@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,7 @@ URHO3D_EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
     URHO3D_PARAM(P_TIMESTEP, TimeStep); // float
 }
 
-/// Crowd agent has been repositioned, specific to a node
+/// Crowd agent has been repositioned, specific to a node.
 URHO3D_EVENT(E_CROWD_AGENT_NODE_REPOSITION, CrowdAgentNodeReposition)
 {
     URHO3D_PARAM(P_NODE, Node); // Node pointer

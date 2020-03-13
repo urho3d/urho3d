@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     layer_(0),
     blendingMode_(ABM_LERP)
 {
-    // Set default start bone (use all tracks.)
+    // Set default start bone (use all tracks)
     SetStartBone(nullptr);
 }
 

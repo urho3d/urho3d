@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -187,19 +189,19 @@ public:
     bool IsObject() const { return GetValueType() == JSON_OBJECT; }
 
     /// Return boolean value.
-    bool GetBool() const { return IsBool() ? boolValue_ : false;}
+    bool GetBool(bool defaultValue = false) const { return IsBool() ? boolValue_ : defaultValue;}
     /// Return integer value.
-    int GetInt() const { return IsNumber() ? (int)numberValue_ : 0; }
+    int GetInt(int defaultValue = 0) const { return IsNumber() ? (int)numberValue_ : defaultValue; }
     /// Return unsigned integer value.
-    unsigned GetUInt() const { return IsNumber() ? (unsigned)numberValue_ : 0; }
+    unsigned GetUInt(unsigned defaultValue = 0) const { return IsNumber() ? (unsigned)numberValue_ : defaultValue; }
     /// Return float value.
-    float GetFloat() const { return IsNumber() ? (float)numberValue_ : 0.0f; }
+    float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : defaultValue; }
     /// Return double value.
-    double GetDouble() const { return IsNumber() ? numberValue_ : 0.0; }
-    /// Return string value.
-    const String& GetString() const { return IsString() ? *stringValue_ : String::EMPTY;}
-    /// Return C string value.
-    const char* GetCString() const { return IsString() ? stringValue_->CString() : nullptr;}
+    double GetDouble(double defaultValue = 0.0) const { return IsNumber() ? numberValue_ : defaultValue; }
+    /// Return string value. The 'defaultValue' may potentially be returned as is, so it is the responsibility of the caller to ensure the 'defaultValue' remains valid while the return value is being referenced.
+    const String& GetString(const String& defaultValue = String::EMPTY) const { return IsString() ? *stringValue_ : defaultValue;}
+    /// Return C string value. Default to empty string literal.
+    const char* GetCString(const char* defaultValue = "") const { return IsString() ? stringValue_->CString() : defaultValue;}
     /// Return JSON array value.
     const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.

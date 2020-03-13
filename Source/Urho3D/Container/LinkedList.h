@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -143,7 +143,7 @@ public:
         return false;
     }
 
-    /// Erase an element when the previous element is known (optimization.) Return true if successful.
+    /// Erase an element when the previous element is known (optimization). Return true if successful.
     bool Erase(T* element, T* previous)
     {
         if (previous && previous->next_ == element)

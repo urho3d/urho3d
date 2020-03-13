@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -101,7 +103,7 @@ struct JoystickState
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
 
     /// Return hat position.
-    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
+    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : int(HAT_CENTER); }
 
     /// SDL joystick.
     SDL_Joystick* joystick_{};
@@ -152,7 +154,7 @@ public:
     void ResetMouseVisible();
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab, bool suppressEvent = false);
-    /// Reset the mouse grabbed to the last unsuppressed SetMouseGrabbed call
+    /// Reset the mouse grabbed to the last unsuppressed SetMouseGrabbed call.
     void ResetMouseGrabbed();
     /// Set the mouse mode.
     /** Set the mouse mode behaviour.
@@ -173,7 +175,7 @@ public:
      *  outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
     */
     void SetMouseMode(MouseMode mode, bool suppressEvent = false);
-    /// Reset the last mouse mode that wasn't suppressed in SetMouseMode
+    /// Reset the last mouse mode that wasn't suppressed in SetMouseMode.
     void ResetMouseMode();
     /// Add screen joystick.
     /** Return the joystick instance ID when successful or negative on error.
@@ -286,7 +288,7 @@ public:
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether the mouse is currently being grabbed by an operation.
     bool IsMouseGrabbed() const { return mouseGrabbed_; }
-    /// Return whether the mouse is locked to the window
+    /// Return whether the mouse is locked to the window.
     bool IsMouseLocked() const;
 
     /// Return the mouse mode.
@@ -324,7 +326,7 @@ private:
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
-    void SetMouseButton(MouseButton button, bool newState);
+    void SetMouseButton(MouseButton button, bool newState, int clicks);
     /// Handle a key change.
     void SetKey(Key key, Scancode scancode, bool newState);
     /// Handle mouse wheel change.
@@ -370,9 +372,9 @@ private:
     HashSet<int> scancodePress_;
     /// Active finger touches.
     HashMap<int, TouchState> touches_;
-    /// List that maps between event touch IDs and normalised touch IDs
+    /// List that maps between event touch IDs and normalised touch IDs.
     List<int> availableTouchIDs_;
-    /// Mapping of touch indices
+    /// Mapping of touch indices.
     HashMap<int, int> touchIDMap_;
     /// String for text input.
     String textInput_;
@@ -390,7 +392,7 @@ private:
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
     int mouseMoveWheel_;
-    /// Input coordinate scaling. Non-unity when window and backbuffer have different sizes (e.g. Retina display.)
+    /// Input coordinate scaling. Non-unity when window and backbuffer have different sizes (e.g. Retina display).
     Vector2 inputScale_;
     /// SDL window ID.
     unsigned windowID_;

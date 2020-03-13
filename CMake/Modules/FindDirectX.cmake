@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2008-2020 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@
 #  DirectX_D3D11_FOUND
 #  DirectX_DInput_FOUND
 #  DirectX_DSound_FOUND
-#  DirectX_XAudio2_FOUND
 #  DirectX_XInput_FOUND
 #
 # When any of the Direct3D components is being searched for and found:
@@ -46,7 +45,7 @@
 #  DIRECT3D_DLL
 #
 
-set (DIRECTX_HEADERS audioclient.h d3dcompiler.h d3d9.h d3d11.h ddraw.h dsound.h dinput.h dxgi.h mmdeviceapi.h xaudio2.h xinput.h)
+set (DIRECTX_HEADERS d3dcompiler.h d3d9.h d3d11.h ddraw.h dsound.h dinput.h dxgi.h xinput.h)
 
 # When corresponding header listed above is found:
 #  HAVE_<UPCASE_NAME>_H
@@ -232,7 +231,7 @@ endforeach ()
 if (HAVE_D3D9_H)
     set (HAVE_D3D_H TRUE)
 endif ()
-foreach (COMPONENT DInput DSound XAudio2 XInput)
+foreach (COMPONENT DInput DSound XInput)
     string (TOUPPER ${COMPONENT} UPCASE_NAME)
     if (HAVE_${UPCASE_NAME}_H)
         set (DirectX_${COMPONENT}_FOUND TRUE)

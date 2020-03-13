@@ -1,5 +1,5 @@
-﻿//
-// Copyright (c) 2008-2019 the Urho3D project.
+//
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -552,6 +552,11 @@ void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation
     SetWorldPosition(position);
     SetWorldRotation(rotation);
     SetWorldScale(scale);
+}
+
+void Node::SetWorldTransform(const Matrix3x4& worldTransform)
+{
+    SetWorldTransform(worldTransform.Translation(), worldTransform.Rotation(), worldTransform.Scale());
 }
 
 void Node::Translate(const Vector3& delta, TransformSpace space)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ public:
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
 
-    /// Get the length of SplinePath;
+    /// Get the length of SplinePath.
     float GetLength() const { return length_; }
 
     /// Get the parent Node's last position on the spline.

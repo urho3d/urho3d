@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -234,7 +236,7 @@ public:
     /// Return navigation mesh bounding box padding.
     const Vector3& GetPadding() const { return padding_; }
 
-    /// Get the current cost of an area
+    /// Get the current cost of an area.
     float GetAreaCost(unsigned areaID) const;
 
     /// Return whether has been initialized with valid navigation data.
@@ -348,7 +350,7 @@ protected:
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
     bool drawNavAreas_;
-    /// NavAreas for this NavMesh
+    /// NavAreas for this NavMesh.
     Vector<WeakPtr<NavArea> > areas_;
 };
 

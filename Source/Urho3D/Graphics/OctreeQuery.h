@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -205,7 +207,7 @@ struct URHO3D_API RayQueryResult
     Vector3 position_;
     /// Hit normal in world space. Negation of ray direction if per-triangle data not available.
     Vector3 normal_;
-    /// Hit texture position
+    /// Hit texture position.
     Vector2 textureUV_;
     /// Distance from ray origin.
     float distance_{};

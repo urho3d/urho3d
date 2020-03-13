@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -200,7 +202,7 @@ private:
     Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
-    /// Storage for unapplied node and component ID attributes
+    /// Storage for unapplied node and component ID attributes.
     HashMap<AttributeInfo*, unsigned> idAttributes_;
     /// Storage for attributes while script object is being hot-reloaded.
     HashMap<String, Variant> storedAttributes_;

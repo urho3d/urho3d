@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ public:
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
 
-    /// Set ProgressBar range maximum value (minimum value is always 0.)
+    /// Set ProgressBar range maximum value (minimum value is always 0).
     void SetRange(float range);
 
     /// Set ProgressBar current value.
@@ -91,12 +91,12 @@ protected:
     void UpdateProgressBar();
 
     /// ProgressBar knob.
-    SharedPtr <BorderImage> knob_;
-    /// ProgressBar text
-    SharedPtr <Text> loadingText_;
+    SharedPtr<BorderImage> knob_;
+    /// ProgressBar text.
+    SharedPtr<Text> loadingText_;
     /// Orientation.
     Orientation orientation_;
-    /// ProgressBar text style
+    /// ProgressBar text style.
     String loadingPercentStyle_;
     /// ProgressBar range.
     float range_;

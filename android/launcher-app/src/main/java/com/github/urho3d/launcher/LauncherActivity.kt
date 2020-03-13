@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import com.github.urho3d.UrhoActivity
 class LauncherActivity : ExpandableListActivity() {
 
     // Filter to only include filename that has an extension
-    private fun getScriptNames(path: String) = assets.list(path).filter { it.contains('.') }
+    private fun getScriptNames(path: String) = assets.list(path)!!.filter { it.contains('.') }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

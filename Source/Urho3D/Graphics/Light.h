@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -107,7 +109,7 @@ struct URHO3D_API CascadeParameters
 
     /// Far clip values of the splits.
     Vector4 splits_;
-    /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
+    /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0).
     float fadeStart_{};
     /// Automatic depth bias adjustment strength.
     float biasAutoAdjust_{};

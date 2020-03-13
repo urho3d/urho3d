@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ public:
     {
     }
 
-    /// Construct from minimum and maximum floats (all dimensions same.)
+    /// Construct from minimum and maximum floats (all dimensions same).
     BoundingBox(float min, float max) noexcept :
         min_(Vector3(min, min, min)),
         max_(Vector3(max, max, max))
@@ -159,7 +159,7 @@ public:
         max_ = max;
     }
 
-    /// Define from minimum and maximum floats (all dimensions same.)
+    /// Define from minimum and maximum floats (all dimensions same).
     void Define(float min, float max)
     {
         min_ = Vector3(min, min, min);

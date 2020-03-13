@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ class UIElement;
 class Window;
 class XMLFile;
 
-/// %File selector's list entry (file or directory.)
+/// %File selector's list entry (file or directory).
 struct FileSelectorEntry
 {
     /// Name.
@@ -136,7 +136,7 @@ private:
     void HandlePathChanged(StringHash eventType, VariantMap& eventData);
     /// Handle file selected from the list.
     void HandleFileSelected(StringHash eventType, VariantMap& eventData);
-    /// Handle file doubleclicked from the list (enter directory / OK the file selection.)
+    /// Handle file doubleclicked from the list (enter directory / OK the file selection).
     void HandleFileDoubleClicked(StringHash eventType, VariantMap& eventData);
     /// Handle file list key pressed.
     void HandleFileListKey(StringHash eventType, VariantMap& eventData);

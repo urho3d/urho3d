@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
+#include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/peerinterface.h>
 #include <SLikeNet/statistics.h>
 
@@ -100,14 +101,6 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const Vecto
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
     unsigned contentID)
 {
-    /* Make sure not to use SLikeNet(RakNet) internal message ID's
-     and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
-    if (msgID <= 0x4 || msgID >= 255)
-    {
-        URHO3D_LOGERROR("Can not send message with reserved ID");
-        return;
-    }
-
     if (numBytes && !data)
     {
         URHO3D_LOGERROR("Null pointer supplied for network message data");
@@ -115,7 +108,8 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     }
     
     VectorBuffer buffer;
-    buffer.WriteUByte((unsigned char)msgID);
+    buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
+    buffer.WriteUInt((unsigned int)msgID);
     buffer.Write(data, numBytes);
     PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
     if (peer_) {

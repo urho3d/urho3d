@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1500,7 +1500,7 @@ void Renderer::UpdateQueuedViewport(unsigned index)
 
     auto* octree = scene->GetComponent<Octree>();
 
-    // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
+    // Update octree (perform early update for drawables which need that, and reinsert moved drawables).
     // However, if the same scene is viewed from multiple cameras, update the octree only once
     if (!updatedOctrees_.Contains(octree))
     {

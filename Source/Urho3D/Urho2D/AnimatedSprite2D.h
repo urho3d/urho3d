@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
 #include "../Urho2D/StaticSprite2D.h"
@@ -29,6 +31,9 @@ struct spAnimationState;
 struct spAnimationStateData;
 struct spSkeleton;
 #endif
+
+namespace Urho3D
+{
 
 /// Loop mode.
 enum LoopMode2D
@@ -40,9 +45,6 @@ enum LoopMode2D
     /// Force clamped.
     LM_FORCE_CLAMPED
 };
-
-namespace Urho3D
-{
 
 namespace Spriter
 {
@@ -110,7 +112,7 @@ protected:
     void SetSpineAnimation();
     /// Update spine animation.
     void UpdateSpineAnimation(float timeStep);
-    /// Update vertices for spine animation;
+    /// Update vertices for spine animation.
     void UpdateSourceBatchesSpine();
 #endif
     /// Handle set spriter animation.

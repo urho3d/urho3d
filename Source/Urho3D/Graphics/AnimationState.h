@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -50,7 +52,7 @@ struct AnimationStateTrack
 {
     /// Construct with defaults.
     AnimationStateTrack();
-    /// Destruct
+    /// Destruct.
     ~AnimationStateTrack();
 
     /// Animation track.
@@ -102,9 +104,9 @@ public:
     /// Return animation.
     Animation* GetAnimation() const { return animation_; }
 
-    /// Return animated model this state belongs to (model mode.)
+    /// Return animated model this state belongs to (model mode).
     AnimatedModel* GetModel() const;
-    /// Return root scene node this state controls (node hierarchy mode.)
+    /// Return root scene node this state controls (node hierarchy mode).
     Node* GetNode() const;
     /// Return start bone.
     Bone* GetStartBone() const;
@@ -153,9 +155,9 @@ private:
     /// Apply track.
     void ApplyTrack(AnimationStateTrack& stateTrack, float weight, bool silent);
 
-    /// Animated model (model mode.)
+    /// Animated model (model mode).
     WeakPtr<AnimatedModel> model_;
-    /// Root scene node (node hierarchy mode.)
+    /// Root scene node (node hierarchy mode).
     WeakPtr<Node> node_;
     /// Animation.
     SharedPtr<Animation> animation_;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,17 +61,17 @@ public:
     ~Sample2D() override = default;
 
     /// Generate physics collision shapes from the tmx file's objects located in tileMapLayer.
-    void CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info);
+    void CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, const TileMapInfo2D& info);
     /// Build collision shape from Tiled 'Rectangle' objects.
-    CollisionBox2D* CreateRectangleShape(Node* node, TileMapObject2D* object, Vector2 size, TileMapInfo2D info);
+    CollisionBox2D* CreateRectangleShape(Node* node, TileMapObject2D* object, const Vector2& size, const TileMapInfo2D& info);
     /// Build collision shape from Tiled 'Ellipse' objects.
-    CollisionCircle2D* CreateCircleShape(Node* node, TileMapObject2D* object, float radius, TileMapInfo2D info);
+    CollisionCircle2D* CreateCircleShape(Node* node, TileMapObject2D* object, float radius, const TileMapInfo2D& info);
     /// Build collision shape from Tiled 'Polygon' objects.
     CollisionPolygon2D* CreatePolygonShape(Node* node, TileMapObject2D* object);
     /// Build collision shape from Tiled 'Poly Line' objects.
     CollisionChain2D* CreatePolyLineShape(Node* node, TileMapObject2D* object);
     /// Create Imp Spriter character.
-    Node* CreateCharacter(TileMapInfo2D info, float friction, Vector3 position, float scale);
+    Node* CreateCharacter(const TileMapInfo2D& info, float friction, const Vector3& position, float scale);
     /// Create a trigger (will be cloned at each tmx placeholder).
     Node* CreateTrigger();
     /// Create an enemy (will be cloned at each tmx placeholder).
@@ -91,7 +91,7 @@ public:
     /// Read input and zoom the camera.
     float Zoom(Camera* camera);
     /// Create path from tmx object's points.
-    PODVector<Vector2> CreatePathFromPoints(TileMapObject2D* object, Vector2 offset);
+    PODVector<Vector2> CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset);
     /// Create the UI content.
     void CreateUIContent(const String& demoTitle, int remainingLifes, int remainingCoins);
     /// Handle 'EXIT' button released event.
@@ -99,7 +99,7 @@ public:
     /// Save the scene.
     void SaveScene(bool initial);
     /// Create a background 2D sprite, optionally rotated by a ValueAnimation object.
-    void CreateBackgroundSprite(TileMapInfo2D info, float scale, const String& texture, bool animate);
+    void CreateBackgroundSprite(const TileMapInfo2D& info, float scale, const String& texture, bool animate);
     /// Create a particle emitter attached to the given node.
     void SpawnEffect(Node* node);
     /// Play a non-looping sound effect.

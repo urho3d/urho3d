@@ -123,6 +123,7 @@ class TerrainEditor
         //SubscribeToEvent(window.GetChild("PaintFoliage", true), "Toggled", "OnEditModeSelected");
         SubscribeToEvent(window.GetChild("CloseButton", true), "Released", "Hide");
         SubscribeToEvent(window.GetChild("CreateTerrainButton", true), "Released", "CreateTerrain");
+        SubscribeToEvent(window.GetChild("ResetButton", true), "Released", "ResetWindow");
         SubscribeToEvent(brushSizeSlider, "DragEnd", "UpdateScaledBrush");
 
         LoadBrushes();
@@ -131,9 +132,35 @@ class TerrainEditor
         brushVisualizer.Create();
     }
 
+    void ResetWindow()
+    {
+        // Reset edit mode to default
+        SetEditMode(TERRAIN_EDITMODE_RAISELOWERHEIGHT, "Raise or lower terrain");
+
+        // Clear selected brush
+        ClearSelectedBrush();
+    }
+
+    void ClearSelectedBrush()
+    {
+        selectedBrush = null;
+        selectedBrushImage = null;
+        scaledSelectedBrushImage = null;
+
+        ListView@ terrainBrushes = window.GetChild("BrushesContainer", true);
+
+        for (uint i = 0; i < terrainBrushes.numItems; ++i)
+        {
+            CheckBox@ checkbox = cast<CheckBox>(terrainBrushes.items[i]);
+            checkbox.checked = false;
+            checkbox.enabled = true;
+        }
+    }
+	
     // Hide the window
     void Hide()
     {
+        ClearSelectedBrush();
         window.visible = false;
     }
 
@@ -149,7 +176,9 @@ class TerrainEditor
             brushVisualizer.Hide();
             return;
         }
-        brushVisualizer.Update(terrainComponent, position, scaledSelectedBrushImage.width / 2);
+
+        if (window.visible == true)
+            brushVisualizer.Update(terrainComponent, position, scaledSelectedBrushImage.width / 2);
     }
 
     // Save all the terrains we have edited
@@ -238,7 +267,7 @@ class TerrainEditor
     void Work(Terrain@ terrainComponent, Vector3 position)
     {
         // Only work if a brush is selected
-        if (selectedBrushImage is null || scaledSelectedBrushImage is null)
+        if (selectedBrushImage is null || scaledSelectedBrushImage is null || window.visible == false)
             return;
 
         SetSceneModified();

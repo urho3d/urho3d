@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
 #include "../Container/RefCounted.h"
@@ -39,7 +41,7 @@ enum Orientation2D
     O_ISOMETRIC,
     /// Staggered.
     O_STAGGERED,
-    /// Hexagonal
+    /// Hexagonal.
     O_HEXAGONAL
 };
 

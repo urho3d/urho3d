@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -41,6 +43,8 @@ enum CompressedFormat
     CF_DXT3,
     CF_DXT5,
     CF_ETC1,
+    CF_ETC2_RGB,
+    CF_ETC2_RGBA,
     CF_PVRTC_RGB_2BPP,
     CF_PVRTC_RGBA_2BPP,
     CF_PVRTC_RGB_4BPP,
@@ -51,7 +55,7 @@ enum CompressedFormat
 struct CompressedLevel
 {
     /// Decompress to RGBA. The destination buffer required is width * height * 4 bytes. Return true if successful.
-    bool Decompress(unsigned char* dest);
+    bool Decompress(unsigned char* dest) const;
 
     /// Compressed image data.
     unsigned char* data_{};
@@ -183,13 +187,15 @@ public:
     SharedPtr<Image> ConvertToRGBA() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
+    /// Return decompressed image data in RGBA format.
+    SharedPtr<Image> GetDecompressedImage() const;
     /// Return subimage from the image by the defined rect or null if failed. 3D images are not supported. You must free the subimage yourself.
     Image* GetSubimage(const IntRect& rect) const;
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     /// Precalculate the mip levels. Used by asynchronous texture loading.
     void PrecalculateLevels();
-    /// Whether this texture has an alpha channel
+    /// Whether this texture has an alpha channel.
     bool HasAlphaChannel() const;
     /// Copy contents of the image into the defined rect, scaling if necessary. This image should already be large enough to include the rect. Compressed and 3D images are not supported.
     bool SetSubimage(const Image* image, const IntRect& rect);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -151,7 +151,7 @@ private:
     unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
-    /// Emit particle time
+    /// Emit particle time.
     float emitParticleTime_;
     /// Currently emitting flag.
     bool emitting_;

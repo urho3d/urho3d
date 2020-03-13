@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,8 +93,8 @@ public:
     unsigned color_{};
     /// Gradient flag.
     bool useGradient_{};
-    /// Custom material
-    Material* custom_material_{};
+    /// Custom material.
+    Material* customMaterial_{};
 
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
     static Vector3 posAdjust;

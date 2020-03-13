@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ allprojects {
 /**
  * Find the most recent tag that is reachable from a commit and use that to set the Gradle's project version.
  *
- * e.g. commit described as "1.7-664-g34b1" will be mapped to "1.8-BETA" (rolling release for the next version)
+ * e.g. commit described as "1.7-664-g34b1" will be mapped to "1.8-ROLLING" (rolling upgrades for the next version)
  *      tag "1.8" will be mapped to "1.8" as is (point release version), so does tag "1.8-RC" (release candidate)
  */
 fun determineVersion(): String {
@@ -53,7 +53,7 @@ fun determineVersion(): String {
     // If it is on CI server then unshallow the clone's repo when necessary
     if (System.getenv("CI") != null && System.getenv("RELEASE_TAG") == null) unshallowClone()
     val desc = describeCommit(System.getenv("TRAVIS_COMMIT") ?: System.getenv("APPVEYOR_REPO_COMMIT"))
-    return Regex("^(.+?)-\\d").find(desc)?.destructured?.component1()?.let { "${bumpSemVer(it, 1)}-BETA" } ?: desc
+    return Regex("^(.+?)-\\d").find(desc)?.destructured?.component1()?.let { "${bumpSemVer(it, 1)}-ROLLING" } ?: desc
 }
 
 /**
@@ -82,12 +82,16 @@ fun describeCommit(sha: String? = null) = ByteArrayOutputStream().also {
  * Bump the semantic versioning on the specified index, 0 for major version, 1 for minor version, and so on.
  */
 fun bumpSemVer(version: String, index: Int) = version
-        .split('.')
-        .mapIndexed { i: Int, s: String ->
-            when {
-                i < index -> s
-                i == index -> (s.toInt() + 1).toString()
-                else -> "0"
-            }
+    .split('.')
+    .mapIndexed { i: Int, s: String ->
+        when {
+            i < index -> s
+            i == index -> if (s.contains('-')) s else (s.toInt() + 1).toString()
+            else -> "0"
         }
-        .joinToString(".")
+    }
+    .joinToString(".")
+
+tasks.wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+}

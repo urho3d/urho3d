@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ class ScriptResourceRouter : public ResourceRouter
     {
     }
 
-    /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available)
+    /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available).
     void Route(String& name, ResourceRequest requestType) override
     {
         String extension = GetExtension(name);

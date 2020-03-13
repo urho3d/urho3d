@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,12 @@ public:
     /// Perform UI element update.
     void Update(float timeStep) override;
 
+    /// Hide tooltip if visible and reset parentage.
+    void Reset();
+
+    /// Add an alternative hover target.
+    void AddAltTarget(UIElement* target);
+
     /// Set the delay in seconds until the tooltip shows once hovering. Set zero to use the default from the UI subsystem.
     void SetDelay(float delay);
 
@@ -53,10 +59,12 @@ public:
 private:
     /// The element that is being tracked for hovering. Normally the parent element.
     WeakPtr<UIElement> target_;
+    /// Alternative targets. Primarily targets parent.
+    Vector<WeakPtr<UIElement> > altTargets_;
     /// Delay from hover start to displaying the tooltip.
     float delay_;
-    /// Point at which the parent was hovered.
-    bool parentHovered_;
+    /// Hover countdown has started.
+    bool hovered_;
     /// Point at which the tooltip was set visible.
     Timer displayAt_;
     /// Original offset position to the parent.

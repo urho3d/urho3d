@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,10 +62,6 @@ public:
     void SetPressedOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(int x, int y);
-    /// Set offset to image rectangle used when disabled.
-    void SetDisabledOffset(const IntVector2& offset);
-    /// Set offset to image rectangle used when disabled.
-    void SetDisabledOffset(int x, int y);
     /// Set offset of child elements when pressed.
     void SetPressedChildOffset(const IntVector2& offset);
     /// Set offset of child elements when pressed.
@@ -79,9 +75,6 @@ public:
 
     /// Return pressed image offset.
     const IntVector2& GetPressedOffset() const { return pressedOffset_; }
-
-    /// Return disabled image offset.
-    const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
 
     /// Return offset of child elements when pressed.
     const IntVector2& GetPressedChildOffset() const { return pressedChildOffset_; }
@@ -101,8 +94,6 @@ protected:
 
     /// Pressed image offset.
     IntVector2 pressedOffset_;
-    /// Disabled image offset.
-    IntVector2 disabledOffset_;
     /// Pressed label offset.
     IntVector2 pressedChildOffset_;
     /// Repeat delay.

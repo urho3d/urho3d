@@ -18,6 +18,21 @@
             <attribute name="Text" value="Terrain Editor" />
             <attribute name="Auto Localizable" value="false" />
         </element>
+        <element type="Button">
+            <attribute name="Name" value="ResetButton" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+            <attribute name="Pivot" value="0 0" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Image Rect" value="16 0 32 16" />
+            <attribute name="Border" value="4 4 4 4" />
+            <attribute name="Hover Image Offset" value="0 16" />
+            <attribute name="Pressed Image Offset" value="16 0" />
+            <attribute name="Pressed Child Offset" value="-1 1" />
+            <element type="BorderImage">
+                <attribute name="Image Rect" value="128 32 144 48" />
+            </element>
+        </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />
         </element>

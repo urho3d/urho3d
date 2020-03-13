@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ class URHO3D_API SoundSource : public Component
 public:
     /// Construct.
     explicit SoundSource(Context* context);
-    /// Destruct. Remove self from the audio subsystem
+    /// Destruct. Remove self from the audio subsystem.
     ~SoundSource() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
@@ -120,7 +120,7 @@ public:
     void SetPositionAttr(int value);
     /// Return sound attribute.
     ResourceRef GetSoundAttr() const;
-    /// Set sound playing attribute
+    /// Set sound playing attribute.
     void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;

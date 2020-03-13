@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,6 +44,10 @@ extern void UIKit_GetDisplayModes(_THIS, SDL_VideoDisplay * display);
 extern int UIKit_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode);
 extern void UIKit_QuitModes(_THIS);
 extern int UIKit_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
+
+#if !TARGET_OS_TV
+extern void SDL_OnApplicationDidChangeStatusBarOrientation(void);
+#endif
 
 #endif /* SDL_uikitmodes_h_ */
 

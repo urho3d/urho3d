@@ -5,6 +5,10 @@ $#include "Graphics/Material.h"
 $#include "Graphics/Texture2D.h"
 $#include "Graphics/StaticModel.h"
 
+class UIElement3D : public UIElement
+{
+}
+
 class UIComponent : public Component
 {
     UIComponent();

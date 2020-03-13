@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,7 +93,7 @@ private:
     String typeName_;
     /// XML format attribute infos.
     Vector<AttributeInfo> xmlAttributeInfos_;
-    /// XML format attribute data (as strings)
+    /// XML format attribute data (as strings).
     Vector<String> xmlAttributes_;
     /// Binary attributes.
     PODVector<unsigned char> binaryAttributes_;

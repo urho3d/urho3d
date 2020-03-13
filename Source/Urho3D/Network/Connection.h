@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -52,7 +54,7 @@ class PackageFile;
 /// Queued remote event.
 struct RemoteEvent
 {
-    /// Remote sender node ID (0 if not a remote node event.)
+    /// Remote sender node ID (0 if not a remote node event).
     unsigned senderID_;
     /// Event type.
     StringHash eventType_;
@@ -92,7 +94,7 @@ struct PackageUpload
     SharedPtr<File> file_;
     /// Current fragment index.
     unsigned fragment_;
-    /// Total number of fragments
+    /// Total number of fragments.
     unsigned totalFragments_;
 };
 
@@ -263,7 +265,7 @@ private:
     void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
     /// Process a SyncPackagesInfo message from server.
     void ProcessPackageInfo(int msgID, MemoryBuffer& msg);
-    /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set)
+    /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set).
     bool RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
@@ -318,13 +320,13 @@ private:
     SLNet::AddressOrGUID* address_;
     /// Raknet peer object.
     SLNet::RakPeerInterface* peer_;
-    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out
+    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out.
     IntVector2 tempPacketCounter_;
-    /// Packet count in the last second, x - packets in, y - packets out
+    /// Packet count in the last second, x - packets in, y - packets out.
     IntVector2 packetCounter_;
-    /// Packet count timer which resets every 1s
+    /// Packet count timer which resets every 1s.
     Timer packetCounterTimer_;
-    /// Last heard timer, resets when new packet is incoming
+    /// Last heard timer, resets when new packet is incoming.
     Timer lastHeardTimer_;
 };
 

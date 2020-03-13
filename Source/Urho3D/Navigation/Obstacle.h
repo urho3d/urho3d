@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,12 +39,12 @@ class URHO3D_API Obstacle : public Component
 
 public:
     /// Construct.
-    explicit Obstacle(Context*);
+    explicit Obstacle(Context* context);
     /// Destruct.
     ~Obstacle() override;
 
     /// Register Obstacle with engine context.
-    static void RegisterObject(Context*);
+    static void RegisterObject(Context* context);
 
     /// Update the owning mesh when enabled status has changed.
     void OnSetEnabled() override;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,8 +59,13 @@ void CheckBox::RegisterObject(Context* context)
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (hovering_ || selected_ || HasFocus())
-        offset += hoverOffset_;
+    if (enabled_)
+    {
+        if (hovering_ || selected_ || HasFocus())
+            offset += hoverOffset_;
+    }
+    else
+        offset += disabledOffset_;
     if (checked_)
         offset += checkedOffset_;
 

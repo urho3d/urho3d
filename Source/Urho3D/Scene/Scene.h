@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -58,13 +60,13 @@ struct AsyncProgress
     SharedPtr<File> file_;
     /// XML file for XML mode.
     SharedPtr<XMLFile> xmlFile_;
-    /// JSON file for JSON mode
+    /// JSON file for JSON mode.
     SharedPtr<JSONFile> jsonFile_;
 
     /// Current XML element for XML mode.
     XMLElement xmlElement_;
 
-    /// Current JSON child array and for JSON mode
+    /// Current JSON child array and for JSON mode.
     unsigned jsonIndex_;
 
     /// Current load mode.
@@ -144,7 +146,7 @@ public:
     void Clear(bool clearReplicated = true, bool clearLocal = true);
     /// Enable or disable scene update.
     void SetUpdateEnabled(bool enable);
-    /// Set update time scale. 1.0 = real time (default.)
+    /// Set update time scale. 1.0 = real time (default).
     void SetTimeScale(float scale);
     /// Set elapsed time in seconds. This can be used to prevent inaccuracy in the timer if the scene runs for a long time.
     void SetElapsedTime(float time);
@@ -158,7 +160,7 @@ public:
     void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files.
     void ClearRequiredPackageFiles();
-    /// Register a node user variable hash reverse mapping (for editing.)
+    /// Register a node user variable hash reverse mapping (for editing).
     void RegisterVar(const String& name);
     /// Unregister a node user variable hash reverse mapping.
     void UnregisterVar(const String& name);

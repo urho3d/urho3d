@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,10 @@ public:
     void SetHoverOffset(const IntVector2& offset);
     /// Set offset to image rectangle used on hover.
     void SetHoverOffset(int x, int y);
+    /// Set offset to image rectangle used when disabled.
+    void SetDisabledOffset(const IntVector2& offset);
+    /// Set offset to image rectangle used when disabled.
+    void SetDisabledOffset(int x, int y);
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
     /// Set tiled mode.
@@ -82,6 +86,9 @@ public:
 
     /// Return offset to image rectangle used on hover.
     const IntVector2& GetHoverOffset() const { return hoverOffset_; }
+
+    /// Return offset to image rectangle used when disabled.
+    const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
 
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
@@ -116,6 +123,8 @@ protected:
     IntRect imageBorder_;
     /// Offset to image rectangle on hover.
     IntVector2 hoverOffset_;
+    /// Offset to image rectangle when disabled.
+    IntVector2 disabledOffset_;
     /// Blend mode flag.
     BlendMode blendMode_;
     /// Tiled flag.

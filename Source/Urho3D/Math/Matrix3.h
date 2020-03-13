@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -270,6 +270,30 @@ public:
 
     /// Return matrix column.
     Vector3 Column(unsigned j) const { return Vector3(Element(0, j), Element(1, j), Element(2, j)); }
+
+    /// Return whether any element is NaN.
+    bool IsNaN() const
+    {
+        const float* data = Data();
+        for (unsigned i = 0; i < 9; ++i)
+        {
+            if (Urho3D::IsNaN(data[i]))
+                return true;
+        }
+        return false;
+    }
+
+    /// Return whether any element is Inf.
+    bool IsInf() const
+    {
+        const float* data = Data();
+        for (unsigned i = 0; i < 9; ++i)
+        {
+            if (Urho3D::IsInf(data[i]))
+                return true;
+        }
+        return false;
+    }
 
     /// Return as string.
     String ToString() const;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ public:
     void SetDelay(float interval);
     /// Add a file change into the changes queue.
     void AddChange(const String& fileName);
-    /// Return a file change (true if was found, false if not.)
+    /// Return a file change (true if was found, false if not).
     bool GetNextChange(String& dest);
 
     /// Return the path being watched, or empty if not watching.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -505,7 +505,7 @@ public:
     /// Compare two C strings.
     static int Compare(const char* lhs, const char* rhs, bool caseSensitive);
 
-    /// Position for "not found."
+    /// Position for "not found".
     static const unsigned NPOS = 0xffffffff;
     /// Initial dynamic allocation size.
     static const unsigned MIN_CAPACITY = 8;

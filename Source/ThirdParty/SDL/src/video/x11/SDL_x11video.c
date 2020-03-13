@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -260,6 +260,7 @@ X11_CreateDevice(int devindex)
     device->DestroyWindowFramebuffer = X11_DestroyWindowFramebuffer;
     device->GetWindowWMInfo = X11_GetWindowWMInfo;
     device->SetWindowHitTest = X11_SetWindowHitTest;
+    device->AcceptDragAndDrop = X11_AcceptDragAndDrop;
 
     device->shape_driver.CreateShaper = X11_CreateShaper;
     device->shape_driver.SetWindowShape = X11_SetWindowShape;

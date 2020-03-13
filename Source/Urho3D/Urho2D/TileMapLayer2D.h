@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ public:
 
     /// Initialize with tile map and tmx layer.
     void Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer);
-    /// Set draw order
+    /// Set draw order.
     void SetDrawOrder(int drawOrder);
     /// Set visible.
     void SetVisible(bool visible);
@@ -75,7 +75,7 @@ public:
     /// Return visible.
     bool IsVisible() const { return visible_; }
 
-    /// Return has property
+    /// Return has property.
     bool HasProperty(const String& name) const;
     /// Return property.
     const String& GetProperty(const String& name) const;

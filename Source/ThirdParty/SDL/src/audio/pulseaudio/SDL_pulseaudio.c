@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -109,7 +109,7 @@ static pa_operation * (*PULSEAUDIO_pa_stream_drain) (pa_stream *,
     pa_stream_success_cb_t, void *);
 static int (*PULSEAUDIO_pa_stream_peek) (pa_stream *, const void **, size_t *);
 static int (*PULSEAUDIO_pa_stream_drop) (pa_stream *);
-static pa_operation * (*PULSEAUDIO_pa_stream_flush)	(pa_stream *,
+static pa_operation * (*PULSEAUDIO_pa_stream_flush) (pa_stream *,
     pa_stream_success_cb_t, void *);
 static int (*PULSEAUDIO_pa_stream_disconnect) (pa_stream *);
 static void (*PULSEAUDIO_pa_stream_unref) (pa_stream *);
@@ -247,12 +247,6 @@ getAppName(void)
         }
     }
     return "SDL Application";  /* oh well. */
-}
-
-static void
-stream_operation_complete_no_op(pa_stream *s, int success, void *userdata)
-{
-    /* no-op for pa_stream_drain(), etc, to use for callback. */
 }
 
 static void
@@ -426,6 +420,8 @@ static void
 PULSEAUDIO_FlushCapture(_THIS)
 {
     struct SDL_PrivateAudioData *h = this->hidden;
+    const void *data = NULL;
+    size_t nbytes = 0;
 
     if (h->capturebuf != NULL) {
         PULSEAUDIO_pa_stream_drop(h->stream);
@@ -433,7 +429,22 @@ PULSEAUDIO_FlushCapture(_THIS)
         h->capturelen = 0;
     }
 
-    WaitForPulseOperation(h->mainloop, PULSEAUDIO_pa_stream_flush(h->stream, stream_operation_complete_no_op, NULL));
+    while (SDL_TRUE) {
+        if (PULSEAUDIO_pa_context_get_state(h->context) != PA_CONTEXT_READY ||
+            PULSEAUDIO_pa_stream_get_state(h->stream) != PA_STREAM_READY ||
+            PULSEAUDIO_pa_mainloop_iterate(h->mainloop, 1, NULL) < 0) {
+            SDL_OpenedAudioDeviceDisconnected(this);
+            return;  /* uhoh, pulse failed! */
+        }
+
+        if (PULSEAUDIO_pa_stream_readable_size(h->stream) == 0) {
+            break;  /* no data available, so we're done. */
+        }
+
+        /* a new fragment is available! Just dump it. */
+        PULSEAUDIO_pa_stream_peek(h->stream, &data, &nbytes);
+        PULSEAUDIO_pa_stream_drop(h->stream);  /* drop this fragment. */
+    }
 }
 
 static void

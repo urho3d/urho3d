@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2019 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -190,7 +192,7 @@ private:
     void HandleItemFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle focus changed.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
-    /// Update subscription to UI click events
+    /// Update subscription to UI click events.
     void UpdateUIClickSubscription();
 };
 
