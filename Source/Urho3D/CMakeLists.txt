@@ -110,6 +110,10 @@ if (URHO3D_HASH_DEBUG)
     add_definitions (-DURHO3D_HASH_DEBUG)
 endif ()
 
+if (URHO3D_SSL)
+    add_definitions (-DURHO3D_SSL)
+endif ()
+
 # Define source files
 foreach (DIR IK Navigation Network Physics Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)
@@ -336,7 +340,19 @@ endif ()
 if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
+
+if (URHO3D_SSL)
+    if (APPLE)
+        set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
+    endif()
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+    find_package(OpenSSL REQUIRED)
+    message(STATUS "OpenSSL libs: ${OPENSSL_LIBRARIES}")
+    set(ABSOLUTE_PATH_LIBS ${OPENSSL_LIBRARIES})
+endif()
+
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
+
 if (NOT ANDROID AND NOT WEB)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
