@@ -115,18 +115,12 @@ void HttpRequest::ThreadFunction()
 
 #if defined(URHO3D_SSL) || defined(URHO3D_SSL_DYNAMIC)
     if (mg_check_feature(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
-        URHO3D_LOGINFO("Initializing SSL");
-        if (mg_init_library(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
-            URHO3D_LOGINFO("SSL Initialized");
-        } else {
-            URHO3D_LOGERROR("SSL Initialization failed!");
+        if (!mg_init_library(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
+            URHO3D_LOGERROR("MG_FEATURES_SSL Initialization failed!");
         }
     } else if (mg_check_feature(MG_FEATURES_TLS) & MG_FEATURES_TLS) {
-        URHO3D_LOGINFO("Initializing SSL");
-        if (mg_init_library(MG_FEATURES_TLS) & MG_FEATURES_TLS) {
-            URHO3D_LOGINFO("SSL Initialized");
-        } else {
-            URHO3D_LOGERROR("SSL Initialization failed!");
+        if (!mg_init_library(MG_FEATURES_TLS) & MG_FEATURES_TLS) {
+            URHO3D_LOGERROR("MG_FEATURES_TLS Initialization failed!");
         }
    } else {
        URHO3D_LOGERROR("MG_FEATURES_SSL and/or MG_FEATURES_TLS not available!");
