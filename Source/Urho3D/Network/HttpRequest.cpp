@@ -94,9 +94,8 @@ void HttpRequest::ThreadFunction()
     {
         port = ToInt(host.Substring(portStart + 1));
         host = host.Substring(0, portStart);
-    } else if (protocol.Compare("https", false) >= 0) {
+    } else if (protocol.Compare("https", false) >= 0)
         port = 443;
-    }
 
     char errorBuffer[ERROR_BUFFER_SIZE];
     memset(errorBuffer, 0, sizeof(errorBuffer));
@@ -112,20 +111,6 @@ void HttpRequest::ThreadFunction()
 
     // Initiate the connection. This may block due to DNS query
     mg_connection* connection = nullptr;
-
-#if defined(URHO3D_SSL) || defined(URHO3D_SSL_DYNAMIC)
-    if (mg_check_feature(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
-        if (!mg_init_library(MG_FEATURES_SSL) & MG_FEATURES_SSL) {
-            URHO3D_LOGERROR("MG_FEATURES_SSL Initialization failed!");
-        }
-    } else if (mg_check_feature(MG_FEATURES_TLS) & MG_FEATURES_TLS) {
-        if (!mg_init_library(MG_FEATURES_TLS) & MG_FEATURES_TLS) {
-            URHO3D_LOGERROR("MG_FEATURES_TLS Initialization failed!");
-        }
-   } else {
-       URHO3D_LOGERROR("MG_FEATURES_SSL and/or MG_FEATURES_TLS not available!");
-   }
-#endif
 
     if (postData_.Empty())
     {

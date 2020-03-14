@@ -120,10 +120,8 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 JSONValue val = json->GetRoot().Get("origin");
 #endif
 
-                if (val.IsNull()) {
+                if (val.IsNull())
                     text_->SetText("Invalid JSON response retrieved!");
-                    URHO3D_LOGERRORF("Response: %s", message_.CString());
-                }
                 else
                     text_->SetText("Your IP is: " + val.GetString());
 
