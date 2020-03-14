@@ -100,6 +100,7 @@ if (URHO3D_SSL)
         include_directories(${OPENSSL_INCLUDE_DIR})
         message(STATUS "OpenSSL include directory: ${OPENSSL_INCLUDE_DIR}")
         add_definitions(-DOPENSSL_API_1_1)
+        target_link_libraries(Civetweb ${OPENSSL_LIBRARIES})
     endif ()
 endif ()
 
