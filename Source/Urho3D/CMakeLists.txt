@@ -112,6 +112,9 @@ endif ()
 
 if (URHO3D_SSL)
     add_definitions (-DURHO3D_SSL)
+    if (URHO3D_SSL_DYNAMIC)
+        add_definitions (-DURHO3D_SSL_DYNAMIC)
+    endif ()
 endif ()
 
 # Define source files
@@ -340,16 +343,6 @@ endif ()
 if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
-
-if (URHO3D_SSL)
-    if (APPLE)
-        set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
-    endif()
-    set(OPENSSL_USE_STATIC_LIBS TRUE)
-    find_package(OpenSSL REQUIRED)
-    message(STATUS "OpenSSL libs: ${OPENSSL_LIBRARIES}")
-    set(ABSOLUTE_PATH_LIBS ${OPENSSL_LIBRARIES})
-endif()
 
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
 
