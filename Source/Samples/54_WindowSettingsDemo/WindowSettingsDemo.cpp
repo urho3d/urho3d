@@ -146,7 +146,7 @@ void WindowSettingsDemo::InitSettings()
     monitorControl_->SetStyleAuto();
     for (int i = 0; i < graphics->GetMonitorCount(); ++i)
     {
-        auto* text = MakeShared<Text>(context_);
+        auto text = MakeShared<Text>(context_);
         text->SetText(ToString("Monitor %d", i));
         text->SetMinWidth(CeilToInt(text->GetRowWidth(0) + 10));
         monitorControl_->AddItem(text);
@@ -158,7 +158,7 @@ void WindowSettingsDemo::InitSettings()
     resolutionControl_->SetMinHeight(24);
     resolutionControl_->SetStyleAuto();
 
-    auto* resolutionPlaceholder = MakeShared<Text>(context_);
+    auto resolutionPlaceholder = MakeShared<Text>(context_);
     resolutionPlaceholder->SetText("[Cannot fill list of resolutions]");
     resolutionPlaceholder->SetMinWidth(CeilToInt(resolutionPlaceholder->GetRowWidth(0) + 10));
     resolutionControl_->AddItem(resolutionPlaceholder);
@@ -222,7 +222,7 @@ void WindowSettingsDemo::InitSettings()
     multiSampleControl_->SetStyleAuto();
     for (int i = 0; i <= 4; ++i)
     {
-        auto* text = MakeShared<Text>(context_);
+        auto text = MakeShared<Text>(context_);
         text->SetText(i == 0 ? "No MSAA" : ToString("MSAA x%d", 1 << i));
         text->SetMinWidth(CeilToInt(text->GetRowWidth(0) + 10));
         multiSampleControl_->AddItem(text);
