@@ -285,10 +285,10 @@ void WindowSettingsDemo::SynchronizeSettings()
     // Synchronize resolution list
     resolutionControl_->RemoveAllItems();
     const auto& resolutions = graphics->GetResolutions(currentMonitor);
-    for (const IntVector3& resolutions : resolutions)
+    for (const IntVector3& resolution : resolutions)
     {
         auto resolutionEntry = MakeShared<Text>(context_);
-        resolutionEntry->SetText(ToString("%dx%d, %d Hz", resolutions.x_, resolutions.y_, resolutions.z_));
+        resolutionEntry->SetText(ToString("%dx%d, %d Hz", resolution.x_, resolution.y_, resolution.z_));
         resolutionEntry->SetMinWidth(CeilToInt(resolutionEntry->GetRowWidth(0) + 10));
         resolutionControl_->AddItem(resolutionEntry);
         resolutionEntry->SetStyleAuto();
