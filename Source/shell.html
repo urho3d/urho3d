@@ -57,8 +57,8 @@
         <progress value="10" max="100" id="progress" hidden></progress>
     </div>
     <div id="container">
-        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
-        <div class="emscripten fulscreen-container" id="fullscreen" style="display: none;">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 style="display: none;"></canvas>
+        <div class="emscripten fulscreen-container" id="fullscreen">
             <input type="button" value="Go Fullscreen" onclick="viewFullScreen()">
         </div>
     </div>
@@ -71,35 +71,30 @@
         var canvasHeight = (screen.availHeight - (window.outerHeight - window.innerHeight)) * devicePixelRatio;
 
         // Detect fullscreen change and resize canvas resolution accordingly
-        function fullscreenHandler(event) {
+        function viewportResizeHandler(event) {
             if (Module['JSCanvasSize']) {
                 if (isFullScreen()) {
                     Module.JSCanvasSize(screen.width * devicePixelRatio, screen.height * devicePixelRatio, true, devicePixelRatio);
                 } else {
-                    if (document.referrer.includes('itch.io')) {
-                        canvasWidth = parseInt(window.getComputedStyle(canvasElement).getPropertyValue('width')) * devicePixelRatio;
-                        canvasHeight = parseInt(window.getComputedStyle(canvasElement).getPropertyValue('height')) * devicePixelRatio;
-                    }
                     Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
                 }
             }
         }
 
-        document.addEventListener('fullscreenchange', fullscreenHandler, false);
-        document.addEventListener('mozfullscreenchange', fullscreenHandler, false);
-        document.addEventListener('webkitfullscreenchange', fullscreenHandler, false);
-        document.addEventListener('MSFullscreenChange', fullscreenHandler, false);
+        document.addEventListener('fullscreenchange', viewportResizeHandler, false);
+        document.addEventListener('mozfullscreenchange', viewportResizeHandler, false);
+        document.addEventListener('webkitfullscreenchange', viewportResizeHandler, false);
+        document.addEventListener('MSFullscreenChange', viewportResizeHandler, false);
 
         // When window size has changed, resize the canvas accordingly
         window.addEventListener('resize', function(evt) {
             canvasWidth = (screen.availWidth - (window.outerWidth - window.innerWidth)) * devicePixelRatio;
             canvasHeight = (screen.availHeight - (window.outerHeight - window.innerHeight)) * devicePixelRatio;
-            fullscreenHandler(evt);
+            viewportResizeHandler(evt);
         });
 
         canvasElement.addEventListener('click', function (evt) {
             canvasElement.focus();
-            Module.JSMouseFocus();
         });
 
         // Enter the fullscreen mode

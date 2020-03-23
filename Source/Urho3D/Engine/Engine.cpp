@@ -71,11 +71,13 @@ static const Urho3D::Context *appContext;
 
 static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 {
+    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d scale=%f", width, height, fullscreen, scale);
     using namespace Urho3D;
-    URHO3D_LOGINFOF("JSCanvasSize: %d x %d", width, height);
-    appContext->GetSubsystem<Graphics>()->SetMode(width, height);
+    if (appContext)
+        appContext->GetSubsystem<Graphics>()->SetMode(width, height);
     UI* ui = appContext->GetSubsystem<UI>();
-    ui->SetScale(scale);
+    if (ui)
+        ui->SetScale(scale);
 }
 
 using namespace emscripten;
@@ -174,6 +176,16 @@ Engine::Engine(Context* context) :
 
 #ifdef __EMSCRIPTEN__
     appContext = context_;
+
+    SubscribeToEvent(E_SCREENMODE, [&](StringHash eventType, VariantMap& eventData) {
+        using namespace ScreenMode;
+        int width = eventData[P_WIDTH].GetInt();
+        int height = eventData[P_HEIGHT].GetInt();
+
+        EM_ASM({
+            Module.SetRendererSize($0, $1);
+        }, width, height);
+    });
 #endif
 
     SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
