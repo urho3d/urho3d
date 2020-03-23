@@ -64,7 +64,7 @@
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include <Urho3D/Graphics/GraphicsEvents.h>
+#include "../Graphics/GraphicsEvents.h"
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
 static const Context *appContext;
