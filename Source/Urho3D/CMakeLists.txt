@@ -563,11 +563,6 @@ if (ANDROID)
 endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
 
-if (WEB)
-    # Custom emscripten template
-    define_resource_dirs (HTML_SHELL ${CMAKE_SOURCE_DIR}/web/application.html )
-endif()
-
 # Define post build steps
 if (ANDROID AND GRADLE_BUILD_DIR)
     # Copy the library to URHO3D_HOME directory
