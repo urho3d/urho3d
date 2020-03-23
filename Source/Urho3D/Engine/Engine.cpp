@@ -63,8 +63,24 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
-#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
+#ifdef __EMSCRIPTEN__
+#include <Urho3D/Graphics/GraphicsEvents.h>
 #include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
+static const Context *appContext;
+
+static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
+{
+    URHO3D_LOGINFOF("JSCanvasSize: %d x %d", width, height);
+    appContext->GetSubsystem<Graphics>()->SetMode(width, height);
+    UI* ui = appContext->GetSubsystem<UI>();
+    ui->SetScale(scale);
+}
+
+using namespace emscripten;
+EMSCRIPTEN_BINDINGS(Module) {
+    function("JSCanvasSize", &JSCanvasSize);
+}
 #endif
 
 #include "../DebugNew.h"
@@ -153,6 +169,10 @@ Engine::Engine(Context* context) :
 
 #ifdef URHO3D_NAVIGATION
     RegisterNavigationLibrary(context_);
+#endif
+
+#ifdef __EMSCRIPTEN__
+    appContext = context_;
 #endif
 
     SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
