@@ -39,11 +39,6 @@ set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRE
 # Define dependency libs
 set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (WEB)
-    # Custom emscripten template
-    define_resource_dirs (HTML_SHELL ${CMAKE_SOURCE_DIR}/web/application.html )
-endif()
-
 # Macro for adding sample subdirectory
 macro (add_sample_subdirectory SOURCE_DIR)
     if (DEFINED ENV{included_sample})

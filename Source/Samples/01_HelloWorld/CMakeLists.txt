@@ -26,6 +26,11 @@ set (TARGET_NAME 01_HelloWorld)
 # Define source files
 define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
 
+if (WEB)
+    # Custom emscripten template
+    define_resource_dirs (HTML_SHELL ${CMAKE_SOURCE_DIR}/web/application.html )
+endif()
+
 # Setup target with resource copying
 setup_main_executable ()
 
