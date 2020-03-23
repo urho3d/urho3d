@@ -58,7 +58,7 @@
     </div>
     <div id="container">
         <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 style="display: none;"></canvas>
-        <div class="emscripten fulscreen-container" id="fullscreen">
+        <div class="emscripten fulscreen-container" id="fullscreen" style="display: none;">
             <input type="button" value="Go Fullscreen" onclick="viewFullScreen()">
         </div>
     </div>
@@ -120,6 +120,7 @@
         // Emscripten triggered ready event when the app is actually started
         function ready() {
             document.getElementById('canvas').style.display = 'block';
+            document.getElementById('fullscreen').style.display = 'block';
 
             // Small timeout for notifying engine with the actual canvas size
             setTimeout(() => {
