@@ -71,6 +71,7 @@ static const Context *appContext;
 
 static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 {
+    using namespace Urho3D;
     URHO3D_LOGINFOF("JSCanvasSize: %d x %d", width, height);
     appContext->GetSubsystem<Graphics>()->SetMode(width, height);
     UI* ui = appContext->GetSubsystem<UI>();
