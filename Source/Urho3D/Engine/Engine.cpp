@@ -67,7 +67,7 @@
 #include "../Graphics/GraphicsEvents.h"
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
-static const Context *appContext;
+static const Urho3D::Context *appContext;
 
 static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 {
