@@ -1,33 +1,34 @@
 <!doctype html>
 <html lang="en-us">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset=utf-8>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
     <title>Urho3D</title>
     <style>
-        html, body {
-            padding: 0px;
-            margin: 0px;
-            margin: 0px;
+        body, html {
+            padding: 0;
+            margin: 0;
+            margin: 0;
             overflow: hidden;
         }
+
         .emscripten {
             padding-right: 0;
             margin-left: auto;
             margin-right: auto;
             display: block;
         }
+
         div.emscripten {
             text-align: center;
         }
+
         .fulscreen-container {
             width: 100%;
             position: absolute;
             text-align: center;
         }
-        div.emscripten_border {
-            border: none;
-        }
+
         #canvas {
             position: absolute;
             top: 0;
@@ -35,12 +36,14 @@
             width: 100%;
             height: 100%;
             background-color: #000;
-            border: 0px;
+            border: 0;
             cursor: pointer !important;
         }
+
         canvas.emscripten {
             border: none;
         }
+
         .centered {
             position: absolute;
             top: 50%;
@@ -54,24 +57,30 @@
 <body>
     <div class="centered">
         <div class="emscripten" id="status">Downloading...</div>
-        <progress value="10" max="100" id="progress" hidden></progress>
+        <progress hidden id="progress" max=100 value=10></progress>
     </div>
     <div id="container">
-        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 style="display: none;"></canvas>
-        <div class="emscripten fulscreen-container" id="fullscreen" style="display: none;">
-            <input type="button" value="Go Fullscreen" onclick="viewFullScreen()">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="display:none" tabindex=-1></canvas>
+        <div class="emscripten fulscreen-container" id="fullscreen" style="display:none">
+            <input onclick="enterFullscreen()" type="button" value="Fullscreen">
         </div>
     </div>
-    <script type='text/javascript'>
+    <script>
         var canvasElement = document.getElementById('canvas');
         var devicePixelRatio = window.devicePixelRatio || 1;
+        var canvasWidth = 0;
+        var canvasHeight = 0;
 
         // Detect the visible width and height of the window
-        var canvasWidth = (screen.availWidth - (window.outerWidth - window.innerWidth)) * devicePixelRatio;
-        var canvasHeight = (screen.availHeight - (window.outerHeight - window.innerHeight)) * devicePixelRatio;
+        function calculateCanvasSize() {
+            canvasWidth = (screen.availWidth - (window.outerWidth - window.innerWidth)) * devicePixelRatio;
+            canvasHeight = (screen.availHeight - (window.outerHeight - window.innerHeight)) * devicePixelRatio;
+        }
+        calculateCanvasSize();
 
         // Detect fullscreen change and resize canvas resolution accordingly
         function viewportResizeHandler(event) {
+            calculateCanvasSize();
             if (Module['JSCanvasSize']) {
                 if (isFullScreen()) {
                     Module.JSCanvasSize(screen.width * devicePixelRatio, screen.height * devicePixelRatio, true, devicePixelRatio);
@@ -88,17 +97,11 @@
 
         // When window size has changed, resize the canvas accordingly
         window.addEventListener('resize', function(evt) {
-            canvasWidth = (screen.availWidth - (window.outerWidth - window.innerWidth)) * devicePixelRatio;
-            canvasHeight = (screen.availHeight - (window.outerHeight - window.innerHeight)) * devicePixelRatio;
             viewportResizeHandler(evt);
         });
 
-        canvasElement.addEventListener('click', function (evt) {
-            canvasElement.focus();
-        });
-
         // Enter the fullscreen mode
-        function viewFullScreen(show) {
+        function enterFullscreen(show) {
             if (show === undefined) show = !isFullScreen();
             if (show) {
                 if (canvasElement.requestFullscreen) canvasElement.requestFullscreen();
@@ -117,15 +120,18 @@
             return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
         }
 
-        // Emscripten triggered ready event when the app is actually started
+        // App is ready to launch, make canvas and fulscreen button visible
         function ready() {
             document.getElementById('canvas').style.display = 'block';
             document.getElementById('fullscreen').style.display = 'block';
 
-            // Small timeout for notifying engine with the actual canvas size
-            setTimeout(() => {
-                Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
-            }, 100);
+            // Overwrite some emscripten functions that break the input
+            __registerFocusEventCallback = function() {
+                if (!JSEvents.focusEvent) JSEvents.focusEvent = _malloc(256);
+            };
+            __registerFullscreenChangeEventCallback = function() {
+                if (!JSEvents.fullscreenChangeEvent) JSEvents.fullscreenChangeEvent = _malloc(280);
+            };
         }
 
         var Module = {
@@ -135,11 +141,6 @@
             info: false,
             ready: false,
             receiver: false,
-            rendererSize: {
-                width: canvasWidth * devicePixelRatio,
-                height: canvasHeight * devicePixelRatio,
-                aspectRatio: canvasWidth / canvasHeight,
-            },
             canvas: canvasElement,
 
             print: function (text) {
@@ -150,24 +151,31 @@
                 console.error(text);
             },
 
-            // Urho3D called method which tells the canvas the current renderer resolution
+            // Urho3D called method which tells the canvas the current renderer resolution, based on E_SCREENMODE event values
             SetRendererSize: function(width, height) {
                 console.log('Engine renderer size changed to', width, height);
-                this.rendererSize.width  = width;
-                this.rendererSize.height = height;
-                this.rendererSize.aspectRatio = width / height;
 
                 if (isFullScreen()) {
                     return;
                 }
 
-                if (this.canvas.width === width && this.canvas.height === height) {
+                calculateCanvasSize();
+
+                var aspectRatio = width / height;
+                this.canvas.width = canvasWidth;
+                this.canvas.height = canvasHeight;
+
+                // The visible width of the canvas remains the same, height is calculated based on aspect ratio
+                this.canvas.style.height = (parseInt(window.getComputedStyle(canvasElement).getPropertyValue('width')) / aspectRatio) + 'px';
+
+                // Compare calculated canvas resolution with the actual renderer resolution
+                if (canvasWidth === width && canvasHeight === height) {
                     return;
                 }
-                console.log('Updating canvas size, width', this.canvas.width, 'to', width, 'and height', this.canvas.height, 'to', height);
-                this.canvas.width = width;
-                this.canvas.height = height;
-                this.canvas.style.height = (canvasWidth / Module.rendererSize.aspectRatio) + 'px';
+
+                // Renderer resolution is wrong, update it with the calculated values
+                console.log('Renderer and canvas resolution mismatch, updating renderer resolution width', this.canvas.width, 'to', width, 'and height', this.canvas.height, 'to', height);
+                Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
             },
 
             // Retrieve the current status of the application
@@ -201,5 +209,5 @@
         Module.setStatus('Downloading...');
     </script>
     {{{ SCRIPT }}}
-    </body>
+</body>
 </html>

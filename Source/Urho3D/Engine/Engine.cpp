@@ -284,7 +284,11 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
             GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
             GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
+#ifdef __EMSCRIPTEN__
+            false,
+#else
             GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
+#endif
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
             GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
