@@ -165,7 +165,9 @@
                 if (!JSEvents.fullscreenChangeEvent) JSEvents.fullscreenChangeEvent = _malloc(280);
             };
 
-            visibilityChanged();
+            setTimeout(() => {
+                viewportResizeHandler();
+            }, 100);
         }
 
         var Module = {
