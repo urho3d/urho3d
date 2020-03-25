@@ -107,6 +107,10 @@
             }
         }
 
+        function requestPointerLock() {
+            _emscripten_request_pointerlock('#canvas', true);
+        }
+
         function visibilityChanged() {
             if (document.hidden) {
                 return;
@@ -122,10 +126,9 @@
 
             setTimeout(() => {
                 viewportResizeHandler();
-                canvasElement.addEventListener('click', function() {
-                    _emscripten_request_pointerlock();
-                });
-            }, 2000);
+                canvasElement.removeEventListener('click', requestPointerLock);
+                canvasElement.addEventListener('click', requestPointerLock);
+            }, 1000);
         }
 
         document.addEventListener('fullscreenchange', viewportResizeHandler, false);
