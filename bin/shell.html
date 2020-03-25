@@ -23,7 +23,7 @@
             text-align: center;
         }
 
-        .fullscreen-button {
+        #fullscreen-button {
             position: absolute;
             width: 2em;
             height: 2em;
@@ -36,7 +36,7 @@
             stroke-width: 10px;
         }
 
-        .fullscreen-button:hover {
+        #fullscreen-button:hover {
             fill: #999999;
             cursor: pointer;
         }
@@ -69,7 +69,7 @@
         <progress hidden id="progress" max=100 value=10></progress>
     </div>
     <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 width=100 height=100 style="display: none;"></canvas>
-    <div class="fullscreen-button" onclick="enterFullscreen()" style="display: none;">
+    <div id="fullscreen-button" onclick="enterFullscreen()" style="display: none;">
         <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
              viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
             <path d="M93.1,139.6l46.5-46.5L93.1,46.5L139.6,0H0v139.6l46.5-46.5L93.1,139.6z M93.1,372.4l-46.5,46.5L0,372.4V512h139.6
