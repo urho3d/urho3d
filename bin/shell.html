@@ -29,19 +29,22 @@
             text-align: center;
         }
 
-        #canvas {
+        .emscripten_border {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: #000;
-            border: 0;
-            cursor: pointer !important;
+            border: 1px solid #000000;
         }
 
-        canvas.emscripten {
+        #canvas {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
             border: none;
+            cursor: default !important;
         }
 
         .centered {
@@ -59,11 +62,11 @@
         <div class="emscripten" id="status">Downloading...</div>
         <progress hidden id="progress" max=100 value=10></progress>
     </div>
-    <div id="container">
-        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="display:none" tabindex=-1></canvas>
-        <div class="emscripten fulscreen-container" id="fullscreen" style="display:none">
-            <input onclick="enterFullscreen()" type="button" value="Fullscreen">
-        </div>
+    <div class="emscripten_border">
+        <canvas id="canvas" oncontextmenu="event.preventDefault()" style="display:none" tabindex=-1 width=100 height=100></canvas>
+    </div>
+    <div class="emscripten fulscreen-container" id="fullscreen" style="display:none">
+        <input onclick="enterFullscreen()" type="button" value="Fullscreen">
     </div>
     <script>
         var canvasElement = document.getElementById('canvas');
@@ -73,13 +76,17 @@
 
         // Detect the visible width and height of the window
         function calculateCanvasSize() {
-            canvasWidth = (screen.availWidth - (window.outerWidth - window.innerWidth)) * devicePixelRatio;
-            canvasHeight = (screen.availHeight - (window.outerHeight - window.innerHeight)) * devicePixelRatio;
+            canvasWidth = parseInt(window.getComputedStyle(canvasElement).getPropertyValue('width')) * devicePixelRatio;
+            canvasHeight = parseInt(window.getComputedStyle(canvasElement).getPropertyValue('height')) * devicePixelRatio;
         }
         calculateCanvasSize();
 
         // Detect fullscreen change and resize canvas resolution accordingly
-        function viewportResizeHandler(event) {
+        function viewportResizeHandler() {
+            if (document.hidden) {
+                return;
+            }
+
             calculateCanvasSize();
             if (Module['JSCanvasSize']) {
                 if (isFullScreen()) {
@@ -90,14 +97,43 @@
             }
         }
 
+        function visibilityChanged() {
+            if (document.hidden) {
+                return;
+            }
+
+            // Overwrite some emscripten functions that break the input
+            __registerFocusEventCallback = function() {
+                if (!JSEvents.focusEvent) JSEvents.focusEvent = _malloc(256);
+            };
+            __registerFullscreenChangeEventCallback = function() {
+                if (!JSEvents.fullscreenChangeEvent) JSEvents.fullscreenChangeEvent = _malloc(280);
+            };
+
+            setTimeout(() => {
+                viewportResizeHandler();
+                canvasElement.addEventListener('click', function() {
+                    canvasElement.requestPointerLock();
+                    canvasElement.removeEventListener('click', this);
+                });
+            }, 2000);
+        }
+
         document.addEventListener('fullscreenchange', viewportResizeHandler, false);
         document.addEventListener('mozfullscreenchange', viewportResizeHandler, false);
         document.addEventListener('webkitfullscreenchange', viewportResizeHandler, false);
         document.addEventListener('MSFullscreenChange', viewportResizeHandler, false);
 
+        document.addEventListener('visibilitychange', visibilityChanged, false);
+        document.addEventListener('msvisibilitychange', visibilityChanged, false);
+        document.addEventListener('webkitvisibilitychange', visibilityChanged, false);
+
         // When window size has changed, resize the canvas accordingly
         window.addEventListener('resize', function(evt) {
-            viewportResizeHandler(evt);
+            // resize event is called before the resizing has finished, we must wait a bit so the new calculations use the new viewport size
+            setTimeout(() => {
+                viewportResizeHandler(evt);
+            }, 1000);
         });
 
         // Enter the fullscreen mode
@@ -125,6 +161,10 @@
             document.getElementById('canvas').style.display = 'block';
             document.getElementById('fullscreen').style.display = 'block';
 
+            if (document.hidden) {
+                return;
+            }
+
             // Overwrite some emscripten functions that break the input
             __registerFocusEventCallback = function() {
                 if (!JSEvents.focusEvent) JSEvents.focusEvent = _malloc(256);
@@ -137,11 +177,8 @@
         var Module = {
             preRun: [],
             postRun: [],
-            binary: false,
-            info: false,
-            ready: false,
-            receiver: false,
             canvas: canvasElement,
+            forcedAspectRatio: false,
 
             print: function (text) {
                 console.log(text);
@@ -153,20 +190,14 @@
 
             // Urho3D called method which tells the canvas the current renderer resolution, based on E_SCREENMODE event values
             SetRendererSize: function(width, height) {
-                console.log('Engine renderer size changed to', width, height);
-
-                if (isFullScreen()) {
+                if (document.hidden) {
                     return;
                 }
-
+                console.log('Engine renderer size changed to', width, height);
                 calculateCanvasSize();
-
                 var aspectRatio = width / height;
-                this.canvas.width = canvasWidth;
-                this.canvas.height = canvasHeight;
-
-                // The visible width of the canvas remains the same, height is calculated based on aspect ratio
-                this.canvas.style.height = (parseInt(window.getComputedStyle(canvasElement).getPropertyValue('width')) / aspectRatio) + 'px';
+                canvasElement.width = width;
+                canvasElement.height = height;
 
                 // Compare calculated canvas resolution with the actual renderer resolution
                 if (canvasWidth === width && canvasHeight === height) {
