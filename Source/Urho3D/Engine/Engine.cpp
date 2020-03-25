@@ -63,6 +63,10 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
+#include <emscripten/emscripten.h>
+#endif
+
 #include "../DebugNew.h"
 
 
