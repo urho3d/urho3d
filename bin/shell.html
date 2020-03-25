@@ -23,10 +23,22 @@
             text-align: center;
         }
 
-        .fulscreen-container {
-            width: 100%;
+        .fullscreen-button {
             position: absolute;
-            text-align: center;
+            width: 2em;
+            height: 2em;
+            left: 50%;
+            top: 4px;
+            -moz-transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+            stroke: #999999;
+            stroke-width: 10px;
+        }
+
+        .fullscreen-button:hover {
+            fill: #999999;
+            cursor: pointer;
         }
 
         #canvas {
@@ -57,8 +69,14 @@
         <progress hidden id="progress" max=100 value=10></progress>
     </div>
     <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 width=100 height=100 style="display: none;"></canvas>
-    <div class="fulscreen-container" id="fullscreen" style="display:none">
-        <input onclick="enterFullscreen()" type="button" value="Fullscreen">
+    <div class="fullscreen-button" onclick="enterFullscreen()" style="display: none;">
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+             viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+            <path d="M93.1,139.6l46.5-46.5L93.1,46.5L139.6,0H0v139.6l46.5-46.5L93.1,139.6z M93.1,372.4l-46.5,46.5L0,372.4V512h139.6
+                l-46.5-46.5l46.5-46.5L93.1,372.4z M372.4,139.6H139.6v232.7h232.7V139.6z M325.8,325.8H186.2V186.2h139.6V325.8z M372.4,0
+                l46.5,46.5l-46.5,46.5l46.5,46.5l46.5-46.5l46.5,46.5V0H372.4z M418.9,372.4l-46.5,46.5l46.5,46.5L372.4,512H512V372.4l-46.5,46.5
+                L418.9,372.4z"/>
+        </svg>
     </div>
     <script>
         var canvasElement = document.getElementById('canvas');
@@ -151,7 +169,7 @@
         // App is ready to launch, make canvas and fullscreen button visible
         function ready() {
             document.getElementById('canvas').style.display = 'block';
-            document.getElementById('fullscreen').style.display = 'block';
+            document.getElementById('fullscreen-button').style.display = 'block';
 
             if (document.hidden) {
                 return;
