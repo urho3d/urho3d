@@ -123,8 +123,7 @@
             setTimeout(() => {
                 viewportResizeHandler();
                 canvasElement.addEventListener('click', function() {
-                    canvasElement.requestPointerLock();
-                    canvasElement.removeEventListener('click', this);
+                    _emscripten_request_pointerlock();
                 });
             }, 2000);
         }
