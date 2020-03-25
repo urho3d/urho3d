@@ -63,29 +63,6 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
-#ifdef __EMSCRIPTEN__
-#include "../Graphics/GraphicsEvents.h"
-#include <emscripten/emscripten.h>
-#include <emscripten/bind.h>
-static const Urho3D::Context *appContext;
-
-static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
-{
-    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d scale=%f", width, height, fullscreen, scale);
-    using namespace Urho3D;
-    if (appContext)
-        appContext->GetSubsystem<Graphics>()->SetMode(width, height);
-    UI* ui = appContext->GetSubsystem<UI>();
-    if (ui)
-        ui->SetScale(scale);
-}
-
-using namespace emscripten;
-EMSCRIPTEN_BINDINGS(Module) {
-    function("JSCanvasSize", &JSCanvasSize);
-}
-#endif
-
 #include "../DebugNew.h"
 
 
@@ -172,20 +149,6 @@ Engine::Engine(Context* context) :
 
 #ifdef URHO3D_NAVIGATION
     RegisterNavigationLibrary(context_);
-#endif
-
-#ifdef __EMSCRIPTEN__
-    appContext = context_;
-
-    SubscribeToEvent(E_SCREENMODE, [&](StringHash eventType, VariantMap& eventData) {
-        using namespace ScreenMode;
-        int width = eventData[P_WIDTH].GetInt();
-        int height = eventData[P_HEIGHT].GetInt();
-
-        EM_ASM({
-            Module.SetRendererSize($0, $1);
-        }, width, height);
-    });
 #endif
 
     SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
@@ -284,11 +247,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
             GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
             GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
-#ifdef __EMSCRIPTEN__
-            false,
-#else
             GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
-#endif
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
             GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
