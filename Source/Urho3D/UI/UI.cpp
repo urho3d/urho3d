@@ -768,7 +768,7 @@ void UI::SetCustomSize(int width, int height)
 
 IntVector2 UI::GetCursorPosition() const
 {
-    return cursor_ ? cursor_->GetPosition() : GetSubsystem<Input>()->GetMousePosition();
+    return cursor_ ? cursor_->GetPosition() * GetScale() : GetSubsystem<Input>()->GetMousePosition();
 }
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition)
@@ -1797,7 +1797,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         if (!input->IsMouseVisible())
         {
             if (!input->IsMouseLocked())
-                cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
+                cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()) / GetScale());
             else if (cursor_->IsVisible())
             {
                 // Relative mouse motion: move cursor only when visible
