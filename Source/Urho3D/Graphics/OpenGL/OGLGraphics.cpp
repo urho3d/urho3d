@@ -96,9 +96,8 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 
             // Detect current UI pointer state
             Cursor* cursor = ui->GetCursor();
-            if (cursor) {
-                uiCursorVisible = cursor->IsVisible();
-            }
+            if (cursor)
+                uiCursorVisible = cursor->IsVisible();s
         }
 
         // Apply new resolution
@@ -106,11 +105,11 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 
         // Reset the pointer state as it was before resolution change
         if (input) {
-            if (uiCursorVisible) {
+            if (uiCursorVisible)
                 input->SetMouseVisible(false);
-            } else {
+            else
                 input->SetMouseVisible(systemCursorVisible);
-            }
+
             input->SetMouseMode(mouseMode);
         }
 
