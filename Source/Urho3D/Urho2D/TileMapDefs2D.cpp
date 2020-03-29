@@ -200,6 +200,11 @@ unsigned FrameSet2D::GetCurrentFrameGid() const
     return frames_[0]->gid_;
 }
 
+unsigned FrameSet2D::GetNumFrames() const
+{
+    return frames_.Size();
+}
+
 Tile2D::Tile2D() :
     gid_(0)
 {

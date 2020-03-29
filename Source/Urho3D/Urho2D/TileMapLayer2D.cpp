@@ -259,6 +259,9 @@ void TileMapLayer2D::UpdateAnimations()
         for (int x = 0; x < GetWidth(); x++)
         {
             Tile2D* tile = GetTile(x, y);
+            if (!tile)
+                continue;
+
             if (tile->IsAnimated())
             {
                 Node* node = GetTileNode(x, y);

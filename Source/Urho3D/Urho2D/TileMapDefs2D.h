@@ -139,8 +139,10 @@ public:
     void Load(const XMLElement& element);
     /// Update animation timer.
     void UpdateTimer(float timeStep);
-    /// Return current tile gid.
+    /// Get current tile gid of the animation.
     unsigned GetCurrentFrameGid() const;
+    /// Get number of frames.
+    unsigned GetNumFrames() const;
 
 protected:
     /// Animation frame infos.
