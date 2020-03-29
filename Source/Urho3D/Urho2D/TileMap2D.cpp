@@ -27,6 +27,7 @@
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
 #include "../Urho2D/TileMap2D.h"
 #include "../Urho2D/TileMapLayer2D.h"
 #include "../Urho2D/TmxFile2D.h"
@@ -53,6 +54,13 @@ void TileMap2D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
         AM_DEFAULT);
+}
+
+void TileMap2D::OnNodeSet(Node* node)
+{
+    Scene* scene = GetScene();
+    if (scene)
+        SubscribeToEvent(scene, E_SCENEUPDATE , URHO3D_HANDLER(TileMap2D, HandleSceneUpdate));
 }
 
 // Transform vector from node-local space to global space
@@ -189,6 +197,17 @@ Vector<SharedPtr<TileMapObject2D> > TileMap2D::GetTileCollisionShapes(unsigned g
 {
     Vector<SharedPtr<TileMapObject2D> > shapes;
     return tmxFile_ ? tmxFile_->GetTileCollisionShapes(gid) : shapes;
+}
+
+void TileMap2D::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace SceneUpdate;
+
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+    tmxFile_->UpdateAnimationTimers(timeStep);
+
+    for (unsigned l = 0; l < layers_.Size(); ++l)
+        layers_[l]->UpdateAnimations();
 }
 
 }

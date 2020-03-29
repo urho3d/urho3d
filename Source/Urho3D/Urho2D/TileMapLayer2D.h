@@ -58,10 +58,12 @@ public:
 
     /// Initialize with tile map and tmx layer.
     void Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer);
-    /// Set draw order
+    /// Set draw order.
     void SetDrawOrder(int drawOrder);
     /// Set visible.
     void SetVisible(bool visible);
+    /// For tile layers, update animated tile sprites.
+    void UpdateAnimations();
 
     /// Return tile map.
     TileMap2D* GetTileMap() const;
@@ -75,7 +77,7 @@ public:
     /// Return visible.
     bool IsVisible() const { return visible_; }
 
-    /// Return has property
+    /// Return has property.
     bool HasProperty(const String& name) const;
     /// Return property.
     const String& GetProperty(const String& name) const;

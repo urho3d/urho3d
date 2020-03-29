@@ -32,7 +32,6 @@
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/TmxFile2D.h"
 #include "../Math/AreaAllocator.h"
-
 #include "../DebugNew.h"
 
 
@@ -149,6 +148,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                     tile->gid_ = gid;
                     tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_ALL);
                     tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_ALL);
+                    tile->frameSet_ = tmxFile_->GetTileFrameSet(gid & ~FLIP_ALL);
                     tiles_[y * width_ + x] = tile;
                 }
 
@@ -173,6 +173,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                     tile->gid_ = gid;
                     tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_ALL);
                     tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_ALL);
+                    tile->frameSet_ = tmxFile_->GetTileFrameSet(gid & ~FLIP_ALL);
                     tiles_[y * width_ + x] = tile;
                 }
                 ++currentIndex;
@@ -203,6 +204,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                     tile->gid_ = gid;
                     tile->sprite_ = tmxFile_->GetTileSprite(gid & ~FLIP_ALL);
                     tile->propertySet_ = tmxFile_->GetTilePropertySet(gid & ~FLIP_ALL);
+                    tile->frameSet_ = tmxFile_->GetTileFrameSet(gid & ~FLIP_ALL);
                     tiles_[y * width_ + x] = tile;
                 }
                 currentIndex += 4;
@@ -455,9 +457,9 @@ bool TmxFile2D::EndLoad()
 
     XMLElement rootElem = loadXMLFile_->GetRoot("map");
     String version = rootElem.GetAttribute("version");
-    if (version != "1.0")
+    if (!version.StartsWith("1."))
     {
-        URHO3D_LOGERROR("Invalid version");
+        URHO3D_LOGERRORF("Invalid TMX version: %s", version.CString());
         return false;
     }
 
@@ -577,6 +579,22 @@ PropertySet2D* TmxFile2D::GetTilePropertySet(unsigned gid) const
     if (i == gidToPropertySetMapping_.End())
         return nullptr;
     return i->second_;
+}
+
+FrameSet2D* TmxFile2D::GetTileFrameSet(unsigned gid) const
+{
+    HashMap<unsigned, SharedPtr<FrameSet2D> >::ConstIterator i = gidToFrameSetMapping_.Find(gid);
+    if (i == gidToFrameSetMapping_.End())
+        return nullptr;
+    return i->second_;
+}
+
+void TmxFile2D::UpdateAnimationTimers(float timeStep)
+{
+    for (auto i = gidToFrameSetMapping_.Begin(); i != gidToFrameSetMapping_.End(); ++i)
+    {
+        i->second_->UpdateTimer(timeStep);
+    }
 }
 
 const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
@@ -737,6 +755,12 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
             propertySet->Load(tileElem.GetChild("properties"));
             gidToPropertySetMapping_[gid] = propertySet;
+        }
+        if (tileElem.HasChild("animation"))
+        {
+            SharedPtr<FrameSet2D> frameSet(new FrameSet2D());
+            frameSet->Load(tileElem.GetChild("animation"));
+            gidToFrameSetMapping_[gid] = frameSet;
         }
     }
 

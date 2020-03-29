@@ -41,7 +41,7 @@ enum Orientation2D
     O_ISOMETRIC,
     /// Staggered.
     O_STAGGERED,
-    /// Hexagonal
+    /// Hexagonal.
     O_HEXAGONAL
 };
 
@@ -69,6 +69,14 @@ struct URHO3D_API TileMapInfo2D
     Vector2 TileIndexToPosition(int x, int y) const;
     /// Convert position to tile index, if out of map return false.
     bool PositionToTileIndex(int& x, int& y, const Vector2& position) const;
+};
+
+struct URHO3D_API TileFrameInfo2D : public RefCounted
+{
+    /// Gid;
+    unsigned gid_;
+    /// Duration.
+    unsigned duration_;
 };
 
 /// Tile map layer type.
@@ -120,6 +128,29 @@ protected:
     HashMap<String, String> nameToValueMapping_;
 };
 
+/// Frame set.
+class URHO3D_API FrameSet2D : public RefCounted
+{
+public:
+    FrameSet2D();
+    ~FrameSet2D() override;
+
+    /// Load from XML element.
+    void Load(const XMLElement& element);
+    /// Update animation timer.
+    void UpdateTimer(float timeStep);
+    /// Return current tile gid.
+    unsigned GetCurrentFrameGid() const;
+
+protected:
+    /// Animation frame infos.
+    Vector<SharedPtr<TileFrameInfo2D> > frames_;
+    /// Time elapsed in the animation (circular timer).
+    float timeElapsed_{0.0f};
+    /// Time it takes to complete one animation.
+    unsigned lapTime_{0};
+};
+
 /// Tile flipping flags.
 static const unsigned FLIP_HORIZONTAL = 0x80000000u;
 static const unsigned FLIP_VERTICAL   = 0x40000000u;
@@ -149,6 +180,8 @@ public:
     bool HasProperty(const String& name) const;
     /// Return property.
     const String& GetProperty(const String& name) const;
+    /// Checks if tile has animation frames.
+    bool IsAnimated() const;
 
 private:
     friend class TmxTileLayer2D;
@@ -159,6 +192,8 @@ private:
     SharedPtr<Sprite2D> sprite_;
     /// Property set.
     SharedPtr<PropertySet2D> propertySet_;
+    /// Frame set.
+    SharedPtr<FrameSet2D> frameSet_;
 };
 
 /// Tile map object.
