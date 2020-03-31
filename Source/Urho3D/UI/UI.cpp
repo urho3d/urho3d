@@ -1797,7 +1797,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         if (!input->IsMouseVisible())
         {
             if (!input->IsMouseLocked())
-                cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()) / GetScale());
+                cursor_->SetPosition(IntVector2(eventData[P_X].GetInt() / GetScale(), eventData[P_Y].GetInt() / GetScale()));
             else if (cursor_->IsVisible())
             {
                 // Relative mouse motion: move cursor only when visible
@@ -1812,7 +1812,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         else
         {
             // Absolute mouse motion: move always
-            cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt())  / GetScale());
+            cursor_->SetPosition(IntVector2(eventData[P_X].GetInt() / GetScale(), eventData[P_Y].GetInt() / GetScale()));
         }
     }
 
