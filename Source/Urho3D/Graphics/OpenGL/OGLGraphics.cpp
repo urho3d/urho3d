@@ -74,7 +74,7 @@ static const Urho3D::Context *appContext;
 
 static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 {
-    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d scale=%f", width, height, fullscreen, scale);
+    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d ui scale=%f", width, height, fullscreen, scale);
 
     using namespace Urho3D;
 
@@ -83,7 +83,7 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
         bool systemCursorVisible = false;
         MouseMode mouseMode;
 
-        // Detect current system pointe state
+        // Detect current system pointer state
         Input* input = appContext->GetSubsystem<Input>();
         if (input) {
             systemCursorVisible = input->IsMouseVisible();

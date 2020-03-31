@@ -81,6 +81,7 @@
     <script>
         var canvasElement = document.getElementById('canvas');
         var devicePixelRatio = window.devicePixelRatio || 1;
+        var uiScale = parseInt(devicePixelRatio);
         var canvasWidth = 0;
         var canvasHeight = 0;
 
@@ -100,9 +101,9 @@
             calculateCanvasSize();
             if (Module['JSCanvasSize']) {
                 if (isFullScreen()) {
-                    Module.JSCanvasSize(screen.width * devicePixelRatio, screen.height * devicePixelRatio, true, devicePixelRatio);
+                    Module.JSCanvasSize(screen.width * devicePixelRatio, screen.height * devicePixelRatio, true, uiScale);
                 } else {
-                    Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
+                    Module.JSCanvasSize(canvasWidth, canvasHeight, false, uiScale);
                 }
             }
         }
@@ -218,7 +219,7 @@
 
                 // Renderer resolution is wrong, update it with the calculated values
                 console.log('Renderer and canvas resolution mismatch, updating renderer resolution width', this.canvas.width, 'to', width, 'and height', this.canvas.height, 'to', height);
-                Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
+                Module.JSCanvasSize(canvasWidth, canvasHeight, false, uiScale);
             },
 
             // Retrieve the current status of the application
