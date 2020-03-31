@@ -72,9 +72,9 @@ extern "C"
 // Helper functions to support emscripten canvas resolution change
 static const Urho3D::Context *appContext;
 
-static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
+static void JSCanvasSize(int width, int height, bool fullscreen, int scale)
 {
-    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d ui scale=%f", width, height, fullscreen, scale);
+    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d ui scale=%d", width, height, fullscreen, scale);
 
     using namespace Urho3D;
 
@@ -97,7 +97,7 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
             // Detect current UI pointer state
             Cursor* cursor = ui->GetCursor();
             if (cursor)
-                uiCursorVisible = cursor->IsVisible();s
+                uiCursorVisible = cursor->IsVisible();
         }
 
         // Apply new resolution
