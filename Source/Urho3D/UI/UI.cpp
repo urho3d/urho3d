@@ -768,7 +768,13 @@ void UI::SetCustomSize(int width, int height)
 
 IntVector2 UI::GetCursorPosition() const
 {
-    return cursor_ ? cursor_->GetPosition() * GetScale() : GetSubsystem<Input>()->GetMousePosition();
+    if (cursor_) {
+        Vector2 position = static_cast<Vector2>(cursor_->GetPosition());
+        position *= GetScale();
+        return IntVector2(position.x_, position.y_);
+    }
+
+    return GetSubsystem<Input>()->GetMousePosition();
 }
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition)
