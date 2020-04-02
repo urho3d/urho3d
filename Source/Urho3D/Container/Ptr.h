@@ -55,6 +55,13 @@ public:
         AddRef();
     }
 
+    /// Move-construct from another shared pointer.
+    SharedPtr(SharedPtr<T>&& rhs) noexcept :
+        ptr_(rhs.ptr_)
+    {
+        rhs.ptr_ = nullptr;
+    }
+
     /// Copy-construct from another shared pointer allowing implicit upcasting.
     template <class U> SharedPtr(const SharedPtr<U>& rhs) noexcept :    // NOLINT(google-explicit-constructor)
         ptr_(rhs.ptr_)
@@ -82,6 +89,15 @@ public:
             return *this;
 
         SharedPtr<T> copy(rhs);
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Move-assign from another shared pointer.
+    SharedPtr<T>& operator =(SharedPtr<T>&& rhs)
+    {
+        SharedPtr<T> copy(std::move(rhs));
         Swap(copy);
 
         return *this;
@@ -145,10 +161,14 @@ public:
     operator T*() const { return ptr_; }    // NOLINT(google-explicit-constructor)
 
     /// Swap with another SharedPtr.
-    void Swap(SharedPtr& rhs) { Urho3D::Swap(ptr_, rhs.ptr_); }
+    void Swap(SharedPtr<T>& rhs) { Urho3D::Swap(ptr_, rhs.ptr_); }
 
-    /// Reset to null and release the object reference.
-    void Reset() { ReleaseRef(); }
+    /// Reset with another pointer.
+    void Reset(T* ptr = nullptr)
+    {
+        SharedPtr<T> copy(ptr);
+        Swap(copy);
+    }
 
     /// Detach without destroying the object even if the refcount goes zero. To be used for scripting language interoperation.
     T* Detach()
@@ -265,6 +285,15 @@ public:
         AddRef();
     }
 
+    /// Move-construct from another weak pointer.
+    WeakPtr(WeakPtr<T>&& rhs) noexcept :
+        ptr_(rhs.ptr_),
+        refCount_(rhs.refCount_)
+    {
+        rhs.ptr_ = nullptr;
+        rhs.refCount_ = nullptr;
+    }
+
     /// Copy-construct from another weak pointer allowing implicit upcasting.
     template <class U> WeakPtr(const WeakPtr<U>& rhs) noexcept :   // NOLINT(google-explicit-constructor)
         ptr_(rhs.ptr_),
@@ -301,10 +330,8 @@ public:
         if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
             return *this;
 
-        ReleaseRef();
-        ptr_ = rhs.Get();
-        refCount_ = rhs.RefCountPtr();
-        AddRef();
+        WeakPtr<T> copy(rhs);
+        Swap(copy);
 
         return *this;
     }
@@ -315,10 +342,17 @@ public:
         if (ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_)
             return *this;
 
-        ReleaseRef();
-        ptr_ = rhs.ptr_;
-        refCount_ = rhs.refCount_;
-        AddRef();
+        WeakPtr<T> copy(rhs);
+        Swap(copy);
+
+        return *this;
+    }
+
+    /// Move-assign from another weak pointer.
+    WeakPtr<T>& operator =(WeakPtr<T>&& rhs)
+    {
+        WeakPtr<T> copy(std::move(rhs));
+        Swap(copy);
 
         return *this;
     }
@@ -404,8 +438,19 @@ public:
     /// Convert to a raw pointer, null if the object is expired.
     operator T*() const { return Get(); }   // NOLINT(google-explicit-constructor)
 
-    /// Reset to null and release the weak reference.
-    void Reset() { ReleaseRef(); }
+    /// Swap with another WeakPtr.
+    void Swap(WeakPtr<T>& rhs)
+    {
+        Urho3D::Swap(ptr_, rhs.ptr_);
+        Urho3D::Swap(refCount_, rhs.refCount_);
+    }
+
+    /// Reset with another pointer.
+    void Reset(T* ptr = nullptr)
+    {
+        WeakPtr<T> copy(ptr);
+        Swap(copy);
+    }
 
     /// Perform a static cast from a weak pointer of another type.
     template <class U> void StaticCast(const WeakPtr<U>& rhs)

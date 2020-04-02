@@ -229,7 +229,7 @@ public:
     }
 
     /// Return float data.
-    const void* Data() const { return &min_.x_; }
+    const float* Data() const { return &min_.x_; }
 
     /// Return as a vector.
     Vector4 ToVector4() const { return Vector4(min_.x_, min_.y_, max_.x_, max_.y_); }
@@ -260,9 +260,9 @@ public:
     /// Maximum vector.
     Vector2 max_;
 
-    /// Rect in the range (-1, -1) - (1, 1)
+    /// Rect in the range (-1, -1) - (1, 1).
     static const Rect FULL;
-    /// Rect in the range (0, 0) - (1, 1)
+    /// Rect in the range (0, 0) - (1, 1).
     static const Rect POSITIVE;
     /// Zero-sized rect.
     static const Rect ZERO;

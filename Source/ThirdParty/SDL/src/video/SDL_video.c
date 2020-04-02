@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
+// Modified by Lasse Oorni, Yao Wei Tjong and Rainer Deyke for Urho3D
 
 #include "../SDL_internal.h"
 
@@ -1613,6 +1613,7 @@ SDL_CreateWindowFrom(const void *data, Uint32 flags)
     if (flags & SDL_WINDOW_OPENGL) {
         if (!_this->GL_CreateContext) {
             SDL_SetError("No OpenGL support in video driver");
+            SDL_DestroyWindow(window);
             return NULL;
         }
         SDL_GL_LoadLibrary(NULL);

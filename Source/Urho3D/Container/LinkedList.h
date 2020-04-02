@@ -143,7 +143,7 @@ public:
         return false;
     }
 
-    /// Erase an element when the previous element is known (optimization.) Return true if successful.
+    /// Erase an element when the previous element is known (optimization). Return true if successful.
     bool Erase(T* element, T* previous)
     {
         if (previous && previous->next_ == element)

@@ -27,7 +27,7 @@ namespace Urho3D
 
 /// Client->server: send VariantMap of identity and authentication data.
 static const int MSG_IDENTITY = 0x87;
-/// Client->server: send controls (buttons and mouse movement.)
+/// Client->server: send controls (buttons and mouse movement).
 static const int MSG_CONTROLS = 0x88;
 /// Client->server: scene has been loaded and client is ready to proceed.
 static const int MSG_SCENELOADED = 0x89;

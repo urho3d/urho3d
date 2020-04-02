@@ -70,7 +70,7 @@ private:
     b2PolygonShape boxShape_;
     /// Size.
     Vector2 size_;
-    /// Center
+    /// Center.
     Vector2 center_;
     /// Angle.
     float angle_;

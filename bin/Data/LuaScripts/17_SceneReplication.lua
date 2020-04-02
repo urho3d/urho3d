@@ -384,7 +384,7 @@ function HandleClientConnected(eventType, eventData)
 
     -- Finally send the object's node ID using a remote event
     local remoteEventData = VariantMap()
-    remoteEventData:SetInt("ID", newObject.ID)
+    remoteEventData["ID"] = newObject.ID
     newConnection:SendRemoteEvent("ClientObjectID", true, remoteEventData)
 end
 

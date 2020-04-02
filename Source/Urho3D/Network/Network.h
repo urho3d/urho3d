@@ -140,7 +140,7 @@ private:
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
-    void OnServerDisconnected();
+    void OnServerDisconnected(const SLNet::AddressOrGUID& address);
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.

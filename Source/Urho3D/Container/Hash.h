@@ -27,6 +27,12 @@
 namespace Urho3D
 {
 
+/// Combine hash into result value.
+inline void CombineHash(unsigned& result, unsigned hash)
+{
+    result ^= hash + 0x9e3779b9 + (result << 6) + (result >> 2);
+}
+
 /// Pointer hash function.
 template <class T> unsigned MakeHash(T* value)
 {

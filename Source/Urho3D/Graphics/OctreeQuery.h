@@ -207,7 +207,7 @@ struct URHO3D_API RayQueryResult
     Vector3 position_;
     /// Hit normal in world space. Negation of ray direction if per-triangle data not available.
     Vector3 normal_;
-    /// Hit texture position
+    /// Hit texture position.
     Vector2 textureUV_;
     /// Distance from ray origin.
     float distance_{};

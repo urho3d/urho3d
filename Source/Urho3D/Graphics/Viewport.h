@@ -61,7 +61,7 @@ public:
     /// Set rendering path.
     void SetRenderPath(RenderPath* renderPath);
     /// Set rendering path from an XML file.
-    void SetRenderPath(XMLFile* file);
+    bool SetRenderPath(XMLFile* file);
     /// Set whether to render debug geometry. Default true.
     void SetDrawDebug(bool enable);
     /// Set separate camera to use for culling. Sharing a culling camera between several viewports allows to prepare the view only once, saving in CPU use. The culling camera's frustum should cover all the viewport cameras' frusta or else objects may be missing from the rendered view.
@@ -83,7 +83,7 @@ public:
     /// Return whether to draw debug geometry.
     bool GetDrawDebug() const { return drawDebug_; }
 
-    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case.)
+    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case).
     Camera* GetCullCamera() const;
 
     /// Return ray corresponding to normalized screen coordinates.

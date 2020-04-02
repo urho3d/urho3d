@@ -103,11 +103,15 @@ void Viewport::SetRenderPath(RenderPath* renderPath)
     }
 }
 
-void Viewport::SetRenderPath(XMLFile* file)
+bool Viewport::SetRenderPath(XMLFile* file)
 {
     SharedPtr<RenderPath> newRenderPath(new RenderPath());
     if (newRenderPath->Load(file))
+    {
         renderPath_ = newRenderPath;
+        return true;
+    }
+    return false;
 }
 
 Scene* Viewport::GetScene() const

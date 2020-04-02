@@ -33,7 +33,24 @@ class String;
 class URHO3D_API Color
 {
 public:
-    /// Construct with default values (opaque white.)
+    /// Mask describing color channels.
+    struct ChannelMask
+    {
+        /// Red channel mask. If zero, red channel is set to 0.
+        unsigned r_;
+        /// Green channel mask. If zero, green channel is set to 0.
+        unsigned g_;
+        /// Blue channel mask. If zero, blue channel is set to 0.
+        unsigned b_;
+        /// Alpha channel mask. If zero, alpha channel is set to 1.
+        unsigned a_;
+    };
+    /// Mask for 0xAABBGGRR layout.
+    static const ChannelMask ABGR;
+    /// Mask for 0xAARRGGBB layout.
+    static const ChannelMask ARGB;
+
+    /// Construct with default values (opaque white).
     Color() noexcept :
         r_(1.0f),
         g_(1.0f),
@@ -81,6 +98,15 @@ public:
     {
     }
 
+    /// Construct from 32-bit integer. Default format is 0xAABBGGRR.
+    explicit Color(unsigned color, const ChannelMask& mask = ABGR) { FromUIntMask(color, mask); }
+
+    /// Construct from 3-vector.
+    explicit Color(const Vector3& color) : Color(color.x_, color.y_, color.z_) {}
+
+    /// Construct from 4-vector.
+    explicit Color(const Vector4& color) : Color(color.x_, color.y_, color.z_, color.w_) {}
+
     /// Assign from another color.
     Color& operator =(const Color& rhs) noexcept = default;
 
@@ -117,12 +143,16 @@ public:
 
     /// Return color packed to a 32-bit integer, with R component in the lowest 8 bits. Components are clamped to [0, 1] range.
     unsigned ToUInt() const;
+    /// Return color packed to a 32-bit integer with arbitrary channel mask. Components are clamped to [0, 1] range.
+    unsigned ToUIntMask(const ChannelMask& mask) const;
     /// Return HSL color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSL() const;
     /// Return HSV color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSV() const;
     /// Set RGBA values from packed 32-bit integer, with R component in the lowest 8 bits (format 0xAABBGGRR).
     void FromUInt(unsigned color);
+    /// Set RGBA values from packed 32-bit integer with arbitrary channel mask.
+    void FromUIntMask(unsigned color, const ChannelMask& mask);
     /// Set RGBA values from specified HSL values and alpha.
     void FromHSL(float h, float s, float l, float a = 1.0f);
     /// Set RGBA values from specified HSV values and alpha.
@@ -155,6 +185,36 @@ public:
     /// Return value as defined for HSV: largest value of the RGB components. Equivalent to calling MinRGB().
     float Value() const { return MaxRGB(); }
 
+    /// Convert single component of the color from gamma to linear space.
+    static float ConvertGammaToLinear(float value)
+    {
+        if (value <= 0.04045f)
+            return value / 12.92f;
+        else if (value < 1.0f)
+            return Pow((value + 0.055f) / 1.055f, 2.4f);
+        else
+            return Pow(value, 2.2f);
+    }
+
+    /// Convert single component of the color from linear to gamma space.
+    static float ConvertLinearToGamma(float value)
+    {
+        if (value <= 0.0f)
+            return 0.0f;
+        else if (value <= 0.0031308f)
+            return 12.92f * value;
+        else if (value < 1.0f)
+            return 1.055f * Pow(value, 0.4166667f) - 0.055f;
+        else
+            return Pow(value, 0.45454545f);
+    }
+
+    /// Convert color from gamma to linear space.
+    Color GammaToLinear() const { return { ConvertGammaToLinear(r_), ConvertGammaToLinear(g_), ConvertGammaToLinear(b_), a_ }; }
+
+    /// Convert color from linear to gamma space.
+    Color LinearToGamma() const { return { ConvertLinearToGamma(r_), ConvertLinearToGamma(g_), ConvertLinearToGamma(b_), a_ }; }
+
     /// Return lightness as defined for HSL: average of the largest and smallest values of the RGB components.
     float Lightness() const;
 
@@ -185,6 +245,9 @@ public:
 
     /// Return as string.
     String ToString() const;
+
+    /// Return color packed to a 32-bit integer, with B component in the lowest 8 bits. Components are clamped to [0, 1] range.
+    unsigned ToUIntArgb() const { return ToUIntMask(ARGB); }
 
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return ToUInt(); }

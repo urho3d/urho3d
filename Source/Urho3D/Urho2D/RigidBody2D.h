@@ -173,7 +173,7 @@ private:
     b2BodyDef bodyDef_;
     /// Box2D mass data.
     b2MassData massData_;
-    /// Use fixture mass (calculate mass & inertia from collision shapes automatically.)
+    /// Use fixture mass (calculate mass & inertia from collision shapes automatically).
     bool useFixtureMass_;
     /// Box2D body.
     b2Body* body_;

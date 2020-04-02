@@ -172,7 +172,7 @@ public:
     /// Registers this class to the context.
     static void RegisterObject(Context* context);
 
-    /// Returns the active algorithm
+    /// Returns the active algorithm.
     Algorithm GetAlgorithm() const;
 
     /*!
@@ -192,9 +192,9 @@ public:
      */
     void SetAlgorithm(Algorithm algorithm);
 
-    /// Test if a certain feature is enabled (see IKSolver::Feature)
+    /// Test if a certain feature is enabled (see IKSolver::Feature).
     bool GetFeature(Feature feature) const;
-    /// Enable or disable a certain feature (see IKSolver::Feature)
+    /// Enable or disable a certain feature (see IKSolver::Feature).
     void SetFeature(Feature feature, bool enable);
 
     /// Returns the configured maximum number of iterations.
@@ -313,22 +313,22 @@ private:
 
     /// Indicates that the internal structures of the IK library need to be updated. See the documentation of ik_solver_rebuild_chain_trees() for more info on when this happens.
     void MarkChainsNeedUpdating();
-    /// Indicates that the tree structure has changed in some way and needs updating (nodes added or removed, components added or removed)
+    /// Indicates that the tree structure has changed in some way and needs updating (nodes added or removed, components added or removed).
     void MarkTreeNeedsRebuild();
     /// Returns false if calling Solve() would cause the IK library to abort. Urho3D's error handling philosophy is to log an error and continue, not crash.
     bool IsSolverTreeValid() const;
 
-    /// Subscribe to drawable update finished event here
+    /// Subscribe to drawable update finished event here.
     void OnSceneSet(Scene* scene) override;
-    /// Destroys and creates the tree
+    /// Destroys and creates the tree.
     void OnNodeSet(Node* node) override;
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
     ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);
 
-    /// Destroys the solver's tree
+    /// Destroys the solver's tree.
     void DestroyTree();
-    /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed
+    /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed.
     void RebuildTree();
     /// Builds a chain of nodes up to the node of the specified effector component.
     bool BuildTreeToEffector(IKEffector* effector);
@@ -345,10 +345,10 @@ private:
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
-    /// Invokes the IK solver
+    /// Invokes the IK solver.
     void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
 
-    /// Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
+    // Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
 public:
     bool GetJOINT_ROTATIONS() const;
     bool GetTARGET_ROTATIONS() const;

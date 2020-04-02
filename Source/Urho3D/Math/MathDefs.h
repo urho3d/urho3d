@@ -86,11 +86,11 @@ inline T Min(T lhs, U rhs) { return lhs < rhs ? lhs : rhs; }
 template <class T, class U>
 inline T Max(T lhs, U rhs) { return lhs > rhs ? lhs : rhs; }
 
-/// Return absolute value of a value
+/// Return absolute value of a value.
 template <class T>
 inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 
-/// Return the sign of a float (-1, 0 or 1.)
+/// Return the sign of a float (-1, 0 or 1).
 template <class T>
 inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
 
@@ -111,6 +111,9 @@ inline unsigned FloatToRawIntBits(float value)
 
 /// Check whether a floating point value is NaN.
 template <class T> inline bool IsNaN(T value) { return std::isnan(value); }
+
+/// Check whether a floating point value is positive or negative infinity.
+template <class T> inline bool IsInf(T value) { return std::isinf(value); }
 
 /// Clamp a number to a range.
 template <class T>
@@ -162,8 +165,21 @@ template <class T> inline T Ln(T x) { return log(x); }
 /// Return square root of X.
 template <class T> inline T Sqrt(T x) { return sqrt(x); }
 
-/// Return floating-point remainder of X/Y.
-template <class T> inline T Mod(T x, T y) { return fmod(x, y); }
+/// Return remainder of X/Y for float values.
+template <class T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
+inline T Mod(T x, T y) { return fmod(x, y); }
+
+/// Return remainder of X/Y for integer values.
+template <class T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
+inline T Mod(T x, T y) { return x % y; }
+
+/// Return always positive remainder of X/Y.
+template <class T>
+inline T AbsMod(T x, T y)
+{
+    const T result = Mod(x, y);
+    return result < 0 ? result + y : result;
+}
 
 /// Return fractional part of passed value in range [0, 1).
 template <class T> inline T Fract(T value) { return value - floor(value); }
@@ -203,9 +219,9 @@ template <class T> inline T RoundToNearestMultiple(T x, T multiple)
     multiple = Abs(multiple);
     T remainder = Mod(mag, multiple);
     if (remainder >= multiple / 2)
-        return (FloorToInt<T>(mag / multiple) * multiple + multiple)*Sign(x);
+        return (FloorToInt<T>(mag / multiple) * multiple + multiple) * Sign(x);
     else
-        return (FloorToInt<T>(mag / multiple) * multiple)*Sign(x);
+        return (FloorToInt<T>(mag / multiple) * multiple) * Sign(x);
 }
 
 /// Round value up.
@@ -233,6 +249,14 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ++value;
 }
 
+/// Round up or down to the closest power of two.
+inline unsigned ClosestPowerOfTwo(unsigned value)
+{
+    const unsigned next = NextPowerOfTwo(value);
+    const unsigned prev = next >> 1u;
+    return (value - prev) > (next - value) ? next : prev;
+}
+
 /// Return log base two or the MSB position of the given value.
 inline unsigned LogBaseTwo(unsigned value)
 {
@@ -254,9 +278,9 @@ inline unsigned CountSetBits(unsigned value)
 }
 
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
-inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6u) + (hash << 16u) - hash; }
+inline constexpr unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6u) + (hash << 16u) - hash; }
 
-/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
+/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive).
 inline float Random() { return Rand() / 32768.0f; }
 
 /// Return a random float between 0.0 and range, inclusive from both ends.

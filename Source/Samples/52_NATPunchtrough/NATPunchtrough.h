@@ -91,6 +91,8 @@ private:
     void HandleConnect(StringHash eventType, VariantMap& eventData);
     /// Handle NAT master server failed connection
     void HandleNatConnectionFailed(StringHash eventType, VariantMap& eventData);
+    /// Handle NAT master server disconnected
+    void HandleNatDisconnected(StringHash eventType, VariantMap& eventData);
     /// Handle NAT master server succesfull connection
     void HandleNatConnectionSucceeded(StringHash eventType, VariantMap& eventData);
     /// Handle NAT punchtrough success message

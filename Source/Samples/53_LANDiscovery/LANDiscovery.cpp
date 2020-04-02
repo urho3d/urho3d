@@ -90,16 +90,16 @@ void LANDiscovery::CreateUI()
     CreateLabel("1. Start server", IntVector2(20, marginTop-20));
     startServer_ = CreateButton("Start server", 160, IntVector2(20, marginTop));
     stopServer_ = CreateButton("Stop server", 160, IntVector2(20, marginTop));
-	stopServer_->SetVisible(false);
+    stopServer_->SetVisible(false);
 
     // Create client connection related fields
     marginTop += 80;
     CreateLabel("2. Discover LAN servers", IntVector2(20, marginTop-20));
     refreshServerList_ = CreateButton("Search...", 160, IntVector2(20, marginTop));
 
-	marginTop += 80;
-	CreateLabel("Local servers:", IntVector2(20, marginTop - 20));
-	serverList_ = CreateLabel("", IntVector2(20, marginTop));
+    marginTop += 80;
+    CreateLabel("Local servers:", IntVector2(20, marginTop - 20));
+    serverList_ = CreateLabel("", IntVector2(20, marginTop));
 
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     GetSubsystem<Renderer>()->GetDefaultZone()->SetFogColor(Color(0.0f, 0.0f, 0.1f));
@@ -143,42 +143,42 @@ Text* LANDiscovery::CreateLabel(const String& text, IntVector2 pos)
     label->SetColor(Color(0.0f, 1.0f, 0.0f));
     label->SetPosition(pos);
     label->SetText(text);
-	return label;
+    return label;
 }
 
 void LANDiscovery::HandleNetworkHostDiscovered(StringHash eventType, VariantMap& eventData)
 {
-	using namespace NetworkHostDiscovered;
-	URHO3D_LOGINFO("Server discovered!");
-	String text = serverList_->GetText();
-	VariantMap data = eventData[P_BEACON].GetVariantMap();
-	text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetInt()) + ")" + eventData[P_ADDRESS].GetString() + ":" + String(eventData[P_PORT].GetInt());
-	serverList_->SetText(text);
+    using namespace NetworkHostDiscovered;
+    URHO3D_LOGINFO("Server discovered!");
+    String text = serverList_->GetText();
+    VariantMap data = eventData[P_BEACON].GetVariantMap();
+    text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetInt()) + ")" + eventData[P_ADDRESS].GetString() + ":" + String(eventData[P_PORT].GetInt());
+    serverList_->SetText(text);
 }
 
 void LANDiscovery::HandleStartServer(StringHash eventType, VariantMap& eventData)
 {
-	if (GetSubsystem<Network>()->StartServer(SERVER_PORT)) {
-		VariantMap data;
-		data["Name"] = "Test server";
-		data["Players"] = 100;
-		/// Set data which will be sent to all who requests LAN network discovery
-		GetSubsystem<Network>()->SetDiscoveryBeacon(data);
-		startServer_->SetVisible(false);
-		stopServer_->SetVisible(true);
-	}
+    if (GetSubsystem<Network>()->StartServer(SERVER_PORT)) {
+        VariantMap data;
+        data["Name"] = "Test server";
+        data["Players"] = 100;
+        /// Set data which will be sent to all who requests LAN network discovery
+        GetSubsystem<Network>()->SetDiscoveryBeacon(data);
+        startServer_->SetVisible(false);
+        stopServer_->SetVisible(true);
+    }
 }
 
 void LANDiscovery::HandleStopServer(StringHash eventType, VariantMap& eventData)
 {
-	GetSubsystem<Network>()->StopServer();
-	startServer_->SetVisible(true);
-	stopServer_->SetVisible(false);
+    GetSubsystem<Network>()->StopServer();
+    startServer_->SetVisible(true);
+    stopServer_->SetVisible(false);
 }
 
 void LANDiscovery::HandleDoNetworkDiscovery(StringHash eventType, VariantMap& eventData)
 {
-	/// Pass in the port that should be checked
-	GetSubsystem<Network>()->DiscoverHosts(SERVER_PORT);
-	serverList_->SetText("");
+    /// Pass in the port that should be checked
+    GetSubsystem<Network>()->DiscoverHosts(SERVER_PORT);
+    serverList_->SetText("");
 }

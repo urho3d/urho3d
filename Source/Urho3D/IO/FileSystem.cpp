@@ -903,7 +903,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 
 void FileSystem::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
-    /// Go through the execution queue and post + remove completed requests
+    // Go through the execution queue and post + remove completed requests
     for (List<AsyncExecRequest*>::Iterator i = asyncExecQueue_.Begin(); i != asyncExecQueue_.End();)
     {
         AsyncExecRequest* request = *i;

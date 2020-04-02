@@ -59,6 +59,8 @@ public:
     void SetSteeringValue(int wheel, float steeringValue);
     /// Set suspension stiffness for particular wheel.
     void SetWheelSuspensionStiffness(int wheel, float stiffness);
+    /// Set wheel max suspension force. Good results are often obtained by a value that is about 3x to 4x the vehicle weight.
+    void SetWheelMaxSuspensionForce(int wheel, float force);
     /// Set wheel damping relaxation.
     void SetWheelDampingRelaxation(int wheel, float damping);
     /// Set wheel damping compression.
@@ -69,7 +71,7 @@ public:
     void SetWheelRollInfluence(int wheel, float rollInfluence);
     /// Set engine force for the wheel.
     void SetEngineForce(int wheel, float force);
-    /// Set hand brake (wheel rotation blocking force.)
+    /// Set hand brake (wheel rotation blocking force).
     void SetBrake(int wheel, float force);
     /// Set wheel radius.
     void SetWheelRadius(int wheel, float wheelRadius);
@@ -77,7 +79,7 @@ public:
     void ResetWheels();
     /// Set sliding factor 0 <= x <= 1. The less the value, more sliding.
     void SetWheelSkidInfo(int wheel, float factor);
-    /// True if wheel touches ground (raycast hits something.)
+    /// True if wheel touches ground (raycast hits something).
     bool WheelIsGrounded(int wheel) const;
     /// Set maximum suspension travel value.
     void SetMaxSuspensionTravel(int wheel, float maxSuspensionTravel);
@@ -116,6 +118,8 @@ public:
     float GetSteeringValue(int wheel) const;
     /// Get suspension stiffness for particular wheel.
     float GetWheelSuspensionStiffness(int wheel) const;
+    /// Get wheel max suspension force.
+    float GetWheelMaxSuspensionForce(int wheel) const;
     /// Get wheel damping relaxation.
     float GetWheelDampingRelaxation(int wheel) const;
     /// Get wheel damping compression.
@@ -180,17 +184,17 @@ public:
 private:
     /// If the RigidBody should be activated.
     bool activate_;
-    /// Hull RigidBody
+    /// Hull RigidBody.
     WeakPtr<RigidBody> hullBody_;
-    /// Opaque Bullet data hidden from public
+    /// Opaque Bullet data hidden from public.
     RaycastVehicleData* vehicleData_;
     /// Coordinate system.
     IntVector3 coordinateSystem_;
-    /// Nodes of all wheels
+    /// Nodes of all wheels.
     Vector<Node*> wheelNodes_;
-    /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle
+    /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle.
     Vector<Quaternion> origRotation_;
-    /// Revolutions per minute value for in-air motor wheels. FIXME: set this one per wheel
+    /// Revolutions per minute value for in-air motor wheels. FIXME: set this one per wheel.
     float inAirRPM_;
     /// Per-wheel extra settings.
     Vector<float> skidInfoCumulative_;

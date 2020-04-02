@@ -216,7 +216,7 @@ struct DDSurfaceDesc2
     unsigned dwTextureStage_;
 };
 
-bool CompressedLevel::Decompress(unsigned char* dest)
+bool CompressedLevel::Decompress(unsigned char* dest) const
 {
     if (!data_)
         return false;
@@ -228,7 +228,7 @@ bool CompressedLevel::Decompress(unsigned char* dest)
     case CF_DXT5:
         DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
         return true;
-	
+
     // ETC2 format is compatible with ETC1, so we just use the same function.
     case CF_ETC1:
     case CF_ETC2_RGB:
@@ -2092,6 +2092,20 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             ++i;
         }
     }
+}
+
+SharedPtr<Image> Image::GetDecompressedImage() const
+{
+    if (!IsCompressed())
+        return ConvertToRGBA();
+
+    const CompressedLevel compressedLevel = GetCompressedLevel(0);
+
+    auto decompressedImage = MakeShared<Image>(context_);
+    decompressedImage->SetSize(compressedLevel.width_, compressedLevel.height_, 4);
+    compressedLevel.Decompress(decompressedImage->GetData());
+
+    return decompressedImage;
 }
 
 Image* Image::GetSubimage(const IntRect& rect) const

@@ -90,7 +90,7 @@ public:
     /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
 
-    /// Return profiler accumulation interval in seconds
+    /// Return profiler accumulation interval in seconds.
     float GetProfilerInterval() const;
 
     /// Return whether showing 3D geometry primitive/batch count only.

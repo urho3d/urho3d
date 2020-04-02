@@ -777,7 +777,7 @@ private:
     /// Compare two nodes.
     static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->pair_.first_ < rhs->pair_.first_; }
 
-    /// Compute a hash based on the key and the bucket size
+    /// Compute a hash based on the key and the bucket size.
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 

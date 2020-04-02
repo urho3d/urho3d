@@ -79,7 +79,7 @@ public:
         DoInsertElements(0, vector.Begin(), vector.End(), CopyTag{});
     }
 
-    /// Copy-construct from another vector (iterator version)
+    /// Copy-construct from another vector (iterator version).
     Vector(ConstIterator start, ConstIterator end)
     {
         DoInsertElements(0, start, end, CopyTag{});

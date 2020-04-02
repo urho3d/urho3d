@@ -9243,6 +9243,7 @@ float GetWheelDampingCompression(int);
 float GetWheelDampingRelaxation(int);
 Vector3 GetWheelDirection(int);
 float GetWheelFrictionSlip(int);
+float GetWheelMaxSuspensionForce(int);
 Node GetWheelNode(int);
 Vector3 GetWheelPosition(int);
 float GetWheelRadius(int);
@@ -9290,6 +9291,7 @@ void SetWheelDampingCompression(int, float);
 void SetWheelDampingRelaxation(int, float);
 void SetWheelDirection(int, Vector3);
 void SetWheelFrictionSlip(int, float);
+void SetWheelMaxSuspensionForce(int, float);
 void SetWheelRadius(int, float);
 void SetWheelRestLength(int, float);
 void SetWheelRollInfluence(int, float);
@@ -15423,7 +15425,7 @@ bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 Vector3 ScreenToWorldPoint(int, int, float) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetRenderPath(XMLFile);
+bool SetRenderPath(XMLFile);
 IntVector2 WorldToScreenPoint(const Vector3&) const;
 
 // Properties:

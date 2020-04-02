@@ -831,7 +831,7 @@ void FlipBlockVertical(unsigned char* dest, const unsigned char* src, Compressed
         break;
 
     default:
-        /// ETC1 & PVRTC not yet implemented
+        // ETC1 & PVRTC not yet implemented
         break;
     }
 }
@@ -896,7 +896,7 @@ void FlipBlockHorizontal(unsigned char* dest, const unsigned char* src, Compress
         break;
 
     default:
-        /// ETC1 & PVRTC not yet implemented
+        // ETC1 & PVRTC not yet implemented
         break;
     }
 }

@@ -227,7 +227,7 @@ protected:
     unsigned intervalFrames_;
 };
 
-/// Helper class for automatically beginning and ending a profiling block
+/// Helper class for automatically beginning and ending a profiling block.
 class URHO3D_API AutoProfileBlock
 {
 public:

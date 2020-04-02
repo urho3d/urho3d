@@ -1,0 +1,31 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/stale@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 30
+        days-before-close: 15
+        operations-per-run: 10
+        # Workaround Github YAML document parser that does not support anchors!
+        stale-issue-message: |
+          Marking this stale since there has been no activity for 30 days.
+          It will be closed if there is no activity for another 15 days.
+        stale-pr-message: |
+          Marking this stale since there has been no activity for 30 days.
+          It will be closed if there is no activity for another 15 days.
+        stale-issue-label: 'stale'
+        stale-pr-label: 'stale'
+        exempt-issue-label: 'backlog'
+        exempt-pr-label: 'backlog'
+
+# vi: set ts=2 sw=2 expandtab:
