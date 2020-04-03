@@ -147,7 +147,11 @@ public:
     /// Return UI element at global screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Get a child element at element's screen position relative to specified root element.
-    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly=true);
+    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly = true);
+    /// Convert system mouse position (or offset) to scaled UI position (or offset).
+    IntVector2 ConvertSystemToUI(const IntVector2& systemPos) const;
+    /// Convert scaled UI position (or offset) to system mouse position (or offset).
+    IntVector2 ConvertUIToSystem(const IntVector2& uiPos) const;
 
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
@@ -167,10 +171,10 @@ public:
 
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
-    
-    /// Get max screen distance in pixels for double clicks to register.
+
+    /// Return max screen distance in pixels for double clicks to register.
     float GetMaxDoubleClickDistance() const { return maxDoubleClickDist_;}
-    
+
     /// Return UI drag start event interval in seconds.
     float GetDragBeginInterval() const { return dragBeginInterval_; }
 
@@ -303,7 +307,7 @@ private:
 
     /// Send a UI double click event.
     void SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers);
-    
+
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.

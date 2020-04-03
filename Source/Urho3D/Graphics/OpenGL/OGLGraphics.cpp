@@ -78,20 +78,23 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
 
     using namespace Urho3D;
 
-    if (appContext) {
+    if (appContext)
+    {
         bool uiCursorVisible = false;
         bool systemCursorVisible = false;
-        MouseMode mouseMode;
+        MouseMode mouseMode{};
 
         // Detect current system pointer state
         Input* input = appContext->GetSubsystem<Input>();
-        if (input) {
+        if (input)
+        {
             systemCursorVisible = input->IsMouseVisible();
             mouseMode = input->GetMouseMode();
         }
 
         UI* ui = appContext->GetSubsystem<UI>();
-        if (ui) {
+        if (ui)
+        {
             ui->SetScale(scale);
 
             // Detect current UI pointer state
@@ -104,7 +107,8 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
         appContext->GetSubsystem<Graphics>()->SetMode(width, height);
 
         // Reset the pointer state as it was before resolution change
-        if (input) {
+        if (input)
+        {
             if (uiCursorVisible)
                 input->SetMouseVisible(false);
             else
@@ -113,9 +117,11 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
             input->SetMouseMode(mouseMode);
         }
 
-        if (ui) {
+        if (ui)
+        {
             Cursor* cursor = ui->GetCursor();
-            if (cursor) {
+            if (cursor)
+            {
                 cursor->SetVisible(uiCursorVisible);
                 cursor->SetPosition(input->GetMousePosition());
             }
@@ -309,7 +315,7 @@ Graphics::Graphics(Context* context) :
     RegisterGraphicsLibrary(context_);
 
 #ifdef __EMSCRIPTEN__
-        appContext = context_;
+    appContext = context_;
 #endif
 }
 
@@ -2225,9 +2231,9 @@ void Graphics::OnWindowResized()
     URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
 
 #ifdef __EMSCRIPTEN__
-        EM_ASM({
-            Module.SetRendererSize($0, $1);
-        }, width_, height_);
+    EM_ASM({
+        Module.SetRendererSize($0, $1);
+    }, width_, height_);
 #endif
 
     using namespace ScreenMode;
