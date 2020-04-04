@@ -81,8 +81,9 @@ bool Texture2DArray::BeginLoad(Deserializer& source)
 
     cache->ResetDependencies(this);
 
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
+    Path texPath;
+    String texName, texExt;
+    GetNamePath().Split(texPath, texName, texExt);
 
     loadParameters_ = (new XMLFile(context_));
     if (!loadParameters_->Load(source))
@@ -97,10 +98,10 @@ bool Texture2DArray::BeginLoad(Deserializer& source)
     XMLElement layerElem = textureElem.GetChild("layer");
     while (layerElem)
     {
-        String name = layerElem.GetAttribute("name");
+        Path name = layerElem.GetPath("name");
 
         // If path is empty, add the XML file path
-        if (GetPath(name).Empty())
+        if (name.GetDirectoryPath().Empty())
             name = texPath + name;
 
         loadImages_.Push(cache->GetTempResource<Image>(name));

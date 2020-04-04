@@ -868,18 +868,19 @@ bool Image::Save(Serializer& dest) const
     return success;
 }
 
-bool Image::SaveFile(const String& fileName) const
+bool Image::SaveFile(const Urho3D::Path& fileName) const
 {
-    if (fileName.EndsWith(".dds", false))
+    String extension = fileName.GetExtension();
+    if (extension == ".dds")
         return SaveDDS(fileName);
-    else if (fileName.EndsWith(".bmp", false))
+    else if (extension == ".bmp")
         return SaveBMP(fileName);
-    else if (fileName.EndsWith(".jpg", false) || fileName.EndsWith(".jpeg", false))
+    else if (extension == ".jpg" || extension == ".jpeg")
         return SaveJPG(fileName, 100);
-    else if (fileName.EndsWith(".tga", false))
+    else if (extension == ".tga")
         return SaveTGA(fileName);
 #ifdef URHO3D_WEBP
-    else if (fileName.EndsWith(".webp", false))
+    else if (extension == ".webp")
         return SaveWEBP(fileName, 100.0f);
 #endif
     else

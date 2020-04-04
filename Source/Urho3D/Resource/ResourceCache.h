@@ -139,9 +139,9 @@ public:
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const Path& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
-    Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
+    Resource* GetResource(StringHash type, const Path& name, bool sendEventOnFailure = true);
     /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data).
-    SharedPtr<Resource> GetTempResource(StringHash type, const String& name, bool sendEventOnFailure = true);
+    SharedPtr<Resource> GetTempResource(StringHash type, const Path& name, bool sendEventOnFailure = true);
     /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Can be called from outside the main thread.
     bool BackgroundLoadResource(StringHash type, const Path& name, bool sendEventOnFailure = true, Resource* caller = nullptr);
     /// Return number of pending background-loaded resources.
@@ -149,7 +149,7 @@ public:
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, StringHash type) const;
     /// Return an already loaded resource of specific type & name, or null if not found. Will not load if does not exist.
-    Resource* GetExistingResource(StringHash type, const String& name);
+    Resource* GetExistingResource(StringHash type, const Path& name);
 
     /// Return all loaded resources.
     const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
@@ -161,11 +161,11 @@ public:
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
 
     /// Template version of returning a resource by name.
-    template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
+    template <class T> T* GetResource(const Path& name, bool sendEventOnFailure = true);
     /// Template version of returning an existing resource by name.
-    template <class T> T* GetExistingResource(const String& name);
+    template <class T> T* GetExistingResource(const Path& name);
     /// Template version of loading a resource without storing it to the cache.
-    template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
+    template <class T> SharedPtr<T> GetTempResource(const Path& name, bool sendEventOnFailure = true);
     /// Template version of releasing a resource by name.
     template <class T> void ReleaseResource(const String& name, bool force = false);
     /// Template version of queueing a resource background load.
@@ -181,7 +181,7 @@ public:
     /// Return total memory use for all resources.
     unsigned long long GetTotalMemoryUse() const;
     /// Return full absolute file name as a string of resource if possible, or empty if not found.
-    String GetResourceFileName(const Path& name) const;
+    Path GetResourceFileName(const Path& name) const;
     /// Return full absolute file path of resource if possible, or empty if not found.
     Path GetResourceFilePath(const Path& name) const;
 
@@ -201,13 +201,13 @@ public:
     ResourceRouter* GetResourceRouter(unsigned index) const;
 
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
-    String GetPreferredResourceDir(const String& path) const;
+    Path GetPreferredResourceDir(Path path) const;
     /// Remove unsupported constructs from the resource name to prevent ambiguity, and normalize absolute filename to resource path relative if possible.
     Path SanitateResourceName(const Path& name) const;
     /// Remove unnecessary constructs from a resource directory name and ensure it to be an absolute path.
     Path SanitateResourceDirName(Path name) const;
     /// Store a dependency for a resource. If a dependency file changes, the resource will be reloaded.
-    void StoreResourceDependency(Resource* resource, const String& dependency);
+    void StoreResourceDependency(Resource* resource, const Path& dependency);
     /// Reset dependencies for a resource.
     void ResetDependencies(Resource* resource);
 
@@ -258,13 +258,13 @@ private:
     int finishBackgroundResourcesMs_;
 };
 
-template <class T> T* ResourceCache::GetExistingResource(const String& name)
+template <class T> T* ResourceCache::GetExistingResource(const Path& name)
 {
     StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetExistingResource(type, name));
 }
 
-template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
+template <class T> T* ResourceCache::GetResource(const Path& name, bool sendEventOnFailure)
 {
     StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
@@ -276,7 +276,7 @@ template <class T> void ResourceCache::ReleaseResource(const String& name, bool 
     ReleaseResource(type, name, force);
 }
 
-template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure)
+template <class T> SharedPtr<T> ResourceCache::GetTempResource(const Path& name, bool sendEventOnFailure)
 {
     StringHash type = T::GetTypeStatic();
     return StaticCast<T>(GetTempResource(type, name, sendEventOnFailure));

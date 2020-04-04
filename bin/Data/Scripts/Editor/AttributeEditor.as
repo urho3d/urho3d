@@ -22,7 +22,7 @@ Color normalTextColor(1.0f, 1.0f, 1.0f);
 Color modifiedTextColor(1.0f, 0.8f, 0.5f);
 Color nonEditableTextColor(0.7f, 0.7f, 0.7f);
 
-String sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
+String sceneResourcePath = AddTrailingSlash(fileSystem.programDir.ToString() + "Data");
 bool rememberResourcePath = true;
 
 // Exceptions for string attributes that should not be continuously edited

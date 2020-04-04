@@ -577,20 +577,20 @@ bool FileSystem::CheckAccess(Path pathName) const
     return false;
 }
 
-unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
+unsigned FileSystem::GetLastModifiedTime(const Path& fileName) const
 {
     if (fileName.Empty() || !CheckAccess(fileName))
         return 0;
 
 #ifdef _WIN32
     struct _stat st;
-    if (!_stat(fileName.CString(), &st))
+    if (!_stat(fileName.ToString().CString(), &st))
         return (unsigned)st.st_mtime;
     else
         return 0;
 #else
     struct stat st{};
-    if (!stat(fileName.CString(), &st))
+    if (!stat(fileName.ToString().CString(), &st))
         return (unsigned)st.st_mtime;
     else
         return 0;

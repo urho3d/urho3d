@@ -47,16 +47,16 @@ uint uiScriptFilter = 0;
 uint uiParticleFilter = 0;
 uint uiRenderPathFilter = 0;
 uint uiExportFilter = 0;
-String uiScenePath = fileSystem.programDir + "Data/Scenes";
-String uiElementPath = fileSystem.programDir + "Data/UI";
-String uiNodePath = fileSystem.programDir + "Data/Objects";
+String uiScenePath = fileSystem.programDir.ToString() + "Data/Scenes";
+String uiElementPath = fileSystem.programDir.ToString() + "Data/UI";
+String uiNodePath = fileSystem.programDir.ToString() + "Data/Objects";
 String uiImportPath;
 String uiExportPath;
-String uiScriptPath = fileSystem.programDir + "Data/Scripts";
-String uiParticlePath = fileSystem.programDir + "Data/Particles";
-String uiRenderPathPath = fileSystem.programDir + "CoreData/RenderPaths";
+String uiScriptPath = fileSystem.programDir.ToString() + "Data/Scripts";
+String uiParticlePath = fileSystem.programDir.ToString() + "Data/Particles";
+String uiRenderPathPath = fileSystem.programDir.ToString() + "CoreData/RenderPaths";
 Array<String> uiRecentScenes;
-String screenshotDir = fileSystem.programDir + "Screenshots";
+String screenshotDir = fileSystem.programDir.ToString() + "Screenshots";
 
 bool uiFaded = false;
 float uiMinOpacity = 0.3;
@@ -1869,7 +1869,7 @@ XMLFile@ GetEditorUIXMLFile(const String&in fileName)
 {
     // Prefer the executable path to avoid using the user's resource path, which may point
     // to an outdated Urho installation
-    String fullFileName = fileSystem.programDir + "Data/" + fileName;
+    String fullFileName = fileSystem.programDir.ToString() + "Data/" + fileName;
     if (fileSystem.FileExists(fullFileName))
     {
         File@ file = File(fullFileName, FILE_READ);

@@ -166,7 +166,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     if (file && !file->IsPackaged())
     {
         auto* fileSystem = GetSubsystem<FileSystem>();
-        String fullName = cache->GetResourceFileName(file->GetName());
+        Path fullName = cache->GetResourceFileName(file->GetName());
         unsigned fileTimeStamp = fileSystem->GetLastModifiedTime(fullName);
         if (fileTimeStamp > timeStamp_)
             timeStamp_ = fileTimeStamp;

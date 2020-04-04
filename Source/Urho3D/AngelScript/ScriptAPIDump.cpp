@@ -62,7 +62,7 @@ struct PropertyInfo
 struct HeaderFile
 {
     /// Full path to header file.
-    String fileName;
+    Path fileName;
     /// Event section name.
     String sectionName;
 };
@@ -190,7 +190,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
     }
 }
 
-void Script::DumpAPI(DumpMode mode, const String& sourceTree)
+void Script::DumpAPI(DumpMode mode, Path sourceTree)
 {
     // Does not use URHO3D_LOGRAW macro here to ensure the messages are always dumped regardless of URHO3D_LOGGING compiler directive
     // and of Log subsystem availability
@@ -205,11 +205,12 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         auto* fileSystem = GetSubsystem<FileSystem>();
         Vector<Path> headerFileNames;
-        String path = AddTrailingSlash(sourceTree);
-        if (!path.Empty())
-            path.Append("Source/Urho3D/");
+        sourceTree.AddTrailingSlash();
+        if (!sourceTree.Empty())
+            sourceTree += "Source/Urho3D/";
+        // QEUSTION: Why do we hard-code appending Source/Urho3D/ to the path?
 
-        fileSystem->ScanDir(headerFileNames, path, "*.h", SCAN_FILES, true);
+        fileSystem->ScanDir(headerFileNames, sourceTree, "*.h", SCAN_FILES, true);
 
         /// \hack Rename any Events2D to 2DEvents to work with the event category creation correctly (currently PhysicsEvents2D)
         Vector<HeaderFile> headerFiles;
@@ -229,7 +230,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
             for (unsigned i = 0; i < headerFiles.Size(); ++i)
             {
-                SharedPtr<File> file(new File(context_, path + headerFiles[i].fileName, FILE_READ));
+                SharedPtr<File> file(new File(context_, sourceTree + headerFiles[i].fileName, FILE_READ));
                 if (!file->IsOpen())
                     continue;
 

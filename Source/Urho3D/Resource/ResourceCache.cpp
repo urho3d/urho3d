@@ -539,7 +539,7 @@ SharedPtr<File> ResourceCache::GetFile(const Path& name, bool sendEventOnFailure
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetExistingResource(StringHash type, const String& name)
+Resource* ResourceCache::GetExistingResource(StringHash type, const Path& name)
 {
     Path sanitatedName = SanitateResourceName(name);
 
@@ -559,7 +559,7 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const String& name
     return existing;
 }
 
-Resource* ResourceCache::GetResource(StringHash type, const String& name, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const Path& name, bool sendEventOnFailure)
 {
     Path sanitatedName = SanitateResourceName(name);
 
@@ -655,7 +655,7 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const Path& name, bo
 #endif
 }
 
-SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& name, bool sendEventOnFailure)
+SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const Path& name, bool sendEventOnFailure)
 {
     Path sanitatedName = SanitateResourceName(name);
 
@@ -782,7 +782,7 @@ unsigned long long ResourceCache::GetTotalMemoryUse() const
     return total;
 }
 
-String ResourceCache::GetResourceFileName(const Path& name) const
+Path ResourceCache::GetResourceFileName(const Path& name) const
 {
     return GetResourceFilePath(name).ToString();
 }
@@ -807,9 +807,9 @@ ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
     return index < resourceRouters_.Size() ? resourceRouters_[index] : nullptr;
 }
 
-String ResourceCache::GetPreferredResourceDir(const String& path) const
+Path ResourceCache::GetPreferredResourceDir(Path path) const
 {
-    String fixedPath = AddTrailingSlash(path);
+    path.AddTrailingSlash();
 
     bool pathHasKnownDirs = false;
     bool parentHasKnownDirs = false;
@@ -818,7 +818,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
 
     for (unsigned i = 0; checkDirs[i] != nullptr; ++i)
     {
-        if (fileSystem->DirExists(fixedPath + checkDirs[i]))
+        if (fileSystem->DirExists(path + checkDirs[i]))
         {
             pathHasKnownDirs = true;
             break;
@@ -826,7 +826,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
     }
     if (!pathHasKnownDirs)
     {
-        String parentPath = GetParentPath(fixedPath);
+        Path parentPath = path.GetParentPath();
         for (unsigned i = 0; checkDirs[i] != nullptr; ++i)
         {
             if (fileSystem->DirExists(parentPath + checkDirs[i]))
@@ -837,10 +837,10 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
         }
         // If path does not have known subdirectories, but the parent path has, use the parent instead
         if (parentHasKnownDirs)
-            fixedPath = parentPath;
+            path = parentPath;
     }
 
-    return fixedPath;
+    return path;
 }
 
 Path ResourceCache::SanitateResourceName(const Path& name) const
@@ -883,15 +883,15 @@ Path ResourceCache::SanitateResourceDirName(Path name) const
     return name;
 }
 
-void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)
+void ResourceCache::StoreResourceDependency(Resource* resource, const Path& dependency)
 {
     if (!resource)
         return;
 
     MutexLock lock(resourceMutex_);
 
-    StringHash nameHash(resource->GetName());
-    HashSet<StringHash>& dependents = dependentResources_[dependency];
+    StringHash nameHash = resource->GetNameHash();
+    HashSet<StringHash>& dependents = dependentResources_[StringHash{dependency}];
     dependents.Insert(nameHash);
 }
 

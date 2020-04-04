@@ -88,7 +88,8 @@ bool ShaderVariation::Create()
     }
 
     // Check for up-to-date bytecode on disk
-    String path, name, extension;
+    Path path;
+    String name, extension;
     SplitPath(owner_->GetName(), path, name, extension);
     extension = type_ == VS ? ".vs3" : ".ps3";
 
@@ -168,7 +169,7 @@ void ShaderVariation::SetDefines(const String& defines)
     defines_ = defines;
 }
 
-bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
+bool ShaderVariation::LoadByteCode(const Path& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
@@ -357,26 +358,26 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     MOJOSHADER_freeParseData(parseData);
 }
 
-void ShaderVariation::SaveByteCode(const String& binaryShaderName)
+void ShaderVariation::SaveByteCode(const Path& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
 
     // Filename may or may not be inside the resource system
-    String fullName = binaryShaderName;
-    if (!IsAbsolutePath(fullName))
+    Path fileName = binaryShaderName;
+    if (!fileName.IsAbsolute())
     {
         // If not absolute, use the resource dir of the shader
-        String shaderFileName = cache->GetResourceFileName(owner_->GetName());
+        Path shaderFileName = cache->GetResourceFileName(owner_->GetNamePath());
         if (shaderFileName.Empty())
             return;
-        fullName = shaderFileName.Substring(0, shaderFileName.Find(owner_->GetName())) + binaryShaderName;
+        fileName = shaderFileName.ToString().Substring(0, shaderFileName.Find(owner_->GetName())) + fileName;
     }
-    String path = GetPath(fullName);
+    Path path = fileName.GetDirectoryPath();
     if (!fileSystem->DirExists(path))
         fileSystem->CreateDir(path);
 
-    SharedPtr<File> file(new File(owner_->GetContext(), fullName, FILE_WRITE));
+    SharedPtr<File> file(new File(owner_->GetContext(), fileName, FILE_WRITE));
     if (!file->IsOpen())
         return;
 

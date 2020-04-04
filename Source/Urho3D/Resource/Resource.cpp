@@ -84,13 +84,13 @@ bool Resource::Save(Serializer& dest) const
     return false;
 }
 
-bool Resource::LoadFile(const String& fileName)
+bool Resource::LoadFile(const Path& fileName)
 {
     File file(context_);
     return file.Open(fileName, FILE_READ) && Load(file);
 }
 
-bool Resource::SaveFile(const String& fileName) const
+bool Resource::SaveFile(const Path& fileName) const
 {
     File file(context_);
     return file.Open(fileName, FILE_WRITE) && Save(file);
@@ -98,8 +98,14 @@ bool Resource::SaveFile(const String& fileName) const
 
 void Resource::SetName(const String& name)
 {
-    name_ = name;
+    namePath_ = name;
     nameHash_ = name;
+}
+
+void Resource::SetNamePath(const Path& name)
+{
+    namePath_ = name;
+    nameHash_ = StringHash(name);
 }
 
 void Resource::SetMemoryUse(unsigned size)

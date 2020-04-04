@@ -780,17 +780,24 @@ static void DestructPath(Path* ptr)
 {
     ptr->~Path();
 }
+static void ConstructPathCopy(const Path& value, Path* ptr)
+{
+    new(ptr) Path(value);
+}
 static void ConstructPathString(const String& value, Path* ptr)
 {
     new(ptr) Path(value);
 }
 static void RegisterPath(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("Path", sizeof(Path), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
-    engine->RegisterObjectMethod("Path", "String ToString() const", asMETHOD(Path, ToString), asCALL_THISCALL);
+    engine->RegisterObjectType("Path", sizeof(Path), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
     engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPathDefault), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f(const Path&in)", asFUNCTION(ConstructPathCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructPathString), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Path", "Path& opAssign(const Path&in)", asMETHOD(Path, operator =), asCALL_THISCALL);
+
     engine->RegisterObjectBehaviour("Path", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructPath), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Path", "const String& ToString() const", asMETHOD(Path, ToString), asCALL_THISCALL);
 
 //    engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION([](Path*p){}), asCALL_CDECL_OBJLAST);
 //    engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);

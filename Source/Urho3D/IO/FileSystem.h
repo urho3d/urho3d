@@ -90,7 +90,7 @@ public:
     /// Check if a path is allowed to be accessed. If no paths are registered, all are allowed.
     bool CheckAccess(Path pathName) const;
     /// Returns the file's last modified time as seconds since 1.1.1970, or 0 if can not be accessed.
-    unsigned GetLastModifiedTime(const String& fileName) const;
+    unsigned GetLastModifiedTime(const Path& fileName) const;
     /// Check if a file exists.
     bool FileExists(const Path& fileName) const;
     /// Check if a directory exists.

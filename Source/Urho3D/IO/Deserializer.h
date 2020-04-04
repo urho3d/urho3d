@@ -44,8 +44,10 @@ public:
     virtual unsigned Read(void* dest, unsigned size) = 0;
     /// Set position from the beginning of the stream. Return actual new position.
     virtual unsigned Seek(unsigned position) = 0;
-    /// Return name of the stream.
+    /// Return name of the stream as a String.
     virtual const String& GetName() const;
+    /// Return name of the stream as a Path.
+    virtual const Path& GetNamePath() const;
     /// Return a checksum if applicable.
     virtual unsigned GetChecksum();
     /// Return whether the end of stream has been reached.

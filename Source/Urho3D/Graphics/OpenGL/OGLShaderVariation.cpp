@@ -193,10 +193,10 @@ void ShaderVariation::SetDefines(const String& defines)
 }
 
 // These methods are no-ops for OpenGL
-bool ShaderVariation::LoadByteCode(const String& binaryShaderName) { return false; }
+bool ShaderVariation::LoadByteCode(const Path& binaryShaderName) { return false; }
 bool ShaderVariation::Compile() { return false; }
 void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize) {}
-void ShaderVariation::SaveByteCode(const String& binaryShaderName) {}
+void ShaderVariation::SaveByteCode(const Path& binaryShaderName) {}
 void ShaderVariation::CalculateConstantBufferSizes() {}
 
 }

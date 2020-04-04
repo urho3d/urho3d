@@ -79,14 +79,14 @@ Log::~Log()
     logInstance = nullptr;
 }
 
-void Log::Open(const String& fileName)
+void Log::Open(const Path& fileName)
 {
 #if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
     if (fileName.Empty())
         return;
     if (logFile_ && logFile_->IsOpen())
     {
-        if (logFile_->GetName() == fileName)
+        if (logFile_->GetNamePath() == fileName)
             return;
         else
             Close();
@@ -94,11 +94,11 @@ void Log::Open(const String& fileName)
 
     logFile_ = new File(context_);
     if (logFile_->Open(fileName, FILE_WRITE))
-        Write(LOG_INFO, "Opened log file " + fileName);
+        Write(LOG_INFO, "Opened log file " + fileName.ToString());
     else
     {
         logFile_.Reset();
-        Write(LOG_ERROR, "Failed to create log file " + fileName);
+        Write(LOG_ERROR, "Failed to create log file " + fileName.ToString());
     }
 #endif
 }

@@ -70,8 +70,9 @@ bool ShaderVariation::Create()
     }
 
     // Check for up-to-date bytecode on disk
-    String path, name, extension;
-    SplitPath(owner_->GetName(), path, name, extension);
+    Path path;
+    String name, extension;
+    Path(owner_->GetName()).Split(path, name, extension);
     extension = type_ == VS ? ".vs4" : ".ps4";
 
     String binaryShaderName = graphics_->GetShaderCacheDir() + name + "_" + StringHash(defines_).ToString() + extension;
@@ -164,7 +165,7 @@ void ShaderVariation::SetDefines(const String& defines)
         definesClipPlane_ += " CLIPPLANE";
 }
 
-bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
+bool ShaderVariation::LoadByteCode(const Path& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
@@ -403,26 +404,26 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     reflection->Release();
 }
 
-void ShaderVariation::SaveByteCode(const String& binaryShaderName)
+void ShaderVariation::SaveByteCode(const Urho3D::Path& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
 
     // Filename may or may not be inside the resource system
-    String fullName = binaryShaderName;
-    if (!IsAbsolutePath(fullName))
+    Path fileName = binaryShaderName;
+    if (!fileName.IsAbsolute())
     {
         // If not absolute, use the resource dir of the shader
-        String shaderFileName = cache->GetResourceFileName(owner_->GetName());
+        Path shaderFileName = cache->GetResourceFileName(owner_->GetNamePath());
         if (shaderFileName.Empty())
             return;
-        fullName = shaderFileName.Substring(0, shaderFileName.Find(owner_->GetName())) + binaryShaderName;
+        fileName = shaderFileName.ToString().Substring(0, shaderFileName.Find(owner_->GetName())) + fileName;
     }
-    String path = GetPath(fullName);
+    Path path = fileName.GetDirectoryPath();
     if (!fileSystem->DirExists(path))
         fileSystem->CreateDir(path);
 
-    SharedPtr<File> file(new File(owner_->GetContext(), fullName, FILE_WRITE));
+    SharedPtr<File> file(new File(owner_->GetContext(), fileName, FILE_WRITE));
     if (!file->IsOpen())
         return;
 

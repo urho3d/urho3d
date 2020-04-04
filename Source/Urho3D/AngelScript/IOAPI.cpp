@@ -385,7 +385,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "Path get_temporaryDir() const", asMETHOD(FileSystem, GetTemporaryDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
 
-    //TODO: Fix these (NEL)
+#warning: Fix these (NEL)void
     engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetFileName(const String&in)", asFUNCTION(GetFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetExtension(const String&in, bool lowercaseExtension = true)", asFUNCTION(GetExtension), asCALL_CDECL);

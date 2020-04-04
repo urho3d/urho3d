@@ -84,7 +84,7 @@ public:
     /// Return the file name (path as a string).
     const String& GetName() const override { return fileName_.ToString(); }
     /// Return the file path.
-    const Path& GetPath() const { return fileName_; }
+    const Path& GetNamePath() const override { return fileName_; }
 
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     unsigned GetChecksum() override;

@@ -55,6 +55,11 @@ const String& Deserializer::GetName() const
     return String::EMPTY;
 }
 
+const Path& Deserializer::GetNamePath() const
+{
+    return Path::EMPTY;
+}
+
 unsigned Deserializer::GetChecksum()
 {
     return 0;
