@@ -520,34 +520,36 @@ bool FileSystem::Rename(const Path& srcFileName, const Path& destFileName)
 #endif
 }
 
-bool FileSystem::Delete(const String& fileName)
+bool FileSystem::Delete(const Path& fileName)
 {
-    if (!CheckAccess(GetPath(fileName)))
+    if (!CheckAccess(fileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName.ToString());
         return false;
     }
 
 #ifdef _WIN32
-    return DeleteFileW(GetWideNativePath(fileName).CString()) != 0;
+    return DeleteFileW(fileName.GetWideNativePathString().CString()) != 0;
 #else
-    return remove(GetNativePath(fileName).CString()) == 0;
+    return remove(fileName.GetNativePathString().CString()) == 0;
 #endif
 }
 
-String FileSystem::GetCurrentDir() const
+Path FileSystem::GetCurrentDir() const
 {
 #ifdef _WIN32
     wchar_t path[MAX_PATH];
     path[0] = 0;
     GetCurrentDirectoryW(MAX_PATH, path);
-    return AddTrailingSlash(String(path));
 #else
     char path[MAX_PATH];
     path[0] = 0;
     getcwd(path, MAX_PATH);
-    return AddTrailingSlash(String(path));
 #endif
+
+    Path ret(path);
+    ret.AddTrailingSlash();
+    return ret;
 }
 
 bool FileSystem::CheckAccess(Path pathName) const
@@ -759,19 +761,19 @@ Path FileSystem::GetUserDocumentsDir() const
 
 Path FileSystem::GetAppPreferencesDir(const String& org, const String& app) const
 {
-    String dir;
 #ifndef MINI_URHO
     char* prefPath = SDL_GetPrefPath(org.CString(), app.CString());
     if (prefPath)
     {
-        dir = GetInternalPath(String(prefPath));
+        Path dir(prefPath);
         SDL_free(prefPath);
+        return dir;
     }
     else
 #endif
         URHO3D_LOGWARNING("Could not get application preferences directory");
 
-    return dir;
+    return Path::EMPTY;
 }
 
 void FileSystem::RegisterPath(const Path& pathName, bool partialMatch)
@@ -793,7 +795,7 @@ void FileSystem::RegisterPath(const Path& pathName, bool partialMatch)
         allowedPaths_.Insert(pathName);
 }
 
-bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
+bool FileSystem::SetLastModifiedTime(const Path& fileName, unsigned newTime)
 {
     if (fileName.Empty() || !CheckAccess(fileName))
         return false;
@@ -801,19 +803,19 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
 #ifdef _WIN32
     struct _stat oldTime;
     struct _utimbuf newTimes;
-    if (_stat(fileName.CString(), &oldTime) != 0)
+    if (_stat(fileName.ToString().CString(), &oldTime) != 0)
         return false;
     newTimes.actime = oldTime.st_atime;
     newTimes.modtime = newTime;
-    return _utime(fileName.CString(), &newTimes) == 0;
+    return _utime(fileName.ToString().CString(), &newTimes) == 0;
 #else
     struct stat oldTime{};
     struct utimbuf newTimes{};
-    if (stat(fileName.CString(), &oldTime) != 0)
+    if (stat(fileName.ToString().CString(), &oldTime) != 0)
         return false;
     newTimes.actime = oldTime.st_atime;
     newTimes.modtime = newTime;
-    return utime(fileName.CString(), &newTimes) == 0;
+    return utime(fileName.ToString().CString(), &newTimes) == 0;
 #endif
 }
 
@@ -1093,7 +1095,7 @@ bool IsAbsolutePath(const String& pathName)
     return false;
 }
 
-String FileSystem::GetTemporaryDir() const
+Path FileSystem::GetTemporaryDir() const
 {
 #if defined(_WIN32)
 #if defined(MINI_URHO)
@@ -1102,13 +1104,19 @@ String FileSystem::GetTemporaryDir() const
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     GetTempPathW(SDL_arraysize(pathName), pathName);
-    return AddTrailingSlash(String(pathName));
+    Path ret(pathName);
+    ret.AddTrailingSlash();
+    return ret;
 #endif
 #else
     if (char* pathName = getenv("TMPDIR"))
-        return AddTrailingSlash(pathName);
+    {
+        Path ret(pathName);
+        ret.AddTrailingSlash();
+        return ret;
+    }
 #ifdef P_tmpdir
-    return AddTrailingSlash(P_tmpdir);
+    return Path(P_tmpdir).WithTrailingSlash();
 #else
     return "/tmp/";
 #endif

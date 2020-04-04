@@ -107,7 +107,7 @@ static bool consoleOpened = false;
 #endif
 static String currentLine;
 static Vector<String> arguments;
-static String miniDumpDir;
+static Path miniDumpDir;
 
 #if defined(IOS)
 static void GetCPUData(host_basic_info_data_t* data)
@@ -495,12 +495,12 @@ unsigned GetNumLogicalCPUs()
 #endif
 }
 
-void SetMiniDumpDir(const String& pathName)
+void SetMiniDumpDir(const Path& pathName)
 {
-    miniDumpDir = AddTrailingSlash(pathName);
+    miniDumpDir = pathName.WithTrailingSlash();
 }
 
-String GetMiniDumpDir()
+Path GetMiniDumpDir()
 {
 #ifndef MINI_URHO
     if (miniDumpDir.Empty())
@@ -508,7 +508,7 @@ String GetMiniDumpDir()
         char* pathName = SDL_GetPrefPath("urho3d", "crashdumps");
         if (pathName)
         {
-            String ret(pathName);
+            Path ret(pathName);
             SDL_free(pathName);
             return ret;
         }

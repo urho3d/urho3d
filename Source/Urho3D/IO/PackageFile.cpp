@@ -38,7 +38,7 @@ PackageFile::PackageFile(Context* context) :
 {
 }
 
-PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset) :
+PackageFile::PackageFile(Context* context, const Path& fileName, unsigned startOffset) :
     Object(context),
     totalSize_(0),
     totalDataSize_(0),

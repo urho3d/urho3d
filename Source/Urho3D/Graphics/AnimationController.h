@@ -198,7 +198,7 @@ private:
     /// Remove an animation state.
     void RemoveAnimationState(AnimationState* state);
     /// Find the internal index and animation state of an animation.
-    void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;
+    void FindAnimation(const Path& name, unsigned& index, AnimationState*& state) const;
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 

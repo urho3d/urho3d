@@ -72,7 +72,7 @@ public:
     bool HasEventHandler(Object* sender, const String& eventName) const override;
 
     /// Execute script file. Return true if successful.
-    bool ExecuteFile(const String& fileName);
+    bool ExecuteFile(const Path& fileName);
     /// Execute script string. Return true if successful.
     bool ExecuteString(const String& string);
     /// Load script file on file system (i.e. not from resource cache). Return true if successful.

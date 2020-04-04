@@ -103,9 +103,9 @@ public:
     /// Remove a package file. Optionally release the resources loaded from it.
     void RemovePackageFile(PackageFile* package, bool releaseResources = true, bool forceRelease = false);
     /// Remove a package file by name. Optionally release the resources loaded from it.
-    void RemovePackageFile(const String& fileName, bool releaseResources = true, bool forceRelease = false);
+    void RemovePackageFile(const Path& fileName, bool releaseResources = true, bool forceRelease = false);
     /// Release a resource by name.
-    void ReleaseResource(StringHash type, const String& name, bool force = false);
+    void ReleaseResource(StringHash type, const Path& name, bool force = false);
     /// Release all resources of a specific type.
     void ReleaseResources(StringHash type, bool force = false);
     /// Release resources of a specific type and partial name.
@@ -167,9 +167,9 @@ public:
     /// Template version of loading a resource without storing it to the cache.
     template <class T> SharedPtr<T> GetTempResource(const Path& name, bool sendEventOnFailure = true);
     /// Template version of releasing a resource by name.
-    template <class T> void ReleaseResource(const String& name, bool force = false);
+    template <class T> void ReleaseResource(const Path& name, bool force = false);
     /// Template version of queueing a resource background load.
-    template <class T> bool BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = nullptr);
+    template <class T> bool BackgroundLoadResource(const Path& name, bool sendEventOnFailure = true, Resource* caller = nullptr);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists in the resource directories or package files. Does not check manually added in-memory resources.
@@ -270,7 +270,7 @@ template <class T> T* ResourceCache::GetResource(const Path& name, bool sendEven
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
-template <class T> void ResourceCache::ReleaseResource(const String& name, bool force)
+template <class T> void ResourceCache::ReleaseResource(const Path& name, bool force)
 {
     StringHash type = T::GetTypeStatic();
     ReleaseResource(type, name, force);
@@ -282,7 +282,7 @@ template <class T> SharedPtr<T> ResourceCache::GetTempResource(const Path& name,
     return StaticCast<T>(GetTempResource(type, name, sendEventOnFailure));
 }
 
-template <class T> bool ResourceCache::BackgroundLoadResource(const String& name, bool sendEventOnFailure, Resource* caller)
+template <class T> bool ResourceCache::BackgroundLoadResource(const Path& name, bool sendEventOnFailure, Resource* caller)
 {
     StringHash type = T::GetTypeStatic();
     return BackgroundLoadResource(type, name, sendEventOnFailure, caller);

@@ -72,14 +72,14 @@ public:
     /// Rename a file. Return true if successful.
     bool Rename(const Path& srcFileName, const Path& destFileName);
     /// Delete a file. Return true if successful.
-    bool Delete(const String& fileName);
+    bool Delete(const Path& fileName);
     /// Register a path as allowed to access. If no paths are registered, all are allowed. Registering allowed paths is considered securing the Urho3D execution environment: running programs and opening files externally through the system will fail afterward. PartialMatch surrounds the pattern with ** for the globbing.
     void RegisterPath(const Path& pathName, bool partialMatch = true);
     /// Set a file's last modified time as seconds since 1.1.1970. Return true on success.
-    bool SetLastModifiedTime(const String& fileName, unsigned newTime);
+    bool SetLastModifiedTime(const Path& fileName, unsigned newTime);
 
     /// Return the absolute current working directory.
-    String GetCurrentDir() const;
+    Path GetCurrentDir() const;
 
     /// Return whether is executing engine console commands as OS-specific system command.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
@@ -104,7 +104,7 @@ public:
     /// Return the application preferences directory.
     Path GetAppPreferencesDir(const String& org, const String& app) const;
     /// Return path of temporary directory. Path always ends with a forward slash.
-    String GetTemporaryDir() const;
+    Path GetTemporaryDir() const;
 
 private:
     /// Scan directory, called internally.

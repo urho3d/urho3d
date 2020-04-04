@@ -128,7 +128,7 @@ bool AnimationSet2D::BeginLoad(Deserializer& source)
     if (GetName().Empty())
         SetName(source.GetName());
 
-    String extension = GetExtension(source.GetName());
+    String extension = source.GetNamePath().GetExtension();
 #ifdef URHO3D_SPINE
     if (extension == ".json")
         return BeginLoadSpine(source);
@@ -301,14 +301,14 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     }
 
     // Check has sprite sheet
-    String parentPath = GetParentPath(GetName());
+    Path parentPath = GetNamePath().GetParentPath();
     auto* cache = GetSubsystem<ResourceCache>();
 
-    spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".xml";
+    spriteSheetFilePath_ = parentPath + GetNamePath().GetFileName() + ".xml";
     hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
     if (!hasSpriteSheet_)
     {
-        spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".plist";
+        spriteSheetFilePath_ = parentPath + GetNamePath().GetFileName() + ".plist";
         hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
     }
 
@@ -324,7 +324,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
                 for (unsigned j = 0; j < folder->files_.Size(); ++j)
                 {
                     Spriter::File* file = folder->files_[j];
-                    String imagePath = parentPath + file->name_;
+                    Path imagePath = parentPath + file->name_;
                     cache->BackgroundLoadResource<Image>(imagePath, true, this);
                 }
             }
@@ -363,10 +363,10 @@ bool AnimationSet2D::EndLoadSpriter()
             for (unsigned j = 0; j < folder->files_.Size(); ++j)
             {
                 Spriter::File* file = folder->files_[j];
-                SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(GetFileName(file->name_)));
+                SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(file->name_.GetFileName()));
                 if (!sprite)
                 {
-                    URHO3D_LOGERROR("Could not load sprite " + file->name_);
+                    URHO3D_LOGERROR("Could not load sprite " + file->name_.ToString());
                     return false;
                 }
 
@@ -397,7 +397,7 @@ bool AnimationSet2D::EndLoadSpriter()
     else
     {
         Vector<SpriteInfo> spriteInfos;
-        String parentPath = GetParentPath(GetName());
+        Path parentPath = GetNamePath().GetParentPath();
 
         for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
         {
@@ -405,7 +405,7 @@ bool AnimationSet2D::EndLoadSpriter()
             for (unsigned j = 0; j < folder->files_.Size(); ++j)
             {
                 Spriter::File* file = folder->files_[j];
-                String imagePath = parentPath + file->name_;
+                Path imagePath = parentPath + file->name_;
                 SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
                 if (!image)
                 {

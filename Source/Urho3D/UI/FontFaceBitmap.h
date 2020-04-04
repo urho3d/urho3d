@@ -52,7 +52,7 @@ private:
     /// Save font face texture as image resource.
     SharedPtr<Image> SaveFaceTexture(Texture2D* texture);
     /// Save font face texture as image file.
-    bool SaveFaceTexture(Texture2D* texture, const String& fileName);
+    bool SaveFaceTexture(Texture2D* texture, const Urho3D::Path& fileName);
     /// Blit.
     void Blit(Image* dest, int x, int y, int width, int height, Image* source, int sourceX, int sourceY, int components);
 };

@@ -25,7 +25,7 @@ class Graphics : public Object
     void EndDumpShaders();
     void PrecacheShaders(Deserializer& source);
     tolua_outside void GraphicsPrecacheShaders @ PrecacheShaders(const String fileName);
-    void SetShaderCacheDir(const String path);
+    void SetShaderCacheDir(const Path path);
 
     bool IsInitialized() const;
     void* GetExternalWindow() const;
@@ -62,7 +62,7 @@ class Graphics : public Object
     bool GetSRGBWriteSupport() const;
     IntVector2 GetDesktopResolution(int monitor) const;
     int GetMonitorCount() const;
-    const String GetShaderCacheDir() const;
+    const Path GetShaderCacheDir() const;
     int GetCurrentMonitor() const;
     bool GetMaximized() const;
     void Raise() const;
@@ -120,7 +120,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool sRGBSupport;
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
     tolua_readonly tolua_property__get_set int monitorCount;
-    tolua_property__get_set String shaderCacheDir;
+    tolua_property__get_set Path shaderCacheDir;
 };
 
 Graphics* GetGraphics();

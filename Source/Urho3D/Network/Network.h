@@ -97,7 +97,7 @@ public:
     /// Unregister all remote events.
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
-    void SetPackageCacheDir(const String& path);
+    void SetPackageCacheDir(const Path& path);
     /// Trigger all client connections in the specified scene to download a package file from the server. Can be used to download additional resource packages when clients are already joined in the scene. The package must have been added as a requirement to the scene, or else the eventual download will fail.
     void SendPackageToClients(Scene* scene, PackageFile* package);
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
@@ -125,7 +125,7 @@ public:
     bool CheckRemoteEvent(StringHash eventType) const;
 
     /// Return the package download cache directory.
-    const String& GetPackageCacheDir() const { return packageCacheDir_; }
+    const Path& GetPackageCacheDir() const { return packageCacheDir_; }
 
     /// Process incoming messages from connections. Called by HandleBeginFrame.
     void Update(float timeStep);
@@ -171,7 +171,7 @@ private:
     /// Update time accumulator.
     float updateAcc_;
     /// Package cache directory.
-    String packageCacheDir_;
+    Path packageCacheDir_;
     /// Whether we started as server or not.
     bool isServer_;
     /// Server/Client password used for connecting.

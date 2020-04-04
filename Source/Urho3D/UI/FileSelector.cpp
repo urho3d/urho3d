@@ -190,20 +190,20 @@ void FileSelector::SetButtonTexts(const String& okText, const String& cancelText
     cancelButtonText_->SetText(cancelText);
 }
 
-void FileSelector::SetPath(const String& path)
+void FileSelector::SetPath(const Path& path)
 {
     auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem->DirExists(path))
     {
-        path_ = AddTrailingSlash(path);
-        SetLineEditText(pathEdit_, path_);
+        path_ = path.WithTrailingSlash();
+        SetLineEditText(pathEdit_, path_.ToString());
         RefreshFiles();
     }
     else
     {
         // If path was invalid, restore the old path to the line edit
-        if (pathEdit_->GetText() != path_)
-            SetLineEditText(pathEdit_, path_);
+        if (pathEdit_->GetText() != path_.ToString())
+            SetLineEditText(pathEdit_, path_.ToString());
     }
 }
 
@@ -358,7 +358,7 @@ bool FileSelector::EnterFile()
             SetPath(path_ + newPath);
         else if (newPath == "..")
         {
-            String parentPath = GetParentPath(path_);
+            Path parentPath = path_.GetParentPath();
             SetPath(parentPath);
         }
 

@@ -223,16 +223,16 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
     }
 }
 
-void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResources, bool forceRelease)
+void ResourceCache::RemovePackageFile(const Path& fileName, bool releaseResources, bool forceRelease)
 {
     MutexLock lock(resourceMutex_);
 
     // Compare the name and extension only, not the path
-    String fileNameNoPath = GetFileNameAndExtension(fileName);
+    String fileNameNoPath = fileName.GetFileNameAndExtension();
 
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
-        if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
+        if (!(*i)->GetNamePath().GetFileNameAndExtension().Compare(fileNameNoPath, false))
         {
             if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
@@ -243,9 +243,12 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
     }
 }
 
-void ResourceCache::ReleaseResource(StringHash type, const String& name, bool force)
+void ResourceCache::ReleaseResource(StringHash type, const Path& name, bool force)
 {
     StringHash nameHash(name);
+
+    // TODO: Why does this not Sanitate the path name? (Probalby it shouldn't so a resource can release itself regardless of name?
+
     const SharedPtr<Resource>& existingRes = FindResource(type, nameHash);
     if (!existingRes)
         return;
@@ -406,7 +409,7 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
         ReloadResource(resource);
     }
     // Always perform dependency resource check for resource loaded from XML file as it could be used in inheritance
-    if (!resource || GetExtension(resource->GetName()) == ".xml")
+    if (!resource || resource->GetNamePath().GetExtension() == ".xml")
     {
         // Check if this is a dependency resource, reload dependents
         HashMap<StringHash, HashSet<StringHash> >::ConstIterator j = dependentResources_.Find(fileNameHash);

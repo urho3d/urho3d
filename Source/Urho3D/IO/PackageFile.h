@@ -47,7 +47,7 @@ public:
     /// Construct.
     explicit PackageFile(Context* context);
     /// Construct and open.
-    PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
+    PackageFile(Context* context, const Path& fileName, unsigned startOffset = 0);
     /// Destruct.
     ~PackageFile() override;
 
@@ -65,7 +65,7 @@ public:
     const String& GetName() const { return fileName_.ToString(); }
 
     /// Return the package file path.
-    const Path& GetPath() const { return fileName_; }
+    const Path& GetNamePath() const { return fileName_; }
 
     /// Return hash of the package file name.
     StringHash GetNameHash() const { return nameHash_; }

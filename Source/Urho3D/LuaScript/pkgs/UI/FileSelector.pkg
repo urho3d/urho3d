@@ -15,7 +15,7 @@ class FileSelector : public Object
     
     void SetTitle(const String text);
     void SetButtonTexts(const String okText, const String cancelText);
-    void SetPath(const String path);
+    void SetPath(const Path path);
     void SetFileName(const String fileName);
     void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
     void SetDirectoryMode(bool enable);
@@ -32,7 +32,7 @@ class FileSelector : public Object
     Button* GetCancelButton() const;
     Button* GetCloseButton() const;
     const String GetTitle() const;
-    const String GetPath() const;
+    const Path GetPath() const;
     const String GetFileName() const;
     const String GetFilter() const;
     unsigned GetFilterIndex() const;
@@ -49,7 +49,7 @@ class FileSelector : public Object
     tolua_readonly tolua_property__get_set Button* cancelButton;
     tolua_readonly tolua_property__get_set Button* closeButton;
     tolua_property__get_set String title;
-    tolua_property__get_set String path;
+    tolua_property__get_set Path path;
     tolua_property__get_set String fileName;
     tolua_readonly tolua_property__get_set String filter;
     tolua_readonly tolua_property__get_set unsigned filterIndex;

@@ -139,9 +139,9 @@ StringHash ParseTextureTypeName(const String& name)
     return nullptr;
 }
 
-StringHash ParseTextureTypeXml(ResourceCache* cache, const String& filename)
+StringHash ParseTextureTypeXml(ResourceCache* cache, const Path& filename)
 {
-    StringHash type = nullptr;
+    StringHash type;
     if (!cache)
         return type;
 
@@ -215,7 +215,7 @@ bool Material::BeginLoad(Deserializer& source)
     if (!graphics)
         return true;
 
-    String extension = GetExtension(source.GetName());
+    String extension = source.GetNamePath().GetExtension();
 
     bool success = false;
     if (extension == ".xml")
@@ -291,9 +291,9 @@ bool Material::BeginLoadXML(Deserializer& source)
             XMLElement textureElem = rootElem.GetChild("texture");
             while (textureElem)
             {
-                String name = textureElem.GetAttribute("name");
+                Path name = textureElem.GetPath("name");
                 // Detect cube maps and arrays by file extension: they are defined by an XML file
-                if (GetExtension(name) == ".xml")
+                if (name.GetExtension() == ".xml")
                 {
 #ifdef DESKTOP_GRAPHICS
                     StringHash type = ParseTextureTypeXml(cache, name);
@@ -352,9 +352,9 @@ bool Material::BeginLoadJSON(Deserializer& source)
             for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
             {
                 String unitString = it->first_;
-                String name = it->second_.GetString();
+                Path name = it->second_.GetPath();
                 // Detect cube maps and arrays by file extension: they are defined by an XML file
-                if (GetExtension(name) == ".xml")
+                if (name.GetExtension() == ".xml")
                 {
 #ifdef DESKTOP_GRAPHICS
                     StringHash type = ParseTextureTypeXml(cache, name);
@@ -444,9 +444,9 @@ bool Material::Load(const XMLElement& source)
             unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
         if (unit < MAX_TEXTURE_UNITS)
         {
-            String name = textureElem.GetAttribute("name");
+            Path name = textureElem.GetAttribute("name");
             // Detect cube maps and arrays by file extension: they are defined by an XML file
-            if (GetExtension(name) == ".xml")
+            if (name.GetExtension() == ".xml")
             {
 #ifdef DESKTOP_GRAPHICS
                 StringHash type = ParseTextureTypeXml(cache, name);
@@ -595,7 +595,7 @@ bool Material::Load(const JSONValue& source)
     for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
     {
         String textureUnit = it->first_;
-        String textureName = it->second_.GetString();
+        Path textureName = it->second_.GetPath();
 
         TextureUnit unit = TU_DIFFUSE;
         unit = ParseTextureUnitName(textureUnit);
@@ -603,7 +603,7 @@ bool Material::Load(const JSONValue& source)
         if (unit < MAX_TEXTURE_UNITS)
         {
             // Detect cube maps and arrays by file extension: they are defined by an XML file
-            if (GetExtension(textureName) == ".xml")
+            if (textureName.GetExtension() == ".xml")
             {
 #ifdef DESKTOP_GRAPHICS
                 StringHash type = ParseTextureTypeXml(cache, textureName);

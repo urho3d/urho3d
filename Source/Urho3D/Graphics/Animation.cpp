@@ -165,7 +165,7 @@ bool Animation::BeginLoad(Deserializer& source)
 
     // Optionally read triggers from an XML file
     auto* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
+    Path xmlName = GetNamePath().WithReplacedExtension(".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
     if (file)
@@ -187,7 +187,7 @@ bool Animation::BeginLoad(Deserializer& source)
     }
 
     // Optionally read triggers from a JSON file
-    String jsonName = ReplaceExtension(GetName(), ".json");
+    Path jsonName = GetNamePath().WithReplacedExtension(".json");
 
     SharedPtr<JSONFile> jsonFile(cache->GetTempResource<JSONFile>(jsonName, false));
     if (jsonFile)
@@ -257,7 +257,7 @@ bool Animation::Save(Serializer& dest) const
         auto* destFile = dynamic_cast<File*>(&dest);
         if (destFile)
         {
-            String xmlName = ReplaceExtension(destFile->GetName(), ".xml");
+            Path xmlName = destFile->GetNamePath().WithReplacedExtension(".xml");
 
             SharedPtr<XMLFile> xml(new XMLFile(context_));
             XMLElement rootElem = xml->CreateRoot("animation");

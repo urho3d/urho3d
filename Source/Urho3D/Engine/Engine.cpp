@@ -338,19 +338,19 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     Vector<Path> resourcePrefixPaths = Path::SplitPathsStringStatic(GetParameter(parameters, EP_RESOURCE_PREFIX_PATHS, Path::EMPTY).GetPathString(),';', true);
     for (unsigned i = 0; i < resourcePrefixPaths.Size(); ++i)
         resourcePrefixPaths[i] = (resourcePrefixPaths[i].IsAbsolute() ? resourcePrefixPaths[i] : fileSystem->GetProgramDir() + resourcePrefixPaths[i]).WithTrailingSlash();
-    Vector<String> resourcePaths = GetParameter(parameters, EP_RESOURCE_PATHS, "Data;CoreData").GetString().Split(';');
-    Vector<String> resourcePackages = GetParameter(parameters, EP_RESOURCE_PACKAGES).GetString().Split(';');
-    Vector<String> autoLoadPaths = GetParameter(parameters, EP_AUTOLOAD_PATHS, "Autoload").GetString().Split(';');
+    Vector<Path> resourcePaths = Path::SplitPathsStringStatic(GetParameter(parameters, EP_RESOURCE_PATHS, "Data;CoreData").GetPathString(),';');
+    Vector<Path> resourcePackages = Path::SplitPathsStringStatic(GetParameter(parameters, EP_RESOURCE_PACKAGES).GetPathString(), ';');
+    Vector<Path> autoLoadPaths = Path::SplitPathsStringStatic(GetParameter(parameters, EP_AUTOLOAD_PATHS, "Autoload").GetString(), ';');
 
-    for (unsigned i = 0; i < resourcePaths.Size(); ++i)
+    for (Path& resourcePath : resourcePaths)
     {
         // If path is not absolute, prefer to add it as a package if possible
-        if (!IsAbsolutePath(resourcePaths[i]))
+        if (!resourcePath.IsAbsolute())
         {
             unsigned j = 0;
             for (; j < resourcePrefixPaths.Size(); ++j)
             {
-                Path packageName = resourcePrefixPaths[j] + resourcePaths[i] + ".pak";
+                Path packageName = resourcePrefixPaths[j] + resourcePath + ".pak";
                 if (fileSystem->FileExists(packageName))
                 {
                     if (cache->AddPackageFile(packageName))
@@ -358,7 +358,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
                     else
                         return false;   // The root cause of the error should have already been logged
                 }
-                Path pathName = resourcePrefixPaths[j] + resourcePaths[i];
+                Path pathName = resourcePrefixPaths[j] + resourcePath;
                 if (fileSystem->DirExists(pathName))
                 {
                     if (cache->AddResourceDir(pathName))
@@ -371,13 +371,13 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
             {
                 URHO3D_LOGERRORF(
                     "Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
-                    resourcePaths[i].CString());
+                    resourcePath.ToString().CString());
                 return false;
             }
         }
         else
         {
-            String pathName = resourcePaths[i];
+            Path pathName = resourcePath;
             if (fileSystem->DirExists(pathName))
                 if (!cache->AddResourceDir(pathName))
                     return false;
@@ -403,7 +403,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
         {
             URHO3D_LOGERRORF(
                 "Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
-                resourcePackages[i].CString());
+                resourcePackages[i].ToString().CString());
             return false;
         }
     }
@@ -459,7 +459,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
         if (!autoLoadPathExist && (autoLoadPaths.Size() > 1 || autoLoadPaths[0] != "Autoload"))
             URHO3D_LOGDEBUGF(
                 "Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
-                autoLoadPaths[i].CString());
+                autoLoadPaths[i].ToString().CString());
     }
 
     return true;

@@ -327,7 +327,7 @@ private:
     /// Rotation end variance.
     float rotationEndVariance_;
     /// Sprite name acquired during BeginLoad().
-    String loadSpriteName_;
+    Path loadSpriteName_;
 };
 
 }

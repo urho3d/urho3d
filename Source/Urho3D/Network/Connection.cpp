@@ -182,7 +182,7 @@ void Connection::SetScene(Scene* newScene)
         for (unsigned i = 0; i < numPackages; ++i)
         {
             PackageFile* package = packages[i];
-            msg_.WriteString(GetFileNameAndExtension(package->GetName()));
+            msg_.WriteString(package->GetNamePath().GetFileNameAndExtension());
             msg_.WriteUInt(package->GetTotalSize());
             msg_.WriteUInt(package->GetChecksum());
         }
@@ -476,7 +476,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
     }
 
     // Store the scene file name we need to eventually load
-    sceneFileName_ = msg.ReadString();
+    sceneFileName_ = msg.ReadPath();
 
     // Clear previous pending latest data and package downloads if any
     nodeLatestData_.Clear();
@@ -486,13 +486,13 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
     // In case we have joined other scenes in this session, remove first all downloaded package files from the resource system
     // to prevent resource conflicts
     auto* cache = GetSubsystem<ResourceCache>();
-    const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
+    const Path& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
     for (unsigned i = 0; i < packages.Size(); ++i)
     {
         PackageFile* package = packages[i];
-        if (!package->GetName().Find(packageCacheDir))
+        if (!package->GetName().Find(packageCacheDir.ToString()))
             cache->RemovePackageFile(package, true);
     }
 
@@ -754,8 +754,8 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             for (unsigned i = 0; i < packages.Size(); ++i)
             {
                 PackageFile* package = packages[i];
-                const String& packageFullName = package->GetName();
-                if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
+                const Path& packageFullName = package->GetNamePath();
+                if (!packageFullName.GetFileNameAndExtension().Compare(name, false))
                 {
                     StringHash nameHash(name);
 
@@ -1102,7 +1102,7 @@ void Connection::SendPackageToClient(PackageFile* package)
 
     msg_.Clear();
 
-    String filename = GetFileNameAndExtension(package->GetName());
+    String filename = package->GetNamePath().GetFileNameAndExtension();
     msg_.WriteString(filename);
     msg_.WriteUInt(package->GetTotalSize());
     msg_.WriteUInt(package->GetChecksum());
@@ -1405,7 +1405,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
 bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
+    const Path& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
     Vector<Path> downloadedPackages;
@@ -1423,7 +1423,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         for (unsigned j = 0; j < packages.Size(); ++j)
         {
             PackageFile* package = packages[j];
-            if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
+            if (!package->GetNamePath().GetFileNameAndExtension().Compare(name, false) && package->GetTotalSize() == fileSize &&
                 package->GetChecksum() == checksum)
             {
                 found = true;
@@ -1545,7 +1545,7 @@ void Connection::OnPackagesReady()
     else
     {
         // Otherwise start the async loading process
-        String extension = GetExtension(sceneFileName_);
+        String extension = sceneFileName_.GetExtension();
         SharedPtr<File> file = GetSubsystem<ResourceCache>()->GetFile(sceneFileName_);
         bool success;
 

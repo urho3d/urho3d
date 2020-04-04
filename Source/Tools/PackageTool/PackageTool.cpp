@@ -43,7 +43,7 @@ static const unsigned COMPRESSED_BLOCK_SIZE = 32768;
 
 struct FileEntry
 {
-	Path name_;
+    Path name_;
     unsigned offset_{};
     unsigned size_{};
     unsigned checksum_{};
@@ -51,7 +51,7 @@ struct FileEntry
 
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
-String basePath_;
+Path basePath_;
 Vector<FileEntry> entries_;
 unsigned checksum_ = 0;
 bool compress_ = false;
@@ -102,7 +102,7 @@ void Run(const Vector<String>& arguments)
             "-L      Similar to -l but also output compression ratio (compressed package file only)\n"
         );
 
-	const String& dirName = arguments[0];
+    const String& dirName = arguments[0];
     const String& packageName = arguments[1];
     bool isOutputMode = arguments[0].Length() == 2 && arguments[0][0] == '-';
     if (arguments.Size() > 2)
@@ -110,7 +110,10 @@ void Run(const Vector<String>& arguments)
         for (unsigned i = 2; i < arguments.Size(); ++i)
         {
             if (arguments[i][0] != '-')
-                basePath_ = AddTrailingSlash(arguments[i]);
+            {
+                basePath_ = Path(arguments[i]);
+                basePath_.AddTrailingSlash();
+            }
             else
             {
                 if (arguments[i].Length() > 1)
@@ -137,7 +140,7 @@ void Run(const Vector<String>& arguments)
             PrintLine("Scanning directory " + dirName + " for files");
 
         // Get the file list recursively
-		Vector<Path> fileNames;
+        Vector<Path> fileNames;
         fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
         if (!fileNames.Size())
             ErrorExit("No files found");
@@ -145,7 +148,7 @@ void Run(const Vector<String>& arguments)
         // Check for extensions to ignore
         for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
         {
-			String extension = fileNames[i].GetExtension();
+            String extension = fileNames[i].GetExtension();
             for (unsigned j = 0; j < ignoreExtensions_[j].Length(); ++j)
             {
                 if (extension == ignoreExtensions_[j])
@@ -181,10 +184,10 @@ void Run(const Vector<String>& arguments)
             // Fallthrough
         case 'l':
             {
-				const HashMap<Path, PackageEntry>& entries = packageFile->GetEntries();
-				for (auto i = entries.Begin(); i != entries.End();)
+                const HashMap<Path, PackageEntry>& entries = packageFile->GetEntries();
+                for (auto i = entries.Begin(); i != entries.End();)
                 {
-					auto current = i++;
+                    auto current = i++;
                     String fileEntry(current->first_);
                     if (outputCompressionRatio)
                     {
@@ -206,10 +209,10 @@ void Run(const Vector<String>& arguments)
 
 void ProcessFile(const Path& fileName, const String& rootDir)
 {
-	Path fullPath = rootDir / fileName;
+    Path fullPath = rootDir / fileName;
     File file(context_);
     if (!file.Open(fullPath))
-		ErrorExit("Could not open file " + fileName.ToString());
+        ErrorExit("Could not open file " + fileName.ToString());
     if (!file.GetSize())
         return;
 
@@ -228,7 +231,7 @@ void WritePackageFile(const Path& fileName, const String& rootDir)
 
     File dest(context_);
     if (!dest.Open(fileName, FILE_WRITE))
-		ErrorExit("Could not open output file " + fileName.ToString());
+        ErrorExit("Could not open output file " + fileName.ToString());
 
     // Write ID, number of files & placeholder for checksum
     WriteHeader(dest);
@@ -236,7 +239,7 @@ void WritePackageFile(const Path& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         // Write entry (correct offset is still unknown, will be filled in later)
-		dest.WritePath(basePath_ + entries_[i].name_);
+        dest.WritePath(basePath_ + entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);
         dest.WriteUInt(entries_[i].size_);
         dest.WriteUInt(entries_[i].checksum_);
@@ -249,18 +252,18 @@ void WritePackageFile(const Path& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         lastOffset = entries_[i].offset_ = dest.GetSize();
-		Path fileFullPath = rootDir + "/" + entries_[i].name_;
+        Path fileFullPath = rootDir + "/" + entries_[i].name_;
 
         File srcFile(context_, fileFullPath);
         if (!srcFile.IsOpen())
-			ErrorExit("Could not open file " + fileFullPath.ToString());
+            ErrorExit("Could not open file " + fileFullPath.ToString());
 
         unsigned dataSize = entries_[i].size_;
         totalDataSize += dataSize;
         SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
 
         if (srcFile.Read(&buffer[0], dataSize) != dataSize)
-			ErrorExit("Could not read file " + fileFullPath.ToString());
+            ErrorExit("Could not read file " + fileFullPath.ToString());
         srcFile.Close();
 
         for (unsigned j = 0; j < dataSize; ++j)
@@ -272,7 +275,7 @@ void WritePackageFile(const Path& fileName, const String& rootDir)
         if (!compress_)
         {
             if (!quiet_)
-				PrintLine(entries_[i].name_.ToString() + " size " + String(dataSize));
+                PrintLine(entries_[i].name_.ToString() + " size " + String(dataSize));
             dest.Write(&buffer[0], entries_[i].size_);
         }
         else
@@ -289,7 +292,7 @@ void WritePackageFile(const Path& fileName, const String& rootDir)
 
                 auto packedSize = (unsigned)LZ4_compress_HC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize, LZ4_compressBound(unpackedSize), 0);
                 if (!packedSize)
-					ErrorExit("LZ4 compression failed for file " + entries_[i].name_.ToString() + " at offset " + String(pos));
+                    ErrorExit("LZ4 compression failed for file " + entries_[i].name_.ToString() + " at offset " + String(pos));
 
                 dest.WriteUShort((unsigned short)unpackedSize);
                 dest.WriteUShort((unsigned short)packedSize);
@@ -319,7 +322,7 @@ void WritePackageFile(const Path& fileName, const String& rootDir)
 
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
-		dest.WritePath(basePath_ + entries_[i].name_);
+        dest.WritePath(basePath_ + entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);
         dest.WriteUInt(entries_[i].size_);
         dest.WriteUInt(entries_[i].checksum_);

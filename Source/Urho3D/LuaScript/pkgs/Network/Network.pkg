@@ -30,7 +30,7 @@ class Network
     void UnregisterRemoteEvent(const String eventType);
     
     void UnregisterAllRemoteEvents();
-    void SetPackageCacheDir(const String path);
+    void SetPackageCacheDir(const Path path);
     void SendPackageToClients(Scene* scene, PackageFile* package);
 
     // SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
@@ -44,7 +44,7 @@ class Network
     bool IsServerRunning() const;
     
     bool CheckRemoteEvent(StringHash eventType) const;
-    const String GetPackageCacheDir() const;
+    const Path GetPackageCacheDir() const;
 
     void StartNATClient();
     const String& GetGUID() const;
@@ -59,7 +59,7 @@ class Network
     tolua_property__get_set float simulatedPacketLoss;
     tolua_readonly tolua_property__get_set Connection* serverConnection;
     tolua_readonly tolua_property__is_set bool serverRunning;
-    tolua_property__get_set String packageCacheDir;
+    tolua_property__get_set Path packageCacheDir;
 };
 
 Network* GetNetwork();

@@ -147,7 +147,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
             if (definesHash != normalizedHash)
                 variations.Insert(MakePair(definesHash, i->second_));
 
-            i->second_->SetName(GetFileName(GetName()));
+            i->second_->SetName(GetNamePath().GetFileName());
             i->second_->SetDefines(normalizedDefines);
             ++numVariations_;
             RefreshMemoryUse();
@@ -182,7 +182,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 
         if (line.StartsWith("#include"))
         {
-            String includeFileName = GetPath(source.GetName()) + line.Substring(9).Replaced("\"", "").Trimmed();
+            Path includeFileName = source.GetNamePath().GetDirectoryPath() + line.Substring(9).Replaced("\"", "").Trimmed();
 
             SharedPtr<File> includeFile = cache->GetFile(includeFileName);
             if (!includeFile)

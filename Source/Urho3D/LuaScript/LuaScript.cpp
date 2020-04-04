@@ -234,7 +234,7 @@ bool LuaScript::HasEventHandler(Object* sender, const String& eventName) const
     return eventInvoker_->HasSubscribedToEvent(sender, eventName);
 }
 
-bool LuaScript::ExecuteFile(const String& fileName)
+bool LuaScript::ExecuteFile(const Path& fileName)
 {
     URHO3D_PROFILE(ExecuteFile);
 

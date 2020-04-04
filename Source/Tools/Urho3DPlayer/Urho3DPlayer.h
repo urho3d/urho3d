@@ -23,6 +23,7 @@
 #pragma once
 
 #include <Urho3D/Engine/Application.h>
+#include <Urho3D/Core/Path.h>
 
 using namespace Urho3D;
 
@@ -53,7 +54,7 @@ private:
     void GetScriptFileName();
 
     /// Script file name.
-    String scriptFileName_;
+    Path scriptFileName_;
     /// Flag whether CommandLine.txt was already successfully read.
     bool commandLineRead_;
 

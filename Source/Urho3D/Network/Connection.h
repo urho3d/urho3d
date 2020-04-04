@@ -297,7 +297,7 @@ private:
     /// Queued remote events.
     Vector<RemoteEvent> remoteEvents_;
     /// Scene file to load once all packages (if any) have been downloaded.
-    String sceneFileName_;
+    Path sceneFileName_;
     /// Statistics timer.
     Timer statsTimer_;
     /// Remote endpoint port.

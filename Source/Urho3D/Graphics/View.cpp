@@ -277,7 +277,7 @@ void SortShadowQueueWork(const WorkItem* item, unsigned threadIndex)
         start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
 }
 
-StringHash ParseTextureTypeXml(ResourceCache* cache, const String& filename);
+StringHash ParseTextureTypeXml(ResourceCache* cache, const Path& filename);
 
 View::View(Context* context) :
     Object(context),
@@ -3172,7 +3172,7 @@ void View::SendViewEvent(StringHash eventType)
     renderer_->SendEvent(eventType, eventData);
 }
 
-Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap)
+Texture* View::FindNamedTexture(const Path& name, bool isRenderTarget, bool isVolumeMap)
 {
     // Check rendertargets first
     StringHash nameHash(name);
@@ -3198,7 +3198,7 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
     // This will log an error if not found; the texture binding will be cleared in that case to not constantly spam the log
     if (!isRenderTarget)
     {
-        if (GetExtension(name) == ".xml")
+        if (name.GetExtension() == ".xml")
         {
             // Assume 3D textures are only bound to the volume map unit, otherwise it's a cube texture
 #ifdef DESKTOP_GRAPHICS
