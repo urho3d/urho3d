@@ -64,16 +64,14 @@ public:
 	bool IsAbsolute() const
 	{
 
-		if (pathName.Empty())
+		if (path_.Empty())
 			return false;
 
-		String path = GetInternalPath(pathName);
-
-		if (path[0] == '/')
+		if (path_[0] == '/')
 			return true;
 
 		#ifdef _WIN32
-			if (path.Length() > 1 && IsAlpha(path[0]) && path[1] == ':')
+			if (path_.Length() > 1 && IsAlpha(path_[0]) && path_[1] == ':')
 				return true;
 		#endif
 
@@ -219,28 +217,28 @@ public:
 			return *this;
 
 		Path path; String file, extension;
-		SplitPath(path, file, extension);
+		Split(path, file, extension);
 		return path;
 	}
 	/// Return the filename from a full path.
 	String GetFileName() const
 	{
 		Path path; String file, extension;
-		SplitPath(path, file, extension);
+		Split(path, file, extension);
 		return file;
 	}
 	/// Return the extension from a full path, converted to lowercase by default.
 	String GetExtension(bool lowercaseExtension = true) const
 	{
 		Path path; String file, extension;
-		SplitPath(path, file, extension, lowercaseExtension);
+		Split(path, file, extension, lowercaseExtension);
 		return extension;
 	}
 	/// Return the filename and extension from a full path. The case of the extension is preserved by default, so that the file can be opened in case-sensitive operating systems.
 	String GetFileNameAndExtension(String& fileName, bool lowercaseExtension = false) const
 	{
 		Path path; String file, extension;
-		SplitPath(path, file, extension, lowercaseExtension);
+		Split(path, file, extension, lowercaseExtension);
 		return file + extension;
 	}
 
@@ -248,8 +246,8 @@ public:
 	void ReplaceExtension(const String& newExtension)
 	{
 		Path path; String file, extension;
-		SplitPath(path, file, extension);
-		return Path::CreateFromResolvedInternalString(path + file + newExtension);
+		Split(path, file, extension);
+		path_ = path.path_ + file + newExtension;
 	}
 	/// Copy and replace the extension of a file name with another.
 	Path WithReplacedExtension(const String& newExtension) const
@@ -294,11 +292,11 @@ public:
 	/// Return the parent path, or the path itself if not available.
 	Path GetParentPath() const
 	{
-		unsigned pos = String.FindLast('/');
+		unsigned pos = path_.FindLast('/');
 		if (pos != String::NPOS)
-			return path.Substring(0, pos + 1);
+			return path_.Substring(0, pos + 1);
 		else
-			return String();
+			return {};
 	}
 
 	/// Convert a path to internal format (use slashes).
@@ -337,6 +335,7 @@ static int stbi__start_write_file(stbi__write_context *s, const char *filename)
 #endif
 */
 
+	/*
 	/// Convert a path to the format required by the operating system.
 	String GetNativePathString() const
 	{
@@ -346,13 +345,39 @@ static int stbi__start_write_file(stbi__write_context *s, const char *filename)
 		return path_;
 #endif
 	}
+	*/
 
+	/// For now keep this as it's simple enough to refactor later to just use GetNativePathString()
 	WString GetWideNativePathString() const
 	{
 #ifdef _WIN32
 		return WString(path_.Replaced('/', '\\'));
 #else
 		return WString(path_);
+#endif
+	}
+
+#ifdef _WIN32
+	using NativePathString = WString;
+#else
+	using NativePathString = const String&;
+#endif
+
+	NativePathString GetNativePathString() const
+	{
+#ifdef _WIN32
+		return NativePathString(path_.Replaced('/', '\\'));
+#else
+		return path_;
+#endif
+	}
+
+	String GetNativePathNarrowString() const
+	{
+#ifdef _WIN32
+		return String(path_.Replaced('/', '\\'));
+#else
+		return path_;
 #endif
 	}
 

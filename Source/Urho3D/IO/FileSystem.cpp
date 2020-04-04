@@ -25,6 +25,7 @@
 #include "../Container/ArrayPtr.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Core/Path.h"
 #include "../Core/Thread.h"
 #include "../Engine/EngineEvents.h"
 #include "../IO/File.h"
