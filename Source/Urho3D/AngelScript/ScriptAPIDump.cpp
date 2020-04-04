@@ -204,7 +204,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Log::WriteRaw("namespace Urho3D\n{\n\n/**\n");
 
         auto* fileSystem = GetSubsystem<FileSystem>();
-        Vector<String> headerFileNames;
+        Vector<Path> headerFileNames;
         String path = AddTrailingSlash(sourceTree);
         if (!path.Empty())
             path.Append("Source/Urho3D/");
@@ -216,8 +216,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         for (unsigned i = 0; i < headerFileNames.Size(); ++i)
         {
             HeaderFile entry;
-            entry.fileName = headerFileNames[i];
-            entry.sectionName = GetFileNameAndExtension(entry.fileName).Replaced("Events2D", "2DEvents");
+            entry.fileName = headerFileNames[i].ToString();
+            entry.sectionName = headerFileNames[i].GetFileNameAndExtension().Replaced("Events2D", "2DEvents");
             if (entry.sectionName.EndsWith("Events.h"))
                 headerFiles.Push(entry);
         }

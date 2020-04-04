@@ -258,11 +258,11 @@ static FileSystem* GetFileSystem()
     return GetScriptContext()->GetSubsystem<FileSystem>();
 }
 
-static CScriptArray* FileSystemScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive, FileSystem* ptr)
+static CScriptArray* FileSystemScanDir(const Path& pathName, const String& filter, unsigned flags, bool recursive, FileSystem* ptr)
 {
-    Vector<String> result;
+    Vector<Path> result;
     ptr->ScanDir(result, pathName, filter, flags, recursive);
-    return VectorToArray<String>(result, "Array<String>");
+    return VectorToArray<Path>(result, "Array<Path>");
 }
 
 static int FileSystemSystemRun(const String& fileName, CScriptArray* srcArguments, FileSystem* ptr)
@@ -315,8 +315,8 @@ static void RegisterSerialization(asIScriptEngine* engine)
 
     RegisterObject<File>(engine, "File");
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
-    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const Path&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod("File", "bool Open(const Path&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const Path&, FileMode), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);
@@ -361,30 +361,31 @@ static void RegisterSerialization(asIScriptEngine* engine)
 void RegisterFileSystem(asIScriptEngine* engine)
 {
     RegisterObject<FileSystem>(engine, "FileSystem");
-    engine->RegisterObjectMethod("FileSystem", "bool FileExists(const String&in) const", asMETHOD(FileSystem, FileExists), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool DirExists(const String&in) const", asMETHOD(FileSystem, DirExists), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool SetLastModifiedTime(const String&in, uint)", asMETHOD(FileSystem, SetLastModifiedTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "uint GetLastModifiedTime(const String&in) const", asMETHOD(FileSystem, GetLastModifiedTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "Array<String>@ ScanDir(const String&in, const String&in, uint, bool) const", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool FileExists(const Path&in) const", asMETHOD(FileSystem, FileExists), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool DirExists(const Path&in) const", asMETHOD(FileSystem, DirExists), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool SetLastModifiedTime(const Path&in, uint)", asMETHOD(FileSystem, SetLastModifiedTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "uint GetLastModifiedTime(const Path&in) const", asMETHOD(FileSystem, GetLastModifiedTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Array<String>@ ScanDir(const Path&in, const Path&in, uint, bool) const", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const Path&in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in, bool redirectStdOutToLog = false)", asMETHOD(FileSystem, SystemCommand), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRun), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSystem", "int SystemRun(const Path&in, Array<String>@+)", asFUNCTION(FileSystemSystemRun), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("FileSystem", "uint SystemCommandAsync(const String&in)", asMETHOD(FileSystem, SystemCommandAsync), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "uint SystemRunAsync(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRunAsync), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const String&in, const String&in)", asMETHOD(FileSystem, SystemOpen), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool Copy(const String&in, const String&in)", asMETHOD(FileSystem, Copy), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool Rename(const String&in, const String&in)", asMETHOD(FileSystem, Rename), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool Delete(const String&in)", asMETHOD(FileSystem, Delete), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String GetAppPreferencesDir(const String&in org, const String&in app) const", asMETHOD(FileSystem, GetAppPreferencesDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_currentDir() const", asMETHOD(FileSystem, GetCurrentDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const String&in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "uint SystemRunAsync(const Path&in, Array<String>@+)", asFUNCTION(FileSystemSystemRunAsync), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const Path&in, const String&in)", asMETHOD(FileSystem, SystemOpen), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool Copy(const Path&in, const Path&in)", asMETHOD(FileSystem, Copy), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool Rename(const Path&in, const Path&in)", asMETHOD(FileSystem, Rename), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool Delete(const Path&in)", asMETHOD(FileSystem, Delete), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Path GetAppPreferencesDir(const String&in org, const String&in app) const", asMETHOD(FileSystem, GetAppPreferencesDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Path get_currentDir() const", asMETHOD(FileSystem, GetCurrentDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const Path&in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "void set_executeConsoleCommands(bool)", asMETHOD(FileSystem, SetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "bool get_executeConsoleCommands() const", asMETHOD(FileSystem, GetExecuteConsoleCommands), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_temporaryDir() const", asMETHOD(FileSystem, GetTemporaryDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Path get_programDir() const", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Path get_userDocumentsDir() const", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Path get_temporaryDir() const", asMETHOD(FileSystem, GetTemporaryDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
 
+    //TODO: Fix these (NEL)
     engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetFileName(const String&in)", asFUNCTION(GetFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetExtension(const String&in, bool lowercaseExtension = true)", asFUNCTION(GetExtension), asCALL_CDECL);
@@ -409,7 +410,7 @@ static PackageFile* ConstructAndOpenPackageFile(const String& fileName, unsigned
 
 static const CScriptArray* PackageFileGetEntryNames(PackageFile* packageFile)
 {
-    return VectorToArray<String>(packageFile->GetEntryNames(), "Array<String>");
+    return VectorToArray<Path>(packageFile->GetEntryNames(), "Array<Path>");
 }
 
 static void RegisterPackageFile(asIScriptEngine* engine)
@@ -425,7 +426,7 @@ static void RegisterPackageFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PackageFile", "uint get_totalDataSize() const", asMETHOD(PackageFile, GetTotalDataSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHOD(PackageFile, GetChecksum), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "bool compressed() const", asMETHOD(PackageFile, IsCompressed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFileGetEntryNames), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PackageFile", "Array<Path>@ GetEntryNames() const", asFUNCTION(PackageFileGetEntryNames), asCALL_CDECL_OBJLAST);
 }
 
 void RegisterIOAPI(asIScriptEngine* engine)

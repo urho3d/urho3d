@@ -115,6 +115,8 @@ public:
     BoundingBox ReadBoundingBox();
     /// Read a null-terminated string.
     String ReadString();
+    /// Read a path from a null-terminated string.
+    Path ReadPath();
     /// Read a four-letter file ID.
     String ReadFileID();
     /// Read a 32-bit StringHash.

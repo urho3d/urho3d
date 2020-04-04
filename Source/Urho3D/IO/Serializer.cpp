@@ -187,6 +187,11 @@ bool Serializer::WriteString(const String& value)
     return Write(chars, length + 1) == length + 1;
 }
 
+bool Serializer::WritePath(const Path& value)
+{
+    return WriteString(value.ToString());
+}
+
 bool Serializer::WriteFileID(const String& value)
 {
     bool success = true;

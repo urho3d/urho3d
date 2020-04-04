@@ -50,6 +50,7 @@ static const char* typeNames[] =
     "Quaternion",
     "Color",
     "String",
+    "Path",
     "Buffer",
     "VoidPtr",
     "ResourceRef",
@@ -90,6 +91,10 @@ Variant& Variant::operator =(const Variant& rhs)
     {
     case VAR_STRING:
         value_.string_ = rhs.value_.string_;
+        break;
+
+    case VAR_PATH:
+        value_.path_ = rhs.value_.path_;
         break;
 
     case VAR_BUFFER:
@@ -187,6 +192,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_STRING:
         return value_.string_ == rhs.value_.string_;
+
+    case VAR_PATH:
+        return value_.path_ == rhs.value_.path_;
 
     case VAR_BUFFER:
         return value_.buffer_ == rhs.value_.buffer_;
@@ -309,6 +317,10 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_STRING:
         *this = value;
+        break;
+
+    case VAR_PATH:
+        *this = Path{value};
         break;
 
     case VAR_BUFFER:
@@ -471,6 +483,9 @@ String Variant::ToString() const
     case VAR_STRING:
         return value_.string_;
 
+    case VAR_PATH:
+        return value_.path_.ToString();
+
     case VAR_BUFFER:
         {
             const PODVector<unsigned char>& buffer = value_.buffer_;
@@ -555,6 +570,9 @@ bool Variant::IsZero() const
     case VAR_STRING:
         return value_.string_.Empty();
 
+    case VAR_PATH:
+        return value_.path_.Empty();
+
     case VAR_BUFFER:
         return value_.buffer_.Empty();
 
@@ -631,6 +649,10 @@ void Variant::SetType(VariantType newType)
         value_.string_.~String();
         break;
 
+    case VAR_PATH:
+        value_.path_.~Path();
+        break;
+
     case VAR_BUFFER:
         value_.buffer_.~PODVector<unsigned char>();
         break;
@@ -689,6 +711,10 @@ void Variant::SetType(VariantType newType)
     {
     case VAR_STRING:
         new(&value_.string_) String();
+        break;
+
+    case VAR_PATH:
+        new(&value_.path_) Path();
         break;
 
     case VAR_BUFFER:
@@ -816,6 +842,11 @@ template <> const String& Variant::Get<const String&>() const
     return GetString();
 }
 
+template <> const Path& Variant::Get<const Path&>() const
+{
+    return GetPath();
+}
+
 template <> const Rect& Variant::Get<const Rect&>() const
 {
     return GetRect();
@@ -919,6 +950,11 @@ template <> Color Variant::Get<Color>() const
 template <> String Variant::Get<String>() const
 {
     return GetString();
+}
+
+template <> Path Variant::Get<Path>() const
+{
+    return GetPath();
 }
 
 template <> Rect Variant::Get<Rect>() const

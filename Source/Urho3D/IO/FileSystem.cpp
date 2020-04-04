@@ -416,7 +416,7 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
 #endif
 }
 
-unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments)
+unsigned FileSystem::SystemRunAsync(const Path& fileName, const Vector<String>& arguments)
 {
 #ifdef URHO3D_THREADING
     if (allowedPaths_.Empty())
@@ -437,22 +437,22 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
 #endif
 }
 
-bool FileSystem::SystemOpen(const String& fileName, const String& mode)
+bool FileSystem::SystemOpen(const Path& fileName, const String& mode)
 {
     if (allowedPaths_.Empty())
     {
         if (!FileExists(fileName) && !DirExists(fileName))
         {
-            URHO3D_LOGERROR("File or directory " + fileName + " not found");
+            URHO3D_LOGERROR("File or directory " + fileName.ToString() + " not found");
             return false;
         }
 
 #ifdef _WIN32
         bool success = (size_t)ShellExecuteW(nullptr, !mode.Empty() ? WString(mode).CString() : nullptr,
-            GetWideNativePath(fileName).CString(), nullptr, nullptr, SW_SHOW) > 32;
+            fileName.GetWideNativePathString().CString(), nullptr, nullptr, SW_SHOW) > 32;
 #else
         Vector<String> arguments;
-        arguments.Push(fileName);
+        arguments.Push(fileName.ToString());
         bool success = SystemRun(
 #if defined(__APPLE__)
             "/usr/bin/open",
@@ -462,7 +462,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
             arguments) == 0;
 #endif
         if (!success)
-            URHO3D_LOGERROR("Failed to open " + fileName + " externally");
+            URHO3D_LOGERROR("Failed to open " + fileName.ToString() + " externally");
         return success;
     }
     else
@@ -472,16 +472,16 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
     }
 }
 
-bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
+bool FileSystem::Copy(const Path& srcFileName, const Path& destFileName)
 {
-    if (!CheckAccess(GetPath(srcFileName)))
+    if (!CheckAccess(srcFileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + srcFileName);
+        URHO3D_LOGERROR("Access denied to " + srcFileName.ToString());
         return false;
     }
-    if (!CheckAccess(GetPath(destFileName)))
+    if (!CheckAccess(destFileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + destFileName);
+        URHO3D_LOGERROR("Access denied to " + destFileName.ToString());
         return false;
     }
 
@@ -500,23 +500,23 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
     return bytesRead == fileSize && bytesWritten == fileSize;
 }
 
-bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
+bool FileSystem::Rename(const Path& srcFileName, const Path& destFileName)
 {
-    if (!CheckAccess(GetPath(srcFileName)))
+    if (!CheckAccess(srcFileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + srcFileName);
+        URHO3D_LOGERROR("Access denied to " + srcFileName.ToString());
         return false;
     }
-    if (!CheckAccess(GetPath(destFileName)))
+    if (!CheckAccess(destFileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + destFileName);
+        URHO3D_LOGERROR("Access denied to " + destFileName.ToString());
         return false;
     }
 
 #ifdef _WIN32
-    return MoveFileW(GetWideNativePath(srcFileName).CString(), GetWideNativePath(destFileName).CString()) != 0;
+    return MoveFileW(srcFileName.GetWideNativePathString().CString(), destFileName.GetWideNativePathString().CString()) != 0;
 #else
-    return rename(GetNativePath(srcFileName).CString(), GetNativePath(destFileName).CString()) == 0;
+    return rename(srcFileName.GetNativePathString().CString(), destFileName.GetNativePathString().CString()) == 0;
 #endif
 }
 
@@ -597,15 +597,18 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
 #endif
 }
 
-bool FileSystem::FileExists(const String& fileName) const
+bool FileSystem::FileExists(const Path& fileName) const
 {
-    if (!CheckAccess(GetPath(fileName)))
+    if (fileName.Empty())
+        return false;
+
+    if (!CheckAccess(fileName.GetDirectoryPath()))
         return false;
 
 #ifdef __ANDROID__
-    if (URHO3D_IS_ASSET(fileName))
+    if (URHO3D_IS_ASSET(fileName.ToString()))
     {
-        SDL_RWops* rwOps = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
+        SDL_RWops* rwOps = SDL_RWFromFile(URHO3D_ASSET(fileName.ToString()), "rb");
         if (rwOps)
         {
             SDL_RWclose(rwOps);
@@ -616,7 +619,7 @@ bool FileSystem::FileExists(const String& fileName) const
     }
 #endif
 
-    String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
+    String fixedName = fileName.WithoutTrailingSlash().GetNativePathString();
 
 #ifdef _WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
@@ -685,18 +688,18 @@ bool FileSystem::DirExists(const Path& pathName) const
     return true;
 }
 
-void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const
+void FileSystem::ScanDir(Vector<Path>& result, Path pathName, const String& filter, unsigned flags, bool recursive) const
 {
     result.Clear();
 
     if (CheckAccess(pathName))
     {
-        String initialPath = AddTrailingSlash(pathName);
-        ScanDirInternal(result, initialPath, initialPath, filter, flags, recursive);
+        pathName.AddTrailingSlash();
+        ScanDirInternal(result, pathName, pathName, filter, flags, recursive);
     }
 }
 
-String FileSystem::GetProgramDir() const
+Path FileSystem::GetProgramDir() const
 {
 #if defined(__ANDROID__)
     // This is an internal directory specifier pointing to the assets in the .apk
@@ -727,26 +730,34 @@ String FileSystem::GetProgramDir() const
 #endif
 }
 
-String FileSystem::GetUserDocumentsDir() const
+Path FileSystem::GetUserDocumentsDir() const
 {
 #if defined(__ANDROID__)
-    return AddTrailingSlash(SDL_Android_GetFilesDir());
+    Path path{SDL_Android_GetFilesDir()};
+    path.AddTrailingSlash();
+    return path;
 #elif defined(IOS) || defined(TVOS)
-    return AddTrailingSlash(SDL_IOS_GetDocumentsDir());
+    Path path{SDL_IOS_GetDocumentsDir()};
+    path.AddTrailingSlash();
+    return path;
 #elif defined(_WIN32)
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     SHGetSpecialFolderPathW(nullptr, pathName, CSIDL_PERSONAL, 0);
-    return AddTrailingSlash(String(pathName));
+    Path path{pathName};
+    path.AddTrailingSlash();
+    return path;
 #else
     char pathName[MAX_PATH];
     pathName[0] = 0;
     strcpy(pathName, getenv("HOME"));
-    return AddTrailingSlash(String(pathName));
+    Path path{pathName};
+    path.AddTrailingSlash();
+    return path;
 #endif
 }
 
-String FileSystem::GetAppPreferencesDir(const String& org, const String& app) const
+Path FileSystem::GetAppPreferencesDir(const String& org, const String& app) const
 {
     String dir;
 #ifndef MINI_URHO
@@ -806,13 +817,13 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
 #endif
 }
 
-void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
+void FileSystem::ScanDirInternal(Vector<Path>& result, Path path, const Path& startPath,
     const String& filter, unsigned flags, bool recursive) const
 {
-    path = AddTrailingSlash(path);
+    path.AddTrailingSlash();
     String deltaPath;
     if (path.Length() > startPath.Length())
-        deltaPath = path.Substring(startPath.Length());
+        deltaPath = path.ToString().Substring(startPath.Length());
 
     String filterExtension = filter.Substring(filter.FindLast('.'));
     if (filterExtension.Contains('*'))
@@ -887,7 +898,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     DIR* dir;
     struct dirent* de;
     struct stat st{};
-    dir = opendir(GetNativePath(path).CString());
+    dir = opendir(path.GetNativePathString().CString());
     if (dir)
     {
         while ((de = readdir(dir)))
@@ -897,8 +908,8 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
             bool normalEntry = fileName != "." && fileName != "..";
             if (normalEntry && !(flags & SCAN_HIDDEN) && fileName.StartsWith("."))
                 continue;
-            String pathAndName = path + fileName;
-            if (!stat(pathAndName.CString(), &st))
+            Path pathAndName = path + fileName;
+            if (!stat(pathAndName.GetNativePathString().CString(), &st))
             {
                 if (st.st_mode & S_IFDIR)
                 {

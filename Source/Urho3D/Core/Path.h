@@ -103,6 +103,22 @@ public:
 	{
 		return path_.Empty();
 	}
+    /// Returns the length of the string
+    unsigned Length() const
+    {
+        return path_.Length();
+    }
+//    /// Returns the number of segments in the path separated by "/". Trailing empty string is not counted.
+//    unsigned NumberOfSegments
+//    {
+//        return path_.Count('/') - HasTrailingSlash();
+//    }
+
+    int Compare(const Path& rhs, bool caseSensitive = true) const
+    {
+        return path_.Compare(rhs.path_, caseSensitive);
+    }
+
 	/// Returns true if the path would go up a directory ("../" or "..")
 	bool IsRequestingParentDirectory() const
 	{
@@ -110,7 +126,26 @@ public:
         return path_.Length() >= 2 && path_.StartsWith("..") && (path_.Length() == 2 || path_[2] =='/');
 	}
 
+    /// Splits the given path using the specified separator character, optionally preserving empty paths
+    static Vector<Path> SplitPathsStringStatic(const String& path, char separator = ';', bool keepEmptyPaths = false)
+    {
+        Vector<String> split = path.Split(separator,keepEmptyPaths);
+        Vector<Path> paths;
+        paths.Reserve(split.Size());
+        for (auto& p : split)
+        {
+            paths.EmplaceBack(p);
+            if (!keepEmptyPaths && paths.Back().Empty())
+                paths.Pop();
+        }
+        return paths;
+    }
 
+    /// Splits the path using the specified separator character, optionally preserving empty paths.
+    Vector<Path> SplitPaths(char separator = ';', bool keepEmptyPaths = false) const
+    {
+        return SplitPathsStringStatic(path_);
+    }
 
 
 	/// Resolves relative paths agains the base path. The base path may be a file, whose name will be trimmed, or a directory that must end in '/'.
@@ -264,7 +299,7 @@ public:
 		return extension;
 	}
 	/// Return the filename and extension from a full path. The case of the extension is preserved by default, so that the file can be opened in case-sensitive operating systems.
-	String GetFileNameAndExtension(String& fileName, bool lowercaseExtension = false) const
+    String GetFileNameAndExtension(bool lowercaseExtension = false) const
 	{
 		Path path; String file, extension;
 		Split(path, file, extension, lowercaseExtension);

@@ -293,8 +293,8 @@ void FileSelector::RefreshFiles()
     fileList_->RemoveAllItems();
     fileEntries_.Clear();
 
-    Vector<String> directories;
-    Vector<String> files;
+    Vector<Path> directories;
+    Vector<Path> files;
     fileSystem->ScanDir(directories, path_, "*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
 
@@ -303,7 +303,7 @@ void FileSelector::RefreshFiles()
     for (unsigned i = 0; i < directories.Size(); ++i)
     {
         FileSelectorEntry newEntry;
-        newEntry.name_ = directories[i];
+        newEntry.name_ = directories[i].ToString();
         newEntry.directory_ = true;
         fileEntries_.Push(newEntry);
     }
@@ -311,7 +311,7 @@ void FileSelector::RefreshFiles()
     for (unsigned i = 0; i < files.Size(); ++i)
     {
         FileSelectorEntry newEntry;
-        newEntry.name_ = files[i];
+        newEntry.name_ = files[i].ToString();
         newEntry.directory_ = false;
         fileEntries_.Push(newEntry);
     }

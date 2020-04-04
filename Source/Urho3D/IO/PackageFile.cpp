@@ -50,7 +50,7 @@ PackageFile::PackageFile(Context* context, const String& fileName, unsigned star
 
 PackageFile::~PackageFile() = default;
 
-bool PackageFile::Open(const String& fileName, unsigned startOffset)
+bool PackageFile::Open(const Path& fileName, unsigned startOffset)
 {
     SharedPtr<File> file(new File(context_, fileName));
     if (!file->IsOpen())
@@ -78,13 +78,13 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
 
         if (id != "UPAK" && id != "ULZ4")
         {
-            URHO3D_LOGERROR(fileName + " is not a valid package file");
+            URHO3D_LOGERROR(fileName.ToString() + " is not a valid package file");
             return false;
         }
     }
 
     fileName_ = fileName;
-    nameHash_ = fileName_;
+    nameHash_ = fileName_.ToString();
     totalSize_ = file->GetSize();
     compressed_ = id == "ULZ4";
 
@@ -110,7 +110,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
     return true;
 }
 
-bool PackageFile::Exists(const String& fileName) const
+bool PackageFile::Exists(const Path& fileName) const
 {
     bool found = entries_.Find(fileName) != entries_.End();
 
@@ -118,7 +118,7 @@ bool PackageFile::Exists(const String& fileName) const
     // On Windows perform a fallback case-insensitive search
     if (!found)
     {
-        for (HashMap<String, PackageEntry>::ConstIterator i = entries_.Begin(); i != entries_.End(); ++i)
+        for (auto i = entries_.Begin(); i != entries_.End(); ++i)
         {
             if (!i->first_.Compare(fileName, false))
             {
@@ -132,9 +132,9 @@ bool PackageFile::Exists(const String& fileName) const
     return found;
 }
 
-const PackageEntry* PackageFile::GetEntry(const String& fileName) const
+const PackageEntry* PackageFile::GetEntry(const Path& fileName) const
 {
-    HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName);
+    HashMap<Path, PackageEntry>::ConstIterator i = entries_.Find(fileName);
     if (i != entries_.End())
         return &i->second_;
 
@@ -142,7 +142,7 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
     // On Windows perform a fallback case-insensitive search
     else
     {
-        for (HashMap<String, PackageEntry>::ConstIterator j = entries_.Begin(); j != entries_.End(); ++j)
+        for (auto j = entries_.Begin(); j != entries_.End(); ++j)
         {
             if (!j->first_.Compare(fileName, false))
                 return &j->second_;

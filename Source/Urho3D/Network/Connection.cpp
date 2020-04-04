@@ -1408,7 +1408,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
     Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
-    Vector<String> downloadedPackages;
+    Vector<Path> downloadedPackages;
     bool packagesScanned = false;
 
     for (unsigned i = 0; i < numPackages; ++i)
@@ -1447,10 +1447,11 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         }
 
         // Then the download cache
-        for (unsigned j = 0; j < downloadedPackages.Size(); ++j)
+        for (auto& filePath : downloadedPackages)
         {
-            const String& fileName = downloadedPackages[j];
+            const String& fileName = filePath.ToString();
             // In download cache, package file name format is checksum_packagename
+            //TODO: if the above is true, why is it not !fileName.StartsWith(...)...?
             if (!fileName.Find(checksumString) && !fileName.Substring(9).Compare(name, false))
             {
                 // Name matches. Check file size and actual checksum to be sure

@@ -25,6 +25,7 @@
 #include <Urho3D/AngelScript/Script.h>
 #endif
 #include <Urho3D/Core/Main.h>
+#include <Urho3D/Core/Path.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/IO/FileSystem.h>
@@ -56,7 +57,7 @@ void Urho3DPlayer::Setup()
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
     auto* filesystem = GetSubsystem<FileSystem>();
-    const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
+	const Path commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
         SharedPtr<File> commandFile(new File(context_, commandFileName));

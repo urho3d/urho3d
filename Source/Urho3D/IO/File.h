@@ -26,6 +26,7 @@
 
 #include "../Container/ArrayPtr.h"
 #include "../Core/Object.h"
+#include "../Core/Path.h"
 #include "../IO/AbstractFile.h"
 
 #ifdef __ANDROID__
@@ -67,9 +68,9 @@ public:
     /// Construct.
     explicit File(Context* context);
     /// Construct and open a filesystem file.
-    File(Context* context, const String& fileName, FileMode mode = FILE_READ);
+    File(Context* context, const Path& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file.
-    File(Context* context, PackageFile* package, const String& fileName);
+    File(Context* context, PackageFile* package, const Path& fileName);
     /// Destruct. Close the file if open.
     ~File() override;
 
@@ -80,22 +81,26 @@ public:
     /// Write bytes to the file. Return number of bytes actually written.
     unsigned Write(const void* data, unsigned size) override;
 
-    /// Return the file name.
-    const String& GetName() const override { return fileName_; }
+    /// Return the file name (path as a string).
+    const String& GetName() const override { return fileName_.ToString(); }
+    /// Return the file path.
+    const Path& GetPath() const { return fileName_; }
 
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     unsigned GetChecksum() override;
 
     /// Open a filesystem file. Return true if successful.
-    bool Open(const String& fileName, FileMode mode = FILE_READ);
+    bool Open(const Path& fileName, FileMode mode = FILE_READ);
     /// Open from within a package file. Return true if successful.
-    bool Open(PackageFile* package, const String& fileName);
+    bool Open(PackageFile* package, const Path& fileName);
     /// Close the file.
     void Close();
     /// Flush any buffered output to the file.
     void Flush();
     /// Change the file name. Used by the resource system.
     void SetName(const String& name);
+    /// Change the file name. Used by the resource system.
+    void SetName(const Path& name);
 
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
@@ -111,14 +116,14 @@ public:
 
 private:
     /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.
-    bool OpenInternal(const String& fileName, FileMode mode, bool fromPackage = false);
+    bool OpenInternal(const Path& fileName, FileMode mode, bool fromPackage = false);
     /// Perform the file read internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful. This does not handle compressed package file reading.
     bool ReadInternal(void* dest, unsigned size);
     /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
     void SeekInternal(unsigned newPosition);
 
     /// File name.
-    String fileName_;
+    Path fileName_;
     /// Open mode.
     FileMode mode_;
     /// File handle.

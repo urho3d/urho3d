@@ -82,7 +82,7 @@ File::File(Context* context) :
 {
 }
 
-File::File(Context* context, const String& fileName, FileMode mode) :
+File::File(Context* context, const Path& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ),
     handle_(nullptr),
@@ -100,7 +100,7 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     Open(fileName, mode);
 }
 
-File::File(Context* context, PackageFile* package, const String& fileName) :
+File::File(Context* context, PackageFile* package, const Path& fileName) :
     Object(context),
     mode_(FILE_READ),
     handle_(nullptr),
@@ -123,12 +123,12 @@ File::~File()
     Close();
 }
 
-bool File::Open(const String& fileName, FileMode mode)
+bool File::Open(const Path& fileName, FileMode mode)
 {
     return OpenInternal(fileName, mode);
 }
 
-bool File::Open(PackageFile* package, const String& fileName)
+bool File::Open(PackageFile* package, const Path& fileName)
 {
     if (!package)
         return false;
@@ -140,7 +140,7 @@ bool File::Open(PackageFile* package, const String& fileName)
     bool success = OpenInternal(package->GetName(), FILE_READ, true);
     if (!success)
     {
-        URHO3D_LOGERROR("Could not open package file " + fileName);
+        URHO3D_LOGERROR("Could not open package file " + fileName.ToString());
         return false;
     }
 
@@ -413,6 +413,11 @@ void File::Flush()
 
 void File::SetName(const String& name)
 {
+    fileName_ = Path::CreateFromResolvedInternalString(name);
+}
+
+void File::SetName(const Path& name)
+{
     fileName_ = name;
 }
 
@@ -425,7 +430,7 @@ bool File::IsOpen() const
 #endif
 }
 
-bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
+bool File::OpenInternal(const Path& fileName, FileMode mode, bool fromPackage)
 {
     Close();
 
@@ -434,9 +439,9 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     writeSyncNeeded_ = false;
 
     auto* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    if (fileSystem && !fileSystem->CheckAccess(fileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERRORF("Access denied to %s", fileName.CString());
+        URHO3D_LOGERRORF("Access denied to %s", fileName.ToString().CString());
         return false;
     }
 
@@ -447,7 +452,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     }
 
 #ifdef __ANDROID__
-    if (URHO3D_IS_ASSET(fileName))
+    if (URHO3D_IS_ASSET(fileName.ToString()))
     {
         if (mode != FILE_READ)
         {
@@ -455,10 +460,10 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
             return false;
         }
 
-        assetHandle_ = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
+        assetHandle_ = SDL_RWFromFile(URHO3D_ASSET(fileName.ToString()), "rb");
         if (!assetHandle_)
         {
-            URHO3D_LOGERRORF("Could not open Android asset file %s", fileName.CString());
+            URHO3D_LOGERRORF("Could not open Android asset file %s", fileName.ToString().CString());
             return false;
         }
         else
@@ -478,24 +483,24 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 #endif
 
 #ifdef _WIN32
-    handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
+    handle_ = _wfopen(fileName.GetWideNativePathString().CString(), openMode[mode]);
 #else
-    handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
+    handle_ = fopen(fileName.GetNativePathString().CString(), openMode[mode]);
 #endif
 
     // If file did not exist in readwrite mode, retry with write-update mode
     if (mode == FILE_READWRITE && !handle_)
     {
 #ifdef _WIN32
-        handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
+        handle_ = _wfopen(fileName.GetWideNativePathString().CString(), openMode[mode + 1]);
 #else
-        handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
+        handle_ = fopen(fileName.GetNativePathString().CString(), openMode[mode + 1]);
 #endif
     }
 
     if (!handle_)
     {
-        URHO3D_LOGERRORF("Could not open file %s", fileName.CString());
+        URHO3D_LOGERRORF("Could not open file %s", fileName.ToString().CString());
         return false;
     }
 
@@ -506,7 +511,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         fseek((FILE*)handle_, 0, SEEK_SET);
         if (size > M_MAX_UNSIGNED)
         {
-            URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
+            URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.ToString().CString());
             Close();
             size_ = 0;
             return false;

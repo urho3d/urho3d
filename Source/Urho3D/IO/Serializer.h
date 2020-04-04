@@ -104,6 +104,8 @@ public:
     bool WriteBoundingBox(const BoundingBox& value);
     /// Write a null-terminated string.
     bool WriteString(const String& value);
+    /// Write a path as a null-terminated string.
+    bool WritePath(const Path& value);
     /// Write a four-letter file ID. If the string is not long enough, spaces will be appended.
     bool WriteFileID(const String& value);
     /// Write a 32-bit StringHash.

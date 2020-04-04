@@ -22,6 +22,8 @@
 
 #include "../Precompiled.h"
 
+#include "../Container/Vector.h"
+#include "../Core/Path.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
 #include "../IO/FileWatcher.h"
@@ -74,7 +76,7 @@ FileWatcher::~FileWatcher()
 #endif
 }
 
-bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
+bool FileWatcher::StartWatching(const Path& pathName, bool watchSubDirs)
 {
     if (!fileSystem_)
     {
@@ -114,46 +116,47 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     }
 #elif defined(__linux__)
     int flags = IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO;
-    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (unsigned)flags);
+    int handle = inotify_add_watch(watchHandle_, pathName.ToString().CString(), (unsigned)flags);
 
     if (handle < 0)
     {
-        URHO3D_LOGERROR("Failed to start watching path " + pathName);
+        URHO3D_LOGERROR("Failed to start watching path " + pathName.ToString());
         return false;
     }
     else
     {
         // Store the root path here when reconstructed with inotify later
         dirHandle_[handle] = "";
-        path_ = AddTrailingSlash(pathName);
+        path_ = pathName.WithTrailingSlash();
         watchSubDirs_ = watchSubDirs;
 
         if (watchSubDirs_)
         {
-            Vector<String> subDirs;
+            Vector<Path> subDirs;
             fileSystem_->ScanDir(subDirs, pathName, "*", SCAN_DIRS, true);
 
-            for (unsigned i = 0; i < subDirs.Size(); ++i)
+            for (Path& subDir: subDirs)
             {
-                String subDirFullPath = AddTrailingSlash(path_ + subDirs[i]);
+                Path subDirFullPath = (path_ + subDir);
+                subDirFullPath.AddTrailingSlash();
 
                 // Don't watch ./ or ../ sub-directories
-                if (!subDirFullPath.EndsWith("./"))
+                if (!subDirFullPath.ToString().EndsWith("./"))
                 {
-                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (unsigned)flags);
+                    handle = inotify_add_watch(watchHandle_, subDirFullPath.ToString().CString(), (unsigned)flags);
                     if (handle < 0)
-                        URHO3D_LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
+                        URHO3D_LOGERROR("Failed to start watching subdirectory path " + subDirFullPath.ToString());
                     else
                     {
                         // Store sub-directory to reconstruct later from inotify
-                        dirHandle_[handle] = AddTrailingSlash(subDirs[i]);
+                        dirHandle_[handle] = subDir.WithTrailingSlash().ToString();
                     }
                 }
             }
         }
         Run();
 
-        URHO3D_LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName.ToString());
         return true;
     }
 #elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
@@ -224,8 +227,8 @@ void FileWatcher::StopWatching()
         Stop();
 #endif
 
-        URHO3D_LOGDEBUG("Stopped watching path " + path_);
-        path_.Clear();
+        URHO3D_LOGDEBUG("Stopped watching path " + path_.ToString());
+        path_ = Path{};
     }
 }
 

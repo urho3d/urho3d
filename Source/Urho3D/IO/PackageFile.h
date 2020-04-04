@@ -52,17 +52,20 @@ public:
     ~PackageFile() override;
 
     /// Open the package file. Return true if successful.
-    bool Open(const String& fileName, unsigned startOffset = 0);
+    bool Open(const Path& fileName, unsigned startOffset = 0);
     /// Check if a file exists within the package file. This will be case-insensitive on Windows and case-sensitive on other platforms.
-    bool Exists(const String& fileName) const;
+    bool Exists(const Path& fileName) const;
     /// Return the file entry corresponding to the name, or null if not found. This will be case-insensitive on Windows and case-sensitive on other platforms.
-    const PackageEntry* GetEntry(const String& fileName) const;
+    const PackageEntry* GetEntry(const Path& fileName) const;
 
     /// Return all file entries.
-    const HashMap<String, PackageEntry>& GetEntries() const { return entries_; }
+    const HashMap<Path, PackageEntry>& GetEntries() const { return entries_; }
 
     /// Return the package file name.
-    const String& GetName() const { return fileName_; }
+    const String& GetName() const { return fileName_.ToString(); }
+
+    /// Return the package file path.
+    const Path& GetPath() const { return fileName_; }
 
     /// Return hash of the package file name.
     StringHash GetNameHash() const { return nameHash_; }
@@ -83,13 +86,13 @@ public:
     bool IsCompressed() const { return compressed_; }
 
     /// Return list of file names in the package.
-    const Vector<String> GetEntryNames() const { return entries_.Keys(); }
+    const Vector<Path> GetEntryNames() const { return entries_.Keys(); }
 
 private:
     /// File entries.
-    HashMap<String, PackageEntry> entries_;
+    HashMap<Path, PackageEntry> entries_;
     /// File name.
-    String fileName_;
+    Path fileName_;
     /// Package file name hash.
     StringHash nameHash_;
     /// Package file total size.

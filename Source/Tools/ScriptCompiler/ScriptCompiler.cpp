@@ -24,6 +24,7 @@
 #include <Urho3D/AngelScript/ScriptFile.h>
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Core/Path.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/IO/File.h>
@@ -43,7 +44,7 @@
 
 using namespace Urho3D;
 
-void CompileScript(Context* context, const String& fileName);
+void CompileScript(Context* context, const Path& fileName);
 
 int main(int argc, char** argv)
 {
@@ -125,7 +126,7 @@ int main(int argc, char** argv)
             CompileScript(context, outputFile);
         else
         {
-            Vector<String> scriptFiles;
+			Vector<Path> scriptFiles;
             context->GetSubsystem<FileSystem>()->ScanDir(scriptFiles, path, file + extension, SCAN_FILES, false);
             for (unsigned i = 0; i < scriptFiles.Size(); ++i)
                 CompileScript(context, path + scriptFiles[i]);
@@ -153,22 +154,22 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-void CompileScript(Context* context, const String& fileName)
+void CompileScript(Context* context, const Path& fileName)
 {
-    PrintLine("Compiling script file " + fileName);
+	PrintLine("Compiling script file " + fileName.ToString());
 
     File inFile(context, fileName, FILE_READ);
     if (!inFile.IsOpen())
-        ErrorExit("Failed to open script file " + fileName);
+		ErrorExit("Failed to open script file " + fileName.ToString());
 
     ScriptFile script(context);
     if (!script.Load(inFile))
         ErrorExit();
 
-    String outFileName = ReplaceExtension(fileName, ".asc");
+	Path outFileName = fileName.WithReplacedExtension(".asc");
     File outFile(context, outFileName, FILE_WRITE);
     if (!outFile.IsOpen())
-        ErrorExit("Failed to open output file " + fileName);
+		ErrorExit("Failed to open output file " + outFileName.ToString());
 
     script.SaveByteCode(outFile);
 }

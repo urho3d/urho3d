@@ -109,9 +109,9 @@ void BackgroundLoader::ThreadFunction()
     }
 }
 
-bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool sendEventOnFailure, Resource* caller)
+bool BackgroundLoader::QueueResource(StringHash type, const Path& name, bool sendEventOnFailure, Resource* caller)
 {
-    StringHash nameHash(name);
+    StringHash nameHash(name.ToString());
     Pair<StringHash, StringHash> key = MakePair(type, nameHash);
 
     MutexLock lock(backgroundLoadMutex_);
@@ -142,9 +142,9 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
         return false;
     }
 
-    URHO3D_LOGDEBUG("Background loading resource " + name);
+    URHO3D_LOGDEBUG("Background loading resource " + name.ToString());
 
-    item.resource_->SetName(name);
+    item.resource_->SetName(name.ToString());
     item.resource_->SetAsyncLoadState(ASYNC_QUEUED);
 
     // If this is a resource calling for the background load of more resources, mark the dependency as necessary

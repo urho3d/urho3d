@@ -76,7 +76,7 @@ public:
     }
 
     /// Process the resource request and optionally modify the resource name string. Empty name string means the resource is not found or not allowed.
-    virtual void Route(String& name, ResourceRequest requestType) = 0;
+    virtual void Route(Path& name, ResourceRequest requestType) = 0;
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
@@ -91,15 +91,15 @@ public:
     ~ResourceCache() override;
 
     /// Add a resource load directory. Optional priority parameter which will control search order.
-    bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST);
+    bool AddResourceDir(const Path& pathName, unsigned priority = PRIORITY_LAST);
     /// Add a package file for loading resources from. Optional priority parameter which will control search order.
     bool AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST);
     /// Add a package file for loading resources from by name. Optional priority parameter which will control search order.
-    bool AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST);
+    bool AddPackageFile(const Path& fileName, unsigned priority = PRIORITY_LAST);
     /// Add a manually created resource. Must be uniquely named within its type.
     bool AddManualResource(Resource* resource);
     /// Remove a resource load directory.
-    void RemoveResourceDir(const String& pathName);
+    void RemoveResourceDir(const Path& pathName);
     /// Remove a package file. Optionally release the resources loaded from it.
     void RemovePackageFile(PackageFile* package, bool releaseResources = true, bool forceRelease = false);
     /// Remove a package file by name. Optionally release the resources loaded from it.
@@ -137,13 +137,13 @@ public:
     void RemoveResourceRouter(ResourceRouter* router);
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
-    SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
+    SharedPtr<File> GetFile(const Path& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
     Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data).
     SharedPtr<Resource> GetTempResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Can be called from outside the main thread.
-    bool BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure = true, Resource* caller = nullptr);
+    bool BackgroundLoadResource(StringHash type, const Path& name, bool sendEventOnFailure = true, Resource* caller = nullptr);
     /// Return number of pending background-loaded resources.
     unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
@@ -155,7 +155,7 @@ public:
     const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
 
     /// Return added resource load directories.
-    const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
+    const Vector<Path>& GetResourceDirs() const { return resourceDirs_; }
 
     /// Return added package files.
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
@@ -173,15 +173,17 @@ public:
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists in the resource directories or package files. Does not check manually added in-memory resources.
-    bool Exists(const String& name) const;
+    bool Exists(const Path& name) const;
     /// Return memory budget for a resource type.
     unsigned long long GetMemoryBudget(StringHash type) const;
     /// Return total memory use for a resource type.
     unsigned long long GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
     unsigned long long GetTotalMemoryUse() const;
-    /// Return full absolute file name of resource if possible, or empty if not found.
-    String GetResourceFileName(const String& name) const;
+    /// Return full absolute file name as a string of resource if possible, or empty if not found.
+    String GetResourceFileName(const Path& name) const;
+    /// Return full absolute file path of resource if possible, or empty if not found.
+    Path GetResourceFilePath(const Path& name) const;
 
     /// Return whether automatic resource reloading is enabled.
     bool GetAutoReloadResources() const { return autoReloadResources_; }
@@ -201,9 +203,9 @@ public:
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
     /// Remove unsupported constructs from the resource name to prevent ambiguity, and normalize absolute filename to resource path relative if possible.
-    String SanitateResourceName(const String& name) const;
+    Path SanitateResourceName(const Path& name) const;
     /// Remove unnecessary constructs from a resource directory name and ensure it to be an absolute path.
-    String SanitateResourceDirName(const String& name) const;
+    Path SanitateResourceDirName(Path name) const;
     /// Store a dependency for a resource. If a dependency file changes, the resource will be reloaded.
     void StoreResourceDependency(Resource* resource, const String& dependency);
     /// Reset dependencies for a resource.
@@ -224,16 +226,16 @@ private:
     /// Handle begin frame event. Automatic resource reloads and the finalization of background loaded resources are processed here.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Search FileSystem for file.
-    File* SearchResourceDirs(const String& name);
+    File* SearchResourceDirs(const Path& name);
     /// Search resource packages for file.
-    File* SearchPackages(const String& name);
+    File* SearchPackages(const Path& name);
 
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
     /// Resources by type.
     HashMap<StringHash, ResourceGroup> resourceGroups_;
     /// Resource load directories.
-    Vector<String> resourceDirs_;
+    Vector<Path> resourceDirs_;
     /// File watchers for resource directories, if automatic reloading enabled.
     Vector<SharedPtr<FileWatcher> > fileWatchers_;
     /// Package files.

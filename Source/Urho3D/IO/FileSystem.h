@@ -64,13 +64,13 @@ public:
     /// Run a program using the command interpreter asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
     unsigned SystemCommandAsync(const String& commandLine);
     /// Run a specific program asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
-    unsigned SystemRunAsync(const String& fileName, const Vector<String>& arguments);
+    unsigned SystemRunAsync(const Path& fileName, const Vector<String>& arguments);
     /// Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined.
-    bool SystemOpen(const String& fileName, const String& mode = String::EMPTY);
+    bool SystemOpen(const Path& fileName, const String& mode = String::EMPTY);
     /// Copy a file. Return true if successful.
-    bool Copy(const String& srcFileName, const String& destFileName);
+    bool Copy(const Path& srcFileName, const Path& destFileName);
     /// Rename a file. Return true if successful.
-    bool Rename(const String& srcFileName, const String& destFileName);
+    bool Rename(const Path& srcFileName, const Path& destFileName);
     /// Delete a file. Return true if successful.
     bool Delete(const String& fileName);
     /// Register a path as allowed to access. If no paths are registered, all are allowed. Registering allowed paths is considered securing the Urho3D execution environment: running programs and opening files externally through the system will fail afterward. PartialMatch surrounds the pattern with ** for the globbing.
@@ -92,24 +92,24 @@ public:
     /// Returns the file's last modified time as seconds since 1.1.1970, or 0 if can not be accessed.
     unsigned GetLastModifiedTime(const String& fileName) const;
     /// Check if a file exists.
-    bool FileExists(const String& fileName) const;
+    bool FileExists(const Path& fileName) const;
     /// Check if a directory exists.
     bool DirExists(const Path& pathName) const;
     /// Scan a directory for specified files.
-    void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
+    void ScanDir(Vector<Path>& result, Path pathName, const String& filter, unsigned flags, bool recursive) const;
     /// Return the program's directory.
-    String GetProgramDir() const;
+    Path GetProgramDir() const;
     /// Return the user documents directory.
-    String GetUserDocumentsDir() const;
+    Path GetUserDocumentsDir() const;
     /// Return the application preferences directory.
-    String GetAppPreferencesDir(const String& org, const String& app) const;
+    Path GetAppPreferencesDir(const String& org, const String& app) const;
     /// Return path of temporary directory. Path always ends with a forward slash.
     String GetTemporaryDir() const;
 
 private:
     /// Scan directory, called internally.
     void ScanDirInternal
-        (Vector<String>& result, String path, const String& startPath, const String& filter, unsigned flags, bool recursive) const;
+        (Vector<Path>& result, Path path, const Path& startPath, const String& filter, unsigned flags, bool recursive) const;
     /// Handle begin frame event to check for completed async executions.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle a console command event.

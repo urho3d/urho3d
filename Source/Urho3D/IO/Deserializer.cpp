@@ -260,6 +260,11 @@ String Deserializer::ReadString()
     return ret;
 }
 
+Path Deserializer::ReadPath()
+{
+    return Path{ReadString()};
+}
+
 String Deserializer::ReadFileID()
 {
     String ret;
