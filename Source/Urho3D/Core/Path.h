@@ -17,14 +17,15 @@ public:
 	/// Move construct.
 	Path(Path&& other): path_(std::move(other.path_)) {}
 	/// Construct from the specified path string using the specified base path to resolve relative directories as needed.
-	Path(const String& path, const Path& basePath = Path()): path_(MakePathStringInternal(path)) { ResolveRelativeTo(basePath); }
+    Path(const String& path, const Path& basePath = Path::EMPTY): path_(MakePathStringInternal(path)) { ResolveRelativeTo(basePath); }
 	/// Construct from the specified path string using the specified base path to resolve relative directories as needed.
-	Path(const char* path, const Path& basePath = Path()): path_(MakePathStringInternal(path)) { ResolveRelativeTo(basePath); }
+    Path(const char* path, const Path& basePath = Path::EMPTY): path_(MakePathStringInternal(path)) { ResolveRelativeTo(basePath); }
 
 	/// Construct from the specified path string when the string is known not to contain self-resolvable relative components ("./" or "resolvable/../") and known to be in the internal representation
 	static Path CreateFromResolvedInternalString(const String& path) { Path p; p.path_ = path; return p; }
 	//TODO: ^ Consider renaming the above CreateFromRawString or the like so it's shorter
 
+	static const Path EMPTY;
 
 	//TODO: Wide strings
 	/// Convert a path to the format required by the operating system in wide characters.
@@ -59,6 +60,26 @@ public:
 		return p;
 	}
 
+    /// Raw concatenation to this path with the other path. "A/B" + "C/D.file" --> "A/BC/D.file"
+    friend Path operator+ (const String& lhs, const Path& rhs)
+    {
+        Path p{rhs};
+        p.path_ = lhs + p.path_;
+        return p;
+    }
+    /// Smart concatenation to this path with the other path.  "A/B.ext" / "C/D.file" --> "A/B.ext/C/D.file" ; "A/B/" / "C/D.file" --> "A/B/C/D.file"
+    friend Path operator/ (const String& lhs, const Path& rhs)
+    {
+        Path p{lhs};
+        p/=rhs;
+        return p;
+    }
+
+    /// Case-sensitive equality test with the other past based on the internal path format.
+    bool operator== (const Path& rhs) const
+    {
+        return path_ == rhs.path_;
+    }
 
 	/// Return whether a path is absolute (starts with "/" on Unix or "[letter]:" on Windows)
 	bool IsAbsolute() const
@@ -78,10 +99,18 @@ public:
 			return false;
 	}
 	/// Returns true if the path is empty
-	bool IsEmpty() const
+    bool Empty() const
 	{
 		return path_.Empty();
 	}
+	/// Returns true if the path would go up a directory ("../" or "..")
+	bool IsRequestingParentDirectory() const
+	{
+		// Min length is 2 "..", and "..weird_name.txt" does not go up a directory"
+        return path_.Length() >= 2 && path_.StartsWith("..") && (path_.Length() == 2 || path_[2] =='/');
+	}
+
+
 
 
 	/// Resolves relative paths agains the base path. The base path may be a file, whose name will be trimmed, or a directory that must end in '/'.
@@ -89,7 +118,7 @@ public:
 	void ResolveRelativeTo(const Path& basePath, bool requireRelativePrefix = true)
 	{
 		// If this is an absolute path don't resolve it against the other
-		if (IsAbsolute() || basePath.IsEmpty())
+        if (IsAbsolute() || basePath.Empty())
 		{
 			CompressRelativePath();
 			return;
@@ -213,7 +242,7 @@ public:
 	Path GetDirectoryPath() const
 	{
 		// Shortcut if this is a directory path
-		if (IsEmpty() || HasTrailingSlash())
+        if (Empty() || HasTrailingSlash())
 			return *this;
 
 		Path path; String file, extension;
@@ -260,12 +289,12 @@ public:
 	/// Returns true if the path has a traling slash.
 	bool HasTrailingSlash() const
 	{
-		return !path_.Empty() || path_.Back() == '/';
+        return !path_.Empty() && path_.Back() == '/';
 	}
 	/// Add a slash at the end of the path if missing. Does not add a slash to an empty path.
 	void AddTrailingSlash()
 	{
-		if (!IsEmpty() && !HasTrailingSlash())
+        if (!Empty() && !HasTrailingSlash())
 			path_ += '/';
 	}
 	/// Remove the slash from the end of a path if it exists.
@@ -278,14 +307,14 @@ public:
 	Path WithTrailingSlash() const
 	{
 		Path p{*this};
-		p.WithTrailingSlash();
+        p.AddTrailingSlash();
 		return p;
 	}
 	/// Remove the slash from the end of a path if exists and convert to internal format (use slashes).
 	Path WithoutTrailingSlash() const
 	{
 		Path p{*this};
-		p.WithoutTrailingSlash();
+        p.RemoveTrailingSlash();
 		return p;
 	}
 
@@ -358,21 +387,21 @@ static int stbi__start_write_file(stbi__write_context *s, const char *filename)
 	}
 
 #ifdef _WIN32
-	using NativePathString = WString;
+	using NativeString = WString;
 #else
-	using NativePathString = const String&;
+	using NativeString = const String&;
 #endif
 
-	NativePathString GetNativePathString() const
+	NativeString GetAutoNativePathString() const
 	{
 #ifdef _WIN32
-		return NativePathString(path_.Replaced('/', '\\'));
+		return NativeString(path_.Replaced('/', '\\'));
 #else
 		return path_;
 #endif
 	}
 
-	String GetNativePathNarrowString() const
+	String GetNativePathString() const
 	{
 #ifdef _WIN32
 		return String(path_.Replaced('/', '\\'));
@@ -384,6 +413,8 @@ static int stbi__start_write_file(stbi__write_context *s, const char *filename)
 	/// Convert a path to a string.
 	const String& ToString() const { return GetInternalPathString(); }
 
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return GetInternalPathString().ToHash(); }
 
 private:
 
@@ -403,7 +434,7 @@ private:
 	void CompressRelativePath()
 	{
 		// Very fast checks
-		if (IsEmpty() || path_ == ".")
+        if (Empty() || path_ == ".")
 			return;
 
 		// Slightly slower huestic checks - may have false positive "relative" paths, no false negatives
@@ -437,5 +468,19 @@ private:
 			path_ = ret;
 	}
 };
+
+/// Enum controlling the behavior of the GLOB Matching
+enum class GLOB_STAR_MODE
+{
+    /// "*" will match "/"
+    GS_REQUIRE_SINGLE_STAR,
+    /// "**" will match "/", "*" will not
+    GS_REQUIRE_DOUBLE_STAR,
+    /// "/" will not be matched
+    GS_DISABLE_RECURSION
+};
+
+/// Test a path against the specified GLOB pattern path. Returns true for a match.
+bool GLOBMatches(const Path& globPattern, const Path& path, GLOB_STAR_MODE mode = GLOB_STAR_MODE::GS_REQUIRE_DOUBLE_STAR);
 
 }

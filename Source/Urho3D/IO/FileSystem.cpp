@@ -142,12 +142,12 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
 #endif
 }
 
-int DoSystemRun(const String& fileName, const Vector<String>& arguments)
+int DoSystemRun(const Path& fileName, const Vector<String>& arguments)
 {
 #ifdef TVOS
     return -1;
 #else
-    String fixedFileName = GetNativePath(fileName);
+    String fixedFileName = fileName.GetNativePathString();
 
 #ifdef _WIN32
     // Add .exe extension if no extension defined
@@ -261,7 +261,7 @@ class AsyncSystemRun : public AsyncExecRequest
 {
 public:
     /// Construct and run.
-    AsyncSystemRun(unsigned requestID, const String& fileName, const Vector<String>& arguments) :
+    AsyncSystemRun(unsigned requestID, const Path& fileName, const Vector<String>& arguments) :
         AsyncExecRequest(requestID),
         fileName_(fileName),
         arguments_(arguments)
@@ -278,7 +278,7 @@ public:
 
 private:
     /// File to run.
-    String fileName_;
+    Path fileName_;
     /// Command line split in arguments.
     const Vector<String>& arguments_;
 };
@@ -304,23 +304,23 @@ FileSystem::~FileSystem()
     }
 }
 
-bool FileSystem::SetCurrentDir(const String& pathName)
+bool FileSystem::SetCurrentDir(const Path& pathName)
 {
     if (!CheckAccess(pathName))
     {
-        URHO3D_LOGERROR("Access denied to " + pathName);
+        URHO3D_LOGERROR("Access denied to " + pathName.ToString());
         return false;
     }
 #ifdef _WIN32
-    if (SetCurrentDirectoryW(GetWideNativePath(pathName).CString()) == FALSE)
+    if (SetCurrentDirectoryW(pathName.GetWideNativePathString().CString()) == FALSE)
     {
         URHO3D_LOGERROR("Failed to change directory to " + pathName);
         return false;
     }
 #else
-    if (chdir(GetNativePath(pathName).CString()) != 0)
+    if (chdir(pathName.GetNativePathString().CString()) != 0)
     {
-        URHO3D_LOGERROR("Failed to change directory to " + pathName);
+        URHO3D_LOGERROR("Failed to change directory to " + pathName.ToString());
         return false;
     }
 #endif
@@ -328,33 +328,35 @@ bool FileSystem::SetCurrentDir(const String& pathName)
     return true;
 }
 
-bool FileSystem::CreateDir(const String& pathName)
+bool FileSystem::CreateDir(Path pathName)
 {
     if (!CheckAccess(pathName))
     {
-        URHO3D_LOGERROR("Access denied to " + pathName);
+        URHO3D_LOGERROR("Access denied to " + pathName.ToString());
         return false;
     }
 
     // Create each of the parents if necessary
-    String parentPath = GetParentPath(pathName);
-    if (parentPath.Length() > 1 && !DirExists(parentPath))
+    Path parentPath = pathName.GetParentPath();
+    if (parentPath.ToString().Length() > 1 && !DirExists(parentPath))
     {
         if (!CreateDir(parentPath))
             return false;
     }
 
+    pathName.RemoveTrailingSlash();
+
 #ifdef _WIN32
-    bool success = (CreateDirectoryW(GetWideNativePath(RemoveTrailingSlash(pathName)).CString(), nullptr) == TRUE) ||
+    bool success = (CreateDirectoryW(pathName.GetWideNativePathString().CString(), nullptr) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
 #else
-    bool success = mkdir(GetNativePath(RemoveTrailingSlash(pathName)).CString(), S_IRWXU) == 0 || errno == EEXIST;
+    bool success = mkdir(pathName.GetNativePathString().CString(), S_IRWXU) == 0 || errno == EEXIST;
 #endif
 
     if (success)
-        URHO3D_LOGDEBUG("Created directory " + pathName);
+        URHO3D_LOGDEBUG("Created directory " + pathName.ToString());
     else
-        URHO3D_LOGERROR("Failed to create directory " + pathName);
+        URHO3D_LOGERROR("Failed to create directory " + pathName.ToString());
 
     return success;
 }
@@ -382,7 +384,7 @@ int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLo
     }
 }
 
-int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments)
+int FileSystem::SystemRun(const Path& fileName, const Vector<String>& arguments)
 {
     if (allowedPaths_.Empty())
         return DoSystemRun(fileName, arguments);
@@ -548,22 +550,26 @@ String FileSystem::GetCurrentDir() const
 #endif
 }
 
-bool FileSystem::CheckAccess(const String& pathName) const
+bool FileSystem::CheckAccess(Path pathName) const
 {
-    String fixedPath = AddTrailingSlash(pathName);
+    // By not using a const Path& we can avoid having to duplicate the path anyway to add the slash
+    pathName.AddTrailingSlash();
+
+    // Resolving the path will move the .. to the front so our check will be more complete
+    pathName.ResolveRelativeTo(Path::EMPTY);
 
     // If no allowed directories defined, succeed always
     if (allowedPaths_.Empty())
         return true;
 
     // If there is any attempt to go to a parent directory, disallow
-    if (fixedPath.Contains(".."))
+    if (pathName.IsRequestingParentDirectory())
         return false;
 
     // Check if the path is a partial match of any of the allowed directories
-    for (HashSet<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
+    for (auto i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
     {
-        if (fixedPath.Find(*i) == 0)
+        if (GLOBMatches(*i,pathName))
             return true;
     }
 
@@ -625,18 +631,18 @@ bool FileSystem::FileExists(const String& fileName) const
     return true;
 }
 
-bool FileSystem::DirExists(const String& pathName) const
+bool FileSystem::DirExists(const Path& pathName) const
 {
     if (!CheckAccess(pathName))
         return false;
 
 #ifndef _WIN32
     // Always return true for the root directory
-    if (pathName == "/")
+    if (pathName.ToString() == "/")
         return true;
 #endif
 
-    String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
+    String fixedName = pathName.WithoutTrailingSlash().GetNativePathString();
 
 #ifdef __ANDROID__
     if (URHO3D_IS_ASSET(fixedName))
@@ -757,12 +763,23 @@ String FileSystem::GetAppPreferencesDir(const String& org, const String& app) co
     return dir;
 }
 
-void FileSystem::RegisterPath(const String& pathName)
+void FileSystem::RegisterPath(const Path& pathName, bool partialMatch)
 {
     if (pathName.Empty())
         return;
 
-    allowedPaths_.Insert(AddTrailingSlash(pathName));
+    // Partial match enables the "Old" behavior where the path just had to match part of the registered path.
+    if (partialMatch)
+    {
+        Path match = pathName.WithTrailingSlash();
+        if (!match.ToString().StartsWith("**"))
+            match = "**" + match;
+        if (!match.ToString().EndsWith("**"))
+            match += "**";
+        allowedPaths_.Insert(match);
+    }
+    else
+        allowedPaths_.Insert(pathName);
 }
 
 bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
