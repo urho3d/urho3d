@@ -302,12 +302,62 @@ public:
 	}
 
 	/// Convert a path to internal format (use slashes).
-	String GetInternalPathString() const;
+	const String& GetInternalPathString() const
+	{
+		return path_;
+	}
+
+
+	//Question: Why doesn't GetNativePathString() just return a WString on Windows?
+	// I believe the only time we don't just convert to a WString after that on Windows is in
+	//		int DoSystemRun(const String& fileName, const Vector<String>& arguments)
+	// in which I would be fine with having to move fixedFileName into the #ifdef code
+	// One more in bool LuaScript::LoadRawFile(const String& fileName)
+	// which should probably be re-written using luaL_loadbuffer instead of luaL_loadfile
+	// Another couple for Image:
+	//      return stbi_write_tga(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get()) != 0;
+	//      return stbi_write_jpg(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), quality) != 0;
+	// As such I support switching to a [W]String GetNativePathString()
+	//									String GetNativePathStringNarrow() that can hopefully be removed in the future.
+	// This may sound unreasonable, but if you check stb_image_write.h, we might as well just make it use a wide character string instead
+/*
+static int stbi__start_write_file(stbi__write_context *s, const char *filename)
+{
+   FILE *f;
+   // Urho3D: proper UTF8 handling for Windows, requires Urho3D WString class
+#ifndef _WIN32
+   f = fopen(filename, "wb");
+#else
+   Urho3D::WString wstr(filename);
+#ifdef STBI_MSC_SECURE_CRT
+   if (_wfopen_s(&f, wstr.CString(), L"wb")   // NOTE: This line doesn't even match parentheses
+	  f = NULL;
+#else
+   f = _wfopen(wstr.CString(), L"wb");
+#endif
+*/
+
 	/// Convert a path to the format required by the operating system.
-	String GetNativePathString() const;
+	String GetNativePathString() const
+	{
+#ifdef _WIN32
+		return path_.Replaced('/', '\\');
+#else
+		return path_;
+#endif
+	}
+
+	WString GetWideNativePathString() const
+	{
+#ifdef _WIN32
+		return WString(path_.Replaced('/', '\\'));
+#else
+		return WString(path_);
+#endif
+	}
 
 	/// Convert a path to a string.
-	String ToString() const { return GetInternalPathString(); }
+	const String& ToString() const { return GetInternalPathString(); }
 
 
 private:
