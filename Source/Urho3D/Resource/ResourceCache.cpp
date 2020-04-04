@@ -556,7 +556,7 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const Path& name)
     if (sanitatedName.Empty())
         return nullptr;
 
-    StringHash nameHash(sanitatedName.ToString());
+    StringHash nameHash(sanitatedName);
 
     const SharedPtr<Resource>& existing = FindResource(type, nameHash);
     return existing;
@@ -647,7 +647,7 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const Path& name, bo
         return false;
 
     // First check if already exists as a loaded resource
-    StringHash nameHash(sanitatedName.ToString());
+    StringHash nameHash(sanitatedName);
     if (FindResource(type, nameHash) != noResource)
         return false;
 

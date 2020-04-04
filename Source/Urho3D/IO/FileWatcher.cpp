@@ -228,7 +228,7 @@ void FileWatcher::StopWatching()
 #endif
 
         URHO3D_LOGDEBUG("Stopped watching path " + path_.ToString());
-        path_ = Path{};
+        path_.Clear();
     }
 }
 

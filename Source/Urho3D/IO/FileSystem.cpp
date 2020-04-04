@@ -773,7 +773,7 @@ Path FileSystem::GetAppPreferencesDir(const String& org, const String& app) cons
 #endif
         URHO3D_LOGWARNING("Could not get application preferences directory");
 
-    return Path::EMPTY;
+    return {};
 }
 
 void FileSystem::RegisterPath(const Path& pathName, bool partialMatch)

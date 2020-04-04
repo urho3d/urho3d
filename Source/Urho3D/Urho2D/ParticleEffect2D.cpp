@@ -116,7 +116,7 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
     if (GetName().Empty())
         SetName(source.GetName());
 
-    loadSpriteName_ = Path::EMPTY;
+    loadSpriteName_.Clear();
 
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))
@@ -218,7 +218,7 @@ bool ParticleEffect2D::EndLoad()
         if (!sprite_)
             URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_.ToString() + " for particle effect");
 
-        loadSpriteName_ = Path::EMPTY;
+        loadSpriteName_.Clear();
     }
 
     return true;

@@ -66,8 +66,8 @@ String ignoreExtensions_[] = {
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
-void ProcessFile(const Path& fileName, const String& rootDir);
-void WritePackageFile(const Path& fileName, const String& rootDir);
+void ProcessFile(const Path& fileName, const Path& rootDir);
+void WritePackageFile(const Path& fileName, const Path& rootDir);
 void WriteHeader(File& dest);
 
 int main(int argc, char** argv)
@@ -207,7 +207,7 @@ void Run(const Vector<String>& arguments)
     }
 }
 
-void ProcessFile(const Path& fileName, const String& rootDir)
+void ProcessFile(const Path& fileName, const Path& rootDir)
 {
     Path fullPath = rootDir / fileName;
     File file(context_);
@@ -224,7 +224,7 @@ void ProcessFile(const Path& fileName, const String& rootDir)
     entries_.Push(newEntry);
 }
 
-void WritePackageFile(const Path& fileName, const String& rootDir)
+void WritePackageFile(const Path& fileName, const Path& rootDir)
 {
     if (!quiet_)
         PrintLine("Writing package");
