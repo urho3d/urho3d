@@ -771,6 +771,41 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String GetFileSizeString(uint64)", asFUNCTION(GetFileSizeString), asCALL_CDECL);
 }
 
+
+static void ConstructPathDefault(Path* ptr)
+{
+    new(ptr) Path();
+}
+static void DestructPath(Path* ptr)
+{
+    ptr->~Path();
+}
+static void ConstructPathString(const String& value, Path* ptr)
+{
+    new(ptr) Path(value);
+}
+static void RegisterPath(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Path", sizeof(Path), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
+    engine->RegisterObjectMethod("Path", "String ToString() const", asMETHOD(Path, ToString), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPathDefault), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructPathString), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Path", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructPath), asCALL_CDECL_OBJLAST);
+
+//    engine->RegisterObjectBehaviour("Path", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION([](Path*p){}), asCALL_CDECL_OBJLAST);
+//    engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+//    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAttributeInfo), asCALL_CDECL_OBJLAST);
+//    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f(const AttributeInfo&in)", asFUNCTION(ConstructAttributeInfoCopy), asCALL_CDECL_OBJLAST);
+//    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
+//    engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames() const", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
+//    engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
+//    engine->RegisterObjectProperty("AttributeInfo", "String name", offsetof(AttributeInfo, name_));
+//    engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
+//    engine->RegisterObjectProperty("AttributeInfo", "uint mode", offsetof(AttributeInfo, mode_));
+//    engine->RegisterObjectProperty("AttributeInfo", "VariantMap metadata", offsetof(AttributeInfo, metadata_));
+}
+
 static void ConstructTimer(Timer* ptr)
 {
     new(ptr) Timer();
@@ -1051,6 +1086,7 @@ void RegisterCoreAPI(asIScriptEngine* engine)
     RegisterVariant(engine);
     RegisterSpline(engine);
     RegisterStringUtils(engine);
+    RegisterPath(engine);
     RegisterProcessUtils(engine);
     RegisterObject(engine);
     RegisterTimer(engine);
