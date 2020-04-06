@@ -3,6 +3,10 @@ $#include "Urho2D/TmxFile2D.h"
 // FIXME: complete the bindings for the rest of the class methods
 class TmxFile2D : Resource
 {
+    void UpdateAnimationTimers(float timeStep);
+
+    unsigned GetNumLayers() const;
+
     void SetSpriteTextureEdgeOffset(float offset);
 
     float GetSpriteTextureEdgeOffset() const;

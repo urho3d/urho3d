@@ -4,6 +4,7 @@ class TileMapLayer2D : Component
 {
     void SetDrawOrder(int drawOrder);
     void SetVisible(bool visible);
+    void UpdateAnimations();
 
     int GetDrawOrder() const;
     bool IsVisible() const;
