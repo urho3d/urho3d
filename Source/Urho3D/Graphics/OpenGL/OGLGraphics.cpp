@@ -53,6 +53,12 @@
 #endif
 
 #ifdef __EMSCRIPTEN__
+#include "../Input/Input.h"
+#include "../UI/Cursor.h"
+#include "../UI/UI.h"
+#include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
+
 // Emscripten provides even all GL extension functions via static linking. However there is
 // no GLES2-specific extension header at the moment to include instanced rendering declarations,
 // so declare them manually from GLES3 gl2ext.h. Emscripten will provide these when linking final output.
@@ -61,6 +67,71 @@ extern "C"
     GL_APICALL void GL_APIENTRY glDrawArraysInstancedANGLE (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
     GL_APICALL void GL_APIENTRY glDrawElementsInstancedANGLE (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
     GL_APICALL void GL_APIENTRY glVertexAttribDivisorANGLE (GLuint index, GLuint divisor);
+}
+
+// Helper functions to support emscripten canvas resolution change
+static const Urho3D::Context *appContext;
+
+static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
+{
+    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d ui scale=%f", width, height, fullscreen, scale);
+
+    using namespace Urho3D;
+
+    if (appContext)
+    {
+        bool uiCursorVisible = false;
+        bool systemCursorVisible = false;
+        MouseMode mouseMode{};
+
+        // Detect current system pointer state
+        Input* input = appContext->GetSubsystem<Input>();
+        if (input)
+        {
+            systemCursorVisible = input->IsMouseVisible();
+            mouseMode = input->GetMouseMode();
+        }
+
+        UI* ui = appContext->GetSubsystem<UI>();
+        if (ui)
+        {
+            ui->SetScale(scale);
+
+            // Detect current UI pointer state
+            Cursor* cursor = ui->GetCursor();
+            if (cursor)
+                uiCursorVisible = cursor->IsVisible();
+        }
+
+        // Apply new resolution
+        appContext->GetSubsystem<Graphics>()->SetMode(width, height);
+
+        // Reset the pointer state as it was before resolution change
+        if (input)
+        {
+            if (uiCursorVisible)
+                input->SetMouseVisible(false);
+            else
+                input->SetMouseVisible(systemCursorVisible);
+
+            input->SetMouseMode(mouseMode);
+        }
+
+        if (ui)
+        {
+            Cursor* cursor = ui->GetCursor();
+            if (cursor)
+            {
+                cursor->SetVisible(uiCursorVisible);
+                cursor->SetPosition(input->GetMousePosition());
+            }
+        }
+    }
+}
+
+using namespace emscripten;
+EMSCRIPTEN_BINDINGS(Module) {
+    function("JSCanvasSize", &JSCanvasSize);
 }
 #endif
 
@@ -242,6 +313,10 @@ Graphics::Graphics(Context* context) :
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
+
+#ifdef __EMSCRIPTEN__
+    appContext = context_;
+#endif
 }
 
 Graphics::~Graphics()
@@ -340,8 +415,11 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
             flags |= SDL_WINDOW_BORDERLESS;
         if (newParams.resizable_)
             flags |= SDL_WINDOW_RESIZABLE;
+
+#ifndef __EMSCRIPTEN__
         if (newParams.highDPI_)
             flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
 
         SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
@@ -2151,6 +2229,12 @@ void Graphics::OnWindowResized()
     ResetRenderTargets();
 
     URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
+
+#ifdef __EMSCRIPTEN__
+    EM_ASM({
+        Module.SetRendererSize($0, $1);
+    }, width_, height_);
+#endif
 
     using namespace ScreenMode;
 
