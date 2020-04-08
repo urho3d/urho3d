@@ -43,6 +43,7 @@ class ResourceCache;
 class Serializer;
 
 /// %Bone in a skeleton.
+/// @fakeref
 struct Bone
 {
     /// Construct with defaults.
@@ -83,6 +84,7 @@ struct Bone
 };
 
 /// Hierarchical collection of bones.
+/// @fakeref
 class URHO3D_API Skeleton
 {
 public:

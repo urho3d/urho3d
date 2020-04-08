@@ -293,11 +293,6 @@ static unsigned FileSystemSystemRunAsync(const String& fileName, CScriptArray* s
 
 static void RegisterSerialization(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("FileMode");
-    engine->RegisterEnumValue("FileMode", "FILE_READ", FILE_READ);
-    engine->RegisterEnumValue("FileMode", "FILE_WRITE", FILE_WRITE);
-    engine->RegisterEnumValue("FileMode", "FILE_READWRITE", FILE_READWRITE);
-
     engine->RegisterGlobalProperty("const uint SCAN_FILES", (void*)&SCAN_FILES);
     engine->RegisterGlobalProperty("const uint SCAN_DIRS", (void*)&SCAN_DIRS);
     engine->RegisterGlobalProperty("const uint SCAN_HIDDEN", (void*)&SCAN_HIDDEN);

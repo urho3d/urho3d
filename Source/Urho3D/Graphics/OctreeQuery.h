@@ -254,6 +254,7 @@ public:
     RayQueryLevel level_;
 };
 
+/// @nobind
 class URHO3D_API AllContentOctreeQuery : public OctreeQuery
 {
 public:

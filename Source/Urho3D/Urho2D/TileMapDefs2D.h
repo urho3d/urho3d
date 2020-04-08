@@ -46,6 +46,7 @@ enum Orientation2D
 };
 
 /// Tile map information.
+/// @fakeref
 struct URHO3D_API TileMapInfo2D
 {
     /// Orientation.

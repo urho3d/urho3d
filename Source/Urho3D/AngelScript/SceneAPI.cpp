@@ -36,22 +36,6 @@ namespace Urho3D
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("AttributeMode");
-    engine->RegisterEnumValue("AttributeMode", "AM_FILE", AM_FILE);
-    engine->RegisterEnumValue("AttributeMode", "AM_NET", AM_NET);
-    engine->RegisterEnumValue("AttributeMode", "AM_DEFAULT", AM_DEFAULT);
-    engine->RegisterEnumValue("AttributeMode", "AM_LATESTDATA", AM_LATESTDATA);
-    engine->RegisterEnumValue("AttributeMode", "AM_NOEDIT", AM_NOEDIT);
-    engine->RegisterEnumValue("AttributeMode", "AM_NODEID", AM_NODEID);
-    engine->RegisterEnumValue("AttributeMode", "AM_COMPONENTID", AM_COMPONENTID);
-    engine->RegisterEnumValue("AttributeMode", "AM_NODEIDVECTOR", AM_NODEIDVECTOR);
-    engine->RegisterEnumValue("AttributeMode", "AM_FILEREADONLY", AM_FILEREADONLY);
-
-    engine->RegisterEnum("AutoRemoveMode");
-    engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_DISABLED", REMOVE_DISABLED);
-    engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_COMPONENT", REMOVE_COMPONENT);
-    engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_NODE", REMOVE_NODE);
-
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
 
@@ -62,11 +46,6 @@ static void ValueAnimationSetEventFrame(float time, const String& eventType, con
 
 static void RegisterValueAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("InterpMethod");
-    engine->RegisterEnumValue("InterpMethod", "IM_NONE", IM_NONE);
-    engine->RegisterEnumValue("InterpMethod", "IM_LINEAR", IM_LINEAR);
-    engine->RegisterEnumValue("InterpMethod", "IM_SPLINE", IM_SPLINE);
-
     RegisterResource<ValueAnimation>(engine, "ValueAnimation");
     engine->RegisterObjectMethod("ValueAnimation", "void set_interpolationMethod(InterpMethod)", asMETHOD(ValueAnimation, SetInterpolationMethod), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "InterpMethod get_interpolationMethod() const", asMETHOD(ValueAnimation, GetInterpolationMethod), asCALL_THISCALL);
@@ -80,11 +59,6 @@ static void RegisterValueAnimation(asIScriptEngine* engine)
 
 static void RegisterObjectAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("WrapMode");
-    engine->RegisterEnumValue("WrapMode", "WM_LOOP", WM_LOOP);
-    engine->RegisterEnumValue("WrapMode", "WM_ONCE", WM_ONCE);
-    engine->RegisterEnumValue("WrapMode", "WM_CLAMP", WM_CLAMP);
-
     RegisterResource<ObjectAnimation>(engine, "ObjectAnimation");
     engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&in, ValueAnimation@+, WrapMode wrapMode=WM_LOOP, float speed=1.0f)", asMETHOD(ObjectAnimation, AddAttributeAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ObjectAnimation, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
@@ -125,15 +99,6 @@ static bool NodeSaveJSONVectorBuffer(VectorBuffer& buffer, Node* ptr)
 
 static void RegisterNode(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("CreateMode");
-    engine->RegisterEnumValue("CreateMode", "REPLICATED", REPLICATED);
-    engine->RegisterEnumValue("CreateMode", "LOCAL", LOCAL);
-
-    engine->RegisterEnum("TransformSpace");
-    engine->RegisterEnumValue("TransformSpace", "TS_LOCAL", TS_LOCAL);
-    engine->RegisterEnumValue("TransformSpace", "TS_PARENT", TS_PARENT);
-    engine->RegisterEnumValue("TransformSpace", "TS_WORLD", TS_WORLD);
-
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");
@@ -331,11 +296,6 @@ static void RegisterSplinePath(asIScriptEngine* engine)
 
 static void RegisterScene(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("LoadMode");
-    engine->RegisterEnumValue("LoadMode", "LOAD_RESOURCES_ONLY", LOAD_RESOURCES_ONLY);
-    engine->RegisterEnumValue("LoadMode", "LOAD_SCENE", LOAD_SCENE);
-    engine->RegisterEnumValue("LoadMode", "LOAD_SCENE_AND_RESOURCES", LOAD_SCENE_AND_RESOURCES);
-
     engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);

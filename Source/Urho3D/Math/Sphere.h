@@ -32,6 +32,7 @@ class Polyhedron;
 class Frustum;
 
 /// %Sphere in three-dimensional space.
+/// @allfloats
 class URHO3D_API Sphere
 {
 public:

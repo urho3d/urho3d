@@ -54,6 +54,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Matrix2(const float* data) noexcept :
         m00_(data[0]),
         m01_(data[1]),
@@ -200,6 +201,7 @@ public:
     Matrix2 Inverse() const;
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &m00_; }
 
     /// Return whether any element is NaN.

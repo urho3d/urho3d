@@ -59,6 +59,7 @@ struct ResourceGroup
 };
 
 /// Resource request types.
+/// @nobind
 enum ResourceRequest
 {
     RESOURCE_CHECKEXISTS = 0,

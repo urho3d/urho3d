@@ -67,17 +67,6 @@ void FakeReleaseRef(void* ptr);
 
 static void RegisterCamera(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("ViewOverride");
-    engine->RegisterEnumValue("ViewOverride", "VO_NONE", VO_NONE);
-    engine->RegisterEnumValue("ViewOverride", "VO_LOW_MATERIAL_QUALITY", VO_LOW_MATERIAL_QUALITY);
-    engine->RegisterEnumValue("ViewOverride", "VO_DISABLE_SHADOWS", VO_DISABLE_SHADOWS);
-    engine->RegisterEnumValue("ViewOverride", "VO_DISABLE_OCCLUSION", VO_DISABLE_OCCLUSION);
-
-    engine->RegisterEnum("FillMode");
-    engine->RegisterEnumValue("FillMode", "FILL_SOLID", FILL_SOLID);
-    engine->RegisterEnumValue("FillMode", "FILL_WIREFRAME", FILL_WIREFRAME);
-    engine->RegisterEnumValue("FillMode", "FILL_POINT", FILL_POINT);
-
     RegisterComponent<Camera>(engine, "Camera");
     engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2&in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float) const", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
@@ -265,73 +254,6 @@ static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
 
 static void RegisterRenderPath(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("BlendMode");
-    engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
-    engine->RegisterEnumValue("BlendMode", "BLEND_MULTIPLY", BLEND_MULTIPLY);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ALPHA", BLEND_ALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ADDALPHA", BLEND_ADDALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_PREMULALPHA", BLEND_PREMULALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_INVDESTALPHA", BLEND_INVDESTALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACT", BLEND_SUBTRACT);
-    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACTALPHA", BLEND_SUBTRACTALPHA);
-
-    engine->RegisterEnum("CubeMapFace");
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Y", FACE_POSITIVE_Y);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Y", FACE_NEGATIVE_Y);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Z", FACE_POSITIVE_Z);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
-
-    engine->RegisterEnum("RenderCommandType");
-    engine->RegisterEnumValue("RenderCommandType", "CMD_NONE", CMD_NONE);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_CLEAR", CMD_CLEAR);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_SCENEPASS", CMD_SCENEPASS);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_QUAD", CMD_QUAD);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_FORWARDLIGHTS", CMD_FORWARDLIGHTS);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_LIGHTVOLUMES", CMD_LIGHTVOLUMES);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_RENDERUI", CMD_RENDERUI);
-    engine->RegisterEnumValue("RenderCommandType", "CMD_SENDEVENT", CMD_SENDEVENT);
-
-    engine->RegisterEnum("RenderCommandSortMode");
-    engine->RegisterEnumValue("RenderCommandSortMode", "SORT_FRONTTOBACK", SORT_FRONTTOBACK);
-    engine->RegisterEnumValue("RenderCommandSortMode", "SORT_BACKTOFRONT", SORT_BACKTOFRONT);
-
-    engine->RegisterEnum("RenderTargetSizeMode");
-    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_ABSOLUTE", SIZE_ABSOLUTE);
-    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_VIEWPORTDIVISOR", SIZE_VIEWPORTDIVISOR);
-    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_VIEWPORTMULTIPLIER", SIZE_VIEWPORTMULTIPLIER);
-
-    engine->RegisterEnum("TextureUnit");
-    engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
-    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
-    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
-    engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
-    engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
-    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
-    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
-    engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
-#ifdef DESKTOP_GRAPHICS
-    engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM1", TU_CUSTOM1);
-    engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM2", TU_CUSTOM2);
-    engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
-    engine->RegisterEnumValue("TextureUnit", "TU_FACESELECT", TU_FACESELECT);
-    engine->RegisterEnumValue("TextureUnit", "TU_INDIRECTION", TU_INDIRECTION);
-    engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_ZONE", TU_ZONE);
-#endif
-    engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
-    engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
-
-    engine->RegisterEnum("ClearTarget");
-    engine->RegisterEnumValue("ClearTarget", "CLEAR_COLOR", CLEAR_COLOR);
-    engine->RegisterEnumValue("ClearTarget", "CLEAR_DEPTH", CLEAR_DEPTH);
-    engine->RegisterEnumValue("ClearTarget", "CLEAR_STENCIL", CLEAR_STENCIL);
-
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderTargetInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f(const RenderTargetInfo&in)", asFUNCTION(ConstructRenderTargetInfoCopy), asCALL_CDECL_OBJLAST);
@@ -421,35 +343,6 @@ static void RegisterTextures(asIScriptEngine* engine)
 {
     /// \todo Expose getting/setting raw texture data
 
-    engine->RegisterEnum("TextureUsage");
-    engine->RegisterEnumValue("TextureUsage", "TEXTURE_STATIC", TEXTURE_STATIC);
-    engine->RegisterEnumValue("TextureUsage", "TEXTURE_DYNAMIC", TEXTURE_DYNAMIC);
-    engine->RegisterEnumValue("TextureUsage", "TEXTURE_RENDERTARGET", TEXTURE_RENDERTARGET);
-    engine->RegisterEnumValue("TextureUsage", "TEXTURE_DEPTHSTENCIL", TEXTURE_DEPTHSTENCIL);
-
-    engine->RegisterEnum("TextureFilterMode");
-    engine->RegisterEnumValue("TextureFilterMode", "FILTER_NEAREST", FILTER_NEAREST);
-    engine->RegisterEnumValue("TextureFilterMode", "FILTER_BILINEAR", FILTER_BILINEAR);
-    engine->RegisterEnumValue("TextureFilterMode", "FILTER_TRILINEAR", FILTER_TRILINEAR);
-    engine->RegisterEnumValue("TextureFilterMode", "FILTER_ANISOTROPIC", FILTER_ANISOTROPIC);
-    engine->RegisterEnumValue("TextureFilterMode", "FILTER_NEAREST_ANISOTROPIC", FILTER_NEAREST_ANISOTROPIC);
-    engine->RegisterEnumValue("TextureFilterMode", "FILTER_DEFAULT", FILTER_DEFAULT);
-
-    engine->RegisterEnum("TextureAddressMode");
-    engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_WRAP", ADDRESS_WRAP);
-    engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_MIRROR", ADDRESS_MIRROR);
-    engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_CLAMP", ADDRESS_CLAMP);
-    engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_BORDER", ADDRESS_BORDER);
-
-    engine->RegisterEnum("TextureCoordinate");
-    engine->RegisterEnumValue("TextureCoordinate", "COORD_U", COORD_U);
-    engine->RegisterEnumValue("TextureCoordinate", "COORD_V", COORD_V);
-    engine->RegisterEnumValue("TextureCoordinate", "COORD_W", COORD_W);
-
-    engine->RegisterEnum("RenderSurfaceUpdateMode");
-    engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_MANUALUPDATE", SURFACE_MANUALUPDATE);
-    engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_UPDATEVISIBLE", SURFACE_UPDATEVISIBLE);
-    engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_UPDATEALWAYS", SURFACE_UPDATEALWAYS);
     RegisterTexture<Texture>(engine, "Texture");
 
     RegisterObject<Viewport>(engine, "Viewport");
@@ -727,53 +620,6 @@ static VectorBuffer IndexBufferGetData(IndexBuffer* ptr)
 
 static void RegisterBuffers(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("VertexMask");
-    engine->RegisterEnumValue("VertexMask", "MASK_NONE", MASK_NONE);
-    engine->RegisterEnumValue("VertexMask", "MASK_POSITION", MASK_POSITION);
-    engine->RegisterEnumValue("VertexMask", "MASK_NORMAL", MASK_NORMAL);
-    engine->RegisterEnumValue("VertexMask", "MASK_COLOR", MASK_COLOR);
-    engine->RegisterEnumValue("VertexMask", "MASK_TEXCOORD1", MASK_TEXCOORD1);
-    engine->RegisterEnumValue("VertexMask", "MASK_TEXCOORD2", MASK_TEXCOORD2);
-    engine->RegisterEnumValue("VertexMask", "MASK_CUBETEXCOORD1", MASK_CUBETEXCOORD1);
-    engine->RegisterEnumValue("VertexMask", "MASK_CUBETEXCOORD2", MASK_CUBETEXCOORD2);
-    engine->RegisterEnumValue("VertexMask", "MASK_TANGENT", MASK_TANGENT);
-    engine->RegisterEnumValue("VertexMask", "MASK_BLENDWEIGHTS", MASK_BLENDWEIGHTS);
-    engine->RegisterEnumValue("VertexMask", "MASK_BLENDINDICES", MASK_BLENDINDICES);
-    engine->RegisterEnumValue("VertexMask", "MASK_INSTANCEMATRIX1", MASK_INSTANCEMATRIX1);
-    engine->RegisterEnumValue("VertexMask", "MASK_INSTANCEMATRIX2", MASK_INSTANCEMATRIX2);
-    engine->RegisterEnumValue("VertexMask", "MASK_INSTANCEMATRIX3", MASK_INSTANCEMATRIX3);
-    engine->RegisterEnumValue("VertexMask", "MASK_OBJECTINDEX", MASK_OBJECTINDEX);
-
-    engine->RegisterEnum("PrimitiveType");
-    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
-    engine->RegisterEnumValue("PrimitiveType", "LINE_LIST", LINE_LIST);
-    engine->RegisterEnumValue("PrimitiveType", "POINT_LIST", POINT_LIST);
-    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_STRIP", TRIANGLE_STRIP);
-    engine->RegisterEnumValue("PrimitiveType", "LINE_STRIP", LINE_STRIP);
-    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_FAN", TRIANGLE_FAN);
-
-    engine->RegisterEnum("VertexElementType");
-    engine->RegisterEnumValue("VertexElementType", "TYPE_INT", TYPE_INT);
-    engine->RegisterEnumValue("VertexElementType", "TYPE_FLOAT", TYPE_FLOAT);
-    engine->RegisterEnumValue("VertexElementType", "TYPE_VECTOR2", TYPE_VECTOR2);
-    engine->RegisterEnumValue("VertexElementType", "TYPE_VECTOR3", TYPE_VECTOR3);
-    engine->RegisterEnumValue("VertexElementType", "TYPE_VECTOR4", TYPE_VECTOR4);
-    engine->RegisterEnumValue("VertexElementType", "TYPE_UBYTE4", TYPE_UBYTE4);
-    engine->RegisterEnumValue("VertexElementType", "TYPE_UBYTE4_NORM", TYPE_UBYTE4_NORM);
-    engine->RegisterEnumValue("VertexElementType", "MAX_VERTEX_ELEMENT_TYPES", MAX_VERTEX_ELEMENT_TYPES);
-
-    engine->RegisterEnum("VertexElementSemantic");
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_POSITION", SEM_POSITION);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_NORMAL", SEM_NORMAL);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_BINORMAL", SEM_BINORMAL);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_TANGENT", SEM_TANGENT);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_TEXCOORD", SEM_TEXCOORD);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_COLOR", SEM_COLOR);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_BLENDWEIGHTS", SEM_BLENDWEIGHTS);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_BLENDINDICES", SEM_BLENDINDICES);
-    engine->RegisterEnumValue("VertexElementSemantic", "SEM_OBJECTINDEX", SEM_OBJECTINDEX);
-    engine->RegisterEnumValue("VertexElementSemantic", "MAX_VERTEX_ELEMENT_SEMANTICS", MAX_VERTEX_ELEMENT_SEMANTICS);
-
     engine->RegisterObjectType("VertexElement", sizeof(VertexElement), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVertexElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(const VertexElement&in)", asFUNCTION(ConstructVertexElementCopy), asCALL_CDECL_OBJLAST);
@@ -847,25 +693,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
     engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
     engine->RegisterObjectProperty("BiasParameters", "float normalOffset", offsetof(BiasParameters, normalOffset_));
-
-    engine->RegisterEnum("CompareMode");
-    engine->RegisterEnumValue("CompareMode", "CMP_ALWAYS", CMP_ALWAYS);
-    engine->RegisterEnumValue("CompareMode", "CMP_EQUAL", CMP_EQUAL);
-    engine->RegisterEnumValue("CompareMode", "CMP_NOTEQUAL", CMP_NOTEQUAL);
-    engine->RegisterEnumValue("CompareMode", "CMP_LESS", CMP_LESS);
-    engine->RegisterEnumValue("CompareMode", "CMP_LESSEQUAL", CMP_LESSEQUAL);
-    engine->RegisterEnumValue("CompareMode", "CMP_GREATER", CMP_GREATER);
-    engine->RegisterEnumValue("CompareMode", "CMP_GREATEREQUAL", CMP_GREATEREQUAL);
-
-    engine->RegisterEnum("CullMode");
-    engine->RegisterEnumValue("CullMode", "CULL_NONE", CULL_NONE);
-    engine->RegisterEnumValue("CullMode", "CULL_CCW", CULL_CCW);
-    engine->RegisterEnumValue("CullMode", "CULL_CW", CULL_CW);
-
-    engine->RegisterEnum("PassLightingMode");
-    engine->RegisterEnumValue("PassLightingMode", "LIGHTING_UNLIT", LIGHTING_UNLIT);
-    engine->RegisterEnumValue("PassLightingMode", "LIGHTING_PERVERTEX", LIGHTING_PERVERTEX);
-    engine->RegisterEnumValue("PassLightingMode", "LIGHTING_PERPIXEL", LIGHTING_PERPIXEL);
 
     RegisterRefCounted<Pass>(engine, "Pass");
     engine->RegisterObjectMethod("Pass", "void set_blendMode(BlendMode)", asMETHOD(Pass, SetBlendMode), asCALL_THISCALL);
@@ -1088,11 +915,6 @@ static Animation* AnimationClone(const String& cloneName, Animation* ptr)
 
 static void RegisterAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("AnimationChannel");
-    engine->RegisterEnumValue("AnimationChannel", "CHANNEL_POSITION", CHANNEL_POSITION);
-    engine->RegisterEnumValue("AnimationChannel", "CHANNEL_ROTATION", CHANNEL_ROTATION);
-    engine->RegisterEnumValue("AnimationChannel", "CHANNEL_SCALE", CHANNEL_SCALE);
-
     engine->RegisterObjectType("AnimationKeyFrame", sizeof(AnimationKeyFrame), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAnimationKeyFrame), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f(const AnimationKeyFrame&in)", asFUNCTION(ConstructAnimationKeyFrameCopy), asCALL_CDECL_OBJLAST);
@@ -1190,11 +1012,6 @@ static void ConstructFocusParametersInit(bool focus, bool nonUniform, bool autoS
 
 static void RegisterLight(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("LightType");
-    engine->RegisterEnumValue("LightType", "LIGHT_DIRECTIONAL", LIGHT_DIRECTIONAL);
-    engine->RegisterEnumValue("LightType", "LIGHT_SPOT", LIGHT_SPOT);
-    engine->RegisterEnumValue("LightType", "LIGHT_POINT", LIGHT_POINT);
-
     engine->RegisterObjectType("CascadeParameters", sizeof(CascadeParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructCascadeParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f(const CascadeParameters&in)", asFUNCTION(ConstructCascadeParametersCopy), asCALL_CDECL_OBJLAST);
@@ -1372,10 +1189,6 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     RegisterRefCounted<AnimationState>(engine, "AnimationState");
     RegisterStaticModel<AnimatedModel>(engine, "AnimatedModel", false);
 
-    engine->RegisterEnum("AnimationBlendMode");
-    engine->RegisterEnumValue("AnimationBlendMode", "ABM_LERP", ABM_LERP);
-    engine->RegisterEnumValue("AnimationBlendMode", "ABM_ADDITIVE", ABM_ADDITIVE);
-
     engine->RegisterObjectBehaviour("AnimationState", asBEHAVE_FACTORY, "AnimationState@+ f(Node@+, Animation@+)", asFUNCTION(ConstructAnimationState), asCALL_CDECL);
     engine->RegisterObjectMethod("AnimationState", "void AddWeight(float)", asMETHOD(AnimationState, AddWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void AddTime(float)", asMETHOD(AnimationState, AddTime), asCALL_THISCALL);
@@ -1498,15 +1311,6 @@ static void RegisterAnimationController(asIScriptEngine* engine)
 
 static void RegisterBillboardSet(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("FaceCameraMode");
-    engine->RegisterEnumValue("FaceCameraMode", "FC_NONE", FC_NONE);
-    engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_XYZ", FC_ROTATE_XYZ);
-    engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_Y", FC_ROTATE_Y);
-    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_XYZ", FC_LOOKAT_XYZ);
-    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_Y", FC_LOOKAT_Y);
-    engine->RegisterEnumValue("FaceCameraMode", "FC_LOOKAT_MIXED", FC_LOOKAT_MIXED);
-    engine->RegisterEnumValue("FaceCameraMode", "FC_DIRECTION", FC_DIRECTION);
-
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -1553,13 +1357,6 @@ static ParticleEffect* ParticleEffectClone(const String& cloneName, ParticleEffe
 
 static void RegisterParticleEffect(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("EmitterType");
-    engine->RegisterEnumValue("EmitterType", "EMITTER_SPHERE", EMITTER_SPHERE);
-    engine->RegisterEnumValue("EmitterType", "EMITTER_BOX", EMITTER_BOX);
-    engine->RegisterEnumValue("EmitterType", "EMITTER_SPHEREVOLUME", EMITTER_SPHEREVOLUME);
-    engine->RegisterEnumValue("EmitterType", "EMITTER_CYLINDER", EMITTER_CYLINDER);
-    engine->RegisterEnumValue("EmitterType", "EMITTER_RING", EMITTER_RING);
-
     engine->RegisterObjectType("ColorFrame", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -1700,10 +1497,6 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
 
 static void RegisterRibbonTrail(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("TrailType");
-    engine->RegisterEnumValue("TrailType", "TT_FACE_CAMERA", TT_FACE_CAMERA);
-    engine->RegisterEnumValue("TrailType", "TT_BONE", TT_BONE);
-
     RegisterDrawable<RibbonTrail>(engine, "RibbonTrail");
     engine->RegisterObjectMethod("RibbonTrail", "void Commit()", asMETHOD(RibbonTrail, Commit), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_material(Material@+)", asMETHOD(RibbonTrail, SetMaterial), asCALL_THISCALL);
@@ -1960,20 +1753,6 @@ static void RendererSetVSMShadowParameters(const Vector2& parameters, Renderer* 
 
 static void RegisterRenderer(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("MaterialQuality");
-    engine->RegisterEnumValue("MaterialQuality", "QUALITY_LOW", QUALITY_LOW);
-    engine->RegisterEnumValue("MaterialQuality", "QUALITY_MEDIUM", QUALITY_MEDIUM);
-    engine->RegisterEnumValue("MaterialQuality", "QUALITY_HIGH", QUALITY_HIGH);
-    engine->RegisterEnumValue("MaterialQuality", "QUALITY_MAX", QUALITY_MAX);
-
-    engine->RegisterEnum("ShadowQuality");
-    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_16BIT", SHADOWQUALITY_SIMPLE_16BIT);
-    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_24BIT", SHADOWQUALITY_SIMPLE_24BIT);
-    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_PCF_16BIT", SHADOWQUALITY_PCF_16BIT);
-    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_PCF_24BIT", SHADOWQUALITY_PCF_24BIT);
-    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_VSM", SHADOWQUALITY_VSM);
-    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_BLUR_VSM", SHADOWQUALITY_BLUR_VSM);
-
     RegisterObject<Renderer>(engine, "Renderer");
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void ReloadShaders() const", asMETHOD(Renderer, ReloadShaders), asCALL_THISCALL);
@@ -2185,12 +1964,6 @@ static Octree* GetOctree()
 
 static void RegisterOctree(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("RayQueryLevel");
-    engine->RegisterEnumValue("RayQueryLevel", "RAY_AABB", RAY_AABB);
-    engine->RegisterEnumValue("RayQueryLevel", "RAY_OBB", RAY_OBB);
-    engine->RegisterEnumValue("RayQueryLevel", "RAY_TRIANGLE", RAY_TRIANGLE);
-    engine->RegisterEnumValue("RayQueryLevel", "RAY_TRIANGLE_UV", RAY_TRIANGLE_UV);
-
     engine->RegisterObjectType("RayQueryResult", sizeof(RayQueryResult), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RayQueryResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRayQueryResult), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("RayQueryResult", "Vector3 position", offsetof(RayQueryResult, position_));

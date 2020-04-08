@@ -30,6 +30,7 @@
 namespace Urho3D
 {
 
+/// @nobind
 enum UpdateEvent : unsigned
 {
     /// Bitmask for not using any events.

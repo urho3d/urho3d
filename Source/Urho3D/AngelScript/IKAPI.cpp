@@ -32,14 +32,6 @@
 namespace Urho3D
 {
 
-static void RegisterIKEnumerations(asIScriptEngine* engine)
-{
-    engine->RegisterEnum("IKAlgorithm");
-    engine->RegisterEnumValue("IKAlgorithm", "ONE_BONE", IKSolver::ONE_BONE);
-    engine->RegisterEnumValue("IKAlgorithm", "TWO_BONE", IKSolver::TWO_BONE);
-    engine->RegisterEnumValue("IKAlgorithm", "FABRIK", IKSolver::FABRIK);
-}
-
 void RegisterIKSolver(asIScriptEngine* engine)
 {
     RegisterComponent<IKSolver>(engine, "IKSolver");
@@ -104,7 +96,6 @@ static void RegisterIKConstraint(asIScriptEngine* engine)
 
 void RegisterIKAPI(asIScriptEngine* engine)
 {
-    RegisterIKEnumerations(engine);
     RegisterIKSolver(engine);
     RegisterIKEffector(engine);
     //RegisterIKConstraint(engine);

@@ -21,6 +21,7 @@
 //
 
 /// \file
+/// @nobindfile
 
 #pragma once
 

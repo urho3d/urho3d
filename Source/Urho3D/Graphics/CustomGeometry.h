@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 /// Custom geometry vertex.
+/// @fakeref
 struct CustomGeometryVertex
 {
     /// Position.

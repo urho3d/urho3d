@@ -52,6 +52,7 @@ enum PrimitiveType
 };
 
 /// %Geometry type for vertex shader geometry variations.
+/// @nobind
 enum GeometryType
 {
     GEOM_STATIC = 0,
@@ -112,6 +113,7 @@ enum FillMode
 };
 
 /// Stencil operation.
+/// @nobind
 enum StencilOp
 {
     OP_KEEP = 0,
@@ -122,6 +124,7 @@ enum StencilOp
 };
 
 /// Vertex/index buffer lock state.
+/// @nobind
 enum LockState
 {
     LOCK_NONE = 0,
@@ -131,6 +134,7 @@ enum LockState
 };
 
 /// Hardcoded legacy vertex elements.
+/// @nobind
 enum LegacyVertexElement
 {
     ELEMENT_POSITION = 0,
@@ -279,6 +283,7 @@ enum CubeMapFace
 };
 
 /// Cubemap single image layout modes.
+/// @nobind
 enum CubeMapLayout
 {
     CML_HORIZONTAL = 0,
@@ -297,6 +302,7 @@ enum RenderSurfaceUpdateMode
 };
 
 /// Shader types.
+/// @nobind
 enum ShaderType
 {
     VS = 0,
@@ -304,6 +310,7 @@ enum ShaderType
 };
 
 /// Shader parameter groups for determining need to update. On APIs that support constant buffers, these correspond to different constant buffers.
+/// @nobind
 enum ShaderParameterGroup
 {
     SP_FRAME = 0,
@@ -317,6 +324,7 @@ enum ShaderParameterGroup
 };
 
 /// Texture units.
+/// @manualbind
 enum TextureUnit
 {
     TU_DIFFUSE = 0,

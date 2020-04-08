@@ -143,11 +143,6 @@ static void RegisterAnimationSet2D(asIScriptEngine* engine)
 
 static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("LoopMode2D");
-    engine->RegisterEnumValue("LoopMode2D", "LM_DEFAULT", LM_DEFAULT);
-    engine->RegisterEnumValue("LoopMode2D", "LM_FORCE_LOOPED", LM_FORCE_LOOPED);
-    engine->RegisterEnumValue("LoopMode2D", "LM_FORCE_CLAMPED", LM_FORCE_CLAMPED);
-
     RegisterStaticSprite2D<AnimatedSprite2D>(engine, "AnimatedSprite2D");
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animationSet(AnimationSet2D@+)", asMETHOD(AnimatedSprite2D, SetAnimationSet), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "AnimationSet2D@+ get_animationSet() const", asMETHOD(AnimatedSprite2D, GetAnimationSet), asCALL_THISCALL);
@@ -180,10 +175,6 @@ static ParticleEffect2D* ParticleEffect2DClone(const String& cloneName, Particle
 
 static void RegisterParticleEffect2D(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("EmitterType2D");
-    engine->RegisterEnumValue("EmitterType2D", "EMITTER_TYPE_GRAVITY", EMITTER_TYPE_GRAVITY);
-    engine->RegisterEnumValue("EmitterType2D", "EMITTER_TYPE_RADIAL", EMITTER_TYPE_RADIAL);
-
     RegisterResource<ParticleEffect2D>(engine, "ParticleEffect2D");
     engine->RegisterObjectMethod("ParticleEffect2D", "ParticleEffect2D@ Clone(const String&in cloneName = String()) const", asFUNCTION(ParticleEffect2DClone), asCALL_CDECL_OBJLAST);
 }
@@ -211,12 +202,6 @@ static void FakeReleaseRef(void* ptr)
 
 static void RegisterTileMapDefs2D(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("Orientation2D");
-    engine->RegisterEnumValue("Orientation2D", "O_ORTHOGONAL", O_ORTHOGONAL);
-    engine->RegisterEnumValue("Orientation2D", "O_ISOMETRIC", O_ISOMETRIC);
-    engine->RegisterEnumValue("Orientation2D", "O_STAGGERED", O_STAGGERED);
-    engine->RegisterEnumValue("Orientation2D", "O_HEXAGONAL", O_HEXAGONAL);
-
     engine->RegisterObjectType("TileMapInfo2D", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -227,20 +212,6 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TileMapInfo2D", "float tileHeight", offsetof(TileMapInfo2D, tileHeight_));
     engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapWidth() const", asMETHOD(TileMapInfo2D, GetMapWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapHeight() const", asMETHOD(TileMapInfo2D, GetMapHeight), asCALL_THISCALL);
-
-    engine->RegisterEnum("TileMapLayerType2D");
-    engine->RegisterEnumValue("TileMapLayerType2D", "LT_TILE_LAYER", LT_TILE_LAYER);
-    engine->RegisterEnumValue("TileMapLayerType2D", "LT_OBJECT_GROUP", LT_OBJECT_GROUP);
-    engine->RegisterEnumValue("TileMapLayerType2D", "LT_IMAGE_LAYER", LT_IMAGE_LAYER);
-    engine->RegisterEnumValue("TileMapLayerType2D", "LT_INVALID", LT_INVALID);
-
-    engine->RegisterEnum("TileObjectType2D");
-    engine->RegisterEnumValue("TileObjectType2D", "OT_RECTANGLE", OT_RECTANGLE);
-    engine->RegisterEnumValue("TileObjectType2D", "OT_ELLIPSE", OT_ELLIPSE);
-    engine->RegisterEnumValue("TileObjectType2D", "OT_POLYGON", OT_POLYGON);
-    engine->RegisterEnumValue("TileObjectType2D", "OT_POLYLINE", OT_POLYLINE);
-    engine->RegisterEnumValue("TileObjectType2D", "OT_TILE", OT_TILE);
-    engine->RegisterEnumValue("TileObjectType2D", "OT_INVALID", OT_INVALID);
 
     RegisterRefCounted<PropertySet2D>(engine, "PropertySet2D");
     engine->RegisterObjectMethod("PropertySet2D", "bool HasProperty(const String&in) const", asMETHOD(PropertySet2D, HasProperty), asCALL_THISCALL);
@@ -262,7 +233,7 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHOD(Tile2D, HasProperty), asCALL_THISCALL);
 
     RegisterRefCounted<TileMapObject2D>(engine, "TileMapObject2D");
-    engine->RegisterObjectMethod("TileMapObject2D", "TileObjectType2D get_objectType() const", asMETHOD(TileMapObject2D, GetObjectType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "TileMapObjectType2D get_objectType() const", asMETHOD(TileMapObject2D, GetObjectType), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapObject2D", "const String& get_name() const", asMETHOD(TileMapObject2D, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapObject2D", "const String& get_type() const", asMETHOD(TileMapObject2D, GetType), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& get_position() const", asMETHOD(TileMapObject2D, GetPosition), asCALL_THISCALL);
@@ -332,11 +303,6 @@ static void RegisterTileMap2D(asIScriptEngine* engine)
 
 static void RegisterRigidBody2D(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("BodyType2D");
-    engine->RegisterEnumValue("BodyType2D", "BT_STATIC", BT_STATIC);
-    engine->RegisterEnumValue("BodyType2D", "BT_KINEMATIC", BT_KINEMATIC);
-    engine->RegisterEnumValue("BodyType2D", "BT_DYNAMIC", BT_DYNAMIC);
-
     RegisterComponent<RigidBody2D>(engine, "RigidBody2D");
     engine->RegisterObjectMethod("RigidBody2D", "void set_bodyType(BodyType2D)", asMETHOD(RigidBody2D, SetBodyType), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "BodyType2D get_bodyType() const", asMETHOD(RigidBody2D, GetBodyType), asCALL_THISCALL);
