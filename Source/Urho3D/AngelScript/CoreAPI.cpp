@@ -451,34 +451,6 @@ static CScriptArray* VariantMapGetValues(const VariantMap& map)
 
 static void RegisterVariant(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("VariantType");
-    engine->RegisterEnumValue("VariantType", "VAR_NONE", VAR_NONE);
-    engine->RegisterEnumValue("VariantType", "VAR_INT", VAR_INT);
-    engine->RegisterEnumValue("VariantType", "VAR_BOOL", VAR_BOOL);
-    engine->RegisterEnumValue("VariantType", "VAR_FLOAT", VAR_FLOAT);
-    engine->RegisterEnumValue("VariantType", "VAR_VECTOR2", VAR_VECTOR2);
-    engine->RegisterEnumValue("VariantType", "VAR_VECTOR3", VAR_VECTOR3);
-    engine->RegisterEnumValue("VariantType", "VAR_VECTOR4", VAR_VECTOR4);
-    engine->RegisterEnumValue("VariantType", "VAR_QUATERNION", VAR_QUATERNION);
-    engine->RegisterEnumValue("VariantType", "VAR_COLOR", VAR_COLOR);
-    engine->RegisterEnumValue("VariantType", "VAR_STRING", VAR_STRING);
-    engine->RegisterEnumValue("VariantType", "VAR_BUFFER", VAR_BUFFER);
-    engine->RegisterEnumValue("VariantType", "VAR_VOIDPTR", VAR_VOIDPTR);
-    engine->RegisterEnumValue("VariantType", "VAR_RESOURCEREF", VAR_RESOURCEREF);
-    engine->RegisterEnumValue("VariantType", "VAR_RESOURCEREFLIST", VAR_RESOURCEREFLIST);
-    engine->RegisterEnumValue("VariantType", "VAR_VARIANTVECTOR", VAR_VARIANTVECTOR);
-    engine->RegisterEnumValue("VariantType", "VAR_VARIANTMAP", VAR_VARIANTMAP);
-    engine->RegisterEnumValue("VariantType", "VAR_INTRECT", VAR_INTRECT);
-    engine->RegisterEnumValue("VariantType", "VAR_INTVECTOR2", VAR_INTVECTOR2);
-    engine->RegisterEnumValue("VariantType", "VAR_INTVECTOR3", VAR_INTVECTOR3);
-    engine->RegisterEnumValue("VariantType", "VAR_PTR", VAR_PTR);
-    engine->RegisterEnumValue("VariantType", "VAR_MATRIX3", VAR_MATRIX3);
-    engine->RegisterEnumValue("VariantType", "VAR_MATRIX3X4", VAR_MATRIX3X4);
-    engine->RegisterEnumValue("VariantType", "VAR_MATRIX4", VAR_MATRIX4);
-    engine->RegisterEnumValue("VariantType", "VAR_DOUBLE", VAR_DOUBLE);
-    engine->RegisterEnumValue("VariantType", "VAR_STRINGVECTOR", VAR_STRINGVECTOR);
-    engine->RegisterEnumValue("VariantType", "VAR_RECT", VAR_RECT);
-
     engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CK);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ConstructResourceRefCopy), asCALL_CDECL_OBJLAST);
@@ -693,12 +665,6 @@ static void SetSplineKnot(unsigned index, const Variant& in, Spline* ptr)
 
 static void RegisterSpline(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("InterpolationMode");
-    engine->RegisterEnumValue("InterpolationMode", "BEZIER_CURVE", BEZIER_CURVE);
-    engine->RegisterEnumValue("InterpolationMode", "CATMULL_ROM_CURVE", CATMULL_ROM_CURVE);
-    engine->RegisterEnumValue("InterpolationMode", "LINEAR_CURVE", LINEAR_CURVE);
-    engine->RegisterEnumValue("InterpolationMode", "CATMULL_ROM_FULL_CURVE", CATMULL_ROM_FULL_CURVE);
-
     engine->RegisterObjectType("Spline", sizeof(Spline), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f()", asFUNCTIONPR(ConstructSpline, (Spline*), void), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(InterpolationMode)", asFUNCTIONPR(ConstructSpline, (InterpolationMode, Spline*), void), asCALL_CDECL_OBJLAST);

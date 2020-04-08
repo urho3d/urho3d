@@ -200,18 +200,6 @@ static bool ImageLoadColorLUTVectorBuffer(VectorBuffer& buffer, Image* ptr)
 
 static void RegisterImage(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("CompressedFormat");
-    engine->RegisterEnumValue("CompressedFormat", "CF_NONE", 0);
-    engine->RegisterEnumValue("CompressedFormat", "CF_RGBA", 1);
-    engine->RegisterEnumValue("CompressedFormat", "CF_DXT1", 2);
-    engine->RegisterEnumValue("CompressedFormat", "CF_DXT3", 3);
-    engine->RegisterEnumValue("CompressedFormat", "CF_DXT5", 4);
-    engine->RegisterEnumValue("CompressedFormat", "CF_ETC1", 5);
-    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGB_2BPP", 6);
-    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGBA_2BPP", 7);
-    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGB_4BPP", 8);
-    engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGBA_4BPP", 9);
-
     RegisterResource<Image>(engine, "Image");
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
@@ -350,20 +338,6 @@ static void JSONValueSetVariantMap(const VariantMap& variantMap, JSONValue& json
 
 static void RegisterJSONValue(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("JSONValueType");
-    engine->RegisterEnumValue("JSONValueType", "JSON_NULL", JSON_NULL);
-    engine->RegisterEnumValue("JSONValueType", "JSON_BOOL", JSON_BOOL);
-    engine->RegisterEnumValue("JSONValueType", "JSON_NUMBER", JSON_NUMBER);
-    engine->RegisterEnumValue("JSONValueType", "JSON_STRING", JSON_STRING);
-    engine->RegisterEnumValue("JSONValueType", "JSON_ARRAY", JSON_ARRAY);
-    engine->RegisterEnumValue("JSONValueType", "JSON_OBJECT", JSON_OBJECT);
-
-    engine->RegisterEnum("JSONNumberType");
-    engine->RegisterEnumValue("JSONNumberType", "JSONNT_NAN", JSONNT_NAN);
-    engine->RegisterEnumValue("JSONNumberType", "JSONNT_INT", JSONNT_INT);
-    engine->RegisterEnumValue("JSONNumberType", "JSONNT_UINT", JSONNT_UINT);
-    engine->RegisterEnumValue("JSONNumberType", "JSONNT_FLOAT_DOUBLE", JSONNT_FLOAT_DOUBLE);
-
     engine->RegisterObjectType("JSONValue", sizeof(JSONValue), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructJSONValue), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(ConstructJSONValueBool), asCALL_CDECL_OBJLAST);

@@ -65,6 +65,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Matrix3(const float* data) noexcept :
         m00_(data[0]),
         m01_(data[1]),
@@ -260,6 +261,7 @@ public:
     Matrix3 Inverse() const;
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &m00_; }
 
     /// Return matrix element.

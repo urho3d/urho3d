@@ -69,11 +69,6 @@ static bool FontSaveXMLFile(File* file, int pointSize, bool usedGlyphs, const St
 
 static void RegisterFont(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("FontType");
-    engine->RegisterEnumValue("FontType", "FONT_NONE", FONT_NONE);
-    engine->RegisterEnumValue("FontType", "FONT_FREETYPE", FONT_FREETYPE);
-    engine->RegisterEnumValue("FontType", "FONT_BITMAP", FONT_BITMAP);
-
     RegisterResource<Font>(engine, "Font");
     engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
@@ -88,49 +83,6 @@ static void RegisterFont(asIScriptEngine* engine)
 
 static void RegisterUIElement(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("HorizontalAlignment");
-    engine->RegisterEnumValue("HorizontalAlignment", "HA_LEFT", HA_LEFT);
-    engine->RegisterEnumValue("HorizontalAlignment", "HA_CENTER", HA_CENTER);
-    engine->RegisterEnumValue("HorizontalAlignment", "HA_RIGHT", HA_RIGHT);
-    engine->RegisterEnumValue("HorizontalAlignment", "HA_CUSTOM", HA_CUSTOM);
-
-    engine->RegisterEnum("VerticalAlignment");
-    engine->RegisterEnumValue("VerticalAlignment", "VA_TOP", VA_TOP);
-    engine->RegisterEnumValue("VerticalAlignment", "VA_CENTER", VA_CENTER);
-    engine->RegisterEnumValue("VerticalAlignment", "VA_BOTTOM", VA_BOTTOM);
-    engine->RegisterEnumValue("VerticalAlignment", "VA_CUSTOM", VA_CUSTOM);
-
-    engine->RegisterEnum("Corner");
-    engine->RegisterEnumValue("Corner", "C_TOPLEFT", C_TOPLEFT);
-    engine->RegisterEnumValue("Corner", "C_TOPRIGHT", C_TOPRIGHT);
-    engine->RegisterEnumValue("Corner", "C_BOTTOMLEFT", C_BOTTOMLEFT);
-    engine->RegisterEnumValue("Corner", "C_BOTTOMRIGHT", C_BOTTOMRIGHT);
-
-    engine->RegisterEnum("Orientation");
-    engine->RegisterEnumValue("Orientation", "O_HORIZONTAL", O_HORIZONTAL);
-    engine->RegisterEnumValue("Orientation", "O_VERTICAL", O_VERTICAL);
-
-    engine->RegisterEnum("FocusMode");
-    engine->RegisterEnumValue("FocusMode", "FM_NOTFOCUSABLE", FM_NOTFOCUSABLE);
-    engine->RegisterEnumValue("FocusMode", "FM_RESETFOCUS", FM_RESETFOCUS);
-    engine->RegisterEnumValue("FocusMode", "FM_FOCUSABLE", FM_FOCUSABLE);
-    engine->RegisterEnumValue("FocusMode", "FM_FOCUSABLE_DEFOCUSABLE", FM_FOCUSABLE_DEFOCUSABLE);
-
-    engine->RegisterEnum("LayoutMode");
-    engine->RegisterEnumValue("LayoutMode", "LM_FREE", LM_FREE);
-    engine->RegisterEnumValue("LayoutMode", "LM_HORIZONTAL", LM_HORIZONTAL);
-    engine->RegisterEnumValue("LayoutMode", "LM_VERTICAL", LM_VERTICAL);
-
-    engine->RegisterEnum("TraversalMode");
-    engine->RegisterEnumValue("TraversalMode", "TM_BREADTH_FIRST", TM_BREADTH_FIRST);
-    engine->RegisterEnumValue("TraversalMode", "TM_DEPTH_FIRST", TM_DEPTH_FIRST);
-
-    engine->RegisterEnum("DragAndDropMode");
-    engine->RegisterEnumValue("DragAndDropMode", "DD_DISABLED", DD_DISABLED);
-    engine->RegisterEnumValue("DragAndDropMode", "DD_SOURCE", DD_SOURCE);
-    engine->RegisterEnumValue("DragAndDropMode", "DD_TARGET", DD_TARGET);
-    engine->RegisterEnumValue("DragAndDropMode", "DD_SOURCE_AND_TARGET", DD_SOURCE_AND_TARGET);
-
     RegisterUIElement<UIElement>(engine, "UIElement");
 
     // Register TouchState touchedElement property now
@@ -173,20 +125,6 @@ static void RegisterSprite(asIScriptEngine* engine)
 
 static void RegisterCursor(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("CursorShape");
-    engine->RegisterEnumValue("CursorShape", "CS_NORMAL", CS_NORMAL);
-    engine->RegisterEnumValue("CursorShape", "CS_IBEAM", CS_IBEAM);
-    engine->RegisterEnumValue("CursorShape", "CS_CROSS", CS_CROSS);
-    engine->RegisterEnumValue("CursorShape", "CS_RESIZEVERTICAL", CS_RESIZEVERTICAL);
-    engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPRIGHT", CS_RESIZEDIAGONAL_TOPRIGHT);
-    engine->RegisterEnumValue("CursorShape", "CS_RESIZEHORIZONTAL", CS_RESIZEHORIZONTAL);
-    engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPLEFT", CS_RESIZEDIAGONAL_TOPLEFT);
-    engine->RegisterEnumValue("CursorShape", "CS_RESIZE_ALL", CS_RESIZE_ALL);
-    engine->RegisterEnumValue("CursorShape", "CS_ACCEPTDROP", CS_ACCEPTDROP);
-    engine->RegisterEnumValue("CursorShape", "CS_REJECTDROP", CS_REJECTDROP);
-    engine->RegisterEnumValue("CursorShape", "CS_BUSY", CS_BUSY);
-    engine->RegisterEnumValue("CursorShape", "CS_BUSY_ARROW", CS_BUSY_ARROW);
-
     RegisterBorderImage<Cursor>(engine, "Cursor");
     engine->RegisterObjectMethod("Cursor", "void DefineShape(const String&in, Texture@+, const IntRect&in, const IntVector2&in)", asMETHODPR(Cursor, DefineShape, (CursorShape, Image*, const IntRect&, const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in)", asMETHODPR(Cursor, DefineShape, (const String&, Image*, const IntRect&, const IntVector2&), void), asCALL_THISCALL);
@@ -313,11 +251,6 @@ static CScriptArray* ListViewGetSelectedItems(ListView* ptr)
 
 static void RegisterListView(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("HighlightMode");
-    engine->RegisterEnumValue("HighlightMode", "HM_NEVER", HM_NEVER);
-    engine->RegisterEnumValue("HighlightMode", "HM_FOCUS", HM_FOCUS);
-    engine->RegisterEnumValue("HighlightMode", "HM_ALWAYS", HM_ALWAYS);
-
     RegisterUIElement<ListView>(engine, "ListView");
     engine->RegisterObjectMethod("ListView", "void UpdateInternalLayout()", asMETHOD(ListView, UpdateInternalLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void DisableInternalLayoutUpdate()", asMETHOD(ListView, DisableInternalLayoutUpdate), asCALL_THISCALL);
@@ -385,11 +318,6 @@ static void RegisterListView(asIScriptEngine* engine)
 
 static void RegisterText(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("TextEffect");
-    engine->RegisterEnumValue("TextEffect", "TE_NONE", TE_NONE);
-    engine->RegisterEnumValue("TextEffect", "TE_SHADOW", TE_SHADOW);
-    engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
-
     RegisterUISelectable<Text>(engine, "Text");
     engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, float)", asMETHODPR(Text, SetFont, (const String&, float), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, float)", asMETHODPR(Text, SetFont, (Font*, float), bool), asCALL_THISCALL);
@@ -745,11 +673,6 @@ static CScriptArray* UIGetDragElements(UI* ptr)
 
 static void RegisterUI(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("FontHintLevel");
-    engine->RegisterEnumValue("FontHintLevel", "FONT_HINT_LEVEL_NONE", FONT_HINT_LEVEL_NONE);
-    engine->RegisterEnumValue("FontHintLevel", "FONT_HINT_LEVEL_LIGHT", FONT_HINT_LEVEL_LIGHT);
-    engine->RegisterEnumValue("FontHintLevel", "FONT_HINT_LEVEL_NORMAL", FONT_HINT_LEVEL_NORMAL);
-
     RegisterObject<UI>(engine, "UI");
     engine->RegisterObjectMethod("UI", "void Clear()", asMETHOD(UI, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void DebugDraw(UIElement@+)", asMETHOD(UI, DebugDraw), asCALL_THISCALL);

@@ -123,6 +123,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Matrix3x4(const float* data) noexcept
 #ifndef URHO3D_SSE
        :m00_(data[0]),
@@ -654,6 +655,7 @@ public:
     Matrix3x4 Inverse() const;
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &m00_; }
 
     /// Return matrix element.

@@ -47,6 +47,7 @@ public:
     }
 
     /// Construct from an int array.
+    /// @manualbind
     explicit IntVector2(const int* data) noexcept :
         x_(data[0]),
         y_(data[1])
@@ -54,6 +55,7 @@ public:
     }
 
     /// Construct from an float array.
+    /// @nobind
     explicit IntVector2(const float* data) :
         x_((int)data[0]),
         y_((int)data[1])
@@ -141,6 +143,7 @@ public:
     }
 
     /// Return integer data.
+    /// @manualbind
     const int* Data() const { return &x_; }
 
     /// Return as string.
@@ -200,6 +203,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Vector2(const float* data) noexcept :
         x_(data[0]),
         y_(data[1])
@@ -298,9 +302,11 @@ public:
     }
 
     /// Return length.
+    /// @property
     float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
 
     /// Return squared length.
+    /// @property
     float LengthSquared() const { return x_ * x_ + y_ * y_; }
 
     /// Calculate dot product.
@@ -365,6 +371,7 @@ public:
     }
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &x_; }
 
     /// Return as string.

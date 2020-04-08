@@ -98,12 +98,6 @@ static void RegisterConnection(asIScriptEngine* engine)
 
 static void RegisterHttpRequest(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("HttpRequestState");
-    engine->RegisterEnumValue("HttpRequestState", "HTTP_INITIALIZING", HTTP_INITIALIZING);
-    engine->RegisterEnumValue("HttpRequestState", "HTTP_ERROR", HTTP_ERROR);
-    engine->RegisterEnumValue("HttpRequestState", "HTTP_OPEN", HTTP_OPEN);
-    engine->RegisterEnumValue("HttpRequestState", "HTTP_CLOSED", HTTP_CLOSED);
-
     RegisterRefCounted<HttpRequest>(engine, "HttpRequest");
     RegisterDeserializer<HttpRequest>(engine, "HttpRequest");
     engine->RegisterObjectMethod("HttpRequest", "const String& get_url() const", asMETHOD(HttpRequest, GetURL), asCALL_THISCALL);

@@ -153,8 +153,37 @@ endif ()
 if (APPLE AND NOT ARM)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for macOS platform at the moment
 endif ()
+
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
 define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
+
+if (URHO3D_GENERATEBINDINGS)
+    find_package (Doxygen REQUIRED)
+    
+    if (NOT DOXYGEN_FOUND)
+        message (FATAL_ERROR Doxygen required to generate bindings)
+    endif ()
+    
+    set (XML_AST_DIR ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/xml)
+    
+    # Generate xmls and run BindingGenerator
+    add_custom_command (OUTPUT ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/Lua/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/JavaScript/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/CSharp/Generated.cpp
+                               fake_output_to_force_run_every_time
+                        COMMAND ${CMAKE_COMMAND} -E echo "Generating XMLs with AST to ${XML_AST_DIR}"
+                        COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile"
+                        COMMAND ${CMAKE_COMMAND} -E echo "Running $<TARGET_FILE:BindingGenerator> ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
+                        COMMAND BindingGenerator "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
+                        DEPENDS BindingGenerator ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile
+                        COMMENT "Generating bindings to script languages")
+
+    if (URHO3D_ANGELSCRIPT)
+        list (APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated.cpp)
+        source_group ("Source Files\\AngelScript" FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated.cpp)
+    endif()
+endif ()
 
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)

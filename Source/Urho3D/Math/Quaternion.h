@@ -79,6 +79,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Quaternion(const float* data) noexcept
 #ifndef URHO3D_SSE
        :w_(data[0]),
@@ -433,6 +434,7 @@ public:
     }
 
     /// Return Euler angles in degrees.
+    /// @property
     Vector3 EulerAngles() const;
     /// Return yaw angle in degrees.
     float YawAngle() const;
@@ -441,10 +443,13 @@ public:
     /// Return roll angle in degrees.
     float RollAngle() const;
     /// Return rotation axis.
+    /// @property
     Vector3 Axis() const;
     /// Return rotation angle.
+    /// @property
     float Angle() const;
     /// Return the rotation matrix that corresponds to this quaternion.
+    /// @property
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.
     Quaternion Slerp(const Quaternion& rhs, float t) const;
@@ -452,6 +457,7 @@ public:
     Quaternion Nlerp(const Quaternion& rhs, float t, bool shortestPath = false) const;
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &w_; }
 
     /// Return as string.

@@ -62,6 +62,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Vector4(const float* data) noexcept :
         x_(data[0]),
         y_(data[1]),
@@ -204,6 +205,7 @@ public:
     explicit operator Vector3() const { return { x_, y_, z_ }; }
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &x_; }
 
     /// Return as string.

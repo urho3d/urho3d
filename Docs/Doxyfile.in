@@ -2459,3 +2459,13 @@ GENERATE_LEGEND        = YES
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_CLEANUP            = YES
+
+ALIASES += manualbind=""
+ALIASES += nobind=""
+ALIASES += nobindfile=""
+ALIASES += nobindfiletemp=""
+ALIASES += fakeref=""
+ALIASES += pod=""
+ALIASES += allints=""
+ALIASES += allfloats=""
+ALIASES += property=""

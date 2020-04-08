@@ -54,6 +54,7 @@ environment:
     - URHO3D_LIB_TYPE: SHARED
 before_build:
   - rake ci_timer
+  - ps: do { "Installing doxygen..."; choco install doxygen.install >$null } until ($?);
   - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) };
         if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
         if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE))))
