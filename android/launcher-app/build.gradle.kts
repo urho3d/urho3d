@@ -49,6 +49,7 @@ android {
                             "URHO3D_LIB_TYPE",
                             // TODO: "URHO3D_PACKAGING",
                             "URHO3D_ANGELSCRIPT",
+                            "URHO3D_GLES2",
                             "URHO3D_GLES3",
                             "URHO3D_LUA"
                         )
