@@ -48,8 +48,12 @@ uniform mat4 cZone;
 #ifdef COMPILEPS
 
 // Fragment shader uniforms
+#ifdef GL_ES
 #ifdef MOBILE_GRAPHICS
     precision mediump float;
+#else
+    precision highp float;
+#endif
 #endif
 
 uniform vec4 cAmbientColor;
@@ -157,8 +161,12 @@ uniform ObjectVS
 
 #ifdef COMPILEPS
 
+#ifdef GL_ES
 #ifdef MOBILE_GRAPHICS
     precision mediump float;
+#else
+    precision highp float;
+#endif
 #endif
 
 // Pixel shader uniforms
