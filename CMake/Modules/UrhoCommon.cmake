@@ -1065,11 +1065,8 @@ macro (define_resource_dirs)
                             get_filename_component (NAME ${FILE} NAME)
                             list (APPEND PAK_NAMES ${NAME})
                         endforeach ()
-                        if (CMAKE_BUILD_TYPE STREQUAL Debug)
-                            set (SEPARATE_METADATA --separate-metadata)
-                        endif ()
                         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data
-                            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${SEPARATE_METADATA}
+                            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
                             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
                             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                             COMMENT "Generating shared data file")
