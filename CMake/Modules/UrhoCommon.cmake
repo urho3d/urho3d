@@ -152,8 +152,15 @@ option (URHO3D_GLES2 "Enable GLES2" TRUE)
 option (URHO3D_GLES3 "Enable GLES3" FALSE)
 option (URHO3D_WEBP "Enable WebP support" TRUE)
 
-if ((ANDROID OR IOS) AND NOT URHO3D_GLES3)
-    set(URHO3D_GLES2 TRUE)
+# URHO3D_GLES3 and URHO3D_GLES2 are mutually exclusive
+if (ANDROID OR IOS)
+    if (URHO3D_GLES3)
+        set(URHO3D_GLES2 FALSE)
+    elseif (URHO3D_GLES2)
+        set(URHO3D_GLES3 FALSE)
+    else ()
+        set(URHO3D_GLES2 TRUE)
+    endif ()
 endif ()
 
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT APPLE)
