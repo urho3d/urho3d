@@ -492,7 +492,7 @@ void Graphics::AdjustScreenMode(int& newWidth, int& newHeight, ScreenModeParams&
     // High DPI is supported only for OpenGL backend
 #ifndef URHO3D_OPENGL
     params.highDPI_ = false;
-#endif;
+#endif
 
 #if defined(IOS) || defined(TVOS)
     // iOS and tvOS app always take the fullscreen (and with status bar hidden)
