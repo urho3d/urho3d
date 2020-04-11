@@ -126,7 +126,18 @@ bool ShaderVariation::Create()
     }
     // Force GLSL version 150 if no version define and GL3 is being used
     if (!verEnd && Graphics::GetGL3Support())
+    {
+#if defined(MOBILE_GRAPHICS) || URHO3D_GLES3
+        shaderCode += "#version 300 es\n";
+#else
         shaderCode += "#version 150\n";
+#endif
+    }
+#if defined(DESKTOP_GRAPHICS)
+    shaderCode += "#define DESKTOP_GRAPHICS\n";
+#elif defined(MOBILE_GRAPHICS)
+    shaderCode += "#define MOBILE_GRAPHICS\n";
+#endif
 
     // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
     shaderCode += type_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
