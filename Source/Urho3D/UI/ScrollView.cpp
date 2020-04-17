@@ -116,7 +116,7 @@ void ScrollView::Update(float timeStep)
     // Check if we should not scroll:
     // - ScrollView is not visible, is not enabled, or doesn't have focus
     // - The element being dragged is not a child of the ScrollView, or is one of our scrollbars
-    if (!IsVisible() || !IsEnabled() || !HasFocus())
+    if (!IsVisible() || !IsEnabled() || !IsActive() || !HasFocus())
     {
         touchScrollSpeed_ = Vector2::ZERO;
         touchScrollSpeedMax_ = Vector2::ZERO;

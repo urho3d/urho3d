@@ -88,7 +88,7 @@ void Button::Update(float timeStep)
 void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (enabled_)
+    if (IsActive())
     {
         if (hovering_ || HasFocus())
             offset += hoverOffset_;

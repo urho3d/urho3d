@@ -297,7 +297,7 @@ public:
     void SetSortChildren(bool enable);
     /// Set whether parent elements' opacity affects opacity. Default true.
     void SetUseDerivedOpacity(bool enable);
-    /// Set whether reacts to input. Default false, but is enabled by subclasses if applicable.
+    /// Set whether element claims inputs. If false then inputs pass through element to elements below. Default false, but is enabled by subclasses if applicable.
     void SetEnabled(bool enable);
     /// Set enabled state on self and child elements. Elements' own enabled state is remembered (IsEnabledSelf) and can be restored.
     void SetDeepEnabled(bool enable);
@@ -305,6 +305,14 @@ public:
     void ResetDeepEnabled();
     /// Set enabled state on self and child elements. Unlike SetDeepEnabled this does not remember the elements' own enabled state, but overwrites it.
     void SetEnabledRecursive(bool enable);
+    /// Set whether element reacts to inputs (also needs to be enabled to do so). Disabled graphic is displayed when applicable while not active. Default true.
+    void SetActive(bool active);
+    /// Set active state on self and child elements. Elements' own active state is remembered (IsActiveSelf) and can be restored.
+    void SetDeepActive(bool active);
+    /// Reset active state to the element's remembered state prior to calling SetDeepActive.
+    void ResetDeepActive();
+    /// Set active state on self and child elements. Unlike SetDeepActive this does not remember the elements' own active state, but overwrites it.
+    void SetActiveRecursive(bool active);
     /// Set whether value is editable through input. Not applicable to all elements. Default true.
     void SetEditable(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
@@ -507,11 +515,17 @@ public:
     /// Return whether is a direct or indirect child of specified element.
     bool IsChildOf(UIElement* element) const;
 
-    /// Return whether reacts to input.
+    /// Return whether claims inputs.
     bool IsEnabled() const { return enabled_; }
 
     /// Returns the element's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
     bool IsEnabledSelf() const { return enabledPrev_; }
+
+    /// Return whether reacts to input.
+    bool IsActive() const { return active_; }
+
+    /// Returns the element's last own active state. May be different than the value returned by IsActive when SetDeepActive has been used.
+    bool IsActiveSelf() const { return activePrev_; }
 
     /// Return whether value is editable through input.
     bool IsEditable() const { return editable_; }
@@ -699,6 +713,10 @@ protected:
     bool enabled_{};
     /// Last SetEnabled flag before any SetDeepEnabled.
     bool enabledPrev_{};
+    /// Input active flag.
+    bool active_{true};
+    /// Last SetActive flag before any SetDeepActive.
+    bool activePrev_{true};
     /// Value editable flag.
     bool editable_{true};
     /// Selected flag.
