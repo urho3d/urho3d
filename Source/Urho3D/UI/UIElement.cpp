@@ -137,7 +137,6 @@ void UIElement::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Bottom Left Color", Color, colors_[2], Color::WHITE, AM_FILE);
     URHO3D_ATTRIBUTE("Bottom Right Color", Color, colors_[3], Color::WHITE, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Active", IsActive, SetActive, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
@@ -914,37 +913,6 @@ void UIElement::SetEnabledRecursive(bool enable)
 
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->SetEnabledRecursive(enable);
-}
-
-void UIElement::SetActive(bool active)
-{
-    active_ = active;
-    activePrev_ = active;
-}
-
-void UIElement::SetDeepActive(bool active)
-{
-    active_ = active;
-
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetDeepActive(active);
-}
-
-void UIElement::ResetDeepActive()
-{
-    active_ = activePrev_;
-
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->ResetDeepActive();
-}
-
-void UIElement::SetActiveRecursive(bool active)
-{
-    active_ = active;
-    activePrev_ = active;
-
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetActiveRecursive(active);
 }
 
 void UIElement::SetEditable(bool enable)

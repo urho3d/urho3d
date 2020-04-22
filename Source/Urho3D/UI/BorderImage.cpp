@@ -69,7 +69,7 @@ void BorderImage::RegisterObject(Context* context)
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    if (IsActive())
+    if (enabled_)
         GetBatches(batches, vertexData, currentScissor, (hovering_ || selected_ || HasFocus()) ? hoverOffset_ : IntVector2::ZERO);
     else
         GetBatches(batches, vertexData, currentScissor, disabledOffset_);

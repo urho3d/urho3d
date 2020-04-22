@@ -59,7 +59,7 @@ void CheckBox::RegisterObject(Context* context)
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (IsActive())
+    if (enabled_)
     {
         if (hovering_ || selected_ || HasFocus())
             offset += hoverOffset_;
