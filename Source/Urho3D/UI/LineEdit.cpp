@@ -55,7 +55,7 @@ LineEdit::LineEdit(Context* context) :
     textCopyable_(true)
 {
     clipChildren_ = true;
-    SetEnabled(true);
+    SetPassthrough(false);
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
     text_ = CreateChild<Text>("LE_Text");
@@ -77,7 +77,7 @@ void LineEdit::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Passthrough", false);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);

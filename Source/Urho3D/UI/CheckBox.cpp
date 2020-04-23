@@ -39,7 +39,7 @@ CheckBox::CheckBox(Context* context) :
     checkedOffset_(IntVector2::ZERO),
     checked_(false)
 {
-    SetEnabled(true);
+    SetPassthrough(false);
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 }
 
@@ -50,7 +50,7 @@ void CheckBox::RegisterObject(Context* context)
     context->RegisterFactory<CheckBox>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
-    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Passthrough", false);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Checked", IsChecked, SetChecked, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
@@ -59,7 +59,7 @@ void CheckBox::RegisterObject(Context* context)
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (enabled_)
+    if (IsEnabled())
     {
         if (hovering_ || selected_ || HasFocus())
             offset += hoverOffset_;

@@ -855,7 +855,7 @@ UIElement* UI::GetFrontElement() const
     for (unsigned i = 0; i < rootChildren.Size(); ++i)
     {
         // Do not take into account input-disabled elements, hidden elements or those that are always in the front
-        if (!rootChildren[i]->IsEnabled() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
+        if (!rootChildren[i]->IsEnabled() || rootChildren[i]->IsPassthrough() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
             continue;
 
         int priority = rootChildren[i]->GetPriority();
@@ -1225,7 +1225,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
             {
                 // Store the current result, then recurse into its children. Because children
                 // are sorted from lowest to highest priority, the topmost match should remain
-                if (element->IsEnabled() || !enabledOnly)
+                if ((element->IsEnabled() && !element->IsPassthrough()) || !enabledOnly)
                     result = element;
 
                 if (hasChildren)
@@ -1355,7 +1355,7 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags button
 
         // Hover effect
         // If a drag is going on, transmit hover only to the element being dragged, unless it's a drop target
-        if (element && element->IsEnabled())
+        if (element && element->IsEnabled() && !element->IsPassthrough())
         {
             if (dragElement == element || dragDropTest)
             {
@@ -1400,7 +1400,7 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags button
 
     // Hover effect
     // If no drag is going on, transmit hover event.
-    if (element && element->IsEnabled())
+    if (element && element->IsEnabled() && !element->IsPassthrough())
     {
         if (dragElementsCount_ == 0)
         {
@@ -1529,7 +1529,7 @@ void UI::ProcessClickEnd(const IntVector2& windowCursorPos, MouseButton button, 
 
             SendClickEvent(E_UIMOUSECLICKEND, dragElement, element, cursorPos, button, buttons, qualifiers);
 
-            if (dragElement && dragElement->IsEnabled() && dragElement->IsVisible() && !dragData->dragBeginPending)
+            if (dragElement && dragElement->IsEnabled() && !dragElement->IsPassthrough() && dragElement->IsVisible() && !dragData->dragBeginPending)
             {
                 dragElement->OnDragEnd(dragElement->ScreenToElement(cursorPos), cursorPos, dragData->dragButtons, buttons,
                     cursor);
@@ -1608,7 +1608,7 @@ void UI::ProcessMove(const IntVector2& windowCursorPos, const IntVector2& cursor
                 sendPos = cursorPos;
             }
 
-            if (dragElement->IsEnabled() && dragElement->IsVisible())
+            if (dragElement->IsEnabled() && !dragElement->IsPassthrough() && dragElement->IsVisible())
             {
                 // Signal drag begin if distance threshold was exceeded
 
@@ -1916,7 +1916,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
             ++i;
     }
 
-    if (element && element->IsEnabled())
+    if (element && element->IsEnabled() && !element->IsPassthrough())
         element->OnHover(element->ScreenToElement(pos), pos, 0, 0, nullptr);
 
     ProcessClickEnd(pos, touchId, MOUSEB_NONE, QUAL_NONE, nullptr, true);
@@ -2109,7 +2109,7 @@ void UI::ProcessDragCancel()
         WeakPtr<UIElement> dragElement = i->first_;
         UI::DragData* dragData = i->second_;
 
-        if (dragElement && dragElement->IsEnabled() && dragElement->IsVisible() && !dragData->dragBeginPending)
+        if (dragElement && dragElement->IsEnabled() && !dragElement->IsPassthrough() && dragElement->IsVisible() && !dragData->dragBeginPending)
         {
             dragElement->OnDragCancel(dragElement->ScreenToElement(cursorPos), cursorPos, dragData->dragButtons, mouseButtons_,
                 cursor_);

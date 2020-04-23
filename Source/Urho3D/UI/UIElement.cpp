@@ -96,7 +96,6 @@ UIElement::UIElement(Context* context) :
     Animatable(context),
     pivot_(std::numeric_limits<float>::max(), std::numeric_limits<float>::max())
 {
-    SetEnabled(false);
 }
 
 UIElement::~UIElement()
@@ -136,7 +135,8 @@ void UIElement::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Top Right Color", Color, colors_[1], Color::WHITE, AM_FILE);
     URHO3D_ATTRIBUTE("Bottom Left Color", Color, colors_[2], Color::WHITE, AM_FILE);
     URHO3D_ATTRIBUTE("Bottom Right Color", Color, colors_[3], Color::WHITE, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Passthrough", IsPassthrough, SetPassthrough, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
@@ -915,6 +915,37 @@ void UIElement::SetEnabledRecursive(bool enable)
         (*i)->SetEnabledRecursive(enable);
 }
 
+void UIElement::SetPassthrough(bool passthrough)
+{
+    passthrough_ = passthrough;
+    passthroughPrev_ = passthrough;
+}
+
+void UIElement::SetDeepPassthrough(bool passthrough)
+{
+    passthrough_ = passthrough;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->SetDeepPassthrough(passthrough);
+}
+
+void UIElement::ResetDeepPassthrough()
+{
+    passthrough_ = passthroughPrev_;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->ResetDeepPassthrough();
+}
+
+void UIElement::SetPassthroughRecursive(bool passthrough)
+{
+    passthrough_ = passthrough;
+    passthroughPrev_ = passthrough;
+
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->SetPassthroughRecursive(passthrough);
+}
+
 void UIElement::SetEditable(bool enable)
 {
     editable_ = enable;
@@ -1238,7 +1269,7 @@ void UIElement::BringToFront()
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
     {
         UIElement* other = *i;
-        if (other->IsEnabled() && other->bringToBack_ && other != ptr)
+        if (other->IsEnabled() && !other->IsPassthrough() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
             // M_MAX_INT is used by popups and tooltips. Disregard these to avoid an "arms race" with the priorities
@@ -1262,7 +1293,7 @@ void UIElement::BringToFront()
             UIElement* other = *i;
             int priority = other->GetPriority();
 
-            if (other->IsEnabled() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
+            if (other->IsEnabled() && !other->IsPassthrough() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
                 other->SetPriority(priority - 1);
         }
     }

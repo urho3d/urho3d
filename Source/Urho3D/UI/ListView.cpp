@@ -353,7 +353,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
         return;
 
     // Enable input so that clicking the item can be detected
-    item->SetEnabled(true);
+    item->SetPassthrough(false);
     item->SetSelected(false);
 
     const unsigned numItems = contentElement_->GetNumChildren();
@@ -741,7 +741,7 @@ void ListView::SetHierarchyMode(bool enable)
     container->SetName("LV_ItemContainer");
     container->SetInternal(true);
     SetContentElement(container);
-    container->SetEnabled(true);
+    container->SetPassthrough(false);
     container->SetSortChildren(false);
 }
 
@@ -953,7 +953,7 @@ bool ListView::FilterImplicitAttributes(XMLElement& dest) const
         return false;
     if (!RemoveChildXML(containerElem, "Name", "LV_ItemContainer"))
         return false;
-    if (!RemoveChildXML(containerElem, "Is Enabled", "true"))
+    if (!RemoveChildXML(containerElem, "Is Passthrough", "false"))
         return false;
     if (!RemoveChildXML(containerElem, "Layout Mode", "Vertical"))
         return false;

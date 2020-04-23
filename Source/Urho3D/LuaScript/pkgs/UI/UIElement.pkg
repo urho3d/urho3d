@@ -118,6 +118,10 @@ class UIElement : public Animatable
     void SetDeepEnabled(bool enable);
     void ResetDeepEnabled();
     void SetEnabledRecursive(bool enable);
+    void SetPassthrough(bool passthrough);
+    void SetDeepPassthrough(bool passthrough);
+    void ResetDeepPassthrough();
+    void SetPassthroughRecursive(bool passthrough);
     void SetEditable(bool enable);
     void SetFocus(bool enable);
     void SetSelected(bool enable);
@@ -199,6 +203,8 @@ class UIElement : public Animatable
     bool HasFocus() const;
     bool IsEnabled() const;
     bool IsEnabledSelf() const;
+    bool IsPassthrough() const;
+    bool IsPassthroughSelf() const;
     bool IsEditable() const;
     bool IsSelected() const;
     bool IsVisible() const;
@@ -287,6 +293,8 @@ class UIElement : public Animatable
     tolua_property__has_set bool focus;
     tolua_property__is_set bool enabled;
     tolua_readonly tolua_property__is_set bool enabledSelf;
+    tolua_property__is_set bool passthrough;
+    tolua_readonly tolua_property__is_set bool passthroughSelf;
     tolua_property__is_set bool editable;
     tolua_property__is_set bool selected;
     tolua_property__is_set bool visible;

@@ -297,7 +297,7 @@ public:
     void SetSortChildren(bool enable);
     /// Set whether parent elements' opacity affects opacity. Default true.
     void SetUseDerivedOpacity(bool enable);
-    /// Set whether reacts to input. Default false, but is enabled by subclasses if applicable.
+    /// Set whether enabled.
     void SetEnabled(bool enable);
     /// Set enabled state on self and child elements. Elements' own enabled state is remembered (IsEnabledSelf) and can be restored.
     void SetDeepEnabled(bool enable);
@@ -305,6 +305,14 @@ public:
     void ResetDeepEnabled();
     /// Set enabled state on self and child elements. Unlike SetDeepEnabled this does not remember the elements' own enabled state, but overwrites it.
     void SetEnabledRecursive(bool enable);
+    /// Set whether element ignores inputs. Default true, but is enabled by subclasses (eg. Button) if applicable.
+    void SetPassthrough(bool passthrough);
+    /// Set passthrough state on self and child elements. Elements' own passthrough state is remembered (IsPassthroughSelf) and can be restored.
+    void SetDeepPassthrough(bool passthrough);
+    /// Reset passthrough state to the element's remembered state prior to calling SetDeepPassthrough.
+    void ResetDeepPassthrough();
+    /// Set passthrough state on self and child elements. Unlike SetDeepPassthrough this does not remember the elements' own passthrough state, but overwrites it.
+    void SetPassthroughRecursive(bool passthrough);
     /// Set whether value is editable through input. Not applicable to all elements. Default true.
     void SetEditable(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
@@ -507,11 +515,17 @@ public:
     /// Return whether is a direct or indirect child of specified element.
     bool IsChildOf(UIElement* element) const;
 
-    /// Return whether reacts to input.
+    /// Return whether enabled.
     bool IsEnabled() const { return enabled_; }
 
     /// Returns the element's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
     bool IsEnabledSelf() const { return enabledPrev_; }
+
+    /// Return whether element ignores input.
+    bool IsPassthrough() const { return passthrough_; }
+
+    /// Returns the element's last own passthrough state. May be different than the value returned by IsPassthrough when SetDeepPassthrough has been used.
+    bool IsPassthroughSelf() const { return passthroughPrev_; }
 
     /// Return whether value is editable through input.
     bool IsEditable() const { return editable_; }
@@ -695,10 +709,14 @@ protected:
     bool sortChildren_{true};
     /// Use derived opacity flag.
     bool useDerivedOpacity_{true};
-    /// Input enabled flag.
-    bool enabled_{};
+    /// Enabled flag.
+    bool enabled_{true};
     /// Last SetEnabled flag before any SetDeepEnabled.
-    bool enabledPrev_{};
+    bool enabledPrev_{true};
+    /// Pass through input flag.
+    bool passthrough_{true};
+    /// Last SetPassthrough flag before any SetDeepPassthrough.
+    bool passthroughPrev_{true};
     /// Value editable flag.
     bool editable_{true};
     /// Selected flag.

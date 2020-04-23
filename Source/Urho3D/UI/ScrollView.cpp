@@ -61,7 +61,7 @@ ScrollView::ScrollView(Context* context) :
     autoDisableThreshold_(25.0f)
 {
     clipChildren_ = true;
-    SetEnabled(true);
+    SetPassthrough(false);
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
     horizontalScrollBar_ = CreateChild<ScrollBar>("SV_HorizontalScrollBar");
@@ -74,7 +74,7 @@ ScrollView::ScrollView(Context* context) :
     verticalScrollBar_->SetOrientation(O_VERTICAL);
     scrollPanel_ = CreateChild<BorderImage>("SV_ScrollPanel");
     scrollPanel_->SetInternal(true);
-    scrollPanel_->SetEnabled(true);
+    scrollPanel_->SetPassthrough(false);
     scrollPanel_->SetClipChildren(true);
 
     SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, URHO3D_HANDLER(ScrollView, HandleScrollBarChanged));
@@ -95,7 +95,7 @@ void ScrollView::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Passthrough", false);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
@@ -114,9 +114,9 @@ void ScrollView::Update(float timeStep)
         return;
 
     // Check if we should not scroll:
-    // - ScrollView is not visible, is not enabled, or doesn't have focus
+    // - ScrollView is not visible, is not enabled, is passthrough, or doesn't have focus
     // - The element being dragged is not a child of the ScrollView, or is one of our scrollbars
-    if (!IsVisible() || !IsEnabled() || !HasFocus())
+    if (!IsVisible() || !IsEnabled() || IsPassthrough() || !HasFocus())
     {
         touchScrollSpeed_ = Vector2::ZERO;
         touchScrollSpeedMax_ = Vector2::ZERO;
@@ -398,7 +398,7 @@ bool ScrollView::FilterImplicitAttributes(XMLElement& dest) const
         return false;
     if (!RemoveChildXML(childElem, "Name", "SV_ScrollPanel"))
         return false;
-    if (!RemoveChildXML(childElem, "Is Enabled", "true"))
+    if (!RemoveChildXML(childElem, "Is Passthrough", "false"))
         return false;
     if (!RemoveChildXML(childElem, "Clip Children", "true"))
         return false;
@@ -571,7 +571,7 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
             if (visible_ && !scrollChildrenDisable_)
             {
                 scrollChildrenDisable_ = true;
-                scrollPanel_->SetDeepEnabled(false);
+                scrollPanel_->SetDeepPassthrough(true);
             }
         }
 
@@ -603,7 +603,7 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
         {
             touchDistanceSum_ = 0.0f;
             scrollChildrenDisable_ = false;
-            scrollPanel_->ResetDeepEnabled();
+            scrollPanel_->ResetDeepPassthrough();
         }
 
         barScrolling_ = false;
