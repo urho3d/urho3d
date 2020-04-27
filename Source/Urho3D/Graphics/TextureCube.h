@@ -73,8 +73,9 @@ public:
     /// Return render surface for one face.
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
 
-    /// Control for texture sampling across cube faces.
+    /// Get whether texture sampling across cube faces is used.
     bool GetSeamless() const { return seamless_; }
+    /// Set whether texture sampling across cube faces is used.
     void SetSeamless(bool seamless) { seamless_ = seamless; }
 
 protected:

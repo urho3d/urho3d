@@ -509,7 +509,7 @@ bool TextureCube::Create()
     if (glIsEnabled(GL_TEXTURE_CUBE_MAP_SEAMLESS))
     {
         // Disables the global setting because otherwise it 
-        // overrides the per texture setting below.
+        // overrides the per texture setting below
         glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     }
     glTexParameteri(target_, GL_TEXTURE_CUBE_MAP_SEAMLESS, seamless_ ? 1 : 0);

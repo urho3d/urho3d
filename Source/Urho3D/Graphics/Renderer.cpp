@@ -1822,8 +1822,8 @@ void Renderer::CreateGeometries()
         indirectionCubeMap_ = new TextureCube(context_);
         // We disable seamless mode because sampling across faces with
         // bilinear filter is not valid for the positional data stored 
-        // in this cube map and may result in anomolies in the shadows
-        // projected from the cube edges.
+        // in this cube map and may result in anomalies in the shadows
+        // projected from the cube edges
         indirectionCubeMap_->SetSeamless(false);
         indirectionCubeMap_->SetNumLevels(1);
         indirectionCubeMap_->SetSize(256, graphics_->GetRGBAFormat());
