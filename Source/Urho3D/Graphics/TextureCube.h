@@ -73,6 +73,10 @@ public:
     /// Return render surface for one face.
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
 
+    /// Control for texture sampling across cube faces.
+    bool GetSeamless() const { return seamless_; }
+    void SetSeamless(bool seamless) { seamless_ = seamless; }
+
 protected:
     /// Create the GPU texture.
     bool Create() override;
@@ -89,6 +93,8 @@ private:
     Vector<SharedPtr<Image> > loadImages_;
     /// Parameter file acquired during BeginLoad.
     SharedPtr<XMLFile> loadParameters_;
+    /// If supported, allows control of texture sampling across cube faces.
+    bool seamless_;
 };
 
 }

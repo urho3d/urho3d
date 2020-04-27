@@ -64,6 +64,8 @@ TextureCube::TextureCube(Context* context) :
 #ifdef URHO3D_OPENGL
     target_ = GL_TEXTURE_CUBE_MAP;
 #endif
+    // Default to seamless sampling across cube faces (if supported)
+    seamless_ = true;
 
     // Default to clamp mode addressing
     addressModes_[COORD_U] = ADDRESS_CLAMP;

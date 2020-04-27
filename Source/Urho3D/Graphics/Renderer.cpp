@@ -1814,11 +1814,17 @@ void Renderer::CreateGeometries()
     if (graphics_->GetShadowMapFormat())
     {
         faceSelectCubeMap_ = new TextureCube(context_);
+        faceSelectCubeMap_->SetSeamless(false);
         faceSelectCubeMap_->SetNumLevels(1);
         faceSelectCubeMap_->SetSize(1, graphics_->GetRGBAFormat());
         faceSelectCubeMap_->SetFilterMode(FILTER_NEAREST);
 
         indirectionCubeMap_ = new TextureCube(context_);
+        // We disable seamless mode because sampling across faces with
+        // bilinear filter is not valid for the positional data stored 
+        // in this cube map and may result in anomolies in the shadows
+        // projected from the cube edges.
+        indirectionCubeMap_->SetSeamless(false);
         indirectionCubeMap_->SetNumLevels(1);
         indirectionCubeMap_->SetSize(256, graphics_->GetRGBAFormat());
         indirectionCubeMap_->SetFilterMode(FILTER_BILINEAR);

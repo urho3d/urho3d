@@ -505,6 +505,16 @@ bool TextureCube::Create()
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
 #endif
 
+#if GL_ARB_seamless_cubemap_per_texture
+    if (glIsEnabled(GL_TEXTURE_CUBE_MAP_SEAMLESS))
+    {
+        // Disables the global setting because otherwise it 
+        // overrides the per texture setting below.
+        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    }
+    glTexParameteri(target_, GL_TEXTURE_CUBE_MAP_SEAMLESS, seamless_ ? 1 : 0);
+#endif
+
     // Set initial parameters, then unbind the texture
     UpdateParameters();
     graphics_->SetTexture(0, nullptr);
