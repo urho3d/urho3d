@@ -297,7 +297,7 @@ public:
     void SetSortChildren(bool enable);
     /// Set whether parent elements' opacity affects opacity. Default true.
     void SetUseDerivedOpacity(bool enable);
-    /// Set whether enabled.
+    /// Set whether enabled. Children of disabled element are enabled unless SetDeepEnabled is used.
     void SetEnabled(bool enable);
     /// Set enabled state on self and child elements. Elements' own enabled state is remembered (IsEnabledSelf) and can be restored.
     void SetDeepEnabled(bool enable);
@@ -519,13 +519,16 @@ public:
     bool IsEnabled() const { return enabled_; }
 
     /// Returns the element's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
-    bool IsEnabledSelf() const { return enabledPrev_; }
+    bool IsEnabledSelf() const { return enabledSelf_; }
 
     /// Return whether element ignores input.
     bool IsPassthrough() const { return passthrough_; }
 
     /// Returns the element's last own passthrough state. May be different than the value returned by IsPassthrough when SetDeepPassthrough has been used.
-    bool IsPassthroughSelf() const { return passthroughPrev_; }
+    bool IsPassthroughSelf() const { return passthroughSelf_; }
+
+    /// Returns whether element makes use of inputs. If passthrough is set then inputs are let through to other elements, if not enabled then inputs are ignored by this.
+    bool IsInputEnabled() const { return enabled_ && !passthrough_; }
 
     /// Return whether value is editable through input.
     bool IsEditable() const { return editable_; }
@@ -712,11 +715,11 @@ protected:
     /// Enabled flag.
     bool enabled_{true};
     /// Last SetEnabled flag before any SetDeepEnabled.
-    bool enabledPrev_{true};
+    bool enabledSelf_{true};
     /// Pass through input flag.
     bool passthrough_{true};
     /// Last SetPassthrough flag before any SetDeepPassthrough.
-    bool passthroughPrev_{true};
+    bool passthroughSelf_{true};
     /// Value editable flag.
     bool editable_{true};
     /// Selected flag.

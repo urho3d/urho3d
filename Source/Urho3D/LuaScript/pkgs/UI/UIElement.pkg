@@ -205,6 +205,7 @@ class UIElement : public Animatable
     bool IsEnabledSelf() const;
     bool IsPassthrough() const;
     bool IsPassthroughSelf() const;
+    bool IsInputEnabled() const;
     bool IsEditable() const;
     bool IsSelected() const;
     bool IsVisible() const;
@@ -295,6 +296,7 @@ class UIElement : public Animatable
     tolua_readonly tolua_property__is_set bool enabledSelf;
     tolua_property__is_set bool passthrough;
     tolua_readonly tolua_property__is_set bool passthroughSelf;
+    tolua_readonly tolua_property__is_set bool inputEnabled;
     tolua_property__is_set bool editable;
     tolua_property__is_set bool selected;
     tolua_property__is_set bool visible;

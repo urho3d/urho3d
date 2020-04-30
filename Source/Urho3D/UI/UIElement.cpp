@@ -887,63 +887,63 @@ void UIElement::SetUseDerivedOpacity(bool enable)
 void UIElement::SetEnabled(bool enable)
 {
     enabled_ = enable;
-    enabledPrev_ = enable;
+    enabledSelf_ = enable;
 }
 
 void UIElement::SetDeepEnabled(bool enable)
 {
     enabled_ = enable;
 
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetDeepEnabled(enable);
+    for (SharedPtr<UIElement> child : children_)
+        child->SetDeepEnabled(enable);
 }
 
 void UIElement::ResetDeepEnabled()
 {
-    enabled_ = enabledPrev_;
+    enabled_ = enabledSelf_;
 
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->ResetDeepEnabled();
+    for (SharedPtr<UIElement> child : children_)
+        child->ResetDeepEnabled();
 }
 
 void UIElement::SetEnabledRecursive(bool enable)
 {
     enabled_ = enable;
-    enabledPrev_ = enable;
+    enabledSelf_ = enable;
 
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetEnabledRecursive(enable);
+    for (SharedPtr<UIElement> child : children_)
+        child->SetEnabledRecursive(enable);
 }
 
 void UIElement::SetPassthrough(bool passthrough)
 {
     passthrough_ = passthrough;
-    passthroughPrev_ = passthrough;
+    passthroughSelf_ = passthrough;
 }
 
 void UIElement::SetDeepPassthrough(bool passthrough)
 {
     passthrough_ = passthrough;
 
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetDeepPassthrough(passthrough);
+    for (SharedPtr<UIElement> child : children_)
+        child->SetDeepPassthrough(passthrough);
 }
 
 void UIElement::ResetDeepPassthrough()
 {
-    passthrough_ = passthroughPrev_;
+    passthrough_ = passthroughSelf_;
 
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->ResetDeepPassthrough();
+    for (SharedPtr<UIElement> child : children_)
+        child->ResetDeepPassthrough();
 }
 
 void UIElement::SetPassthroughRecursive(bool passthrough)
 {
     passthrough_ = passthrough;
-    passthroughPrev_ = passthrough;
+    passthroughSelf_ = passthrough;
 
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetPassthroughRecursive(passthrough);
+    for (SharedPtr<UIElement> child : children_)
+        child->SetPassthroughRecursive(passthrough);
 }
 
 void UIElement::SetEditable(bool enable)
@@ -1269,7 +1269,7 @@ void UIElement::BringToFront()
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
     {
         UIElement* other = *i;
-        if (other->IsEnabled() && !other->IsPassthrough() && other->bringToBack_ && other != ptr)
+        if (other->IsInputEnabled() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
             // M_MAX_INT is used by popups and tooltips. Disregard these to avoid an "arms race" with the priorities
@@ -1293,7 +1293,7 @@ void UIElement::BringToFront()
             UIElement* other = *i;
             int priority = other->GetPriority();
 
-            if (other->IsEnabled() && !other->IsPassthrough() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
+            if (other->IsInputEnabled() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
                 other->SetPriority(priority - 1);
         }
     }
