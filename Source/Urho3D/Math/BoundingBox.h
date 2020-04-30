@@ -40,6 +40,7 @@ class Matrix3x4;
 class Sphere;
 
 /// Three-dimensional axis-aligned bounding box.
+/// @allfloats
 class URHO3D_API BoundingBox
 {
 public:
@@ -79,6 +80,7 @@ public:
     }
 
 #ifdef URHO3D_SSE
+    /// @nobind
     BoundingBox(__m128 min, __m128 max) noexcept
     {
         _mm_storeu_ps(&min_.x_, min);
@@ -87,6 +89,7 @@ public:
 #endif
 
     /// Construct from an array of vertices.
+    /// @nobind
     BoundingBox(const Vector3* vertices, unsigned count) :
         min_(M_INFINITY, M_INFINITY, M_INFINITY),
         max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
@@ -218,6 +221,7 @@ public:
     }
 
     /// Define from an array of vertices.
+    /// @nobind
     void Define(const Vector3* vertices, unsigned count);
     /// Define from a frustum.
     void Define(const Frustum& frustum);
@@ -226,6 +230,7 @@ public:
     /// Define from a sphere.
     void Define(const Sphere& sphere);
     /// Merge an array of vertices.
+    /// @nobind
     void Merge(const Vector3* vertices, unsigned count);
     /// Merge a frustum.
     void Merge(const Frustum& frustum);
@@ -259,12 +264,15 @@ public:
     }
 
     /// Return center.
+    /// @property
     Vector3 Center() const { return (max_ + min_) * 0.5f; }
 
     /// Return size.
+    /// @property
     Vector3 Size() const { return max_ - min_; }
 
     /// Return half-size.
+    /// @property
     Vector3 HalfSize() const { return (max_ - min_) * 0.5f; }
 
     /// Return transformed by a 3x3 matrix.
@@ -319,9 +327,11 @@ public:
 
     /// Minimum vector.
     Vector3 min_;
+    /// @nobind
     float dummyMin_{}; // This is never used, but exists to pad the min_ value to four floats.
     /// Maximum vector.
     Vector3 max_;
+    /// @nobind
     float dummyMax_{}; // This is never used, but exists to pad the max_ value to four floats.
 };
 

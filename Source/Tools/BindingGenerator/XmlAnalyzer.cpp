@@ -518,7 +518,7 @@ string ClassFunctionAnalyzer::GetVirt() const
     return result;
 }
 
-string ClassFunctionAnalyzer::GetLocation(bool detailed) const
+string ClassFunctionAnalyzer::GetLocation() const
 {
     string definition = memberdef_.child("definition").child_value();
     assert(!definition.empty());
@@ -528,28 +528,15 @@ string ClassFunctionAnalyzer::GetLocation(bool detailed) const
 
     string prototype = definition + argsstring;
 
-    if (detailed)
-    {
-        // Remove Urho3D::
-        smatch match;
-        regex_match(prototype, match, regex("(.*)Urho3D::(.+)"));
-        assert(match.size() == 3);
-        string result = match[1].str() + match[2].str();
+    // Remove Urho3D::
+    smatch match;
+    regex_match(prototype, match, regex("(.*)Urho3D::(.+)"));
+    assert(match.size() == 3);
+    string result = match[1].str() + match[2].str();
 
-        result += " | File: " + GetHeaderFile() + " | Line: " + ExtractLine(memberdef_);
+    result += " | File: " + GetHeaderFile() + " | Line: " + ExtractLine(memberdef_);
 
-        return result;
-    }
-    else
-    {
-        // Remove Urho3D::ClassName::
-        smatch match;
-        regex_match(prototype, match, regex("(.*)Urho3D::.+?::(.+)"));
-        assert(match.size() == 3);
-        string result = match[1].str() + match[2].str();
-
-        return result;
-    }
+    return result;
 }
 
 string ClassFunctionAnalyzer::JoinParamsNames() const
@@ -653,12 +640,15 @@ string ClassVariableAnalyzer::GetLocation() const
     string definition = memberdef_.child("definition").child_value();
     assert(!definition.empty());
     
-    // Remove Urho3D::ClassName::
+    // Remove Urho3D::
     smatch match;
-    regex_match(definition, match, regex("(.*)Urho3D::.+?::(.+)"));
+    regex_match(definition, match, regex("(.*)Urho3D::(.+)"));
     assert(match.size() == 3);
-    
-    return match[1].str() + match[2].str();
+    string result =  match[1].str() + match[2].str();
+
+    result += " | File: " + GetHeaderFile() + " | Line: " + ExtractLine(memberdef_);
+
+    return result;
 }
 
 // ============================================================================

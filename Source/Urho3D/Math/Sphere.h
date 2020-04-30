@@ -54,6 +54,7 @@ public:
     }
 
     /// Construct from an array of vertices.
+    /// @nobind
     Sphere(const Vector3* vertices, unsigned count) noexcept
     {
         Define(vertices, count);
@@ -100,6 +101,7 @@ public:
     }
 
     /// Define from an array of vertices.
+    /// @nobind
     void Define(const Vector3* vertices, unsigned count);
     /// Define from a bounding box.
     void Define(const BoundingBox& box);
@@ -130,6 +132,7 @@ public:
     }
 
     /// Merge an array of vertices.
+    /// @nobind
     void Merge(const Vector3* vertices, unsigned count);
     /// Merge a bounding box.
     void Merge(const BoundingBox& box);
