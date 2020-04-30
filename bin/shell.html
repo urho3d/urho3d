@@ -134,10 +134,14 @@
         document.addEventListener('msvisibilitychange', visibilityChanged, false);
         document.addEventListener('webkitvisibilitychange', visibilityChanged, false);
 
+        var resizeTimeout = false;
         // When window size has changed, resize the canvas accordingly
         window.addEventListener('resize', function(evt) {
             // resize event is called before the resizing has finished, we must wait a bit so the new calculations use the new viewport size
-            setTimeout(() => {
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
+            }
+            resizeTimeout = setTimeout(() => {
                 viewportResizeHandler(evt);
             }, 1000);
         });
