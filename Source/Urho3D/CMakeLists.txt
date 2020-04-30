@@ -164,6 +164,10 @@ if (URHO3D_GENERATEBINDINGS)
         message (FATAL_ERROR Doxygen required to generate bindings)
     endif ()
     
+    # Generating Doxyfile
+    configure_file (${CMAKE_SOURCE_DIR}/Source/Tools/BindingGenerator/Doxyfile.in ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile)
+
+    
     set (XML_AST_DIR ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/xml)
     
     # Generate xmls and run BindingGenerator
