@@ -170,9 +170,9 @@ static void GetXmlFiles(string dirPath, vector<string>& result)
 
 namespace SourceData
 {
-    unordered_map<string, xml_node> classes_;
+    map<string, xml_node> classes_;
     xml_node namespaceUrho3D_;
-    unordered_map<string, xml_node> members_;
+    map<string, xml_node> members_;
     vector<string> defines_;
     vector<string> ignoredHeaders_;
 

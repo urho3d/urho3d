@@ -24,7 +24,7 @@
 
 #include <PugiXml/pugixml.hpp>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 using namespace std;
@@ -33,10 +33,10 @@ using namespace pugi;
 namespace SourceData
 {
     // All classes and structs
-    extern unordered_map<string, xml_node> classes_; // id -> compounddef
+    extern map<string, xml_node> classes_; // id -> compounddef
 
     // Huge table with all members of all classes and structs
-    extern unordered_map<string, xml_node> members_; // id -> memberdef
+    extern map<string, xml_node> members_; // id -> memberdef
 
     // List of all defines. Used to detect that some function is a define
     extern vector<string> defines_;
