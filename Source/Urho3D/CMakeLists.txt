@@ -151,6 +151,9 @@ string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
 define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
 
 if (URHO3D_GENERATEBINDINGS)
+    set (SOURCE_FILES_WITHOUT_GENERATED "${SOURCE_FILES}")
+    list(REMOVE_ITEM SOURCE_FILES_WITHOUT_GENERATED "AngelScript/Generated.cpp")
+
     find_package (Doxygen REQUIRED)
     
     if (NOT DOXYGEN_FOUND)
@@ -168,12 +171,12 @@ if (URHO3D_GENERATEBINDINGS)
                                #${CMAKE_SOURCE_DIR}/Source/Urho3D/Lua/Generated.cpp
                                #${CMAKE_SOURCE_DIR}/Source/Urho3D/JavaScript/Generated.cpp
                                #${CMAKE_SOURCE_DIR}/Source/Urho3D/CSharp/Generated.cpp
-                               fake_output_to_force_run_every_time
+                               #fake_output_to_force_run_every_time
                         COMMAND ${CMAKE_COMMAND} -E echo "Generating XMLs with AST to ${XML_AST_DIR}"
                         COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile"
                         COMMAND ${CMAKE_COMMAND} -E echo "Running ${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
                         COMMAND ${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
-                        DEPENDS BindingGenerator ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile
+                        DEPENDS BindingGenerator ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile "${SOURCE_FILES_WITHOUT_GENERATED}"
                         COMMENT "Generating bindings to script languages")
 
     if (URHO3D_ANGELSCRIPT)
