@@ -70,7 +70,6 @@ GENERATE_XML           = YES
 
 XML_OUTPUT             = "@CMAKE_BINARY_DIR@/Source/Tools/BindingGenerator/generated/xml"
 
-
 # If you set the HAVE_DOT tag to YES then doxygen will assume the dot tool is
 # available from the path. This tool is part of Graphviz (see:
 # http://www.graphviz.org/), a graph visualization toolkit from AT&T and Lucent
