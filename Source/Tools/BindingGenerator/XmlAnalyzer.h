@@ -194,6 +194,7 @@ public:
     vector<ClassFunctionAnalyzer> GetFunctions() const;
     vector<ClassVariableAnalyzer> GetVariables() const;
     bool IsRefCounted() const { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); }
+    bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
     bool IsAbstract() const;
     string GetLocation() const;
     bool AllFloats() const;
@@ -231,7 +232,8 @@ public:
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
     bool IsConstrunctor() const { return GetName() == GetClassName(); }
-    string GetLocation(bool detailed) const;
+    bool IsDestructor() const { return GetName() == "~" + GetClassName(); }
+    string GetLocation() const;
     string GetHeaderFile() const { return classAnalyzer_.GetHeaderFile(); }
     TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_); }
     bool CanBeGetProperty() const;

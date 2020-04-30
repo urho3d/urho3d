@@ -49,6 +49,7 @@ public:
     }
 
     /// Construct from a list of faces.
+    /// @nobind
     explicit Polyhedron(const Vector<PODVector<Vector3> >& faces) :
         faces_(faces)
     {
@@ -82,6 +83,7 @@ public:
     /// Add a quadrilateral face.
     void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Add an arbitrary face.
+    /// @manualbind
     void AddFace(const PODVector<Vector3>& face);
     /// Clip with a plane.
     void Clip(const Plane& plane);
@@ -105,6 +107,7 @@ public:
     bool Empty() const { return faces_.Empty(); }
 
     /// Polygon faces.
+    /// @manualbind
     Vector<PODVector<Vector3> > faces_;
 
 private:

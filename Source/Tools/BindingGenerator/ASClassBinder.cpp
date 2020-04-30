@@ -42,6 +42,15 @@ static vector<string> onlyClasses
     "Matrix3x4",
     "Matrix4",
     "Quaternion",
+    "IntRect",
+    "Rect",
+    "Plane",
+    "Color",
+    "Ray",
+    "BoundingBox",
+    "Frustum",
+    "Polyhedron",
+    "Sphere",
 };
 
 static string GenerateWrapperName(ClassFunctionAnalyzer& function)
@@ -66,7 +75,7 @@ static void RegisterValueConstructor(ClassFunctionAnalyzer& function)
     args = args.substr(1, endPos - 1);
 
     ASResult::glue_ <<
-        "// " << function.GetLocation(true) << "\n"
+        "// " << function.GetLocation() << "\n"
         "static void " << wrapperName << "(" << className << "* ptr";
     
     if (args.length() > 0)
@@ -93,6 +102,48 @@ static void RegisterValueConstructor(ClassFunctionAnalyzer& function)
         "\"" << className << "\", "
         "asBEHAVE_CONSTRUCT, "
         "\"" << decl << "\", "
+        "asFUNCTION(" << wrapperName << "), "
+        "asCALL_CDECL_OBJFIRST);\n";
+}
+
+static void RegisterValueDestructor(ClassFunctionAnalyzer& function)
+{
+    string className = function.GetClassName();
+    string wrapperName = GenerateWrapperName(function);
+
+    ASResult::glue_ <<
+        "// " << function.GetLocation() << "\n"
+        "static void " << wrapperName << "(" << className << "* ptr)\n"
+        "{\n"
+        "    ptr->~" << className << "();\n"
+        "}\n\n";
+
+    ASResult::reg_ <<
+        "    engine->RegisterObjectBehaviour("
+        "\"" << className << "\", "
+        "asBEHAVE_DESTRUCT, "
+        "\"void f()\", "
+        "asFUNCTION(" << wrapperName << "), "
+        "asCALL_CDECL_OBJFIRST);\n";
+}
+
+static void RegisterDefaultValueDestructor(const string& className)
+{
+    string wrapperName = className + "_Destructor";
+
+    ASResult::glue_ <<
+        "// " << className << "::~" << className << "()\n"
+        "static void " << wrapperName << "(" << className << "* ptr)\n"
+        "{\n"
+        "    ptr->~" << className << "();\n"
+        "}\n\n";
+
+    ASResult::reg_ <<
+        "    // " << className << "::~" << className << "()\n"
+        "    engine->RegisterObjectBehaviour("
+        "\"" << className << "\", "
+        "asBEHAVE_DESTRUCT, "
+        "\"void f()\", "
         "asFUNCTION(" << wrapperName << "), "
         "asCALL_CDECL_OBJFIRST);\n";
 }
@@ -181,7 +232,7 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
         string func = function.GetName();
     }
 
-    ASResult::reg_ << "    // " << function.GetLocation(false) << "\n";
+    ASResult::reg_ << "    // " << function.GetLocation() << "\n";
 
     if (function.IsConstrunctor())
     {
@@ -194,6 +245,11 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
         {
             RegisterValueConstructor(function);
         }
+    }
+    else if (function.IsDestructor())
+    {
+        if (!function.GetClass().IsRefCounted())
+            RegisterValueDestructor(function);
     }
     else
     {
@@ -291,7 +347,7 @@ static void RegisterObjectMembers(ClassAnalyzer& analyzer)
     if (!insideDefine.empty())
         ASResult::reg_ << "#ifdef " << insideDefine << "\n";
 
-    ASResult::reg_ << "    // " << analyzer.GetLocation() << "\n";
+    //ASResult::reg_ << "    // " << analyzer.GetLocation() << "\n";
 
     vector<ClassVariableAnalyzer> variables = analyzer.GetVariables();
     for (ClassVariableAnalyzer variable : variables)
@@ -317,20 +373,20 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
 
     ASResult::regFirst_ << "    // " + analyzer.GetLocation() + "\n";
 
-    string name = analyzer.GetClassName();
+    string className = analyzer.GetClassName();
 
     if (analyzer.IsRefCounted() || Contains(analyzer.GetComment(), "FAKE_REF"))
     {
         ASResult::regFirst_ <<
             "    engine->RegisterObjectType("
-            "\"" << name << "\", "
+            "\"" << className << "\", "
             "0, "
             "asOBJ_REF"
             ");\n";
     }
     else // Value type
     {
-        string flags = "asOBJ_VALUE | asGetTypeTraits<" + name + ">()";
+        string flags = "asOBJ_VALUE | asGetTypeTraits<" + className + ">()";
 
         if (analyzer.IsPod())
         {
@@ -344,10 +400,16 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
 
         ASResult::regFirst_ <<
             "    engine->RegisterObjectType("
-            "\"" << name << "\", "
-            "sizeof(" << name << "), " <<
+            "\"" << className << "\", "
+            "sizeof(" << className << "), " <<
             flags <<
             ");\n";
+
+        // Non-pod classes required destructor
+        // If destructor exists, it will be registered later when processing functions,
+        // if not exists - rgister here
+        if (!analyzer.HasDestructor() && !analyzer.IsPod())
+            RegisterDefaultValueDestructor(className);
     }
 
     if (!insideDefine.empty())

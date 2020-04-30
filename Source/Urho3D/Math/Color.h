@@ -90,6 +90,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Color(const float* data) noexcept :
         r_(data[0]),
         g_(data[1]),
@@ -99,6 +100,7 @@ public:
     }
 
     /// Construct from 32-bit integer. Default format is 0xAABBGGRR.
+    /// @nobind
     explicit Color(unsigned color, const ChannelMask& mask = ABGR) { FromUIntMask(color, mask); }
 
     /// Construct from 3-vector.
@@ -139,11 +141,13 @@ public:
     }
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &r_; }
 
     /// Return color packed to a 32-bit integer, with R component in the lowest 8 bits. Components are clamped to [0, 1] range.
     unsigned ToUInt() const;
     /// Return color packed to a 32-bit integer with arbitrary channel mask. Components are clamped to [0, 1] range.
+    /// @nobind
     unsigned ToUIntMask(const ChannelMask& mask) const;
     /// Return HSL color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSL() const;
@@ -152,6 +156,7 @@ public:
     /// Set RGBA values from packed 32-bit integer, with R component in the lowest 8 bits (format 0xAABBGGRR).
     void FromUInt(unsigned color);
     /// Set RGBA values from packed 32-bit integer with arbitrary channel mask.
+    /// @nobind
     void FromUIntMask(unsigned color, const ChannelMask& mask);
     /// Set RGBA values from specified HSL values and alpha.
     void FromHSL(float h, float s, float l, float a = 1.0f);
@@ -219,6 +224,7 @@ public:
     float Lightness() const;
 
     /// Stores the values of least and greatest RGB component at specified pointer addresses, optionally clipping those values to [0, 1] range.
+    /// @nobind
     void Bounds(float* min, float* max, bool clipped = false) const;
     /// Return the largest value of the RGB components.
     float MaxRGB() const;

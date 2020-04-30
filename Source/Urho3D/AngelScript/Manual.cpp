@@ -27,7 +27,9 @@
 #ifdef URHO3D_IK
 #include "../IK/IKSolver.h"
 #endif
+#include "../Math/Polyhedron.h"
 #include "../Math/Matrix2.h"
+#include "../Math/Ray.h"
 
 namespace Urho3D
 {
@@ -152,6 +154,77 @@ static CScriptArray* QuaternionData(Quaternion* ptr)
     return BufferToArray<float>(ptr->Data(), 4, "float[]");
 }
 
+// explicit IntRect::IntRect(const int* data) noexcept | File: ../Math/Rect.h
+static void ConstructIntRectArrayInit(CScriptArray* data, IntRect* ptr)
+{
+    new(ptr) IntRect((static_cast<int*>(data->At(0))));
+}
+
+// const int* IntRect::Data() const | File: ../Math/Rect.h
+static CScriptArray* IntRectData(IntRect* ptr)
+{
+    return BufferToArray<int>(ptr->Data(), 4, "int[]");
+}
+
+// explicit Rect::Rect(const float* data) noexcept | File: ../Math/Rect.h
+static void ConstructRectArrayInit(CScriptArray* data, Rect* ptr)
+{
+    new(ptr) Rect((static_cast<float*>(data->At(0))));
+}
+
+// const float* Rect::Data() const | File: ../Math/Rect.h
+static CScriptArray* RectData(Rect* ptr)
+{
+    return BufferToArray<float>(ptr->Data(), 4, "float[]");
+}
+
+// explicit Color::Color(const float* data) noexcept | File: ../Math/Color.h
+static void ConstructColorArrayInit(CScriptArray* data, Color* ptr)
+{
+    new(ptr) Color((static_cast<float*>(data->At(0))));
+}
+
+// const float* Color::Data() const | File: ../Math/Color.h
+static CScriptArray* ColorData(Color* ptr)
+{
+    return BufferToArray<float>(ptr->Data(), 4, "float[]");
+}
+
+// Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h
+static Vector3 FrustumGetVertex(unsigned index, Frustum* ptr)
+{
+    if (index >= NUM_FRUSTUM_VERTICES)
+        return Vector3::ZERO;
+    return ptr->vertices_[index];
+}
+
+// void Polyhedron::AddFace(const PODVector<Vector3>& face) | File: ../Math/Polyhedron.h
+void PolyhedronAddFaceArray(CScriptArray* arr, Polyhedron* ptr)
+{
+    PODVector<Vector3> face;
+    unsigned numVertices = arr->GetSize();
+
+    face.Resize(numVertices);
+    for (unsigned i = 0; i < numVertices; ++i)
+        face[i] = *((Vector3*)arr->At(i));
+    ptr->AddFace(face);
+}
+
+// Vector<PODVector<Vector3> > Polyhedron::faces_ | File: ../Math/Polyhedron.h
+static unsigned PolyhedronGetNumFaces(Polyhedron* ptr)
+{
+    return ptr->faces_.Size();
+}
+
+// Vector<PODVector<Vector3> > Polyhedron::faces_ | File: ../Math/Polyhedron.h
+static CScriptArray* PolyhedronGetFace(unsigned index, Polyhedron* ptr)
+{
+    PODVector<Vector3> face;
+    if (index < ptr->faces_.Size())
+        face = ptr->faces_[index];
+    return VectorToArray<Vector3>(face, "Array<Vector3>");
+}
+
 // This function is called before RegisterGenerated()
 void RegisterManualFirst(asIScriptEngine* engine)
 {
@@ -257,6 +330,38 @@ void RegisterManualLast(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "float get_pitch() const", asMETHOD(Quaternion, PitchAngle), asCALL_THISCALL);
     // float Quaternion::RollAngle() const | File: ../Math/Quaternion.h
     engine->RegisterObjectMethod("Quaternion", "float get_roll() const", asMETHOD(Quaternion, RollAngle), asCALL_THISCALL);
+
+    // explicit IntRect::IntRect(const int* data) noexcept | File: ../Math/Rect.h
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int[]&)", asFUNCTION(ConstructIntRectArrayInit), asCALL_CDECL_OBJLAST);
+    // const int* IntRect::Data() const | File: ../Math/Rect.h
+    engine->RegisterObjectMethod("IntRect", "int[]& get_data() const", asFUNCTION(IntRectData), asCALL_CDECL_OBJLAST);
+
+    // explicit Rect::Rect(const float* data) noexcept | File: ../Math/Rect.h
+    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(float[]&)", asFUNCTION(ConstructRectArrayInit), asCALL_CDECL_OBJLAST);
+    // const float* Rect::Data() const | File: ../Math/Rect.h
+    engine->RegisterObjectMethod("Rect", "float[]& get_data() const", asFUNCTION(RectData), asCALL_CDECL_OBJLAST);
+
+    // explicit Color::Color(const float* data) noexcept | File: ../Math/Color.h
+    engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(float[]&)", asFUNCTION(ConstructColorArrayInit), asCALL_CDECL_OBJLAST);
+    // const float* Color::Data() const | File: ../Math/Color.h
+    engine->RegisterObjectMethod("Color", "float[]& get_data() const", asFUNCTION(ColorData), asCALL_CDECL_OBJLAST);
+    // Vector3 Color::ToVector3() const | File: ../Math/Color.h
+    engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, ToVector3), asCALL_THISCALL);
+    // Vector4 Color::ToVector4() const | File: ../Math/Color.h
+    engine->RegisterObjectMethod("Color", "Vector4 get_rgba() const", asMETHOD(Color, ToVector4), asCALL_THISCALL);
+
+    // float Ray::HitDistance(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2, Vector3 *outNormal=nullptr, Vector3 *outBary=nullptr) const | File: ../Math/Ray.h
+    engine->RegisterObjectMethod("Ray", "float HitDistance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(Ray, HitDistance, (const Vector3&, const Vector3&, const Vector3&, Vector3*, Vector3*) const, float), asCALL_THISCALL);
+
+    // Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Vector3 get_vertices(uint) const", asFUNCTION(FrustumGetVertex), asCALL_CDECL_OBJLAST);
+
+    // void Polyhedron::AddFace(const PODVector<Vector3>& face) | File: ../Math/Polyhedron.h
+    engine->RegisterObjectMethod("Polyhedron", "void AddFace(const Array<Vector3>@)", asFUNCTION(PolyhedronAddFaceArray), asCALL_CDECL_OBJLAST);
+    // Vector<PODVector<Vector3> > Polyhedron::faces_ | File: ../Math/Polyhedron.h
+    engine->RegisterObjectMethod("Polyhedron", "uint get_numFaces() const", asFUNCTION(PolyhedronGetNumFaces), asCALL_CDECL_OBJLAST);
+    // Vector<PODVector<Vector3> > Polyhedron::faces_ | File: ../Math/Polyhedron.h
+    engine->RegisterObjectMethod("Polyhedron", "Array<Vector3>@ get_face(uint) const", asFUNCTION(PolyhedronGetFace), asCALL_CDECL_OBJLAST);
 }
 
 }

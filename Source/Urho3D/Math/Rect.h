@@ -61,6 +61,7 @@ public:
     }
 
     /// Construct from a float array.
+    /// @manualbind
     explicit Rect(const float* data) noexcept :
         min_(data[0], data[1]),
         max_(data[2], data[3])
@@ -198,12 +199,15 @@ public:
     }
 
     /// Return center.
+    /// @property
     Vector2 Center() const { return (max_ + min_) * 0.5f; }
 
     /// Return size.
+    /// @property
     Vector2 Size() const { return max_ - min_; }
 
     /// Return half-size.
+    /// @property
     Vector2 HalfSize() const { return (max_ - min_) * 0.5f; }
 
     /// Test for equality with another rect with epsilon.
@@ -230,6 +234,7 @@ public:
     }
 
     /// Return float data.
+    /// @manualbind
     const float* Data() const { return &min_.x_; }
 
     /// Return as a vector.
@@ -245,15 +250,19 @@ public:
     Vector2 Max() const { return max_; }
 
     /// Return left coordinate.
+    /// @property
     float Left() const { return min_.x_; }
 
     /// Return top coordinate.
+    /// @property
     float Top() const { return min_.y_; }
 
     /// Return right coordinate.
+    /// @property
     float Right() const { return max_.x_; }
 
     /// Return bottom coordinate.
+    /// @property
     float Bottom() const { return max_.y_; }
 
     /// Minimum vector.
@@ -301,6 +310,7 @@ public:
     }
 
     /// Construct from an int array.
+    /// @manualbind
     explicit IntRect(const int* data) noexcept :
         left_(data[0]),
         top_(data[1]),
@@ -398,12 +408,15 @@ public:
     }
 
     /// Return size.
+    /// @property
     IntVector2 Size() const { return IntVector2(Width(), Height()); }
 
     /// Return width.
+    /// @property
     int Width() const { return right_ - left_; }
 
     /// Return height.
+    /// @property
     int Height() const { return bottom_ - top_; }
 
     /// Test whether a point is inside.
@@ -424,6 +437,7 @@ public:
     void Merge(const IntRect& rect);
 
     /// Return integer data.
+    /// @manualbind
     const int* Data() const { return &left_; }
 
     /// Return as string.

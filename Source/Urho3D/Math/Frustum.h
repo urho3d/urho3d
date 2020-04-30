@@ -179,8 +179,10 @@ public:
     void UpdatePlanes();
 
     /// Frustum planes.
+    /// @nobind
     Plane planes_[NUM_FRUSTUM_PLANES];
     /// Frustum vertices.
+    /// @manualbind
     Vector3 vertices_[NUM_FRUSTUM_VERTICES];
 };
 
