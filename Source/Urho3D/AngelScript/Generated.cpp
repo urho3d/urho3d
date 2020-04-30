@@ -100,60 +100,6 @@
 namespace Urho3D
 {
 
-// IntRect::IntRect() noexcept | File: ../Math/Rect.h | Line: 286
-static void IntRect_IntRect_286_5(IntRect* ptr)
-{
-    new(ptr) IntRect();
-}
-
-// IntRect::IntRect(const IntVector2 &min, const IntVector2 &max) noexcept | File: ../Math/Rect.h | Line: 295
-static void IntRect_IntRect_295_5(IntRect* ptr, const IntVector2 &min, const IntVector2 &max)
-{
-    new(ptr) IntRect(min, max);
-}
-
-// IntRect::IntRect(int left, int top, int right, int bottom) noexcept | File: ../Math/Rect.h | Line: 304
-static void IntRect_IntRect_304_5(IntRect* ptr, int left, int top, int right, int bottom)
-{
-    new(ptr) IntRect(left, top, right, bottom);
-}
-
-// IntVector2::IntVector2() noexcept | File: ../Math/Vector2.h | Line: 36
-static void IntVector2_IntVector2_36_5(IntVector2* ptr)
-{
-    new(ptr) IntVector2();
-}
-
-// IntVector2::IntVector2(int x, int y) noexcept | File: ../Math/Vector2.h | Line: 43
-static void IntVector2_IntVector2_43_5(IntVector2* ptr, int x, int y)
-{
-    new(ptr) IntVector2(x, y);
-}
-
-// IntVector2::IntVector2(const IntVector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 65
-static void IntVector2_IntVector2_65_5(IntVector2* ptr, const IntVector2 &rhs)
-{
-    new(ptr) IntVector2(rhs);
-}
-
-// IntVector3::IntVector3() noexcept | File: ../Math/Vector3.h | Line: 36
-static void IntVector3_IntVector3_36_5(IntVector3* ptr)
-{
-    new(ptr) IntVector3();
-}
-
-// IntVector3::IntVector3(int x, int y, int z) noexcept | File: ../Math/Vector3.h | Line: 44
-static void IntVector3_IntVector3_44_5(IntVector3* ptr, int x, int y, int z)
-{
-    new(ptr) IntVector3(x, y, z);
-}
-
-// IntVector3::IntVector3(const IntVector3 &rhs) noexcept=default | File: ../Math/Vector3.h | Line: 61
-static void IntVector3_IntVector3_61_5(IntVector3* ptr, const IntVector3 &rhs)
-{
-    new(ptr) IntVector3(rhs);
-}
-
 // BoundingBox::BoundingBox() noexcept | File: ../Math/BoundingBox.h | Line: 48
 static void BoundingBox_BoundingBox_48_5(BoundingBox* ptr)
 {
@@ -262,28 +208,58 @@ static void Frustum_Frustum_58_5(Frustum* ptr, const Frustum &frustum)
     new(ptr) Frustum(frustum);
 }
 
-// Vector2::Vector2() noexcept | File: ../Math/Vector2.h | Line: 182
-static void Vector2_Vector2_182_5(Vector2* ptr)
+// IntRect::IntRect() noexcept | File: ../Math/Rect.h | Line: 286
+static void IntRect_IntRect_286_5(IntRect* ptr)
 {
-    new(ptr) Vector2();
+    new(ptr) IntRect();
 }
 
-// Vector2::Vector2(const Vector2 &vector) noexcept=default | File: ../Math/Vector2.h | Line: 189
-static void Vector2_Vector2_189_5(Vector2* ptr, const Vector2 &vector)
+// IntRect::IntRect(const IntVector2 &min, const IntVector2 &max) noexcept | File: ../Math/Rect.h | Line: 295
+static void IntRect_IntRect_295_5(IntRect* ptr, const IntVector2 &min, const IntVector2 &max)
 {
-    new(ptr) Vector2(vector);
+    new(ptr) IntRect(min, max);
 }
 
-// Vector2::Vector2(const IntVector2 &vector) noexcept | File: ../Math/Vector2.h | Line: 192
-static void Vector2_Vector2_192_14(Vector2* ptr, const IntVector2 &vector)
+// IntRect::IntRect(int left, int top, int right, int bottom) noexcept | File: ../Math/Rect.h | Line: 304
+static void IntRect_IntRect_304_5(IntRect* ptr, int left, int top, int right, int bottom)
 {
-    new(ptr) Vector2(vector);
+    new(ptr) IntRect(left, top, right, bottom);
 }
 
-// Vector2::Vector2(float x, float y) noexcept | File: ../Math/Vector2.h | Line: 199
-static void Vector2_Vector2_199_5(Vector2* ptr, float x, float y)
+// IntVector2::IntVector2() noexcept | File: ../Math/Vector2.h | Line: 36
+static void IntVector2_IntVector2_36_5(IntVector2* ptr)
 {
-    new(ptr) Vector2(x, y);
+    new(ptr) IntVector2();
+}
+
+// IntVector2::IntVector2(int x, int y) noexcept | File: ../Math/Vector2.h | Line: 43
+static void IntVector2_IntVector2_43_5(IntVector2* ptr, int x, int y)
+{
+    new(ptr) IntVector2(x, y);
+}
+
+// IntVector2::IntVector2(const IntVector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 65
+static void IntVector2_IntVector2_65_5(IntVector2* ptr, const IntVector2 &rhs)
+{
+    new(ptr) IntVector2(rhs);
+}
+
+// IntVector3::IntVector3() noexcept | File: ../Math/Vector3.h | Line: 36
+static void IntVector3_IntVector3_36_5(IntVector3* ptr)
+{
+    new(ptr) IntVector3();
+}
+
+// IntVector3::IntVector3(int x, int y, int z) noexcept | File: ../Math/Vector3.h | Line: 44
+static void IntVector3_IntVector3_44_5(IntVector3* ptr, int x, int y, int z)
+{
+    new(ptr) IntVector3(x, y, z);
+}
+
+// IntVector3::IntVector3(const IntVector3 &rhs) noexcept=default | File: ../Math/Vector3.h | Line: 61
+static void IntVector3_IntVector3_61_5(IntVector3* ptr, const IntVector3 &rhs)
+{
+    new(ptr) IntVector3(rhs);
 }
 
 // Matrix2::Matrix2() noexcept | File: ../Math/Matrix2.h | Line: 35
@@ -386,30 +362,6 @@ static void Matrix4_Matrix4_100_14(Matrix4* ptr, const Matrix3 &matrix)
 static void Matrix4_Matrix4_121_5(Matrix4* ptr, float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33)
 {
     new(ptr) Matrix4(v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33);
-}
-
-// Vector4::Vector4() noexcept | File: ../Math/Vector4.h | Line: 35
-static void Vector4_Vector4_35_5(Vector4* ptr)
-{
-    new(ptr) Vector4();
-}
-
-// Vector4::Vector4(const Vector4 &vector) noexcept=default | File: ../Math/Vector4.h | Line: 44
-static void Vector4_Vector4_44_5(Vector4* ptr, const Vector4 &vector)
-{
-    new(ptr) Vector4(vector);
-}
-
-// Vector4::Vector4(const Vector3 &vector, float w) noexcept | File: ../Math/Vector4.h | Line: 47
-static void Vector4_Vector4_47_5(Vector4* ptr, const Vector3 &vector, float w)
-{
-    new(ptr) Vector4(vector, w);
-}
-
-// Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
-static void Vector4_Vector4_56_5(Vector4* ptr, float x, float y, float z, float w)
-{
-    new(ptr) Vector4(x, y, z, w);
 }
 
 // Plane::Plane() noexcept | File: ../Math/Plane.h | Line: 36
@@ -616,6 +568,30 @@ static void Sphere_Sphere_76_14(Sphere* ptr, const Polyhedron &poly)
     new(ptr) Sphere(poly);
 }
 
+// Vector2::Vector2() noexcept | File: ../Math/Vector2.h | Line: 182
+static void Vector2_Vector2_182_5(Vector2* ptr)
+{
+    new(ptr) Vector2();
+}
+
+// Vector2::Vector2(const Vector2 &vector) noexcept=default | File: ../Math/Vector2.h | Line: 189
+static void Vector2_Vector2_189_5(Vector2* ptr, const Vector2 &vector)
+{
+    new(ptr) Vector2(vector);
+}
+
+// Vector2::Vector2(const IntVector2 &vector) noexcept | File: ../Math/Vector2.h | Line: 192
+static void Vector2_Vector2_192_14(Vector2* ptr, const IntVector2 &vector)
+{
+    new(ptr) Vector2(vector);
+}
+
+// Vector2::Vector2(float x, float y) noexcept | File: ../Math/Vector2.h | Line: 199
+static void Vector2_Vector2_199_5(Vector2* ptr, float x, float y)
+{
+    new(ptr) Vector2(x, y);
+}
+
 // Vector3::Vector3() noexcept | File: ../Math/Vector3.h | Line: 190
 static void Vector3_Vector3_190_5(Vector3* ptr)
 {
@@ -656,6 +632,30 @@ static void Vector3_Vector3_225_5(Vector3* ptr, float x, float y, float z)
 static void Vector3_Vector3_233_5(Vector3* ptr, float x, float y)
 {
     new(ptr) Vector3(x, y);
+}
+
+// Vector4::Vector4() noexcept | File: ../Math/Vector4.h | Line: 35
+static void Vector4_Vector4_35_5(Vector4* ptr)
+{
+    new(ptr) Vector4();
+}
+
+// Vector4::Vector4(const Vector4 &vector) noexcept=default | File: ../Math/Vector4.h | Line: 44
+static void Vector4_Vector4_44_5(Vector4* ptr, const Vector4 &vector)
+{
+    new(ptr) Vector4(vector);
+}
+
+// Vector4::Vector4(const Vector3 &vector, float w) noexcept | File: ../Math/Vector4.h | Line: 47
+static void Vector4_Vector4_47_5(Vector4* ptr, const Vector3 &vector, float w)
+{
+    new(ptr) Vector4(vector, w);
+}
+
+// Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
+static void Vector4_Vector4_56_5(Vector4* ptr, float x, float y, float z, float w)
+{
+    new(ptr) Vector4(x, y, z, w);
 }
 
 void RegisterGenerated(asIScriptEngine* engine)
@@ -1880,20 +1880,18 @@ void RegisterGenerated(asIScriptEngine* engine)
 #endif
 
     // Classes and structs
-    // class IntRect | File: ../Math/Rect.h | Line: 283
-    engine->RegisterObjectType("IntRect", sizeof(IntRect), asOBJ_VALUE | asGetTypeTraits<IntRect>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
-    // class IntVector2 | File: ../Math/Vector2.h | Line: 33
-    engine->RegisterObjectType("IntVector2", sizeof(IntVector2), asOBJ_VALUE | asGetTypeTraits<IntVector2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
-    // class IntVector3 | File: ../Math/Vector3.h | Line: 33
-    engine->RegisterObjectType("IntVector3", sizeof(IntVector3), asOBJ_VALUE | asGetTypeTraits<IntVector3>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
     // class BoundingBox | File: ../Math/BoundingBox.h | Line: 45
     engine->RegisterObjectType("BoundingBox", sizeof(BoundingBox), asOBJ_VALUE | asGetTypeTraits<BoundingBox>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Color | File: ../Math/Color.h | Line: 34
     engine->RegisterObjectType("Color", sizeof(Color), asOBJ_VALUE | asGetTypeTraits<Color>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Frustum | File: ../Math/Frustum.h | Line: 52
     engine->RegisterObjectType("Frustum", sizeof(Frustum), asOBJ_VALUE | asGetTypeTraits<Frustum>());
-    // class Vector2 | File: ../Math/Vector2.h | Line: 179
-    engine->RegisterObjectType("Vector2", sizeof(Vector2), asOBJ_VALUE | asGetTypeTraits<Vector2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
+    // class IntRect | File: ../Math/Rect.h | Line: 283
+    engine->RegisterObjectType("IntRect", sizeof(IntRect), asOBJ_VALUE | asGetTypeTraits<IntRect>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
+    // class IntVector2 | File: ../Math/Vector2.h | Line: 33
+    engine->RegisterObjectType("IntVector2", sizeof(IntVector2), asOBJ_VALUE | asGetTypeTraits<IntVector2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
+    // class IntVector3 | File: ../Math/Vector3.h | Line: 33
+    engine->RegisterObjectType("IntVector3", sizeof(IntVector3), asOBJ_VALUE | asGetTypeTraits<IntVector3>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
     // class Matrix2 | File: ../Math/Matrix2.h | Line: 32
     engine->RegisterObjectType("Matrix2", sizeof(Matrix2), asOBJ_VALUE | asGetTypeTraits<Matrix2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Matrix3 | File: ../Math/Matrix3.h | Line: 32
@@ -1902,8 +1900,6 @@ void RegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectType("Matrix3x4", sizeof(Matrix3x4), asOBJ_VALUE | asGetTypeTraits<Matrix3x4>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Matrix4 | File: ../Math/Matrix4.h | Line: 39
     engine->RegisterObjectType("Matrix4", sizeof(Matrix4), asOBJ_VALUE | asGetTypeTraits<Matrix4>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
-    // class Vector4 | File: ../Math/Vector4.h | Line: 32
-    engine->RegisterObjectType("Vector4", sizeof(Vector4), asOBJ_VALUE | asGetTypeTraits<Vector4>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Plane | File: ../Math/Plane.h | Line: 33
     engine->RegisterObjectType("Plane", sizeof(Plane), asOBJ_VALUE | asGetTypeTraits<Plane>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Polyhedron | File: ../Math/Polyhedron.h | Line: 38
@@ -1916,163 +1912,12 @@ void RegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectType("Rect", sizeof(Rect), asOBJ_VALUE | asGetTypeTraits<Rect>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Sphere | File: ../Math/Sphere.h | Line: 37
     engine->RegisterObjectType("Sphere", sizeof(Sphere), asOBJ_VALUE | asGetTypeTraits<Sphere>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
+    // class Vector2 | File: ../Math/Vector2.h | Line: 179
+    engine->RegisterObjectType("Vector2", sizeof(Vector2), asOBJ_VALUE | asGetTypeTraits<Vector2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Vector3 | File: ../Math/Vector3.h | Line: 187
     engine->RegisterObjectType("Vector3", sizeof(Vector3), asOBJ_VALUE | asGetTypeTraits<Vector3>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
-
-    // int IntRect::bottom_ | File: ../Math/Rect.h | Line: 471
-    engine->RegisterObjectProperty("IntRect", "int bottom", offsetof(IntRect, bottom_));
-    // int IntRect::left_ | File: ../Math/Rect.h | Line: 465
-    engine->RegisterObjectProperty("IntRect", "int left", offsetof(IntRect, left_));
-    // int IntRect::right_ | File: ../Math/Rect.h | Line: 469
-    engine->RegisterObjectProperty("IntRect", "int right", offsetof(IntRect, right_));
-    // int IntRect::top_ | File: ../Math/Rect.h | Line: 467
-    engine->RegisterObjectProperty("IntRect", "int top", offsetof(IntRect, top_));
-    // int IntRect::Bottom() const | File: ../Math/Rect.h | Line: 462
-    engine->RegisterObjectMethod("IntRect", "int Bottom() const", asMETHODPR(IntRect, Bottom, () const, int), asCALL_THISCALL);
-    // void IntRect::Clip(const IntRect &rect) | File: ../Math/Rect.h | Line: 433
-    engine->RegisterObjectMethod("IntRect", "void Clip(const IntRect&in)", asMETHODPR(IntRect, Clip, (const IntRect &), void), asCALL_THISCALL);
-    // int IntRect::Height() const | File: ../Math/Rect.h | Line: 420
-    engine->RegisterObjectMethod("IntRect", "int get_height() const", asMETHODPR(IntRect, Height, () const, int), asCALL_THISCALL);
-    // IntRect::IntRect() noexcept | File: ../Math/Rect.h | Line: 286
-    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntRect_IntRect_286_5), asCALL_CDECL_OBJFIRST);
-    // IntRect::IntRect(const IntVector2 &min, const IntVector2 &max) noexcept | File: ../Math/Rect.h | Line: 295
-    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in, const IntVector2&in)", asFUNCTION(IntRect_IntRect_295_5), asCALL_CDECL_OBJFIRST);
-    // IntRect::IntRect(int left, int top, int right, int bottom) noexcept | File: ../Math/Rect.h | Line: 304
-    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(IntRect_IntRect_304_5), asCALL_CDECL_OBJFIRST);
-    // Intersection IntRect::IsInside(const IntVector2 &point) const | File: ../Math/Rect.h | Line: 423
-    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntVector2&in) const", asMETHODPR(IntRect, IsInside, (const IntVector2 &) const, Intersection), asCALL_THISCALL);
-    // int IntRect::Left() const | File: ../Math/Rect.h | Line: 453
-    engine->RegisterObjectMethod("IntRect", "int Left() const", asMETHODPR(IntRect, Left, () const, int), asCALL_THISCALL);
-    // IntVector2 IntRect::Max() const | File: ../Math/Rect.h | Line: 450
-    engine->RegisterObjectMethod("IntRect", "IntVector2 Max() const", asMETHODPR(IntRect, Max, () const, IntVector2), asCALL_THISCALL);
-    // void IntRect::Merge(const IntRect &rect) | File: ../Math/Rect.h | Line: 437
-    engine->RegisterObjectMethod("IntRect", "void Merge(const IntRect&in)", asMETHODPR(IntRect, Merge, (const IntRect &), void), asCALL_THISCALL);
-    // IntVector2 IntRect::Min() const | File: ../Math/Rect.h | Line: 447
-    engine->RegisterObjectMethod("IntRect", "IntVector2 Min() const", asMETHODPR(IntRect, Min, () const, IntVector2), asCALL_THISCALL);
-    // IntRect IntRect::operator*(float value) const | File: ../Math/Rect.h | Line: 384
-    engine->RegisterObjectMethod("IntRect", "IntRect opMul(float) const", asMETHODPR(IntRect, operator*, (float) const, IntRect), asCALL_THISCALL);
-    // IntRect& IntRect::operator*=(float value) | File: ../Math/Rect.h | Line: 365
-    engine->RegisterObjectMethod("IntRect", "IntRect& opMulAssign(float)", asMETHODPR(IntRect, operator*=, (float), IntRect &), asCALL_THISCALL);
-    // IntRect IntRect::operator+(const IntRect &rhs) const | File: ../Math/Rect.h | Line: 393
-    engine->RegisterObjectMethod("IntRect", "IntRect opAdd(const IntRect&in) const", asMETHODPR(IntRect, operator+, (const IntRect &) const, IntRect), asCALL_THISCALL);
-    // IntRect& IntRect::operator+=(const IntRect &rhs) | File: ../Math/Rect.h | Line: 335
-    engine->RegisterObjectMethod("IntRect", "IntRect& opAddAssign(const IntRect&in)", asMETHODPR(IntRect, operator+=, (const IntRect &), IntRect &), asCALL_THISCALL);
-    // IntRect IntRect::operator-(const IntRect &rhs) const | File: ../Math/Rect.h | Line: 402
-    engine->RegisterObjectMethod("IntRect", "IntRect opSub(const IntRect&in) const", asMETHODPR(IntRect, operator-, (const IntRect &) const, IntRect), asCALL_THISCALL);
-    // IntRect& IntRect::operator-=(const IntRect &rhs) | File: ../Math/Rect.h | Line: 345
-    engine->RegisterObjectMethod("IntRect", "IntRect& opSubAssign(const IntRect&in)", asMETHODPR(IntRect, operator-=, (const IntRect &), IntRect &), asCALL_THISCALL);
-    // IntRect IntRect::operator/(float value) const | File: ../Math/Rect.h | Line: 375
-    engine->RegisterObjectMethod("IntRect", "IntRect opDiv(float) const", asMETHODPR(IntRect, operator/, (float) const, IntRect), asCALL_THISCALL);
-    // IntRect& IntRect::operator/=(float value) | File: ../Math/Rect.h | Line: 355
-    engine->RegisterObjectMethod("IntRect", "IntRect& opDivAssign(float)", asMETHODPR(IntRect, operator/=, (float), IntRect &), asCALL_THISCALL);
-    // bool IntRect::operator==(const IntRect &rhs) const | File: ../Math/Rect.h | Line: 323
-    engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect&in) const", asMETHODPR(IntRect, operator==, (const IntRect &) const, bool), asCALL_THISCALL);
-    // int IntRect::Right() const | File: ../Math/Rect.h | Line: 459
-    engine->RegisterObjectMethod("IntRect", "int Right() const", asMETHODPR(IntRect, Right, () const, int), asCALL_THISCALL);
-    // IntVector2 IntRect::Size() const | File: ../Math/Rect.h | Line: 412
-    engine->RegisterObjectMethod("IntRect", "IntVector2 get_size() const", asMETHODPR(IntRect, Size, () const, IntVector2), asCALL_THISCALL);
-    // int IntRect::Top() const | File: ../Math/Rect.h | Line: 456
-    engine->RegisterObjectMethod("IntRect", "int Top() const", asMETHODPR(IntRect, Top, () const, int), asCALL_THISCALL);
-    // String IntRect::ToString() const | File: ../Math/Rect.h | Line: 444
-    engine->RegisterObjectMethod("IntRect", "String ToString() const", asMETHODPR(IntRect, ToString, () const, String), asCALL_THISCALL);
-    // int IntRect::Width() const | File: ../Math/Rect.h | Line: 416
-    engine->RegisterObjectMethod("IntRect", "int get_width() const", asMETHODPR(IntRect, Width, () const, int), asCALL_THISCALL);
-
-    // int IntVector2::x_ | File: ../Math/Vector2.h | Line: 159
-    engine->RegisterObjectProperty("IntVector2", "int x", offsetof(IntVector2, x_));
-    // int IntVector2::y_ | File: ../Math/Vector2.h | Line: 161
-    engine->RegisterObjectProperty("IntVector2", "int y", offsetof(IntVector2, y_));
-    // IntVector2::IntVector2() noexcept | File: ../Math/Vector2.h | Line: 36
-    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntVector2_IntVector2_36_5), asCALL_CDECL_OBJFIRST);
-    // IntVector2::IntVector2(int x, int y) noexcept | File: ../Math/Vector2.h | Line: 43
-    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(IntVector2_IntVector2_43_5), asCALL_CDECL_OBJFIRST);
-    // IntVector2::IntVector2(const IntVector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 65
-    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(IntVector2_IntVector2_65_5), asCALL_CDECL_OBJFIRST);
-    // float IntVector2::Length() const | File: ../Math/Vector2.h | Line: 156
-    engine->RegisterObjectMethod("IntVector2", "float Length() const", asMETHODPR(IntVector2, Length, () const, float), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator*(int rhs) const | File: ../Math/Vector2.h | Line: 86
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(int) const", asMETHODPR(IntVector2, operator*, (int) const, IntVector2), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator*(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 89
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(const IntVector2&in) const", asMETHODPR(IntVector2, operator*, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator*=(int rhs) | File: ../Math/Vector2.h | Line: 114
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(int)", asMETHODPR(IntVector2, operator*=, (int), IntVector2 &), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator*=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 122
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator*=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator+(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 77
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opAdd(const IntVector2&in) const", asMETHODPR(IntVector2, operator+, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator+=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 98
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAddAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator+=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator-() const | File: ../Math/Vector2.h | Line: 80
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opNeg() const", asMETHODPR(IntVector2, operator-, () const, IntVector2), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator-(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 83
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opSub(const IntVector2&in) const", asMETHODPR(IntVector2, operator-, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator-=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 106
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opSubAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator-=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator/(int rhs) const | File: ../Math/Vector2.h | Line: 92
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(int) const", asMETHODPR(IntVector2, operator/, (int) const, IntVector2), asCALL_THISCALL);
-    // IntVector2 IntVector2::operator/(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 95
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(const IntVector2&in) const", asMETHODPR(IntVector2, operator/, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator/=(int rhs) | File: ../Math/Vector2.h | Line: 130
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(int)", asMETHODPR(IntVector2, operator/=, (int), IntVector2 &), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator/=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 138
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator/=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
-    // IntVector2& IntVector2::operator=(const IntVector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 68
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
-    // bool IntVector2::operator==(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 71
-    engine->RegisterObjectMethod("IntVector2", "bool opEquals(const IntVector2&in) const", asMETHODPR(IntVector2, operator==, (const IntVector2 &) const, bool), asCALL_THISCALL);
-    // unsigned IntVector2::ToHash() const | File: ../Math/Vector2.h | Line: 153
-    engine->RegisterObjectMethod("IntVector2", "uint ToHash() const", asMETHODPR(IntVector2, ToHash, () const, unsigned), asCALL_THISCALL);
-    // String IntVector2::ToString() const | File: ../Math/Vector2.h | Line: 150
-    engine->RegisterObjectMethod("IntVector2", "String ToString() const", asMETHODPR(IntVector2, ToString, () const, String), asCALL_THISCALL);
-
-    // int IntVector3::x_ | File: ../Math/Vector3.h | Line: 161
-    engine->RegisterObjectProperty("IntVector3", "int x", offsetof(IntVector3, x_));
-    // int IntVector3::y_ | File: ../Math/Vector3.h | Line: 163
-    engine->RegisterObjectProperty("IntVector3", "int y", offsetof(IntVector3, y_));
-    // int IntVector3::z_ | File: ../Math/Vector3.h | Line: 165
-    engine->RegisterObjectProperty("IntVector3", "int z", offsetof(IntVector3, z_));
-    // IntVector3::IntVector3() noexcept | File: ../Math/Vector3.h | Line: 36
-    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntVector3_IntVector3_36_5), asCALL_CDECL_OBJFIRST);
-    // IntVector3::IntVector3(int x, int y, int z) noexcept | File: ../Math/Vector3.h | Line: 44
-    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int, int, int)", asFUNCTION(IntVector3_IntVector3_44_5), asCALL_CDECL_OBJFIRST);
-    // IntVector3::IntVector3(const IntVector3 &rhs) noexcept=default | File: ../Math/Vector3.h | Line: 61
-    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", asFUNCTION(IntVector3_IntVector3_61_5), asCALL_CDECL_OBJFIRST);
-    // float IntVector3::Length() const | File: ../Math/Vector3.h | Line: 158
-    engine->RegisterObjectMethod("IntVector3", "float Length() const", asMETHODPR(IntVector3, Length, () const, float), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator*(int rhs) const | File: ../Math/Vector3.h | Line: 82
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(int) const", asMETHODPR(IntVector3, operator*, (int) const, IntVector3), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator*(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 85
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(const IntVector3&in) const", asMETHODPR(IntVector3, operator*, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator*=(int rhs) | File: ../Math/Vector3.h | Line: 112
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(int)", asMETHODPR(IntVector3, operator*=, (int), IntVector3 &), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator*=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 121
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator*=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator+(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 73
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opAdd(const IntVector3&in) const", asMETHODPR(IntVector3, operator+, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator+=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 94
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAddAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator+=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator-() const | File: ../Math/Vector3.h | Line: 76
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opNeg() const", asMETHODPR(IntVector3, operator-, () const, IntVector3), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator-(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 79
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opSub(const IntVector3&in) const", asMETHODPR(IntVector3, operator-, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator-=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 103
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opSubAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator-=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator/(int rhs) const | File: ../Math/Vector3.h | Line: 88
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(int) const", asMETHODPR(IntVector3, operator/, (int) const, IntVector3), asCALL_THISCALL);
-    // IntVector3 IntVector3::operator/(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 91
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(const IntVector3&in) const", asMETHODPR(IntVector3, operator/, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator/=(int rhs) | File: ../Math/Vector3.h | Line: 130
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(int)", asMETHODPR(IntVector3, operator/=, (int), IntVector3 &), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator/=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 139
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator/=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
-    // IntVector3& IntVector3::operator=(const IntVector3 &rhs) noexcept=default | File: ../Math/Vector3.h | Line: 64
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
-    // bool IntVector3::operator==(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 67
-    engine->RegisterObjectMethod("IntVector3", "bool opEquals(const IntVector3&in) const", asMETHODPR(IntVector3, operator==, (const IntVector3 &) const, bool), asCALL_THISCALL);
-    // unsigned IntVector3::ToHash() const | File: ../Math/Vector3.h | Line: 155
-    engine->RegisterObjectMethod("IntVector3", "uint ToHash() const", asMETHODPR(IntVector3, ToHash, () const, unsigned), asCALL_THISCALL);
-    // String IntVector3::ToString() const | File: ../Math/Vector3.h | Line: 152
-    engine->RegisterObjectMethod("IntVector3", "String ToString() const", asMETHODPR(IntVector3, ToString, () const, String), asCALL_THISCALL);
+    // class Vector4 | File: ../Math/Vector4.h | Line: 32
+    engine->RegisterObjectType("Vector4", sizeof(Vector4), asOBJ_VALUE | asGetTypeTraits<Vector4>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
 
     // Vector3 BoundingBox::max_ | File: ../Math/BoundingBox.h | Line: 333
     engine->RegisterObjectProperty("BoundingBox", "Vector3 max", offsetof(BoundingBox, max_));
@@ -2305,80 +2150,160 @@ void RegisterGenerated(asIScriptEngine* engine)
     // void Frustum::UpdatePlanes() | File: ../Math/Frustum.h | Line: 179
     engine->RegisterObjectMethod("Frustum", "void UpdatePlanes()", asMETHODPR(Frustum, UpdatePlanes, (), void), asCALL_THISCALL);
 
-    // float Vector2::x_ | File: ../Math/Vector2.h | Line: 381
-    engine->RegisterObjectProperty("Vector2", "float x", offsetof(Vector2, x_));
-    // float Vector2::y_ | File: ../Math/Vector2.h | Line: 383
-    engine->RegisterObjectProperty("Vector2", "float y", offsetof(Vector2, y_));
-    // Vector2 Vector2::Abs() const | File: ../Math/Vector2.h | Line: 325
-    engine->RegisterObjectMethod("Vector2", "Vector2 Abs() const", asMETHODPR(Vector2, Abs, () const, Vector2), asCALL_THISCALL);
-    // float Vector2::AbsDotProduct(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 316
-    engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHODPR(Vector2, AbsDotProduct, (const Vector2 &) const, float), asCALL_THISCALL);
-    // float Vector2::Angle(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 322
-    engine->RegisterObjectMethod("Vector2", "float Angle(const Vector2&in) const", asMETHODPR(Vector2, Angle, (const Vector2 &) const, float), asCALL_THISCALL);
-    // float Vector2::DotProduct(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 313
-    engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHODPR(Vector2, DotProduct, (const Vector2 &) const, float), asCALL_THISCALL);
-    // bool Vector2::Equals(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 331
-    engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHODPR(Vector2, Equals, (const Vector2 &) const, bool), asCALL_THISCALL);
-    // bool Vector2::IsInf() const | File: ../Math/Vector2.h | Line: 337
-    engine->RegisterObjectMethod("Vector2", "bool IsInf() const", asMETHODPR(Vector2, IsInf, () const, bool), asCALL_THISCALL);
-    // bool Vector2::IsNaN() const | File: ../Math/Vector2.h | Line: 334
-    engine->RegisterObjectMethod("Vector2", "bool IsNaN() const", asMETHODPR(Vector2, IsNaN, () const, bool), asCALL_THISCALL);
-    // float Vector2::Length() const | File: ../Math/Vector2.h | Line: 306
-    engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHODPR(Vector2, Length, () const, float), asCALL_THISCALL);
-    // float Vector2::LengthSquared() const | File: ../Math/Vector2.h | Line: 310
-    engine->RegisterObjectMethod("Vector2", "float get_lengthSquared() const", asMETHODPR(Vector2, LengthSquared, () const, float), asCALL_THISCALL);
-    // Vector2 Vector2::Lerp(const Vector2 &rhs, float t) const | File: ../Math/Vector2.h | Line: 328
-    engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHODPR(Vector2, Lerp, (const Vector2 &, float) const, Vector2), asCALL_THISCALL);
-    // void Vector2::Normalize() | File: ../Math/Vector2.h | Line: 293
-    engine->RegisterObjectMethod("Vector2", "void Normalize()", asMETHODPR(Vector2, Normalize, (), void), asCALL_THISCALL);
-    // Vector2 Vector2::Normalized() const | File: ../Math/Vector2.h | Line: 340
-    engine->RegisterObjectMethod("Vector2", "Vector2 Normalized() const", asMETHODPR(Vector2, Normalized, () const, Vector2), asCALL_THISCALL);
-    // Vector2 Vector2::NormalizedOrDefault(const Vector2 &defaultValue=Vector2::ZERO, float eps=M_LARGE_EPSILON) const | File: ../Math/Vector2.h | Line: 353
-    engine->RegisterObjectMethod("Vector2", "Vector2 NormalizedOrDefault(const Vector2&in, float) const", asMETHODPR(Vector2, NormalizedOrDefault, (const Vector2 &, float) const, Vector2), asCALL_THISCALL);
-    // Vector2 Vector2::operator*(float rhs) const | File: ../Math/Vector2.h | Line: 232
-    engine->RegisterObjectMethod("Vector2", "Vector2 opMul(float) const", asMETHODPR(Vector2, operator*, (float) const, Vector2), asCALL_THISCALL);
-    // Vector2 Vector2::operator*(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 235
-    engine->RegisterObjectMethod("Vector2", "Vector2 opMul(const Vector2&in) const", asMETHODPR(Vector2, operator*, (const Vector2 &) const, Vector2), asCALL_THISCALL);
-    // Vector2& Vector2::operator*=(float rhs) | File: ../Math/Vector2.h | Line: 260
-    engine->RegisterObjectMethod("Vector2", "Vector2& opMulAssign(float)", asMETHODPR(Vector2, operator*=, (float), Vector2 &), asCALL_THISCALL);
-    // Vector2& Vector2::operator*=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 268
-    engine->RegisterObjectMethod("Vector2", "Vector2& opMulAssign(const Vector2&in)", asMETHODPR(Vector2, operator*=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
-    // Vector2 Vector2::operator+(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 223
-    engine->RegisterObjectMethod("Vector2", "Vector2 opAdd(const Vector2&in) const", asMETHODPR(Vector2, operator+, (const Vector2 &) const, Vector2), asCALL_THISCALL);
-    // Vector2& Vector2::operator+=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 244
-    engine->RegisterObjectMethod("Vector2", "Vector2& opAddAssign(const Vector2&in)", asMETHODPR(Vector2, operator+=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
-    // Vector2 Vector2::operator-() const | File: ../Math/Vector2.h | Line: 226
-    engine->RegisterObjectMethod("Vector2", "Vector2 opNeg() const", asMETHODPR(Vector2, operator-, () const, Vector2), asCALL_THISCALL);
-    // Vector2 Vector2::operator-(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 229
-    engine->RegisterObjectMethod("Vector2", "Vector2 opSub(const Vector2&in) const", asMETHODPR(Vector2, operator-, (const Vector2 &) const, Vector2), asCALL_THISCALL);
-    // Vector2& Vector2::operator-=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 252
-    engine->RegisterObjectMethod("Vector2", "Vector2& opSubAssign(const Vector2&in)", asMETHODPR(Vector2, operator-=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
-    // Vector2 Vector2::operator/(float rhs) const | File: ../Math/Vector2.h | Line: 238
-    engine->RegisterObjectMethod("Vector2", "Vector2 opDiv(float) const", asMETHODPR(Vector2, operator/, (float) const, Vector2), asCALL_THISCALL);
-    // Vector2 Vector2::operator/(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 241
-    engine->RegisterObjectMethod("Vector2", "Vector2 opDiv(const Vector2&in) const", asMETHODPR(Vector2, operator/, (const Vector2 &) const, Vector2), asCALL_THISCALL);
-    // Vector2& Vector2::operator/=(float rhs) | File: ../Math/Vector2.h | Line: 276
-    engine->RegisterObjectMethod("Vector2", "Vector2& opDivAssign(float)", asMETHODPR(Vector2, operator/=, (float), Vector2 &), asCALL_THISCALL);
-    // Vector2& Vector2::operator/=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 285
-    engine->RegisterObjectMethod("Vector2", "Vector2& opDivAssign(const Vector2&in)", asMETHODPR(Vector2, operator/=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
-    // Vector2& Vector2::operator=(const Vector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 214
-    engine->RegisterObjectMethod("Vector2", "Vector2& opAssign(const Vector2&in)", asMETHODPR(Vector2, operator=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
-    // bool Vector2::operator==(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 217
-    engine->RegisterObjectMethod("Vector2", "bool opEquals(const Vector2&in) const", asMETHODPR(Vector2, operator==, (const Vector2 &) const, bool), asCALL_THISCALL);
-    // float Vector2::ProjectOntoAxis(const Vector2 &axis) const | File: ../Math/Vector2.h | Line: 319
-    engine->RegisterObjectMethod("Vector2", "float ProjectOntoAxis(const Vector2&in) const", asMETHODPR(Vector2, ProjectOntoAxis, (const Vector2 &) const, float), asCALL_THISCALL);
-    // Vector2 Vector2::ReNormalized(float minLength, float maxLength, const Vector2 &defaultValue=Vector2::ZERO, float eps=M_LARGE_EPSILON) const | File: ../Math/Vector2.h | Line: 362
-    engine->RegisterObjectMethod("Vector2", "Vector2 ReNormalized(float, float, const Vector2&in, float) const", asMETHODPR(Vector2, ReNormalized, (float, float, const Vector2 &, float) const, Vector2), asCALL_THISCALL);
-    // String Vector2::ToString() const | File: ../Math/Vector2.h | Line: 378
-    engine->RegisterObjectMethod("Vector2", "String ToString() const", asMETHODPR(Vector2, ToString, () const, String), asCALL_THISCALL);
-    // Vector2::Vector2() noexcept | File: ../Math/Vector2.h | Line: 182
-    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector2_Vector2_182_5), asCALL_CDECL_OBJFIRST);
-    // Vector2::Vector2(const Vector2 &vector) noexcept=default | File: ../Math/Vector2.h | Line: 189
-    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(Vector2_Vector2_189_5), asCALL_CDECL_OBJFIRST);
-    // Vector2::Vector2(const IntVector2 &vector) noexcept | File: ../Math/Vector2.h | Line: 192
-    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(Vector2_Vector2_192_14), asCALL_CDECL_OBJFIRST);
-    // Vector2::Vector2(float x, float y) noexcept | File: ../Math/Vector2.h | Line: 199
-    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(Vector2_Vector2_199_5), asCALL_CDECL_OBJFIRST);
+    // int IntRect::bottom_ | File: ../Math/Rect.h | Line: 471
+    engine->RegisterObjectProperty("IntRect", "int bottom", offsetof(IntRect, bottom_));
+    // int IntRect::left_ | File: ../Math/Rect.h | Line: 465
+    engine->RegisterObjectProperty("IntRect", "int left", offsetof(IntRect, left_));
+    // int IntRect::right_ | File: ../Math/Rect.h | Line: 469
+    engine->RegisterObjectProperty("IntRect", "int right", offsetof(IntRect, right_));
+    // int IntRect::top_ | File: ../Math/Rect.h | Line: 467
+    engine->RegisterObjectProperty("IntRect", "int top", offsetof(IntRect, top_));
+    // int IntRect::Bottom() const | File: ../Math/Rect.h | Line: 462
+    engine->RegisterObjectMethod("IntRect", "int Bottom() const", asMETHODPR(IntRect, Bottom, () const, int), asCALL_THISCALL);
+    // void IntRect::Clip(const IntRect &rect) | File: ../Math/Rect.h | Line: 433
+    engine->RegisterObjectMethod("IntRect", "void Clip(const IntRect&in)", asMETHODPR(IntRect, Clip, (const IntRect &), void), asCALL_THISCALL);
+    // int IntRect::Height() const | File: ../Math/Rect.h | Line: 420
+    engine->RegisterObjectMethod("IntRect", "int get_height() const", asMETHODPR(IntRect, Height, () const, int), asCALL_THISCALL);
+    // IntRect::IntRect() noexcept | File: ../Math/Rect.h | Line: 286
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntRect_IntRect_286_5), asCALL_CDECL_OBJFIRST);
+    // IntRect::IntRect(const IntVector2 &min, const IntVector2 &max) noexcept | File: ../Math/Rect.h | Line: 295
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in, const IntVector2&in)", asFUNCTION(IntRect_IntRect_295_5), asCALL_CDECL_OBJFIRST);
+    // IntRect::IntRect(int left, int top, int right, int bottom) noexcept | File: ../Math/Rect.h | Line: 304
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(IntRect_IntRect_304_5), asCALL_CDECL_OBJFIRST);
+    // Intersection IntRect::IsInside(const IntVector2 &point) const | File: ../Math/Rect.h | Line: 423
+    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntVector2&in) const", asMETHODPR(IntRect, IsInside, (const IntVector2 &) const, Intersection), asCALL_THISCALL);
+    // int IntRect::Left() const | File: ../Math/Rect.h | Line: 453
+    engine->RegisterObjectMethod("IntRect", "int Left() const", asMETHODPR(IntRect, Left, () const, int), asCALL_THISCALL);
+    // IntVector2 IntRect::Max() const | File: ../Math/Rect.h | Line: 450
+    engine->RegisterObjectMethod("IntRect", "IntVector2 Max() const", asMETHODPR(IntRect, Max, () const, IntVector2), asCALL_THISCALL);
+    // void IntRect::Merge(const IntRect &rect) | File: ../Math/Rect.h | Line: 437
+    engine->RegisterObjectMethod("IntRect", "void Merge(const IntRect&in)", asMETHODPR(IntRect, Merge, (const IntRect &), void), asCALL_THISCALL);
+    // IntVector2 IntRect::Min() const | File: ../Math/Rect.h | Line: 447
+    engine->RegisterObjectMethod("IntRect", "IntVector2 Min() const", asMETHODPR(IntRect, Min, () const, IntVector2), asCALL_THISCALL);
+    // IntRect IntRect::operator*(float value) const | File: ../Math/Rect.h | Line: 384
+    engine->RegisterObjectMethod("IntRect", "IntRect opMul(float) const", asMETHODPR(IntRect, operator*, (float) const, IntRect), asCALL_THISCALL);
+    // IntRect& IntRect::operator*=(float value) | File: ../Math/Rect.h | Line: 365
+    engine->RegisterObjectMethod("IntRect", "IntRect& opMulAssign(float)", asMETHODPR(IntRect, operator*=, (float), IntRect &), asCALL_THISCALL);
+    // IntRect IntRect::operator+(const IntRect &rhs) const | File: ../Math/Rect.h | Line: 393
+    engine->RegisterObjectMethod("IntRect", "IntRect opAdd(const IntRect&in) const", asMETHODPR(IntRect, operator+, (const IntRect &) const, IntRect), asCALL_THISCALL);
+    // IntRect& IntRect::operator+=(const IntRect &rhs) | File: ../Math/Rect.h | Line: 335
+    engine->RegisterObjectMethod("IntRect", "IntRect& opAddAssign(const IntRect&in)", asMETHODPR(IntRect, operator+=, (const IntRect &), IntRect &), asCALL_THISCALL);
+    // IntRect IntRect::operator-(const IntRect &rhs) const | File: ../Math/Rect.h | Line: 402
+    engine->RegisterObjectMethod("IntRect", "IntRect opSub(const IntRect&in) const", asMETHODPR(IntRect, operator-, (const IntRect &) const, IntRect), asCALL_THISCALL);
+    // IntRect& IntRect::operator-=(const IntRect &rhs) | File: ../Math/Rect.h | Line: 345
+    engine->RegisterObjectMethod("IntRect", "IntRect& opSubAssign(const IntRect&in)", asMETHODPR(IntRect, operator-=, (const IntRect &), IntRect &), asCALL_THISCALL);
+    // IntRect IntRect::operator/(float value) const | File: ../Math/Rect.h | Line: 375
+    engine->RegisterObjectMethod("IntRect", "IntRect opDiv(float) const", asMETHODPR(IntRect, operator/, (float) const, IntRect), asCALL_THISCALL);
+    // IntRect& IntRect::operator/=(float value) | File: ../Math/Rect.h | Line: 355
+    engine->RegisterObjectMethod("IntRect", "IntRect& opDivAssign(float)", asMETHODPR(IntRect, operator/=, (float), IntRect &), asCALL_THISCALL);
+    // bool IntRect::operator==(const IntRect &rhs) const | File: ../Math/Rect.h | Line: 323
+    engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect&in) const", asMETHODPR(IntRect, operator==, (const IntRect &) const, bool), asCALL_THISCALL);
+    // int IntRect::Right() const | File: ../Math/Rect.h | Line: 459
+    engine->RegisterObjectMethod("IntRect", "int Right() const", asMETHODPR(IntRect, Right, () const, int), asCALL_THISCALL);
+    // IntVector2 IntRect::Size() const | File: ../Math/Rect.h | Line: 412
+    engine->RegisterObjectMethod("IntRect", "IntVector2 get_size() const", asMETHODPR(IntRect, Size, () const, IntVector2), asCALL_THISCALL);
+    // int IntRect::Top() const | File: ../Math/Rect.h | Line: 456
+    engine->RegisterObjectMethod("IntRect", "int Top() const", asMETHODPR(IntRect, Top, () const, int), asCALL_THISCALL);
+    // String IntRect::ToString() const | File: ../Math/Rect.h | Line: 444
+    engine->RegisterObjectMethod("IntRect", "String ToString() const", asMETHODPR(IntRect, ToString, () const, String), asCALL_THISCALL);
+    // int IntRect::Width() const | File: ../Math/Rect.h | Line: 416
+    engine->RegisterObjectMethod("IntRect", "int get_width() const", asMETHODPR(IntRect, Width, () const, int), asCALL_THISCALL);
+
+    // int IntVector2::x_ | File: ../Math/Vector2.h | Line: 159
+    engine->RegisterObjectProperty("IntVector2", "int x", offsetof(IntVector2, x_));
+    // int IntVector2::y_ | File: ../Math/Vector2.h | Line: 161
+    engine->RegisterObjectProperty("IntVector2", "int y", offsetof(IntVector2, y_));
+    // IntVector2::IntVector2() noexcept | File: ../Math/Vector2.h | Line: 36
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntVector2_IntVector2_36_5), asCALL_CDECL_OBJFIRST);
+    // IntVector2::IntVector2(int x, int y) noexcept | File: ../Math/Vector2.h | Line: 43
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(IntVector2_IntVector2_43_5), asCALL_CDECL_OBJFIRST);
+    // IntVector2::IntVector2(const IntVector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 65
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(IntVector2_IntVector2_65_5), asCALL_CDECL_OBJFIRST);
+    // float IntVector2::Length() const | File: ../Math/Vector2.h | Line: 156
+    engine->RegisterObjectMethod("IntVector2", "float Length() const", asMETHODPR(IntVector2, Length, () const, float), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator*(int rhs) const | File: ../Math/Vector2.h | Line: 86
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(int) const", asMETHODPR(IntVector2, operator*, (int) const, IntVector2), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator*(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 89
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(const IntVector2&in) const", asMETHODPR(IntVector2, operator*, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator*=(int rhs) | File: ../Math/Vector2.h | Line: 114
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(int)", asMETHODPR(IntVector2, operator*=, (int), IntVector2 &), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator*=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 122
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator*=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator+(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 77
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opAdd(const IntVector2&in) const", asMETHODPR(IntVector2, operator+, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator+=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 98
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAddAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator+=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator-() const | File: ../Math/Vector2.h | Line: 80
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opNeg() const", asMETHODPR(IntVector2, operator-, () const, IntVector2), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator-(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 83
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opSub(const IntVector2&in) const", asMETHODPR(IntVector2, operator-, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator-=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 106
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opSubAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator-=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator/(int rhs) const | File: ../Math/Vector2.h | Line: 92
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(int) const", asMETHODPR(IntVector2, operator/, (int) const, IntVector2), asCALL_THISCALL);
+    // IntVector2 IntVector2::operator/(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 95
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(const IntVector2&in) const", asMETHODPR(IntVector2, operator/, (const IntVector2 &) const, IntVector2), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator/=(int rhs) | File: ../Math/Vector2.h | Line: 130
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(int)", asMETHODPR(IntVector2, operator/=, (int), IntVector2 &), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator/=(const IntVector2 &rhs) | File: ../Math/Vector2.h | Line: 138
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator/=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
+    // IntVector2& IntVector2::operator=(const IntVector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 68
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator=, (const IntVector2 &), IntVector2 &), asCALL_THISCALL);
+    // bool IntVector2::operator==(const IntVector2 &rhs) const | File: ../Math/Vector2.h | Line: 71
+    engine->RegisterObjectMethod("IntVector2", "bool opEquals(const IntVector2&in) const", asMETHODPR(IntVector2, operator==, (const IntVector2 &) const, bool), asCALL_THISCALL);
+    // unsigned IntVector2::ToHash() const | File: ../Math/Vector2.h | Line: 153
+    engine->RegisterObjectMethod("IntVector2", "uint ToHash() const", asMETHODPR(IntVector2, ToHash, () const, unsigned), asCALL_THISCALL);
+    // String IntVector2::ToString() const | File: ../Math/Vector2.h | Line: 150
+    engine->RegisterObjectMethod("IntVector2", "String ToString() const", asMETHODPR(IntVector2, ToString, () const, String), asCALL_THISCALL);
+
+    // int IntVector3::x_ | File: ../Math/Vector3.h | Line: 161
+    engine->RegisterObjectProperty("IntVector3", "int x", offsetof(IntVector3, x_));
+    // int IntVector3::y_ | File: ../Math/Vector3.h | Line: 163
+    engine->RegisterObjectProperty("IntVector3", "int y", offsetof(IntVector3, y_));
+    // int IntVector3::z_ | File: ../Math/Vector3.h | Line: 165
+    engine->RegisterObjectProperty("IntVector3", "int z", offsetof(IntVector3, z_));
+    // IntVector3::IntVector3() noexcept | File: ../Math/Vector3.h | Line: 36
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntVector3_IntVector3_36_5), asCALL_CDECL_OBJFIRST);
+    // IntVector3::IntVector3(int x, int y, int z) noexcept | File: ../Math/Vector3.h | Line: 44
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int, int, int)", asFUNCTION(IntVector3_IntVector3_44_5), asCALL_CDECL_OBJFIRST);
+    // IntVector3::IntVector3(const IntVector3 &rhs) noexcept=default | File: ../Math/Vector3.h | Line: 61
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", asFUNCTION(IntVector3_IntVector3_61_5), asCALL_CDECL_OBJFIRST);
+    // float IntVector3::Length() const | File: ../Math/Vector3.h | Line: 158
+    engine->RegisterObjectMethod("IntVector3", "float Length() const", asMETHODPR(IntVector3, Length, () const, float), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator*(int rhs) const | File: ../Math/Vector3.h | Line: 82
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(int) const", asMETHODPR(IntVector3, operator*, (int) const, IntVector3), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator*(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 85
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(const IntVector3&in) const", asMETHODPR(IntVector3, operator*, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator*=(int rhs) | File: ../Math/Vector3.h | Line: 112
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(int)", asMETHODPR(IntVector3, operator*=, (int), IntVector3 &), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator*=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 121
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator*=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator+(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 73
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opAdd(const IntVector3&in) const", asMETHODPR(IntVector3, operator+, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator+=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 94
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAddAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator+=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator-() const | File: ../Math/Vector3.h | Line: 76
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opNeg() const", asMETHODPR(IntVector3, operator-, () const, IntVector3), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator-(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 79
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opSub(const IntVector3&in) const", asMETHODPR(IntVector3, operator-, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator-=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 103
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opSubAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator-=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator/(int rhs) const | File: ../Math/Vector3.h | Line: 88
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(int) const", asMETHODPR(IntVector3, operator/, (int) const, IntVector3), asCALL_THISCALL);
+    // IntVector3 IntVector3::operator/(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 91
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(const IntVector3&in) const", asMETHODPR(IntVector3, operator/, (const IntVector3 &) const, IntVector3), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator/=(int rhs) | File: ../Math/Vector3.h | Line: 130
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(int)", asMETHODPR(IntVector3, operator/=, (int), IntVector3 &), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator/=(const IntVector3 &rhs) | File: ../Math/Vector3.h | Line: 139
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator/=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
+    // IntVector3& IntVector3::operator=(const IntVector3 &rhs) noexcept=default | File: ../Math/Vector3.h | Line: 64
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator=, (const IntVector3 &), IntVector3 &), asCALL_THISCALL);
+    // bool IntVector3::operator==(const IntVector3 &rhs) const | File: ../Math/Vector3.h | Line: 67
+    engine->RegisterObjectMethod("IntVector3", "bool opEquals(const IntVector3&in) const", asMETHODPR(IntVector3, operator==, (const IntVector3 &) const, bool), asCALL_THISCALL);
+    // unsigned IntVector3::ToHash() const | File: ../Math/Vector3.h | Line: 155
+    engine->RegisterObjectMethod("IntVector3", "uint ToHash() const", asMETHODPR(IntVector3, ToHash, () const, unsigned), asCALL_THISCALL);
+    // String IntVector3::ToString() const | File: ../Math/Vector3.h | Line: 152
+    engine->RegisterObjectMethod("IntVector3", "String ToString() const", asMETHODPR(IntVector3, ToString, () const, String), asCALL_THISCALL);
 
     // float Matrix2::m00_ | File: ../Math/Matrix2.h | Line: 234
     engine->RegisterObjectProperty("Matrix2", "float m00", offsetof(Matrix2, m00_));
@@ -2697,81 +2622,6 @@ void RegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix4", "Vector3 Translation() const", asMETHODPR(Matrix4, Translation, () const, Vector3), asCALL_THISCALL);
     // Matrix4 Matrix4::Transpose() const | File: ../Math/Matrix4.h | Line: 582
     engine->RegisterObjectMethod("Matrix4", "Matrix4 Transpose() const", asMETHODPR(Matrix4, Transpose, () const, Matrix4), asCALL_THISCALL);
-
-    // float Vector4::w_ | File: ../Math/Vector4.h | Line: 233
-    engine->RegisterObjectProperty("Vector4", "float w", offsetof(Vector4, w_));
-    // float Vector4::x_ | File: ../Math/Vector4.h | Line: 227
-    engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
-    // float Vector4::y_ | File: ../Math/Vector4.h | Line: 229
-    engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
-    // float Vector4::z_ | File: ../Math/Vector4.h | Line: 231
-    engine->RegisterObjectProperty("Vector4", "float z", offsetof(Vector4, z_));
-    // Vector4 Vector4::Abs() const | File: ../Math/Vector4.h | Line: 184
-    engine->RegisterObjectMethod("Vector4", "Vector4 Abs() const", asMETHODPR(Vector4, Abs, () const, Vector4), asCALL_THISCALL);
-    // float Vector4::AbsDotProduct(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 175
-    engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHODPR(Vector4, AbsDotProduct, (const Vector4 &) const, float), asCALL_THISCALL);
-    // float Vector4::DotProduct(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 172
-    engine->RegisterObjectMethod("Vector4", "float DotProduct(const Vector4&in) const", asMETHODPR(Vector4, DotProduct, (const Vector4 &) const, float), asCALL_THISCALL);
-    // bool Vector4::Equals(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 190
-    engine->RegisterObjectMethod("Vector4", "bool Equals(const Vector4&in) const", asMETHODPR(Vector4, Equals, (const Vector4 &) const, bool), asCALL_THISCALL);
-    // bool Vector4::IsInf() const | File: ../Math/Vector4.h | Line: 199
-    engine->RegisterObjectMethod("Vector4", "bool IsInf() const", asMETHODPR(Vector4, IsInf, () const, bool), asCALL_THISCALL);
-    // bool Vector4::IsNaN() const | File: ../Math/Vector4.h | Line: 196
-    engine->RegisterObjectMethod("Vector4", "bool IsNaN() const", asMETHODPR(Vector4, IsNaN, () const, bool), asCALL_THISCALL);
-    // Vector4 Vector4::Lerp(const Vector4 &rhs, float t) const | File: ../Math/Vector4.h | Line: 187
-    engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHODPR(Vector4, Lerp, (const Vector4 &, float) const, Vector4), asCALL_THISCALL);
-    // Vector4::operator Vector2() const | File: ../Math/Vector4.h | Line: 202
-    engine->RegisterObjectMethod("Vector4", "Vector2 opConv() const", asMETHODPR(Vector4, operator Vector2, () const, Vector2), asCALL_THISCALL);
-    // Vector4::operator Vector3() const | File: ../Math/Vector4.h | Line: 205
-    engine->RegisterObjectMethod("Vector4", "Vector3 opConv() const", asMETHODPR(Vector4, operator Vector3, () const, Vector3), asCALL_THISCALL);
-    // Vector4 Vector4::operator*(float rhs) const | File: ../Math/Vector4.h | Line: 93
-    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(float) const", asMETHODPR(Vector4, operator*, (float) const, Vector4), asCALL_THISCALL);
-    // Vector4 Vector4::operator*(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 96
-    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(const Vector4&in) const", asMETHODPR(Vector4, operator*, (const Vector4 &) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator*=(float rhs) | File: ../Math/Vector4.h | Line: 125
-    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(float)", asMETHODPR(Vector4, operator*=, (float), Vector4 &), asCALL_THISCALL);
-    // Vector4& Vector4::operator*=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 135
-    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(const Vector4&in)", asMETHODPR(Vector4, operator*=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
-    // Vector4 Vector4::operator+(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 84
-    engine->RegisterObjectMethod("Vector4", "Vector4 opAdd(const Vector4&in) const", asMETHODPR(Vector4, operator+, (const Vector4 &) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator+=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 105
-    engine->RegisterObjectMethod("Vector4", "Vector4& opAddAssign(const Vector4&in)", asMETHODPR(Vector4, operator+=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
-    // Vector4 Vector4::operator-() const | File: ../Math/Vector4.h | Line: 87
-    engine->RegisterObjectMethod("Vector4", "Vector4 opNeg() const", asMETHODPR(Vector4, operator-, () const, Vector4), asCALL_THISCALL);
-    // Vector4 Vector4::operator-(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 90
-    engine->RegisterObjectMethod("Vector4", "Vector4 opSub(const Vector4&in) const", asMETHODPR(Vector4, operator-, (const Vector4 &) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator-=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 115
-    engine->RegisterObjectMethod("Vector4", "Vector4& opSubAssign(const Vector4&in)", asMETHODPR(Vector4, operator-=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
-    // Vector4 Vector4::operator/(float rhs) const | File: ../Math/Vector4.h | Line: 99
-    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(float) const", asMETHODPR(Vector4, operator/, (float) const, Vector4), asCALL_THISCALL);
-    // Vector4 Vector4::operator/(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 102
-    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(const Vector4&in) const", asMETHODPR(Vector4, operator/, (const Vector4 &) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator/=(float rhs) | File: ../Math/Vector4.h | Line: 145
-    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(float)", asMETHODPR(Vector4, operator/=, (float), Vector4 &), asCALL_THISCALL);
-    // Vector4& Vector4::operator/=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 156
-    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(const Vector4&in)", asMETHODPR(Vector4, operator/=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
-    // Vector4& Vector4::operator=(const Vector4 &rhs) noexcept=default | File: ../Math/Vector4.h | Line: 75
-    engine->RegisterObjectMethod("Vector4", "Vector4& opAssign(const Vector4&in)", asMETHODPR(Vector4, operator=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
-    // bool Vector4::operator==(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 78
-    engine->RegisterObjectMethod("Vector4", "bool opEquals(const Vector4&in) const", asMETHODPR(Vector4, operator==, (const Vector4 &) const, bool), asCALL_THISCALL);
-    // float Vector4::operator[](unsigned index) const | File: ../Math/Vector4.h | Line: 166
-    engine->RegisterObjectMethod("Vector4", "float opIndex(uint) const", asMETHODPR(Vector4, operator[], (unsigned) const, float), asCALL_THISCALL);
-    // float& Vector4::operator[](unsigned index) | File: ../Math/Vector4.h | Line: 169
-    engine->RegisterObjectMethod("Vector4", "float& opIndex(uint)", asMETHODPR(Vector4, operator[], (unsigned), float &), asCALL_THISCALL);
-    // float Vector4::ProjectOntoAxis(const Vector3 &axis) const | File: ../Math/Vector4.h | Line: 181
-    engine->RegisterObjectMethod("Vector4", "float ProjectOntoAxis(const Vector3&in) const", asMETHODPR(Vector4, ProjectOntoAxis, (const Vector3 &) const, float), asCALL_THISCALL);
-    // unsigned Vector4::ToHash() const | File: ../Math/Vector4.h | Line: 215
-    engine->RegisterObjectMethod("Vector4", "uint ToHash() const", asMETHODPR(Vector4, ToHash, () const, unsigned), asCALL_THISCALL);
-    // String Vector4::ToString() const | File: ../Math/Vector4.h | Line: 212
-    engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHODPR(Vector4, ToString, () const, String), asCALL_THISCALL);
-    // Vector4::Vector4() noexcept | File: ../Math/Vector4.h | Line: 35
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector4_Vector4_35_5), asCALL_CDECL_OBJFIRST);
-    // Vector4::Vector4(const Vector4 &vector) noexcept=default | File: ../Math/Vector4.h | Line: 44
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(Vector4_Vector4_44_5), asCALL_CDECL_OBJFIRST);
-    // Vector4::Vector4(const Vector3 &vector, float w) noexcept | File: ../Math/Vector4.h | Line: 47
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(Vector4_Vector4_47_5), asCALL_CDECL_OBJFIRST);
-    // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_56_5), asCALL_CDECL_OBJFIRST);
 
     // Vector3 Plane::absNormal_ | File: ../Math/Plane.h | Line: 122
     engine->RegisterObjectProperty("Plane", "Vector3 absNormal", offsetof(Plane, absNormal_));
@@ -3131,6 +2981,81 @@ void RegisterGenerated(asIScriptEngine* engine)
     // Sphere::Sphere(const Polyhedron &poly) noexcept | File: ../Math/Sphere.h | Line: 76
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(Sphere_Sphere_76_14), asCALL_CDECL_OBJFIRST);
 
+    // float Vector2::x_ | File: ../Math/Vector2.h | Line: 381
+    engine->RegisterObjectProperty("Vector2", "float x", offsetof(Vector2, x_));
+    // float Vector2::y_ | File: ../Math/Vector2.h | Line: 383
+    engine->RegisterObjectProperty("Vector2", "float y", offsetof(Vector2, y_));
+    // Vector2 Vector2::Abs() const | File: ../Math/Vector2.h | Line: 325
+    engine->RegisterObjectMethod("Vector2", "Vector2 Abs() const", asMETHODPR(Vector2, Abs, () const, Vector2), asCALL_THISCALL);
+    // float Vector2::AbsDotProduct(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 316
+    engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHODPR(Vector2, AbsDotProduct, (const Vector2 &) const, float), asCALL_THISCALL);
+    // float Vector2::Angle(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 322
+    engine->RegisterObjectMethod("Vector2", "float Angle(const Vector2&in) const", asMETHODPR(Vector2, Angle, (const Vector2 &) const, float), asCALL_THISCALL);
+    // float Vector2::DotProduct(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 313
+    engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHODPR(Vector2, DotProduct, (const Vector2 &) const, float), asCALL_THISCALL);
+    // bool Vector2::Equals(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 331
+    engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHODPR(Vector2, Equals, (const Vector2 &) const, bool), asCALL_THISCALL);
+    // bool Vector2::IsInf() const | File: ../Math/Vector2.h | Line: 337
+    engine->RegisterObjectMethod("Vector2", "bool IsInf() const", asMETHODPR(Vector2, IsInf, () const, bool), asCALL_THISCALL);
+    // bool Vector2::IsNaN() const | File: ../Math/Vector2.h | Line: 334
+    engine->RegisterObjectMethod("Vector2", "bool IsNaN() const", asMETHODPR(Vector2, IsNaN, () const, bool), asCALL_THISCALL);
+    // float Vector2::Length() const | File: ../Math/Vector2.h | Line: 306
+    engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHODPR(Vector2, Length, () const, float), asCALL_THISCALL);
+    // float Vector2::LengthSquared() const | File: ../Math/Vector2.h | Line: 310
+    engine->RegisterObjectMethod("Vector2", "float get_lengthSquared() const", asMETHODPR(Vector2, LengthSquared, () const, float), asCALL_THISCALL);
+    // Vector2 Vector2::Lerp(const Vector2 &rhs, float t) const | File: ../Math/Vector2.h | Line: 328
+    engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHODPR(Vector2, Lerp, (const Vector2 &, float) const, Vector2), asCALL_THISCALL);
+    // void Vector2::Normalize() | File: ../Math/Vector2.h | Line: 293
+    engine->RegisterObjectMethod("Vector2", "void Normalize()", asMETHODPR(Vector2, Normalize, (), void), asCALL_THISCALL);
+    // Vector2 Vector2::Normalized() const | File: ../Math/Vector2.h | Line: 340
+    engine->RegisterObjectMethod("Vector2", "Vector2 Normalized() const", asMETHODPR(Vector2, Normalized, () const, Vector2), asCALL_THISCALL);
+    // Vector2 Vector2::NormalizedOrDefault(const Vector2 &defaultValue=Vector2::ZERO, float eps=M_LARGE_EPSILON) const | File: ../Math/Vector2.h | Line: 353
+    engine->RegisterObjectMethod("Vector2", "Vector2 NormalizedOrDefault(const Vector2&in, float) const", asMETHODPR(Vector2, NormalizedOrDefault, (const Vector2 &, float) const, Vector2), asCALL_THISCALL);
+    // Vector2 Vector2::operator*(float rhs) const | File: ../Math/Vector2.h | Line: 232
+    engine->RegisterObjectMethod("Vector2", "Vector2 opMul(float) const", asMETHODPR(Vector2, operator*, (float) const, Vector2), asCALL_THISCALL);
+    // Vector2 Vector2::operator*(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 235
+    engine->RegisterObjectMethod("Vector2", "Vector2 opMul(const Vector2&in) const", asMETHODPR(Vector2, operator*, (const Vector2 &) const, Vector2), asCALL_THISCALL);
+    // Vector2& Vector2::operator*=(float rhs) | File: ../Math/Vector2.h | Line: 260
+    engine->RegisterObjectMethod("Vector2", "Vector2& opMulAssign(float)", asMETHODPR(Vector2, operator*=, (float), Vector2 &), asCALL_THISCALL);
+    // Vector2& Vector2::operator*=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 268
+    engine->RegisterObjectMethod("Vector2", "Vector2& opMulAssign(const Vector2&in)", asMETHODPR(Vector2, operator*=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
+    // Vector2 Vector2::operator+(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 223
+    engine->RegisterObjectMethod("Vector2", "Vector2 opAdd(const Vector2&in) const", asMETHODPR(Vector2, operator+, (const Vector2 &) const, Vector2), asCALL_THISCALL);
+    // Vector2& Vector2::operator+=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 244
+    engine->RegisterObjectMethod("Vector2", "Vector2& opAddAssign(const Vector2&in)", asMETHODPR(Vector2, operator+=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
+    // Vector2 Vector2::operator-() const | File: ../Math/Vector2.h | Line: 226
+    engine->RegisterObjectMethod("Vector2", "Vector2 opNeg() const", asMETHODPR(Vector2, operator-, () const, Vector2), asCALL_THISCALL);
+    // Vector2 Vector2::operator-(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 229
+    engine->RegisterObjectMethod("Vector2", "Vector2 opSub(const Vector2&in) const", asMETHODPR(Vector2, operator-, (const Vector2 &) const, Vector2), asCALL_THISCALL);
+    // Vector2& Vector2::operator-=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 252
+    engine->RegisterObjectMethod("Vector2", "Vector2& opSubAssign(const Vector2&in)", asMETHODPR(Vector2, operator-=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
+    // Vector2 Vector2::operator/(float rhs) const | File: ../Math/Vector2.h | Line: 238
+    engine->RegisterObjectMethod("Vector2", "Vector2 opDiv(float) const", asMETHODPR(Vector2, operator/, (float) const, Vector2), asCALL_THISCALL);
+    // Vector2 Vector2::operator/(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 241
+    engine->RegisterObjectMethod("Vector2", "Vector2 opDiv(const Vector2&in) const", asMETHODPR(Vector2, operator/, (const Vector2 &) const, Vector2), asCALL_THISCALL);
+    // Vector2& Vector2::operator/=(float rhs) | File: ../Math/Vector2.h | Line: 276
+    engine->RegisterObjectMethod("Vector2", "Vector2& opDivAssign(float)", asMETHODPR(Vector2, operator/=, (float), Vector2 &), asCALL_THISCALL);
+    // Vector2& Vector2::operator/=(const Vector2 &rhs) | File: ../Math/Vector2.h | Line: 285
+    engine->RegisterObjectMethod("Vector2", "Vector2& opDivAssign(const Vector2&in)", asMETHODPR(Vector2, operator/=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
+    // Vector2& Vector2::operator=(const Vector2 &rhs) noexcept=default | File: ../Math/Vector2.h | Line: 214
+    engine->RegisterObjectMethod("Vector2", "Vector2& opAssign(const Vector2&in)", asMETHODPR(Vector2, operator=, (const Vector2 &), Vector2 &), asCALL_THISCALL);
+    // bool Vector2::operator==(const Vector2 &rhs) const | File: ../Math/Vector2.h | Line: 217
+    engine->RegisterObjectMethod("Vector2", "bool opEquals(const Vector2&in) const", asMETHODPR(Vector2, operator==, (const Vector2 &) const, bool), asCALL_THISCALL);
+    // float Vector2::ProjectOntoAxis(const Vector2 &axis) const | File: ../Math/Vector2.h | Line: 319
+    engine->RegisterObjectMethod("Vector2", "float ProjectOntoAxis(const Vector2&in) const", asMETHODPR(Vector2, ProjectOntoAxis, (const Vector2 &) const, float), asCALL_THISCALL);
+    // Vector2 Vector2::ReNormalized(float minLength, float maxLength, const Vector2 &defaultValue=Vector2::ZERO, float eps=M_LARGE_EPSILON) const | File: ../Math/Vector2.h | Line: 362
+    engine->RegisterObjectMethod("Vector2", "Vector2 ReNormalized(float, float, const Vector2&in, float) const", asMETHODPR(Vector2, ReNormalized, (float, float, const Vector2 &, float) const, Vector2), asCALL_THISCALL);
+    // String Vector2::ToString() const | File: ../Math/Vector2.h | Line: 378
+    engine->RegisterObjectMethod("Vector2", "String ToString() const", asMETHODPR(Vector2, ToString, () const, String), asCALL_THISCALL);
+    // Vector2::Vector2() noexcept | File: ../Math/Vector2.h | Line: 182
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector2_Vector2_182_5), asCALL_CDECL_OBJFIRST);
+    // Vector2::Vector2(const Vector2 &vector) noexcept=default | File: ../Math/Vector2.h | Line: 189
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(Vector2_Vector2_189_5), asCALL_CDECL_OBJFIRST);
+    // Vector2::Vector2(const IntVector2 &vector) noexcept | File: ../Math/Vector2.h | Line: 192
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(Vector2_Vector2_192_14), asCALL_CDECL_OBJFIRST);
+    // Vector2::Vector2(float x, float y) noexcept | File: ../Math/Vector2.h | Line: 199
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(Vector2_Vector2_199_5), asCALL_CDECL_OBJFIRST);
+
     // float Vector3::x_ | File: ../Math/Vector3.h | Line: 480
     engine->RegisterObjectProperty("Vector3", "float x", offsetof(Vector3, x_));
     // float Vector3::y_ | File: ../Math/Vector3.h | Line: 482
@@ -3227,6 +3152,81 @@ void RegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(Vector3_Vector3_225_5), asCALL_CDECL_OBJFIRST);
     // Vector3::Vector3(float x, float y) noexcept | File: ../Math/Vector3.h | Line: 233
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(Vector3_Vector3_233_5), asCALL_CDECL_OBJFIRST);
+
+    // float Vector4::w_ | File: ../Math/Vector4.h | Line: 233
+    engine->RegisterObjectProperty("Vector4", "float w", offsetof(Vector4, w_));
+    // float Vector4::x_ | File: ../Math/Vector4.h | Line: 227
+    engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
+    // float Vector4::y_ | File: ../Math/Vector4.h | Line: 229
+    engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
+    // float Vector4::z_ | File: ../Math/Vector4.h | Line: 231
+    engine->RegisterObjectProperty("Vector4", "float z", offsetof(Vector4, z_));
+    // Vector4 Vector4::Abs() const | File: ../Math/Vector4.h | Line: 184
+    engine->RegisterObjectMethod("Vector4", "Vector4 Abs() const", asMETHODPR(Vector4, Abs, () const, Vector4), asCALL_THISCALL);
+    // float Vector4::AbsDotProduct(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 175
+    engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHODPR(Vector4, AbsDotProduct, (const Vector4 &) const, float), asCALL_THISCALL);
+    // float Vector4::DotProduct(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 172
+    engine->RegisterObjectMethod("Vector4", "float DotProduct(const Vector4&in) const", asMETHODPR(Vector4, DotProduct, (const Vector4 &) const, float), asCALL_THISCALL);
+    // bool Vector4::Equals(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 190
+    engine->RegisterObjectMethod("Vector4", "bool Equals(const Vector4&in) const", asMETHODPR(Vector4, Equals, (const Vector4 &) const, bool), asCALL_THISCALL);
+    // bool Vector4::IsInf() const | File: ../Math/Vector4.h | Line: 199
+    engine->RegisterObjectMethod("Vector4", "bool IsInf() const", asMETHODPR(Vector4, IsInf, () const, bool), asCALL_THISCALL);
+    // bool Vector4::IsNaN() const | File: ../Math/Vector4.h | Line: 196
+    engine->RegisterObjectMethod("Vector4", "bool IsNaN() const", asMETHODPR(Vector4, IsNaN, () const, bool), asCALL_THISCALL);
+    // Vector4 Vector4::Lerp(const Vector4 &rhs, float t) const | File: ../Math/Vector4.h | Line: 187
+    engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHODPR(Vector4, Lerp, (const Vector4 &, float) const, Vector4), asCALL_THISCALL);
+    // Vector4::operator Vector2() const | File: ../Math/Vector4.h | Line: 202
+    engine->RegisterObjectMethod("Vector4", "Vector2 opConv() const", asMETHODPR(Vector4, operator Vector2, () const, Vector2), asCALL_THISCALL);
+    // Vector4::operator Vector3() const | File: ../Math/Vector4.h | Line: 205
+    engine->RegisterObjectMethod("Vector4", "Vector3 opConv() const", asMETHODPR(Vector4, operator Vector3, () const, Vector3), asCALL_THISCALL);
+    // Vector4 Vector4::operator*(float rhs) const | File: ../Math/Vector4.h | Line: 93
+    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(float) const", asMETHODPR(Vector4, operator*, (float) const, Vector4), asCALL_THISCALL);
+    // Vector4 Vector4::operator*(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 96
+    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(const Vector4&in) const", asMETHODPR(Vector4, operator*, (const Vector4 &) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator*=(float rhs) | File: ../Math/Vector4.h | Line: 125
+    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(float)", asMETHODPR(Vector4, operator*=, (float), Vector4 &), asCALL_THISCALL);
+    // Vector4& Vector4::operator*=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 135
+    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(const Vector4&in)", asMETHODPR(Vector4, operator*=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
+    // Vector4 Vector4::operator+(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 84
+    engine->RegisterObjectMethod("Vector4", "Vector4 opAdd(const Vector4&in) const", asMETHODPR(Vector4, operator+, (const Vector4 &) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator+=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 105
+    engine->RegisterObjectMethod("Vector4", "Vector4& opAddAssign(const Vector4&in)", asMETHODPR(Vector4, operator+=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
+    // Vector4 Vector4::operator-() const | File: ../Math/Vector4.h | Line: 87
+    engine->RegisterObjectMethod("Vector4", "Vector4 opNeg() const", asMETHODPR(Vector4, operator-, () const, Vector4), asCALL_THISCALL);
+    // Vector4 Vector4::operator-(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 90
+    engine->RegisterObjectMethod("Vector4", "Vector4 opSub(const Vector4&in) const", asMETHODPR(Vector4, operator-, (const Vector4 &) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator-=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 115
+    engine->RegisterObjectMethod("Vector4", "Vector4& opSubAssign(const Vector4&in)", asMETHODPR(Vector4, operator-=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
+    // Vector4 Vector4::operator/(float rhs) const | File: ../Math/Vector4.h | Line: 99
+    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(float) const", asMETHODPR(Vector4, operator/, (float) const, Vector4), asCALL_THISCALL);
+    // Vector4 Vector4::operator/(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 102
+    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(const Vector4&in) const", asMETHODPR(Vector4, operator/, (const Vector4 &) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator/=(float rhs) | File: ../Math/Vector4.h | Line: 145
+    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(float)", asMETHODPR(Vector4, operator/=, (float), Vector4 &), asCALL_THISCALL);
+    // Vector4& Vector4::operator/=(const Vector4 &rhs) | File: ../Math/Vector4.h | Line: 156
+    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(const Vector4&in)", asMETHODPR(Vector4, operator/=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
+    // Vector4& Vector4::operator=(const Vector4 &rhs) noexcept=default | File: ../Math/Vector4.h | Line: 75
+    engine->RegisterObjectMethod("Vector4", "Vector4& opAssign(const Vector4&in)", asMETHODPR(Vector4, operator=, (const Vector4 &), Vector4 &), asCALL_THISCALL);
+    // bool Vector4::operator==(const Vector4 &rhs) const | File: ../Math/Vector4.h | Line: 78
+    engine->RegisterObjectMethod("Vector4", "bool opEquals(const Vector4&in) const", asMETHODPR(Vector4, operator==, (const Vector4 &) const, bool), asCALL_THISCALL);
+    // float Vector4::operator[](unsigned index) const | File: ../Math/Vector4.h | Line: 166
+    engine->RegisterObjectMethod("Vector4", "float opIndex(uint) const", asMETHODPR(Vector4, operator[], (unsigned) const, float), asCALL_THISCALL);
+    // float& Vector4::operator[](unsigned index) | File: ../Math/Vector4.h | Line: 169
+    engine->RegisterObjectMethod("Vector4", "float& opIndex(uint)", asMETHODPR(Vector4, operator[], (unsigned), float &), asCALL_THISCALL);
+    // float Vector4::ProjectOntoAxis(const Vector3 &axis) const | File: ../Math/Vector4.h | Line: 181
+    engine->RegisterObjectMethod("Vector4", "float ProjectOntoAxis(const Vector3&in) const", asMETHODPR(Vector4, ProjectOntoAxis, (const Vector3 &) const, float), asCALL_THISCALL);
+    // unsigned Vector4::ToHash() const | File: ../Math/Vector4.h | Line: 215
+    engine->RegisterObjectMethod("Vector4", "uint ToHash() const", asMETHODPR(Vector4, ToHash, () const, unsigned), asCALL_THISCALL);
+    // String Vector4::ToString() const | File: ../Math/Vector4.h | Line: 212
+    engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHODPR(Vector4, ToString, () const, String), asCALL_THISCALL);
+    // Vector4::Vector4() noexcept | File: ../Math/Vector4.h | Line: 35
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector4_Vector4_35_5), asCALL_CDECL_OBJFIRST);
+    // Vector4::Vector4(const Vector4 &vector) noexcept=default | File: ../Math/Vector4.h | Line: 44
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(Vector4_Vector4_44_5), asCALL_CDECL_OBJFIRST);
+    // Vector4::Vector4(const Vector3 &vector, float w) noexcept | File: ../Math/Vector4.h | Line: 47
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(Vector4_Vector4_47_5), asCALL_CDECL_OBJFIRST);
+    // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_56_5), asCALL_CDECL_OBJFIRST);
 
 }
 
