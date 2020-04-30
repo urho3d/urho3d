@@ -51,12 +51,6 @@ RECURSIVE              = YES
 
 GENERATE_HTML          = NO
 
-# The HTML_OUTPUT tag is used to specify where the HTML docs will be put. If a
-# relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
-# it.
-# The default directory is: html.
-# This tag requires that the tag GENERATE_HTML is set to YES.
-
 # If the GENERATE_LATEX tag is set to YES, doxygen will generate LaTeX output.
 # The default value is: YES.
 

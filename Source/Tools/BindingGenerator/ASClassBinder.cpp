@@ -347,8 +347,6 @@ static void RegisterObjectMembers(ClassAnalyzer& analyzer)
     if (!insideDefine.empty())
         ASResult::reg_ << "#ifdef " << insideDefine << "\n";
 
-    //ASResult::reg_ << "    // " << analyzer.GetLocation() << "\n";
-
     vector<ClassVariableAnalyzer> variables = analyzer.GetVariables();
     for (ClassVariableAnalyzer variable : variables)
         RegisterProperty(variable);
@@ -405,9 +403,9 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
             flags <<
             ");\n";
 
-        // Non-pod classes required destructor
+        // Non-pod value classes required destructor
         // If destructor exists, it will be registered later when processing functions,
-        // if not exists - rgister here
+        // if not exists - registered here
         if (!analyzer.HasDestructor() && !analyzer.IsPod())
             RegisterDefaultValueDestructor(className);
     }

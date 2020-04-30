@@ -175,7 +175,7 @@ if (URHO3D_GENERATEBINDINGS)
                         COMMAND ${CMAKE_COMMAND} -E echo "Generating XMLs with AST to ${XML_AST_DIR}"
                         COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile"
                         COMMAND ${CMAKE_COMMAND} -E echo "Running $<TARGET_FILE:BindingGenerator> ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
-                        COMMAND BindingGenerator "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
+                        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
                         DEPENDS BindingGenerator ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile
                         COMMENT "Generating bindings to script languages")
 
