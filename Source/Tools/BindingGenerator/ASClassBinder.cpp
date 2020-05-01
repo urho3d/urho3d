@@ -51,6 +51,8 @@ static vector<string> onlyClasses
     "Frustum",
     "Polyhedron",
     "Sphere",
+    "StringHash",
+    //"Controls",
 };
 
 static string GenerateWrapperName(ClassFunctionAnalyzer& function)
@@ -148,6 +150,30 @@ static void RegisterDefaultValueDestructor(const string& className)
         "asCALL_CDECL_OBJFIRST);\n";
 }
 
+static void RegisterComparisonOperator(const string& className)
+{
+    string wrapperName = className + "_Comparison";
+
+    ASResult::glue_ <<
+        "// " << className << "::operator>" << " | " << className << "::operator<\n"
+        "static int " << wrapperName << "(const " << className << "& lhs, const " << className << "& rhs)\n"
+        "{\n"
+        "    if (lhs < rhs)\n"
+        "        return -1;\n"
+        "    if (lhs > rhs)\n"
+        "        return 1;\n"
+        "    return 0;\n"
+        "}\n\n";
+
+    ASResult::reg_ <<
+        "    // " << className << "::operator>" << " | " << className << "::operator<\n"
+        "    engine->RegisterObjectMethod("
+        "\"" << className << "\", "
+        "\"int opCmp(const " << className << "&in) const\", "
+        "asFUNCTION(" << wrapperName << "), "
+        "asCALL_CDECL_OBJFIRST);\n";
+}
+
 string CppMethodNameToAS(ClassFunctionAnalyzer& function)
 {
     string name = function.GetName();
@@ -193,6 +219,12 @@ string CppMethodNameToAS(ClassFunctionAnalyzer& function)
     if (name == "operator!=")
         return "IGNORED";
 
+    if (name == "operator<")
+        return "IGNORED";
+
+    if (name == "operator>")
+        return "IGNORED";
+
     return name;
 }
 
@@ -225,6 +257,9 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
         return;
 
     if (function.GetName() == "operator!=")
+        return;
+
+    if (function.GetName() == "operator<" || function.GetName() == "operator>")
         return;
 
     if (function.GetClassName() == "Vector4") // TODO Remove test
@@ -408,6 +443,9 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
         // if not exists - registered here
         if (!analyzer.HasDestructor() && !analyzer.IsPod())
             RegisterDefaultValueDestructor(className);
+
+        if (analyzer.ContainsFunction("operator>") || analyzer.ContainsFunction("operator>"))
+            RegisterComparisonOperator(className);
     }
 
     if (!insideDefine.empty())

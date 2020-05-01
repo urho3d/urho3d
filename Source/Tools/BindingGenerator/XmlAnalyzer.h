@@ -180,7 +180,6 @@ private:
     xml_node compounddef_;
     
     vector<xml_node> GetMemberdefs() const;
-    bool ContainsFunction(const string& name) const;
 
 public:
     ClassAnalyzer(xml_node compounddef);
@@ -193,6 +192,7 @@ public:
     bool IsTemplate() const { return !compounddef_.child("templateparamlist").empty(); }
     vector<ClassFunctionAnalyzer> GetFunctions() const;
     vector<ClassVariableAnalyzer> GetVariables() const;
+    bool ContainsFunction(const string& name) const;
     bool IsRefCounted() const { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); }
     bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
     bool IsAbstract() const;

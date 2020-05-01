@@ -213,8 +213,8 @@ static void RegisterInput(asIScriptEngine* engine)
 
 void RegisterInputAPI(asIScriptEngine* engine)
 {
-    RegisterControls(engine);
     RegisterInputConstants(engine);
+    RegisterControls(engine);
     RegisterInput(engine);
 }
 
