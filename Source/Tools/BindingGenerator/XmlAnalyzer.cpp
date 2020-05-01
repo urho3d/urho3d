@@ -418,6 +418,20 @@ bool ClassAnalyzer::ContainsFunction(const string& name) const
     return false;
 }
 
+ClassFunctionAnalyzer ClassAnalyzer::GetFunction(const string& name) const
+{
+    vector<ClassFunctionAnalyzer> functions = GetFunctions();
+
+    for (ClassFunctionAnalyzer function : functions)
+    {
+        if (function.GetName() == name)
+            return function;
+    }
+
+    assert(true);
+    return (ClassFunctionAnalyzer(*this, xml_node())); // xml_node can not be empty, so here we return incorrect value
+}
+
 bool ClassAnalyzer::IsAbstract() const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
