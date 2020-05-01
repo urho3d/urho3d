@@ -193,6 +193,7 @@ public:
     vector<ClassFunctionAnalyzer> GetFunctions() const;
     vector<ClassVariableAnalyzer> GetVariables() const;
     bool ContainsFunction(const string& name) const;
+    ClassFunctionAnalyzer GetFunction(const string& name) const;
     bool IsRefCounted() const { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); }
     bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
     bool IsAbstract() const;

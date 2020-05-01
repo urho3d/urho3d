@@ -569,7 +569,8 @@ static void Sphere_Sphere_76_14(Sphere* ptr, const Polyhedron &poly)
     new(ptr) Sphere(poly);
 }
 
-// StringHash::operator> | StringHash::operator<
+// bool StringHash::operator<(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 82
+// bool StringHash::operator>(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 85
 static int StringHash_Comparison(const StringHash& lhs, const StringHash& rhs)
 {
     if (lhs < rhs)
@@ -3018,7 +3019,8 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // Sphere::Sphere(const Polyhedron &poly) noexcept | File: ../Math/Sphere.h | Line: 76
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(Sphere_Sphere_76_14), asCALL_CDECL_OBJFIRST);
 
-    // StringHash::operator> | StringHash::operator<
+    // bool StringHash::operator<(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 82
+    // bool StringHash::operator>(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 85
     engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHash_Comparison), asCALL_CDECL_OBJFIRST);
     // StringHash::operator bool() const | File: ../Math/StringHash.h | Line: 88
     engine->RegisterObjectMethod("StringHash", "bool opConv() const", asMETHODPR(StringHash, operator bool, () const, bool), asCALL_THISCALL);

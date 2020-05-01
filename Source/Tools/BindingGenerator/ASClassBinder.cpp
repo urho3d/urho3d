@@ -150,12 +150,17 @@ static void RegisterDefaultValueDestructor(const string& className)
         "asCALL_CDECL_OBJFIRST);\n";
 }
 
-static void RegisterComparisonOperator(const string& className)
+static void RegisterComparisonOperator(ClassAnalyzer analyzer)
 {
+    string className = analyzer.GetClassName();
     string wrapperName = className + "_Comparison";
 
+    ClassFunctionAnalyzer operatorLess = analyzer.GetFunction("operator<");
+    ClassFunctionAnalyzer operatorGreater = analyzer.GetFunction("operator>");
+
     ASResult::glue_ <<
-        "// " << className << "::operator>" << " | " << className << "::operator<\n"
+        "// " << operatorLess.GetLocation() << "\n"
+        "// " << operatorGreater.GetLocation() << "\n"
         "static int " << wrapperName << "(const " << className << "& lhs, const " << className << "& rhs)\n"
         "{\n"
         "    if (lhs < rhs)\n"
@@ -166,7 +171,8 @@ static void RegisterComparisonOperator(const string& className)
         "}\n\n";
 
     ASResult::reg_ <<
-        "    // " << className << "::operator>" << " | " << className << "::operator<\n"
+        "    // " << operatorLess.GetLocation() << "\n"
+        "    // " << operatorGreater.GetLocation() << "\n"
         "    engine->RegisterObjectMethod("
         "\"" << className << "\", "
         "\"int opCmp(const " << className << "&in) const\", "
@@ -259,6 +265,7 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
     if (function.GetName() == "operator!=")
         return;
 
+    // Already registered as sigle function opCmp
     if (function.GetName() == "operator<" || function.GetName() == "operator>")
         return;
 
@@ -444,8 +451,9 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
         if (!analyzer.HasDestructor() && !analyzer.IsPod())
             RegisterDefaultValueDestructor(className);
 
+        // 2 operators is replaced by single function opCmp
         if (analyzer.ContainsFunction("operator>") || analyzer.ContainsFunction("operator>"))
-            RegisterComparisonOperator(className);
+            RegisterComparisonOperator(analyzer);
     }
 
     if (!insideDefine.empty())
