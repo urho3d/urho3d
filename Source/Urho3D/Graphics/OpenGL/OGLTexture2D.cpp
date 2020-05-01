@@ -41,6 +41,9 @@ namespace Urho3D
 
 void Texture2D::OnDeviceLost()
 {
+    if (object_.name_ && !graphics_->IsDeviceLost())
+        glDeleteTextures(1, &object_.name_);
+
     GPUObject::OnDeviceLost();
 
     if (renderSurface_)

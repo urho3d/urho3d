@@ -35,6 +35,9 @@ namespace Urho3D
 
 void IndexBuffer::OnDeviceLost()
 {
+    if (object_.name_ && !graphics_->IsDeviceLost())
+        glDeleteBuffers(1, &object_.name_);
+
     GPUObject::OnDeviceLost();
 }
 

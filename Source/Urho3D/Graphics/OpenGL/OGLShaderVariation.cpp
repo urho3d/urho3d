@@ -49,6 +49,9 @@ const char* ShaderVariation::elementSemanticNames[] =
 
 void ShaderVariation::OnDeviceLost()
 {
+    if (object_.name_ && !graphics_->IsDeviceLost())
+        glDeleteShader(object_.name_);
+
     GPUObject::OnDeviceLost();
 
     compilerOutput_.Clear();

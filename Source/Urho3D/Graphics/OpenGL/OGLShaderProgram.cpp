@@ -74,6 +74,9 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::OnDeviceLost()
 {
+    if (object_.name_ && !graphics_->IsDeviceLost())
+        glDeleteProgram(object_.name_);
+
     GPUObject::OnDeviceLost();
 
     if (graphics_ && graphics_->GetShaderProgram() == this)
