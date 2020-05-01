@@ -65,9 +65,9 @@ class ScriptResourceRouter : public ResourceRouter
     }
 };
 
-void RegisterManualFirst(asIScriptEngine* engine);
-void RegisterGenerated(asIScriptEngine* engine);
-void RegisterManualLast(asIScriptEngine* engine);
+void ASRegisterManualFirst(asIScriptEngine* engine);
+void ASRegisterGenerated(asIScriptEngine* engine);
+void ASRegisterManualLast(asIScriptEngine* engine);
 
 Script::Script(Context* context) :
     Object(context),
@@ -113,9 +113,9 @@ Script::Script(Context* context) :
     RegisterDictionary(scriptEngine_);
     RegisterScriptInterfaceAPI(scriptEngine_);
 
-    RegisterManualFirst(scriptEngine_);
-    RegisterGenerated(scriptEngine_);
-    RegisterManualLast(scriptEngine_);
+    ASRegisterManualFirst(scriptEngine_);
+    ASRegisterGenerated(scriptEngine_);
+    ASRegisterManualLast(scriptEngine_);
 
     // Register the rest of the script API
     RegisterMathAPI(scriptEngine_);

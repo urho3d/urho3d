@@ -45,6 +45,7 @@
 #include "../Math/Ray.h"
 #include "../Math/Rect.h"
 #include "../Math/Sphere.h"
+#include "../Math/StringHash.h"
 #include "../Math/Vector2.h"
 #include "../Math/Vector3.h"
 #include "../Math/Vector4.h"
@@ -568,6 +569,40 @@ static void Sphere_Sphere_76_14(Sphere* ptr, const Polyhedron &poly)
     new(ptr) Sphere(poly);
 }
 
+// StringHash::operator> | StringHash::operator<
+static int StringHash_Comparison(const StringHash& lhs, const StringHash& rhs)
+{
+    if (lhs < rhs)
+        return -1;
+    if (lhs > rhs)
+        return 1;
+    return 0;
+}
+
+// StringHash::StringHash() noexcept | File: ../Math/StringHash.h | Line: 37
+static void StringHash_StringHash_37_5(StringHash* ptr)
+{
+    new(ptr) StringHash();
+}
+
+// StringHash::StringHash(const StringHash &rhs) noexcept=default | File: ../Math/StringHash.h | Line: 43
+static void StringHash_StringHash_43_5(StringHash* ptr, const StringHash &rhs)
+{
+    new(ptr) StringHash(rhs);
+}
+
+// StringHash::StringHash(unsigned value) noexcept | File: ../Math/StringHash.h | Line: 46
+static void StringHash_StringHash_46_14(StringHash* ptr, unsigned value)
+{
+    new(ptr) StringHash(value);
+}
+
+// StringHash::StringHash(const String &str) noexcept | File: ../Math/StringHash.h | Line: 55
+static void StringHash_StringHash_55_5(StringHash* ptr, const String &str)
+{
+    new(ptr) StringHash(str);
+}
+
 // Vector2::Vector2() noexcept | File: ../Math/Vector2.h | Line: 182
 static void Vector2_Vector2_182_5(Vector2* ptr)
 {
@@ -658,7 +693,7 @@ static void Vector4_Vector4_56_5(Vector4* ptr, float x, float y, float z, float 
     new(ptr) Vector4(x, y, z, w);
 }
 
-void RegisterGenerated(asIScriptEngine* engine)
+void ASRegisterGenerated(asIScriptEngine* engine)
 {
     // enum AttributeMode | File: ../Core/Attribute.h | Line: 35
     engine->RegisterEnum("AttributeMode");
@@ -1912,6 +1947,8 @@ void RegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectType("Rect", sizeof(Rect), asOBJ_VALUE | asGetTypeTraits<Rect>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Sphere | File: ../Math/Sphere.h | Line: 37
     engine->RegisterObjectType("Sphere", sizeof(Sphere), asOBJ_VALUE | asGetTypeTraits<Sphere>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
+    // class StringHash | File: ../Math/StringHash.h | Line: 34
+    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asGetTypeTraits<StringHash>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
     // class Vector2 | File: ../Math/Vector2.h | Line: 179
     engine->RegisterObjectType("Vector2", sizeof(Vector2), asOBJ_VALUE | asGetTypeTraits<Vector2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Vector3 | File: ../Math/Vector3.h | Line: 187
@@ -2980,6 +3017,35 @@ void RegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(Sphere_Sphere_70_14), asCALL_CDECL_OBJFIRST);
     // Sphere::Sphere(const Polyhedron &poly) noexcept | File: ../Math/Sphere.h | Line: 76
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(Sphere_Sphere_76_14), asCALL_CDECL_OBJFIRST);
+
+    // StringHash::operator> | StringHash::operator<
+    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHash_Comparison), asCALL_CDECL_OBJFIRST);
+    // StringHash::operator bool() const | File: ../Math/StringHash.h | Line: 88
+    engine->RegisterObjectMethod("StringHash", "bool opConv() const", asMETHODPR(StringHash, operator bool, () const, bool), asCALL_THISCALL);
+    // StringHash StringHash::operator+(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 61
+    engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHODPR(StringHash, operator+, (const StringHash &) const, StringHash), asCALL_THISCALL);
+    // StringHash& StringHash::operator+=(const StringHash &rhs) | File: ../Math/StringHash.h | Line: 69
+    engine->RegisterObjectMethod("StringHash", "StringHash& opAddAssign(const StringHash&in)", asMETHODPR(StringHash, operator+=, (const StringHash &), StringHash &), asCALL_THISCALL);
+    // StringHash& StringHash::operator=(const StringHash &rhs) noexcept=default | File: ../Math/StringHash.h | Line: 58
+    engine->RegisterObjectMethod("StringHash", "StringHash& opAssign(const StringHash&in)", asMETHODPR(StringHash, operator=, (const StringHash &), StringHash &), asCALL_THISCALL);
+    // bool StringHash::operator==(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 76
+    engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHODPR(StringHash, operator==, (const StringHash &) const, bool), asCALL_THISCALL);
+    // String StringHash::Reverse() const | File: ../Math/StringHash.h | Line: 98
+    engine->RegisterObjectMethod("StringHash", "String Reverse() const", asMETHODPR(StringHash, Reverse, () const, String), asCALL_THISCALL);
+    // StringHash::StringHash() noexcept | File: ../Math/StringHash.h | Line: 37
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(StringHash_StringHash_37_5), asCALL_CDECL_OBJFIRST);
+    // StringHash::StringHash(const StringHash &rhs) noexcept=default | File: ../Math/StringHash.h | Line: 43
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(StringHash_StringHash_43_5), asCALL_CDECL_OBJFIRST);
+    // StringHash::StringHash(unsigned value) noexcept | File: ../Math/StringHash.h | Line: 46
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(StringHash_StringHash_46_14), asCALL_CDECL_OBJFIRST);
+    // StringHash::StringHash(const String &str) noexcept | File: ../Math/StringHash.h | Line: 55
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(StringHash_StringHash_55_5), asCALL_CDECL_OBJFIRST);
+    // unsigned StringHash::ToHash() const | File: ../Math/StringHash.h | Line: 101
+    engine->RegisterObjectMethod("StringHash", "uint ToHash() const", asMETHODPR(StringHash, ToHash, () const, unsigned), asCALL_THISCALL);
+    // String StringHash::ToString() const | File: ../Math/StringHash.h | Line: 95
+    engine->RegisterObjectMethod("StringHash", "String ToString() const", asMETHODPR(StringHash, ToString, () const, String), asCALL_THISCALL);
+    // unsigned StringHash::Value() const | File: ../Math/StringHash.h | Line: 92
+    engine->RegisterObjectMethod("StringHash", "uint get_value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
 
     // float Vector2::x_ | File: ../Math/Vector2.h | Line: 381
     engine->RegisterObjectProperty("Vector2", "float x", offsetof(Vector2, x_));

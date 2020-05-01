@@ -102,7 +102,7 @@ namespace ASResult
             "{\n"
             "\n"
             << glue_.str() <<
-            "void RegisterGenerated(asIScriptEngine* engine)\n"
+            "void ASRegisterGenerated(asIScriptEngine* engine)\n"
             "{\n"
             << regFirst_.str()
             << reg_.str() <<

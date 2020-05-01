@@ -29,52 +29,6 @@
 namespace Urho3D
 {
 
-static void ConstructStringHash(StringHash* ptr)
-{
-    new(ptr) StringHash();
-}
-
-static void ConstructStringHashCopy(const StringHash& hash, StringHash* ptr)
-{
-    new(ptr) StringHash(hash);
-}
-
-static void ConstructStringHashInit(const String& str, StringHash* ptr)
-{
-    new(ptr) StringHash(str);
-}
-
-static void ConstructStringHashInitUInt(unsigned value, StringHash* ptr)
-{
-    new(ptr) StringHash(value);
-}
-
-static int StringHashCmp(const StringHash& lhs, const StringHash& rhs)
-{
-    int cmp = 0;
-    if (lhs < rhs)
-        cmp = -1;
-    else if (lhs > rhs)
-        cmp = 1;
-    return cmp;
-}
-
-static void RegisterStringHash(asIScriptEngine* engine)
-{
-    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<StringHash>() | asOBJ_APP_CLASS_ALLINTS);
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructStringHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructStringHashCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringHashInit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructStringHashInitUInt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("StringHash", "StringHash& opAssign(const StringHash&in)", asMETHOD(StringHash, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "StringHash& opAddAssign(const StringHash&in)", asMETHOD(StringHash, operator +=), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHOD(StringHash, operator ==), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHashCmp), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHOD(StringHash, operator +), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "String ToString() const", asMETHOD(StringHash, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "uint get_value()", asMETHOD(StringHash, Value), asCALL_THISCALL);
-}
-
 static void ConstructResourceRef(ResourceRef* ptr)
 {
     new(ptr) ResourceRef();
@@ -1013,7 +967,6 @@ void RegisterObject(asIScriptEngine* engine)
 
 void RegisterCoreAPI(asIScriptEngine* engine)
 {
-    RegisterStringHash(engine);
     RegisterVariant(engine);
     RegisterSpline(engine);
     RegisterStringUtils(engine);

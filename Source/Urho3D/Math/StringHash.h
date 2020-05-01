@@ -49,6 +49,7 @@ public:
     }
 
     /// Construct from a C string.
+    /// @nobind
     StringHash(const char* str) noexcept;        // NOLINT(google-explicit-constructor)
     /// Construct from a string.
     StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
@@ -87,6 +88,7 @@ public:
     explicit operator bool() const { return value_ != 0; }
 
     /// Return hash value.
+    /// @property
     unsigned Value() const { return value_; }
 
     /// Return as string.
