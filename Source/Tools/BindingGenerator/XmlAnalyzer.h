@@ -189,11 +189,12 @@ public:
     string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
     string GetKind() const { return ExtractKind(compounddef_); }
     bool IsInternal() const;
-    bool IsTemplate() const { return !compounddef_.child("templateparamlist").empty(); }
+    bool IsTemplate() const { return compounddef_.child("templateparamlist"); }
     vector<ClassFunctionAnalyzer> GetFunctions() const;
     vector<ClassVariableAnalyzer> GetVariables() const;
     bool ContainsFunction(const string& name) const;
     ClassFunctionAnalyzer GetFunction(const string& name) const;
+    int NumFunctions(const string& name) const;
     bool IsRefCounted() const { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); }
     bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
     bool IsAbstract() const;
@@ -232,13 +233,17 @@ public:
     string GetComment() const { return ExtractComment(memberdef_); }
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
-    bool IsConstrunctor() const { return GetName() == GetClassName(); }
-    bool IsDestructor() const { return GetName() == "~" + GetClassName(); }
+    bool IsThisConstructor() const { return GetName() == GetClassName(); }
+    bool IsParentConstructor() const;
+    bool IsThisDestructor() const { return GetName() == "~" + GetClassName(); }
+    bool IsParentDestructor() const;
     string GetLocation() const;
-    string GetHeaderFile() const { return classAnalyzer_.GetHeaderFile(); }
+    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_); }
     bool CanBeGetProperty() const;
     bool CanBeSetProperty() const;
+    bool IsTemplate() const { return memberdef_.child("templateparamlist"); }
+    bool IsDefine() const;
     
     // <memberdef kind="function">
     //     <name>operator xxx</name>
@@ -246,6 +251,8 @@ public:
     
     // <memberdef kind="function" explicit="yes">
     bool IsExplicit() const;
+
+    bool IsDeleted() const;
 
     vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_); }
     string JoinParamsNames() const;
@@ -270,7 +277,7 @@ public:
     string GetName() const { return ExtractName(memberdef_); }
     string GetComment() const { return ExtractComment(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
-    string GetHeaderFile() const { return classAnalyzer_.GetHeaderFile(); }
+    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     string GetLocation() const;
     string GetClassName() const { return classAnalyzer_.GetClassName(); }
 };
