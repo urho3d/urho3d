@@ -502,6 +502,7 @@ public:
     }
 
     /// Set translation elements.
+    /// @notproperty
     void SetTranslation(const Vector3& translation)
     {
         m03_ = translation.x_;
@@ -510,6 +511,7 @@ public:
     }
 
     /// Set rotation elements from a 3x3 matrix.
+    /// @notproperty
     void SetRotation(const Matrix3& rotation)
     {
         m00_ = rotation.m00_;

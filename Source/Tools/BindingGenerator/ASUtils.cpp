@@ -64,5 +64,8 @@ string CppTypeToAS(TypeAnalyzer type, bool returnType)
     else if (type.IsPointer())
         result += "@+";
 
+    if (returnType && type.IsConst())
+        result = "const " + result;
+
     return result;
 }

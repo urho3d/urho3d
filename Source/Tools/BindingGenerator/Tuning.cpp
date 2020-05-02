@@ -57,7 +57,7 @@ bool IsIgnoredHeader(const string& headerFile)
 {
     static vector<string> ignoredDirs = {
         "../AngelScript",
-        "../Container",
+        //"../Container",
         "../LuaScript",
         "../Graphics/Direct3D11",
         "../Graphics/Direct3D9",

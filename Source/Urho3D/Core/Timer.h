@@ -86,8 +86,10 @@ public:
     ~Time() override;
 
     /// Begin new frame, with (last) frame duration in seconds and send frame start event.
+    /// @nobind
     void BeginFrame(float timeStep);
     /// End frame. Increment total time and send frame end event.
+    /// @nobind
     void EndFrame();
     /// Set the low-resolution timer period in milliseconds. 0 resets to the default period.
     void SetTimerPeriod(unsigned mSec);

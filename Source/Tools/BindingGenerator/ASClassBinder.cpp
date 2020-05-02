@@ -28,6 +28,7 @@
 #include "XmlSourceData.h"
 
 #include <cassert>
+#include <regex>
 
 // Temporary bind only classes from list
 static vector<string> onlyClasses
@@ -52,6 +53,10 @@ static vector<string> onlyClasses
     "Polyhedron",
     "Sphere",
     "StringHash",
+    "Timer",
+    "RefCounted",
+    //"Object",
+    //"Time",
     //"Controls",
 };
 
@@ -100,6 +105,7 @@ static void RegisterValueConstructor(ClassFunctionAnalyzer& function)
     decl = "void f(" + decl + ")";
 
     ASResult::reg_ <<
+        "    // " << function.GetLocation() << "\n"
         "    engine->RegisterObjectBehaviour("
         "\"" << className << "\", "
         "asBEHAVE_CONSTRUCT, "
@@ -180,6 +186,40 @@ static void RegisterComparisonOperator(ClassAnalyzer analyzer)
         "asCALL_CDECL_OBJFIRST);\n";
 }
 
+string Generate_asMETHODPR(ClassFunctionAnalyzer& function)
+{
+    string cppParams = function.JoinParamsTypes();
+    cppParams = "(" + cppParams + ")";
+    if (function.IsConst())
+        cppParams += " const";
+
+    string returnType = function.GetReturnType().ToString();
+
+    // https://github.com/doxygen/doxygen/issues/7732
+    if (function.IsConsversionOperator())
+        returnType = CutStart(function.GetName(), "operator ");
+
+    return "asMETHODPR(" + function.GetClassName() + ", "
+        + function.GetName() + ", " + cppParams + ", " + returnType + ")";
+}
+
+static void RegisterAddReleaseRef(ClassFunctionAnalyzer function)
+{
+    string functionName = function.GetName();
+    string className = function.GetClassName();
+
+    string behaviour = (functionName == "AddRef") ? "asBEHAVE_ADDREF" : "asBEHAVE_RELEASE";
+
+    ASResult::reg_ <<
+        "    // " << function.GetLocation() << "\n"
+        "    engine->RegisterObjectBehaviour("
+        "\"" << className << "\", "
+        << behaviour << ", "
+        "\"void f()\", "
+        << Generate_asMETHODPR(function) << ", "
+        "asCALL_THISCALL);\n";
+}
+
 string CppMethodNameToAS(ClassFunctionAnalyzer& function)
 {
     string name = function.GetName();
@@ -234,23 +274,6 @@ string CppMethodNameToAS(ClassFunctionAnalyzer& function)
     return name;
 }
 
-string Generate_asMETHODPR(ClassFunctionAnalyzer& function)
-{
-    string cppParams = function.JoinParamsTypes();
-    cppParams = "(" + cppParams + ")";
-    if (function.IsConst())
-        cppParams += " const";
-
-    string returnType = function.GetReturnType().ToString();
-    
-    // https://github.com/doxygen/doxygen/issues/7732
-    if (function.IsConsversionOperator())
-        returnType = CutStart(function.GetName(), "operator ");
-
-    return "asMETHODPR(" + function.GetClassName() + ", "
-        + function.GetName() + ", " + cppParams + ", " + returnType + ")";
-}
-
 static void RegisterMethod(ClassFunctionAnalyzer& function)
 {
     if (Contains(function.GetComment(), "BIND_IGNORE"))
@@ -262,11 +285,32 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
     if (function.IsStatic())
         return;
 
-    if (function.GetName() == "operator!=")
+    if (function.IsParentDestructor())
+        return;
+
+    if (function.IsParentConstructor())
+        return;
+
+    if (function.IsDeleted())
+        return;
+
+    // Do not register destructor for refcounted because object is deleted by himself
+    if (function.IsThisDestructor()
+        && (function.GetClass().IsRefCounted() || Contains(function.GetClass().GetComment(), "FAKE_REF")))
+    {
+        return;
+    }
+
+    if (function.IsTemplate())
+        return;
+
+    string functionName = function.GetName();
+
+    if (functionName == "operator!=")
         return;
 
     // Already registered as sigle function opCmp
-    if (function.GetName() == "operator<" || function.GetName() == "operator>")
+    if (functionName == "operator<" || functionName == "operator>")
         return;
 
     if (function.GetClassName() == "Vector4") // TODO Remove test
@@ -274,83 +318,117 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
         string func = function.GetName();
     }
 
-    ASResult::reg_ << "    // " << function.GetLocation() << "\n";
+    if (functionName == "AddRef" || functionName == "ReleaseRef")
+    {
+        RegisterAddReleaseRef(function);
+        return;
+    }
 
-    if (function.IsConstrunctor())
+    if (function.IsThisConstructor())
     {
         if (function.GetClass().IsRefCounted()
             || Contains(function.GetClass().GetComment(), "FAKE_REF"))
         {
-            
+            // Do not register construnctor for abstract class
+            if (function.GetClass().IsAbstract())
+                return;
         }
         else
         {
             RegisterValueConstructor(function);
         }
+        
+        return;
     }
-    else if (function.IsDestructor())
+
+    ASResult::reg_ << "    // " << function.GetLocation() << "\n";
+    
+    if (function.IsThisDestructor())
     {
+        // Do not register destructor for reference type
         if (!function.GetClass().IsRefCounted())
             RegisterValueDestructor(function);
+
+        return;
     }
-    else
+
+    string decl = "";
+    vector<ParamAnalyzer> params = function.GetParams();
+    for (ParamAnalyzer param : params)
     {
-        string decl = "";
-        vector<ParamAnalyzer> params = function.GetParams();
-        for (ParamAnalyzer param : params)
-        {
-            if (decl.length() > 0)
-                decl += ", ";
+        if (decl.length() > 0)
+            decl += ", ";
 
-            decl += CppTypeToAS(param.GetType(), false);
+        decl += CppTypeToAS(param.GetType(), false);
+    }
+
+    string returnType = CppTypeToAS(function.GetReturnType(), true);
+
+    string asFunctionName = function.GetName();
+    if (function.IsConsversionOperator())
+    {
+        returnType = CutStart(asFunctionName, "operator ");
+
+        if (function.IsExplicit())
+            asFunctionName = "opConv";
+        else
+            asFunctionName = "opImplConv";
+    }
+    else if (Contains(function.GetComment(), "BIND_AS_PROPERTY"))
+    {
+        if (function.CanBeGetProperty())
+        {
+            asFunctionName = CutStart(asFunctionName, "Get");
+            asFunctionName = "get_" + FirstCharToLower(asFunctionName);
         }
-
-        string returnType = CppTypeToAS(function.GetReturnType(), true);
-
-        string functionName = function.GetName();
-        if (function.IsConsversionOperator())
+        else if (function.CanBeSetProperty())
         {
-            returnType = CutStart(functionName, "operator ");
-
-            if (function.IsExplicit())
-                functionName = "opConv";
-            else
-                functionName = "opImplConv";
-        }
-        else if (Contains(function.GetComment(), "BIND_AS_PROPERTY"))
-        {
-            if (function.CanBeGetProperty())
-            {
-                functionName = CutStart(functionName, "Get");
-                functionName = "get_" + FirstCharToLower(functionName);
-            }
-            else if (function.CanBeSetProperty())
-            {
-                functionName = CutStart(functionName, "Set");
-                functionName = "set_" + FirstCharToLower(functionName);
-            }
-            else
-            {
-                assert(false);
-            }
+            asFunctionName = CutStart(asFunctionName, "Set");
+            asFunctionName = "set_" + FirstCharToLower(asFunctionName);
         }
         else
         {
-            functionName = CppMethodNameToAS(function);
+            assert(false);
         }
-
-        decl = returnType + " " + functionName + "(" + decl + ")";
-
-        if (function.IsConst())
-            decl += " const";
-
-        ASResult::reg_ <<
-            "    engine->RegisterObjectMethod("
-            "\"" << function.GetClassName() << "\", "
-            "\"" << decl << "\", "
-            << Generate_asMETHODPR(function) << ", "
-            "asCALL_THISCALL);\n";
     }
+    else
+    {
+        smatch matchGet;
+        bool successGet = regex_match(functionName, matchGet, regex("^Get[A-Z].*"));
+
+        smatch matchSet;
+        bool successSet = regex_match(functionName, matchSet, regex("^Set[A-Z].*"));
+
+        int numFunctions = function.GetClass().NumFunctions(functionName);
+        bool notProperty = Contains(function.GetComment(), "NOT_PROPERTY");
+        
+        if (successGet && function.CanBeGetProperty() && numFunctions == 1 && !notProperty)
+        {
+            asFunctionName = CutStart(asFunctionName, "Get");
+            asFunctionName = "get_" + FirstCharToLower(asFunctionName);
+        }
+        else if (successSet && function.CanBeSetProperty() && numFunctions == 1 && !notProperty)
+        {
+            asFunctionName = CutStart(asFunctionName, "Set");
+            asFunctionName = "set_" + FirstCharToLower(asFunctionName);
+        }
+        else
+        {
+            asFunctionName = CppMethodNameToAS(function);
+        }
+    }
+
+    decl = returnType + " " + asFunctionName + "(" + decl + ")";
+
+    if (function.IsConst())
+        decl += " const";
+
+    ASResult::reg_ <<
+        "    engine->RegisterObjectMethod("
+        "\"" << function.GetClassName() << "\", "
+        "\"" << decl << "\", "
+        << Generate_asMETHODPR(function) << ", "
+        "asCALL_THISCALL);\n";
 }
 
 static void RegisterProperty(ClassVariableAnalyzer& variable)
@@ -462,7 +540,18 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
 
 static void ProcessClass(ClassAnalyzer analyzer)
 {
-    if (analyzer.IsInternal() || analyzer.IsAbstract() || analyzer.IsTemplate())
+    if (analyzer.GetClassName() == "Object") // TODO remove
+    {
+        int ff = 1;
+    }
+
+    if (analyzer.IsTemplate())
+        return;
+
+    if (analyzer.IsInternal())
+        return;
+
+    if (analyzer.IsAbstract() && !analyzer.IsRefCounted())
         return;
 
     if (Contains(analyzer.GetComment(), "BIND_IGNORE"))

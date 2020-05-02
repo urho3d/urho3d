@@ -27,7 +27,6 @@
 #include <cassert>
 #include <regex>
 
-
 TypeAnalyzer::TypeAnalyzer(xml_node type)
     : node_(type)
 {
@@ -428,8 +427,23 @@ ClassFunctionAnalyzer ClassAnalyzer::GetFunction(const string& name) const
             return function;
     }
 
-    assert(true);
+    assert(false);
     return (ClassFunctionAnalyzer(*this, xml_node())); // xml_node can not be empty, so here we return incorrect value
+}
+
+int ClassAnalyzer::NumFunctions(const string& name) const
+{
+    int result = 0;
+
+    vector<ClassFunctionAnalyzer> functions = GetFunctions();
+
+    for (ClassFunctionAnalyzer function : functions)
+    {
+        if (function.GetName() == name)
+            result++;
+    }
+
+    return result;
 }
 
 bool ClassAnalyzer::IsAbstract() const
@@ -630,6 +644,39 @@ bool ClassFunctionAnalyzer::IsExplicit() const
     assert(!explicitAttr.empty());
 
     return explicitAttr == "yes";
+}
+
+bool ClassFunctionAnalyzer::IsDeleted() const
+{
+    string argsstring = memberdef_.child("argsstring").child_value();
+    return EndsWith(argsstring, "=delete");
+}
+
+bool ClassFunctionAnalyzer::IsParentDestructor() const
+{
+    string functionName = GetName();
+    if (!StartsWith(functionName, "~"))
+        return false;
+    
+    return !IsThisDestructor();
+}
+
+bool ClassFunctionAnalyzer::IsDefine() const
+{
+    return CONTAINS(SourceData::defines_, GetName());
+}
+
+bool ClassFunctionAnalyzer::IsParentConstructor() const
+{
+    if (IsThisConstructor())
+        return false;
+
+    string definition = memberdef_.child("definition").child_value();
+    assert(!definition.empty());
+
+    string name = GetName();
+
+    return definition == "Urho3D::" + name + "::" + name;
 }
 
 // ============================================================================

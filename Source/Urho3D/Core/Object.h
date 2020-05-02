@@ -133,6 +133,7 @@ public:
     /// Send event with parameters to all subscribers.
     void SendEvent(StringHash eventType, VariantMap& eventData);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
+    /// @nobind
     VariantMap& GetEventDataMap() const;
     /// Send event with variadic parameter pairs to all subscribers. The parameter pairs is a list of paramID and paramValue separated by comma, one pair after another.
     template <typename... Args> void SendEvent(StringHash eventType, Args... args)
@@ -141,6 +142,7 @@ public:
     }
 
     /// Return execution context.
+    /// @nobind
     Context* GetContext() const { return context_; }
     /// Return global variable based on key.
     const Variant& GetGlobalVar(StringHash key) const;
@@ -151,8 +153,10 @@ public:
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
     /// Return active event sender. Null outside event handling.
+    /// @notproperty
     Object* GetEventSender() const;
     /// Return active event handler. Null outside event handling.
+    /// @nobind
     EventHandler* GetEventHandler() const;
     /// Return whether has subscribed to an event without specific sender.
     bool HasSubscribedToEvent(StringHash eventType) const;
@@ -170,6 +174,7 @@ public:
     /// Block object from sending and receiving events.
     void SetBlockEvents(bool block) { blockEvents_ = block; }
     /// Return sending and receiving events blocking status.
+    /// @nobind
     bool GetBlockEvents() const { return blockEvents_; }
 
 protected:
