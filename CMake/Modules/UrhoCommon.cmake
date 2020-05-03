@@ -883,6 +883,17 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
+    # ThirdParty/Civetweb external dependency
+    if (${TARGET} MATCHES Civetweb|Urho3D)
+        if (URHO3D_SSL)
+            if (NOT URHO3D_SSL_DYNAMIC)
+                set(OPENSSL_USE_STATIC_LIBS TRUE)
+            endif ()
+            find_package(OpenSSL)
+            list (APPEND LIBS ${OPENSSL_LIBRARIES})
+        endif ()
+    endif ()
+
     # Urho3D/LuaJIT external dependency
     if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32 AND NOT WEB)

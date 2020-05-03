@@ -36,6 +36,9 @@ Although all required third-party libraries are included as source code, there a
     - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.
     - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
     - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+  + HTTPS support (optional).
+    - libssl-dev (Debian-based)
+    - openssl (OS X using homebrew)
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian) or libevdev (Pidora).
 
@@ -114,6 +117,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
 |URHO3D_IK            |1|Enable inverse kinematics support|
 |URHO3D_NETWORK       |1|Enable Networking support|
+|URHO3D_SSL           |0|Enable HTTPS support for HttpRequest. Requires URHO3D_NETWORK build option to be enabled|
+|URHO3D_SSL_DYNAMIC   |0|Enables dynamic SSL library loading, requires URHO3D_SSL build option to be enabled|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
@@ -174,6 +179,7 @@ A number of build options can be defined when invoking the build scripts or when
 |EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten only); default to 128 MB, must be in multiple of 64 KB|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten only)|
 |EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten only), use 'emrun --list_browsers' command to get the list of possible values|
+|OPENSSL_ROOT_DIR|-|Root path to OpenSSL directory|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by executing cmake_clean.bat or cmake_clean.sh with the location of the build tree as the first argument or by executing it in the build tree itself.
 

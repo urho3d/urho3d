@@ -110,6 +110,13 @@ if (URHO3D_HASH_DEBUG)
     add_definitions (-DURHO3D_HASH_DEBUG)
 endif ()
 
+if (URHO3D_SSL)
+    add_definitions (-DURHO3D_SSL)
+    if (URHO3D_SSL_DYNAMIC)
+        add_definitions (-DURHO3D_SSL_DYNAMIC)
+    endif ()
+endif ()
+
 # Define source files
 foreach (DIR IK Navigation Network Physics Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)
@@ -336,7 +343,9 @@ endif ()
 if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
+
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
+
 if (NOT ANDROID AND NOT WEB)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
