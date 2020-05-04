@@ -55,6 +55,8 @@ static vector<string> onlyClasses
     "StringHash",
     "Timer",
     "RefCounted",
+    "ResourceRef",
+    //"Variant",
     //"Object",
     //"Time",
     //"Controls",
@@ -294,6 +296,9 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
     if (function.IsDeleted())
         return;
 
+    /*if (function.IsPureVirtual()) // Register pure virtual function but not register constructor for this class
+        return;*/
+
     // Do not register destructor for refcounted because object is deleted by himself
     if (function.IsThisDestructor()
         && (function.GetClass().IsRefCounted() || Contains(function.GetClass().GetComment(), "FAKE_REF")))
@@ -332,6 +337,8 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
             // Do not register construnctor for abstract class
             if (function.GetClass().IsAbstract())
                 return;
+
+            ASResult::reg_ << " // REF CONSTRUCTOR\n";
         }
         else
         {

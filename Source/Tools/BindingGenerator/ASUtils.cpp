@@ -43,6 +43,12 @@ string SimpleCppTypeToAS(const string& cppType)
     if (cppType == "unsigned")
         return "uint";
 
+    if (cppType == "long long")
+        return "int64";
+
+    if (cppType == "unsigned long long")
+        return "uint64";
+
     if (cppType == "SDL_JoystickID")
         return "int";
 
