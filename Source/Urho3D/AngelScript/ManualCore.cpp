@@ -23,17 +23,104 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
+#include "../Core/Variant.h"
+
 namespace Urho3D
 {
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static void VariantMap_Constructor(VariantMap* ptr)
+{
+    new(ptr) VariantMap();
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static void VariantMap_CopyConstructor(const VariantMap& map, VariantMap* ptr)
+{
+    new(ptr) VariantMap(map);
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static void VariantMap_Destructor(VariantMap* ptr)
+{
+    ptr->~VariantMap();
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static Variant& VariantMap_At(const String& key, VariantMap& map)
+{
+    return map[key];
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static Variant& VariantMap_AtHash(StringHash key, VariantMap& map)
+{
+    return map[key];
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static bool VariantMap_Contains(const String& key, VariantMap& map)
+{
+    return map.Contains(key);
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static bool VariantMap_Erase(const String& key, VariantMap& map)
+{
+    return map.Erase(key);
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static bool VariantMap_ContainsHash(StringHash key, VariantMap& map)
+{
+    return map.Contains(key);
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static bool VariantMap_EraseHash(StringHash key, VariantMap& map)
+{
+    return map.Erase(key);
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static CScriptArray* VariantMap_GetKeys(const VariantMap& map)
+{
+    return VectorToArray<StringHash>(map.Keys(), "Array<StringHash>");
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+static CScriptArray* VariantMap_GetValues(const VariantMap& map)
+{
+    return VectorToArray<Variant>(map.Values(), "Array<Variant>");
+}
 
 // This function is called before ASRegisterGenerated()
 void ASRegisterManualFirst_Core(asIScriptEngine* engine)
 {
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asGetTypeTraits<VariantMap>());
 }
 
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Core(asIScriptEngine* engine)
 {
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VariantMap_Constructor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(VariantMap_CopyConstructor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VariantMap_Destructor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap&in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const String&in)", asFUNCTION(VariantMap_At), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const String&in) const", asFUNCTION(VariantMap_At), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(StringHash)", asFUNCTION(VariantMap_AtHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(StringHash) const", asFUNCTION(VariantMap_AtHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Contains(const String&in) const", asFUNCTION(VariantMap_Contains), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Erase(const String&in)", asFUNCTION(VariantMap_Erase), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Contains(StringHash) const", asFUNCTION(VariantMap_ContainsHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Erase(StringHash)", asFUNCTION(VariantMap_EraseHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "Array<StringHash>@ get_keys() const", asFUNCTION(VariantMap_GetKeys), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "Array<Variant>@ get_values() const", asFUNCTION(VariantMap_GetValues), asCALL_CDECL_OBJLAST);
 }
 
 }

@@ -93,8 +93,10 @@ public:
     /// Return type name.
     virtual const String& GetTypeName() const = 0;
     /// Return type info.
+    /// @nobind
     virtual const TypeInfo* GetTypeInfo() const = 0;
     /// Handle event.
+    /// @nobind
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
 
     /// Return type info static.
@@ -102,6 +104,7 @@ public:
     /// Check current instance is type of specified type.
     bool IsInstanceOf(StringHash type) const;
     /// Check current instance is type of specified type.
+    /// @nobind
     bool IsInstanceOf(const TypeInfo* typeInfo) const;
     /// Check current instance is type of specified class.
     template<typename T> bool IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()); }

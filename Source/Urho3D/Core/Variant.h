@@ -86,6 +86,7 @@ using StringVector = Vector<String>;
 using VariantMap = HashMap<StringHash, Variant>;
 
 /// Typed resource reference.
+/// @pod
 struct URHO3D_API ResourceRef
 {
     /// Construct.
@@ -112,6 +113,7 @@ struct URHO3D_API ResourceRef
     }
 
     /// Construct with type and resource name.
+    /// @nobind
     ResourceRef(const char* type, const char* name) :
         type_(type),
         name_(name)
@@ -1071,10 +1073,12 @@ public:
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// @nobind
     void FromString(const char* type, const char* value);
     /// Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(VariantType type, const String& value);
     /// Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// @nobind
     void FromString(VariantType type, const char* value);
     /// Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
@@ -1084,6 +1088,7 @@ public:
     template <class T> void SetCustom(const T& value) { SetCustomVariantValue(MakeCustomValue<T>(value)); }
 
     /// Return int or zero on type mismatch. Floats and doubles are converted.
+    /// @notproperty
     int GetInt() const
     {
         if (type_ == VAR_INT)
@@ -1097,6 +1102,7 @@ public:
     }
 
     /// Return 64 bit int or zero on type mismatch. Floats and doubles are converted.
+    /// @notproperty
     long long GetInt64() const
     {
         if (type_ == VAR_INT64)
@@ -1112,6 +1118,7 @@ public:
     }
 
     /// Return unsigned 64 bit int or zero on type mismatch. Floats and doubles are converted.
+    /// @notproperty
     unsigned long long GetUInt64() const
     {
         if (type_ == VAR_INT64)
@@ -1140,12 +1147,15 @@ public:
     }
 
     /// Return StringHash or zero on type mismatch.
+    /// @notproperty
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
 
     /// Return bool or false on type mismatch.
+    /// @notproperty
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
 
     /// Return float or zero on type mismatch. Ints and doubles are converted.
+    /// @notproperty
     float GetFloat() const
     {
         if (type_ == VAR_FLOAT)
@@ -1161,6 +1171,7 @@ public:
     }
 
     /// Return double or zero on type mismatch. Ints and floats are converted.
+    /// @notproperty
     double GetDouble() const
     {
         if (type_ == VAR_DOUBLE)
@@ -1185,18 +1196,22 @@ public:
     const Vector4& GetVector4() const { return type_ == VAR_VECTOR4 ? value_.vector4_ : Vector4::ZERO; }
 
     /// Return quaternion or identity on type mismatch.
+    /// @notproperty
     const Quaternion& GetQuaternion() const
     {
         return type_ == VAR_QUATERNION ? value_.quaternion_ : Quaternion::IDENTITY;
     }
 
     /// Return color or default on type mismatch. Vector4 is aliased to Color if necessary.
+    /// @notproperty
     const Color& GetColor() const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : Color::WHITE; }
 
     /// Return string or empty on type mismatch.
+    /// @notproperty
     const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
 
     /// Return buffer or empty on type mismatch.
+    /// @nobind
     const PODVector<unsigned char>& GetBuffer() const
     {
         return type_ == VAR_BUFFER ? value_.buffer_ : emptyBuffer;
@@ -1217,12 +1232,14 @@ public:
     }
 
     /// Return a resource reference or empty on type mismatch.
+    /// @notproperty
     const ResourceRef& GetResourceRef() const
     {
         return type_ == VAR_RESOURCEREF ? value_.resourceRef_ : emptyResourceRef;
     }
 
     /// Return a resource reference list or empty on type mismatch.
+    /// @notproperty
     const ResourceRefList& GetResourceRefList() const
     {
         return type_ == VAR_RESOURCEREFLIST ? value_.resourceRefList_ : emptyResourceRefList;
@@ -1247,54 +1264,64 @@ public:
     }
 
     /// Return a rect or empty on type mismatch.
+    /// @notproperty
     const Rect& GetRect() const { return type_ == VAR_RECT ? value_.rect_ : Rect::ZERO; }
 
     /// Return an integer rect or empty on type mismatch.
+    /// @notproperty
     const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? value_.intRect_ : IntRect::ZERO; }
 
     /// Return an IntVector2 or empty on type mismatch.
+    /// @notproperty
     const IntVector2& GetIntVector2() const
     {
         return type_ == VAR_INTVECTOR2 ? value_.intVector2_ : IntVector2::ZERO;
     }
 
     /// Return an IntVector3 or empty on type mismatch.
+    /// @notproperty
     const IntVector3& GetIntVector3() const
     {
         return type_ == VAR_INTVECTOR3 ? value_.intVector3_ : IntVector3::ZERO;
     }
 
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
+    /// @notproperty
     RefCounted* GetPtr() const
     {
         return type_ == VAR_PTR ? value_.weakPtr_ : nullptr;
     }
 
     /// Return a Matrix3 or identity on type mismatch.
+     /// @notproperty
     const Matrix3& GetMatrix3() const
     {
         return type_ == VAR_MATRIX3 ? *value_.matrix3_ : Matrix3::IDENTITY;
     }
 
     /// Return a Matrix3x4 or identity on type mismatch.
+     /// @notproperty
     const Matrix3x4& GetMatrix3x4() const
     {
         return type_ == VAR_MATRIX3X4 ? *value_.matrix3x4_ : Matrix3x4::IDENTITY;
     }
 
     /// Return a Matrix4 or identity on type mismatch.
+     /// @notproperty
     const Matrix4& GetMatrix4() const
     {
         return type_ == VAR_MATRIX4 ? *value_.matrix4_ : Matrix4::IDENTITY;
     }
 
     /// Return pointer to custom variant value.
+    /// @nobind
     CustomVariantValue* GetCustomVariantValuePtr()
     {
         return const_cast<CustomVariantValue*>(const_cast<const Variant*>(this)->GetCustomVariantValuePtr());
     }
 
     /// Return const pointer to custom variant value.
+    /// @nobind
     const CustomVariantValue* GetCustomVariantValuePtr() const
     {
         if (type_ == VAR_CUSTOM_HEAP)
@@ -1345,15 +1372,18 @@ public:
     template <class T> T Get() const;
 
     /// Return a pointer to a modifiable buffer or null on type mismatch.
+    /// @nobind
     PODVector<unsigned char>* GetBufferPtr()
     {
         return type_ == VAR_BUFFER ? &value_.buffer_ : nullptr;
     }
 
     /// Return a pointer to a modifiable variant vector or null on type mismatch.
+    /// @nobind
     VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? &value_.variantVector_ : nullptr; }
 
     /// Return a pointer to a modifiable string vector or null on type mismatch.
+    /// @nobind
     StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? &value_.stringVector_ : nullptr; }
 
     /// Return a pointer to a modifiable variant map or null on type mismatch.

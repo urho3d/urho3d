@@ -702,6 +702,36 @@ static void Vector4_Vector4_56_5(Vector4* ptr, float x, float y, float z, float 
     new(ptr) Vector4(x, y, z, w);
 }
 
+// ResourceRef::ResourceRef()=default | File: ../Core/Variant.h | Line: 93
+static void ResourceRef_ResourceRef_93_5(ResourceRef* ptr)
+{
+    new(ptr) ResourceRef();
+}
+
+// ResourceRef::ResourceRef(StringHash type) | File: ../Core/Variant.h | Line: 96
+static void ResourceRef_ResourceRef_96_14(ResourceRef* ptr, StringHash type)
+{
+    new(ptr) ResourceRef(type);
+}
+
+// ResourceRef::ResourceRef(StringHash type, const String &name) | File: ../Core/Variant.h | Line: 102
+static void ResourceRef_ResourceRef_102_5(ResourceRef* ptr, StringHash type, const String &name)
+{
+    new(ptr) ResourceRef(type, name);
+}
+
+// ResourceRef::ResourceRef(const String &type, const String &name) | File: ../Core/Variant.h | Line: 109
+static void ResourceRef_ResourceRef_109_5(ResourceRef* ptr, const String &type, const String &name)
+{
+    new(ptr) ResourceRef(type, name);
+}
+
+// ResourceRef::ResourceRef(const ResourceRef &rhs)=default | File: ../Core/Variant.h | Line: 124
+static void ResourceRef_ResourceRef_124_5(ResourceRef* ptr, const ResourceRef &rhs)
+{
+    new(ptr) ResourceRef(rhs);
+}
+
 void ASRegisterGenerated(asIScriptEngine* engine)
 {
     // enum AttributeMode | File: ../Core/Attribute.h | Line: 35
@@ -1968,6 +1998,8 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectType("Vector3", sizeof(Vector3), asOBJ_VALUE | asGetTypeTraits<Vector3>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Vector4 | File: ../Math/Vector4.h | Line: 32
     engine->RegisterObjectType("Vector4", sizeof(Vector4), asOBJ_VALUE | asGetTypeTraits<Vector4>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
+    // struct ResourceRef | File: ../Core/Variant.h | Line: 91
+    engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asGetTypeTraits<ResourceRef>() | asOBJ_POD);
 
     // Vector3 BoundingBox::max_ | File: ../Math/BoundingBox.h | Line: 333
     engine->RegisterObjectProperty("BoundingBox", "Vector3 max", offsetof(BoundingBox, max_));
@@ -2972,6 +3004,7 @@ void ASRegisterGenerated(asIScriptEngine* engine)
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h | Line: 73
     engine->RegisterObjectBehaviour("RefCounted", asBEHAVE_ADDREF, "void f()", asMETHODPR(RefCounted, AddRef, (), void), asCALL_THISCALL);
+ // REF CONSTRUCTOR
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h | Line: 78
     engine->RegisterObjectMethod("RefCounted", "int get_refs() const", asMETHODPR(RefCounted, Refs, () const, int), asCALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h | Line: 75
@@ -3323,6 +3356,23 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(Vector4_Vector4_47_5), asCALL_CDECL_OBJFIRST);
     // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_56_5), asCALL_CDECL_OBJFIRST);
+
+    // String ResourceRef::name_ | File: ../Core/Variant.h | Line: 129
+    engine->RegisterObjectProperty("ResourceRef", "String name", offsetof(ResourceRef, name_));
+    // StringHash ResourceRef::type_ | File: ../Core/Variant.h | Line: 127
+    engine->RegisterObjectProperty("ResourceRef", "StringHash type", offsetof(ResourceRef, type_));
+    // bool ResourceRef::operator==(const ResourceRef &rhs) const | File: ../Core/Variant.h | Line: 132
+    engine->RegisterObjectMethod("ResourceRef", "bool opEquals(const ResourceRef&in) const", asMETHODPR(ResourceRef, operator==, (const ResourceRef &) const, bool), asCALL_THISCALL);
+    // ResourceRef::ResourceRef()=default | File: ../Core/Variant.h | Line: 93
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ResourceRef_ResourceRef_93_5), asCALL_CDECL_OBJFIRST);
+    // ResourceRef::ResourceRef(StringHash type) | File: ../Core/Variant.h | Line: 96
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(StringHash)", asFUNCTION(ResourceRef_ResourceRef_96_14), asCALL_CDECL_OBJFIRST);
+    // ResourceRef::ResourceRef(StringHash type, const String &name) | File: ../Core/Variant.h | Line: 102
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(StringHash, const String&in)", asFUNCTION(ResourceRef_ResourceRef_102_5), asCALL_CDECL_OBJFIRST);
+    // ResourceRef::ResourceRef(const String &type, const String &name) | File: ../Core/Variant.h | Line: 109
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const String&in, const String&in)", asFUNCTION(ResourceRef_ResourceRef_109_5), asCALL_CDECL_OBJFIRST);
+    // ResourceRef::ResourceRef(const ResourceRef &rhs)=default | File: ../Core/Variant.h | Line: 124
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ResourceRef_ResourceRef_124_5), asCALL_CDECL_OBJFIRST);
 
 }
 
