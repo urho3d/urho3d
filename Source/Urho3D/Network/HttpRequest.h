@@ -45,10 +45,6 @@ enum HttpRequestState
 /// An HTTP connection with response data stream.
 class URHO3D_API HttpRequest : public RefCounted, public Deserializer, public Thread
 {
-private:
-#ifdef URHO3D_SSL
-    static bool sSSLInitialized;
-#endif
 public:
     /// Construct with parameters.
     HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData);

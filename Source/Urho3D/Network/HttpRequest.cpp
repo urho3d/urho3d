@@ -35,9 +35,6 @@ namespace Urho3D
 
 static const unsigned ERROR_BUFFER_SIZE = 256;
 static const unsigned READ_BUFFER_SIZE = 65536; // Must be a power of two
-#ifdef URHO3D_SSL
-bool HttpRequest::sSSLInitialized = false;
-#endif;
 
 HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData) :
     url_(url.Trimmed()),
@@ -55,6 +52,15 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     size_ = M_MAX_UNSIGNED;
 
     URHO3D_LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
+
+#ifdef URHO3D_SSL
+    static bool sslInitialized = false;
+    if (!sslInitialized)
+    {
+        mg_init_library(MG_FEATURES_TLS);
+        sslInitialized = true;
+    }
+#endif
 
 #ifdef URHO3D_THREADING
     // Start the worker thread to actually create the connection and read the response data.
@@ -111,14 +117,6 @@ void HttpRequest::ThreadFunction()
         if (header.Length())
             headersStr += header + "\r\n";
     }
-
-#ifdef URHO3D_SSL
-    if (!sSSLInitialized)
-    {
-        mg_init_library(MG_FEATURES_TLS);
-        sSSLInitialized = true;
-    }
-#endif
 
     // Initiate the connection. This may block due to DNS query
     mg_connection* connection = nullptr;
