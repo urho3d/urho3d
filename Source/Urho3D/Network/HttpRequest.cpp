@@ -53,6 +53,15 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
 
     URHO3D_LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
 
+#ifdef URHO3D_SSL
+    static bool sslInitialized = false;
+    if (!sslInitialized)
+    {
+        mg_init_library(MG_FEATURES_TLS);
+        sslInitialized = true;
+    }
+#endif
+
 #ifdef URHO3D_THREADING
     // Start the worker thread to actually create the connection and read the response data.
     Run();
