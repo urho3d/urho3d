@@ -31,6 +31,10 @@
 namespace Urho3D
 {
 
+void ASRegisterManualFirst_Core(asIScriptEngine* engine);
+void ASRegisterManualLast_Core(asIScriptEngine* engine);
+void ASRegisterManualLast_Math(asIScriptEngine* engine);
+
 // This function is called before ASRegisterGenerated()
 void ASRegisterManualFirst(asIScriptEngine* engine)
 {
@@ -76,13 +80,14 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
     engine->RegisterEnumValue("IKFeature", "CONSTRAINTS", IKSolver::CONSTRAINTS);
     engine->RegisterEnumValue("IKFeature", "AUTO_SOLVE", IKSolver::AUTO_SOLVE);
 #endif
-}
 
-void ASRegisterManualLast_Math(asIScriptEngine* engine);
+    ASRegisterManualFirst_Core(engine);
+}
 
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast(asIScriptEngine* engine)
 {
+    ASRegisterManualLast_Core(engine);
     ASRegisterManualLast_Math(engine);
 }
 

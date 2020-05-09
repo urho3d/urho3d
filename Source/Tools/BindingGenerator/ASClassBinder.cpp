@@ -56,6 +56,7 @@ static vector<string> onlyClasses
     "Timer",
     "RefCounted",
     "ResourceRef",
+    "ResourceRefList",
     //"Variant",
     //"Object",
     //"Time",
@@ -156,6 +157,17 @@ static void RegisterDefaultValueDestructor(const string& className)
         "\"void f()\", "
         "asFUNCTION(" << wrapperName << "), "
         "asCALL_CDECL_OBJFIRST);\n";
+}
+
+static void RegisterDefaultAssignOperator(const string& className)
+{
+    ASResult::reg_ <<
+        "    // " << className << "& " << className << "::operator=(const " << className << "&)\n"
+        "    engine->RegisterObjectMethod("
+        "\"" << className << "\", "
+        "\"" << className << "& opAssign(const " << className << "&in)\", "
+        "asMETHODPR(" << className << ", operator=, (const " << className << "&), " << className << "&), "
+        "asCALL_THISCALL);\n";
 }
 
 static void RegisterComparisonOperator(ClassAnalyzer analyzer)
@@ -488,6 +500,17 @@ static void RegisterObjectMembers(ClassAnalyzer& analyzer)
     ASResult::reg_ << "\n";
 }
 
+static bool IsDestructorRequired(ClassAnalyzer analyzer)
+{
+    if (analyzer.IsRefCounted())
+        return false;
+
+    if (analyzer.IsPod())
+        return false;
+
+    return true;
+}
+
 static void RegisterObjectType(ClassAnalyzer analyzer)
 {
     string header = analyzer.GetHeaderFile();
@@ -530,11 +553,13 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
             flags <<
             ");\n";
 
-        // Non-pod value classes required destructor
         // If destructor exists, it will be registered later when processing functions,
         // if not exists - registered here
-        if (!analyzer.HasDestructor() && !analyzer.IsPod())
+        if (!analyzer.HasDestructor() && IsDestructorRequired(analyzer))
             RegisterDefaultValueDestructor(className);
+
+        if (!analyzer.ContainsFunction("operator="))
+            RegisterDefaultAssignOperator(className);
 
         // 2 operators is replaced by single function opCmp
         if (analyzer.ContainsFunction("operator>") || analyzer.ContainsFunction("operator>"))

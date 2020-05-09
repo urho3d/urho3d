@@ -98,14 +98,51 @@ static CScriptArray* VariantMap_GetValues(const VariantMap& map)
 void ASRegisterManualFirst_Core(asIScriptEngine* engine)
 {
     // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
-    engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asGetTypeTraits<VariantMap>());
+    //engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asGetTypeTraits<VariantMap>());
+}
+
+static void ResourceRefListResize(unsigned size, ResourceRefList* ptr)
+{
+    ptr->names_.Resize(size);
+}
+
+static unsigned ResourceRefListGetSize(ResourceRefList* ptr)
+{
+    return ptr->names_.Size();
+}
+
+static bool ResourceRefListIsEmpty(ResourceRefList* ptr)
+{
+    return ptr->names_.Size() == 0;
+}
+
+static void ResourceRefListSetName(unsigned index, const String& name, ResourceRefList* ptr)
+{
+    if (index >= ptr->names_.Size())
+    {
+        asGetActiveContext()->SetException("Index out of bounds");
+        return;
+    }
+
+    ptr->names_[index] = name;
+}
+
+static const String& ResourceRefListGetName(unsigned index, ResourceRefList* ptr)
+{
+    if (index >= ptr->names_.Size())
+    {
+        asGetActiveContext()->SetException("Index out of bounds");
+        return String::EMPTY;
+    }
+
+    return ptr->names_[index];
 }
 
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Core(asIScriptEngine* engine)
 {
     // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
-    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VariantMap_Constructor), asCALL_CDECL_OBJLAST);
+    /*engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VariantMap_Constructor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(VariantMap_CopyConstructor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VariantMap_Destructor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap&in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
@@ -121,6 +158,13 @@ void ASRegisterManualLast_Core(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Array<StringHash>@ get_keys() const", asFUNCTION(VariantMap_GetKeys), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "Array<Variant>@ get_values() const", asFUNCTION(VariantMap_GetValues), asCALL_CDECL_OBJLAST);
+    */
+
+    engine->RegisterObjectMethod("ResourceRefList", "void Resize(uint)", asFUNCTION(ResourceRefListResize), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "uint get_length() const", asFUNCTION(ResourceRefListGetSize), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "bool get_empty() const", asFUNCTION(ResourceRefListIsEmpty), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "void set_names(uint, const String&in) const", asFUNCTION(ResourceRefListSetName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "const String& get_names(uint) const", asFUNCTION(ResourceRefListGetName), asCALL_CDECL_OBJLAST);
 }
 
 }
