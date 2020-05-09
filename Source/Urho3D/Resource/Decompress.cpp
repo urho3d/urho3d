@@ -24,6 +24,8 @@
 
 #include "../Resource/Decompress.h"
 
+#include <cstdint>
+
 // ETC2 decompress
 typedef unsigned char uint8;
 typedef unsigned short uint16;
