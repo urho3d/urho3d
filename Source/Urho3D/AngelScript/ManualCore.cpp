@@ -101,21 +101,25 @@ void ASRegisterManualFirst_Core(asIScriptEngine* engine)
     //engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asGetTypeTraits<VariantMap>());
 }
 
+// StringVector ResourceRefList::names_ | File: ../Core/Variant.h
 static void ResourceRefListResize(unsigned size, ResourceRefList* ptr)
 {
     ptr->names_.Resize(size);
 }
 
+// StringVector ResourceRefList::names_ | File: ../Core/Variant.h
 static unsigned ResourceRefListGetSize(ResourceRefList* ptr)
 {
     return ptr->names_.Size();
 }
 
+// StringVector ResourceRefList::names_ | File: ../Core/Variant.h
 static bool ResourceRefListIsEmpty(ResourceRefList* ptr)
 {
     return ptr->names_.Size() == 0;
 }
 
+// StringVector ResourceRefList::names_ | File: ../Core/Variant.h
 static void ResourceRefListSetName(unsigned index, const String& name, ResourceRefList* ptr)
 {
     if (index >= ptr->names_.Size())
@@ -127,6 +131,7 @@ static void ResourceRefListSetName(unsigned index, const String& name, ResourceR
     ptr->names_[index] = name;
 }
 
+// StringVector ResourceRefList::names_ | File: ../Core/Variant.h
 static const String& ResourceRefListGetName(unsigned index, ResourceRefList* ptr)
 {
     if (index >= ptr->names_.Size())
@@ -160,10 +165,15 @@ void ASRegisterManualLast_Core(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "Array<Variant>@ get_values() const", asFUNCTION(VariantMap_GetValues), asCALL_CDECL_OBJLAST);
     */
 
+    // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
     engine->RegisterObjectMethod("ResourceRefList", "void Resize(uint)", asFUNCTION(ResourceRefListResize), asCALL_CDECL_OBJLAST);
+    // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
     engine->RegisterObjectMethod("ResourceRefList", "uint get_length() const", asFUNCTION(ResourceRefListGetSize), asCALL_CDECL_OBJLAST);
+    // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
     engine->RegisterObjectMethod("ResourceRefList", "bool get_empty() const", asFUNCTION(ResourceRefListIsEmpty), asCALL_CDECL_OBJLAST);
+    // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
     engine->RegisterObjectMethod("ResourceRefList", "void set_names(uint, const String&in) const", asFUNCTION(ResourceRefListSetName), asCALL_CDECL_OBJLAST);
+    // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
     engine->RegisterObjectMethod("ResourceRefList", "const String& get_names(uint) const", asFUNCTION(ResourceRefListGetName), asCALL_CDECL_OBJLAST);
 }
 
