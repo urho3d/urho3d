@@ -148,6 +148,7 @@ struct URHO3D_API ResourceRefList
     }
 
     /// Construct with type and id list.
+    /// @nobind
     ResourceRefList(StringHash type, const StringVector& names) :
         type_(type),
         names_(names)
@@ -157,6 +158,7 @@ struct URHO3D_API ResourceRefList
     /// Object type.
     StringHash type_;
     /// List of object names.
+    /// @manualbind
     StringVector names_;
 
     /// Test for equality with another reference list.
