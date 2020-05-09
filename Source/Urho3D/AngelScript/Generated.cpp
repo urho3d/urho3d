@@ -193,7 +193,7 @@ static void Color_Color_110_14(Color* ptr, const Vector4 &color)
     new(ptr) Color(color);
 }
 
-// Frustum::~Frustum()
+// Frustum::~Frustum() | Implicitly-declared 
 static void Frustum_Destructor(Frustum* ptr)
 {
     ptr->~Frustum();
@@ -732,7 +732,7 @@ static void ResourceRef_ResourceRef_124_5(ResourceRef* ptr, const ResourceRef &r
     new(ptr) ResourceRef(rhs);
 }
 
-// ResourceRefList::~ResourceRefList()
+// ResourceRefList::~ResourceRefList() | Implicitly-declared 
 static void ResourceRefList_Destructor(ResourceRefList* ptr)
 {
     ptr->~ResourceRefList();
@@ -2207,7 +2207,7 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // float Color::Value() const | File: ../Math/Color.h | Line: 191
     engine->RegisterObjectMethod("Color", "float Value() const", asMETHODPR(Color, Value, () const, float), asCALL_THISCALL);
 
-    // Frustum::~Frustum()
+    // Frustum::~Frustum() | Implicitly-declared
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Frustum_Destructor), asCALL_CDECL_OBJFIRST);
     // void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4 &transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h | Line: 65
     engine->RegisterObjectMethod("Frustum", "void Define(float, float, float, float, float, const Matrix3x4&in)", asMETHODPR(Frustum, Define, (float, float, float, float, float, const Matrix3x4 &), void), asCALL_THISCALL);
@@ -2252,7 +2252,7 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // void Frustum::UpdatePlanes() | File: ../Math/Frustum.h | Line: 179
     engine->RegisterObjectMethod("Frustum", "void UpdatePlanes()", asMETHODPR(Frustum, UpdatePlanes, (), void), asCALL_THISCALL);
 
-    // IntRect& IntRect::operator=(const IntRect&)
+    // IntRect& IntRect::operator=(const IntRect&) | Implicitly-declared
     engine->RegisterObjectMethod("IntRect", "IntRect& opAssign(const IntRect&in)", asMETHODPR(IntRect, operator=, (const IntRect&), IntRect&), asCALL_THISCALL);
     // int IntRect::bottom_ | File: ../Math/Rect.h | Line: 471
     engine->RegisterObjectProperty("IntRect", "int bottom", offsetof(IntRect, bottom_));
@@ -3125,7 +3125,7 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // unsigned StringHash::Value() const | File: ../Math/StringHash.h | Line: 92
     engine->RegisterObjectMethod("StringHash", "uint get_value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
 
-    // Timer& Timer::operator=(const Timer&)
+    // Timer& Timer::operator=(const Timer&) | Implicitly-declared
     engine->RegisterObjectMethod("Timer", "Timer& opAssign(const Timer&in)", asMETHODPR(Timer, operator=, (const Timer&), Timer&), asCALL_THISCALL);
     // unsigned Timer::GetMSec(bool reset) | File: ../Core/Timer.h | Line: 38
     engine->RegisterObjectMethod("Timer", "uint GetMSec(bool)", asMETHODPR(Timer, GetMSec, (bool), unsigned), asCALL_THISCALL);
@@ -3381,7 +3381,7 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_56_5), asCALL_CDECL_OBJFIRST);
 
-    // ResourceRef& ResourceRef::operator=(const ResourceRef&)
+    // ResourceRef& ResourceRef::operator=(const ResourceRef&) | Implicitly-declared
     engine->RegisterObjectMethod("ResourceRef", "ResourceRef& opAssign(const ResourceRef&in)", asMETHODPR(ResourceRef, operator=, (const ResourceRef&), ResourceRef&), asCALL_THISCALL);
     // String ResourceRef::name_ | File: ../Core/Variant.h | Line: 129
     engine->RegisterObjectProperty("ResourceRef", "String name", offsetof(ResourceRef, name_));
@@ -3400,9 +3400,9 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // ResourceRef::ResourceRef(const ResourceRef &rhs)=default | File: ../Core/Variant.h | Line: 124
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ResourceRef_ResourceRef_124_5), asCALL_CDECL_OBJFIRST);
 
-    // ResourceRefList::~ResourceRefList()
+    // ResourceRefList::~ResourceRefList() | Implicitly-declared
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ResourceRefList_Destructor), asCALL_CDECL_OBJFIRST);
-    // ResourceRefList& ResourceRefList::operator=(const ResourceRefList&)
+    // ResourceRefList& ResourceRefList::operator=(const ResourceRefList&) | Implicitly-declared
     engine->RegisterObjectMethod("ResourceRefList", "ResourceRefList& opAssign(const ResourceRefList&in)", asMETHODPR(ResourceRefList, operator=, (const ResourceRefList&), ResourceRefList&), asCALL_THISCALL);
     // StringHash ResourceRefList::type_ | File: ../Core/Variant.h | Line: 159
     engine->RegisterObjectProperty("ResourceRefList", "StringHash type", offsetof(ResourceRefList, type_));

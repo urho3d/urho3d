@@ -143,14 +143,14 @@ static void RegisterDefaultValueDestructor(const string& className)
     string wrapperName = className + "_Destructor";
 
     ASResult::glue_ <<
-        "// " << className << "::~" << className << "()\n"
+        "// " << className << "::~" << className << "() | Implicitly-declared \n"
         "static void " << wrapperName << "(" << className << "* ptr)\n"
         "{\n"
         "    ptr->~" << className << "();\n"
         "}\n\n";
 
     ASResult::reg_ <<
-        "    // " << className << "::~" << className << "()\n"
+        "    // " << className << "::~" << className << "() | Implicitly-declared\n"
         "    engine->RegisterObjectBehaviour("
         "\"" << className << "\", "
         "asBEHAVE_DESTRUCT, "
@@ -162,7 +162,7 @@ static void RegisterDefaultValueDestructor(const string& className)
 static void RegisterDefaultAssignOperator(const string& className)
 {
     ASResult::reg_ <<
-        "    // " << className << "& " << className << "::operator=(const " << className << "&)\n"
+        "    // " << className << "& " << className << "::operator=(const " << className << "&) | Implicitly-declared\n"
         "    engine->RegisterObjectMethod("
         "\"" << className << "\", "
         "\"" << className << "& opAssign(const " << className << "&in)\", "
