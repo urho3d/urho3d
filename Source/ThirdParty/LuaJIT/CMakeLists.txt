@@ -24,7 +24,7 @@
 # The cross-compiling logic is ported to CMake as faithful as possible although currently Urho3D does not support all target archs supported by LuaJIT
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set CMake minimum version and CMake policy required by UrhoCommon module
+    # Set CMake minimum version
     cmake_minimum_required (VERSION 3.10.2)
 
     # Set project name

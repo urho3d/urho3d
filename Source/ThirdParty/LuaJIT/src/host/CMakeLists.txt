@@ -21,7 +21,7 @@
 #
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set CMake minimum version and CMake policy required by UrhoCommon module
+    # Set CMake minimum version
     cmake_minimum_required (VERSION 3.10.2)
 
     # Set project name

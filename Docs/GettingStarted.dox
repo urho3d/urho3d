@@ -602,7 +602,7 @@ The physical project root directory is also the logical project source tree in C
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
-# Set CMake minimum version and CMake policy required by UrhoCommon module
+# Set CMake minimum version
 cmake_minimum_required (VERSION 3.10.2)
 
 # Set project name

@@ -370,20 +370,19 @@ endif ()
 
 # Setup dependency libraries to be linked or archived as a whole inside Urho3D library for SHARED or STATIC lib type, respectively
 if (APPLE)
-    set (WHOLE_ARCHIVE -force_load)
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -force_load)
 elseif (MSVC)
-    set (WHOLE_ARCHIVE /WHOLEARCHIVE)   # Require VS 2015 Update 2 onward
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_OPTIONS /FORCE /WHOLEARCHIVE)  # Require VS 2015 Update 2 onward
 else ()
-    set (WHOLE_ARCHIVE -Wl,--whole-archive)
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
 endif ()
-set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${WHOLE_ARCHIVE})
 foreach (TARGET ${STATIC_LIBRARY_TARGETS})
     set (ARCHIVE $<TARGET_FILE:${TARGET}>)
-    if (NOT ${TARGET} MATCHES boost|rapidjson|STB)    # Exlucde header-only "fake" static lib targets
-        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVE})    # Should work for all platforms while building shared library
+    if (NOT ${TARGET} MATCHES boost|rapidjson|STB)  # Exclude header-only "fake" static lib targets
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVE})      # Should work for all compiler toolchains while building shared library
         if (URHO3D_LIB_TYPE STREQUAL STATIC)
             if (XCODE OR MSVC)  # Only works in Xcode and MSVC while building static library
-                set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")
+                set_property (TARGET ${TARGET_NAME} APPEND STATIC_LIBRARY_OPTIONS ${ARCHIVE})
             else ()
                 list (APPEND ARCHIVES ${ARCHIVE})   # Accumulate the target locations for archiving later
             endif ()

@@ -27,7 +27,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # All Clang-tools must be natively built and output to bin/tool/clang subdir to differentiate them from the rest
     set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/clang RUNTIME PDB)
 else ()
-    # Set CMake minimum version and CMake policy required by UrhoCommon module
+    # Set CMake minimum version
     cmake_minimum_required (VERSION 3.10.2)
 
     # Set project name
