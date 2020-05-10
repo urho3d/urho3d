@@ -163,7 +163,7 @@ public:
     }
 
     /// Returns true if any flag is set.
-    operator bool () const
+    explicit operator bool () const
     {
         return value_ != 0;
     }
