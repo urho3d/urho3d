@@ -382,7 +382,7 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
         set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVE})      # Should work for all compiler toolchains while building shared library
         if (URHO3D_LIB_TYPE STREQUAL STATIC)
             if (XCODE OR MSVC)  # Only works in Xcode and MSVC while building static library
-                set_property (TARGET ${TARGET_NAME} APPEND STATIC_LIBRARY_OPTIONS ${ARCHIVE})
+                set_property (TARGET ${TARGET_NAME} APPEND PROPERTY STATIC_LIBRARY_OPTIONS ${ARCHIVE})
             else ()
                 list (APPEND ARCHIVES ${ARCHIVE})   # Accumulate the target locations for archiving later
             endif ()
