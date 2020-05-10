@@ -50,7 +50,7 @@ public:
     /// Perform UI element update.
     void Update(float timeStep) override;
     /// React to mouse hover.
-    void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+    void OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to the popup being shown.
     virtual void OnShowPopup();
 
