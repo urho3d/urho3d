@@ -31,6 +31,6 @@ find_path (NAS_INCLUDE_DIRS NAMES audio/audiolib.h nas/audiolib.h DOC "NetworkAu
 find_library (NAS_LIBRARIES NAMES audio DOC "NetworkAudioSystem library")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (NAS REQUIRED_VARS NAS_LIBRARIES NAS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find NetworkAudioSystem development library")
+find_package_handle_standard_args (NetworkAudioSystem REQUIRED_VARS NAS_LIBRARIES NAS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find NetworkAudioSystem development library")
 
 mark_as_advanced (NAS_INCLUDE_DIRS NAS_LIBRARIES)

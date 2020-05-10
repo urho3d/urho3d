@@ -272,43 +272,8 @@ execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_B
 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
 source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
 
-# Define generated object files
-# This is a hack as it relies on internal working of CMake
-if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have force_load/whole_archive equivalent
-    foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-        get_target_property (SOURCES ${TARGET} SOURCES)
-        get_target_property (INT_DIR ${TARGET} LOCATION)
-        if (INT_DIR)
-            get_filename_component (INT_DIR ${INT_DIR} PATH)
-            if (CMAKE_GENERATOR MATCHES 2008)
-                string (REPLACE /$(OutDir) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
-            elseif (VS)
-                string (REPLACE /$(Configuration) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
-            endif ()
-            foreach (SOURCE ${SOURCES})
-                get_filename_component (NAME ${SOURCE} NAME)
-                if (NAME MATCHES \\.c.*$|\\.mm?$|\\.S$|\\.s$)
-                    if (VS)
-                        string (REGEX REPLACE \\.c.*$|\\.mm?$|\\.S$|\\.s$ "" NAME "${NAME}")
-                        list (APPEND OBJ_FILES ${INT_DIR}/${NAME}.obj)
-                    else ()
-                        string (REGEX REPLACE ^.*/ThirdParty/${TARGET}/ "" SOURCE "${SOURCE}")
-                        list (APPEND OBJ_FILES ${INT_DIR}/CMakeFiles/${TARGET}.dir/${SOURCE}.obj)
-                    endif ()
-                elseif (NAME MATCHES \\.o.*$)
-                    list (APPEND OBJ_FILES ${SOURCE})
-                endif ()
-            endforeach ()
-            source_group ("Object Files\\${TARGET}" FILES ${OBJ_FILES})
-            list (APPEND ALL_OBJ_FILES ${OBJ_FILES})
-            unset (OBJ_FILES)
-        endif ()
-    endforeach ()
-    set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
-endif ()
-
 # Aggregate all source files
-list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${LUA_GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h ${SYMBOLIC_SOURCES})
+list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${LUA_GEN_CPP_FILES} librevision.h Urho3D.h ${SYMBOLIC_SOURCES})
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from third-party libs
@@ -394,40 +359,40 @@ if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_DLL_INSTALLED TRUE)
 endif ()
 
-# Setup dependency frameworks and libraries
+# TODO: This seems out of place
 if (MINGW)
     set (CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES_INIT} -lwinmm")
     set (CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES_INIT} -lwinmm")
-endif ()
-if (APPLE)
-    set (FORCE_LOAD -force_load)
-elseif (NOT MSVC)
-    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
-    if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
         set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")
     endif ()
 endif ()
+
+# Setup dependency libraries to be linked or archived as a whole inside Urho3D library for SHARED or STATIC lib type, respectively
+if (APPLE)
+    set (WHOLE_ARCHIVE -force_load)
+elseif (MSVC)
+    set (WHOLE_ARCHIVE /WHOLEARCHIVE)   # Require VS 2015 Update 2 onward
+else ()
+    set (WHOLE_ARCHIVE -Wl,--whole-archive)
+endif ()
+set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${WHOLE_ARCHIVE})
 foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-    get_target_property (ARCHIVE ${TARGET} LOCATION)
-    if (ARCHIVE)
-        if (NOT MSVC)
-            set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
-        endif ()
-        if (MSVC_VERSION VERSION_EQUAL 1500)
-            if (ARCHIVE MATCHES " ")
-                message (FATAL_ERROR "CMake/VS2008 generator does not support spaces in the source and/or build tree path")
+    set (ARCHIVE $<TARGET_FILE:${TARGET}>)
+    if (NOT ${TARGET} MATCHES boost|rapidjson|STB)    # Exlucde header-only "fake" static lib targets
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVE})    # Should work for all platforms while building shared library
+        if (URHO3D_LIB_TYPE STREQUAL STATIC)
+            if (XCODE OR MSVC)  # Only works in Xcode and MSVC while building static library
+                set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")
+            else ()
+                list (APPEND ARCHIVES ${ARCHIVE})   # Accumulate the target locations for archiving later
             endif ()
-            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")  # Fallback for VS2008
-        elseif (XCODE OR MSVC)
-            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
-        else ()
-            list (APPEND ARCHIVES ${ARCHIVE})
         endif ()
     endif ()
 endforeach ()
 if (NOT XCODE AND NOT MSVC)
     if (NOT APPLE)
-        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)  # GCC/Clang-specific to pair up with whole-archive linker option
     endif ()
     if (URHO3D_LIB_TYPE STREQUAL STATIC)
         if (APPLE)
