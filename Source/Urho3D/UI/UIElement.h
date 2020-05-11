@@ -598,7 +598,7 @@ public:
     PODVector<UIElement*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return the drag button combo if this element is being dragged.
-    int GetDragButtonCombo() const { return dragButtonCombo_; }
+    MouseButtonFlags GetDragButtonCombo() const { return dragButtonCombo_; }
 
     /// Return the number of buttons dragging this element.
     unsigned GetDragButtonCount() const { return dragButtonCount_; }
@@ -740,7 +740,7 @@ protected:
     /// Applied style.
     String appliedStyle_;
     /// Drag button combo.
-    int dragButtonCombo_{};
+    MouseButtonFlags dragButtonCombo_{};
     /// Drag button count.
     unsigned dragButtonCount_{};
 

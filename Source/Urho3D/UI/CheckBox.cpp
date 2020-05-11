@@ -84,7 +84,7 @@ void CheckBox::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
     if (HasFocus() && key == KEY_SPACE)
     {
         // Simulate LMB click
-        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, MouseButtonFlags(0), QualifierFlags(0), nullptr);
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, MOUSEB_NONE, QUAL_NONE, nullptr);
     }
 }
 
