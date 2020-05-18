@@ -119,5 +119,4 @@ ALIASES += pod="IS_POD"
 ALIASES += allints="ALL_INTS"
 ALIASES += allfloats="ALL_FLOATS"
 ALIASES += property="BIND_AS_PROPERTY"
-ALIASES += notproperty="NOT_PROPERTY"
 

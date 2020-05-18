@@ -436,29 +436,7 @@ static void RegisterMethod(ClassFunctionAnalyzer& function)
     }
     else
     {
-        smatch matchGet;
-        bool successGet = regex_match(functionName, matchGet, regex("^Get[A-Z].*"));
-
-        smatch matchSet;
-        bool successSet = regex_match(functionName, matchSet, regex("^Set[A-Z].*"));
-
-        int numFunctions = function.GetClass().NumFunctions(functionName);
-        bool notProperty = Contains(function.GetComment(), "NOT_PROPERTY");
-        
-        if (successGet && function.CanBeGetProperty() && numFunctions == 1 && !notProperty)
-        {
-            asFunctionName = CutStart(asFunctionName, "Get");
-            asFunctionName = "get_" + FirstCharToLower(asFunctionName);
-        }
-        else if (successSet && function.CanBeSetProperty() && numFunctions == 1 && !notProperty)
-        {
-            asFunctionName = CutStart(asFunctionName, "Set");
-            asFunctionName = "set_" + FirstCharToLower(asFunctionName);
-        }
-        else
-        {
-            asFunctionName = CppMethodNameToAS(function);
-        }
+        asFunctionName = CppMethodNameToAS(function);
     }
 
     decl = returnType + " " + asFunctionName + "(" + decl + ")";

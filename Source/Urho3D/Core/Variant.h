@@ -1112,7 +1112,6 @@ public:
     template <class T> void SetCustom(const T& value) { SetCustomVariantValue(MakeCustomValue<T>(value)); }
 
     /// Return int or zero on type mismatch. Floats and doubles are converted.
-    /// @notproperty
     int GetInt() const
     {
         if (type_ == VAR_INT)
@@ -1126,7 +1125,6 @@ public:
     }
 
     /// Return 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    /// @notproperty
     long long GetInt64() const
     {
         if (type_ == VAR_INT64)
@@ -1142,7 +1140,6 @@ public:
     }
 
     /// Return unsigned 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    /// @notproperty
     unsigned long long GetUInt64() const
     {
         if (type_ == VAR_INT64)
@@ -1158,7 +1155,6 @@ public:
     }
 
     /// Return unsigned int or zero on type mismatch. Floats and doubles are converted.
-    /// @notproperty
     unsigned GetUInt() const
     {
         if (type_ == VAR_INT)
@@ -1172,15 +1168,12 @@ public:
     }
 
     /// Return StringHash or zero on type mismatch.
-    /// @notproperty
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
 
     /// Return bool or false on type mismatch.
-    /// @notproperty
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
 
     /// Return float or zero on type mismatch. Ints and doubles are converted.
-    /// @notproperty
     float GetFloat() const
     {
         if (type_ == VAR_FLOAT)
@@ -1196,7 +1189,6 @@ public:
     }
 
     /// Return double or zero on type mismatch. Ints and floats are converted.
-    /// @notproperty
     double GetDouble() const
     {
         if (type_ == VAR_DOUBLE)
@@ -1212,30 +1204,24 @@ public:
     }
 
     /// Return Vector2 or zero on type mismatch.
-    /// @notproperty
     const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? value_.vector2_ : Vector2::ZERO; }
 
     /// Return Vector3 or zero on type mismatch.
-    /// @notproperty
     const Vector3& GetVector3() const { return type_ == VAR_VECTOR3 ? value_.vector3_ : Vector3::ZERO; }
 
     /// Return Vector4 or zero on type mismatch.
-    /// @notproperty
     const Vector4& GetVector4() const { return type_ == VAR_VECTOR4 ? value_.vector4_ : Vector4::ZERO; }
 
     /// Return quaternion or identity on type mismatch.
-    /// @notproperty
     const Quaternion& GetQuaternion() const
     {
         return type_ == VAR_QUATERNION ? value_.quaternion_ : Quaternion::IDENTITY;
     }
 
     /// Return color or default on type mismatch. Vector4 is aliased to Color if necessary.
-    /// @notproperty
     const Color& GetColor() const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : Color::WHITE; }
 
     /// Return string or empty on type mismatch.
-    /// @notproperty
     const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
 
     /// Return buffer or empty on type mismatch.
@@ -1262,14 +1248,12 @@ public:
     }
 
     /// Return a resource reference or empty on type mismatch.
-    /// @notproperty
     const ResourceRef& GetResourceRef() const
     {
         return type_ == VAR_RESOURCEREF ? value_.resourceRef_ : emptyResourceRef;
     }
 
     /// Return a resource reference list or empty on type mismatch.
-    /// @notproperty
     const ResourceRefList& GetResourceRefList() const
     {
         return type_ == VAR_RESOURCEREFLIST ? value_.resourceRefList_ : emptyResourceRefList;
@@ -1290,57 +1274,48 @@ public:
     }
 
     /// Return a variant map or empty on type mismatch.
-    /// @notproperty
     const VariantMap& GetVariantMap() const
     {
         return type_ == VAR_VARIANTMAP ? value_.variantMap_ : emptyVariantMap;
     }
 
     /// Return a rect or empty on type mismatch.
-    /// @notproperty
     const Rect& GetRect() const { return type_ == VAR_RECT ? value_.rect_ : Rect::ZERO; }
 
     /// Return an integer rect or empty on type mismatch.
-    /// @notproperty
     const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? value_.intRect_ : IntRect::ZERO; }
 
     /// Return an IntVector2 or empty on type mismatch.
-    /// @notproperty
     const IntVector2& GetIntVector2() const
     {
         return type_ == VAR_INTVECTOR2 ? value_.intVector2_ : IntVector2::ZERO;
     }
 
     /// Return an IntVector3 or empty on type mismatch.
-    /// @notproperty
     const IntVector3& GetIntVector3() const
     {
         return type_ == VAR_INTVECTOR3 ? value_.intVector3_ : IntVector3::ZERO;
     }
 
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
-    /// @notproperty
     RefCounted* GetPtr() const
     {
         return type_ == VAR_PTR ? value_.weakPtr_ : nullptr;
     }
 
     /// Return a Matrix3 or identity on type mismatch.
-     /// @notproperty
     const Matrix3& GetMatrix3() const
     {
         return type_ == VAR_MATRIX3 ? *value_.matrix3_ : Matrix3::IDENTITY;
     }
 
     /// Return a Matrix3x4 or identity on type mismatch.
-     /// @notproperty
     const Matrix3x4& GetMatrix3x4() const
     {
         return type_ == VAR_MATRIX3X4 ? *value_.matrix3x4_ : Matrix3x4::IDENTITY;
     }
 
     /// Return a Matrix4 or identity on type mismatch.
-     /// @notproperty
     const Matrix4& GetMatrix4() const
     {
         return type_ == VAR_MATRIX4 ? *value_.matrix4_ : Matrix4::IDENTITY;
@@ -1386,6 +1361,7 @@ public:
     }
 
     /// Return value's type.
+    /// @property
     VariantType GetType() const { return type_; }
 
     /// Return value's type name.
