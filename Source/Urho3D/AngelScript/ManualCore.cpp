@@ -28,6 +28,13 @@
 namespace Urho3D
 {
 
+// This function is called before ASRegisterGenerated()
+void ASRegisterManualFirst_Core(asIScriptEngine* engine)
+{
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asGetTypeTraits<VariantMap>());
+}
+    
 // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
 static void VariantMap_Constructor(VariantMap* ptr)
 {
@@ -94,13 +101,6 @@ static CScriptArray* VariantMap_GetValues(const VariantMap& map)
     return VectorToArray<Variant>(map.Values(), "Array<Variant>");
 }
 
-// This function is called before ASRegisterGenerated()
-void ASRegisterManualFirst_Core(asIScriptEngine* engine)
-{
-    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
-    //engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asGetTypeTraits<VariantMap>());
-}
-
 // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
 static void ResourceRefListResize(unsigned size, ResourceRefList* ptr)
 {
@@ -143,11 +143,97 @@ static const String& ResourceRefListGetName(unsigned index, ResourceRefList* ptr
     return ptr->names_[index];
 }
 
+
+void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest);
+
+static void ConstructVariantVariantVector(CScriptArray* value, Variant* ptr)
+{
+    VariantVector vector;
+    ArrayToVariantVector(value, vector);
+    new(ptr) Variant(vector);
+}
+
+void ArrayToStringVector(CScriptArray* arr, StringVector& dest);
+
+static void ConstructVariantStringVector(CScriptArray* value, Variant* ptr)
+{
+    StringVector vector;
+    ArrayToStringVector(value, vector);
+    new(ptr) Variant(vector);
+}
+
+static Variant& VariantAssignVariantVector(CScriptArray* value, Variant* ptr)
+{
+    VariantVector vector;
+    ArrayToVariantVector(value, vector);
+    *ptr = vector;
+    return *ptr;
+}
+
+static Variant& VariantAssignStringVector(CScriptArray* value, Variant* ptr)
+{
+    StringVector vector;
+    ArrayToStringVector(value, vector);
+    *ptr = vector;
+    return *ptr;
+}
+
+static bool VariantEqualsVariantVector(CScriptArray* value, Variant* ptr)
+{
+    VariantVector vector;
+    ArrayToVariantVector(value, vector);
+    return *ptr == vector;
+}
+
+static bool VariantEqualsStringVector(CScriptArray* value, Variant* ptr)
+{
+    StringVector vector;
+    ArrayToStringVector(value, vector);
+    return *ptr == vector;
+}
+
+static CScriptArray* VariantGetVariantVector(Variant* ptr)
+{
+    return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
+}
+
+static CScriptArray* VariantGetStringVector(Variant* ptr)
+{
+    return VectorToArray<String>(ptr->GetStringVector(), "Array<String>");
+}
+
+static void ConstructVariantScriptObject(asIScriptObject* value, Variant* ptr)
+{
+    if (value)
+    {
+        asITypeInfo* scriptObjectInterface = value->GetEngine()->GetTypeInfoByName("ScriptObject");
+        if (value->GetObjectType()->Implements(scriptObjectInterface))
+            new(ptr) Variant(value);
+        else
+            new(ptr) Variant();
+    }
+    else
+        new(ptr) Variant();
+}
+
+static asIScriptObject* VariantGetScriptObject(Variant* ptr)
+{
+    auto* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
+    if (!object)
+        return nullptr;
+
+    asITypeInfo* scriptObjectInterface = object->GetEngine()->GetTypeInfoByName("ScriptObject");
+    if (!object->GetObjectType()->Implements(scriptObjectInterface))
+        return nullptr;
+
+    return object;
+}
+
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Core(asIScriptEngine* engine)
 {
     // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
-    /*engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VariantMap_Constructor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VariantMap_Constructor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(VariantMap_CopyConstructor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VariantMap_Destructor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap&in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
@@ -163,7 +249,21 @@ void ASRegisterManualLast_Core(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Array<StringHash>@ get_keys() const", asFUNCTION(VariantMap_GetKeys), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "Array<Variant>@ get_values() const", asFUNCTION(VariantMap_GetValues), asCALL_CDECL_OBJLAST);
-    */
+
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(ScriptObject@+)", asFUNCTION(ConstructVariantScriptObject), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Array<Variant>@+)", asFUNCTION(ConstructVariantVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Array<String>@+)", asFUNCTION(ConstructVariantStringVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Array<Variant>@+)", asFUNCTION(VariantAssignVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Array<String>@+)", asFUNCTION(VariantAssignStringVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(ScriptObject@+)", asMETHODPR(Variant, operator =, (void*), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Array<Variant>@+)", asFUNCTION(VariantEqualsVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Array<String>@+)", asFUNCTION(VariantEqualsStringVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(ScriptObject@+) const", asMETHODPR(Variant, operator ==, (void*) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Array<Variant>@ GetVariantVector() const", asFUNCTION(VariantGetVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Array<String>@ GetStringVector() const", asFUNCTION(VariantGetStringVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "ScriptObject@+ GetScriptObject() const", asFUNCTION(VariantGetScriptObject), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "bool get_zero() const", asMETHOD(Variant, IsZero), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool get_empty() const", asMETHOD(Variant, IsEmpty), asCALL_THISCALL);
 
     // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
     engine->RegisterObjectMethod("ResourceRefList", "void Resize(uint)", asFUNCTION(ResourceRefListResize), asCALL_CDECL_OBJLAST);

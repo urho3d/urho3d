@@ -157,6 +157,7 @@ struct URHO3D_API ResourceRefList
 
     /// Object type.
     StringHash type_;
+    
     /// List of object names.
     /// @manualbind
     StringVector names_;
@@ -416,24 +417,28 @@ public:
     }
 
     /// Construct from a C string.
+    /// @nobind
     Variant(const char* value)          // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a buffer.
+    /// @nobind
     Variant(const PODVector<unsigned char>& value)      // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a %VectorBuffer and store as a buffer.
+    /// @nobind
     Variant(const VectorBuffer& value)  // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
 
     /// Construct from a pointer.
+    /// @manualbind
     Variant(void* value)                // NOLINT(google-explicit-constructor)
     {
         *this = value;
@@ -452,6 +457,7 @@ public:
     }
 
     /// Construct from a variant vector.
+    /// @manualbind
     Variant(const VariantVector& value) // NOLINT(google-explicit-constructor)
     {
         *this = value;
@@ -464,6 +470,7 @@ public:
     }
 
     /// Construct from a string vector.
+    /// @manualbind
     Variant(const StringVector& value)  // NOLINT(google-explicit-constructor)
     {
         *this = value;
@@ -537,12 +544,14 @@ public:
     }
 
     /// Construct from type and value.
+    /// @nobind
     Variant(const char* type, const char* value)
     {
         FromString(type, value);
     }
 
     /// Construct from type and value.
+    /// @nobind
     Variant(VariantType type, const char* value)
     {
         FromString(type, value);
@@ -682,6 +691,7 @@ public:
     }
 
     /// Assign from a C string.
+    /// @nobind
     Variant& operator =(const char* rhs)
     {
         SetType(VAR_STRING);
@@ -690,6 +700,7 @@ public:
     }
 
     /// Assign from a buffer.
+    /// @nobind
     Variant& operator =(const PODVector<unsigned char>& rhs)
     {
         SetType(VAR_BUFFER);
@@ -698,9 +709,11 @@ public:
     }
 
     /// Assign from a %VectorBuffer and store as a buffer.
+    /// @nobind
     Variant& operator =(const VectorBuffer& rhs);
 
     /// Assign from a void pointer.
+    /// @manualbind
     Variant& operator =(void* rhs)
     {
         SetType(VAR_VOIDPTR);
@@ -725,6 +738,7 @@ public:
     }
 
     /// Assign from a variant vector.
+    /// @manualbind
     Variant& operator =(const VariantVector& rhs)
     {
         SetType(VAR_VARIANTVECTOR);
@@ -733,6 +747,7 @@ public:
     }
 
     /// Assign from a string vector.
+    /// @manualbind
     Variant& operator =(const StringVector& rhs)
     {
         SetType(VAR_STRINGVECTOR);
@@ -881,11 +896,14 @@ public:
     }
 
     /// Test for equality with a buffer. To return true, both the type and value must match.
+    /// @nobind
     bool operator ==(const PODVector<unsigned char>& rhs) const;
     /// Test for equality with a %VectorBuffer. To return true, both the type and value must match.
+    /// @nobind
     bool operator ==(const VectorBuffer& rhs) const;
 
     /// Test for equality with a void pointer. To return true, both the type and value must match, with the exception that a RefCounted pointer is also allowed.
+    /// @manualbind
     bool operator ==(void* rhs) const
     {
         if (type_ == VAR_VOIDPTR)
@@ -909,12 +927,14 @@ public:
     }
 
     /// Test for equality with a variant vector. To return true, both the type and value must match.
+    /// @manualbind
     bool operator ==(const VariantVector& rhs) const
     {
         return type_ == VAR_VARIANTVECTOR ? value_.variantVector_ == rhs : false;
     }
 
     /// Test for equality with a string vector. To return true, both the type and value must match.
+    /// @manualbind
     bool operator ==(const StringVector& rhs) const
     {
         return type_ == VAR_STRINGVECTOR ? value_.stringVector_ == rhs : false;
@@ -1083,8 +1103,10 @@ public:
     /// @nobind
     void FromString(VariantType type, const char* value);
     /// Set buffer type from a memory area.
+    /// @nobind
     void SetBuffer(const void* data, unsigned size);
     /// Set custom value.
+    /// @nobind
     void SetCustomVariantValue(const CustomVariantValue& value);
     /// Set custom value.
     template <class T> void SetCustom(const T& value) { SetCustomVariantValue(MakeCustomValue<T>(value)); }
@@ -1136,6 +1158,7 @@ public:
     }
 
     /// Return unsigned int or zero on type mismatch. Floats and doubles are converted.
+    /// @notproperty
     unsigned GetUInt() const
     {
         if (type_ == VAR_INT)
@@ -1189,12 +1212,15 @@ public:
     }
 
     /// Return Vector2 or zero on type mismatch.
+    /// @notproperty
     const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? value_.vector2_ : Vector2::ZERO; }
 
     /// Return Vector3 or zero on type mismatch.
+    /// @notproperty
     const Vector3& GetVector3() const { return type_ == VAR_VECTOR3 ? value_.vector3_ : Vector3::ZERO; }
 
     /// Return Vector4 or zero on type mismatch.
+    /// @notproperty
     const Vector4& GetVector4() const { return type_ == VAR_VECTOR4 ? value_.vector4_ : Vector4::ZERO; }
 
     /// Return quaternion or identity on type mismatch.
@@ -1220,9 +1246,11 @@ public:
     }
 
     /// Return %VectorBuffer containing the buffer or empty on type mismatch.
+    /// @nobind
     VectorBuffer GetVectorBuffer() const;
 
     /// Return void pointer or null on type mismatch. RefCounted pointer will be converted.
+    /// @manualbind
     void* GetVoidPtr() const
     {
         if (type_ == VAR_VOIDPTR)
@@ -1248,18 +1276,21 @@ public:
     }
 
     /// Return a variant vector or empty on type mismatch.
+    /// @manualbind
     const VariantVector& GetVariantVector() const
     {
         return type_ == VAR_VARIANTVECTOR ? value_.variantVector_ : emptyVariantVector;
     }
 
     /// Return a string vector or empty on type mismatch.
+    /// @manualbind
     const StringVector& GetStringVector() const
     {
         return type_ == VAR_STRINGVECTOR ? value_.stringVector_ : emptyStringVector;
     }
 
     /// Return a variant map or empty on type mismatch.
+    /// @notproperty
     const VariantMap& GetVariantMap() const
     {
         return type_ == VAR_VARIANTMAP ? value_.variantMap_ : emptyVariantMap;
@@ -1358,13 +1389,16 @@ public:
     VariantType GetType() const { return type_; }
 
     /// Return value's type name.
+    /// @property
     String GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
     /// Return true when the variant value is considered zero according to its actual type.
+    /// @manualbind
     bool IsZero() const;
 
     /// Return true when the variant is empty (i.e. not initialized yet).
+    /// @manualbind
     bool IsEmpty() const { return type_ == VAR_NONE; }
 
     /// Return true when the variant stores custom type.
@@ -1389,6 +1423,7 @@ public:
     StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? &value_.stringVector_ : nullptr; }
 
     /// Return a pointer to a modifiable variant map or null on type mismatch.
+    /// @nobind
     VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? &value_.variantMap_ : nullptr; }
 
     /// Return a pointer to a modifiable custom variant value or null on type mismatch.
