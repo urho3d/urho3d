@@ -57,7 +57,7 @@ static vector<string> onlyClasses
     "RefCounted",
     "ResourceRef",
     "ResourceRefList",
-    //"Variant",
+    "Variant",
     //"Object",
     //"Time",
     //"Controls",
@@ -138,7 +138,7 @@ static void RegisterValueDestructor(ClassFunctionAnalyzer& function)
         "asCALL_CDECL_OBJFIRST);\n";
 }
 
-static void RegisterDefaultValueDestructor(const string& className)
+static void RegisterImplicitlyDeclaredDestructor(const string& className)
 {
     string wrapperName = className + "_Destructor";
 
@@ -159,7 +159,7 @@ static void RegisterDefaultValueDestructor(const string& className)
         "asCALL_CDECL_OBJFIRST);\n";
 }
 
-static void RegisterDefaultAssignOperator(const string& className)
+static void RegisterImplicitlyDeclaredAssignOperator(const string& className)
 {
     ASResult::reg_ <<
         "    // " << className << "& " << className << "::operator=(const " << className << "&) | Implicitly-declared\n"
@@ -170,7 +170,31 @@ static void RegisterDefaultAssignOperator(const string& className)
         "asCALL_THISCALL);\n";
 }
 
-static void RegisterComparisonOperator(ClassAnalyzer analyzer)
+static bool IsDestructorRequired(ClassAnalyzer& analyzer)
+{
+    if (analyzer.IsRefCounted())
+        return false;
+
+    if (analyzer.IsPod())
+        return false;
+
+    return true;
+}
+
+// Some required methods can not be bound automatically when processing class
+// because implicitly-declared
+static void RegisterImplicitlyDeclaredMethods(ClassAnalyzer& analyzer)
+{
+    string className = analyzer.GetClassName();
+
+    if (!analyzer.HasDestructor() && IsDestructorRequired(analyzer))
+        RegisterImplicitlyDeclaredDestructor(className);
+
+    if (!analyzer.ContainsFunction("operator="))
+        RegisterImplicitlyDeclaredAssignOperator(className);
+}
+
+static void RegisterComparisonOperator(ClassAnalyzer& analyzer)
 {
     string className = analyzer.GetClassName();
     string wrapperName = className + "_Comparison";
@@ -247,7 +271,7 @@ string CppMethodNameToAS(ClassFunctionAnalyzer& function)
     if (name == "operator-")
     {
         if (!function.GetParams().size()) // If no params
-            return "opNeg"; // then unary minus
+            return "opNeg";               // then unary minus
 
         return "opSub";
     }
@@ -494,24 +518,19 @@ static void RegisterObjectMembers(ClassAnalyzer& analyzer)
     for (ClassFunctionAnalyzer function : functions)
         RegisterMethod(function);
 
+    RegisterImplicitlyDeclaredMethods(analyzer);
+
+    // 2 operators is replaced by single function opCmp
+    if (analyzer.ContainsFunction("operator>") || analyzer.ContainsFunction("operator>"))
+        RegisterComparisonOperator(analyzer);
+
     if (!insideDefine.empty())
         ASResult::reg_ << "#endif\n";
 
     ASResult::reg_ << "\n";
 }
 
-static bool IsDestructorRequired(ClassAnalyzer analyzer)
-{
-    if (analyzer.IsRefCounted())
-        return false;
-
-    if (analyzer.IsPod())
-        return false;
-
-    return true;
-}
-
-static void RegisterObjectType(ClassAnalyzer analyzer)
+static void RegisterObjectType(ClassAnalyzer& analyzer)
 {
     string header = analyzer.GetHeaderFile();
 
@@ -552,18 +571,6 @@ static void RegisterObjectType(ClassAnalyzer analyzer)
             "sizeof(" << className << "), " <<
             flags <<
             ");\n";
-
-        // If destructor exists, it will be registered later when processing functions,
-        // if not exists - registered here
-        if (!analyzer.HasDestructor() && IsDestructorRequired(analyzer))
-            RegisterDefaultValueDestructor(className);
-
-        if (!analyzer.ContainsFunction("operator="))
-            RegisterDefaultAssignOperator(className);
-
-        // 2 operators is replaced by single function opCmp
-        if (analyzer.ContainsFunction("operator>") || analyzer.ContainsFunction("operator>"))
-            RegisterComparisonOperator(analyzer);
     }
 
     if (!insideDefine.empty())

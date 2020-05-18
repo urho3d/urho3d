@@ -193,12 +193,6 @@ static void Color_Color_110_14(Color* ptr, const Vector4 &color)
     new(ptr) Color(color);
 }
 
-// Frustum::~Frustum() | Implicitly-declared 
-static void Frustum_Destructor(Frustum* ptr)
-{
-    ptr->~Frustum();
-}
-
 // Frustum::Frustum() noexcept=default | File: ../Math/Frustum.h | Line: 55
 static void Frustum_Frustum_55_5(Frustum* ptr)
 {
@@ -209,6 +203,12 @@ static void Frustum_Frustum_55_5(Frustum* ptr)
 static void Frustum_Frustum_58_5(Frustum* ptr, const Frustum &frustum)
 {
     new(ptr) Frustum(frustum);
+}
+
+// Frustum::~Frustum() | Implicitly-declared 
+static void Frustum_Destructor(Frustum* ptr)
+{
+    ptr->~Frustum();
 }
 
 // IntRect::IntRect() noexcept | File: ../Math/Rect.h | Line: 286
@@ -571,17 +571,6 @@ static void Sphere_Sphere_76_14(Sphere* ptr, const Polyhedron &poly)
     new(ptr) Sphere(poly);
 }
 
-// bool StringHash::operator<(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 82
-// bool StringHash::operator>(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 85
-static int StringHash_Comparison(const StringHash& lhs, const StringHash& rhs)
-{
-    if (lhs < rhs)
-        return -1;
-    if (lhs > rhs)
-        return 1;
-    return 0;
-}
-
 // StringHash::StringHash() noexcept | File: ../Math/StringHash.h | Line: 37
 static void StringHash_StringHash_37_5(StringHash* ptr)
 {
@@ -606,10 +595,201 @@ static void StringHash_StringHash_55_5(StringHash* ptr, const String &str)
     new(ptr) StringHash(str);
 }
 
+// bool StringHash::operator<(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 82
+// bool StringHash::operator>(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 85
+static int StringHash_Comparison(const StringHash& lhs, const StringHash& rhs)
+{
+    if (lhs < rhs)
+        return -1;
+    if (lhs > rhs)
+        return 1;
+    return 0;
+}
+
 // Timer::Timer() | File: ../Core/Timer.h | Line: 35
 static void Timer_Timer_35_5(Timer* ptr)
 {
     new(ptr) Timer();
+}
+
+// Variant::Variant()=default | File: ../Core/Variant.h | Line: 333
+static void Variant_Variant_333_5(Variant* ptr)
+{
+    new(ptr) Variant();
+}
+
+// Variant::Variant(int value) | File: ../Core/Variant.h | Line: 336
+static void Variant_Variant_336_5(Variant* ptr, int value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(long long value) | File: ../Core/Variant.h | Line: 342
+static void Variant_Variant_342_5(Variant* ptr, long long value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(unsigned value) | File: ../Core/Variant.h | Line: 348
+static void Variant_Variant_348_5(Variant* ptr, unsigned value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(unsigned long long value) | File: ../Core/Variant.h | Line: 354
+static void Variant_Variant_354_5(Variant* ptr, unsigned long long value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const StringHash &value) | File: ../Core/Variant.h | Line: 360
+static void Variant_Variant_360_5(Variant* ptr, const StringHash &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(bool value) | File: ../Core/Variant.h | Line: 366
+static void Variant_Variant_366_5(Variant* ptr, bool value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(float value) | File: ../Core/Variant.h | Line: 372
+static void Variant_Variant_372_5(Variant* ptr, float value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(double value) | File: ../Core/Variant.h | Line: 378
+static void Variant_Variant_378_5(Variant* ptr, double value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Vector2 &value) | File: ../Core/Variant.h | Line: 384
+static void Variant_Variant_384_5(Variant* ptr, const Vector2 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Vector3 &value) | File: ../Core/Variant.h | Line: 390
+static void Variant_Variant_390_5(Variant* ptr, const Vector3 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Vector4 &value) | File: ../Core/Variant.h | Line: 396
+static void Variant_Variant_396_5(Variant* ptr, const Vector4 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Quaternion &value) | File: ../Core/Variant.h | Line: 402
+static void Variant_Variant_402_5(Variant* ptr, const Quaternion &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Color &value) | File: ../Core/Variant.h | Line: 408
+static void Variant_Variant_408_5(Variant* ptr, const Color &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const String &value) | File: ../Core/Variant.h | Line: 414
+static void Variant_Variant_414_5(Variant* ptr, const String &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const ResourceRef &value) | File: ../Core/Variant.h | Line: 448
+static void Variant_Variant_448_5(Variant* ptr, const ResourceRef &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const ResourceRefList &value) | File: ../Core/Variant.h | Line: 454
+static void Variant_Variant_454_5(Variant* ptr, const ResourceRefList &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const VariantMap &value) | File: ../Core/Variant.h | Line: 467
+static void Variant_Variant_467_5(Variant* ptr, const VariantMap &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Rect &value) | File: ../Core/Variant.h | Line: 480
+static void Variant_Variant_480_5(Variant* ptr, const Rect &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const IntRect &value) | File: ../Core/Variant.h | Line: 486
+static void Variant_Variant_486_5(Variant* ptr, const IntRect &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const IntVector2 &value) | File: ../Core/Variant.h | Line: 492
+static void Variant_Variant_492_5(Variant* ptr, const IntVector2 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const IntVector3 &value) | File: ../Core/Variant.h | Line: 498
+static void Variant_Variant_498_5(Variant* ptr, const IntVector3 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(RefCounted *value) | File: ../Core/Variant.h | Line: 504
+static void Variant_Variant_504_5(Variant* ptr, RefCounted *value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Matrix3 &value) | File: ../Core/Variant.h | Line: 510
+static void Variant_Variant_510_5(Variant* ptr, const Matrix3 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Matrix3x4 &value) | File: ../Core/Variant.h | Line: 516
+static void Variant_Variant_516_5(Variant* ptr, const Matrix3x4 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const Matrix4 &value) | File: ../Core/Variant.h | Line: 522
+static void Variant_Variant_522_5(Variant* ptr, const Matrix4 &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::Variant(const String &type, const String &value) | File: ../Core/Variant.h | Line: 535
+static void Variant_Variant_535_5(Variant* ptr, const String &type, const String &value)
+{
+    new(ptr) Variant(type, value);
+}
+
+// Variant::Variant(VariantType type, const String &value) | File: ../Core/Variant.h | Line: 541
+static void Variant_Variant_541_5(Variant* ptr, VariantType type, const String &value)
+{
+    new(ptr) Variant(type, value);
+}
+
+// Variant::Variant(const Variant &value) | File: ../Core/Variant.h | Line: 561
+static void Variant_Variant_561_5(Variant* ptr, const Variant &value)
+{
+    new(ptr) Variant(value);
+}
+
+// Variant::~Variant() | File: ../Core/Variant.h | Line: 567
+static void Variant_Destructor_Variant_567_5(Variant* ptr)
+{
+    ptr->~Variant();
 }
 
 // Vector2::Vector2() noexcept | File: ../Math/Vector2.h | Line: 182
@@ -732,12 +912,6 @@ static void ResourceRef_ResourceRef_124_5(ResourceRef* ptr, const ResourceRef &r
     new(ptr) ResourceRef(rhs);
 }
 
-// ResourceRefList::~ResourceRefList() | Implicitly-declared 
-static void ResourceRefList_Destructor(ResourceRefList* ptr)
-{
-    ptr->~ResourceRefList();
-}
-
 // ResourceRefList::ResourceRefList()=default | File: ../Core/Variant.h | Line: 142
 static void ResourceRefList_ResourceRefList_142_5(ResourceRefList* ptr)
 {
@@ -748,6 +922,12 @@ static void ResourceRefList_ResourceRefList_142_5(ResourceRefList* ptr)
 static void ResourceRefList_ResourceRefList_145_14(ResourceRefList* ptr, StringHash type)
 {
     new(ptr) ResourceRefList(type);
+}
+
+// ResourceRefList::~ResourceRefList() | Implicitly-declared 
+static void ResourceRefList_Destructor(ResourceRefList* ptr)
+{
+    ptr->~ResourceRefList();
 }
 
 void ASRegisterGenerated(asIScriptEngine* engine)
@@ -2010,6 +2190,8 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asGetTypeTraits<StringHash>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
     // class Timer | File: ../Core/Timer.h | Line: 32
     engine->RegisterObjectType("Timer", sizeof(Timer), asOBJ_VALUE | asGetTypeTraits<Timer>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
+    // class Variant | File: ../Core/Variant.h | Line: 330
+    engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asGetTypeTraits<Variant>());
     // class Vector2 | File: ../Math/Vector2.h | Line: 179
     engine->RegisterObjectType("Vector2", sizeof(Vector2), asOBJ_VALUE | asGetTypeTraits<Vector2>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
     // class Vector3 | File: ../Math/Vector3.h | Line: 187
@@ -2207,8 +2389,6 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // float Color::Value() const | File: ../Math/Color.h | Line: 191
     engine->RegisterObjectMethod("Color", "float Value() const", asMETHODPR(Color, Value, () const, float), asCALL_THISCALL);
 
-    // Frustum::~Frustum() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Frustum_Destructor), asCALL_CDECL_OBJFIRST);
     // void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4 &transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h | Line: 65
     engine->RegisterObjectMethod("Frustum", "void Define(float, float, float, float, float, const Matrix3x4&in)", asMETHODPR(Frustum, Define, (float, float, float, float, float, const Matrix3x4 &), void), asCALL_THISCALL);
     // void Frustum::Define(const Vector3 &near, const Vector3 &far, const Matrix3x4 &transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h | Line: 67
@@ -2251,9 +2431,9 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3x4&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3x4 &) const, Frustum), asCALL_THISCALL);
     // void Frustum::UpdatePlanes() | File: ../Math/Frustum.h | Line: 179
     engine->RegisterObjectMethod("Frustum", "void UpdatePlanes()", asMETHODPR(Frustum, UpdatePlanes, (), void), asCALL_THISCALL);
+    // Frustum::~Frustum() | Implicitly-declared
+    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Frustum_Destructor), asCALL_CDECL_OBJFIRST);
 
-    // IntRect& IntRect::operator=(const IntRect&) | Implicitly-declared
-    engine->RegisterObjectMethod("IntRect", "IntRect& opAssign(const IntRect&in)", asMETHODPR(IntRect, operator=, (const IntRect&), IntRect&), asCALL_THISCALL);
     // int IntRect::bottom_ | File: ../Math/Rect.h | Line: 471
     engine->RegisterObjectProperty("IntRect", "int bottom", offsetof(IntRect, bottom_));
     // int IntRect::left_ | File: ../Math/Rect.h | Line: 465
@@ -2312,6 +2492,8 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IntRect", "String ToString() const", asMETHODPR(IntRect, ToString, () const, String), asCALL_THISCALL);
     // int IntRect::Width() const | File: ../Math/Rect.h | Line: 416
     engine->RegisterObjectMethod("IntRect", "int get_width() const", asMETHODPR(IntRect, Width, () const, int), asCALL_THISCALL);
+    // IntRect& IntRect::operator=(const IntRect&) | Implicitly-declared
+    engine->RegisterObjectMethod("IntRect", "IntRect& opAssign(const IntRect&in)", asMETHODPR(IntRect, operator=, (const IntRect&), IntRect&), asCALL_THISCALL);
 
     // int IntVector2::x_ | File: ../Math/Vector2.h | Line: 159
     engine->RegisterObjectProperty("IntVector2", "int x", offsetof(IntVector2, x_));
@@ -3095,9 +3277,6 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // Sphere::Sphere(const Polyhedron &poly) noexcept | File: ../Math/Sphere.h | Line: 76
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(Sphere_Sphere_76_14), asCALL_CDECL_OBJFIRST);
 
-    // bool StringHash::operator<(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 82
-    // bool StringHash::operator>(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 85
-    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHash_Comparison), asCALL_CDECL_OBJFIRST);
     // StringHash::operator bool() const | File: ../Math/StringHash.h | Line: 88
     engine->RegisterObjectMethod("StringHash", "bool opConv() const", asMETHODPR(StringHash, operator bool, () const, bool), asCALL_THISCALL);
     // StringHash StringHash::operator+(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 61
@@ -3124,15 +3303,247 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StringHash", "String ToString() const", asMETHODPR(StringHash, ToString, () const, String), asCALL_THISCALL);
     // unsigned StringHash::Value() const | File: ../Math/StringHash.h | Line: 92
     engine->RegisterObjectMethod("StringHash", "uint get_value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
+    // bool StringHash::operator<(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 82
+    // bool StringHash::operator>(const StringHash &rhs) const | File: ../Math/StringHash.h | Line: 85
+    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHash_Comparison), asCALL_CDECL_OBJFIRST);
 
-    // Timer& Timer::operator=(const Timer&) | Implicitly-declared
-    engine->RegisterObjectMethod("Timer", "Timer& opAssign(const Timer&in)", asMETHODPR(Timer, operator=, (const Timer&), Timer&), asCALL_THISCALL);
     // unsigned Timer::GetMSec(bool reset) | File: ../Core/Timer.h | Line: 38
     engine->RegisterObjectMethod("Timer", "uint GetMSec(bool)", asMETHODPR(Timer, GetMSec, (bool), unsigned), asCALL_THISCALL);
     // void Timer::Reset() | File: ../Core/Timer.h | Line: 40
     engine->RegisterObjectMethod("Timer", "void Reset()", asMETHODPR(Timer, Reset, (), void), asCALL_THISCALL);
     // Timer::Timer() | File: ../Core/Timer.h | Line: 35
     engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Timer_Timer_35_5), asCALL_CDECL_OBJFIRST);
+    // Timer& Timer::operator=(const Timer&) | Implicitly-declared
+    engine->RegisterObjectMethod("Timer", "Timer& opAssign(const Timer&in)", asMETHODPR(Timer, operator=, (const Timer&), Timer&), asCALL_THISCALL);
+
+    // void Variant::Clear() | File: ../Core/Variant.h | Line: 573
+    engine->RegisterObjectMethod("Variant", "void Clear()", asMETHODPR(Variant, Clear, (), void), asCALL_THISCALL);
+    // void Variant::FromString(const String &type, const String &value) | File: ../Core/Variant.h | Line: 1096
+    engine->RegisterObjectMethod("Variant", "void FromString(const String&in, const String&in)", asMETHODPR(Variant, FromString, (const String &, const String &), void), asCALL_THISCALL);
+    // void Variant::FromString(VariantType type, const String &value) | File: ../Core/Variant.h | Line: 1101
+    engine->RegisterObjectMethod("Variant", "void FromString(VariantType, const String&in)", asMETHODPR(Variant, FromString, (VariantType, const String &), void), asCALL_THISCALL);
+    // bool Variant::GetBool() const | File: ../Core/Variant.h | Line: 1180
+    engine->RegisterObjectMethod("Variant", "bool GetBool() const", asMETHODPR(Variant, GetBool, () const, bool), asCALL_THISCALL);
+    // const Color& Variant::GetColor() const | File: ../Core/Variant.h | Line: 1235
+    engine->RegisterObjectMethod("Variant", "const Color& GetColor() const", asMETHODPR(Variant, GetColor, () const, const Color &), asCALL_THISCALL);
+    // double Variant::GetDouble() const | File: ../Core/Variant.h | Line: 1200
+    engine->RegisterObjectMethod("Variant", "double GetDouble() const", asMETHODPR(Variant, GetDouble, () const, double), asCALL_THISCALL);
+    // float Variant::GetFloat() const | File: ../Core/Variant.h | Line: 1184
+    engine->RegisterObjectMethod("Variant", "float GetFloat() const", asMETHODPR(Variant, GetFloat, () const, float), asCALL_THISCALL);
+    // int Variant::GetInt() const | File: ../Core/Variant.h | Line: 1116
+    engine->RegisterObjectMethod("Variant", "int GetInt() const", asMETHODPR(Variant, GetInt, () const, int), asCALL_THISCALL);
+    // long long Variant::GetInt64() const | File: ../Core/Variant.h | Line: 1130
+    engine->RegisterObjectMethod("Variant", "int64 GetInt64() const", asMETHODPR(Variant, GetInt64, () const, long long), asCALL_THISCALL);
+    // const IntRect& Variant::GetIntRect() const | File: ../Core/Variant.h | Line: 1305
+    engine->RegisterObjectMethod("Variant", "const IntRect& GetIntRect() const", asMETHODPR(Variant, GetIntRect, () const, const IntRect &), asCALL_THISCALL);
+    // const IntVector2& Variant::GetIntVector2() const | File: ../Core/Variant.h | Line: 1309
+    engine->RegisterObjectMethod("Variant", "const IntVector2& GetIntVector2() const", asMETHODPR(Variant, GetIntVector2, () const, const IntVector2 &), asCALL_THISCALL);
+    // const IntVector3& Variant::GetIntVector3() const | File: ../Core/Variant.h | Line: 1316
+    engine->RegisterObjectMethod("Variant", "const IntVector3& GetIntVector3() const", asMETHODPR(Variant, GetIntVector3, () const, const IntVector3 &), asCALL_THISCALL);
+    // const Matrix3& Variant::GetMatrix3() const | File: ../Core/Variant.h | Line: 1330
+    engine->RegisterObjectMethod("Variant", "const Matrix3& GetMatrix3() const", asMETHODPR(Variant, GetMatrix3, () const, const Matrix3 &), asCALL_THISCALL);
+    // const Matrix3x4& Variant::GetMatrix3x4() const | File: ../Core/Variant.h | Line: 1337
+    engine->RegisterObjectMethod("Variant", "const Matrix3x4& GetMatrix3x4() const", asMETHODPR(Variant, GetMatrix3x4, () const, const Matrix3x4 &), asCALL_THISCALL);
+    // const Matrix4& Variant::GetMatrix4() const | File: ../Core/Variant.h | Line: 1344
+    engine->RegisterObjectMethod("Variant", "const Matrix4& GetMatrix4() const", asMETHODPR(Variant, GetMatrix4, () const, const Matrix4 &), asCALL_THISCALL);
+    // RefCounted* Variant::GetPtr() const | File: ../Core/Variant.h | Line: 1323
+    engine->RegisterObjectMethod("Variant", "RefCounted@+ GetPtr() const", asMETHODPR(Variant, GetPtr, () const, RefCounted *), asCALL_THISCALL);
+    // const Quaternion& Variant::GetQuaternion() const | File: ../Core/Variant.h | Line: 1228
+    engine->RegisterObjectMethod("Variant", "const Quaternion& GetQuaternion() const", asMETHODPR(Variant, GetQuaternion, () const, const Quaternion &), asCALL_THISCALL);
+    // const Rect& Variant::GetRect() const | File: ../Core/Variant.h | Line: 1301
+    engine->RegisterObjectMethod("Variant", "const Rect& GetRect() const", asMETHODPR(Variant, GetRect, () const, const Rect &), asCALL_THISCALL);
+    // const ResourceRef& Variant::GetResourceRef() const | File: ../Core/Variant.h | Line: 1266
+    engine->RegisterObjectMethod("Variant", "const ResourceRef& GetResourceRef() const", asMETHODPR(Variant, GetResourceRef, () const, const ResourceRef &), asCALL_THISCALL);
+    // const ResourceRefList& Variant::GetResourceRefList() const | File: ../Core/Variant.h | Line: 1273
+    engine->RegisterObjectMethod("Variant", "const ResourceRefList& GetResourceRefList() const", asMETHODPR(Variant, GetResourceRefList, () const, const ResourceRefList &), asCALL_THISCALL);
+    // const String& Variant::GetString() const | File: ../Core/Variant.h | Line: 1239
+    engine->RegisterObjectMethod("Variant", "const String& GetString() const", asMETHODPR(Variant, GetString, () const, const String &), asCALL_THISCALL);
+    // StringHash Variant::GetStringHash() const | File: ../Core/Variant.h | Line: 1176
+    engine->RegisterObjectMethod("Variant", "StringHash GetStringHash() const", asMETHODPR(Variant, GetStringHash, () const, StringHash), asCALL_THISCALL);
+    // VariantType Variant::GetType() const | File: ../Core/Variant.h | Line: 1389
+    engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHODPR(Variant, GetType, () const, VariantType), asCALL_THISCALL);
+    // String Variant::GetTypeName() const | File: ../Core/Variant.h | Line: 1393
+    engine->RegisterObjectMethod("Variant", "String get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, String), asCALL_THISCALL);
+    // unsigned Variant::GetUInt() const | File: ../Core/Variant.h | Line: 1162
+    engine->RegisterObjectMethod("Variant", "uint GetUInt() const", asMETHODPR(Variant, GetUInt, () const, unsigned), asCALL_THISCALL);
+    // unsigned long long Variant::GetUInt64() const | File: ../Core/Variant.h | Line: 1146
+    engine->RegisterObjectMethod("Variant", "uint64 GetUInt64() const", asMETHODPR(Variant, GetUInt64, () const, unsigned long long), asCALL_THISCALL);
+    // const VariantMap& Variant::GetVariantMap() const | File: ../Core/Variant.h | Line: 1294
+    engine->RegisterObjectMethod("Variant", "const VariantMap& GetVariantMap() const", asMETHODPR(Variant, GetVariantMap, () const, const VariantMap &), asCALL_THISCALL);
+    // const Vector2& Variant::GetVector2() const | File: ../Core/Variant.h | Line: 1216
+    engine->RegisterObjectMethod("Variant", "const Vector2& GetVector2() const", asMETHODPR(Variant, GetVector2, () const, const Vector2 &), asCALL_THISCALL);
+    // const Vector3& Variant::GetVector3() const | File: ../Core/Variant.h | Line: 1220
+    engine->RegisterObjectMethod("Variant", "const Vector3& GetVector3() const", asMETHODPR(Variant, GetVector3, () const, const Vector3 &), asCALL_THISCALL);
+    // const Vector4& Variant::GetVector4() const | File: ../Core/Variant.h | Line: 1224
+    engine->RegisterObjectMethod("Variant", "const Vector4& GetVector4() const", asMETHODPR(Variant, GetVector4, () const, const Vector4 &), asCALL_THISCALL);
+    // bool Variant::IsCustom() const | File: ../Core/Variant.h | Line: 1405
+    engine->RegisterObjectMethod("Variant", "bool IsCustom() const", asMETHODPR(Variant, IsCustom, () const, bool), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Variant &rhs) | File: ../Core/Variant.h | Line: 579
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Variant&in)", asMETHODPR(Variant, operator=, (const Variant &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(int rhs) | File: ../Core/Variant.h | Line: 582
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(int)", asMETHODPR(Variant, operator=, (int), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(long long rhs) | File: ../Core/Variant.h | Line: 590
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(int64)", asMETHODPR(Variant, operator=, (long long), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(unsigned long long rhs) | File: ../Core/Variant.h | Line: 598
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(uint64)", asMETHODPR(Variant, operator=, (unsigned long long), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(unsigned rhs) | File: ../Core/Variant.h | Line: 606
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(uint)", asMETHODPR(Variant, operator=, (unsigned), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const StringHash &rhs) | File: ../Core/Variant.h | Line: 614
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const StringHash&in)", asMETHODPR(Variant, operator=, (const StringHash &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(bool rhs) | File: ../Core/Variant.h | Line: 622
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(bool)", asMETHODPR(Variant, operator=, (bool), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(float rhs) | File: ../Core/Variant.h | Line: 630
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(float)", asMETHODPR(Variant, operator=, (float), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(double rhs) | File: ../Core/Variant.h | Line: 638
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(double)", asMETHODPR(Variant, operator=, (double), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Vector2 &rhs) | File: ../Core/Variant.h | Line: 646
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Vector2&in)", asMETHODPR(Variant, operator=, (const Vector2 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Vector3 &rhs) | File: ../Core/Variant.h | Line: 654
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Vector3&in)", asMETHODPR(Variant, operator=, (const Vector3 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Vector4 &rhs) | File: ../Core/Variant.h | Line: 662
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Vector4&in)", asMETHODPR(Variant, operator=, (const Vector4 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Quaternion &rhs) | File: ../Core/Variant.h | Line: 670
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Quaternion&in)", asMETHODPR(Variant, operator=, (const Quaternion &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Color &rhs) | File: ../Core/Variant.h | Line: 678
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Color&in)", asMETHODPR(Variant, operator=, (const Color &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const String &rhs) | File: ../Core/Variant.h | Line: 686
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const String&in)", asMETHODPR(Variant, operator=, (const String &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const ResourceRef &rhs) | File: ../Core/Variant.h | Line: 725
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const ResourceRef&in)", asMETHODPR(Variant, operator=, (const ResourceRef &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const ResourceRefList &rhs) | File: ../Core/Variant.h | Line: 733
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const ResourceRefList&in)", asMETHODPR(Variant, operator=, (const ResourceRefList &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const VariantMap &rhs) | File: ../Core/Variant.h | Line: 759
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VariantMap&in)", asMETHODPR(Variant, operator=, (const VariantMap &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Rect &rhs) | File: ../Core/Variant.h | Line: 767
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Rect&in)", asMETHODPR(Variant, operator=, (const Rect &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const IntRect &rhs) | File: ../Core/Variant.h | Line: 775
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntRect&in)", asMETHODPR(Variant, operator=, (const IntRect &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const IntVector2 &rhs) | File: ../Core/Variant.h | Line: 783
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntVector2&in)", asMETHODPR(Variant, operator=, (const IntVector2 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const IntVector3 &rhs) | File: ../Core/Variant.h | Line: 791
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntVector3&in)", asMETHODPR(Variant, operator=, (const IntVector3 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(RefCounted *rhs) | File: ../Core/Variant.h | Line: 799
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(RefCounted@+)", asMETHODPR(Variant, operator=, (RefCounted *), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Matrix3 &rhs) | File: ../Core/Variant.h | Line: 807
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Matrix3&in)", asMETHODPR(Variant, operator=, (const Matrix3 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Matrix3x4 &rhs) | File: ../Core/Variant.h | Line: 815
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Matrix3x4&in)", asMETHODPR(Variant, operator=, (const Matrix3x4 &), Variant &), asCALL_THISCALL);
+    // Variant& Variant::operator=(const Matrix4 &rhs) | File: ../Core/Variant.h | Line: 823
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Matrix4&in)", asMETHODPR(Variant, operator=, (const Matrix4 &), Variant &), asCALL_THISCALL);
+    // bool Variant::operator==(const Variant &rhs) const | File: ../Core/Variant.h | Line: 839
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Variant&in) const", asMETHODPR(Variant, operator==, (const Variant &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(int rhs) const | File: ../Core/Variant.h | Line: 842
+    engine->RegisterObjectMethod("Variant", "bool opEquals(int) const", asMETHODPR(Variant, operator==, (int) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(unsigned rhs) const | File: ../Core/Variant.h | Line: 845
+    engine->RegisterObjectMethod("Variant", "bool opEquals(uint) const", asMETHODPR(Variant, operator==, (unsigned) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(long long rhs) const | File: ../Core/Variant.h | Line: 848
+    engine->RegisterObjectMethod("Variant", "bool opEquals(int64) const", asMETHODPR(Variant, operator==, (long long) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(unsigned long long rhs) const | File: ../Core/Variant.h | Line: 851
+    engine->RegisterObjectMethod("Variant", "bool opEquals(uint64) const", asMETHODPR(Variant, operator==, (unsigned long long) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(bool rhs) const | File: ../Core/Variant.h | Line: 854
+    engine->RegisterObjectMethod("Variant", "bool opEquals(bool) const", asMETHODPR(Variant, operator==, (bool) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(float rhs) const | File: ../Core/Variant.h | Line: 857
+    engine->RegisterObjectMethod("Variant", "bool opEquals(float) const", asMETHODPR(Variant, operator==, (float) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(double rhs) const | File: ../Core/Variant.h | Line: 860
+    engine->RegisterObjectMethod("Variant", "bool opEquals(double) const", asMETHODPR(Variant, operator==, (double) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Vector2 &rhs) const | File: ../Core/Variant.h | Line: 863
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector2&in) const", asMETHODPR(Variant, operator==, (const Vector2 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Vector3 &rhs) const | File: ../Core/Variant.h | Line: 869
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector3&in) const", asMETHODPR(Variant, operator==, (const Vector3 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Vector4 &rhs) const | File: ../Core/Variant.h | Line: 875
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector4&in) const", asMETHODPR(Variant, operator==, (const Vector4 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Quaternion &rhs) const | File: ../Core/Variant.h | Line: 881
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Quaternion&in) const", asMETHODPR(Variant, operator==, (const Quaternion &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Color &rhs) const | File: ../Core/Variant.h | Line: 887
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Color&in) const", asMETHODPR(Variant, operator==, (const Color &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const String &rhs) const | File: ../Core/Variant.h | Line: 893
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const String&in) const", asMETHODPR(Variant, operator==, (const String &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const ResourceRef &rhs) const | File: ../Core/Variant.h | Line: 918
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const ResourceRef&in) const", asMETHODPR(Variant, operator==, (const ResourceRef &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const ResourceRefList &rhs) const | File: ../Core/Variant.h | Line: 924
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const ResourceRefList&in) const", asMETHODPR(Variant, operator==, (const ResourceRefList &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const VariantMap &rhs) const | File: ../Core/Variant.h | Line: 944
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const VariantMap&in) const", asMETHODPR(Variant, operator==, (const VariantMap &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Rect &rhs) const | File: ../Core/Variant.h | Line: 950
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Rect&in) const", asMETHODPR(Variant, operator==, (const Rect &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const IntRect &rhs) const | File: ../Core/Variant.h | Line: 956
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const IntRect&in) const", asMETHODPR(Variant, operator==, (const IntRect &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const IntVector2 &rhs) const | File: ../Core/Variant.h | Line: 962
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const IntVector2&in) const", asMETHODPR(Variant, operator==, (const IntVector2 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const IntVector3 &rhs) const | File: ../Core/Variant.h | Line: 968
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const IntVector3&in) const", asMETHODPR(Variant, operator==, (const IntVector3 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const StringHash &rhs) const | File: ../Core/Variant.h | Line: 974
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const StringHash&in) const", asMETHODPR(Variant, operator==, (const StringHash &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(RefCounted *rhs) const | File: ../Core/Variant.h | Line: 977
+    engine->RegisterObjectMethod("Variant", "bool opEquals(RefCounted@+) const", asMETHODPR(Variant, operator==, (RefCounted *) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Matrix3 &rhs) const | File: ../Core/Variant.h | Line: 988
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix3&in) const", asMETHODPR(Variant, operator==, (const Matrix3 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Matrix3x4 &rhs) const | File: ../Core/Variant.h | Line: 994
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix3x4&in) const", asMETHODPR(Variant, operator==, (const Matrix3x4 &) const, bool), asCALL_THISCALL);
+    // bool Variant::operator==(const Matrix4 &rhs) const | File: ../Core/Variant.h | Line: 1000
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix4&in) const", asMETHODPR(Variant, operator==, (const Matrix4 &) const, bool), asCALL_THISCALL);
+    // String Variant::ToString() const | File: ../Core/Variant.h | Line: 1395
+    engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHODPR(Variant, ToString, () const, String), asCALL_THISCALL);
+    // Variant::Variant()=default | File: ../Core/Variant.h | Line: 333
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Variant_Variant_333_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(int value) | File: ../Core/Variant.h | Line: 336
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(Variant_Variant_336_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(long long value) | File: ../Core/Variant.h | Line: 342
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(int64)", asFUNCTION(Variant_Variant_342_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(unsigned value) | File: ../Core/Variant.h | Line: 348
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(Variant_Variant_348_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(unsigned long long value) | File: ../Core/Variant.h | Line: 354
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(uint64)", asFUNCTION(Variant_Variant_354_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const StringHash &value) | File: ../Core/Variant.h | Line: 360
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(Variant_Variant_360_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(bool value) | File: ../Core/Variant.h | Line: 366
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(Variant_Variant_366_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(float value) | File: ../Core/Variant.h | Line: 372
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(Variant_Variant_372_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(double value) | File: ../Core/Variant.h | Line: 378
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(double)", asFUNCTION(Variant_Variant_378_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Vector2 &value) | File: ../Core/Variant.h | Line: 384
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(Variant_Variant_384_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Vector3 &value) | File: ../Core/Variant.h | Line: 390
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(Variant_Variant_390_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Vector4 &value) | File: ../Core/Variant.h | Line: 396
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(Variant_Variant_396_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Quaternion &value) | File: ../Core/Variant.h | Line: 402
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Quaternion&in)", asFUNCTION(Variant_Variant_402_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Color &value) | File: ../Core/Variant.h | Line: 408
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Color&in)", asFUNCTION(Variant_Variant_408_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const String &value) | File: ../Core/Variant.h | Line: 414
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(Variant_Variant_414_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const ResourceRef &value) | File: ../Core/Variant.h | Line: 448
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(Variant_Variant_448_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const ResourceRefList &value) | File: ../Core/Variant.h | Line: 454
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ResourceRefList&in)", asFUNCTION(Variant_Variant_454_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const VariantMap &value) | File: ../Core/Variant.h | Line: 467
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(Variant_Variant_467_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Rect &value) | File: ../Core/Variant.h | Line: 480
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Rect&in)", asFUNCTION(Variant_Variant_480_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const IntRect &value) | File: ../Core/Variant.h | Line: 486
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntRect&in)", asFUNCTION(Variant_Variant_486_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const IntVector2 &value) | File: ../Core/Variant.h | Line: 492
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(Variant_Variant_492_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const IntVector3 &value) | File: ../Core/Variant.h | Line: 498
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", asFUNCTION(Variant_Variant_498_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(RefCounted *value) | File: ../Core/Variant.h | Line: 504
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(RefCounted@+)", asFUNCTION(Variant_Variant_504_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Matrix3 &value) | File: ../Core/Variant.h | Line: 510
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(Variant_Variant_510_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Matrix3x4 &value) | File: ../Core/Variant.h | Line: 516
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Matrix3x4&in)", asFUNCTION(Variant_Variant_516_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Matrix4 &value) | File: ../Core/Variant.h | Line: 522
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Matrix4&in)", asFUNCTION(Variant_Variant_522_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const String &type, const String &value) | File: ../Core/Variant.h | Line: 535
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const String&in, const String&in)", asFUNCTION(Variant_Variant_535_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(VariantType type, const String &value) | File: ../Core/Variant.h | Line: 541
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(VariantType, const String&in)", asFUNCTION(Variant_Variant_541_5), asCALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Variant &value) | File: ../Core/Variant.h | Line: 561
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Variant&in)", asFUNCTION(Variant_Variant_561_5), asCALL_CDECL_OBJFIRST);
+    // Variant::~Variant() | File: ../Core/Variant.h | Line: 567
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Variant_Destructor_Variant_567_5), asCALL_CDECL_OBJFIRST);
 
     // float Vector2::x_ | File: ../Math/Vector2.h | Line: 381
     engine->RegisterObjectProperty("Vector2", "float x", offsetof(Vector2, x_));
@@ -3381,8 +3792,6 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h | Line: 56
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_56_5), asCALL_CDECL_OBJFIRST);
 
-    // ResourceRef& ResourceRef::operator=(const ResourceRef&) | Implicitly-declared
-    engine->RegisterObjectMethod("ResourceRef", "ResourceRef& opAssign(const ResourceRef&in)", asMETHODPR(ResourceRef, operator=, (const ResourceRef&), ResourceRef&), asCALL_THISCALL);
     // String ResourceRef::name_ | File: ../Core/Variant.h | Line: 129
     engine->RegisterObjectProperty("ResourceRef", "String name", offsetof(ResourceRef, name_));
     // StringHash ResourceRef::type_ | File: ../Core/Variant.h | Line: 127
@@ -3399,19 +3808,21 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const String&in, const String&in)", asFUNCTION(ResourceRef_ResourceRef_109_5), asCALL_CDECL_OBJFIRST);
     // ResourceRef::ResourceRef(const ResourceRef &rhs)=default | File: ../Core/Variant.h | Line: 124
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ResourceRef_ResourceRef_124_5), asCALL_CDECL_OBJFIRST);
+    // ResourceRef& ResourceRef::operator=(const ResourceRef&) | Implicitly-declared
+    engine->RegisterObjectMethod("ResourceRef", "ResourceRef& opAssign(const ResourceRef&in)", asMETHODPR(ResourceRef, operator=, (const ResourceRef&), ResourceRef&), asCALL_THISCALL);
 
-    // ResourceRefList::~ResourceRefList() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ResourceRefList_Destructor), asCALL_CDECL_OBJFIRST);
-    // ResourceRefList& ResourceRefList::operator=(const ResourceRefList&) | Implicitly-declared
-    engine->RegisterObjectMethod("ResourceRefList", "ResourceRefList& opAssign(const ResourceRefList&in)", asMETHODPR(ResourceRefList, operator=, (const ResourceRefList&), ResourceRefList&), asCALL_THISCALL);
     // StringHash ResourceRefList::type_ | File: ../Core/Variant.h | Line: 159
     engine->RegisterObjectProperty("ResourceRefList", "StringHash type", offsetof(ResourceRefList, type_));
-    // bool ResourceRefList::operator==(const ResourceRefList &rhs) const | File: ../Core/Variant.h | Line: 165
+    // bool ResourceRefList::operator==(const ResourceRefList &rhs) const | File: ../Core/Variant.h | Line: 166
     engine->RegisterObjectMethod("ResourceRefList", "bool opEquals(const ResourceRefList&in) const", asMETHODPR(ResourceRefList, operator==, (const ResourceRefList &) const, bool), asCALL_THISCALL);
     // ResourceRefList::ResourceRefList()=default | File: ../Core/Variant.h | Line: 142
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ResourceRefList_ResourceRefList_142_5), asCALL_CDECL_OBJFIRST);
     // ResourceRefList::ResourceRefList(StringHash type) | File: ../Core/Variant.h | Line: 145
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f(StringHash)", asFUNCTION(ResourceRefList_ResourceRefList_145_14), asCALL_CDECL_OBJFIRST);
+    // ResourceRefList::~ResourceRefList() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ResourceRefList_Destructor), asCALL_CDECL_OBJFIRST);
+    // ResourceRefList& ResourceRefList::operator=(const ResourceRefList&) | Implicitly-declared
+    engine->RegisterObjectMethod("ResourceRefList", "ResourceRefList& opAssign(const ResourceRefList&in)", asMETHODPR(ResourceRefList, operator=, (const ResourceRefList&), ResourceRefList&), asCALL_THISCALL);
 
 }
 
