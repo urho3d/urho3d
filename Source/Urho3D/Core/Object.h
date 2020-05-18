@@ -156,7 +156,6 @@ public:
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
     /// Return active event sender. Null outside event handling.
-    /// @notproperty
     Object* GetEventSender() const;
     /// Return active event handler. Null outside event handling.
     /// @nobind

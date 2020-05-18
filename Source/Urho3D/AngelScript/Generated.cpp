@@ -2707,43 +2707,43 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     // Matrix3 Matrix3::Transpose() const | File: ../Math/Matrix3.h | Line: 214
     engine->RegisterObjectMethod("Matrix3", "Matrix3 Transpose() const", asMETHODPR(Matrix3, Transpose, () const, Matrix3), asCALL_THISCALL);
 
-    // float Matrix3x4::m00_ | File: ../Math/Matrix3x4.h | Line: 699
+    // float Matrix3x4::m00_ | File: ../Math/Matrix3x4.h | Line: 697
     engine->RegisterObjectProperty("Matrix3x4", "float m00", offsetof(Matrix3x4, m00_));
-    // float Matrix3x4::m01_ | File: ../Math/Matrix3x4.h | Line: 700
+    // float Matrix3x4::m01_ | File: ../Math/Matrix3x4.h | Line: 698
     engine->RegisterObjectProperty("Matrix3x4", "float m01", offsetof(Matrix3x4, m01_));
-    // float Matrix3x4::m02_ | File: ../Math/Matrix3x4.h | Line: 701
+    // float Matrix3x4::m02_ | File: ../Math/Matrix3x4.h | Line: 699
     engine->RegisterObjectProperty("Matrix3x4", "float m02", offsetof(Matrix3x4, m02_));
-    // float Matrix3x4::m03_ | File: ../Math/Matrix3x4.h | Line: 702
+    // float Matrix3x4::m03_ | File: ../Math/Matrix3x4.h | Line: 700
     engine->RegisterObjectProperty("Matrix3x4", "float m03", offsetof(Matrix3x4, m03_));
-    // float Matrix3x4::m10_ | File: ../Math/Matrix3x4.h | Line: 703
+    // float Matrix3x4::m10_ | File: ../Math/Matrix3x4.h | Line: 701
     engine->RegisterObjectProperty("Matrix3x4", "float m10", offsetof(Matrix3x4, m10_));
-    // float Matrix3x4::m11_ | File: ../Math/Matrix3x4.h | Line: 704
+    // float Matrix3x4::m11_ | File: ../Math/Matrix3x4.h | Line: 702
     engine->RegisterObjectProperty("Matrix3x4", "float m11", offsetof(Matrix3x4, m11_));
-    // float Matrix3x4::m12_ | File: ../Math/Matrix3x4.h | Line: 705
+    // float Matrix3x4::m12_ | File: ../Math/Matrix3x4.h | Line: 703
     engine->RegisterObjectProperty("Matrix3x4", "float m12", offsetof(Matrix3x4, m12_));
-    // float Matrix3x4::m13_ | File: ../Math/Matrix3x4.h | Line: 706
+    // float Matrix3x4::m13_ | File: ../Math/Matrix3x4.h | Line: 704
     engine->RegisterObjectProperty("Matrix3x4", "float m13", offsetof(Matrix3x4, m13_));
-    // float Matrix3x4::m20_ | File: ../Math/Matrix3x4.h | Line: 707
+    // float Matrix3x4::m20_ | File: ../Math/Matrix3x4.h | Line: 705
     engine->RegisterObjectProperty("Matrix3x4", "float m20", offsetof(Matrix3x4, m20_));
-    // float Matrix3x4::m21_ | File: ../Math/Matrix3x4.h | Line: 708
+    // float Matrix3x4::m21_ | File: ../Math/Matrix3x4.h | Line: 706
     engine->RegisterObjectProperty("Matrix3x4", "float m21", offsetof(Matrix3x4, m21_));
-    // float Matrix3x4::m22_ | File: ../Math/Matrix3x4.h | Line: 709
+    // float Matrix3x4::m22_ | File: ../Math/Matrix3x4.h | Line: 707
     engine->RegisterObjectProperty("Matrix3x4", "float m22", offsetof(Matrix3x4, m22_));
-    // float Matrix3x4::m23_ | File: ../Math/Matrix3x4.h | Line: 710
+    // float Matrix3x4::m23_ | File: ../Math/Matrix3x4.h | Line: 708
     engine->RegisterObjectProperty("Matrix3x4", "float m23", offsetof(Matrix3x4, m23_));
-    // Vector3 Matrix3x4::Column(unsigned j) const | File: ../Math/Matrix3x4.h | Line: 670
+    // Vector3 Matrix3x4::Column(unsigned j) const | File: ../Math/Matrix3x4.h | Line: 668
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 Column(uint) const", asMETHODPR(Matrix3x4, Column, (unsigned) const, Vector3), asCALL_THISCALL);
-    // void Matrix3x4::Decompose(Vector3 &translation, Quaternion &rotation, Vector3 &scale) const | File: ../Math/Matrix3x4.h | Line: 654
+    // void Matrix3x4::Decompose(Vector3 &translation, Quaternion &rotation, Vector3 &scale) const | File: ../Math/Matrix3x4.h | Line: 652
     engine->RegisterObjectMethod("Matrix3x4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix3x4, Decompose, (Vector3 &, Quaternion &, Vector3 &) const, void), asCALL_THISCALL);
-    // float Matrix3x4::Element(unsigned i, unsigned j) const | File: ../Math/Matrix3x4.h | Line: 664
+    // float Matrix3x4::Element(unsigned i, unsigned j) const | File: ../Math/Matrix3x4.h | Line: 662
     engine->RegisterObjectMethod("Matrix3x4", "float Element(uint, uint) const", asMETHODPR(Matrix3x4, Element, (unsigned, unsigned) const, float), asCALL_THISCALL);
-    // bool Matrix3x4::Equals(const Matrix3x4 &rhs) const | File: ../Math/Matrix3x4.h | Line: 639
+    // bool Matrix3x4::Equals(const Matrix3x4 &rhs) const | File: ../Math/Matrix3x4.h | Line: 637
     engine->RegisterObjectMethod("Matrix3x4", "bool Equals(const Matrix3x4&in) const", asMETHODPR(Matrix3x4, Equals, (const Matrix3x4 &) const, bool), asCALL_THISCALL);
-    // Matrix3x4 Matrix3x4::Inverse() const | File: ../Math/Matrix3x4.h | Line: 657
+    // Matrix3x4 Matrix3x4::Inverse() const | File: ../Math/Matrix3x4.h | Line: 655
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 Inverse() const", asMETHODPR(Matrix3x4, Inverse, () const, Matrix3x4), asCALL_THISCALL);
-    // bool Matrix3x4::IsInf() const | File: ../Math/Matrix3x4.h | Line: 685
+    // bool Matrix3x4::IsInf() const | File: ../Math/Matrix3x4.h | Line: 683
     engine->RegisterObjectMethod("Matrix3x4", "bool IsInf() const", asMETHODPR(Matrix3x4, IsInf, () const, bool), asCALL_THISCALL);
-    // bool Matrix3x4::IsNaN() const | File: ../Math/Matrix3x4.h | Line: 673
+    // bool Matrix3x4::IsNaN() const | File: ../Math/Matrix3x4.h | Line: 671
     engine->RegisterObjectMethod("Matrix3x4", "bool IsNaN() const", asMETHODPR(Matrix3x4, IsNaN, () const, bool), asCALL_THISCALL);
     // Matrix3x4::Matrix3x4() noexcept | File: ../Math/Matrix3x4.h | Line: 39
     engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Matrix3x4_Matrix3x4_39_5), asCALL_CDECL_OBJFIRST);
@@ -2781,78 +2781,78 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4& opAssign(const Matrix4&in)", asMETHODPR(Matrix3x4, operator=, (const Matrix4 &), Matrix3x4 &), asCALL_THISCALL);
     // bool Matrix3x4::operator==(const Matrix3x4 &rhs) const | File: ../Math/Matrix3x4.h | Line: 224
     engine->RegisterObjectMethod("Matrix3x4", "bool opEquals(const Matrix3x4&in) const", asMETHODPR(Matrix3x4, operator==, (const Matrix3x4 &) const, bool), asCALL_THISCALL);
-    // Quaternion Matrix3x4::Rotation() const | File: ../Math/Matrix3x4.h | Line: 616
+    // Quaternion Matrix3x4::Rotation() const | File: ../Math/Matrix3x4.h | Line: 614
     engine->RegisterObjectMethod("Matrix3x4", "Quaternion Rotation() const", asMETHODPR(Matrix3x4, Rotation, () const, Quaternion), asCALL_THISCALL);
-    // Matrix3 Matrix3x4::RotationMatrix() const | File: ../Math/Matrix3x4.h | Line: 594
+    // Matrix3 Matrix3x4::RotationMatrix() const | File: ../Math/Matrix3x4.h | Line: 592
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3 RotationMatrix() const", asMETHODPR(Matrix3x4, RotationMatrix, () const, Matrix3), asCALL_THISCALL);
-    // Vector4 Matrix3x4::Row(unsigned i) const | File: ../Math/Matrix3x4.h | Line: 667
+    // Vector4 Matrix3x4::Row(unsigned i) const | File: ../Math/Matrix3x4.h | Line: 665
     engine->RegisterObjectMethod("Matrix3x4", "Vector4 Row(uint) const", asMETHODPR(Matrix3x4, Row, (unsigned) const, Vector4), asCALL_THISCALL);
-    // Vector3 Matrix3x4::Scale() const | File: ../Math/Matrix3x4.h | Line: 619
+    // Vector3 Matrix3x4::Scale() const | File: ../Math/Matrix3x4.h | Line: 617
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 Scale() const", asMETHODPR(Matrix3x4, Scale, () const, Vector3), asCALL_THISCALL);
-    // void Matrix3x4::SetRotation(const Matrix3 &rotation) | File: ../Math/Matrix3x4.h | Line: 515
+    // void Matrix3x4::SetRotation(const Matrix3 &rotation) | File: ../Math/Matrix3x4.h | Line: 513
     engine->RegisterObjectMethod("Matrix3x4", "void SetRotation(const Matrix3&in)", asMETHODPR(Matrix3x4, SetRotation, (const Matrix3 &), void), asCALL_THISCALL);
-    // void Matrix3x4::SetScale(const Vector3 &scale) | File: ../Math/Matrix3x4.h | Line: 529
+    // void Matrix3x4::SetScale(const Vector3 &scale) | File: ../Math/Matrix3x4.h | Line: 527
     engine->RegisterObjectMethod("Matrix3x4", "void SetScale(const Vector3&in)", asMETHODPR(Matrix3x4, SetScale, (const Vector3 &), void), asCALL_THISCALL);
-    // void Matrix3x4::SetScale(float scale) | File: ../Math/Matrix3x4.h | Line: 537
+    // void Matrix3x4::SetScale(float scale) | File: ../Math/Matrix3x4.h | Line: 535
     engine->RegisterObjectMethod("Matrix3x4", "void SetScale(float)", asMETHODPR(Matrix3x4, SetScale, (float), void), asCALL_THISCALL);
-    // void Matrix3x4::SetTranslation(const Vector3 &translation) | File: ../Math/Matrix3x4.h | Line: 506
+    // void Matrix3x4::SetTranslation(const Vector3 &translation) | File: ../Math/Matrix3x4.h | Line: 505
     engine->RegisterObjectMethod("Matrix3x4", "void SetTranslation(const Vector3&in)", asMETHODPR(Matrix3x4, SetTranslation, (const Vector3 &), void), asCALL_THISCALL);
-    // Vector3 Matrix3x4::SignedScale(const Matrix3 &rotation) const | File: ../Math/Matrix3x4.h | Line: 629
+    // Vector3 Matrix3x4::SignedScale(const Matrix3 &rotation) const | File: ../Math/Matrix3x4.h | Line: 627
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 SignedScale(const Matrix3&in) const", asMETHODPR(Matrix3x4, SignedScale, (const Matrix3 &) const, Vector3), asCALL_THISCALL);
-    // Matrix3 Matrix3x4::ToMatrix3() const | File: ../Math/Matrix3x4.h | Line: 545
+    // Matrix3 Matrix3x4::ToMatrix3() const | File: ../Math/Matrix3x4.h | Line: 543
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3 ToMatrix3() const", asMETHODPR(Matrix3x4, ToMatrix3, () const, Matrix3), asCALL_THISCALL);
-    // Matrix4 Matrix3x4::ToMatrix4() const | File: ../Math/Matrix3x4.h | Line: 561
+    // Matrix4 Matrix3x4::ToMatrix4() const | File: ../Math/Matrix3x4.h | Line: 559
     engine->RegisterObjectMethod("Matrix3x4", "Matrix4 ToMatrix4() const", asMETHODPR(Matrix3x4, ToMatrix4, () const, Matrix4), asCALL_THISCALL);
-    // String Matrix3x4::ToString() const | File: ../Math/Matrix3x4.h | Line: 697
+    // String Matrix3x4::ToString() const | File: ../Math/Matrix3x4.h | Line: 695
     engine->RegisterObjectMethod("Matrix3x4", "String ToString() const", asMETHODPR(Matrix3x4, ToString, () const, String), asCALL_THISCALL);
-    // Vector3 Matrix3x4::Translation() const | File: ../Math/Matrix3x4.h | Line: 606
+    // Vector3 Matrix3x4::Translation() const | File: ../Math/Matrix3x4.h | Line: 604
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 Translation() const", asMETHODPR(Matrix3x4, Translation, () const, Vector3), asCALL_THISCALL);
 
-    // float Matrix4::m00_ | File: ../Math/Matrix4.h | Line: 681
+    // float Matrix4::m00_ | File: ../Math/Matrix4.h | Line: 679
     engine->RegisterObjectProperty("Matrix4", "float m00", offsetof(Matrix4, m00_));
-    // float Matrix4::m01_ | File: ../Math/Matrix4.h | Line: 682
+    // float Matrix4::m01_ | File: ../Math/Matrix4.h | Line: 680
     engine->RegisterObjectProperty("Matrix4", "float m01", offsetof(Matrix4, m01_));
-    // float Matrix4::m02_ | File: ../Math/Matrix4.h | Line: 683
+    // float Matrix4::m02_ | File: ../Math/Matrix4.h | Line: 681
     engine->RegisterObjectProperty("Matrix4", "float m02", offsetof(Matrix4, m02_));
-    // float Matrix4::m03_ | File: ../Math/Matrix4.h | Line: 684
+    // float Matrix4::m03_ | File: ../Math/Matrix4.h | Line: 682
     engine->RegisterObjectProperty("Matrix4", "float m03", offsetof(Matrix4, m03_));
-    // float Matrix4::m10_ | File: ../Math/Matrix4.h | Line: 685
+    // float Matrix4::m10_ | File: ../Math/Matrix4.h | Line: 683
     engine->RegisterObjectProperty("Matrix4", "float m10", offsetof(Matrix4, m10_));
-    // float Matrix4::m11_ | File: ../Math/Matrix4.h | Line: 686
+    // float Matrix4::m11_ | File: ../Math/Matrix4.h | Line: 684
     engine->RegisterObjectProperty("Matrix4", "float m11", offsetof(Matrix4, m11_));
-    // float Matrix4::m12_ | File: ../Math/Matrix4.h | Line: 687
+    // float Matrix4::m12_ | File: ../Math/Matrix4.h | Line: 685
     engine->RegisterObjectProperty("Matrix4", "float m12", offsetof(Matrix4, m12_));
-    // float Matrix4::m13_ | File: ../Math/Matrix4.h | Line: 688
+    // float Matrix4::m13_ | File: ../Math/Matrix4.h | Line: 686
     engine->RegisterObjectProperty("Matrix4", "float m13", offsetof(Matrix4, m13_));
-    // float Matrix4::m20_ | File: ../Math/Matrix4.h | Line: 689
+    // float Matrix4::m20_ | File: ../Math/Matrix4.h | Line: 687
     engine->RegisterObjectProperty("Matrix4", "float m20", offsetof(Matrix4, m20_));
-    // float Matrix4::m21_ | File: ../Math/Matrix4.h | Line: 690
+    // float Matrix4::m21_ | File: ../Math/Matrix4.h | Line: 688
     engine->RegisterObjectProperty("Matrix4", "float m21", offsetof(Matrix4, m21_));
-    // float Matrix4::m22_ | File: ../Math/Matrix4.h | Line: 691
+    // float Matrix4::m22_ | File: ../Math/Matrix4.h | Line: 689
     engine->RegisterObjectProperty("Matrix4", "float m22", offsetof(Matrix4, m22_));
-    // float Matrix4::m23_ | File: ../Math/Matrix4.h | Line: 692
+    // float Matrix4::m23_ | File: ../Math/Matrix4.h | Line: 690
     engine->RegisterObjectProperty("Matrix4", "float m23", offsetof(Matrix4, m23_));
-    // float Matrix4::m30_ | File: ../Math/Matrix4.h | Line: 693
+    // float Matrix4::m30_ | File: ../Math/Matrix4.h | Line: 691
     engine->RegisterObjectProperty("Matrix4", "float m30", offsetof(Matrix4, m30_));
-    // float Matrix4::m31_ | File: ../Math/Matrix4.h | Line: 694
+    // float Matrix4::m31_ | File: ../Math/Matrix4.h | Line: 692
     engine->RegisterObjectProperty("Matrix4", "float m31", offsetof(Matrix4, m31_));
-    // float Matrix4::m32_ | File: ../Math/Matrix4.h | Line: 695
+    // float Matrix4::m32_ | File: ../Math/Matrix4.h | Line: 693
     engine->RegisterObjectProperty("Matrix4", "float m32", offsetof(Matrix4, m32_));
-    // float Matrix4::m33_ | File: ../Math/Matrix4.h | Line: 696
+    // float Matrix4::m33_ | File: ../Math/Matrix4.h | Line: 694
     engine->RegisterObjectProperty("Matrix4", "float m33", offsetof(Matrix4, m33_));
-    // Vector4 Matrix4::Column(unsigned j) const | File: ../Math/Matrix4.h | Line: 652
+    // Vector4 Matrix4::Column(unsigned j) const | File: ../Math/Matrix4.h | Line: 650
     engine->RegisterObjectMethod("Matrix4", "Vector4 Column(uint) const", asMETHODPR(Matrix4, Column, (unsigned) const, Vector4), asCALL_THISCALL);
-    // void Matrix4::Decompose(Vector3 &translation, Quaternion &rotation, Vector3 &scale) const | File: ../Math/Matrix4.h | Line: 636
+    // void Matrix4::Decompose(Vector3 &translation, Quaternion &rotation, Vector3 &scale) const | File: ../Math/Matrix4.h | Line: 634
     engine->RegisterObjectMethod("Matrix4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix4, Decompose, (Vector3 &, Quaternion &, Vector3 &) const, void), asCALL_THISCALL);
-    // float Matrix4::Element(unsigned i, unsigned j) const | File: ../Math/Matrix4.h | Line: 646
+    // float Matrix4::Element(unsigned i, unsigned j) const | File: ../Math/Matrix4.h | Line: 644
     engine->RegisterObjectMethod("Matrix4", "float Element(uint, uint) const", asMETHODPR(Matrix4, Element, (unsigned, unsigned) const, float), asCALL_THISCALL);
-    // bool Matrix4::Equals(const Matrix4 &rhs) const | File: ../Math/Matrix4.h | Line: 621
+    // bool Matrix4::Equals(const Matrix4 &rhs) const | File: ../Math/Matrix4.h | Line: 619
     engine->RegisterObjectMethod("Matrix4", "bool Equals(const Matrix4&in) const", asMETHODPR(Matrix4, Equals, (const Matrix4 &) const, bool), asCALL_THISCALL);
-    // Matrix4 Matrix4::Inverse() const | File: ../Math/Matrix4.h | Line: 639
+    // Matrix4 Matrix4::Inverse() const | File: ../Math/Matrix4.h | Line: 637
     engine->RegisterObjectMethod("Matrix4", "Matrix4 Inverse() const", asMETHODPR(Matrix4, Inverse, () const, Matrix4), asCALL_THISCALL);
-    // bool Matrix4::IsInf() const | File: ../Math/Matrix4.h | Line: 667
+    // bool Matrix4::IsInf() const | File: ../Math/Matrix4.h | Line: 665
     engine->RegisterObjectMethod("Matrix4", "bool IsInf() const", asMETHODPR(Matrix4, IsInf, () const, bool), asCALL_THISCALL);
-    // bool Matrix4::IsNaN() const | File: ../Math/Matrix4.h | Line: 655
+    // bool Matrix4::IsNaN() const | File: ../Math/Matrix4.h | Line: 653
     engine->RegisterObjectMethod("Matrix4", "bool IsNaN() const", asMETHODPR(Matrix4, IsNaN, () const, bool), asCALL_THISCALL);
     // Matrix4::Matrix4() noexcept | File: ../Math/Matrix4.h | Line: 42
     engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Matrix4_Matrix4_42_5), asCALL_CDECL_OBJFIRST);
@@ -2882,31 +2882,31 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix4", "Matrix4& opAssign(const Matrix3&in)", asMETHODPR(Matrix4, operator=, (const Matrix3 &), Matrix4 &), asCALL_THISCALL);
     // bool Matrix4::operator==(const Matrix4 &rhs) const | File: ../Math/Matrix4.h | Line: 226
     engine->RegisterObjectMethod("Matrix4", "bool opEquals(const Matrix4&in) const", asMETHODPR(Matrix4, operator==, (const Matrix4 &) const, bool), asCALL_THISCALL);
-    // Quaternion Matrix4::Rotation() const | File: ../Math/Matrix4.h | Line: 561
+    // Quaternion Matrix4::Rotation() const | File: ../Math/Matrix4.h | Line: 559
     engine->RegisterObjectMethod("Matrix4", "Quaternion Rotation() const", asMETHODPR(Matrix4, Rotation, () const, Quaternion), asCALL_THISCALL);
-    // Matrix3 Matrix4::RotationMatrix() const | File: ../Math/Matrix4.h | Line: 539
+    // Matrix3 Matrix4::RotationMatrix() const | File: ../Math/Matrix4.h | Line: 537
     engine->RegisterObjectMethod("Matrix4", "Matrix3 RotationMatrix() const", asMETHODPR(Matrix4, RotationMatrix, () const, Matrix3), asCALL_THISCALL);
-    // Vector4 Matrix4::Row(unsigned i) const | File: ../Math/Matrix4.h | Line: 649
+    // Vector4 Matrix4::Row(unsigned i) const | File: ../Math/Matrix4.h | Line: 647
     engine->RegisterObjectMethod("Matrix4", "Vector4 Row(uint) const", asMETHODPR(Matrix4, Row, (unsigned) const, Vector4), asCALL_THISCALL);
-    // Vector3 Matrix4::Scale() const | File: ../Math/Matrix4.h | Line: 564
+    // Vector3 Matrix4::Scale() const | File: ../Math/Matrix4.h | Line: 562
     engine->RegisterObjectMethod("Matrix4", "Vector3 Scale() const", asMETHODPR(Matrix4, Scale, () const, Vector3), asCALL_THISCALL);
-    // void Matrix4::SetRotation(const Matrix3 &rotation) | File: ../Math/Matrix4.h | Line: 493
+    // void Matrix4::SetRotation(const Matrix3 &rotation) | File: ../Math/Matrix4.h | Line: 491
     engine->RegisterObjectMethod("Matrix4", "void SetRotation(const Matrix3&in)", asMETHODPR(Matrix4, SetRotation, (const Matrix3 &), void), asCALL_THISCALL);
-    // void Matrix4::SetScale(const Vector3 &scale) | File: ../Math/Matrix4.h | Line: 507
+    // void Matrix4::SetScale(const Vector3 &scale) | File: ../Math/Matrix4.h | Line: 505
     engine->RegisterObjectMethod("Matrix4", "void SetScale(const Vector3&in)", asMETHODPR(Matrix4, SetScale, (const Vector3 &), void), asCALL_THISCALL);
-    // void Matrix4::SetScale(float scale) | File: ../Math/Matrix4.h | Line: 515
+    // void Matrix4::SetScale(float scale) | File: ../Math/Matrix4.h | Line: 513
     engine->RegisterObjectMethod("Matrix4", "void SetScale(float)", asMETHODPR(Matrix4, SetScale, (float), void), asCALL_THISCALL);
-    // void Matrix4::SetTranslation(const Vector3 &translation) | File: ../Math/Matrix4.h | Line: 484
+    // void Matrix4::SetTranslation(const Vector3 &translation) | File: ../Math/Matrix4.h | Line: 483
     engine->RegisterObjectMethod("Matrix4", "void SetTranslation(const Vector3&in)", asMETHODPR(Matrix4, SetTranslation, (const Vector3 &), void), asCALL_THISCALL);
-    // Vector3 Matrix4::SignedScale(const Matrix3 &rotation) const | File: ../Math/Matrix4.h | Line: 574
+    // Vector3 Matrix4::SignedScale(const Matrix3 &rotation) const | File: ../Math/Matrix4.h | Line: 572
     engine->RegisterObjectMethod("Matrix4", "Vector3 SignedScale(const Matrix3&in) const", asMETHODPR(Matrix4, SignedScale, (const Matrix3 &) const, Vector3), asCALL_THISCALL);
-    // Matrix3 Matrix4::ToMatrix3() const | File: ../Math/Matrix4.h | Line: 523
+    // Matrix3 Matrix4::ToMatrix3() const | File: ../Math/Matrix4.h | Line: 521
     engine->RegisterObjectMethod("Matrix4", "Matrix3 ToMatrix3() const", asMETHODPR(Matrix4, ToMatrix3, () const, Matrix3), asCALL_THISCALL);
-    // String Matrix4::ToString() const | File: ../Math/Matrix4.h | Line: 679
+    // String Matrix4::ToString() const | File: ../Math/Matrix4.h | Line: 677
     engine->RegisterObjectMethod("Matrix4", "String ToString() const", asMETHODPR(Matrix4, ToString, () const, String), asCALL_THISCALL);
-    // Vector3 Matrix4::Translation() const | File: ../Math/Matrix4.h | Line: 551
+    // Vector3 Matrix4::Translation() const | File: ../Math/Matrix4.h | Line: 549
     engine->RegisterObjectMethod("Matrix4", "Vector3 Translation() const", asMETHODPR(Matrix4, Translation, () const, Vector3), asCALL_THISCALL);
-    // Matrix4 Matrix4::Transpose() const | File: ../Math/Matrix4.h | Line: 584
+    // Matrix4 Matrix4::Transpose() const | File: ../Math/Matrix4.h | Line: 582
     engine->RegisterObjectMethod("Matrix4", "Matrix4 Transpose() const", asMETHODPR(Matrix4, Transpose, () const, Matrix4), asCALL_THISCALL);
 
     // Vector3 Plane::absNormal_ | File: ../Math/Plane.h | Line: 122
@@ -3322,61 +3322,61 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "void FromString(const String&in, const String&in)", asMETHODPR(Variant, FromString, (const String &, const String &), void), asCALL_THISCALL);
     // void Variant::FromString(VariantType type, const String &value) | File: ../Core/Variant.h | Line: 1101
     engine->RegisterObjectMethod("Variant", "void FromString(VariantType, const String&in)", asMETHODPR(Variant, FromString, (VariantType, const String &), void), asCALL_THISCALL);
-    // bool Variant::GetBool() const | File: ../Core/Variant.h | Line: 1180
+    // bool Variant::GetBool() const | File: ../Core/Variant.h | Line: 1174
     engine->RegisterObjectMethod("Variant", "bool GetBool() const", asMETHODPR(Variant, GetBool, () const, bool), asCALL_THISCALL);
-    // const Color& Variant::GetColor() const | File: ../Core/Variant.h | Line: 1235
+    // const Color& Variant::GetColor() const | File: ../Core/Variant.h | Line: 1222
     engine->RegisterObjectMethod("Variant", "const Color& GetColor() const", asMETHODPR(Variant, GetColor, () const, const Color &), asCALL_THISCALL);
-    // double Variant::GetDouble() const | File: ../Core/Variant.h | Line: 1200
+    // double Variant::GetDouble() const | File: ../Core/Variant.h | Line: 1192
     engine->RegisterObjectMethod("Variant", "double GetDouble() const", asMETHODPR(Variant, GetDouble, () const, double), asCALL_THISCALL);
-    // float Variant::GetFloat() const | File: ../Core/Variant.h | Line: 1184
+    // float Variant::GetFloat() const | File: ../Core/Variant.h | Line: 1177
     engine->RegisterObjectMethod("Variant", "float GetFloat() const", asMETHODPR(Variant, GetFloat, () const, float), asCALL_THISCALL);
-    // int Variant::GetInt() const | File: ../Core/Variant.h | Line: 1116
+    // int Variant::GetInt() const | File: ../Core/Variant.h | Line: 1115
     engine->RegisterObjectMethod("Variant", "int GetInt() const", asMETHODPR(Variant, GetInt, () const, int), asCALL_THISCALL);
-    // long long Variant::GetInt64() const | File: ../Core/Variant.h | Line: 1130
+    // long long Variant::GetInt64() const | File: ../Core/Variant.h | Line: 1128
     engine->RegisterObjectMethod("Variant", "int64 GetInt64() const", asMETHODPR(Variant, GetInt64, () const, long long), asCALL_THISCALL);
-    // const IntRect& Variant::GetIntRect() const | File: ../Core/Variant.h | Line: 1305
+    // const IntRect& Variant::GetIntRect() const | File: ../Core/Variant.h | Line: 1286
     engine->RegisterObjectMethod("Variant", "const IntRect& GetIntRect() const", asMETHODPR(Variant, GetIntRect, () const, const IntRect &), asCALL_THISCALL);
-    // const IntVector2& Variant::GetIntVector2() const | File: ../Core/Variant.h | Line: 1309
+    // const IntVector2& Variant::GetIntVector2() const | File: ../Core/Variant.h | Line: 1289
     engine->RegisterObjectMethod("Variant", "const IntVector2& GetIntVector2() const", asMETHODPR(Variant, GetIntVector2, () const, const IntVector2 &), asCALL_THISCALL);
-    // const IntVector3& Variant::GetIntVector3() const | File: ../Core/Variant.h | Line: 1316
+    // const IntVector3& Variant::GetIntVector3() const | File: ../Core/Variant.h | Line: 1295
     engine->RegisterObjectMethod("Variant", "const IntVector3& GetIntVector3() const", asMETHODPR(Variant, GetIntVector3, () const, const IntVector3 &), asCALL_THISCALL);
-    // const Matrix3& Variant::GetMatrix3() const | File: ../Core/Variant.h | Line: 1330
+    // const Matrix3& Variant::GetMatrix3() const | File: ../Core/Variant.h | Line: 1307
     engine->RegisterObjectMethod("Variant", "const Matrix3& GetMatrix3() const", asMETHODPR(Variant, GetMatrix3, () const, const Matrix3 &), asCALL_THISCALL);
-    // const Matrix3x4& Variant::GetMatrix3x4() const | File: ../Core/Variant.h | Line: 1337
+    // const Matrix3x4& Variant::GetMatrix3x4() const | File: ../Core/Variant.h | Line: 1313
     engine->RegisterObjectMethod("Variant", "const Matrix3x4& GetMatrix3x4() const", asMETHODPR(Variant, GetMatrix3x4, () const, const Matrix3x4 &), asCALL_THISCALL);
-    // const Matrix4& Variant::GetMatrix4() const | File: ../Core/Variant.h | Line: 1344
+    // const Matrix4& Variant::GetMatrix4() const | File: ../Core/Variant.h | Line: 1319
     engine->RegisterObjectMethod("Variant", "const Matrix4& GetMatrix4() const", asMETHODPR(Variant, GetMatrix4, () const, const Matrix4 &), asCALL_THISCALL);
-    // RefCounted* Variant::GetPtr() const | File: ../Core/Variant.h | Line: 1323
+    // RefCounted* Variant::GetPtr() const | File: ../Core/Variant.h | Line: 1301
     engine->RegisterObjectMethod("Variant", "RefCounted@+ GetPtr() const", asMETHODPR(Variant, GetPtr, () const, RefCounted *), asCALL_THISCALL);
-    // const Quaternion& Variant::GetQuaternion() const | File: ../Core/Variant.h | Line: 1228
+    // const Quaternion& Variant::GetQuaternion() const | File: ../Core/Variant.h | Line: 1216
     engine->RegisterObjectMethod("Variant", "const Quaternion& GetQuaternion() const", asMETHODPR(Variant, GetQuaternion, () const, const Quaternion &), asCALL_THISCALL);
-    // const Rect& Variant::GetRect() const | File: ../Core/Variant.h | Line: 1301
+    // const Rect& Variant::GetRect() const | File: ../Core/Variant.h | Line: 1283
     engine->RegisterObjectMethod("Variant", "const Rect& GetRect() const", asMETHODPR(Variant, GetRect, () const, const Rect &), asCALL_THISCALL);
-    // const ResourceRef& Variant::GetResourceRef() const | File: ../Core/Variant.h | Line: 1266
+    // const ResourceRef& Variant::GetResourceRef() const | File: ../Core/Variant.h | Line: 1251
     engine->RegisterObjectMethod("Variant", "const ResourceRef& GetResourceRef() const", asMETHODPR(Variant, GetResourceRef, () const, const ResourceRef &), asCALL_THISCALL);
-    // const ResourceRefList& Variant::GetResourceRefList() const | File: ../Core/Variant.h | Line: 1273
+    // const ResourceRefList& Variant::GetResourceRefList() const | File: ../Core/Variant.h | Line: 1257
     engine->RegisterObjectMethod("Variant", "const ResourceRefList& GetResourceRefList() const", asMETHODPR(Variant, GetResourceRefList, () const, const ResourceRefList &), asCALL_THISCALL);
-    // const String& Variant::GetString() const | File: ../Core/Variant.h | Line: 1239
+    // const String& Variant::GetString() const | File: ../Core/Variant.h | Line: 1225
     engine->RegisterObjectMethod("Variant", "const String& GetString() const", asMETHODPR(Variant, GetString, () const, const String &), asCALL_THISCALL);
-    // StringHash Variant::GetStringHash() const | File: ../Core/Variant.h | Line: 1176
+    // StringHash Variant::GetStringHash() const | File: ../Core/Variant.h | Line: 1171
     engine->RegisterObjectMethod("Variant", "StringHash GetStringHash() const", asMETHODPR(Variant, GetStringHash, () const, StringHash), asCALL_THISCALL);
-    // VariantType Variant::GetType() const | File: ../Core/Variant.h | Line: 1389
+    // VariantType Variant::GetType() const | File: ../Core/Variant.h | Line: 1365
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHODPR(Variant, GetType, () const, VariantType), asCALL_THISCALL);
-    // String Variant::GetTypeName() const | File: ../Core/Variant.h | Line: 1393
+    // String Variant::GetTypeName() const | File: ../Core/Variant.h | Line: 1369
     engine->RegisterObjectMethod("Variant", "String get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, String), asCALL_THISCALL);
-    // unsigned Variant::GetUInt() const | File: ../Core/Variant.h | Line: 1162
+    // unsigned Variant::GetUInt() const | File: ../Core/Variant.h | Line: 1158
     engine->RegisterObjectMethod("Variant", "uint GetUInt() const", asMETHODPR(Variant, GetUInt, () const, unsigned), asCALL_THISCALL);
-    // unsigned long long Variant::GetUInt64() const | File: ../Core/Variant.h | Line: 1146
+    // unsigned long long Variant::GetUInt64() const | File: ../Core/Variant.h | Line: 1143
     engine->RegisterObjectMethod("Variant", "uint64 GetUInt64() const", asMETHODPR(Variant, GetUInt64, () const, unsigned long long), asCALL_THISCALL);
-    // const VariantMap& Variant::GetVariantMap() const | File: ../Core/Variant.h | Line: 1294
+    // const VariantMap& Variant::GetVariantMap() const | File: ../Core/Variant.h | Line: 1277
     engine->RegisterObjectMethod("Variant", "const VariantMap& GetVariantMap() const", asMETHODPR(Variant, GetVariantMap, () const, const VariantMap &), asCALL_THISCALL);
-    // const Vector2& Variant::GetVector2() const | File: ../Core/Variant.h | Line: 1216
+    // const Vector2& Variant::GetVector2() const | File: ../Core/Variant.h | Line: 1207
     engine->RegisterObjectMethod("Variant", "const Vector2& GetVector2() const", asMETHODPR(Variant, GetVector2, () const, const Vector2 &), asCALL_THISCALL);
-    // const Vector3& Variant::GetVector3() const | File: ../Core/Variant.h | Line: 1220
+    // const Vector3& Variant::GetVector3() const | File: ../Core/Variant.h | Line: 1210
     engine->RegisterObjectMethod("Variant", "const Vector3& GetVector3() const", asMETHODPR(Variant, GetVector3, () const, const Vector3 &), asCALL_THISCALL);
-    // const Vector4& Variant::GetVector4() const | File: ../Core/Variant.h | Line: 1224
+    // const Vector4& Variant::GetVector4() const | File: ../Core/Variant.h | Line: 1213
     engine->RegisterObjectMethod("Variant", "const Vector4& GetVector4() const", asMETHODPR(Variant, GetVector4, () const, const Vector4 &), asCALL_THISCALL);
-    // bool Variant::IsCustom() const | File: ../Core/Variant.h | Line: 1405
+    // bool Variant::IsCustom() const | File: ../Core/Variant.h | Line: 1381
     engine->RegisterObjectMethod("Variant", "bool IsCustom() const", asMETHODPR(Variant, IsCustom, () const, bool), asCALL_THISCALL);
     // Variant& Variant::operator=(const Variant &rhs) | File: ../Core/Variant.h | Line: 579
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Variant&in)", asMETHODPR(Variant, operator=, (const Variant &), Variant &), asCALL_THISCALL);
@@ -3482,7 +3482,7 @@ void ASRegisterGenerated(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix3x4&in) const", asMETHODPR(Variant, operator==, (const Matrix3x4 &) const, bool), asCALL_THISCALL);
     // bool Variant::operator==(const Matrix4 &rhs) const | File: ../Core/Variant.h | Line: 1000
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix4&in) const", asMETHODPR(Variant, operator==, (const Matrix4 &) const, bool), asCALL_THISCALL);
-    // String Variant::ToString() const | File: ../Core/Variant.h | Line: 1395
+    // String Variant::ToString() const | File: ../Core/Variant.h | Line: 1371
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHODPR(Variant, ToString, () const, String), asCALL_THISCALL);
     // Variant::Variant()=default | File: ../Core/Variant.h | Line: 333
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Variant_Variant_333_5), asCALL_CDECL_OBJFIRST);
