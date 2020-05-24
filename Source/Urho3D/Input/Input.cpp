@@ -153,8 +153,10 @@ EmscriptenInput::EmscriptenInput(Input* inputInst)
     inputInst_ = inputInst;
     auto* vInputInst = (void*)inputInst;
 
+#ifndef URHO3D_CUSTOM_SHELL
     // Handle pointer lock
     emscripten_set_pointerlockchange_callback(NULL, vInputInst, false, EmscriptenInput::HandlePointerLockChange);
+#endif
 
     // Handle mouse events to prevent mouse jumps
     emscripten_set_mousedown_callback(NULL, vInputInst, true, EmscriptenInput::HandleMouseJump);
@@ -172,7 +174,9 @@ void EmscriptenInput::RequestPointerLock(MouseMode mode, bool suppressEvent)
 {
     requestedMouseMode_ = mode;
     suppressMouseModeEvent_ = suppressEvent;
+#ifndef URHO3D_CUSTOM_SHELL
     emscripten_request_pointerlock(NULL, true);
+#endif
 
     EM_ASM({
         Module.RequestPointerLock();
@@ -192,7 +196,9 @@ void EmscriptenInput::ExitPointerLock(bool suppressEvent)
     if (inputInst_->IsMouseLocked())
     {
         inputInst_->emscriptenExitingPointerLock_ = true;
+#ifndef URHO3D_CUSTOM_SHELL
         emscripten_exit_pointerlock();
+#endif
     }
     EM_ASM({
         Module.ExitPointerLock();
