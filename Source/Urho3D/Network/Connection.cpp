@@ -93,6 +93,20 @@ Connection::~Connection()
     address_ = nullptr;
 }
 
+PacketType Connection::GetPacketType(bool reliable, bool inOrder)
+{
+    if (reliable && inOrder) {
+        return PT_RELIABLE_ORDERED;
+    }
+    if (reliable && !inOrder) {
+        return PT_RELIABLE_UNORDERED;
+    }
+    if (!reliable && inOrder) {
+        return PT_UNRELIABLE_ORDERED;
+    }
+    return PT_UNRELIABLE_UNORDERED;
+}
+
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
 {
     SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
@@ -106,16 +120,22 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
         URHO3D_LOGERROR("Null pointer supplied for network message data");
         return;
     }
-    
-    VectorBuffer buffer;
-    buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
-    buffer.WriteUInt((unsigned int)msgID);
-    buffer.Write(data, numBytes);
-    PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
-    if (peer_) {
-        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0, *address_, false);
-        tempPacketCounter_.y_++;
+
+    PacketType type = GetPacketType(reliable, inOrder);
+    VectorBuffer& buffer = outgoingBuffer_[type];
+
+    if (buffer.GetSize() + numBytes >= packedMessageLimit_) {
+        SendBuffer(type);
     }
+
+    if (buffer.GetSize() == 0) {
+        buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
+        buffer.WriteUInt((unsigned int)MSG_PACKED_MESSAGE);
+    }
+
+    buffer.WriteUInt((unsigned int) msgID);
+    buffer.WriteUInt(numBytes);
+    buffer.Write(data, numBytes);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -354,6 +374,40 @@ void Connection::SendPackages()
     }
 }
 
+void Connection::SendBuffer(PacketType type)
+{
+    VectorBuffer& buffer = outgoingBuffer_[type];
+    if (buffer.GetSize() == 0) {
+        return;
+    }
+
+    PacketReliability reliability = PacketReliability::UNRELIABLE;
+    if (type == PT_UNRELIABLE_ORDERED)
+        reliability = PacketReliability::UNRELIABLE_SEQUENCED;
+
+    if (type == PT_RELIABLE_ORDERED)
+        reliability = PacketReliability::RELIABLE_ORDERED;
+
+    if (type == PT_RELIABLE_UNORDERED)
+        reliability = PacketReliability::RELIABLE;
+
+    if (peer_) {
+        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0,
+                    *address_, false);
+        tempPacketCounter_.y_++;
+    }
+
+    buffer.Clear();
+}
+
+void Connection::SendAllBuffers()
+{
+    SendBuffer(PT_RELIABLE_ORDERED);
+    SendBuffer(PT_RELIABLE_UNORDERED);
+    SendBuffer(PT_UNRELIABLE_ORDERED);
+    SendBuffer(PT_UNRELIABLE_UNORDERED);
+}
+
 void Connection::ProcessPendingLatestData()
 {
     if (!scene_ || !sceneLoaded_)
@@ -391,66 +445,70 @@ void Connection::ProcessPendingLatestData()
     }
 }
 
-bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
+bool Connection::ProcessMessage(int msgID, MemoryBuffer& packedMsg)
 {
-    // New incomming message, reset last heard timer
-    lastHeardTimer_.Reset();
     tempPacketCounter_.x_++;
-    bool processed = true;
-
-    switch (msgID)
-    {
-    case MSG_IDENTITY:
-        ProcessIdentity(msgID, msg);
-        break;
-
-    case MSG_CONTROLS:
-        ProcessControls(msgID, msg);
-        break;
-
-    case MSG_SCENELOADED:
-        ProcessSceneLoaded(msgID, msg);
-        break;
-
-    case MSG_REQUESTPACKAGE:
-    case MSG_PACKAGEDATA:
-        ProcessPackageDownload(msgID, msg);
-        break;
-
-    case MSG_LOADSCENE:
-        ProcessLoadScene(msgID, msg);
-        break;
-
-    case MSG_SCENECHECKSUMERROR:
-        ProcessSceneChecksumError(msgID, msg);
-        break;
-
-    case MSG_CREATENODE:
-    case MSG_NODEDELTAUPDATE:
-    case MSG_NODELATESTDATA:
-    case MSG_REMOVENODE:
-    case MSG_CREATECOMPONENT:
-    case MSG_COMPONENTDELTAUPDATE:
-    case MSG_COMPONENTLATESTDATA:
-    case MSG_REMOVECOMPONENT:
-        ProcessSceneUpdate(msgID, msg);
-        break;
-
-    case MSG_REMOTEEVENT:
-    case MSG_REMOTENODEEVENT:
-        ProcessRemoteEvent(msgID, msg);
-        break;
-
-    case MSG_PACKAGEINFO:
-        ProcessPackageInfo(msgID, msg);
-        break;
-
-    default:
-        processed = false;
-        break;
+    if (packedMsg.GetSize() == 0) {
+        return true;
     }
+    while (!packedMsg.IsEof()) {
+        unsigned int msgID = packedMsg.ReadUInt();
+        unsigned int packetSize = packedMsg.ReadUInt();
+        MemoryBuffer msg(packedMsg.GetData() + packedMsg.GetPosition(), packetSize);
+        packedMsg.Seek(packedMsg.GetPosition() + packetSize);
+//        URHO3D_LOGINFOF("Processing MSG ID %d", msgID);
 
-    return processed;
+        switch (msgID)
+        {
+            case MSG_IDENTITY:
+                ProcessIdentity(msgID, msg);
+                break;
+
+            case MSG_CONTROLS:
+                ProcessControls(msgID, msg);
+                break;
+
+            case MSG_SCENELOADED:
+                ProcessSceneLoaded(msgID, msg);
+                break;
+
+            case MSG_REQUESTPACKAGE:
+            case MSG_PACKAGEDATA:
+                ProcessPackageDownload(msgID, msg);
+                break;
+
+            case MSG_LOADSCENE:
+                ProcessLoadScene(msgID, msg);
+                break;
+
+            case MSG_SCENECHECKSUMERROR:
+                ProcessSceneChecksumError(msgID, msg);
+                break;
+
+            case MSG_CREATENODE:
+            case MSG_NODEDELTAUPDATE:
+            case MSG_NODELATESTDATA:
+            case MSG_REMOVENODE:
+            case MSG_CREATECOMPONENT:
+            case MSG_COMPONENTDELTAUPDATE:
+            case MSG_COMPONENTLATESTDATA:
+            case MSG_REMOVECOMPONENT:
+                ProcessSceneUpdate(msgID, msg);
+                break;
+
+            case MSG_REMOTEEVENT:
+            case MSG_REMOTENODEEVENT:
+                ProcessRemoteEvent(msgID, msg);
+                break;
+
+            case MSG_PACKAGEINFO:
+                ProcessPackageInfo(msgID, msg);
+                break;
+            default:
+                break;
+        }
+    }
+    return true;
 }
 
 void Connection::Ban()

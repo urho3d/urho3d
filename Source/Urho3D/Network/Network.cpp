@@ -962,6 +962,7 @@ void Network::PostUpdate(float timeStep)
                     i->second_->SendServerUpdate();
                     i->second_->SendRemoteEvents();
                     i->second_->SendPackages();
+                    i->second_->SendAllBuffers();
                 }
             }
         }
@@ -971,6 +972,7 @@ void Network::PostUpdate(float timeStep)
             // Send the client update
             serverConnection_->SendClientUpdate();
             serverConnection_->SendRemoteEvents();
+            serverConnection_->SendAllBuffers();
         }
 
         // Notify that the update was sent

@@ -106,6 +106,14 @@ enum ObserverPositionSendMode
     OPSM_POSITION_ROTATION
 };
 
+/// Packet types for outgoing buffers. Outgoing messages are grouped by their type
+enum PacketType {
+    PT_UNRELIABLE_UNORDERED,
+    PT_UNRELIABLE_ORDERED,
+    PT_RELIABLE_UNORDERED,
+    PT_RELIABLE_ORDERED
+};
+
 /// %Connection to a remote network host.
 class URHO3D_API Connection : public Object
 {
@@ -117,6 +125,8 @@ public:
     /// Destruct.
     ~Connection() override;
 
+    /// Get packet type based on the message parameters
+    PacketType GetPacketType(bool reliable, bool inOrder);
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Send a message.
@@ -149,17 +159,20 @@ public:
     void SendRemoteEvents();
     /// Send package files to client. Called by network.
     void SendPackages();
+    /// Send out buffered messages by their type
+    void SendBuffer(PacketType type);
+    /// Send out all buffered messages
+    void SendAllBuffers();
     /// Process pending latest data for nodes and components.
     void ProcessPendingLatestData();
     /// Process a message from the server or client. Called by Network.
-    bool ProcessMessage(int msgID, MemoryBuffer& msg);
+    bool ProcessMessage(int msgID, MemoryBuffer& packedMsg);
     /// Ban this connections IP address.
     void Ban();
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
     /// Set the the RakNet address/guid.
     void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
-
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
 
@@ -328,6 +341,10 @@ private:
     Timer packetCounterTimer_;
     /// Last heard timer, resets when new packet is incoming.
     Timer lastHeardTimer_;
+    /// Outgoing packet buffer which can contain multiple messages
+    HashMap<int, VectorBuffer> outgoingBuffer_;
+    /// Outgoing packet size limit
+    int packedMessageLimit_{1024};
 };
 
 }
