@@ -243,6 +243,8 @@ public:
 
     /// Set network simulation parameters. Called by Network.
     void ConfigureNetworkSimulator(int latencyMs, float packetLoss);
+    /// Buffered packet size limit, when reached, packet is sent out immediately
+    void SetPacketSizeLimit(int limit);
 
     /// Current controls.
     Controls controls_;

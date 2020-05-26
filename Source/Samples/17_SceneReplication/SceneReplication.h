@@ -118,5 +118,6 @@ private:
     SharedPtr<Text> packetsIn_;
     /// Packets out per second
     SharedPtr<Text> packetsOut_;
+    /// Packet counter UI update timer
     Timer packetCounterTimer_;
 };

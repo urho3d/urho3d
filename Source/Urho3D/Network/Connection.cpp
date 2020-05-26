@@ -1173,6 +1173,11 @@ void Connection::ConfigureNetworkSimulator(int latencyMs, float packetLoss)
         peer_->ApplyNetworkSimulator(packetLoss, latencyMs, 0);
 }
 
+void Connection::SetPacketSizeLimit(int limit)
+{
+    packedMessageLimit_ = limit;
+}
+
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
 {
     sceneLoaded_ = true;
