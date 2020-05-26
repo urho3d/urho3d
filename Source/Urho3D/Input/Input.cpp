@@ -174,13 +174,13 @@ void EmscriptenInput::RequestPointerLock(MouseMode mode, bool suppressEvent)
 {
     requestedMouseMode_ = mode;
     suppressMouseModeEvent_ = suppressEvent;
-#ifndef URHO3D_CUSTOM_SHELL
-    emscripten_request_pointerlock(NULL, true);
-#endif
-
+#ifdef URHO3D_CUSTOM_SHELL
     EM_ASM({
         Module.RequestPointerLock();
     });
+#else
+    emscripten_request_pointerlock(NULL, true);
+#endif
 }
 
 void EmscriptenInput::ExitPointerLock(bool suppressEvent)
@@ -200,9 +200,12 @@ void EmscriptenInput::ExitPointerLock(bool suppressEvent)
         emscripten_exit_pointerlock();
 #endif
     }
+
+#ifdef URHO3D_CUSTOM_SHELL
     EM_ASM({
         Module.ExitPointerLock();
     });
+#endif
 }
 
 bool EmscriptenInput::IsVisible()
@@ -229,7 +232,7 @@ void EmscriptenInput::HandleCustomPointerLockChange(bool pointerLocked)
         invalidatedSuppressMouseModeEvent_ = false;
     }
 
-    if (pointerLocked >= 1)
+    if (pointerLocked)
     {
         // Pointer Lock is now active
         inputInst_->emscriptenPointerLock_ = true;
