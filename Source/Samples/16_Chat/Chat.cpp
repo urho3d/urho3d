@@ -51,7 +51,7 @@
 #endif
 
 // Identifier for the chat network messages
-const int MSG_CHAT = 153;
+const int MSG_CHAT = 154;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 

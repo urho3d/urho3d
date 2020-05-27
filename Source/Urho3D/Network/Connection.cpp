@@ -445,18 +445,23 @@ void Connection::ProcessPendingLatestData()
     }
 }
 
-bool Connection::ProcessMessage(int msgID, MemoryBuffer& packedMsg)
+bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
 {
     tempPacketCounter_.x_++;
-    if (packedMsg.GetSize() == 0) {
+    if (buffer.GetSize() == 0) {
+        return false;
+    }
+
+    if (msgID != MSG_PACKED_MESSAGE) {
+        ProcessUnknownMessage(msgID, buffer);
         return true;
     }
-    while (!packedMsg.IsEof()) {
-        unsigned int msgID = packedMsg.ReadUInt();
-        unsigned int packetSize = packedMsg.ReadUInt();
-        MemoryBuffer msg(packedMsg.GetData() + packedMsg.GetPosition(), packetSize);
-        packedMsg.Seek(packedMsg.GetPosition() + packetSize);
-//        URHO3D_LOGINFOF("Processing MSG ID %d", msgID);
+
+    while (!buffer.IsEof()) {
+        msgID = buffer.ReadUInt();
+        unsigned int packetSize = buffer.ReadUInt();
+        MemoryBuffer msg(buffer.GetData() + buffer.GetPosition(), packetSize);
+        buffer.Seek(buffer.GetPosition() + packetSize);
 
         switch (msgID)
         {
@@ -505,6 +510,7 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& packedMsg)
                 ProcessPackageInfo(msgID, msg);
                 break;
             default:
+                ProcessUnknownMessage(msgID, msg);
                 break;
         }
     }
@@ -1633,6 +1639,18 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
     }
 
     RequestNeededPackages(1, msg);
+}
+
+void Connection::ProcessUnknownMessage(int msgID, MemoryBuffer& msg)
+{
+    // If message was not handled internally, forward as an event
+    using namespace NetworkMessage;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_CONNECTION] = this;
+    eventData[P_MESSAGEID] = (int)msgID;
+    eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
+    SendEvent(E_NETWORKMESSAGE, eventData);
 }
 
 String Connection::GetAddress() const {

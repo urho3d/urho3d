@@ -166,7 +166,7 @@ public:
     /// Process pending latest data for nodes and components.
     void ProcessPendingLatestData();
     /// Process a message from the server or client. Called by Network.
-    bool ProcessMessage(int msgID, MemoryBuffer& packedMsg);
+    bool ProcessMessage(int msgID, MemoryBuffer& buffer);
     /// Ban this connections IP address.
     void Ban();
     /// Return the RakNet address/guid.
@@ -280,6 +280,8 @@ private:
     void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
     /// Process a SyncPackagesInfo message from server.
     void ProcessPackageInfo(int msgID, MemoryBuffer& msg);
+    /// Process unknown message. All unknown messages are forwarded as an events
+    void ProcessUnknownMessage(int msgID, MemoryBuffer& msg);
     /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set).
     bool RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg);
     /// Initiate a package download.
