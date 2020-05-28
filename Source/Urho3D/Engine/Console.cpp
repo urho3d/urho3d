@@ -77,7 +77,7 @@ Console::Console(Context* context) :
     background_ = uiRoot->CreateChild<BorderImage>();
     background_->SetBringToBack(false);
     background_->SetClipChildren(true);
-    background_->SetEnabled(true);
+    background_->SetPassthrough(false);
     background_->SetVisible(false); // Hide by default
     background_->SetPriority(200); // Show on top of the debug HUD
     background_->SetBringToBack(false);

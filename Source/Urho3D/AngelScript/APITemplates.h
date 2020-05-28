@@ -1243,6 +1243,13 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_enabledSelf() const", asMETHOD(T, IsEnabledSelf), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetDeepPassthrough(bool)", asMETHOD(T, SetDeepPassthrough), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ResetDeepPassthrough()", asMETHOD(T, ResetDeepPassthrough), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetPassthroughRecursive(bool)", asMETHOD(T, SetPassthroughRecursive), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_passthrough(bool)", asMETHOD(T, SetPassthrough), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_passthrough() const", asMETHOD(T, IsPassthrough), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_passthroughSelf() const", asMETHOD(T, IsPassthroughSelf), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_inputEnabled() const", asMETHOD(T, IsInputEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_editable(bool)", asMETHOD(T, SetEditable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_editable() const", asMETHOD(T, IsEditable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);

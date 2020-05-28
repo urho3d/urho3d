@@ -44,7 +44,7 @@ Button::Button(Context* context) :
     repeatTimer_(0.0f),
     pressed_(false)
 {
-    SetEnabled(true);
+    SetPassthrough(false);
     focusMode_ = FM_FOCUSABLE;
 }
 
@@ -55,7 +55,7 @@ void Button::RegisterObject(Context* context)
     context->RegisterFactory<Button>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
-    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Passthrough", false);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pressed Child Offset", GetPressedChildOffset, SetPressedChildOffset, IntVector2, IntVector2::ZERO, AM_FILE);
@@ -88,7 +88,7 @@ void Button::Update(float timeStep)
 void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (enabled_)
+    if (IsEnabled())
     {
         if (hovering_ || HasFocus())
             offset += hoverOffset_;

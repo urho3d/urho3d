@@ -159,7 +159,7 @@ UIComponent::UIComponent(Context* context)
 
     rootElement_ = context_->CreateObject<UIElement3D>();
     rootElement_->SetTraversalMode(TM_BREADTH_FIRST);
-    rootElement_->SetEnabled(true);
+    rootElement_->SetPassthrough(false);
 
     material_ = context_->CreateObject<Material>();
     material_->SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/Diff.xml"));

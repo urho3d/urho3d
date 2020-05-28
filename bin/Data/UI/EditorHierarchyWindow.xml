@@ -109,7 +109,7 @@
             <attribute name="Layout Mode" value="Horizontal" />
             <attribute name="Color" value="0 0 0 0" />
             <element type="BorderImage">
-                <attribute name="Image Rect" value="192 64 208 80" />
+                <attribute name="Image Rect" value="192 96 208 112" />
             </element>
         </element>
     </element>
