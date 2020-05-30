@@ -348,7 +348,7 @@ private:
     /// Outgoing packet buffer which can contain multiple messages
     HashMap<int, VectorBuffer> outgoingBuffer_;
     /// Outgoing packet size limit
-    int packedMessageLimit_{1024};
+    int packedMessageLimit_;
 };
 
 }

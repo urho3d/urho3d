@@ -77,7 +77,8 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     connectPending_(false),
     sceneLoaded_(false),
     logStatistics_(false),
-    address_(nullptr)
+    address_(nullptr),
+    packedMessageLimit_(1024)
 {
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
@@ -95,15 +96,15 @@ Connection::~Connection()
 
 PacketType Connection::GetPacketType(bool reliable, bool inOrder)
 {
-    if (reliable && inOrder) {
+    if (reliable && inOrder)
         return PT_RELIABLE_ORDERED;
-    }
-    if (reliable && !inOrder) {
+
+    if (reliable && !inOrder)
         return PT_RELIABLE_UNORDERED;
-    }
-    if (!reliable && inOrder) {
+
+    if (!reliable && inOrder)
         return PT_UNRELIABLE_ORDERED;
-    }
+
     return PT_UNRELIABLE_UNORDERED;
 }
 
@@ -124,11 +125,11 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     PacketType type = GetPacketType(reliable, inOrder);
     VectorBuffer& buffer = outgoingBuffer_[type];
 
-    if (buffer.GetSize() + numBytes >= packedMessageLimit_) {
+    if (buffer.GetSize() + numBytes >= packedMessageLimit_)
         SendBuffer(type);
-    }
 
-    if (buffer.GetSize() == 0) {
+    if (buffer.GetSize() == 0)
+    {
         buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
         buffer.WriteUInt((unsigned int)MSG_PACKED_MESSAGE);
     }
@@ -377,9 +378,8 @@ void Connection::SendPackages()
 void Connection::SendBuffer(PacketType type)
 {
     VectorBuffer& buffer = outgoingBuffer_[type];
-    if (buffer.GetSize() == 0) {
+    if (buffer.GetSize() == 0)
         return;
-    }
 
     PacketReliability reliability = PacketReliability::UNRELIABLE;
     if (type == PT_UNRELIABLE_ORDERED)
@@ -448,11 +448,11 @@ void Connection::ProcessPendingLatestData()
 bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
 {
     tempPacketCounter_.x_++;
-    if (buffer.GetSize() == 0) {
+    if (buffer.GetSize() == 0)
         return false;
-    }
 
-    if (msgID != MSG_PACKED_MESSAGE) {
+    if (msgID != MSG_PACKED_MESSAGE)
+    {
         ProcessUnknownMessage(msgID, buffer);
         return true;
     }

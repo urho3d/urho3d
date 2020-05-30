@@ -358,12 +358,14 @@ void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventD
     // We only rotate the camera according to mouse movement since last frame, so do not need the time step
     MoveCamera();
 
-    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection()) {
+    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection())
+    {
         packetsIn_->SetText("Packets  in: " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsInPerSec()));
         packetsOut_->SetText("Packets out: " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
         packetCounterTimer_.Reset();
     }
-    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetClientConnections().Size()) {
+    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetClientConnections().Size())
+    {
         int packetsIn = 0;
         int packetsOut = 0;
         auto connections = GetSubsystem<Network>()->GetClientConnections();
