@@ -166,7 +166,7 @@ void SetupViewports()
     // texture unit of the water material
     int texSize = 1024;
     Texture2D@ renderTexture = Texture2D();
-    renderTexture.SetSize(texSize, texSize, GetRGBFormat(), TEXTURE_RENDERTARGET);
+    renderTexture.SetSize(texSize, texSize, Graphics::GetRGBFormat(), TEXTURE_RENDERTARGET);
     renderTexture.filterMode = FILTER_BILINEAR;
     RenderSurface@ surface = renderTexture.renderSurface;
     Viewport@ rttViewport = Viewport(scene_, reflectionCamera);

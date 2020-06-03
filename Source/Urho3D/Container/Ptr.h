@@ -260,6 +260,7 @@ template <class T, class U> SharedPtr<T> DynamicCast(const SharedPtr<U>& ptr)
 }
 
 /// Weak pointer template class with intrusive reference counting. Does not keep the object pointed to alive.
+/// @specialization{WeakHandle,RefCounted}
 template <class T> class WeakPtr
 {
 public:
@@ -411,6 +412,7 @@ public:
     }
 
     /// Dereference the object.
+    /// @nobindtemp
     T& operator *() const
     {
         T* rawPtr = Get();
@@ -419,6 +421,7 @@ public:
     }
 
     /// Subscript the object if applicable.
+    /// @nobindtemp
     T& operator [](int index)
     {
         T* rawPtr = Get();
@@ -436,6 +439,7 @@ public:
     template <class U> bool operator <(const WeakPtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Convert to a raw pointer, null if the object is expired.
+    /// @nobindtemp
     operator T*() const { return Get(); }   // NOLINT(google-explicit-constructor)
 
     /// Swap with another WeakPtr.
@@ -483,9 +487,11 @@ public:
     bool NotNull() const { return refCount_ != nullptr; }
 
     /// Return the object's reference count, or 0 if null pointer or if object has expired.
+    /// @property
     int Refs() const { return (refCount_ && refCount_->refs_ >= 0) ? refCount_->refs_ : 0; }
 
     /// Return the object's weak reference count.
+    /// @property
     int WeakRefs() const
     {
         if (!Expired())
@@ -495,6 +501,7 @@ public:
     }
 
     /// Return whether the object has expired. If null pointer, always return true.
+    /// @property
     bool Expired() const { return refCount_ ? refCount_->refs_ < 0 : true; }
 
     /// Return pointer to the RefCount structure.

@@ -66,65 +66,92 @@ public:
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
     /// Return initial world transform to Bullet.
+    /// @nobind
     void getWorldTransform(btTransform& worldTrans) const override;
     /// Update world transform from Bullet.
+    /// @nobind
     void setWorldTransform(const btTransform& worldTrans) override;
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set mass. Zero mass makes the body static.
+    /// @property
     void SetMass(float mass);
     /// Set rigid body position in world space.
+    /// @property
     void SetPosition(const Vector3& position);
     /// Set rigid body rotation in world space.
+    /// @property
     void SetRotation(const Quaternion& rotation);
     /// Set rigid body position and rotation in world space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set linear velocity.
+    /// @property
     void SetLinearVelocity(const Vector3& velocity);
     /// Set linear degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
+    /// @property
     void SetLinearFactor(const Vector3& factor);
     /// Set linear velocity deactivation threshold.
+    /// @property
     void SetLinearRestThreshold(float threshold);
     /// Set linear velocity damping factor.
+    /// @property
     void SetLinearDamping(float damping);
     /// Set angular velocity.
+    /// @property
     void SetAngularVelocity(const Vector3& velocity);
     /// Set angular degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
+    /// @property
     void SetAngularFactor(const Vector3& factor);
     /// Set angular velocity deactivation threshold.
+    /// @property
     void SetAngularRestThreshold(float threshold);
     /// Set angular velocity damping factor.
+    /// @property
     void SetAngularDamping(float damping);
     /// Set friction coefficient.
+    /// @property
     void SetFriction(float friction);
     /// Set anisotropic friction.
+    /// @property
     void SetAnisotropicFriction(const Vector3& friction);
     /// Set rolling friction coefficient.
+    /// @property
     void SetRollingFriction(float friction);
     /// Set restitution coefficient.
+    /// @property
     void SetRestitution(float restitution);
     /// Set contact processing threshold.
+    /// @property
     void SetContactProcessingThreshold(float threshold);
     /// Set continuous collision detection swept sphere radius.
+    /// @property
     void SetCcdRadius(float radius);
     /// Set continuous collision detection motion-per-simulation-step threshold. 0 disables, which is the default.
+    /// @property
     void SetCcdMotionThreshold(float threshold);
     /// Set whether gravity is applied to rigid body.
+    /// @property
     void SetUseGravity(bool enable);
     /// Set gravity override. If zero, uses physics world's gravity.
+    /// @property
     void SetGravityOverride(const Vector3& gravity);
     /// Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
+    /// @property
     void SetKinematic(bool enable);
     /// Set rigid body trigger mode. In trigger mode collisions are reported but do not apply forces.
+    /// @property
     void SetTrigger(bool enable);
     /// Set collision layer.
+    /// @property
     void SetCollisionLayer(unsigned layer);
     /// Set collision mask.
+    /// @property
     void SetCollisionMask(unsigned mask);
     /// Set collision group and mask.
     void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
     /// Set collision event signaling mode. Default is to signal when rigid bodies are active.
+    /// @property
     void SetCollisionEventMode(CollisionEventMode mode);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
@@ -159,70 +186,97 @@ public:
     btCompoundShape* GetCompoundShape() const { return compoundShape_.Get(); }
 
     /// Return mass.
+    /// @property
     float GetMass() const { return mass_; }
 
     /// Return rigid body position in world space.
+    /// @property
     Vector3 GetPosition() const;
     /// Return rigid body rotation in world space.
+    /// @property
     Quaternion GetRotation() const;
     /// Return linear velocity.
+    /// @property
     Vector3 GetLinearVelocity() const;
     /// Return linear degrees of freedom.
+    /// @property
     Vector3 GetLinearFactor() const;
     /// Return linear velocity at local point.
     Vector3 GetVelocityAtPoint(const Vector3& position) const;
     /// Return linear velocity deactivation threshold.
+    /// @property
     float GetLinearRestThreshold() const;
     /// Return linear velocity damping factor.
+    /// @property
     float GetLinearDamping() const;
     /// Return angular velocity.
+    /// @property
     Vector3 GetAngularVelocity() const;
     /// Return angular degrees of freedom.
+    /// @property
     Vector3 GetAngularFactor() const;
     /// Return angular velocity deactivation threshold.
+    /// @property
     float GetAngularRestThreshold() const;
     /// Return angular velocity damping factor.
+    /// @property
     float GetAngularDamping() const;
     /// Return friction coefficient.
+    /// @property
     float GetFriction() const;
     /// Return anisotropic friction.
+    /// @property
     Vector3 GetAnisotropicFriction() const;
     /// Return rolling friction coefficient.
+    /// @property
     float GetRollingFriction() const;
     /// Return restitution coefficient.
+    /// @property
     float GetRestitution() const;
     /// Return contact processing threshold.
+    /// @property
     float GetContactProcessingThreshold() const;
     /// Return continuous collision detection swept sphere radius.
+    /// @property
     float GetCcdRadius() const;
     /// Return continuous collision detection motion-per-simulation-step threshold.
+    /// @property
     float GetCcdMotionThreshold() const;
 
     /// Return whether rigid body uses gravity.
+    /// @property
     bool GetUseGravity() const { return useGravity_; }
 
     /// Return gravity override. If zero (default), uses the physics world's gravity.
+    /// @property
     const Vector3& GetGravityOverride() const { return gravityOverride_; }
 
     /// Return center of mass offset.
+    /// @property
     const Vector3& GetCenterOfMass() const { return centerOfMass_; }
 
     /// Return kinematic mode flag.
+    /// @property
     bool IsKinematic() const { return kinematic_; }
 
     /// Return whether this RigidBody is acting as a trigger.
+    /// @property
     bool IsTrigger() const { return trigger_; }
 
     /// Return whether rigid body is active (not sleeping).
+    /// @property
     bool IsActive() const;
 
     /// Return collision layer.
+    /// @property
     unsigned GetCollisionLayer() const { return collisionLayer_; }
 
     /// Return collision mask.
+    /// @property
     unsigned GetCollisionMask() const { return collisionMask_; }
 
     /// Return collision event signaling mode.
+    /// @property
     CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
 
     /// Return colliding rigid bodies from the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.

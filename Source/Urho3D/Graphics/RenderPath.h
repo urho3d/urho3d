@@ -102,36 +102,48 @@ struct URHO3D_API RenderPathCommand
     /// Read from an XML element.
     void Load(const XMLElement& element);
     /// Set a texture resource name. Can also refer to a rendertarget defined in the rendering path.
+    /// @property{set_textureNames}
     void SetTextureName(TextureUnit unit, const String& name);
     /// Set a shader parameter.
+    /// @property{set_shaderParameters}
     void SetShaderParameter(const String& name, const Variant& value);
     /// Remove a shader parameter.
     void RemoveShaderParameter(const String& name);
     /// Set number of output rendertargets.
+    /// @property
     void SetNumOutputs(unsigned num);
     /// Set output rendertarget name and face index for cube maps.
     void SetOutput(unsigned index, const String& name, CubeMapFace face = FACE_POSITIVE_X);
     /// Set output rendertarget name.
+    /// @property{set_outputNames}
     void SetOutputName(unsigned index, const String& name);
     /// Set output rendertarget face index for cube maps.
+    /// @property{set_outputFaces}
     void SetOutputFace(unsigned index, CubeMapFace face);
     /// Set depth-stencil output name. When empty, will assign a depth-stencil buffer automatically.
+    /// @property
     void SetDepthStencilName(const String& name);
 
     /// Return texture resource name.
+    /// @property{get_textureNames}
     const String& GetTextureName(TextureUnit unit) const;
     /// Return shader parameter.
+    /// @property{get_shaderParameters}
     const Variant& GetShaderParameter(const String& name) const;
 
     /// Return number of output rendertargets.
+    /// @property
     unsigned GetNumOutputs() const { return outputs_.Size(); }
 
     /// Return output rendertarget name.
+    /// @property{get_outputNames}
     const String& GetOutputName(unsigned index) const;
     /// Return output rendertarget face index.
+    /// @property{get_outputFaces}
     CubeMapFace GetOutputFace(unsigned index) const;
 
     /// Return depth-stencil output name.
+    /// @property
     const String& GetDepthStencilName() const { return depthStencilName_; }
 
     /// Tag name.
@@ -204,12 +216,15 @@ public:
     /// Enable/disable commands and rendertargets by tag.
     void SetEnabled(const String& tag, bool active);
     /// Return true of any of render targets or commands with specified tag are enabled.
+    /// @property
     bool IsEnabled(const String& tag) const;
     /// Return true if renderpath or command with given tag exists.
+    /// @property
     bool IsAdded(const String& tag) const;
     /// Toggle enabled state of commands and rendertargets by tag.
     void ToggleEnabled(const String& tag);
     /// Assign rendertarget at index.
+    /// @property{set_renderTargets}
     void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
     /// Add a rendertarget.
     void AddRenderTarget(const RenderTargetInfo& info);
@@ -220,6 +235,7 @@ public:
     /// Remove rendertargets by tag name.
     void RemoveRenderTargets(const String& tag);
     /// Assign command at index.
+    /// @property{set_commands}
     void SetCommand(unsigned index, const RenderPathCommand& command);
     /// Add a command to the end of the list.
     void AddCommand(const RenderPathCommand& command);
@@ -230,18 +246,22 @@ public:
     /// Remove commands by tag name.
     void RemoveCommands(const String& tag);
     /// Set a shader parameter in all commands that define it.
+    /// @property{set_shaderParameters}
     void SetShaderParameter(const String& name, const Variant& value);
 
     /// Return number of rendertargets.
+    /// @property
     unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
 
     /// Return number of commands.
+    /// @property
     unsigned GetNumCommands() const { return commands_.Size(); }
 
     /// Return command at index, or null if does not exist.
     RenderPathCommand* GetCommand(unsigned index) { return index < commands_.Size() ? &commands_[index] : nullptr; }
 
     /// Return a shader parameter (first appearance in any command).
+    /// @property{get_shaderParameters}
     const Variant& GetShaderParameter(const String& name) const;
 
     /// Rendertargets.

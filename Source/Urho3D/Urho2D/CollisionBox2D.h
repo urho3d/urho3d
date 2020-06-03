@@ -41,23 +41,29 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set size.
+    /// @property
     void SetSize(const Vector2& size);
     /// Set size.
     void SetSize(float width, float height);
     /// Set center.
+    /// @property
     void SetCenter(const Vector2& center);
     /// Set center.
     void SetCenter(float x, float y);
     /// Set angle.
+    /// @property
     void SetAngle(float angle);
 
     /// Return size.
+    /// @property
     const Vector2& GetSize() const { return size_; }
 
     /// Return center.
+    /// @property
     const Vector2& GetCenter() const { return center_; }
 
     /// Return angle.
+    /// @property
     float GetAngle() const { return angle_; }
 
 private:

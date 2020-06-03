@@ -37,6 +37,7 @@ struct FrameInfo;
 struct SourceBatch2D;
 
 /// 2D view batch info.
+/// @nobind
 struct ViewBatchInfo2D
 {
     /// Construct.

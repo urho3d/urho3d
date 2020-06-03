@@ -58,29 +58,37 @@ public:
     virtual void OnHidePopup() { }
 
     /// Set popup element to show on selection.
+    /// @property
     void SetPopup(UIElement* popup);
     /// Set popup element offset.
+    /// @property
     void SetPopupOffset(const IntVector2& offset);
     /// Set popup element offset.
     void SetPopupOffset(int x, int y);
     /// Force the popup to show or hide.
+    /// @property
     void ShowPopup(bool enable);
     /// Set accelerator key (set zero key code to disable).
     void SetAccelerator(int key, int qualifiers);
 
     /// Return popup element.
+    /// @property
     UIElement* GetPopup() const { return popup_; }
 
     /// Return popup element offset.
+    /// @property
     const IntVector2& GetPopupOffset() const { return popupOffset_; }
 
     /// Return whether popup is open.
+    /// @property
     bool GetShowPopup() const { return showPopup_; }
 
     /// Return accelerator key code, 0 if disabled.
+    /// @property
     int GetAcceleratorKey() const { return acceleratorKey_; }
 
     /// Return accelerator qualifiers.
+    /// @property
     int GetAcceleratorQualifiers() const { return acceleratorQualifiers_; }
 
 protected:

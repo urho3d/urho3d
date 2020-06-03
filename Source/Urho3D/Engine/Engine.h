@@ -53,16 +53,22 @@ public:
     /// Create the debug hud.
     DebugHud* CreateDebugHud();
     /// Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
+    /// @property
     void SetMinFps(int fps);
     /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
+    /// @property
     void SetMaxFps(int fps);
     /// Set maximum frames per second when the application does not have input focus.
+    /// @property
     void SetMaxInactiveFps(int fps);
     /// Set how many frames to average for timestep smoothing. Default is 2. 1 disables smoothing.
+    /// @property
     void SetTimeStepSmoothing(int frames);
     /// Set whether to pause update events and audio when minimized.
+    /// @property
     void SetPauseMinimized(bool enable);
     /// Set whether to exit automatically on exit request (window close button).
+    /// @property
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);
@@ -79,30 +85,39 @@ public:
     float GetNextTimeStep() const { return timeStep_; }
 
     /// Return the minimum frames per second.
+    /// @property
     int GetMinFps() const { return minFps_; }
 
     /// Return the maximum frames per second.
+    /// @property
     int GetMaxFps() const { return maxFps_; }
 
     /// Return the maximum frames per second when the application does not have input focus.
+    /// @property
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
 
     /// Return how many frames to average for timestep smoothing.
+    /// @property
     int GetTimeStepSmoothing() const { return timeStepSmoothing_; }
 
     /// Return whether to pause update events and audio when minimized.
+    /// @property
     bool GetPauseMinimized() const { return pauseMinimized_; }
 
     /// Return whether to exit automatically on exit request.
+    /// @property
     bool GetAutoExit() const { return autoExit_; }
 
     /// Return whether engine has been initialized.
+    /// @property
     bool IsInitialized() const { return initialized_; }
 
     /// Return whether exit has been requested.
+    /// @property
     bool IsExiting() const { return exiting_; }
 
     /// Return whether the engine has been created in headless mode.
+    /// @property
     bool IsHeadless() const { return headless_; }
 
     /// Send frame update events.

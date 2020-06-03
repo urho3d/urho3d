@@ -111,32 +111,46 @@ public:
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry();
     /// Enable or disable automatic physics simulation during scene update. Enabled by default.
+    /// @property
     void SetUpdateEnabled(bool enable);
     /// Set draw shape.
+    /// @property
     void SetDrawShape(bool drawShape);
     /// Set draw joint.
+    /// @property
     void SetDrawJoint(bool drawJoint);
     /// Set draw aabb.
+    /// @property
     void SetDrawAabb(bool drawAabb);
     /// Set draw pair.
+    /// @property
     void SetDrawPair(bool drawPair);
     /// Set draw center of mass.
+    /// @property
     void SetDrawCenterOfMass(bool drawCenterOfMass);
     /// Set allow sleeping.
+    /// @property
     void SetAllowSleeping(bool enable);
     /// Set warm starting.
+    /// @property
     void SetWarmStarting(bool enable);
     /// Set continuous physics.
+    /// @property
     void SetContinuousPhysics(bool enable);
     /// Set sub stepping.
+    /// @property
     void SetSubStepping(bool enable);
     /// Set gravity.
+    /// @property
     void SetGravity(const Vector2& gravity);
     /// Set auto clear forces.
+    /// @property
     void SetAutoClearForces(bool enable);
     /// Set velocity iterations.
+    /// @property
     void SetVelocityIterations(int velocityIterations);
     /// Set position iterations.
+    /// @property
     void SetPositionIterations(int positionIterations);
     /// Add rigid body.
     void AddRigidBody(RigidBody2D* rigidBody);
@@ -159,41 +173,55 @@ public:
     void GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 
     /// Return whether physics world will automatically simulate during scene update.
+    /// @property
     bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return draw shape.
+    /// @property
     bool GetDrawShape() const { return (m_drawFlags & e_shapeBit) != 0; }
 
     /// Return draw joint.
+    /// @property
     bool GetDrawJoint() const { return (m_drawFlags & e_jointBit) != 0; }
 
     /// Return draw aabb.
+    /// @property
     bool GetDrawAabb() const { return (m_drawFlags & e_aabbBit) != 0; }
 
     /// Return draw pair.
+    /// @property
     bool GetDrawPair() const { return (m_drawFlags & e_pairBit) != 0; }
 
     /// Return draw center of mass.
+    /// @property
     bool GetDrawCenterOfMass() const { return (m_drawFlags & e_centerOfMassBit) != 0; }
 
     /// Return allow sleeping.
+    /// @property
     bool GetAllowSleeping() const;
     /// Return warm starting.
+    /// @property
     bool GetWarmStarting() const;
     /// Return continuous physics.
+    /// @property
     bool GetContinuousPhysics() const;
     /// Return sub stepping.
+    /// @property
     bool GetSubStepping() const;
     /// Return auto clear forces.
+    /// @property
     bool GetAutoClearForces() const;
 
     /// Return gravity.
+    /// @property
     const Vector2& GetGravity() const { return gravity_; }
 
     /// Return velocity iterations.
+    /// @property
     int GetVelocityIterations() const { return velocityIterations_; }
 
     /// Return position iterations.
+    /// @property
     int GetPositionIterations() const { return positionIterations_; }
 
     /// Return the Box2D physics world.

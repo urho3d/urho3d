@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 /// Custom geometry vertex.
+/// @fakeref
 struct CustomGeometryVertex
 {
     /// Position.
@@ -102,8 +103,10 @@ public:
     /// Clear all geometries.
     void Clear();
     /// Set number of geometries.
+    /// @property
     void SetNumGeometries(unsigned num);
     /// Set vertex buffer dynamic mode. A dynamic buffer should be faster to update frequently. Effective at the next Commit() call.
+    /// @property
     void SetDynamic(bool enable);
     /// Begin defining a geometry. Clears existing vertices in that index.
     void BeginGeometry(unsigned index, PrimitiveType type);
@@ -124,20 +127,26 @@ public:
     /// Update vertex buffer and calculate the bounding box. Call after finishing defining geometry.
     void Commit();
     /// Set material on all geometries.
+    /// @property
     void SetMaterial(Material* material);
     /// Set material on one geometry. Return true if successful.
+    /// @property{set_materials}
     bool SetMaterial(unsigned index, Material* material);
 
     /// Return number of geometries.
+    /// @property
     unsigned GetNumGeometries() const { return geometries_.Size(); }
 
     /// Return number of vertices in a geometry.
+    /// @property
     unsigned GetNumVertices(unsigned index) const;
 
     /// Return whether vertex buffer dynamic mode is enabled.
+    /// @property
     bool IsDynamic() const { return dynamic_; }
 
     /// Return material by geometry index.
+    /// @property{get_materials}
     Material* GetMaterial(unsigned index = 0) const;
 
     /// Return all vertices. These can be edited; calling Commit() updates the vertex buffer.

@@ -69,32 +69,46 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set constraint type and recreate the constraint.
+    /// @property
     void SetConstraintType(ConstraintType type);
     /// Set other body to connect to. Set to null to connect to the static world.
+    /// @property
     void SetOtherBody(RigidBody* body);
     /// Set constraint position relative to own body.
+    /// @property
     void SetPosition(const Vector3& position);
     /// Set constraint rotation relative to own body.
+    /// @property
     void SetRotation(const Quaternion& rotation);
     /// Set constraint rotation relative to own body by specifying the axis.
+    /// @property
     void SetAxis(const Vector3& axis);
     /// Set constraint position relative to the other body. If connected to the static world, is a world space position.
+    /// @property
     void SetOtherPosition(const Vector3& position);
     /// Set constraint rotation relative to the other body. If connected to the static world, is a world space rotation.
+    /// @property
     void SetOtherRotation(const Quaternion& rotation);
     /// Set constraint rotation relative to the other body by specifying the axis.
+    /// @property
     void SetOtherAxis(const Vector3& axis);
     /// Set constraint world space position. Resets both own and other body relative position, ie. zeroes the constraint error.
+    /// @property
     void SetWorldPosition(const Vector3& position);
     /// Set high limit. Interpretation is constraint type specific.
+    /// @property
     void SetHighLimit(const Vector2& limit);
     /// Set low limit. Interpretation is constraint type specific.
+    /// @property
     void SetLowLimit(const Vector2& limit);
     /// Set constraint error reduction parameter. Zero = leave to default.
+    /// @property{set_erp}
     void SetERP(float erp);
     /// Set constraint force mixing parameter. Zero = leave to default.
+    /// @property{set_cfm}
     void SetCFM(float cfm);
     /// Set whether to disable collisions between connected bodies.
+    /// @property
     void SetDisableCollision(bool disable);
 
     /// Return physics world.
@@ -104,42 +118,55 @@ public:
     btTypedConstraint* GetConstraint() const { return constraint_.Get(); }
 
     /// Return constraint type.
+    /// @property
     ConstraintType GetConstraintType() const { return constraintType_; }
 
     /// Return rigid body in own scene node.
+    /// @property
     RigidBody* GetOwnBody() const { return ownBody_; }
 
     /// Return the other rigid body. May be null if connected to the static world.
+    /// @property
     RigidBody* GetOtherBody() const { return otherBody_; }
 
     /// Return constraint position relative to own body.
+    /// @property
     const Vector3& GetPosition() const { return position_; }
 
     /// Return constraint rotation relative to own body.
+    /// @property
     const Quaternion& GetRotation() const { return rotation_; }
 
     /// Return constraint position relative to other body.
+    /// @property
     const Vector3& GetOtherPosition() const { return otherPosition_; }
 
     /// Return constraint rotation relative to other body.
+    /// @property
     const Quaternion& GetOtherRotation() const { return otherRotation_; }
 
     /// Return constraint world position, calculated from own body.
+    /// @property
     Vector3 GetWorldPosition() const;
 
     /// Return high limit.
+    /// @property
     const Vector2& GetHighLimit() const { return highLimit_; }
 
     /// Return low limit.
+    /// @property
     const Vector2& GetLowLimit() const { return lowLimit_; }
 
     /// Return constraint error reduction parameter.
+    /// @property{get_erp}
     float GetERP() const { return erp_; }
 
     /// Return constraint force mixing parameter.
+    /// @property{get_cfm}
     float GetCFM() const { return cfm_; }
 
     /// Return whether collisions between connected bodies are disabled.
+    /// @property
     bool GetDisableCollision() const { return disableCollision_; }
 
     /// Release the constraint.

@@ -199,9 +199,11 @@ public:
     const TmxLayer2D* GetLayer(unsigned index) const;
 
     /// Set texture edge offset for all sprites, in pixels.
+    /// @property{set_edgeOffset}
     void SetSpriteTextureEdgeOffset(float offset);
 
     /// Return texture edge offset, in pixels.
+    /// @property{get_edgeOffset}
     float GetSpriteTextureEdgeOffset() const { return edgeOffset_; }
 
 private:

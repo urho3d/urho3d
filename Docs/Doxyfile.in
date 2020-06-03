@@ -1,4 +1,4 @@
-# Doxyfile 1.8.13
+# Doxyfile 1.8.17
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project.
@@ -2459,3 +2459,19 @@ GENERATE_LEGEND        = YES
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_CLEANUP            = YES
+
+ALIASES += manualbind=""
+ALIASES += nobind=""
+ALIASES += nobindtemp=""
+ALIASES += nobindfile=""
+ALIASES += fakeref=""
+ALIASES += pod=""
+ALIASES += templateversion=""
+ALIASES += allints=""
+ALIASES += allfloats=""
+ALIASES += property=""
+ALIASES += property{1}=""
+ALIASES += alias{1}=""
+ALIASES += specialization{1}=""
+ALIASES += specialization{2}=""
+ALIASES += specialization{3}=""

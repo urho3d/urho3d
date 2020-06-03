@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 /// Memory area that can be read and written to as a stream.
+/// @nobind
 class URHO3D_API MemoryBuffer : public AbstractFile
 {
 public:

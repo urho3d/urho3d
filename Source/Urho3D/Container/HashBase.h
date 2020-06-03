@@ -101,8 +101,10 @@ class URHO3D_API HashBase
 {
 public:
     /// Initial amount of buckets.
+    /// @nobindtemp
     static const unsigned MIN_BUCKETS = 8;
     /// Maximum load factor.
+    /// @nobindtemp
     static const unsigned MAX_LOAD_FACTOR = 4;
 
     /// Construct.
@@ -124,6 +126,7 @@ public:
     }
 
     /// Return number of elements.
+    /// @property{get_length}
     unsigned Size() const { return ptrs_ ? (reinterpret_cast<unsigned*>(ptrs_))[0] : 0; }
 
     /// Return number of buckets.

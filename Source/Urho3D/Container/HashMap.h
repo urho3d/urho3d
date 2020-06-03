@@ -34,6 +34,7 @@ namespace Urho3D
 {
 
 /// Hash map template class.
+/// @specialization{VariantMap,StringHash,Variant}
 template <class T, class U> class HashMap : public HashBase
 {
 public:
@@ -353,6 +354,7 @@ public:
     }
 
     /// Populate the map using variadic template. This handles the base case.
+    /// @nobindtemp
     HashMap& Populate(const T& key, const U& value)
     {
         this->operator [](key) = value;

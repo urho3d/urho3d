@@ -207,6 +207,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     option (URHO3D_SAMPLES "Build sample applications" TRUE)
     option (URHO3D_UPDATE_SOURCE_TREE "Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)")
     option (URHO3D_BINDINGS "Enable API binding generation support for script subsystems")
+    option (URHO3D_GENERATEBINDINGS "Regenerate bindings for scripting languages")
     cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native on host system only)" FALSE "NOT CMAKE_CROSSCOMPILING" FALSE)
     mark_as_advanced (URHO3D_UPDATE_SOURCE_TREE URHO3D_BINDINGS URHO3D_CLANG_TOOLS)
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native, RPI, and ARM on Linux only)" TRUE "NOT IOS AND NOT TVOS AND NOT ANDROID AND NOT WEB" FALSE)
@@ -416,6 +417,12 @@ if (URHO3D_CLANG_TOOLS)
     foreach (OPT URHO3D_TESTING URHO3D_LUAJIT URHO3D_DATABASE_ODBC)
         set (${OPT} 0)
     endforeach ()
+endif ()
+
+if (URHO3D_GENERATEBINDINGS)
+    # Ensure the script subsystems are enabled at the very least
+    set (URHO3D_ANGELSCRIPT 1)
+    set (URHO3D_LUA 1)
 endif ()
 
 # Coverity scan does not support PCH

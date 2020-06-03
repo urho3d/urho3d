@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 /// Event profiling data for one block in the event profiling tree.
+/// @nobind
 class URHO3D_API EventProfilerBlock : public ProfilerBlock
 {
 public:

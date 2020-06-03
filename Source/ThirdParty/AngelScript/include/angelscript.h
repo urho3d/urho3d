@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni, Nathanial Lydick, Yao Wei Tjong and Ramil Sattarov for Urho3D
+// Modified by Lasse Oorni, Nathanial Lydick, Yao Wei Tjong, Ramil Sattarov and 1vanK for Urho3D
 
 //
 // angelscript.h
@@ -487,6 +487,9 @@ template <typename T>
 #else
  #define AS_METHOD_AMBIGUITY_CAST(t) static_cast<t >
 #endif
+
+// Urho3D: allows write HashMap<StringHash COMMA Variant> instead HashMap<StringHash, Variant> when passing to asMETHOD() and asMETHODPR()
+#define COMMA ,
 
 #define asMETHOD(c,m) asSMethodPtr<sizeof(void (c::*)())>::Convert((void (c::*)())(&c::m))
 #define asMETHODPR(c,m,p,r) asSMethodPtr<sizeof(void (c::*)())>::Convert(AS_METHOD_AMBIGUITY_CAST(r (c::*)p)(&c::m))

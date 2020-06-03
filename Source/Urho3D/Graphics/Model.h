@@ -125,6 +125,7 @@ public:
     bool Save(Serializer& dest) const override;
 
     /// Set local-space bounding box.
+    /// @property
     void SetBoundingBox(const BoundingBox& box);
     /// Set vertex buffers and their morph ranges.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts,
@@ -132,12 +133,15 @@ public:
     /// Set index buffers.
     bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers);
     /// Set number of geometries.
+    /// @property
     void SetNumGeometries(unsigned num);
     /// Set number of LOD levels in a geometry.
+    /// @property
     bool SetNumGeometryLodLevels(unsigned index, unsigned num);
     /// Set geometry.
     bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
     /// Set geometry center.
+    /// @property{set_geometryCenters}
     bool SetGeometryCenter(unsigned index, const Vector3& center);
     /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
@@ -149,9 +153,11 @@ public:
     SharedPtr<Model> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return bounding box.
+    /// @property
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
 
     /// Return skeleton.
+    /// @property
     Skeleton& GetSkeleton() { return skeleton_; }
 
     /// Return vertex buffers.
@@ -161,9 +167,11 @@ public:
     const Vector<SharedPtr<IndexBuffer> >& GetIndexBuffers() const { return indexBuffers_; }
 
     /// Return number of geometries.
+    /// @property
     unsigned GetNumGeometries() const { return geometries_.Size(); }
 
     /// Return number of LOD levels in geometry.
+    /// @property
     unsigned GetNumGeometryLodLevels(unsigned index) const;
 
     /// Return geometry pointers.
@@ -176,6 +184,7 @@ public:
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
 
     /// Return geometry center by index.
+    /// @property{get_geometryCenters}
     const Vector3& GetGeometryCenter(unsigned index) const
     {
         return index < geometryCenters_.Size() ? geometryCenters_[index] : Vector3::ZERO;
@@ -188,6 +197,7 @@ public:
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
 
     /// Return number of vertex morphs.
+    /// @property
     unsigned GetNumMorphs() const { return morphs_.Size(); }
 
     /// Return vertex morph by index.

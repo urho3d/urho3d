@@ -136,18 +136,22 @@ public:
     /// Send a remote event with the specified node as sender.
     void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Assign scene. On the server, this will cause the client to load it.
+    /// @property
     void SetScene(Scene* newScene);
     /// Assign identity. Called by Network.
     void SetIdentity(const VariantMap& identity);
     /// Set new controls.
     void SetControls(const Controls& newControls);
     /// Set the observer position for interest management, to be sent to the server.
+    /// @property
     void SetPosition(const Vector3& position);
     /// Set the observer rotation for interest management, to be sent to the server. Note: not used by the NetworkPriority component.
+    /// @property
     void SetRotation(const Quaternion& rotation);
     /// Set the connection pending status. Called by Network.
     void SetConnectPending(bool connectPending);
     /// Set whether to log data in/out statistics.
+    /// @property
     void SetLogStatistics(bool enable);
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
@@ -177,6 +181,7 @@ public:
     VariantMap& GetIdentity() { return identity_; }
 
     /// Return the scene used by this connection.
+    /// @property
     Scene* GetScene() const;
 
     /// Return the client controls of this connection.
@@ -186,57 +191,75 @@ public:
     unsigned char GetTimeStamp() const { return timeStamp_; }
 
     /// Return the observer position sent by the client for interest management.
+    /// @property
     const Vector3& GetPosition() const { return position_; }
 
     /// Return the observer rotation sent by the client for interest management.
+    /// @property
     const Quaternion& GetRotation() const { return rotation_; }
 
     /// Return whether is a client connection.
+    /// @property
     bool IsClient() const { return isClient_; }
 
     /// Return whether is fully connected.
+    /// @property
     bool IsConnected() const;
 
     /// Return whether connection is pending.
+    /// @property
     bool IsConnectPending() const { return connectPending_; }
 
     /// Return whether the scene is loaded and ready to receive server updates.
+    /// @property
     bool IsSceneLoaded() const { return sceneLoaded_; }
 
     /// Return whether to log data in/out statistics.
+    /// @property
     bool GetLogStatistics() const { return logStatistics_; }
 
     /// Return remote address.
+    /// @property
     String GetAddress() const;
 
     /// Return remote port.
+    /// @property
     unsigned short GetPort() const { return port_; }
 
     /// Return the connection's round trip time in milliseconds.
+    /// @property
     float GetRoundTripTime() const;
 
     /// Return the time since last received data from the remote host in milliseconds.
+    /// @property
     unsigned GetLastHeardTime() const;
 
     /// Return bytes received per second.
+    /// @property
     float GetBytesInPerSec() const;
 
     /// Return bytes sent per second.
+    /// @property
     float GetBytesOutPerSec() const;
 
     /// Return packets received per second.
+    /// @property
     int GetPacketsInPerSec() const;
 
     /// Return packets sent per second.
+    /// @property
     int GetPacketsOutPerSec() const;
 
     /// Return an address:port string.
     String ToString() const;
     /// Return number of package downloads remaining.
+    /// @property
     unsigned GetNumDownloads() const;
     /// Return name of current package download, or empty if no downloads.
+    /// @property
     const String& GetDownloadName() const;
     /// Return progress of current package download, or 1.0 if no downloads.
+    /// @property
     float GetDownloadProgress() const;
     /// Trigger client connection to download a package file from the server. Can be used to download additional resource packages when client is already joined in a scene. The package must have been added as a requirement to the scene the client is joined in, or else the eventual download will fail.
     void SendPackageToClient(PackageFile* package);
