@@ -596,15 +596,15 @@ void View::Render()
     }
 #endif
 
+#ifdef URHO3D_OPENGL
     if (renderTarget_)
     {
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
         // as a render texture produced on Direct3D9
-#ifdef URHO3D_OPENGL
         if (camera_)
-            camera_->SetFlipVertical(true);
-#endif
+            camera_->SetFlipVertical(!camera_->GetFlipVertical());
     }
+#endif
 
     // Render
     ExecuteRenderPathCommands();
@@ -651,8 +651,12 @@ void View::Render()
     }
 
 #ifdef URHO3D_OPENGL
-    if (camera_)
-        camera_->SetFlipVertical(false);
+    if (renderTarget_)
+    {
+        // Restores original setting of FlipVertical when flipped by code above.
+        if (camera_)
+            camera_->SetFlipVertical(!camera_->GetFlipVertical());
+    }
 #endif
 
     // Run framebuffer blitting if necessary. If scene was resolved from backbuffer, do not touch depth
