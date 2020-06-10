@@ -601,6 +601,10 @@ void View::Render()
     {
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
         // as a render texture produced on Direct3D9
+        // Note that the state of the FlipVertical mode is toggled here rather than enabled
+        // The reason for this is that we want the mode to be the opposite of what the user has currently set for the
+        // camera when rendering to texture for OpenGL
+        // This mode is returned to the original state by toggling it again below, after the render
         if (camera_)
             camera_->SetFlipVertical(!camera_->GetFlipVertical());
     }
