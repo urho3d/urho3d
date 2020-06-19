@@ -42,7 +42,8 @@ extern const char* UI_CATEGORY;
 DropDownList::DropDownList(Context* context) :
     Menu(context),
     resizePopup_(false),
-    selectionAttr_(0)
+    selectionAttr_(0),
+    selectedItem_(nullptr)
 {
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
@@ -316,11 +317,6 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
 
 void DropDownList::HandleItemClicked(StringHash eventType, VariantMap& eventData)
 {
-    // Resize the selection placeholder to match the selected item
-    UIElement* selectedItem = GetSelectedItem();
-    if (selectedItem)
-        placeholder_->SetSize(selectedItem->GetSize());
-
     // Close and defocus the popup. This will actually send the selection forward
     if (listView_->HasFocus())
         GetSubsystem<UI>()->SetFocusElement(focusMode_ < FM_FOCUSABLE ? nullptr : this);
@@ -341,6 +337,22 @@ void DropDownList::HandleSelectionChanged(StringHash eventType, VariantMap& even
 {
     // Display the place holder text when there is no selection, however, the place holder text is only visible when the place holder itself is set to visible
     placeholder_->GetChild(0)->SetVisible(GetSelection() == M_MAX_UNSIGNED);
+
+    if (selectedItem_)
+        UnsubscribeFromEvent(selectedItem_, E_RESIZED);
+
+    // Resize the selection placeholder to match the selected item
+    selectedItem_ = GetSelectedItem();
+    if (selectedItem_)
+    {
+        placeholder_->SetFixedSize(selectedItem_->GetSize());
+        SubscribeToEvent(selectedItem_, E_RESIZED, URHO3D_HANDLER(DropDownList, HandleSelectionResized));
+    }
+}
+
+void DropDownList::HandleSelectionResized(StringHash eventType, VariantMap& eventData)
+{
+    placeholder_->SetFixedSize(selectedItem_->GetSize());
 }
 
 }

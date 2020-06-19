@@ -116,9 +116,13 @@ private:
     void HandleListViewKey(StringHash eventType, VariantMap& eventData);
     /// Handle the listview selection change. Set placeholder text hidden/visible as necessary.
     void HandleSelectionChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle when an item is resized.
+    void HandleSelectionResized(StringHash eventType, VariantMap& eventData);
 
     /// Selected item index attribute.
     unsigned selectionAttr_;
+    /// Current selected item
+    UIElement* selectedItem_;
 };
 
 }
