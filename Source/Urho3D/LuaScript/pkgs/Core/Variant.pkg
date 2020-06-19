@@ -77,20 +77,20 @@ class Variant
     void* Get(const char* type = 0) const;          // "Generic" get which is only possible in Lua scripting
 
     // All below getters are preserved for backward compatibility and for compatibility with C++ and AngelScript API
-    int GetInt() const;
-    unsigned GetUInt() const;
-    long long int GetInt64() const;
-    unsigned long long int GetUInt64() const;
+    int GetInt(int defaultValue = 0) const;
+    unsigned GetUInt(unsigned defaultValue = 0) const;
+    long long int GetInt64(long long int defaultValue = 0) const;
+    unsigned long long int GetUInt64(unsigned long long int defaultValue = 0) const;
     StringHash GetStringHash() const;
-    bool GetBool() const;
-    float GetFloat() const;
-    double GetDouble() const;
-    const Vector2& GetVector2() const;
-    const Vector3& GetVector3() const;
-    const Vector4& GetVector4() const;
-    const Quaternion& GetQuaternion() const;
-    const Color& GetColor() const;
-    const String GetString() const;
+    bool GetBool(bool defaultValue = false) const;
+    float GetFloat(float defaultValue = 0.0f) const;
+    double GetDouble(double defaultValue = 0.0) const;
+    const Vector2& GetVector2(const Vector2& defaultValue = Vector2::ZERO) const;
+    const Vector3& GetVector3(const Vector3& defaultValue = Vector3::ZERO) const;
+    const Vector4& GetVector4(const Vector4& defaultValue = Vector4::ZERO) const;
+    const Quaternion& GetQuaternion(const Quaternion& defaultValue = Quaternion::IDENTITY) const;
+    const Color& GetColor(const Color& defaultValue = Color::WHITE) const;
+    const String GetString(const String& defaultValue = String::EMPTY) const;
     const PODVector<unsigned char>& GetBuffer @ GetRawBuffer() const;
     VectorBuffer GetVectorBuffer @ GetBuffer() const;     // For backward compatibility reason, keep the old alias
     void* GetVoidPtr(const char* type) const;
@@ -99,14 +99,14 @@ class Variant
     const Vector<Variant>& GetVariantVector() const;
     const VariantMap& GetVariantMap() const;
     const Vector<String>& GetStringVector() const;
-    const Rect& GetRect() const;
-    const IntRect& GetIntRect() const;
-    const IntVector2& GetIntVector2() const;
-    const IntVector3& GetIntVector3() const;
+    const Rect& GetRect(const Rect& defaultValue = Rect::ZERO) const;
+    const IntRect& GetIntRect(const IntRect& defaultValue = IntRect::ZERO) const;
+    const IntVector2& GetIntVector2(const IntVector2& defaultValue = IntVector2::ZERO) const;
+    const IntVector3& GetIntVector3(const IntVector3& defaultValue = IntVector3::ZERO) const;
     RefCounted* GetPtr(const char* type) const;
-    const Matrix3& GetMatrix3() const;
-    const Matrix3x4& GetMatrix3x4() const;
-    const Matrix4& GetMatrix4() const;
+    const Matrix3& GetMatrix3(const Matrix3& defaultValue = Matrix3::IDENTITY) const;
+    const Matrix3x4& GetMatrix3x4(const Matrix3x4& defaultValue = Matrix3x4::IDENTITY) const;
+    const Matrix4& GetMatrix4(const Matrix4& defaultValue = Matrix4::IDENTITY) const;
 
     VariantType GetType() const;
     String GetTypeName() const;

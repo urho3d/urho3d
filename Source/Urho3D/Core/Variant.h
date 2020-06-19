@@ -1083,8 +1083,8 @@ public:
     /// Set custom value.
     template <class T> void SetCustom(const T& value) { SetCustomVariantValue(MakeCustomValue<T>(value)); }
 
-    /// Return int or zero on type mismatch. Floats and doubles are converted.
-    int GetInt() const
+    /// Return int or defaultValue on type mismatch. Floats and doubles are converted.
+    int GetInt(int defaultValue = 0) const
     {
         if (type_ == VAR_INT)
             return value_.int_;
@@ -1093,11 +1093,11 @@ public:
         else if (type_ == VAR_DOUBLE)
             return static_cast<int>(value_.double_);
         else
-            return 0;
+            return defaultValue;
     }
 
-    /// Return 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    long long GetInt64() const
+    /// Return 64 bit int or defaultValue on type mismatch. Floats and doubles are converted.
+    long long GetInt64(long long defaultValue = 0) const
     {
         if (type_ == VAR_INT64)
             return value_.int64_;
@@ -1108,11 +1108,11 @@ public:
         else if (type_ == VAR_DOUBLE)
             return static_cast<long long>(value_.double_);
         else
-            return 0;
+            return defaultValue;
     }
 
-    /// Return unsigned 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    unsigned long long GetUInt64() const
+    /// Return unsigned 64 bit int or defaultValue on type mismatch. Floats and doubles are converted.
+    unsigned long long GetUInt64(unsigned long defaultValue = 0) const
     {
         if (type_ == VAR_INT64)
             return static_cast<unsigned long long>(value_.int64_);
@@ -1123,11 +1123,11 @@ public:
         else if (type_ == VAR_DOUBLE)
             return static_cast<unsigned long long>(value_.double_);
         else
-            return 0;
+            return defaultValue;
     }
 
-    /// Return unsigned int or zero on type mismatch. Floats and doubles are converted.
-    unsigned GetUInt() const
+    /// Return unsigned int or defaultValue on type mismatch. Floats and doubles are converted.
+    unsigned GetUInt(unsigned defaultValue = 0) const
     {
         if (type_ == VAR_INT)
             return static_cast<unsigned>(value_.int_);
@@ -1136,17 +1136,17 @@ public:
         else if (type_ == VAR_DOUBLE)
             return static_cast<unsigned>(value_.double_);
         else
-            return 0;
+            return defaultValue;
     }
 
     /// Return StringHash or zero on type mismatch.
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
 
-    /// Return bool or false on type mismatch.
-    bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
+    /// Return bool or defaultValue on type mismatch.
+    bool GetBool(bool defaultValue = false) const { return type_ == VAR_BOOL ? value_.bool_ : defaultValue; }
 
-    /// Return float or zero on type mismatch. Ints and doubles are converted.
-    float GetFloat() const
+    /// Return float or defaultValue on type mismatch. Ints and doubles are converted.
+    float GetFloat(float defaultValue = 0.0f) const
     {
         if (type_ == VAR_FLOAT)
             return value_.float_;
@@ -1157,11 +1157,11 @@ public:
         else if (type_ == VAR_INT64)
             return static_cast<float>(value_.int64_);
         else
-            return 0.0f;
+            return defaultValue;
     }
 
-    /// Return double or zero on type mismatch. Ints and floats are converted.
-    double GetDouble() const
+    /// Return double or defaultValue on type mismatch. Ints and floats are converted.
+    double GetDouble(double defaultValue = 0.0) const
     {
         if (type_ == VAR_DOUBLE)
             return value_.double_;
@@ -1172,29 +1172,29 @@ public:
         else if (type_ == VAR_INT64)
             return static_cast<double>(value_.int64_);
         else
-            return 0.0;
+            return defaultValue;
     }
 
-    /// Return Vector2 or zero on type mismatch.
-    const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? value_.vector2_ : Vector2::ZERO; }
+    /// Return Vector2 or defaultValue on type mismatch.
+    const Vector2& GetVector2(const Vector2& defaultValue = Vector2::ZERO) const { return type_ == VAR_VECTOR2 ? value_.vector2_ : defaultValue; }
 
-    /// Return Vector3 or zero on type mismatch.
-    const Vector3& GetVector3() const { return type_ == VAR_VECTOR3 ? value_.vector3_ : Vector3::ZERO; }
+    /// Return Vector3 or defaultValue on type mismatch.
+    const Vector3& GetVector3(const Vector3& defaultValue = Vector3::ZERO) const { return type_ == VAR_VECTOR3 ? value_.vector3_ : defaultValue; }
 
-    /// Return Vector4 or zero on type mismatch.
-    const Vector4& GetVector4() const { return type_ == VAR_VECTOR4 ? value_.vector4_ : Vector4::ZERO; }
+    /// Return Vector4 or defaultValue on type mismatch.
+    const Vector4& GetVector4(const Vector4& defaultValue = Vector4::ZERO) const { return type_ == VAR_VECTOR4 ? value_.vector4_ : defaultValue; }
 
-    /// Return quaternion or identity on type mismatch.
-    const Quaternion& GetQuaternion() const
+    /// Return quaternion or defaultValue on type mismatch.
+    const Quaternion& GetQuaternion(const Quaternion& defaultValue = Quaternion::IDENTITY) const
     {
-        return type_ == VAR_QUATERNION ? value_.quaternion_ : Quaternion::IDENTITY;
+        return type_ == VAR_QUATERNION ? value_.quaternion_ : defaultValue;
     }
 
-    /// Return color or default on type mismatch. Vector4 is aliased to Color if necessary.
-    const Color& GetColor() const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : Color::WHITE; }
+    /// Return color or defaultValue on type mismatch. Vector4 is aliased to Color if necessary.
+    const Color& GetColor(const Color& defaultValue = Color::WHITE) const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : defaultValue; }
 
-    /// Return string or empty on type mismatch.
-    const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
+    /// Return string or defaultValue on type mismatch.
+    const String& GetString(const String& defaultValue = String::EMPTY) const { return type_ == VAR_STRING ? value_.string_ : defaultValue; }
 
     /// Return buffer or empty on type mismatch.
     const PODVector<unsigned char>& GetBuffer() const
@@ -1246,22 +1246,22 @@ public:
         return type_ == VAR_VARIANTMAP ? value_.variantMap_ : emptyVariantMap;
     }
 
-    /// Return a rect or empty on type mismatch.
-    const Rect& GetRect() const { return type_ == VAR_RECT ? value_.rect_ : Rect::ZERO; }
+    /// Return a rect or defaultValue on type mismatch.
+    const Rect& GetRect(const Rect& defaultValue = Rect::ZERO) const { return type_ == VAR_RECT ? value_.rect_ : defaultValue; }
 
-    /// Return an integer rect or empty on type mismatch.
-    const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? value_.intRect_ : IntRect::ZERO; }
+    /// Return an integer rect or defaultValue on type mismatch.
+    const IntRect& GetIntRect(const IntRect& defaultValue = IntRect::ZERO) const { return type_ == VAR_INTRECT ? value_.intRect_ : defaultValue; }
 
-    /// Return an IntVector2 or empty on type mismatch.
-    const IntVector2& GetIntVector2() const
+    /// Return an IntVector2 or defaultValue on type mismatch.
+    const IntVector2& GetIntVector2(const IntVector2& defaultValue = IntVector2::ZERO) const
     {
-        return type_ == VAR_INTVECTOR2 ? value_.intVector2_ : IntVector2::ZERO;
+        return type_ == VAR_INTVECTOR2 ? value_.intVector2_ : defaultValue;
     }
 
-    /// Return an IntVector3 or empty on type mismatch.
-    const IntVector3& GetIntVector3() const
+    /// Return an IntVector3 or defaultValue on type mismatch.
+    const IntVector3& GetIntVector3(const IntVector3& defaultValue = IntVector3::ZERO) const
     {
-        return type_ == VAR_INTVECTOR3 ? value_.intVector3_ : IntVector3::ZERO;
+        return type_ == VAR_INTVECTOR3 ? value_.intVector3_ : defaultValue;
     }
 
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
@@ -1270,22 +1270,22 @@ public:
         return type_ == VAR_PTR ? value_.weakPtr_ : nullptr;
     }
 
-    /// Return a Matrix3 or identity on type mismatch.
-    const Matrix3& GetMatrix3() const
+    /// Return a Matrix3 or defaultValue on type mismatch.
+    const Matrix3& GetMatrix3(const Matrix3& defaultValue = Matrix3::IDENTITY) const
     {
-        return type_ == VAR_MATRIX3 ? *value_.matrix3_ : Matrix3::IDENTITY;
+        return type_ == VAR_MATRIX3 ? *value_.matrix3_ : defaultValue;
     }
 
-    /// Return a Matrix3x4 or identity on type mismatch.
-    const Matrix3x4& GetMatrix3x4() const
+    /// Return a Matrix3x4 or defaultValue on type mismatch.
+    const Matrix3x4& GetMatrix3x4(const Matrix3x4& defaultValue = Matrix3x4::IDENTITY) const
     {
-        return type_ == VAR_MATRIX3X4 ? *value_.matrix3x4_ : Matrix3x4::IDENTITY;
+        return type_ == VAR_MATRIX3X4 ? *value_.matrix3x4_ : defaultValue;
     }
 
-    /// Return a Matrix4 or identity on type mismatch.
-    const Matrix4& GetMatrix4() const
+    /// Return a Matrix4 or defaultValue on type mismatch.
+    const Matrix4& GetMatrix4(const Matrix4& defaultValue = Matrix4::IDENTITY) const
     {
-        return type_ == VAR_MATRIX4 ? *value_.matrix4_ : Matrix4::IDENTITY;
+        return type_ == VAR_MATRIX4 ? *value_.matrix4_ : defaultValue;
     }
 
     /// Return pointer to custom variant value.
