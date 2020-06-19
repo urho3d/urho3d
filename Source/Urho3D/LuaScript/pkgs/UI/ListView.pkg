@@ -20,12 +20,12 @@ class ListView : public ScrollView
     void DisableInternalLayoutUpdate();
     void EnableInternalLayoutUpdate();
 
-    void AddItem(UIElement* item);
+    bool AddItem(UIElement* item);
 
-    void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
-    void RemoveItem(UIElement* item, unsigned index = 0);
+    bool InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
+    bool RemoveItem(UIElement* item, unsigned index = 0);
 
-    void RemoveItem(unsigned index);
+    bool RemoveItem(unsigned index);
     void RemoveAllItems();
     void SetSelection(unsigned index);
     void SetSelections(const PODVector<unsigned>& indices);

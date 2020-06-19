@@ -54,13 +54,13 @@ public:
     void OnSetEditable() override;
 
     /// Add item to the end of the list.
-    void AddItem(UIElement* item);
+    bool AddItem(UIElement* item);
     /// Insert item to a specific position.
-    void InsertItem(unsigned index, UIElement* item);
+    bool InsertItem(unsigned index, UIElement* item);
     /// Remove specific item.
-    void RemoveItem(UIElement* item);
+    bool RemoveItem(UIElement* item);
     /// Remove item at index.
-    void RemoveItem(unsigned index);
+    bool RemoveItem(unsigned index);
     /// Remove all items.
     void RemoveAllItems();
     /// Set selection.

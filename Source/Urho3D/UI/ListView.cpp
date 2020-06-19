@@ -342,15 +342,15 @@ void ListView::EnableInternalLayoutUpdate()
     contentElement_->EnableLayoutUpdate();
 }
 
-void ListView::AddItem(UIElement* item)
+bool ListView::AddItem(UIElement* item)
 {
-    InsertItem(M_MAX_UNSIGNED, item);
+    return InsertItem(M_MAX_UNSIGNED, item);
 }
 
-void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
+bool ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
 {
     if (!item || item->GetParent() == contentElement_)
-        return;
+        return false;
 
     // Enable input so that clicking the item can be detected
     item->SetEnabled(true);
@@ -410,12 +410,14 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
 
         UpdateSelectionEffect();
     }
+
+    return true;
 }
 
-void ListView::RemoveItem(UIElement* item, unsigned index)
+bool ListView::RemoveItem(UIElement* item, unsigned index)
 {
     if (!item)
-        return;
+        return false;
 
     unsigned numItems = GetNumItems();
     for (unsigned i = index; i < numItems; ++i)
@@ -482,15 +484,20 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
                 UpdateSelectionEffect();
             }
 
+
+            SharedPtr<UIElement> itemToRemove(item);
             contentElement_->RemoveChildAtIndex(i);
-            break;
+
+            return true;
         }
     }
+
+    return false;
 }
 
-void ListView::RemoveItem(unsigned index)
+bool ListView::RemoveItem(unsigned index)
 {
-    RemoveItem(GetItem(index), index);
+    return RemoveItem(GetItem(index), index);
 }
 
 void ListView::RemoveAllItems()

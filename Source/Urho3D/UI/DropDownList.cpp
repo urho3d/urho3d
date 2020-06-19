@@ -151,28 +151,30 @@ void DropDownList::OnSetEditable()
     listView_->SetEditable(editable_);
 }
 
-void DropDownList::AddItem(UIElement* item)
+bool DropDownList::AddItem(UIElement* item)
 {
-    InsertItem(M_MAX_UNSIGNED, item);
+    return InsertItem(M_MAX_UNSIGNED, item);
 }
 
-void DropDownList::InsertItem(unsigned index, UIElement* item)
+bool DropDownList::InsertItem(unsigned index, UIElement* item)
 {
-    listView_->InsertItem(index, item);
+    if (!listView_->InsertItem(index, item))
+        return false;
 
     // If there was no selection, set to the first
     if (GetSelection() == M_MAX_UNSIGNED)
         SetSelection(0);
+    return true;
 }
 
-void DropDownList::RemoveItem(UIElement* item)
+bool DropDownList::RemoveItem(UIElement* item)
 {
-    listView_->RemoveItem(item);
+    return listView_->RemoveItem(item);
 }
 
-void DropDownList::RemoveItem(unsigned index)
+bool DropDownList::RemoveItem(unsigned index)
 {
-    listView_->RemoveItem(index);
+    return listView_->RemoveItem(index);
 }
 
 void DropDownList::RemoveAllItems()

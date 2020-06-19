@@ -324,10 +324,10 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void EnableInternalLayoutUpdate()", asMETHOD(ListView, EnableInternalLayoutUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetViewPosition(int, int)", asMETHODPR(ListView, SetViewPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetScrollBarsVisible(bool, bool)", asMETHOD(ListView, SetScrollBarsVisible), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void AddItem(UIElement@+)", asMETHOD(ListView, AddItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void InsertItem(uint, UIElement@+, UIElement@+ arg2 = null)", asMETHOD(ListView, InsertItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void RemoveItem(UIElement@+, uint index = 0)", asMETHODPR(ListView, RemoveItem, (UIElement*, unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void RemoveItem(uint)", asMETHODPR(ListView, RemoveItem, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool AddItem(UIElement@+)", asMETHOD(ListView, AddItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool InsertItem(uint, UIElement@+, UIElement@+ arg2 = null)", asMETHOD(ListView, InsertItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool RemoveItem(UIElement@+, uint index = 0)", asMETHODPR(ListView, RemoveItem, (UIElement*, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool RemoveItem(uint)", asMETHODPR(ListView, RemoveItem, (unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveAllItems()", asMETHOD(ListView, RemoveAllItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void AddSelection(uint)", asMETHOD(ListView, AddSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveSelection(uint)", asMETHOD(ListView, RemoveSelection), asCALL_THISCALL);
@@ -563,10 +563,10 @@ static void RegisterDropDownList(asIScriptEngine* engine)
 {
     RegisterButton<DropDownList>(engine, "DropDownList");
     engine->RegisterObjectMethod("DropDownList", "void SetAccelerator(int, int)", asMETHOD(DropDownList, SetAccelerator), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DropDownList", "void AddItem(UIElement@+)", asMETHOD(DropDownList, AddItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DropDownList", "void InsertItem(uint, UIElement@+)", asMETHOD(DropDownList, InsertItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DropDownList", "void RemoveItem(UIElement@+)", asMETHODPR(DropDownList, RemoveItem, (UIElement*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DropDownList", "void RemoveItem(uint)", asMETHODPR(DropDownList, RemoveItem, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "bool AddItem(UIElement@+)", asMETHOD(DropDownList, AddItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "bool InsertItem(uint, UIElement@+)", asMETHOD(DropDownList, InsertItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "bool RemoveItem(UIElement@+)", asMETHODPR(DropDownList, RemoveItem, (UIElement*), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "bool RemoveItem(uint)", asMETHODPR(DropDownList, RemoveItem, (unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void RemoveAllItems()", asMETHOD(DropDownList, RemoveAllItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "Array<UIElement@>@ GetItems() const", asFUNCTION(DropDownListGetItems), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DropDownList", "void set_showPopup(bool)", asMETHOD(DropDownList, ShowPopup), asCALL_THISCALL);

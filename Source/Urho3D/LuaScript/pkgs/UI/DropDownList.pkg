@@ -5,10 +5,10 @@ class DropDownList : public Menu
     DropDownList();
     ~DropDownList();
     
-    void AddItem(UIElement* item);
-    void InsertItem(unsigned index, UIElement* item);
-    void RemoveItem(UIElement* item);
-    void RemoveItem(unsigned index);
+    bool AddItem(UIElement* item);
+    bool InsertItem(unsigned index, UIElement* item);
+    bool RemoveItem(UIElement* item);
+    bool RemoveItem(unsigned index);
     void RemoveAllItems();
     void SetSelection(unsigned index);
     
