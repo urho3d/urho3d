@@ -262,7 +262,7 @@ void ScrollView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifi
 
 void ScrollView::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
-    UpdatePanelSize();
+    UpdatePanelSize(true);
     UpdateViewSize();
 
     // If scrollbar auto visibility is enabled, check whether scrollbars should be visible.
@@ -274,7 +274,7 @@ void ScrollView::OnResize(const IntVector2& newSize, const IntVector2& delta)
         verticalScrollBar_->SetVisible(verticalScrollBar_->GetRange() > M_EPSILON);
         ignoreEvents_ = false;
 
-        UpdatePanelSize();
+        UpdatePanelSize(false);
     }
 }
 
@@ -429,17 +429,20 @@ bool ScrollView::FilterScrollBarImplicitAttributes(XMLElement& dest, const Strin
     return true;
 }
 
-void ScrollView::UpdatePanelSize()
+void ScrollView::UpdatePanelSize(bool ignoreScrollBars)
 {
     // Ignore events in case content element resizes itself along with the panel
     // (content element resize triggers our OnResize(), so it could lead to infinite recursion)
     ignoreEvents_ = true;
 
     IntVector2 panelSize = GetSize();
-    if (verticalScrollBar_->IsVisible())
-        panelSize.x_ -= verticalScrollBar_->GetWidth();
-    if (horizontalScrollBar_->IsVisible())
-        panelSize.y_ -= horizontalScrollBar_->GetHeight();
+    if (!ignoreScrollBars)
+    {
+        if (verticalScrollBar_->IsVisible())
+            panelSize.x_ -= verticalScrollBar_->GetWidth();
+        if (horizontalScrollBar_->IsVisible())
+            panelSize.y_ -= horizontalScrollBar_->GetHeight();
+    }
 
     scrollPanel_->SetSize(panelSize);
     horizontalScrollBar_->SetWidth(scrollPanel_->GetWidth());
