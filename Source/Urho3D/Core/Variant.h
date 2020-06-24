@@ -1175,26 +1175,41 @@ public:
             return defaultValue;
     }
 
+    /// Return Vector2 or zero vector on type mismatch.
+    const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? value_.vector2_ : Vector2::ZERO; }
     /// Return Vector2 or defaultValue on type mismatch.
-    const Vector2& GetVector2(const Vector2& defaultValue = Vector2::ZERO) const { return type_ == VAR_VECTOR2 ? value_.vector2_ : defaultValue; }
+    Vector2 GetVector2(const Vector2& defaultValue) const { return type_ == VAR_VECTOR2 ? value_.vector2_ : defaultValue; }
 
+    /// Return Vector3 or zero vector on type mismatch.
+    const Vector3& GetVector3() const { return type_ == VAR_VECTOR3 ? value_.vector3_ : Vector3::ZERO; }
     /// Return Vector3 or defaultValue on type mismatch.
-    const Vector3& GetVector3(const Vector3& defaultValue = Vector3::ZERO) const { return type_ == VAR_VECTOR3 ? value_.vector3_ : defaultValue; }
+    Vector3 GetVector3(const Vector3& defaultValue) const { return type_ == VAR_VECTOR3 ? value_.vector3_ : defaultValue; }
 
+    /// Return Vector4 or zero vector on type mismatch.
+    const Vector4& GetVector4() const { return type_ == VAR_VECTOR4 ? value_.vector4_ : Vector4::ZERO; }
     /// Return Vector4 or defaultValue on type mismatch.
-    const Vector4& GetVector4(const Vector4& defaultValue = Vector4::ZERO) const { return type_ == VAR_VECTOR4 ? value_.vector4_ : defaultValue; }
+    Vector4 GetVector4(const Vector4& defaultValue) const { return type_ == VAR_VECTOR4 ? value_.vector4_ : defaultValue; }
 
+    /// Return quaternion or identity quaternion on type mismatch.
+    const Quaternion& GetQuaternion() const
+    {
+        return type_ == VAR_QUATERNION ? value_.quaternion_ : Quaternion::IDENTITY;
+    }
     /// Return quaternion or defaultValue on type mismatch.
-    const Quaternion& GetQuaternion(const Quaternion& defaultValue = Quaternion::IDENTITY) const
+    Quaternion GetQuaternion(const Quaternion& defaultValue) const
     {
         return type_ == VAR_QUATERNION ? value_.quaternion_ : defaultValue;
     }
 
+    /// Return color or white on type mismatch. Vector4 is aliased to Color if necessary.
+    const Color& GetColor() const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : Color::WHITE; }
     /// Return color or defaultValue on type mismatch. Vector4 is aliased to Color if necessary.
-    const Color& GetColor(const Color& defaultValue = Color::WHITE) const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : defaultValue; }
+    Color GetColor(const Color& defaultValue) const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? value_.color_ : defaultValue; }
 
+    /// Return string or empty string on type mismatch.
+    const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
     /// Return string or defaultValue on type mismatch.
-    const String& GetString(const String& defaultValue = String::EMPTY) const { return type_ == VAR_STRING ? value_.string_ : defaultValue; }
+    String GetString(const String& defaultValue) const { return type_ == VAR_STRING ? value_.string_ : defaultValue; }
 
     /// Return buffer or empty on type mismatch.
     const PODVector<unsigned char>& GetBuffer() const
@@ -1246,20 +1261,34 @@ public:
         return type_ == VAR_VARIANTMAP ? value_.variantMap_ : emptyVariantMap;
     }
 
+    /// Return a rect or zero rect on type mismatch.
+    const Rect& GetRect() const { return type_ == VAR_RECT ? value_.rect_ : Rect::ZERO; }
     /// Return a rect or defaultValue on type mismatch.
-    const Rect& GetRect(const Rect& defaultValue = Rect::ZERO) const { return type_ == VAR_RECT ? value_.rect_ : defaultValue; }
+    Rect GetRect(const Rect& defaultValue) const { return type_ == VAR_RECT ? value_.rect_ : defaultValue; }
 
+    /// Return an integer rect or zero rect on type mismatch.
+    const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? value_.intRect_ : IntRect::ZERO; }
     /// Return an integer rect or defaultValue on type mismatch.
-    const IntRect& GetIntRect(const IntRect& defaultValue = IntRect::ZERO) const { return type_ == VAR_INTRECT ? value_.intRect_ : defaultValue; }
+    IntRect GetIntRect(const IntRect& defaultValue) const { return type_ == VAR_INTRECT ? value_.intRect_ : defaultValue; }
 
+    /// Return an IntVector2 or zero vector on type mismatch.
+    const IntVector2& GetIntVector2() const
+    {
+        return type_ == VAR_INTVECTOR2 ? value_.intVector2_ : IntVector2::ZERO;
+    }
     /// Return an IntVector2 or defaultValue on type mismatch.
-    const IntVector2& GetIntVector2(const IntVector2& defaultValue = IntVector2::ZERO) const
+    IntVector2 GetIntVector2(const IntVector2& defaultValue) const
     {
         return type_ == VAR_INTVECTOR2 ? value_.intVector2_ : defaultValue;
     }
 
+    /// Return an IntVector3 or zero vector on type mismatch.
+    const IntVector3& GetIntVector3() const
+    {
+        return type_ == VAR_INTVECTOR3 ? value_.intVector3_ : IntVector3::ZERO;
+    }
     /// Return an IntVector3 or defaultValue on type mismatch.
-    const IntVector3& GetIntVector3(const IntVector3& defaultValue = IntVector3::ZERO) const
+    IntVector3 GetIntVector3(const IntVector3& defaultValue) const
     {
         return type_ == VAR_INTVECTOR3 ? value_.intVector3_ : defaultValue;
     }
@@ -1270,20 +1299,35 @@ public:
         return type_ == VAR_PTR ? value_.weakPtr_ : nullptr;
     }
 
+    /// Return a Matrix3 or identity matrix on type mismatch.
+    const Matrix3& GetMatrix3() const
+    {
+        return type_ == VAR_MATRIX3 ? *value_.matrix3_ : Matrix3::IDENTITY;
+    }
     /// Return a Matrix3 or defaultValue on type mismatch.
-    const Matrix3& GetMatrix3(const Matrix3& defaultValue = Matrix3::IDENTITY) const
+    Matrix3 GetMatrix3(const Matrix3& defaultValue) const
     {
         return type_ == VAR_MATRIX3 ? *value_.matrix3_ : defaultValue;
     }
 
+    /// Return a Matrix3x4 or identity matrix on type mismatch.
+    const Matrix3x4& GetMatrix3x4() const
+    {
+        return type_ == VAR_MATRIX3X4 ? *value_.matrix3x4_ : Matrix3x4::IDENTITY;
+    }
     /// Return a Matrix3x4 or defaultValue on type mismatch.
-    const Matrix3x4& GetMatrix3x4(const Matrix3x4& defaultValue = Matrix3x4::IDENTITY) const
+    Matrix3x4 GetMatrix3x4(const Matrix3x4& defaultValue) const
     {
         return type_ == VAR_MATRIX3X4 ? *value_.matrix3x4_ : defaultValue;
     }
 
+    /// Return a Matrix4 or identity matrix on type mismatch.
+    const Matrix4& GetMatrix4() const
+    {
+        return type_ == VAR_MATRIX4 ? *value_.matrix4_ : Matrix4::IDENTITY;
+    }
     /// Return a Matrix4 or defaultValue on type mismatch.
-    const Matrix4& GetMatrix4(const Matrix4& defaultValue = Matrix4::IDENTITY) const
+    Matrix4 GetMatrix4(const Matrix4& defaultValue) const
     {
         return type_ == VAR_MATRIX4 ? *value_.matrix4_ : defaultValue;
     }
