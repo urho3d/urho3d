@@ -6844,7 +6844,7 @@ String GetLanguage(int);
 int GetLanguageIndex(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
-void LoadJSONFile(const String&, const String = String ( "" ) const);
+void LoadJSONFile(const String&, const String& = String ( "" ) const);
 void LoadMultipleLanguageJSON(const JSONValue&);
 void LoadSingleLanguageJSON(const JSONValue&, const String& = String ( "" ) const);
 void Reset();
