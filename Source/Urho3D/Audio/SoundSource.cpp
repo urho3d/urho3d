@@ -355,6 +355,7 @@ void SoundSource::Update(float timeStep)
         eventData[P_SOUNDSOURCE] = this;
         eventData[P_SOUND] = sound_;
         node_->SendEvent(E_SOUNDFINISHED, eventData);
+        SendEvent(E_SOUNDFINISHED, eventData);
 
         if (self.Expired())
             return;
