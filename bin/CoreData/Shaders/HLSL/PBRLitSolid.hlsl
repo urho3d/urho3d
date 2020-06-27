@@ -222,7 +222,6 @@ void PS(
     metalness = clamp(metalness, METALNESS_FLOOR, 1.0);
 
     float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
-    specColor *= cMatSpecColor.rgb;
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
 
     // Get normal
