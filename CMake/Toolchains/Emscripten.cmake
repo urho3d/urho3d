@@ -60,8 +60,16 @@ if (NOT IN_TRY_COMPILE)
             if (DEFINED ENV{EMSCRIPTEN_ROOT_PATH})
                 file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_ROOT_PATH} EMSCRIPTEN_ROOT_PATH)
             elseif (DEFINED ENV{EM_CONFIG})
+                # Attempt to auto detect the Emscripten root path from the config file
                 file (STRINGS $ENV{EM_CONFIG} EMSCRIPTEN_ROOT_PATH REGEX "^EMSCRIPTEN_ROOT = '.*'$")
-                string (REGEX REPLACE "^EMSCRIPTEN_ROOT = '(.*)'$" \\1 EMSCRIPTEN_ROOT_PATH "${EMSCRIPTEN_ROOT_PATH}")    # Stringify to guard against empty variable
+                if (EMSCRIPTEN_ROOT_PATH)
+                    string (REGEX REPLACE "^EMSCRIPTEN_ROOT = '(.*)'$" \\1 EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH})
+                else ()
+                    # Newer config file requires Python to actually evaluate it, basically, `cat $EM_CONFIG <(echo 'print(EMSCRIPTEN_ROOT)') |python -`
+                    file (STRINGS $ENV{EM_CONFIG} EM_CONFIG NEWLINE_CONSUME)
+                    execute_process (COMMAND ${CMAKE_COMMAND} -E echo "${EM_CONFIG}\nprint(EMSCRIPTEN_ROOT)"
+                                     COMMAND python - OUTPUT_VARIABLE EMSCRIPTEN_ROOT_PATH OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+                endif ()
             endif ()
         endif ()
         set (EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten only)")
