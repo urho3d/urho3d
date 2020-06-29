@@ -284,8 +284,8 @@ set_option(VIDEO_DIRECTFB      "Use DirectFB video driver" OFF)
 dep_option(DIRECTFB_SHARED     "Dynamically load directfb support" ON VIDEO_DIRECTFB OFF)
 set_option(VIDEO_DUMMY         "Use dummy video driver" ON)
 set_option(VIDEO_OPENGL        "Include OpenGL support" ON)
-# Urho3D - hide OpenGLES option from MinGW platform because it does not have the necessary header file to build OpenGLES video driver
-dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "NOT MINGW" OFF)
+# Urho3D - hide OpenGLES option from all desktop platforms, although a few of them appears to have the necessary header file to build SDL OpenGLES video driver
+dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "ANDROID OR IOS OR TVOS OR ARM OR WEB" OFF)
 # Urho3D - only make PTHREADS option available on UNIX-like platforms
 dep_option(PTHREADS            "Use POSIX threads for multi-threading" ON UNIX OFF)
 dep_option(PTHREADS_SEM        "Use pthread semaphores" ON PTHREADS OFF)
@@ -1075,7 +1075,7 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     CheckRPI()
     CheckX11()
     CheckDirectFB()
-    # Urho3D - raname macros
+    # Urho3D - rename macros
     CheckOpenGL()
     CheckOpenGLES()
     CheckWayland()
