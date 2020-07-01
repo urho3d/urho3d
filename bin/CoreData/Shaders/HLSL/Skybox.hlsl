@@ -10,8 +10,7 @@ void VS(float4 iPos : POSITION,
     out float4 oPos : OUTPOSITION)
 {
 #ifdef IGNORENODETRANSFORM
-    float4x3 m = cViewInv;
-    float4x3 modelMatrix = { float3(1,0,0), float3(0,1,0), float3(0,0,1), m[3] };
+    float4x3 modelMatrix = { float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), cViewInv[3] };
 #else
     float4x3 modelMatrix = iModelMatrix;
 #endif
