@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <regex>
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Container/ArrayPtr.h>
 #include <Urho3D/Core/ProcessUtils.h>
@@ -63,11 +64,37 @@ String ignoreExtensions_[] = {
     ""
 };
 
+Vector<std::regex> excludePatterns_;
+
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void ProcessFile(const String& fileName, const String& rootDir);
 void WritePackageFile(const String& fileName, const String& rootDir);
 void WriteHeader(File& dest);
+
+static std::string glob_to_regex(const std::string &val)
+{
+    std::string newval;
+
+    bool escape = false;
+    for (char c: val)
+    {
+      if (c == '*')
+        newval += escape ? "*" : ".*", escape = false;
+      else if (c == '?')
+        newval += escape ? "?" : ".", escape = false;
+      else if (c == '\\')
+        newval += '\\', escape = !escape;
+      else
+      {
+        if (strchr(".", c))
+          newval += '\\';
+        newval += c;
+        escape = false;
+      }
+    }
+    return newval;
+}
 
 int main(int argc, char** argv)
 {
@@ -92,6 +119,7 @@ void Run(const Vector<String>& arguments)
             "Options:\n"
             "-c      Enable package file LZ4 compression\n"
             "-q      Enable quiet mode\n"
+            "-x <p>  Exclude files matching this pattern (may be used more than once)\n"
             "\n"
             "Basepath is an optional prefix that will be added to the file entries.\n\n"
             "Alternative output usage: PackageTool <output option> <package name>\n"
@@ -122,6 +150,11 @@ void Run(const Vector<String>& arguments)
                     case 'q':
                         quiet_ = true;
                         break;
+                    case 'x':
+                        if (++i == arguments.Size())
+                            ErrorExit("-x needs an option");
+                        excludePatterns_.Push(std::regex(glob_to_regex(arguments[i].CString()).c_str(), std::regex_constants::nosubs));
+                        break;
                     default:
                         ErrorExit("Unrecognized option");
                     }
@@ -148,6 +181,14 @@ void Run(const Vector<String>& arguments)
             for (unsigned j = 0; j < ignoreExtensions_[j].Length(); ++j)
             {
                 if (extension == ignoreExtensions_[j])
+                {
+                    fileNames.Erase(fileNames.Begin() + i);
+                    break;
+                }
+            }
+            for (unsigned j = 0; j < excludePatterns_.Size(); ++j)
+            {
+                if (std::regex_match(fileNames[i].CString(), excludePatterns_[j]))
                 {
                     fileNames.Erase(fileNames.Begin() + i);
                     break;
