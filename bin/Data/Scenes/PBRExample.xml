@@ -1137,7 +1137,7 @@
 					<attribute name="Brightness Multiplier" value="5000" />
 					<attribute name="Use Physical Values" value="true" />
 					<attribute name="Cast Shadows" value="true" />
-					<attribute name="CSM Splits" value="10 20 30 40" />
+					<attribute name="CSM Splits" value="4 16 128 1024" />
 				</component>
 			</node>
 		</node>
