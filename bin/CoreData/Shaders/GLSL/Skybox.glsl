@@ -6,7 +6,15 @@ varying vec3 vTexCoord;
 
 void VS()
 {
+#ifdef IGNORENODETRANSFORM
+    mat4 modelMatrix = transpose(mat4(
+        vec4(1.0, 0.0, 0.0, 0.0),
+        vec4(0.0, 1.0, 0.0, 0.0),
+        vec4(0.0, 0.0, 1.0, 0.0),
+        transpose(cViewInv)[3]));
+#else
     mat4 modelMatrix = iModelMatrix;
+#endif
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     gl_Position.z = gl_Position.w;
