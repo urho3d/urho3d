@@ -64,7 +64,7 @@ public:
     /// Remove a drawable object from this octant.
     void RemoveDrawable(Drawable* drawable, bool resetOctant = true)
     {
-        if (drawables_.Remove(drawable))
+        if (drawables_.RemoveSwap(drawable))
         {
             if (resetOctant)
                 drawable->SetOctant(nullptr);
