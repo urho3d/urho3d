@@ -64,6 +64,7 @@ public:
 
     /// Set model.
     virtual void SetModel(Model* model);
+    void SetModel(Model* model, bool ignoreReloadEvent);
     /// Set material on all geometries.
     virtual void SetMaterial(Material* material);
     /// Set material on one geometry. Return true if successful.
@@ -123,6 +124,8 @@ protected:
     unsigned occlusionLodLevel_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
+    /// Do not subscribe/unsubscribe to E_RELOADFINISHED (much faster with lots of children)
+    bool ignoreReloadEvent_;
 
 private:
     /// Handle model reload finished.

@@ -47,7 +47,8 @@ extern const char* GEOMETRY_CATEGORY;
 StaticModel::StaticModel(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     occlusionLodLevel_(M_MAX_UNSIGNED),
-    materialsAttr_(Material::GetTypeStatic())
+    materialsAttr_(Material::GetTypeStatic()),
+    ignoreReloadEvent_(false)
 {
 }
 
@@ -227,10 +228,17 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
     return true;
 }
 
-void StaticModel::SetModel(Model* model)
+void StaticModel::SetModel(Model* model, bool ignoreReloadEvent)
 {
     if (model == model_)
+    {
+        if (ignoreReloadEvent_ && !ignoreReloadEvent)
+            SubscribeToEvent(model_, E_RELOADFINISHED, URHO3D_HANDLER(StaticModel, HandleModelReloadFinished));
+        else if (!ignoreReloadEvent_ && ignoreReloadEvent)
+            UnsubscribeFromEvent(model_, E_RELOADFINISHED);
+        ignoreReloadEvent_ = ignoreReloadEvent;
         return;
+    }
 
     if (!node_)
     {
@@ -239,14 +247,16 @@ void StaticModel::SetModel(Model* model)
     }
 
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
-    if (model_)
+    if (model_ && !ignoreReloadEvent_)
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);
 
     model_ = model;
+    ignoreReloadEvent_ = ignoreReloadEvent;
 
     if (model)
     {
-        SubscribeToEvent(model, E_RELOADFINISHED, URHO3D_HANDLER(StaticModel, HandleModelReloadFinished));
+        if (!ignoreReloadEvent_)
+            SubscribeToEvent(model, E_RELOADFINISHED, URHO3D_HANDLER(StaticModel, HandleModelReloadFinished));
 
         // Copy the subgeometry & LOD level structure
         SetNumGeometries(model->GetNumGeometries());
@@ -270,6 +280,11 @@ void StaticModel::SetModel(Model* model)
     }
 
     MarkNetworkUpdate();
+}
+
+void StaticModel::SetModel(Model* model)
+{
+    SetModel(model, false);
 }
 
 void StaticModel::SetMaterial(Material* material)
