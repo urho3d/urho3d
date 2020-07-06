@@ -482,6 +482,8 @@ void String::Clear()
 
 void String::Swap(String& str)
 {
+    if (&str == this)
+        return;
     Urho3D::Swap(length_, str.length_);
     Urho3D::Swap(capacity_, str.capacity_);
     Urho3D::Swap(buffer_, str.buffer_);

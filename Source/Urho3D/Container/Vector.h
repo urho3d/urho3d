@@ -122,7 +122,6 @@ public:
     /// Move-assign from another vector.
     Vector<T>& operator =(Vector<T> && rhs)
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }
