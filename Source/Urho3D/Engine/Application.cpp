@@ -101,7 +101,7 @@ int Application::Run()
     }
     catch (std::bad_alloc&)
     {
-        ErrorDialog(GetTypeName(), "An out-of-memory error occurred. The application will now exit.");
+        ErrorDialog(GetTitle(), "An out-of-memory error occurred. The application will now exit.");
         return EXIT_FAILURE;
     }
 #endif
@@ -114,11 +114,11 @@ void Application::ErrorExit(const String& message)
 
     if (!message.Length())
     {
-        ErrorDialog(GetTypeName(), startupErrors_.Length() ? startupErrors_ :
+        ErrorDialog(GetTitle(), startupErrors_.Length() ? startupErrors_ :
             "Application has been terminated due to unexpected error.");
     }
     else
-        ErrorDialog(GetTypeName(), message);
+        ErrorDialog(GetTitle(), message);
 }
 
 void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
