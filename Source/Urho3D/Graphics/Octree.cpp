@@ -565,7 +565,7 @@ void Octree::CancelUpdate(Drawable* drawable)
 {
     // This doesn't have to take into account scene being in threaded update, because it is called only
     // when removing a drawable from octree, which should only ever happen from the main thread.
-    drawableUpdates_.Remove(drawable);
+    drawableUpdates_.RemoveSwap(drawable);
     drawable->updateQueued_ = false;
 }
 
