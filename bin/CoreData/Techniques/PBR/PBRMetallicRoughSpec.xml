@@ -1,5 +1,3 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
 <technique vs="PBRLitSolid" ps="PBRLitSolid" psdefines="PBR IBL METALLIC ROUGHNESS">
     <pass name="base" />
     <pass name="light" depthtest="equal" depthwrite="false" blend="add" />

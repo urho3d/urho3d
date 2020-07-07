@@ -90,7 +90,11 @@ void VS()
             // If using lightmap, disregard zone ambient light
             // If using AO, calculate ambient in the PS
             vVertexLight = vec3(0.0, 0.0, 0.0);
-            vTexCoord2 = iTexCoord1;
+            #if defined(LIGHTMAP)
+                vTexCoord2 = iTexCoord1;
+            #else
+                vTexCoord2 = GetTexCoord(iTexCoord);
+            #endif
         #else
             vVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif
