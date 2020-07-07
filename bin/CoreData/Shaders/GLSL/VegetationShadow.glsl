@@ -24,10 +24,11 @@ void VS()
     worldPos.z -= windStrength * cos(windPeriod);
 
     gl_Position = GetClipPos(worldPos);
-    #ifdef VSM_SHADOW
-        vTexCoord = vec4(GetTexCoord(iTexCoord), gl_Position.z, gl_Position.w);
-    #else
-        vTexCoord = GetTexCoord(iTexCoord);
-    #endif
+    
+#ifdef VSM_SHADOW
+    vTexCoord = vec4(GetTexCoord(iTexCoord), gl_Position.z, gl_Position.w);
+#else
+    vTexCoord = GetTexCoord(iTexCoord);
+#endif
 }
 
