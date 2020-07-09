@@ -99,8 +99,8 @@ void VS(float4 iPos : POSITION,
     const float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     
-    float3 relativePos = mul(iPos.xyz, (float3x3)modelMatrix);
-    float windStrength = max(relativePos.y - cWindHeightPivot, 0.0) * cWindHeightFactor;
+    float3 relativePos = mul(iPos.xyz - float3(cWindHeightPivot, cWindHeightPivot, cWindHeightPivot), (float3x3)modelMatrix);
+    float windStrength = max(relativePos.y, 0.0) * cWindHeightFactor;
     float windPeriod = cElapsedTime * cWindPeriod + dot(worldPos.xz, cWindWorldSpacing);
     worldPos.x += windStrength * sin(windPeriod);
     worldPos.z -= windStrength * cos(windPeriod);
