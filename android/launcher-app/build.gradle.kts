@@ -31,10 +31,10 @@ plugins {
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(29)
+    compileSdkVersion(30)
     defaultConfig {
         minSdkVersion(18)
-        targetSdkVersion(29)
+        targetSdkVersion(30)
         applicationId = "com.github.urho3d.launcher"
         versionCode = 1
         versionName = project.version.toString()
@@ -84,10 +84,13 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+    lintOptions {
+        isAbortOnError = false
+    }
     externalNativeBuild {
         cmake {
-            setVersion(cmakeVersion)
-            setPath(project.file("CMakeLists.txt"))
+            version = cmakeVersion
+            path = project.file("CMakeLists.txt")
         }
     }
 }
@@ -96,7 +99,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":android:urho3d-lib"))
     implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13")
     androidTestImplementation("androidx.test:runner:1.2.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }

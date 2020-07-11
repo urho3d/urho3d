@@ -34,10 +34,10 @@ plugins {
 
 android {
     ndkVersion = ndkSideBySideVersion
-    compileSdkVersion(29)
+    compileSdkVersion(30)
     defaultConfig {
         minSdkVersion(18)
-        targetSdkVersion(29)
+        targetSdkVersion(30)
         versionCode = 1
         versionName = project.version.toString()
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -99,8 +99,8 @@ android {
     }
     externalNativeBuild {
         cmake {
-            setVersion(cmakeVersion)
-            setPath(project.file("../../CMakeLists.txt"))
+            version = cmakeVersion
+            path = project.file("../../CMakeLists.txt")
 
             // Make it explicit as one of the task needs to know the exact path and derived from it
             setBuildStagingDirectory(".cxx")
@@ -116,8 +116,8 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
-    implementation("com.getkeepsafe.relinker:relinker:1.3.1")
-    testImplementation("junit:junit:4.12")
+    implementation("com.getkeepsafe.relinker:relinker:1.4.1")
+    testImplementation("junit:junit:4.13")
     androidTestImplementation("androidx.test:runner:1.2.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
