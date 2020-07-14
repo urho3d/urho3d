@@ -18,7 +18,7 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
-    #if defined(LIGHTMAP) || defined(AO)
+    #if defined(LIGHTMAP)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
     #if (defined(NORMALMAP) || defined(TRAILFACECAM) || defined(TRAILBONE)) && !defined(BILLBOARD) && !defined(DIRBILLBOARD)
@@ -58,7 +58,7 @@ void VS(float4 iPos : POSITION,
         #ifdef ENVCUBEMAP
             out float3 oReflectionVec : TEXCOORD6,
         #endif
-        #if defined(LIGHTMAP) || defined(AO)
+        #if defined(LIGHTMAP)
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
@@ -117,15 +117,13 @@ void VS(float4 iPos : POSITION,
         #endif
     #else
         // Ambient & per-vertex lighting
-        #if defined(LIGHTMAP) || defined(AO)
+        #if defined(LIGHTMAP)
             // If using lightmap, disregard zone ambient light
+            oVertexLight = float3(0.0, 0.0, 0.0);
+            oTexCoord2 = iTexCoord2;
+        #elif defined(AO)
             // If using AO, calculate ambient in the PS
             oVertexLight = float3(0.0, 0.0, 0.0);
-            #if defined(LIGHTMAP)
-                oTexCoord2 = iTexCoord2;
-            #else
-                oTexCoord2 = GetTexCoord(iTexCoord);
-            #endif
         #else
             oVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif
@@ -168,7 +166,7 @@ void PS(
         #ifdef ENVCUBEMAP
             float3 iReflectionVec : TEXCOORD6,
         #endif
-        #if defined(LIGHTMAP) || defined(AO)
+        #if defined(LIGHTMAP)
             float2 iTexCoord2 : TEXCOORD7,
         #endif
     #endif
@@ -308,7 +306,7 @@ void PS(
         float3 ambientOcclusion = float3(1.0, 1.0, 1.0);
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            ambientOcclusion = Sample2D(EmissiveMap, iTexCoord2).rgb;
+            ambientOcclusion = Sample2D(EmissiveMap, iTexCoord.xy).rgb;
             finalColor += ambientOcclusion * cAmbientColor.rgb * diffColor.rgb;
         #endif
 
