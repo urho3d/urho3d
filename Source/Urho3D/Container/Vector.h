@@ -1053,6 +1053,15 @@ public:
         size_ = newSize;
     }
 
+    /// Resize the vector and fill new elements with default value.
+    void Resize(unsigned newSize, const T& value)
+    {
+        unsigned oldSize = Size();
+        Resize(newSize);
+        for (unsigned i = oldSize; i < newSize; ++i)
+            At(i) = value;
+    }
+
     /// Set new capacity.
     void Reserve(unsigned newCapacity)
     {
