@@ -125,8 +125,6 @@ public:
     explicit StateMachine(StateMachineConfig *config, const String &initialState);
     /// Destruct.
     ~StateMachine() override;
-    /// Register object factory. Drawable must be registered first.
-    static void RegisterObject(Context* context);
     
     /// Set delegate to listen events. Overrides existing delegate
     void SetDelegate(StateMachineDelegate *delegate);

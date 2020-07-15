@@ -138,11 +138,6 @@ StateMachine::StateMachine(StateMachineConfig *config, const String &initialStat
 
 StateMachine::~StateMachine() = default;
 
-void StateMachine::RegisterObject(Context* context)
-{
-    context->RegisterFactory<StateMachine>();
-}
-
 void StateMachine::SetDelegate(StateMachineDelegate *delegate)
 {
     delegate_ = delegate;
