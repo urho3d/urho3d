@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Scene/Component.h"
+#include "../Resource/Resource.h"
 
 namespace Urho3D
 {
 
 /// State machine component.
-class URHO3D_API StateMachine : public Component
+class URHO3D_API StateMachine : public ResourceWithMetadata
 {
-    URHO3D_OBJECT(StateMachine, Component);
+    URHO3D_OBJECT(StateMachine, ResourceWithMetadata);
 
 public:
     /// Construct.
@@ -38,7 +38,12 @@ public:
     /// Destruct.
     ~StateMachine() override;
     /// Register object factory. Drawable must be registered first.
-    static void RegisterObject(StateMachine* context);
+    static void RegisterObject(Context* context);
+
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    bool BeginLoad(Deserializer& source) override;
+    /// Save resource. Return true if successful.
+    bool Save(Serializer& dest) const override;
 
 };
 
