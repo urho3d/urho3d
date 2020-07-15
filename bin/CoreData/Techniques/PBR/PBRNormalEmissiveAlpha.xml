@@ -1,5 +1,3 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
 <technique vs="PBRLitSolid" ps="PBRLitSolid" vsdefines="NORMALMAP" psdefines="NORMALMAP EMISSIVEMAP PBR IBL">
     <pass name="alpha" depthwrite="false" blend="alpha" />
     <pass name="litalpha" depthwrite="false" blend="addalpha" />
