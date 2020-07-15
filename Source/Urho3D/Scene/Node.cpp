@@ -359,7 +359,8 @@ void Node::AddTag(const String& tag)
     impl_->tags_.Push(tag);
 
     // Cache
-    if (scene_) {
+    if (scene_)
+    {
         scene_->NodeTagAdded(this, tag);
     
         // Send event
