@@ -34,9 +34,9 @@ struct URHO3D_API StateMachineTransition
     /// Transition name
     String name_;
     
-    /// initial state
+    /// Initial state
     String stateFrom_;
-    /// destination state
+    /// Destination state
     String stateTo_;
     
 //    /// disables a transition (unity style)
@@ -58,21 +58,26 @@ struct URHO3D_API StateMachineState
     String name_;
     
     /// All transitions from this state
-    /// key represents trigger
+    /// key represents transition name (trigger or event that executes this transition)
     HashMap<String, StateMachineTransition *> transitions_;
     
     /// Construct.
     StateMachineState(const String &name);
     ~StateMachineState();
     
+    /// Create new transition from this state to a given state with given transition name
     bool AddTransition(const String &stateTo, const String &transitionName);
+    /// Verifys if transition is possible
     bool CanTransit(const String &transitionName);
 
 };
 
+/// State machine listener interface definition
 class URHO3D_API StateMachineDelegate 
 {
 public:
+    
+    /// Called when state machine transits to a new state
     virtual void StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &transitionName, const String &stateTo) = 0;
 
 };
