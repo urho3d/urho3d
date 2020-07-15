@@ -136,6 +136,9 @@ public:
     /// Execute transition
     bool Transit(const String &transitionName);
     
+    /// Gets the current state name
+    String GetCurrentState() const;
+    
 private:
     
     /// State machine configuration

@@ -169,4 +169,9 @@ bool StateMachine::Transit(const String &transitionName)
     return true;
 }
 
+String StateMachine::GetCurrentState() const
+{
+    return stateCurrent_->name_;
+}
+
 }
