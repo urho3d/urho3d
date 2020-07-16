@@ -26,10 +26,6 @@ StateMachineState::StateMachineState(const String &name)
 
 StateMachineState::~StateMachineState()
 {
-    for (auto i = transitions_.Begin(); i != transitions_.End(); i++)
-    {
-        delete i->second_;
-    }
     transitions_.Clear();
 }
 
@@ -40,14 +36,18 @@ bool StateMachineState::AddTransition(const String &stateTo, const String &trans
         return false;
     }
     
-    StateMachineTransition *transition = new StateMachineTransition(transitionName, name_, stateTo);
-    transitions_.Insert(Pair<String, StateMachineTransition *>(transitionName, transition));
+    transitions_.Insert(Pair<String, StateMachineTransition>(transitionName, StateMachineTransition(transitionName, name_, stateTo)));
     return true;
 }
 
 bool StateMachineState::CanTransit(const String &transitionName)
 {
     return transitions_.Contains(transitionName);
+}
+
+String StateMachineState::GetName() const
+{
+    return name_;
 }
 
 
@@ -58,10 +58,6 @@ StateMachineConfig::StateMachineConfig(Context* context)
 
 StateMachineConfig::~StateMachineConfig()
 {
-    for (auto i = states_.Begin(); i != states_.End(); i++)
-    {
-        delete i->second_;
-    }
     states_.Clear();
 }
 
@@ -86,9 +82,9 @@ bool StateMachineConfig::AddState(const String &stateName)
     {
         return false;
     }
+
     
-    StateMachineState *newState = new StateMachineState(stateName);
-    states_.Insert(Pair<String, StateMachineState *>(stateName, newState));
+    states_.Insert(Pair<String, SharedPtr<StateMachineState>>(stateName, SharedPtr<StateMachineState>(new StateMachineState(stateName))));
     return true;
 }
 
@@ -105,7 +101,7 @@ bool StateMachineConfig::AddTransition(const String &stateFrom, const String &st
         return false;
     }
     
-    StateMachineState *state = states_[stateFrom];
+    StateMachineState *state = states_[stateFrom].Get();
     return state->AddTransition(stateTo, transitionName);
 }
 
@@ -123,7 +119,7 @@ bool StateMachineConfig::CanTransitFromState(const String &stateName, const Stri
         return false;
     }
     
-    StateMachineState *state = stateIterator->second_;
+    StateMachineState *state = stateIterator->second_.Get();
     return state->CanTransit(transitionName);
 }
 
@@ -131,7 +127,7 @@ bool StateMachineConfig::CanTransitFromState(const String &stateName, const Stri
 
 StateMachine::StateMachine(StateMachineConfig *config, const String &initialState)
 :config_(config)
-,stateCurrent_(config->states_[initialState])
+,stateCurrent_(config->states_[initialState].Get())
 {
     
 }
@@ -155,11 +151,11 @@ bool StateMachine::Transit(const String &transitionName)
         return false;
     }
     
-    String oldStateName = stateCurrent_->name_;
-    stateCurrent_ = config_->states_[stateCurrent_->transitions_[transitionName]->stateTo_];
+    String oldStateName = stateCurrent_->GetName();
+    stateCurrent_ = config_->states_[stateCurrent_->transitions_[transitionName].stateTo_].Get();
     if (delegate_)
     {
-        delegate_->StateMachineDidTransit(this, oldStateName, transitionName, stateCurrent_->name_);
+        delegate_->StateMachineDidTransit(this, oldStateName, transitionName, stateCurrent_->GetName());
     }
     return true;
 }

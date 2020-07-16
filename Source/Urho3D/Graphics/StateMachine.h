@@ -29,6 +29,7 @@ namespace Urho3D
 
 class StateMachine;
 
+/// State machine transition. Belongs to a single StateMachineState instance
 struct URHO3D_API StateMachineTransition
 {
     /// Transition name
@@ -41,6 +42,13 @@ struct URHO3D_API StateMachineTransition
     
 //    /// disables a transition (unity style)
 //    bool mute_ = false;
+    
+    /// Construct.
+    /// This constructor is required for hashmap
+    StateMachineTransition()
+    {
+        assert(false);
+    }
 
     /// Construct.
     StateMachineTransition(const String &name, const String &stateFrom, const String &stateTo)
@@ -52,31 +60,43 @@ struct URHO3D_API StateMachineTransition
 
 };
 
-struct URHO3D_API StateMachineState
+
+/// Single state machine of a state machine. Belongs to a single StateMachineConfig instance
+class URHO3D_API StateMachineState: public RefCounted
 {
-    // State name
-    String name_;
     
-    /// All transitions from this state
-    /// key represents transition name (trigger or event that executes this transition)
-    HashMap<String, StateMachineTransition *> transitions_;
+    friend class StateMachine;
     
+public:
     /// Construct.
-    StateMachineState(const String &name);
+    explicit StateMachineState(const String &name);
     ~StateMachineState();
     
     /// Create new transition from this state to a given state with given transition name
     bool AddTransition(const String &stateTo, const String &transitionName);
     /// Verifys if transition is possible
     bool CanTransit(const String &transitionName);
+    
+    String GetName() const;
+    
+private:
+    
+    // State name
+    String name_;
+    
+    /// All transitions from this state
+    /// key represents transition name (trigger or event that executes this transition)
+    HashMap<String, StateMachineTransition> transitions_;
 
 };
+
+
 
 /// State machine listener interface definition
 class URHO3D_API StateMachineDelegate 
 {
-public:
     
+public:
     /// Called when state machine transits to a new state
     virtual void StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &transitionName, const String &stateTo) = 0;
 
@@ -114,9 +134,9 @@ public:
     bool CanTransitFromState(const String &stateName, const String &transitionName);
 
 private:
-    
     /// Available states
-    HashMap<String, StateMachineState *> states_;
+    HashMap<String, SharedPtr<StateMachineState>> states_;
+    
 };
 
 
@@ -143,7 +163,6 @@ public:
     String GetCurrentState() const;
     
 private:
-    
     /// State machine configuration
     SharedPtr<StateMachineConfig> config_ = nullptr;
     
@@ -152,6 +171,7 @@ private:
     
     /// Actual current state
     StateMachineState *stateCurrent_ = nullptr;
+    
 };
 
 }
