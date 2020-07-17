@@ -1,0 +1,4 @@
+<cubemap>
+    <srgb enable="true" />
+    <image name="Default-Skybox-Map.dds" />
+</cubemap>

@@ -1,0 +1,13 @@
+<material>
+	<technique name="Techniques/PBR/PBRNoTextureAlpha.xml" />
+	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+	<parameter name="MatDiffColor" value="0.8631573 0.83077 0.8468733 0.07058824" />
+	<parameter name="MatEnvMapColor" value="1 1 1 1" />
+	<parameter name="MatSpecColor" value="1 1 1 0" />
+	<parameter name="Roughness" value="0.5" />
+	<parameter name="Metallic" value="0" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<cull value="ccw" />
+	<shadowcull value="ccw" />
+</material>

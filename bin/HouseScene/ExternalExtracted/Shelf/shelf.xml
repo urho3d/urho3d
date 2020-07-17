@@ -1,0 +1,32 @@
+<node id="44">
+	<attribute name="Is Enabled" value="true" />
+	<attribute name="Name" value="shelf" />
+	<attribute name="Tags"><string value="Untagged" /></attribute>
+	<attribute name="Position" value="0 0 0" />
+	<attribute name="Rotation" value="1 0 0 0" />
+	<attribute name="Scale" value="1 1 1" />
+	<component type="AnimationController" id="45">
+		<attribute name="Node Animation States">
+			<variant type="Int" value="1" />
+			<variant type="ResourceRef" value="Animation;ExternalExtracted/Shelf/shelfDefault Take.ani" />
+			<variant type="String" value="" />
+			<variant type="Bool" value="false" />
+			<variant type="Float" value="1" />
+			<variant type="Float" value="0" />
+			<variant type="Int" value="0" />
+		</attribute>
+	</component>
+	<node id="46">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Shelf" />
+		<attribute name="Tags"><string value="Untagged" /></attribute>
+		<attribute name="Position" value="-1.942054 0 0" />
+		<attribute name="Rotation" value="0.7071068 -0.7071068 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<component type="StaticModel" id="47">
+			<attribute name="Model" value="Model;ExternalExtracted/Shelf/shelfShelf.mdl" />
+			<attribute name="Material" value="Material;ExternalExtracted/Shelf/Materials/shelf.xml" />
+			<attribute name="Cast Shadows" value="true" />
+		</component>
+	</node>
+</node>

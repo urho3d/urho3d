@@ -1,0 +1,14 @@
+<material>
+	<technique name="Techniques/PBR/PBRDiff.xml" />
+	<texture unit="diffuse" name="ExternalExtracted/Oilcans/Oilcan_D2.tga" />
+	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+	<parameter name="MatDiffColor" value="0.6038274 0.6038274 0.6038274 1" />
+	<parameter name="MatEnvMapColor" value="1 1 1 1" />
+	<parameter name="MatSpecColor" value="1 1 1 0" />
+	<parameter name="Roughness" value="0.929" />
+	<parameter name="Metallic" value="0.01454194" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<cull value="ccw" />
+	<shadowcull value="ccw" />
+</material>
