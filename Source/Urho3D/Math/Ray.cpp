@@ -251,17 +251,20 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
     unsigned index = 0, nearestIdx = M_MAX_UNSIGNED;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : nullptr;
+    Vector3 tmpOutNormal, *tmpOutNormalPointer = outNormal ? &tmpOutNormal : nullptr;
 
     while (index + 2 < vertexCount)
     {
         const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexStride]));
         const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexStride]));
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexStride]));
-        float distance = HitDistance(v0, v1, v2, outNormal, outBary);
+        float distance = HitDistance(v0, v1, v2, tmpOutNormalPointer, outBary);
         if (distance < nearest)
         {
             nearestIdx = index;
             nearest = distance;
+            if (outNormal)
+                *outNormal = tmpOutNormal;
         }
         index += 3;
     }
@@ -291,6 +294,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
     const auto* vertices = (const unsigned char*)vertexData;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : nullptr;
+    Vector3 tmpOutNormal, *tmpOutNormalPointer = outNormal ? &tmpOutNormal : nullptr;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
@@ -304,11 +308,13 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexStride]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
-            float distance = HitDistance(v0, v1, v2, outNormal, outBary);
+            float distance = HitDistance(v0, v1, v2, tmpOutNormalPointer, outBary);
             if (distance < nearest)
             {
                 nearestIndices = indices;
                 nearest = distance;
+                if (outNormal)
+                    *outNormal = tmpOutNormal;
             }
             indices += 3;
         }
@@ -340,11 +346,13 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexStride]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
-            float distance = HitDistance(v0, v1, v2, outNormal, outBary);
+            float distance = HitDistance(v0, v1, v2, tmpOutNormalPointer, outBary);
             if (distance < nearest)
             {
                 nearestIndices = indices;
                 nearest = distance;
+                if (outNormal)
+                    *outNormal = tmpOutNormal;
             }
             indices += 3;
         }
