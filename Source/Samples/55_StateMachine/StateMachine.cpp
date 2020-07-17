@@ -56,7 +56,6 @@ StateMachine::StateMachine(Context* context) :
 //    metallicLabel_(nullptr),
 //    ambientLabel_(nullptr)
 {
-    auto parameters = engineParameters_[EP_RESOURCE_PATHS];
     engineParameters_[EP_RESOURCE_PATHS] = "HouseScene;Data;CoreData";
 }
 
