@@ -43,23 +43,19 @@
 #include <Urho3D/AngelScript/Script.h>
 #endif
 
-#include "StateMachine.h"
+#include "StateMachineSample.h"
 
 #include <Urho3D/DebugNew.h>
 
-URHO3D_DEFINE_APPLICATION_MAIN(StateMachine)
+URHO3D_DEFINE_APPLICATION_MAIN(StateMachineSample)
 
-StateMachine::StateMachine(Context* context) :
-    Sample(context)//,
-//    dynamicMaterial_(nullptr),
-//    roughnessLabel_(nullptr),
-//    metallicLabel_(nullptr),
-//    ambientLabel_(nullptr)
+StateMachineSample::StateMachineSample(Context* context) :
+    Sample(context)
 {
     engineParameters_[EP_RESOURCE_PATHS] = "HouseScene;Data;CoreData";
 }
 
-void StateMachine::Start()
+void StateMachineSample::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -78,7 +74,7 @@ void StateMachine::Start()
     SubscribeToEvents();
 }
 
-void StateMachine::CreateInstructions()
+void StateMachineSample::CreateInstructions()
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* ui = GetSubsystem<UI>();
@@ -96,7 +92,7 @@ void StateMachine::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void StateMachine::CreateScene()
+void StateMachineSample::CreateScene()
 {
     auto* cache = GetSubsystem<ResourceCache>();
 
@@ -108,15 +104,14 @@ void StateMachine::CreateScene()
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<PhysicsWorld>();
-    scene_->CreateComponent<DebugRenderer>();
-//    SharedPtr<File> fileSceneShort = cache->GetFile("Scenes/SampleSceneShort.xml");
-//    int a = 0;
-//    a++;
+    
+//    scene_->CreateComponent<DebugRenderer>();
+//    DebugHud* debugHud = engine_->CreateDebugHud();
+//    debugHud->SetMode(DEBUGHUD_SHOW_ALL);
 
     // Load scene content prepared in the editor (XML format). GetFile() returns an open file from the resource system
     // which scene.LoadXML() will read
     SharedPtr<File> file = cache->GetFile("Scenes/SampleSceneShort.xml");
-//    scene_->LoadXML(*file);
     
     XMLFile xmlFile(scene_->GetContext());
     xmlFile.Load(*file.Get());
@@ -124,6 +119,11 @@ void StateMachine::CreateScene()
     Urho3D::Node *node = new Urho3D::Node(scene_->GetContext());
     node->LoadXML(xmlFile.GetRoot());
     scene_->AddChild(node);
+    
+    auto z = scene_->CreateComponent<Zone>();
+    z->SetBoundingBox(BoundingBox(Vector3(-100, -100, -100), Vector3(1000, 1000, 1000)));
+    float c = 0.1;
+    z->SetAmbientColor(Color(c, c, c, 1));
 
 //    Node* sphereWithDynamicMatNode = scene_->GetChild("SphereWithDynamicMat");
 //    auto* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
@@ -136,13 +136,13 @@ void StateMachine::CreateScene()
     cameraNode_ = scene_->CreateChild("Camera");
     cameraNode_->CreateComponent<Camera>();
 
-    cameraNode_->SetPosition(Vector3(35.0f, 9, 41));
-    cameraNode_->LookAt(Vector3(30.0f, 2.0f, 40.0f));
+    cameraNode_->SetPosition(Vector3(120.0f, 9, 115));
+    cameraNode_->LookAt(Vector3(95.0f, 2.0f, 115.0f));
     yaw_ = cameraNode_->GetRotation().YawAngle();
     pitch_ = cameraNode_->GetRotation().PitchAngle();
 }
 
-void StateMachine::CreateUI()
+void StateMachineSample::CreateUI()
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* ui = GetSubsystem<UI>();
@@ -153,12 +153,12 @@ void StateMachine::CreateUI()
 
     // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
     // control the camera, and when visible, it will interact with the UI
-    SharedPtr<Cursor> cursor(new Cursor(context_));
-    cursor->SetStyleAuto();
-    ui->SetCursor(cursor);
-    // Set starting position of the cursor at the rendering window center
-    auto* graphics = GetSubsystem<Graphics>();
-    cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
+//    SharedPtr<Cursor> cursor(new Cursor(context_));
+//    cursor->SetStyleAuto();
+//    ui->SetCursor(cursor);
+//    // Set starting position of the cursor at the rendering window center
+//    auto* graphics = GetSubsystem<Graphics>();
+//    cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
 //    roughnessLabel_ = ui->GetRoot()->CreateChild<Text>();
 //    roughnessLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
@@ -180,7 +180,7 @@ void StateMachine::CreateUI()
     roughnessSlider->SetPosition(50, 50);
     roughnessSlider->SetSize(300, 20);
     roughnessSlider->SetRange(1.0f); // 0 - 1 range
-    SubscribeToEvent(roughnessSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachine, HandleRoughnessSliderChanged));
+    SubscribeToEvent(roughnessSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachineSample, HandleRoughnessSliderChanged));
     roughnessSlider->SetValue(0.5f);
 
     auto* metallicSlider = ui->GetRoot()->CreateChild<Slider>();
@@ -188,7 +188,7 @@ void StateMachine::CreateUI()
     metallicSlider->SetPosition(50, 100);
     metallicSlider->SetSize(300, 20);
     metallicSlider->SetRange(1.0f); // 0 - 1 range
-    SubscribeToEvent(metallicSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachine, HandleMetallicSliderChanged));
+    SubscribeToEvent(metallicSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachineSample, HandleMetallicSliderChanged));
     metallicSlider->SetValue(0.5f);
 
     auto* ambientSlider = ui->GetRoot()->CreateChild<Slider>();
@@ -196,25 +196,25 @@ void StateMachine::CreateUI()
     ambientSlider->SetPosition(50, 150);
     ambientSlider->SetSize(300, 20);
     ambientSlider->SetRange(10.0f); // 0 - 10 range
-    SubscribeToEvent(ambientSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachine, HandleAmbientSliderChanged));
+    SubscribeToEvent(ambientSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachineSample, HandleAmbientSliderChanged));
 //    ambientSlider->SetValue(zone_->GetAmbientColor().a_);
 }
 
-void StateMachine::HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
+void StateMachineSample::HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
 //    dynamicMaterial_->SetShaderParameter("Roughness", newValue);
 //    roughnessLabel_->SetText("Roughness: " + String(newValue));
 }
 
-void StateMachine::HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
+void StateMachineSample::HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
 //    dynamicMaterial_->SetShaderParameter("Metallic", newValue);
 //    metallicLabel_->SetText("Metallic: " + String(newValue));
 }
 
-void StateMachine::HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
+void StateMachineSample::HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
 //    Color col = Color(0.0, 0.0, 0.0, newValue);
@@ -222,12 +222,13 @@ void StateMachine::HandleAmbientSliderChanged(StringHash eventType, VariantMap& 
 //    ambientLabel_->SetText("Ambient HDR Scale: " + String(zone_->GetAmbientColor().a_));
 }
 
-void StateMachine::SetupViewport()
+void StateMachineSample::SetupViewport()
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* renderer = GetSubsystem<Renderer>();
 
     renderer->SetHDRRendering(true);
+    scene_->SetSmoothingConstant(50);
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -237,24 +238,24 @@ void StateMachine::SetupViewport()
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
-    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/Tonemap.xml"));
-    effectRenderPath->Append(cache->GetResource<XMLFile>("Postprocess/BloomHDR.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/Tonemap.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/BloomHDRSimple.xml"));
 
     viewport->SetRenderPath(effectRenderPath);
+    GetSubsystem<Input>()->SetMouseVisible(true);
 }
 
-void StateMachine::SubscribeToEvents()
+void StateMachineSample::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for camera motion
-    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(StateMachine, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(StateMachineSample, HandleUpdate));
 }
 
-void StateMachine::MoveCamera(float timeStep)
+void StateMachineSample::MoveCamera(float timeStep)
 {
     // Right mouse button controls mouse cursor visibility: hide when pressed
     auto* ui = GetSubsystem<UI>();
     auto* input = GetSubsystem<Input>();
-    ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
 
     // Do not move if the UI has a focused element
     if (ui->GetFocusElement())
@@ -267,7 +268,7 @@ void StateMachine::MoveCamera(float timeStep)
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     // Only move the camera when the cursor is hidden
-    if (!ui->GetCursor()->IsVisible())
+    if (input->GetMouseButtonDown(MOUSEB_RIGHT))
     {
         IntVector2 mouseMove = input->GetMouseMove();
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
@@ -289,7 +290,7 @@ void StateMachine::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
-void StateMachine::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void StateMachineSample::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
@@ -299,3 +300,27 @@ void StateMachine::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }
+
+
+void StateMachineSample::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
+    // bones. Note that debug geometry has to be separately requested each frame. Disable depth test so that we can see the
+    // bones properly
+    if (false)
+    {
+        GetSubsystem<Renderer>()->DrawDebugGeometry(false);
+    }
+    
+    if (false)
+    {
+        // Use debug renderer to output physics world debug.
+        auto debugRendererComp = scene_->GetComponent<DebugRenderer>();
+        auto physicsComp = scene_->GetComponent<PhysicsWorld>();
+        if(physicsComp != nullptr)
+        {
+            physicsComp->DrawDebugGeometry(debugRendererComp, false);
+        }
+    }
+}
+

@@ -3,7 +3,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Main Camera" />
 		<attribute name="Tags"><string value="MainCamera" /></attribute>
-		<attribute name="Position" value="34.88 8.53 41.1" />
+		<attribute name="Position" value="109.1 8.5 118.1" />
 		<attribute name="Rotation" value="0.4907946 0.221544 -0.7680172 0.3466822" />
 		<attribute name="Scale" value="1 1 1" />
 		<component type="Camera" id="3">
@@ -15,7 +15,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Terrain" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-71.8 0 -75.1" />
+		<attribute name="Position" value="2.419991 -0.02999973 1.900002" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<node id="5">
@@ -23,13 +23,13 @@
 		<component type="Terrain" id="6">
 			<attribute name="Height Map" value="Image;Scenes/SampleSceneShortTerrain.Heightmap.tga" />
 			<attribute name="Material" value="Material;Scenes/SampleSceneShortTerrain.Material.xml" />
-			<attribute name="Vertex Spacing" value="1.550388 0 1.550388" />
+			<attribute name="Vertex Spacing" value="3.076923 0 3.076923" />
 		</component>
 		<component type="CollisionShape" id="7">
 		<attribute name="Shape Type" value="Terrain" />
 		</component>
 		<component type="RigidBody" id="8">
-		<attribute name="Physics Position" value="28.2 0 24.9" />
+		<attribute name="Physics Position" value="102.42 -0.02999973 101.9" />
 		</component>
 		</node>
 	</node>
@@ -49,7 +49,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Directional Light" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-0.004673004 3.432659 26.61664" />
+		<attribute name="Position" value="74.21532 3.402659 103.6166" />
 		<attribute name="Rotation" value="0.5213338 0.7064338 0.4777144 0.03084357" />
 		<attribute name="Scale" value="1 1 1" />
 		<component type="Light" id="12">
@@ -80,7 +80,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="testHouse0" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="28.67838 -0.1245304 28.3498" />
+				<attribute name="Position" value="102.8984 -0.1545302 105.3498" />
 				<attribute name="Rotation" value="1 0 0 0" />
 				<attribute name="Scale" value="1 1 1" />
 				<node id="16">
@@ -103,7 +103,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
 					</component>
 					<component type="RigidBody" id="19">
-						<attribute name="Physics Position" value="29.52626 0.1730864 30.03351" />
+						<attribute name="Physics Position" value="103.7463 0.1430867 107.0335" />
 					</component>
 					<component type="StaticModel" id="20">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
@@ -131,7 +131,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.mdl" />
 					</component>
 					<component type="RigidBody" id="24">
-						<attribute name="Physics Position" value="27.94233 4.317785 25.44807" />
+						<attribute name="Physics Position" value="102.1623 4.287785 102.4481" />
 					</component>
 					<component type="StaticModel" id="25">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.mdl" />
@@ -159,7 +159,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.001.mdl" />
 					</component>
 					<component type="RigidBody" id="29">
-						<attribute name="Physics Position" value="31.46009 3.139789 30.29199" />
+						<attribute name="Physics Position" value="105.6801 3.109789 107.292" />
 					</component>
 					<component type="StaticModel" id="30">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.001.mdl" />
@@ -179,7 +179,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.mdl" />
 					</component>
 					<component type="RigidBody" id="33">
-						<attribute name="Physics Position" value="27.93169 1.445512 26.49804" />
+						<attribute name="Physics Position" value="102.1517 1.415513 103.498" />
 					</component>
 					<component type="StaticModel" id="34">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.mdl" />
@@ -199,7 +199,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.001.mdl" />
 					</component>
 					<component type="RigidBody" id="37">
-						<attribute name="Physics Position" value="30.11744 0.8012319 31.06218" />
+						<attribute name="Physics Position" value="104.3374 0.7712321 108.0622" />
 					</component>
 					<component type="StaticModel" id="38">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.001.mdl" />
@@ -227,7 +227,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.002.mdl" />
 					</component>
 					<component type="RigidBody" id="42">
-						<attribute name="Physics Position" value="28.19792 0.1682403 25.55738" />
+						<attribute name="Physics Position" value="102.4179 0.1382406 102.5574" />
 					</component>
 					<component type="StaticModel" id="43">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.002.mdl" />
@@ -255,7 +255,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.003.mdl" />
 					</component>
 					<component type="RigidBody" id="47">
-						<attribute name="Physics Position" value="31.55192 0.01824111 30.29588" />
+						<attribute name="Physics Position" value="105.7719 -0.01175863 107.2959" />
 					</component>
 					<component type="StaticModel" id="48">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.003.mdl" />
@@ -275,7 +275,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.mdl" />
 					</component>
 					<component type="RigidBody" id="51">
-						<attribute name="Physics Position" value="24.74019 1.422239 24.09488" />
+						<attribute name="Physics Position" value="98.96018 1.39224 101.0949" />
 					</component>
 					<component type="StaticModel" id="52">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.mdl" />
@@ -295,7 +295,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.001.mdl" />
 					</component>
 					<component type="RigidBody" id="55">
-						<attribute name="Physics Position" value="31.93042 1.734239 23.00288" />
+						<attribute name="Physics Position" value="106.1504 1.70424 100.0029" />
 					</component>
 					<component type="StaticModel" id="56">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.001.mdl" />
@@ -315,7 +315,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.002.mdl" />
 					</component>
 					<component type="RigidBody" id="59">
-						<attribute name="Physics Position" value="31.93042 1.73424 25.18688" />
+						<attribute name="Physics Position" value="106.1504 1.70424 102.1869" />
 					</component>
 					<component type="StaticModel" id="60">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.002.mdl" />
@@ -343,7 +343,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.003.mdl" />
 					</component>
 					<component type="RigidBody" id="64">
-						<attribute name="Physics Position" value="26.77642 4.542239 23.47088" />
+						<attribute name="Physics Position" value="100.9964 4.512239 100.4709" />
 					</component>
 					<component type="StaticModel" id="65">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.003.mdl" />
@@ -371,7 +371,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.004.mdl" />
 					</component>
 					<component type="RigidBody" id="69">
-						<attribute name="Physics Position" value="26.77642 4.54224 26.12288" />
+						<attribute name="Physics Position" value="100.9964 4.51224 103.1229" />
 					</component>
 					<component type="StaticModel" id="70">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.004.mdl" />
@@ -399,7 +399,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.005.mdl" />
 					</component>
 					<component type="RigidBody" id="74">
-						<attribute name="Physics Position" value="26.77812 4.542241 28.77488" />
+						<attribute name="Physics Position" value="100.9981 4.512241 105.7749" />
 					</component>
 					<component type="StaticModel" id="75">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.005.mdl" />
@@ -427,7 +427,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_1.mdl" />
 					</component>
 					<component type="RigidBody" id="79">
-						<attribute name="Physics Position" value="34.45358 -0.02523637 29.76793" />
+						<attribute name="Physics Position" value="108.6736 -0.0552361 106.7679" />
 					</component>
 					<component type="StaticModel" id="80">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_1.mdl" />
@@ -455,7 +455,7 @@
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_2.mdl" />
 					</component>
 					<component type="RigidBody" id="84">
-						<attribute name="Physics Position" value="30.49424 -0.02523576 33.37439" />
+						<attribute name="Physics Position" value="104.7142 -0.0552355 110.3744" />
 					</component>
 					<component type="StaticModel" id="85">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_2.mdl" />
@@ -468,7 +468,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="OilCan4" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="21.77438 1.64047 30.2158" />
+				<attribute name="Position" value="95.99437 1.61047 107.2158" />
 				<attribute name="Rotation" value="1 0 0 0" />
 				<attribute name="Scale" value="1 1 1" />
 				<component type="AnimationController" id="87">
@@ -494,7 +494,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="OilCan2" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="24.05238 -0.06653044 29.1788" />
+				<attribute name="Position" value="98.27237 -0.09653017 106.1788" />
 				<attribute name="Rotation" value="0.9304031 0 -0.366538 0" />
 				<attribute name="Scale" value="1 1 1" />
 				<component type="AnimationController" id="91">
@@ -520,7 +520,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="OilCan1" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="26.28238 -0.1635304 29.1558" />
+				<attribute name="Position" value="100.5024 -0.1935302 106.1558" />
 				<attribute name="Rotation" value="1 0 0 0" />
 				<attribute name="Scale" value="1 1 1" />
 				<component type="AnimationController" id="95">
@@ -546,7 +546,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="Shelf" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="26.13838 -0.1325304 27.7298" />
+				<attribute name="Position" value="100.3584 -0.1625302 104.7298" />
 				<attribute name="Rotation" value="0.5 -0.5 0.5 0.5" />
 				<attribute name="Scale" value="1.5 1.5 1.5" />
 				<component type="StaticModel" id="99">
@@ -559,7 +559,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="Dumpster" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="28.79838 -0.1355304 20.9808" />
+				<attribute name="Position" value="103.0184 -0.1655302 97.9808" />
 				<attribute name="Rotation" value="0.7071068 -0.7071069 0 0" />
 				<attribute name="Scale" value="2 2 2" />
 				<component type="CollisionShape" id="101">
@@ -567,7 +567,7 @@
 					<attribute name="Offset Position" value="-5.960464E-08 -0.02310949 0.3652287" />
 				</component>
 				<component type="RigidBody" id="102">
-					<attribute name="Physics Position" value="28.79838 -0.1355304 20.9808" />
+					<attribute name="Physics Position" value="103.0184 -0.1655302 97.9808" />
 				</component>
 				<component type="StaticModel" id="103">
 					<attribute name="Model" value="Model;ExternalExtracted/Dumpster/dumpsterdumpster_001.mdl" />
@@ -579,7 +579,7 @@
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="Barrel" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="26.99837 -0.0745303 21.1998" />
+				<attribute name="Position" value="101.2184 -0.10453 98.1998" />
 				<attribute name="Rotation" value="1 0 0 0" />
 				<attribute name="Scale" value="0.2801405 0.2801405 0.2801405" />
 				<component type="AnimationController" id="105">
@@ -599,7 +599,7 @@
 						<attribute name="Offset Position" value="0 5.662441E-06 2.566735" />
 					</component>
 					<component type="RigidBody" id="108">
-						<attribute name="Physics Position" value="26.99837 -0.0745303 21.1998" />
+						<attribute name="Physics Position" value="101.2184 -0.10453 98.1998" />
 					</component>
 					<component type="StaticModel" id="109">
 						<attribute name="Model" value="Model;ExternalExtracted/Barrel/BarrelBarrel.mdl" />
@@ -614,7 +614,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="CubeInternal" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="15.86 3.01 39.92764" />
+		<attribute name="Position" value="90.07999 2.98 116.9276" />
 		<attribute name="Rotation" value="0.9858179 0 0 -0.1678189" />
 		<attribute name="Scale" value="4.33 0.7499999 0.75" />
 		<component type="CollisionShape" id="111">
@@ -622,7 +622,7 @@
 			<attribute name="Offset Position" value="0 0 0" />
 		</component>
 		<component type="RigidBody" id="112">
-			<attribute name="Physics Position" value="15.86 3.01 39.92764" />
+			<attribute name="Physics Position" value="90.07999 2.98 116.9276" />
 			<attribute name="Mass" value="1" />
 		</component>
 		<component type="StaticModel" id="113">
@@ -635,7 +635,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="CubeParent" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="20.01 5.29 34.70764" />
+		<attribute name="Position" value="94.23 5.26 111.7076" />
 		<attribute name="Rotation" value="0.9858179 0 0 -0.1678189" />
 		<attribute name="Scale" value="1 1 1" />
 		<component type="CollisionShape" id="115">
@@ -643,7 +643,7 @@
 			<attribute name="Offset Position" value="0 0 0" />
 		</component>
 		<component type="RigidBody" id="116">
-			<attribute name="Physics Position" value="20.01 5.29 34.70764" />
+			<attribute name="Physics Position" value="94.23 5.26 111.7076" />
 			<attribute name="Mass" value="1" />
 		</component>
 		<component type="StaticModel" id="117">
@@ -656,7 +656,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Water" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="24.18 0.06 46.68" />
+		<attribute name="Position" value="98.39999 0.03000027 123.68" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<component type="ProjectNMetaData" id="119">

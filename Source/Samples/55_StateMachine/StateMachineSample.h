@@ -40,13 +40,13 @@ class Zone;
 ///
 /// To use with deferred rendering, a PBR deferred renderpath should be chosen:
 /// CoreData/RenderPaths/PBRDeferred.xml or CoreData/RenderPaths/PBRDeferredHWDepth.xml
-class StateMachine : public Sample
+class StateMachineSample : public Sample
 {
-    URHO3D_OBJECT(StateMachine, Sample);
+    URHO3D_OBJECT(StateMachineSample, Sample);
 
 public:
     /// Construct.
-    explicit StateMachine(Context* context);
+    explicit StateMachineSample(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     void Start() override;
@@ -73,4 +73,6 @@ private:
     /// Handle the ambient HDR scale slider drag event.
     void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData);
 
+    //
+    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
 };
