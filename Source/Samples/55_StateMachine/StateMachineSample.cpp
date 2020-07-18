@@ -239,7 +239,9 @@ void StateMachineSample::SetupViewport()
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/Tonemap.xml"));
-    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/BloomHDRSimple.xml"));
+    
+    // This one is very heavy
+//    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/BloomHDRSimple.xml"));
 
     viewport->SetRenderPath(effectRenderPath);
     GetSubsystem<Input>()->SetMouseVisible(true);

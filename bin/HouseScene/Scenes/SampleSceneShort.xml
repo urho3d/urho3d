@@ -1,16 +1,4 @@
 <node id="1">
-	<node id="2">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Main Camera" />
-		<attribute name="Tags"><string value="MainCamera" /></attribute>
-		<attribute name="Position" value="109.1 8.5 118.1" />
-		<attribute name="Rotation" value="0.4907946 0.221544 -0.7680172 0.3466822" />
-		<attribute name="Scale" value="1 1 1" />
-		<component type="Camera" id="3">
-			<attribute name="Near Clip" value="0.3" />
-			<attribute name="Far Clip" value="1006.02" />
-		</component>
-	</node>
 	<node id="4">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Terrain" />
