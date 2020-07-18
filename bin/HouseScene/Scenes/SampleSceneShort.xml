@@ -93,23 +93,6 @@
 					<component type="RigidBody" id="18">
 						<attribute name="Physics Position" value="103.7463 0.1430867 107.0335" />
 					</component>
-					<component type="AnimationController" id="19">
-						<attribute name="Node Animation States">
-							<variant type="Int" value="2" />
-							<variant type="ResourceRef" value="Animation;Animations/SampleScene/AnimationDoor1Close.ani" />
-							<variant type="String" value="" />
-							<variant type="Bool" value="true" />
-							<variant type="Float" value="0" />
-							<variant type="Float" value="0" />
-							<variant type="Int" value="0" />
-							<variant type="ResourceRef" value="Animation;Animations/SampleScene/AnimationDoor1Open.ani" />
-							<variant type="String" value="" />
-							<variant type="Bool" value="true" />
-							<variant type="Float" value="0" />
-							<variant type="Float" value="0" />
-							<variant type="Int" value="0" />
-						</attribute>
-					</component>
 					<component type="StaticModel" id="20">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
 						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
