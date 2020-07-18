@@ -1,46 +1,46 @@
 <node id="1">
-	<node id="4">
+	<node id="3">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Terrain" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="2.419991 -0.02999973 1.900002" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<node id="5">
-		<attribute name="Position" value="100 0 100" />
-		<component type="Terrain" id="6">
-			<attribute name="Height Map" value="Image;Scenes/SampleSceneShortTerrain.Heightmap.tga" />
-			<attribute name="Material" value="Material;Scenes/SampleSceneShortTerrain.Material.xml" />
-			<attribute name="Vertex Spacing" value="3.076923 0 3.076923" />
-		</component>
-		<component type="CollisionShape" id="7">
-		<attribute name="Shape Type" value="Terrain" />
-		</component>
-		<component type="RigidBody" id="8">
-		<attribute name="Physics Position" value="102.42 -0.02999973 101.9" />
-		</component>
+		<node id="500">
+            <attribute name="Position" value="100 0 100" />
+            <component type="Terrain" id="501">
+                <attribute name="Height Map" value="Image;Scenes/SampleSceneShortTerrain.Heightmap.tga" />
+                <attribute name="Material" value="Material;Scenes/SampleSceneShortTerrain.Material.xml" />
+                <attribute name="Vertex Spacing" value="3.076923 0 3.076923" />
+            </component>
+            <component type="CollisionShape" id="502">
+                <attribute name="Shape Type" value="Terrain" />
+            </component>
+            <component type="RigidBody" id="503">
+                <attribute name="Physics Position" value="102.42 -0.02999973 101.9" />
+            </component>
 		</node>
 	</node>
-	<node id="9">
+	<node id="8">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Skybox" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="10.12222 3.46879 11.56317" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="Skybox" id="10">
+		<component type="Skybox" id="9">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Skybox_Mat.xml" />
 		</component>
 	</node>
-	<node id="11">
+	<node id="10">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Directional Light" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="74.21532 3.402659 103.6166" />
 		<attribute name="Rotation" value="0.5213338 0.7064338 0.4777144 0.03084357" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="Light" id="12">
+		<component type="Light" id="11">
 			<attribute name="Light Type" value="Directional" />
 			<attribute name="CSM Splits" value="8.533334 25.6 59.73333 128" />
 			<attribute name="Color" value="1 1 1 1" />
@@ -50,35 +50,35 @@
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
-	<node id="13">
+	<node id="12">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Houses" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="0 0 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<node id="14">
+		<node id="13">
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="canyonHouse" />
 			<attribute name="Tags"><string value="Untagged" /></attribute>
 			<attribute name="Position" value="0 0 0" />
 			<attribute name="Rotation" value="1 0 0 0" />
 			<attribute name="Scale" value="1 1 1" />
-			<node id="15">
+			<node id="14">
 				<attribute name="Is Enabled" value="true" />
 				<attribute name="Name" value="testHouse0" />
 				<attribute name="Tags"><string value="Untagged" /></attribute>
 				<attribute name="Position" value="102.8984 -0.1545302 105.3498" />
 				<attribute name="Rotation" value="1 0 0 0" />
 				<attribute name="Scale" value="1 1 1" />
-				<node id="16">
+				<node id="15">
 					<attribute name="Is Enabled" value="true" />
 					<attribute name="Name" value="Дверь" />
 					<attribute name="Tags"><string value="Untagged" /></attribute>
 					<attribute name="Position" value="0.8478884 0.2976168 1.683706" />
 					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="17">
+					<component type="ProjectNMetaData" id="16">
 						<attribute name="groundPathClickable" value="False" />
 						<attribute name="bulletObstacle" value="False" />
 						<attribute name="isRoof" value="False" />
@@ -86,12 +86,29 @@
 						<attribute name="gameObjectId" value="door1" />
 						<attribute name="gameObjectElementId" value="1" />
 					</component>
-					<component type="CollisionShape" id="18">
+					<component type="CollisionShape" id="17">
 						<attribute name="Shape Type" value="TriangleMesh" />
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
 					</component>
-					<component type="RigidBody" id="19">
+					<component type="RigidBody" id="18">
 						<attribute name="Physics Position" value="103.7463 0.1430867 107.0335" />
+					</component>
+					<component type="AnimationController" id="19">
+						<attribute name="Node Animation States">
+							<variant type="Int" value="2" />
+							<variant type="ResourceRef" value="Animation;Animations/SampleScene/AnimationDoor1Close.ani" />
+							<variant type="String" value="" />
+							<variant type="Bool" value="true" />
+							<variant type="Float" value="0" />
+							<variant type="Float" value="0" />
+							<variant type="Int" value="0" />
+							<variant type="ResourceRef" value="Animation;Animations/SampleScene/AnimationDoor1Open.ani" />
+							<variant type="String" value="" />
+							<variant type="Bool" value="true" />
+							<variant type="Float" value="0" />
+							<variant type="Float" value="0" />
+							<variant type="Int" value="0" />
+						</attribute>
 					</component>
 					<component type="StaticModel" id="20">
 						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
@@ -452,202 +469,74 @@
 					</component>
 				</node>
 			</node>
-			<node id="86">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="OilCan4" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="95.99437 1.61047 107.2158" />
-				<attribute name="Rotation" value="1 0 0 0" />
-				<attribute name="Scale" value="1 1 1" />
-				<component type="AnimationController" id="87">
-					<attribute name="Node Animation States">
-						<variant type="Int" value="0" />
-					</attribute>
-				</component>
-				<node id="88">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="OilCan4" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="4.392 -0.213 -2.228" />
-					<attribute name="Rotation" value="0.7071068 -0.7071068 0 0" />
-					<attribute name="Scale" value="0.3 0.3 0.3" />
-					<component type="StaticModel" id="89">
-						<attribute name="Model" value="Model;ExternalExtracted/Oilcans/Oilcan4OilCan4.mdl" />
-						<attribute name="Material" value="Material;ExternalExtracted/Oilcans/Materials/Oilcan4-OilCan4__AO.tga.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-			</node>
-			<node id="90">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="OilCan2" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="98.27237 -0.09653017 106.1788" />
-				<attribute name="Rotation" value="0.9304031 0 -0.366538 0" />
-				<attribute name="Scale" value="1 1 1" />
-				<component type="AnimationController" id="91">
-					<attribute name="Node Animation States">
-						<variant type="Int" value="0" />
-					</attribute>
-				</component>
-				<node id="92">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="OilCan2" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="0.0455102 -0.001400872 -2.373561" />
-					<attribute name="Rotation" value="0.7071068 -0.7071068 0 0" />
-					<attribute name="Scale" value="0.3 0.3 0.3" />
-					<component type="StaticModel" id="93">
-						<attribute name="Model" value="Model;ExternalExtracted/Oilcans/Oilcan2OilCan2.mdl" />
-						<attribute name="Material" value="Material;ExternalExtracted/Oilcans/Materials/Oilcan2-OilCan2__AO.tga.002.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-			</node>
-			<node id="94">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="OilCan1" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="100.5024 -0.1935302 106.1558" />
-				<attribute name="Rotation" value="1 0 0 0" />
-				<attribute name="Scale" value="1 1 1" />
-				<component type="AnimationController" id="95">
-					<attribute name="Node Animation States">
-						<variant type="Int" value="0" />
-					</attribute>
-				</component>
-				<node id="96">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="OilCan1" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="0 0.08451539 -3.694285E-09" />
-					<attribute name="Rotation" value="0.7071068 -0.7071068 0 0" />
-					<attribute name="Scale" value="0.5 0.5 0.5" />
-					<component type="StaticModel" id="97">
-						<attribute name="Model" value="Model;ExternalExtracted/Oilcans/Oilcan1OilCan1.mdl" />
-						<attribute name="Material" value="Material;ExternalExtracted/Oilcans/Materials/Oilcan1-Material.001__AO.tga.001.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-			</node>
-			<node id="98">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="Shelf" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="100.3584 -0.1625302 104.7298" />
-				<attribute name="Rotation" value="0.5 -0.5 0.5 0.5" />
-				<attribute name="Scale" value="1.5 1.5 1.5" />
-				<component type="StaticModel" id="99">
-					<attribute name="Model" value="Model;ExternalExtracted/Shelf/shelfShelf.mdl" />
-					<attribute name="Material" value="Material;ExternalExtracted/Shelf/Materials/shelf.xml" />
-					<attribute name="Cast Shadows" value="true" />
-				</component>
-			</node>
-			<node id="100">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="Dumpster" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="103.0184 -0.1655302 97.9808" />
-				<attribute name="Rotation" value="0.7071068 -0.7071069 0 0" />
-				<attribute name="Scale" value="2 2 2" />
-				<component type="CollisionShape" id="101">
-					<attribute name="Size" value="1.135368 0.7107831 0.7304574" />
-					<attribute name="Offset Position" value="-5.960464E-08 -0.02310949 0.3652287" />
-				</component>
-				<component type="RigidBody" id="102">
-					<attribute name="Physics Position" value="103.0184 -0.1655302 97.9808" />
-				</component>
-				<component type="StaticModel" id="103">
-					<attribute name="Model" value="Model;ExternalExtracted/Dumpster/dumpsterdumpster_001.mdl" />
-					<attribute name="Material" value="Material;ExternalExtracted/Dumpster/Materials/dumpster-Material_002__Untitled1_tga.xml;ExternalExtracted/Dumpster/Materials/dumpster-Material_002__AO_tga.xml" />
-					<attribute name="Cast Shadows" value="true" />
-				</component>
-			</node>
-			<node id="104">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="Barrel" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="101.2184 -0.10453 98.1998" />
-				<attribute name="Rotation" value="1 0 0 0" />
-				<attribute name="Scale" value="0.2801405 0.2801405 0.2801405" />
-				<component type="AnimationController" id="105">
-					<attribute name="Node Animation States">
-						<variant type="Int" value="0" />
-					</attribute>
-				</component>
-				<node id="106">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Barrel" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="0 0 0" />
-					<attribute name="Rotation" value="0.7071068 -0.7071068 0 0" />
-					<attribute name="Scale" value="1 1 1" />
-					<component type="CollisionShape" id="107">
-						<attribute name="Size" value="3.794794 3.737143 5.133471" />
-						<attribute name="Offset Position" value="0 5.662441E-06 2.566735" />
-					</component>
-					<component type="RigidBody" id="108">
-						<attribute name="Physics Position" value="101.2184 -0.10453 98.1998" />
-					</component>
-					<component type="StaticModel" id="109">
-						<attribute name="Model" value="Model;ExternalExtracted/Barrel/BarrelBarrel.mdl" />
-						<attribute name="Material" value="Material;ExternalExtracted/Barrel/Materials/Barrel-Barrel.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-			</node>
 		</node>
 	</node>
-	<node id="110">
+	<node id="86">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="CubeInternal" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="90.07999 2.98 116.9276" />
 		<attribute name="Rotation" value="0.9858179 0 0 -0.1678189" />
 		<attribute name="Scale" value="4.33 0.7499999 0.75" />
-		<component type="CollisionShape" id="111">
+		<component type="CollisionShape" id="87">
 			<attribute name="Size" value="1 1 1" />
 			<attribute name="Offset Position" value="0 0 0" />
 		</component>
-		<component type="RigidBody" id="112">
+		<component type="RigidBody" id="88">
 			<attribute name="Physics Position" value="90.07999 2.98 116.9276" />
 			<attribute name="Mass" value="1" />
 		</component>
-		<component type="StaticModel" id="113">
+		<component type="StaticModel" id="89">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Default.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
-	<node id="114">
+	<node id="90">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="CubeParent" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="94.23 5.26 111.7076" />
 		<attribute name="Rotation" value="0.9858179 0 0 -0.1678189" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="CollisionShape" id="115">
+		<component type="CollisionShape" id="91">
 			<attribute name="Size" value="1 1 1" />
 			<attribute name="Offset Position" value="0 0 0" />
 		</component>
-		<component type="RigidBody" id="116">
+		<component type="RigidBody" id="92">
 			<attribute name="Physics Position" value="94.23 5.26 111.7076" />
 			<attribute name="Mass" value="1" />
 		</component>
-		<component type="StaticModel" id="117">
+		<component type="StaticModel" id="93">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Default.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
-	<node id="118">
+	<node id="94">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Water" />
+		<attribute name="Name" value="Reflection Probe (1)" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="98.39999 0.03000027 123.68" />
+		<attribute name="Position" value="134.74 3.98 146" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="ProjectNMetaData" id="119">
+		<component type="Zone" id="95">
+			<attribute name="Ambient Color" value="0.03696759 0.04214946 0.05455384 1" />
+			<attribute name="Override Mode" value="false" />
+			<attribute name="Bounding Box Min" value="-500 -500 -500" />
+			<attribute name="Bounding Box Max" value="500 500 500" />
+			<attribute name="Priority" value="1" />
+			<attribute name="Zone Texture" value="TextureCube;Scenes/SampleScene/ReflectionProbe-2.xml" />
+		</component>
+	</node>
+	<node id="96">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Water (1)" />
+		<attribute name="Tags"><string value="Untagged" /></attribute>
+		<attribute name="Position" value="99.61 -0.022 122.34" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<component type="ProjectNMetaData" id="97">
 			<attribute name="groundPathClickable" value="True" />
 			<attribute name="bulletObstacle" value="False" />
 			<attribute name="isRoof" value="False" />
@@ -655,26 +544,10 @@
 			<attribute name="gameObjectId" value="" />
 			<attribute name="gameObjectElementId" value="" />
 		</component>
-		<component type="StaticModel" id="120">
-			<attribute name="Model" value="Model;Scenes/SampleSceneShort/PolybrushMesh33762.mdl" />
-			<attribute name="Material" value="Material;Content/_System/Materials/WaterRiver.xml" />
+		<component type="StaticModel" id="98">
+			<attribute name="Model" value="Model;Scenes/SampleSceneShort/PolybrushMesh-17450.mdl" />
+			<attribute name="Material" value="Material;Content/_System/Materials/WaterRiverDefault.xml" />
 			<attribute name="Cast Shadows" value="false" />
-		</component>
-	</node>
-	<node id="121">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Reflection Probe (1)" />
-		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="134.74 3.98 146" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
-		<component type="Zone" id="122">
-			<attribute name="Ambient Color" value="0.03696759 0.04214946 0.05455384 1" />
-			<attribute name="Override Mode" value="false" />
-			<attribute name="Bounding Box Min" value="-500 -500 -500" />
-			<attribute name="Bounding Box Max" value="500 500 500" />
-			<attribute name="Priority" value="1" />
-			<attribute name="Zone Texture" value="TextureCube;Scenes/SampleSceneShort/ReflectionProbe-3.xml" />
 		</component>
 	</node>
 </node>

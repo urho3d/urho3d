@@ -1,10 +1,17 @@
 <material>
-<technique name="Techniques/PBR/PBRTerrainBlend.xml" />
-<texture unit="0" name="Scenes/SampleSceneShortTerrain.Weights.tga" />
-<texture unit="1" name="Content/Ground/SandDesert/DesertGround01/DesertGround01_Base Color.jpeg" />
-<texture unit="2" name="Content/Ground/SandDesert/DesertGround02/DesertGround02_Base Color.jpeg" />
-<parameter name="MatSpecColor" value="0.0 0.0 0.0 16" />
+	<technique name="Techniques/PBR/PBRTerrainBlend.xml" />
+	<texture unit="0" name="Scenes/SampleSceneShortTerrain.Weights.tga" />
+	<texture unit="1" name="Content/Ground/SandDesert/DesertGround01/DesertGround01_Base Color.jpeg" />
+	<texture unit="2" name="Content/Ground/SandDesert/DesertGround02/DesertGround02_Base Color.jpeg" />
+	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+	<parameter name="MatEnvMapColor" value="1 1 1 1" />
+	<parameter name="MatSpecColor" value="0 0 0 1" />
+	<parameter name="Roughness" value="1" />
+	<parameter name="Metallic" value="0" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<cull value="ccw" />
+	<shadowcull value="ccw" />
 	<parameter name="DetailTiling" value="10 10" />
-<parameter name="Roughness" value="1" />
-<parameter name="Metallic" value="0" />
 </material>
