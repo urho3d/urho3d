@@ -276,7 +276,7 @@ void PS(
     roughness = clamp(roughness, ROUGHNESS_FLOOR, 1.0);
     metalness = clamp(metalness, METALNESS_FLOOR, 1.0);
 
-    float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
+    float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness) * pow(iColor.a, 2.0);
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
 
     // Get fog factor

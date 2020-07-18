@@ -1,0 +1,21 @@
+<material>
+	<technique name="Techniques/PBR/PBRWater.xml" />
+	<texture unit="diffuse" name="Content/_System/WaterFoam.png" />
+	<texture unit="normal" name="Content/_System/WaterNoise0.488.png" />
+	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+	<parameter name="MatDiffColor" value="1 1 1 0.5529412" />
+	<parameter name="MatEnvMapColor" value="1 1 1 1" />
+	<parameter name="MatSpecColor" value="1 1 1 0" />
+	<parameter name="Roughness" value="1" />
+	<parameter name="Metallic" value="0" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<cull value="ccw" />
+	<shadowcull value="ccw" />
+	<parameter name="WaterMetallic" value="1" />
+	<parameter name="WaterRoughness" value="0" />
+	<parameter name="WaterFlowSpeed" value="0.56" />
+	<parameter name="WaterTimeScale" value="0.38" />
+	<parameter name="WaterFresnelPower" value="4.15" />
+	<shader psdefines="DIFFMAP" vsdefines="" />
+</material>

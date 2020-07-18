@@ -190,7 +190,7 @@ void PS()
     roughness = clamp(roughness, ROUGHNESS_FLOOR, 1.0);
     metalness = clamp(metalness, METALNESS_FLOOR, 1.0);
 
-    vec3 specColor = mix(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
+    vec3 specColor = mix(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness) * pow(vColor.a, 2.0);
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness;
 
     // Get fog factor

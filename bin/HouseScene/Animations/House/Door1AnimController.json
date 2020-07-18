@@ -1,0 +1,153 @@
+{
+    "name": "Door1AnimController",
+    "layers": [
+        {
+            "stateMachine": {
+                "states": [
+                    {
+                        "name": "Locked",
+                        "speed": 1.0,
+                        "animationClip": "",
+                        "hasBlendTree": false,
+                        "blendTree": {
+                            "name": "",
+                            "children": [],
+                            "blendParameter": "",
+                            "blendParameterY": "",
+                            "blendType": 0,
+                            "maxThreshold": 0.0,
+                            "minThreshold": 0.0,
+                            "useAutomaticThresholds": false,
+                            "apparentSpeed": 0.0,
+                            "averageAngularSpeed": 0.0,
+                            "averageDuration": 0.0,
+                            "averageSpeed": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "isHumanMotion": false,
+                            "isLooping": false,
+                            "legacy": false
+                        },
+                        "transitions": [
+                            {
+                                "destinationState": "Closed",
+                                "duration": 0.25,
+                                "hasFixedDuration": true,
+                                "canTransitionToSelf": true,
+                                "exitTime": 0.75,
+                                "hasExitTime": false,
+                                "offset": 0.0,
+                                "orderedInterruption": true,
+                                "isExit": false,
+                                "mute": false,
+                                "solo": false
+                            }
+                        ],
+                        "cycleOffset": 0.0
+                    },
+                    {
+                        "name": "Closed",
+                        "speed": 1.0,
+                        "animationClip": "Animations/SampleScene/AnimationDoor1Close.ani",
+                        "hasBlendTree": false,
+                        "blendTree": {
+                            "name": "",
+                            "children": [],
+                            "blendParameter": "",
+                            "blendParameterY": "",
+                            "blendType": 0,
+                            "maxThreshold": 0.0,
+                            "minThreshold": 0.0,
+                            "useAutomaticThresholds": false,
+                            "apparentSpeed": 0.0,
+                            "averageAngularSpeed": 0.0,
+                            "averageDuration": 0.0,
+                            "averageSpeed": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "isHumanMotion": false,
+                            "isLooping": false,
+                            "legacy": false
+                        },
+                        "transitions": [
+                            {
+                                "destinationState": "Locked",
+                                "duration": 0.0,
+                                "hasFixedDuration": true,
+                                "canTransitionToSelf": true,
+                                "exitTime": 0.9965728521347046,
+                                "hasExitTime": false,
+                                "offset": 0.0,
+                                "orderedInterruption": true,
+                                "isExit": false,
+                                "mute": false,
+                                "solo": false
+                            },
+                            {
+                                "destinationState": "Opened",
+                                "duration": 0.0,
+                                "hasFixedDuration": true,
+                                "canTransitionToSelf": true,
+                                "exitTime": 1.0,
+                                "hasExitTime": false,
+                                "offset": 0.0,
+                                "orderedInterruption": true,
+                                "isExit": false,
+                                "mute": false,
+                                "solo": false
+                            }
+                        ],
+                        "cycleOffset": 0.0
+                    },
+                    {
+                        "name": "Opened",
+                        "speed": 1.0,
+                        "animationClip": "Animations/SampleScene/AnimationDoor1Open.ani",
+                        "hasBlendTree": false,
+                        "blendTree": {
+                            "name": "",
+                            "children": [],
+                            "blendParameter": "",
+                            "blendParameterY": "",
+                            "blendType": 0,
+                            "maxThreshold": 0.0,
+                            "minThreshold": 0.0,
+                            "useAutomaticThresholds": false,
+                            "apparentSpeed": 0.0,
+                            "averageAngularSpeed": 0.0,
+                            "averageDuration": 0.0,
+                            "averageSpeed": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "isHumanMotion": false,
+                            "isLooping": false,
+                            "legacy": false
+                        },
+                        "transitions": [
+                            {
+                                "destinationState": "Closed",
+                                "duration": 0.0,
+                                "hasFixedDuration": true,
+                                "canTransitionToSelf": true,
+                                "exitTime": 1.0,
+                                "hasExitTime": true,
+                                "offset": 0.0,
+                                "orderedInterruption": true,
+                                "isExit": false,
+                                "mute": false,
+                                "solo": false
+                            }
+                        ],
+                        "cycleOffset": 0.0
+                    }
+                ]
+            }
+        }
+    ]
+}

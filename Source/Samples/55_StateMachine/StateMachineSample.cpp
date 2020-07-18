@@ -128,10 +128,10 @@ void StateMachineSample::CreateScene()
     sceneData_ = std::make_shared<GameSceneData>();
     sceneData_->analyse(scene_);
     
-    auto z = scene_->CreateComponent<Zone>();
-    z->SetBoundingBox(BoundingBox(Vector3(-100, -100, -100), Vector3(1000, 1000, 1000)));
-    float c = 0.1;
-    z->SetAmbientColor(Color(c, c, c, 1));
+//    auto z = scene_->CreateComponent<Zone>();
+//    z->SetBoundingBox(BoundingBox(Vector3(-100, -100, -100), Vector3(1000, 1000, 1000)));
+//    float c = 0.1;
+//    z->SetAmbientColor(Color(c, c, c, 1));
 
 //    Node* sphereWithDynamicMatNode = scene_->GetChild("SphereWithDynamicMat");
 //    auto* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
