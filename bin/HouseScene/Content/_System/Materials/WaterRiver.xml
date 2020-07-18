@@ -1,7 +1,7 @@
 <material>
 	<technique name="Techniques/PBR/PBRWater.xml" />
 	<texture unit="diffuse" name="Content/_System/WaterFoam.png" />
-	<texture unit="normal" name="Content/_System/WaterNoise0.603.png" />
+	<texture unit="normal" name="Content/_System/WaterNoise0.488.png" />
 	<parameter name="MatEmissiveColor" value="0 0 0 1" />
 	<parameter name="MatDiffColor" value="1 1 1 0.5529412" />
 	<parameter name="MatEnvMapColor" value="1 1 1 1" />

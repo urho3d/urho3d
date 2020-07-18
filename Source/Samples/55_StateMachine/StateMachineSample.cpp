@@ -32,6 +32,7 @@
 #include <Urho3D/Physics/PhysicsWorld.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Graphics/AnimationController.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Font.h>
@@ -39,11 +40,13 @@
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/Text3D.h>
 #ifdef URHO3D_ANGELSCRIPT
 #include <Urho3D/AngelScript/Script.h>
 #endif
 
 #include "StateMachineSample.h"
+#include "StateMachineComponents.h"
 
 #include <Urho3D/DebugNew.h>
 
@@ -94,6 +97,8 @@ void StateMachineSample::CreateInstructions()
 
 void StateMachineSample::CreateScene()
 {
+    ProjectNMetaData::RegisterObject(context_);
+    
     auto* cache = GetSubsystem<ResourceCache>();
 
 #ifdef URHO3D_ANGELSCRIPT
@@ -120,6 +125,9 @@ void StateMachineSample::CreateScene()
     node->LoadXML(xmlFile.GetRoot());
     scene_->AddChild(node);
     
+    sceneData_ = std::make_shared<GameSceneData>();
+    sceneData_->analyse(scene_);
+    
     auto z = scene_->CreateComponent<Zone>();
     z->SetBoundingBox(BoundingBox(Vector3(-100, -100, -100), Vector3(1000, 1000, 1000)));
     float c = 0.1;
@@ -140,6 +148,30 @@ void StateMachineSample::CreateScene()
     cameraNode_->LookAt(Vector3(95.0f, 2.0f, 115.0f));
     yaw_ = cameraNode_->GetRotation().YawAngle();
     pitch_ = cameraNode_->GetRotation().PitchAngle();
+    
+    {
+        Node* text = scene_->CreateChild("roofsText");
+        text->SetPosition(Vector3(110, 5.0f, 108));
+        text->SetDirection(Vector3(-1, 0, -1));
+        auto* textComponent = text->CreateComponent<Text3D>();
+        textComponent->SetText(String("Press R to hide Roofs"));
+        textComponent->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
+    }
+    
+    {
+        Node* text = scene_->CreateChild("doorText");
+        text->SetPosition(Vector3(107, 2.5f, 108));
+        text->SetDirection(Vector3(-1, 0, -1));
+        auto* textComponent = text->CreateComponent<Text3D>();
+        textComponent->SetText(String("Click on the door"));
+        textComponent->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
+    }
+    
+    
+//    SharedPtr<Material> m = cache->GetResource<Material>("Techniques/PBR/PBREmissive.xml")->Clone();
+//    m->SetShaderParameter("MatEmissiveColor", Variant(Vector3(1, 1, 1)));
+//    m->SetShaderParameter("MatDiffColor", Variant(Vector3(1, 1, 1)));
+//    boxText1->SetMaterial(m);
 }
 
 void StateMachineSample::CreateUI()
@@ -238,7 +270,7 @@ void StateMachineSample::SetupViewport()
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
-    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/Tonemap.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("_HouseScenePostprocess/Tonemap.xml"));
     
     // This one is very heavy
 //    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/BloomHDRSimple.xml"));
@@ -290,6 +322,17 @@ void StateMachineSample::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
+    
+    if (!input->GetKeyDown(KEY_R)) 
+    {
+        if (rDown_) {
+            rDown_ = false;
+            SwitchRoofs();
+        }
+    }
+    else {
+        rDown_ = true;
+    }
 }
 
 void StateMachineSample::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -301,8 +344,128 @@ void StateMachineSample::HandleUpdate(StringHash eventType, VariantMap& eventDat
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+    
+    //
+    CheckClick();
 }
 
+void StateMachineSample::CheckClick()
+{
+    auto* input = GetSubsystem<Input>();
+    if (input->GetMouseButtonDown(MOUSEB_LEFT)) {
+        mouseDown_ = true;
+        return;
+    }
+    bool checkClick = false;
+    if (mouseDown_) {
+        checkClick = true;
+        mouseDown_ = false;
+    }
+    if (!checkClick) {
+        return;
+    }
+    
+    UI* ui = scene_->GetSubsystem<UI>();
+    IntVector2 pos = ui->GetCursorPosition();
+    Graphics* graphics = scene_->GetSubsystem<Graphics>();
+    Camera* camera = cameraNode_->GetComponent<Camera>();
+    Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
+    PODVector<RayQueryResult> raycastResults;
+    RayOctreeQuery sceneQuery(raycastResults, cameraRay, RAY_TRIANGLE, 250, DRAWABLE_GEOMETRY);
+    scene_->GetComponent<Octree>()->Raycast(sceneQuery);
+    
+    if (raycastResults.Size() == 0) 
+    {
+        return;
+    }
+    
+    Node *node = nullptr;
+    ProjectNMetaData *metadata = nullptr;
+    float distance = 1000;
+    for (unsigned i = 0; i < raycastResults.Size(); i ++) 
+    {
+        RayQueryResult& thisResult = raycastResults[i];
+        if (!thisResult.node_) 
+        {
+            continue;
+        }
+        if (thisResult.node_ == node && distance < thisResult.distance_ + 0.01) 
+        {
+            continue;
+        }
+        
+        Node *thisNode = thisResult.node_;
+        ProjectNMetaData *thisMetadata = thisNode->GetComponent<ProjectNMetaData>();
+        while (thisMetadata == nullptr)
+        {
+            Node *parentNode = thisNode->GetParent();
+            if (!parentNode) {
+                break;
+            }
+            thisNode = parentNode;
+            
+            thisMetadata = thisNode->GetComponent<ProjectNMetaData>();
+        }
+        if (!thisMetadata) 
+        {
+            continue;
+        }
+        if (thisMetadata->_isRoof && !roofsShown_) 
+        {
+            continue;
+        }
+        if (distance < thisResult.distance_ + 0.01) 
+        {
+            continue;
+        }
+        
+        distance = thisResult.distance_;
+        metadata = thisMetadata;
+        node = thisNode;
+    }
+    
+    if (metadata == nullptr) 
+    {
+        return;
+    }
+    
+    if (metadata->_gameObjectType == ProjectNMetaData::ObjectType::Door) 
+    {
+        if (metadata->_gameObjectId == "door1") 
+        {
+            if (metadata->_gameObjectElementId == "1") 
+            {
+                SwitchDoorState(node);
+                return;
+            }
+        }
+    }
+}
+
+void StateMachineSample::SwitchDoorState(Urho3D::Node *node)
+{
+    static int a = 0;
+    if (a%2 == 0) 
+    {
+        auto controller = node->CreateComponent<AnimationController>();
+        controller->PlayExclusive("_Animations/Door1Animations/Door1Animation.ani", 0, false);
+    }
+    else 
+    {
+        auto controller = node->CreateComponent<AnimationController>();
+        controller->PlayExclusive("_Animations/Door1Animations/Door1Animation.ani", 0, false);
+        controller->SetSpeed("_Animations/Door1Animations/Door1Animation.ani", -1);
+    }
+    a++;
+}
+
+void StateMachineSample::SwitchRoofs()
+{
+    roofsShown_ = !roofsShown_;
+    for (size_t i = 0; i < sceneData_->_roofs.size(); i++) {
+        sceneData_->_roofs[i]->GetComponent<ProjectNMetaData>()->setRoofVisible(roofsShown_);
+    }
+}
 
 void StateMachineSample::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -325,4 +488,3 @@ void StateMachineSample::HandlePostRenderUpdate(StringHash eventType, VariantMap
         }
     }
 }
-

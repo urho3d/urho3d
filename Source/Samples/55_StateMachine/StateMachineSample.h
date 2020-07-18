@@ -34,6 +34,8 @@ class Zone;
 
 }
 
+class GameSceneData;
+
 /// PBR materials example.
 /// This sample demonstrates:
 ///      - Loading a scene that showcases physically based materials & shaders
@@ -52,6 +54,13 @@ public:
     void Start() override;
 
 private:
+    
+    std::shared_ptr<GameSceneData> sceneData_;
+    
+    bool mouseDown_ = false;
+    bool rDown_ = false;
+    bool roofsShown_ = true;
+    
     /// Construct the scene content.
     void CreateScene();
     /// Construct user interface elements.
@@ -62,6 +71,8 @@ private:
     void SubscribeToEvents();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
+    /// dfsd
+    void CheckClick();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Construct an instruction text to the UI.
@@ -73,6 +84,12 @@ private:
     /// Handle the ambient HDR scale slider drag event.
     void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData);
 
-    //
+    /// Do 
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    
+    ///
+    void SwitchDoorState(Urho3D::Node *node);
+    
+    ///
+    void SwitchRoofs();
 };

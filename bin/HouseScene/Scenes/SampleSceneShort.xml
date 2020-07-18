@@ -661,4 +661,20 @@
 			<attribute name="Cast Shadows" value="false" />
 		</component>
 	</node>
+	<node id="121">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Reflection Probe (1)" />
+		<attribute name="Tags"><string value="Untagged" /></attribute>
+		<attribute name="Position" value="134.74 3.98 146" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<component type="Zone" id="122">
+			<attribute name="Ambient Color" value="0.03696759 0.04214946 0.05455384 1" />
+			<attribute name="Override Mode" value="false" />
+			<attribute name="Bounding Box Min" value="-500 -500 -500" />
+			<attribute name="Bounding Box Max" value="500 500 500" />
+			<attribute name="Priority" value="1" />
+			<attribute name="Zone Texture" value="TextureCube;Scenes/SampleSceneShort/ReflectionProbe-3.xml" />
+		</component>
+	</node>
 </node>

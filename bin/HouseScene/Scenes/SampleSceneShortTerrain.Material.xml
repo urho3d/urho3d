@@ -4,7 +4,7 @@
 <texture unit="1" name="Content/Ground/SandDesert/DesertGround01/DesertGround01_Base Color.jpeg" />
 <texture unit="2" name="Content/Ground/SandDesert/DesertGround02/DesertGround02_Base Color.jpeg" />
 <parameter name="MatSpecColor" value="0.0 0.0 0.0 16" />
-	<parameter name="DetailTiling" value="20 20" />
+	<parameter name="DetailTiling" value="10 10" />
 <parameter name="Roughness" value="1" />
 <parameter name="Metallic" value="0" />
 </material>

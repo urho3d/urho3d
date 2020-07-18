@@ -3,7 +3,7 @@
 	<texture unit="diffuse" name="Content/Houses/CanyonHouse/BaseColore.png" />
 	<texture unit="normal" name="Content/Houses/CanyonHouse/Normal.png" />
 	<texture unit="specular" name="Content/Houses/CanyonHouse/Roughnes.BaseColore.0.000.MetallicRoughness.png" />
-	<texture unit="emissive" name="Content/Houses/CanyonHouse/AO.AO.png" />
+	<texture unit="emissive" name="Content/Houses/CanyonHouse/AO.AO.0.840.png" />
 	<parameter name="MatEmissiveColor" value="0 0 0 1" />
 	<parameter name="MatDiffColor" value="1 1 1 1" />
 	<parameter name="MatEnvMapColor" value="1 1 1 1" />
