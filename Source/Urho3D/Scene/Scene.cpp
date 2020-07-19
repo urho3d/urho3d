@@ -42,6 +42,7 @@
 #include "../Scene/SplinePath.h"
 #include "../Scene/UnknownComponent.h"
 #include "../Scene/ValueAnimation.h"
+#include "../Graphics/StateMachine.h"
 
 #include "../DebugNew.h"
 
@@ -1536,6 +1537,7 @@ void RegisterSceneLibrary(Context* context)
     SmoothedTransform::RegisterObject(context);
     UnknownComponent::RegisterObject(context);
     SplinePath::RegisterObject(context);
+    StateMachineRunner::RegisterObject(context);
 }
 
 }

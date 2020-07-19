@@ -12,6 +12,7 @@
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 #include "../Resource/JSONFile.h"
+#include "../Scene/SceneEvents.h"
 
 #include "../DebugNew.h"
 
@@ -163,6 +164,54 @@ bool StateMachine::Transit(const String &transitionName)
 String StateMachine::GetCurrentState() const
 {
     return stateCurrent_->name_;
+}
+
+void StateMachine::OnUpdate(float time)
+{}
+
+
+
+StateMachineRunner::StateMachineRunner(Context* context)
+:Component(context)
+{}
+
+StateMachineRunner::~StateMachineRunner() = default;
+    
+void StateMachineRunner::RegisterObject(Context* context)
+{
+    context->RegisterFactory<StateMachineRunner>();
+}
+    
+void StateMachineRunner::RunStateMachine(SharedPtr<StateMachine> stateMachine)
+{
+    stateMachines_[stateMachine] = true;
+}
+
+void StateMachineRunner::StopStateMachine(SharedPtr<StateMachine> stateMachine)
+{
+    stateMachines_.Erase(stateMachine);
+}   
+
+void StateMachineRunner::OnSceneSet(Scene* scene) 
+{
+    Component::OnSceneSet(scene);
+    
+    if (scene) {
+        // Subscribe scene update event
+        SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(StateMachineRunner, HandleSceneUpdate));
+    }
+    else {
+        UnsubscribeFromEvent(E_SCENEUPDATE);
+    }
+}
+
+void StateMachineRunner::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
+{
+    auto timeStep = eventData[SceneUpdate::P_TIMESTEP].GetFloat();
+    for (auto i = stateMachines_.Begin(); i != stateMachines_.End(); i++) 
+    {
+        i->first_->OnUpdate(timeStep);
+    }
 }
 
 }

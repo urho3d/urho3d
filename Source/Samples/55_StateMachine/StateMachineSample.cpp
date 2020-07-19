@@ -33,6 +33,7 @@
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/AnimationController.h>
+#include <Urho3D/Graphics/StateMachine.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Font.h>
@@ -109,6 +110,7 @@ void StateMachineSample::CreateScene()
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<PhysicsWorld>();
+    scene_->CreateComponent<StateMachineRunner>();
     
 //    scene_->CreateComponent<DebugRenderer>();
 //    DebugHud* debugHud = engine_->CreateDebugHud();

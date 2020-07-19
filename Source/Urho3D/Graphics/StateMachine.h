@@ -23,6 +23,9 @@
 #pragma once
 
 #include "../Resource/Resource.h"
+#include "../Scene/Component.h"
+
+
 
 namespace Urho3D
 {
@@ -162,6 +165,9 @@ public:
     /// Gets the current state name
     String GetCurrentState() const;
     
+    /// Update transitions
+    void OnUpdate(float time);
+    
 private:
     /// State machine configuration
     SharedPtr<StateMachineConfig> config_ = nullptr;
@@ -171,6 +177,38 @@ private:
     
     /// Actual current state
     StateMachineState *stateCurrent_ = nullptr;
+    
+};
+
+
+
+/// Scene component that bypass scene update to all state machines
+class URHO3D_API StateMachineRunner : public Component
+{
+    URHO3D_OBJECT(StateMachineRunner, Component);
+
+public:
+    /// Construct.
+    explicit StateMachineRunner(Context* context);
+    /// Destruct.
+    ~StateMachineRunner() override;
+    /// Register object factory.
+    static void RegisterObject(Context* context);
+    
+    void RunStateMachine(SharedPtr<StateMachine> stateMachine);
+    void StopStateMachine(SharedPtr<StateMachine> stateMachine);
+    
+protected:
+    /// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
+    void OnSceneSet(Scene* scene) override;
+    
+private:
+    
+    /// Handle scene update event to control camera's pitch and yaw for all samples.
+    void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
+    
+    HashMap<SharedPtr<StateMachine>, bool> stateMachines_;
+//    PODVector<SharedPtr<StateMachine>> stateMachines_;
     
 };
 
