@@ -30,14 +30,14 @@ StateMachineState::~StateMachineState()
     transitions_.Clear();
 }
 
-bool StateMachineState::AddTransition(const String &stateTo, const String &transitionName)
+bool StateMachineState::AddTransition(const StateMachineTransition &transition)
 {
-    if (transitions_.Contains(transitionName))
+    if (transitions_.Contains(transition.name_))
     {
         return false;
     }
     
-    transitions_.Insert(Pair<String, StateMachineTransition>(transitionName, StateMachineTransition(transitionName, name_, stateTo)));
+    transitions_.Insert(Pair<String, StateMachineTransition>(transition.name_, transition));
     return true;
 }
 
@@ -89,21 +89,21 @@ bool StateMachineConfig::AddState(const String &stateName)
     return true;
 }
 
-bool StateMachineConfig::AddTransition(const String &stateFrom, const String &stateTo, const String &transitionName)
+bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
 {
-    auto stateIterator = states_.Find(stateFrom);
+    auto stateIterator = states_.Find(transition.stateFrom_);
     if (stateIterator == states_.End())
     {
         return false;
     }
     
-    if (!states_.Contains(stateTo))
+    if (!states_.Contains(transition.stateTo_))
     {
         return false;
     }
     
-    StateMachineState *state = states_[stateFrom].Get();
-    return state->AddTransition(stateTo, transitionName);
+    StateMachineState *state = states_[transition.stateFrom_].Get();
+    return state->AddTransition(transition);
 }
 
 //bool StateMachineConfig::IsTransitionMuted(const String &transitionName)

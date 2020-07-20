@@ -40,11 +40,19 @@ struct URHO3D_API StateMachineTransition
     
     /// Initial state
     String stateFrom_;
+    
     /// Destination state
     String stateTo_;
     
-//    /// disables a transition (unity style)
-//    bool mute_ = false;
+    float duration_ = 0;
+    
+    bool hasFixedDuration = true;
+    
+    float exitTime_ = 0;
+    
+    bool hasExitTime_ = false;
+    
+    float offset_ = 0;
     
     /// Construct.
     /// This constructor is required for hashmap
@@ -76,7 +84,7 @@ public:
     ~StateMachineState();
     
     /// Create new transition from this state to a given state with given transition name
-    bool AddTransition(const String &stateTo, const String &transitionName);
+    bool AddTransition(const StateMachineTransition &transition);
     /// Verifys if transition is possible
     bool CanTransit(const String &transitionName);
     
@@ -128,7 +136,7 @@ public:
     /// Create new state
     bool AddState(const String &stateName);
     /// Create new transition
-    bool AddTransition(const String &stateFrom, const String &stateTo, const String &transitionName);
+    bool AddTransition(const StateMachineTransition &transition);
     
 //    bool IsTransitionMuted(const String &transitionName);
 //    bool SetTransitionMuted(const String &transitionName, bool value);
@@ -199,6 +207,10 @@ public:
     void StopStateMachine(SharedPtr<StateMachine> stateMachine);
     
 protected:
+    
+    float _transitionTime;
+    
+    
     /// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
     void OnSceneSet(Scene* scene) override;
     
