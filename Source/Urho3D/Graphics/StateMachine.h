@@ -37,22 +37,20 @@ struct URHO3D_API StateMachineTransition
 {
     /// Transition name
     String name_;
-    
     /// Initial state
     String stateFrom_;
-    
     /// Destination state
     String stateTo_;
-    
-    float duration_ = 0;
-    
-    bool hasFixedDuration = true;
-    
-    float exitTime_ = 0;
-    
-    bool hasExitTime_ = false;
-    
+    /// The time at which the destination state will start. The offset is in normalized time of the destination state.
     float offset_ = 0;
+    /// The duration of the transition in seconds
+    float duration_ = 0;
+    /// When active the transition will have an exit time condition.
+    bool hasExitTime_ = false;
+    /// If hasExitTime is true, exitTime represents the exact time at which the transition can take effect.
+    /// This is represented in normalized time, so for example an exit time of 0.75 means that on the first frame where 75% of the animation has played, the Exit Time condition will be true. On the next frame, the condition will be false.
+    /// Transitions with exit times greater than one will be evaluated only once, so they can be used to exit at a specific time, after a fixed number of loops. For example, a transition with an exit time of 3.5 will be evaluated once, after three and a half loops.
+    float exitTime_ = 0;
     
     /// Construct.
     /// This constructor is required for hashmap
@@ -94,6 +92,10 @@ private:
     
     // State name
     String name_;
+    /// The default speed of the motion.
+    float speed_ = 1.0;
+    /// Name of the corresponded animation clip if applicable
+    Urho3D::String animationClip_;// example "Animations/SampleScene/AnimationDoor1Close.ani",
     
     /// All transitions from this state
     /// key represents transition name (trigger or event that executes this transition)
@@ -137,10 +139,6 @@ public:
     bool AddState(const String &stateName);
     /// Create new transition
     bool AddTransition(const StateMachineTransition &transition);
-    
-//    bool IsTransitionMuted(const String &transitionName);
-//    bool SetTransitionMuted(const String &transitionName, bool value);
-    
     /// Verify if transition is correct
     bool CanTransitFromState(const String &stateName, const String &transitionName);
 

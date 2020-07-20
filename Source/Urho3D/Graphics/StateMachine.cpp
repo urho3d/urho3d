@@ -106,12 +106,6 @@ bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
     return state->AddTransition(transition);
 }
 
-//bool StateMachineConfig::IsTransitionMuted(const String &transitionName)
-//{}
-//
-//bool StateMachineConfig::SetTransitionMuted(const String &transitionName, bool value)
-//{}
-
 bool StateMachineConfig::CanTransitFromState(const String &stateName, const String &transitionName)
 {
     auto stateIterator = states_.Find(stateName);
