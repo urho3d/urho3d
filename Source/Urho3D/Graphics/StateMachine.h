@@ -141,6 +141,8 @@ public:
     bool AddTransition(const StateMachineTransition &transition);
     /// Verify if transition is correct
     bool CanTransitFromState(const String &stateName, const String &transitionName);
+    /// Load from a JSON file. Return true if successful.
+    bool LoadJSON(Deserializer& source);
 
 private:
     /// Available states

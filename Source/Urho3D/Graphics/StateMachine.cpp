@@ -106,6 +106,12 @@ bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
     return state->AddTransition(transition);
 }
 
+/// Load from a JSON file. Return true if successful.
+bool StateMachineConfig::LoadJSON(Deserializer& source)
+{
+    return true;
+}
+
 bool StateMachineConfig::CanTransitFromState(const String &stateName, const String &transitionName)
 {
     auto stateIterator = states_.Find(stateName);

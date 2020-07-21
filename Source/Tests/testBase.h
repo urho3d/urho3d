@@ -33,6 +33,11 @@ protected:
         RegisterSceneLibrary(context_);
         RegisterGraphicsLibrary(context_);
         RegisterPhysicsLibrary(context_);
+        
+        ResourceCache *cache = context_->GetSubsystem<ResourceCache>();
+        cache->AddResourceDir("Data");
+        cache->AddResourceDir("CoreData");
+        cache->AddResourceDir("HouseScene");
 	}
 
 	void TearDown() override
