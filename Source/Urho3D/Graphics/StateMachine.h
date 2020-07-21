@@ -149,6 +149,8 @@ public:
     bool LoadJSON(Deserializer& source);
     /// Load from a unity JSON file. Return true if successful.
     bool LoadUnityJSON(Deserializer& source);
+    
+    unsigned int GetStatesCount() const;
 
 private:
     /// Available states

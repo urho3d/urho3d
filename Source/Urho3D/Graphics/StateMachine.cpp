@@ -106,6 +106,18 @@ bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
     return state->AddTransition(transition);
 }
 
+bool StateMachineConfig::CanTransitFromState(const String &stateName, const String &transitionName)
+{
+    auto stateIterator = states_.Find(stateName);
+    if (stateIterator == states_.End())
+    {
+        return false;
+    }
+    
+    StateMachineState *state = stateIterator->second_.Get();
+    return state->CanTransit(transitionName);
+}
+
 bool StateMachineConfig::LoadJSON(const JSONValue& source)
 {
     return true;
@@ -139,16 +151,9 @@ bool StateMachineConfig::LoadUnityJSON(Deserializer& source)
     return LoadJSON(stateMachine);
 }
 
-bool StateMachineConfig::CanTransitFromState(const String &stateName, const String &transitionName)
+unsigned int StateMachineConfig::GetStatesCount() const
 {
-    auto stateIterator = states_.Find(stateName);
-    if (stateIterator == states_.End())
-    {
-        return false;
-    }
-    
-    StateMachineState *state = stateIterator->second_.Get();
-    return state->CanTransit(transitionName);
+    return states_.Size();
 }
 
 
