@@ -141,8 +141,14 @@ public:
     bool AddTransition(const StateMachineTransition &transition);
     /// Verify if transition is correct
     bool CanTransitFromState(const String &stateName, const String &transitionName);
+    
+    /// Load from JSON data. Removes all existing child nodes and components first. Return true if successful.
+    bool LoadJSON(const JSONValue& source);
+    
     /// Load from a JSON file. Return true if successful.
     bool LoadJSON(Deserializer& source);
+    /// Load from a unity JSON file. Return true if successful.
+    bool LoadUnityJSON(Deserializer& source);
 
 private:
     /// Available states

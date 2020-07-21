@@ -14,7 +14,7 @@ TEST_F(UrhoBaseTest, StateMachineTests)
     SharedPtr<File> file = cache->GetFile("Animations/House/Door1AnimController.json");
     
     StateMachineConfig *stateMachineConfig = new StateMachineConfig(context_);
-    stateMachineConfig->LoadJSON(*file.Get());
+    stateMachineConfig->LoadUnityJSON(*file.Get());
     int a = 10;
     ASSERT_EQ(a, 10);
 }

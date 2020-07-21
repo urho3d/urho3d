@@ -106,10 +106,37 @@ bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
     return state->AddTransition(transition);
 }
 
-/// Load from a JSON file. Return true if successful.
-bool StateMachineConfig::LoadJSON(Deserializer& source)
+bool StateMachineConfig::LoadJSON(const JSONValue& source)
 {
     return true;
+}
+
+bool StateMachineConfig::LoadJSON(Deserializer& source)
+{
+    JSONFile jsonFile(context_);
+    jsonFile.Load(source);
+    return LoadJSON(jsonFile.GetRoot());
+}
+
+bool StateMachineConfig::LoadUnityJSON(Deserializer& source)
+{
+    JSONFile jsonFile(context_);
+    jsonFile.Load(source);
+    
+    auto root = jsonFile.GetRoot();
+    if (!root.Contains("layers")) {
+        return false;
+    }
+    auto layers = root["layers"].GetArray();
+    if (layers.Size() == 0) {
+        return false;
+    }
+    auto firstLayer = layers[0];
+    if (!firstLayer.Contains("stateMachine")) {
+        return false;
+    }
+    auto stateMachine = firstLayer["stateMachine"];
+    return LoadJSON(stateMachine);
 }
 
 bool StateMachineConfig::CanTransitFromState(const String &stateName, const String &transitionName)
