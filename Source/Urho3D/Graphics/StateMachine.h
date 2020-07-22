@@ -56,7 +56,7 @@ struct URHO3D_API StateMachineTransition
     /// This constructor is required for hashmap
     StateMachineTransition()
     {
-        assert(false);
+        
     }
 
     /// Construct.
@@ -73,8 +73,8 @@ struct URHO3D_API StateMachineTransition
 /// Single state machine of a state machine. Belongs to a single StateMachineConfig instance
 class URHO3D_API StateMachineState: public RefCounted
 {
-    
     friend class StateMachine;
+    friend class StateMachineConfig;
     
 public:
     /// Construct.

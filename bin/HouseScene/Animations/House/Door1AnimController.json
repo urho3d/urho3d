@@ -42,7 +42,14 @@
                                 "orderedInterruption": true,
                                 "isExit": false,
                                 "mute": false,
-                                "solo": false
+                                "solo": false,
+                                "conditions": [
+                                    {
+                                        "mode": 1,
+                                        "parameter": "Unlock",
+                                        "threshold": 0.0
+                                    }
+                                ]
                             }
                         ],
                         "cycleOffset": 0.0
@@ -85,7 +92,14 @@
                                 "orderedInterruption": true,
                                 "isExit": false,
                                 "mute": false,
-                                "solo": false
+                                "solo": false,
+                                "conditions": [
+                                    {
+                                        "mode": 1,
+                                        "parameter": "Lock",
+                                        "threshold": 0.0
+                                    }
+                                ]
                             },
                             {
                                 "destinationState": "Opened",
@@ -98,7 +112,14 @@
                                 "orderedInterruption": true,
                                 "isExit": false,
                                 "mute": false,
-                                "solo": false
+                                "solo": false,
+                                "conditions": [
+                                    {
+                                        "mode": 1,
+                                        "parameter": "Open",
+                                        "threshold": 0.0
+                                    }
+                                ]
                             }
                         ],
                         "cycleOffset": 0.0
@@ -141,7 +162,14 @@
                                 "orderedInterruption": true,
                                 "isExit": false,
                                 "mute": false,
-                                "solo": false
+                                "solo": false,
+                                "conditions": [
+                                    {
+                                        "mode": 1,
+                                        "parameter": "Close",
+                                        "threshold": 0.0
+                                    }
+                                ]
                             }
                         ],
                         "cycleOffset": 0.0

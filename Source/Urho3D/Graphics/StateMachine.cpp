@@ -120,6 +120,37 @@ bool StateMachineConfig::CanTransitFromState(const String &stateName, const Stri
 
 bool StateMachineConfig::LoadJSON(const JSONValue& source)
 {
+    auto states = source["states"].GetArray();
+    for (size_t i = 0; i < states.Size(); i++) 
+    {
+        auto stateJson = states[i];
+        SharedPtr<StateMachineState> state = SharedPtr<StateMachineState>(new StateMachineState(stateJson["name"].GetString()));
+        state->speed_ = stateJson["speed"].GetFloat();
+        state->animationClip_ = stateJson["animationClip"].GetString();
+        
+        auto transitionsJson = stateJson["transitions"].GetArray();
+        for (size_t j = 0; j < transitionsJson.Size(); j++) 
+        {
+            auto transitionJson = transitionsJson[j];    
+            auto conditionsJson = transitionJson["conditions"].GetArray();
+            if (conditionsJson.Size() == 0) {
+                continue;
+            }
+            
+            String name = conditionsJson[0]["parameter"].GetString();
+            String stateFrom = state->name_;
+            String stateTo = transitionJson["destinationState"].GetString();
+            
+            StateMachineTransition transition(name, stateFrom, stateTo);
+            transition.offset_ = transitionJson["offset"].GetFloat();
+            transition.duration_ = transitionJson["duration"].GetFloat();
+            transition.hasExitTime_ = transitionJson["duration"].GetFloat();
+            transition.exitTime_ = transitionJson["exitTime"].GetFloat();
+            
+            state->AddTransition(transition);
+        }
+        states_[state->name_] = state;
+    }
     return true;
 }
 
