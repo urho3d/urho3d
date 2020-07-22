@@ -276,12 +276,12 @@ env:
     - RPI=1
     - DBE_TAG=latest
   matrix:
-    # RPI 1
+    # RPI 3/4 64-bit
     - URHO3D_LIB_TYPE=STATIC
     - URHO3D_LIB_TYPE=SHARED
     # RPI 2/3
-    - URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
-    - URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
+    - URHO3D_64BIT=0 URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
+    - URHO3D_64BIT=0 URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
 stage: release build configuration
 before_script:
   - rake ci_timer
