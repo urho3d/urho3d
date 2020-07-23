@@ -41,7 +41,7 @@ protected:
 class MockDelegate : public StateMachineDelegate {
     
 public:
-    MOCK_METHOD4(StateMachineDidTransit, void(StateMachine *sender, const String &stateFrom, const String &transitionName, const String &stateTo));
+    MOCK_METHOD4(StateMachineDidTransit, void(StateMachine *sender, const Urho3D::String &stateFrom, const Urho3D::String &transitionName, const Urho3D::String &stateTo));
 };
 
 }
@@ -70,7 +70,25 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
     stateMachine->SetDelegate(&delegate);
     ASSERT_EQ(stateMachine->GetDelegate(), &delegate);
     
+    ASSERT_EQ(stateMachine->GetCurrentState(), "Locked");
     
+    {
+        bool success = stateMachine->Transit("abc");
+        ASSERT_EQ(success, false);
+        ASSERT_EQ(stateMachine->GetCurrentState(), "Locked");
+    }
+    
+    {
+        StateMachine *s = stateMachine.Get();
+        String from = "Locked";
+        String trigger = "Unlock";
+        String to = "Closed";
+        EXPECT_CALL(delegate, StateMachineDidTransit(s, from, trigger, to)).Times(testing::AtLeast(1));
+        
+        bool success = stateMachine->Transit("Unlock");
+        ASSERT_EQ(success, true);
+        ASSERT_EQ(stateMachine->GetCurrentState(), "Closed");
+    }
     
 }
 
