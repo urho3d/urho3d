@@ -139,7 +139,9 @@ endif ()
 add_subdirectory (Urho3D)
 
 # Urho3D tests
-add_subdirectory (Tests)
+if (URHO3D_UNITTESTS)
+    add_subdirectory (Tests)
+endif ()
 
 # Urho3D Clang tools
 if (URHO3D_CLANG_TOOLS)
