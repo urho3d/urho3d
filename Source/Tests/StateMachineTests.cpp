@@ -74,7 +74,7 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
     
 }
 
-// Create instance and imitate life
+// Confirm that state machine runner works correctly
 TEST_F(StateMachineTest, StateMachineRunnerTests)
 {
     SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked"));
