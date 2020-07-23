@@ -12,6 +12,7 @@
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 #include "../Resource/JSONFile.h"
+#include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 
 #include "../DebugNew.h"
@@ -21,32 +22,32 @@
 namespace Urho3D
 {
 
-StateMachineState::StateMachineState(const String &name)
+StateMachineConfigState::StateMachineConfigState(const String &name)
 :name_(name)
 {}
 
-StateMachineState::~StateMachineState()
+StateMachineConfigState::~StateMachineConfigState()
 {
     transitions_.Clear();
 }
 
-bool StateMachineState::AddTransition(const StateMachineTransition &transition)
+bool StateMachineConfigState::AddTransition(const StateMachineConfigTransition &transition)
 {
     if (transitions_.Contains(transition.name_))
     {
         return false;
     }
     
-    transitions_.Insert(Pair<String, StateMachineTransition>(transition.name_, transition));
+    transitions_.Insert(Pair<String, StateMachineConfigTransition>(transition.name_, transition));
     return true;
 }
 
-bool StateMachineState::CanTransit(const String &transitionName)
+bool StateMachineConfigState::CanTransit(const String &transitionName)
 {
     return transitions_.Contains(transitionName);
 }
 
-String StateMachineState::GetName() const
+String StateMachineConfigState::GetName() const
 {
     return name_;
 }
@@ -75,11 +76,11 @@ bool StateMachineConfig::AddState(const String &stateName)
     }
 
     
-    states_.Insert(Pair<String, SharedPtr<StateMachineState>>(stateName, SharedPtr<StateMachineState>(new StateMachineState(stateName))));
+    states_.Insert(Pair<String, SharedPtr<StateMachineConfigState>>(stateName, SharedPtr<StateMachineConfigState>(new StateMachineConfigState(stateName))));
     return true;
 }
 
-bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
+bool StateMachineConfig::AddTransition(const StateMachineConfigTransition &transition)
 {
     auto stateIterator = states_.Find(transition.stateFrom_);
     if (stateIterator == states_.End())
@@ -92,7 +93,7 @@ bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
         return false;
     }
     
-    StateMachineState *state = states_[transition.stateFrom_].Get();
+    StateMachineConfigState *state = states_[transition.stateFrom_].Get();
     return state->AddTransition(transition);
 }
 
@@ -104,7 +105,7 @@ bool StateMachineConfig::CanTransit(const String &stateName, const String &trans
         return false;
     }
     
-    StateMachineState *state = stateIterator->second_.Get();
+    StateMachineConfigState *state = stateIterator->second_.Get();
     return state->CanTransit(transitionName);
 }
 
@@ -114,7 +115,7 @@ bool StateMachineConfig::LoadJSON(const JSONValue& source)
     for (size_t i = 0; i < states.Size(); i++) 
     {
         auto stateJson = states[i];
-        SharedPtr<StateMachineState> state = SharedPtr<StateMachineState>(new StateMachineState(stateJson["name"].GetString()));
+        SharedPtr<StateMachineConfigState> state = SharedPtr<StateMachineConfigState>(new StateMachineConfigState(stateJson["name"].GetString()));
         state->speed_ = stateJson["speed"].GetFloat();
         state->animationClip_ = stateJson["animationClip"].GetString();
         
@@ -131,7 +132,7 @@ bool StateMachineConfig::LoadJSON(const JSONValue& source)
             String stateFrom = state->name_;
             String stateTo = transitionJson["destinationState"].GetString();
             
-            StateMachineTransition transition(name, stateFrom, stateTo);
+            StateMachineConfigTransition transition(name, stateFrom, stateTo);
             transition.offset_ = transitionJson["offset"].GetFloat();
             transition.duration_ = transitionJson["duration"].GetFloat();
             transition.hasExitTime_ = transitionJson["duration"].GetFloat();
@@ -205,8 +206,27 @@ bool StateMachine::Transit(const String &transitionName)
         return false;
     }
     
+    if (transition_) 
+    {
+        // TODO smth?
+        // cancel?
+        
+        // clear data
+        transition_ = false;
+        transitionStateFrom_ = nullptr;
+        transitionData_ = StateMachineConfigTransition();
+    }
+    
+    // do
     String oldStateName = stateCurrent_->GetName();
-    stateCurrent_ = config_->states_[stateCurrent_->transitions_[transitionName].stateTo_].Get();
+    StateMachineConfigTransition transitionData = stateCurrent_->transitions_[transitionName];
+    stateCurrent_ = config_->states_[transitionData.stateTo_].Get();
+    
+    if (transitionData.duration_ > 0.001) {
+        
+    }
+    
+    
     if (delegate_)
     {
         delegate_->StateMachineDidTransit(this, oldStateName, transitionName, stateCurrent_->GetName());
@@ -214,13 +234,20 @@ bool StateMachine::Transit(const String &transitionName)
     return true;
 }
 
-String StateMachine::GetCurrentState() const
+StateMachineState StateMachine::GetCurrentState() const
 {
-    return stateCurrent_->name_;
+    return StateMachineState(stateCurrent_->name_, 1, "", 0);
 }
 
-void StateMachine::OnUpdate(float time)
-{}
+void StateMachine::OnUpdate(float time, float elapsedTime)
+{
+    
+}
+
+void StateMachine::OnRunnerSet(StateMachineRunner* runner)
+{
+    runner_ = runner;
+}
 
 
 
@@ -238,18 +265,20 @@ void StateMachineRunner::RegisterObject(Context* context)
 void StateMachineRunner::RunStateMachine(SharedPtr<StateMachine> stateMachine)
 {
     stateMachines_[stateMachine] = true;
+    stateMachine->OnRunnerSet(this);
 }
 
 void StateMachineRunner::StopStateMachine(SharedPtr<StateMachine> stateMachine)
 {
     stateMachines_.Erase(stateMachine);
+    stateMachine->OnRunnerSet(nullptr);
 }
 
-void StateMachineRunner::Update(float timeStep)
+void StateMachineRunner::Update(float timeStep, float elapsedTime)
 {
     for (auto i = stateMachines_.Begin(); i != stateMachines_.End(); i++) 
     {
-        i->first_->OnUpdate(timeStep);
+        i->first_->OnUpdate(timeStep, elapsedTime);
     }
 }
 
@@ -269,7 +298,8 @@ void StateMachineRunner::OnSceneSet(Scene* scene)
 void StateMachineRunner::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
     auto timeStep = eventData[SceneUpdate::P_TIMESTEP].GetFloat();
-    Update(timeStep);
+    auto scene = static_cast<Scene *>(eventData[SceneUpdate::P_SCENE].GetPtr());
+    Update(timeStep, scene->GetElapsedTime());
 }
 
 }

@@ -31,9 +31,10 @@ namespace Urho3D
 {
 
 class StateMachine;
+class StateMachineRunner;
 
 /// State machine transition. Belongs to a single StateMachineState instance
-struct URHO3D_API StateMachineTransition
+struct URHO3D_API StateMachineConfigTransition
 {
     /// Transition name
     String name_;
@@ -54,13 +55,13 @@ struct URHO3D_API StateMachineTransition
     
     /// Construct.
     /// This constructor is required for hashmap
-    StateMachineTransition()
+    StateMachineConfigTransition()
     {
         
     }
 
     /// Construct.
-    StateMachineTransition(const String &name, const String &stateFrom, const String &stateTo)
+    StateMachineConfigTransition(const String &name, const String &stateFrom, const String &stateTo)
     :name_(name)
     ,stateFrom_(stateFrom)
     ,stateTo_(stateTo)
@@ -71,18 +72,18 @@ struct URHO3D_API StateMachineTransition
 
 
 /// Single state machine of a state machine. Belongs to a single StateMachineConfig instance
-class URHO3D_API StateMachineState: public RefCounted
+class URHO3D_API StateMachineConfigState: public RefCounted
 {
     friend class StateMachine;
     friend class StateMachineConfig;
     
 public:
     /// Construct.
-    explicit StateMachineState(const String &name);
-    ~StateMachineState();
+    explicit StateMachineConfigState(const String &name);
+    ~StateMachineConfigState();
     
     /// Create new transition from this state to a given state with given transition name
-    bool AddTransition(const StateMachineTransition &transition);
+    bool AddTransition(const StateMachineConfigTransition &transition);
     /// Verifys if transition is possible
     bool CanTransit(const String &transitionName);
     
@@ -99,7 +100,7 @@ private:
     
     /// All transitions from this state
     /// key represents transition name (trigger or event that executes this transition)
-    HashMap<String, StateMachineTransition> transitions_;
+    HashMap<String, StateMachineConfigTransition> transitions_;
 
 };
 
@@ -133,7 +134,7 @@ public:
     /// Create new state
     bool AddState(const String &stateName);
     /// Create new transition
-    bool AddTransition(const StateMachineTransition &transition);
+    bool AddTransition(const StateMachineConfigTransition &transition);
     /// Verify if transition is correct
     bool CanTransit(const String &stateName, const String &transitionName);
     
@@ -149,8 +150,26 @@ public:
 
 private:
     /// Available states
-    HashMap<String, SharedPtr<StateMachineState>> states_;
+    HashMap<String, SharedPtr<StateMachineConfigState>> states_;
 
+};
+
+
+
+struct URHO3D_API StateMachineState 
+{
+    String state1_;
+    float weigth1_;
+    
+    String state2_;
+    float weigth2_;
+    
+    StateMachineState(const String &state1, float weigth1, const String &state2, float weigth2)
+    :state1_(state1)
+    ,weigth1_(weigth1)
+    ,state2_(state2)
+    ,weigth2_(weigth2)
+    {}
 };
 
 
@@ -174,10 +193,11 @@ public:
     bool Transit(const String &transitionName);
     
     /// Gets the current state name
-    String GetCurrentState() const;
-    
+    StateMachineState GetCurrentState() const;
     /// Update transitions
-    void OnUpdate(float time);
+    void OnUpdate(float timeStep, float elapsedTime);
+    /// Indicates when state machine is assigned to runner
+    void OnRunnerSet(StateMachineRunner* runner);
     
 private:
     /// State machine configuration
@@ -186,8 +206,16 @@ private:
     /// Delegate for listening for transitions
     StateMachineDelegate *delegate_ = nullptr;
     
+    /// Owner that is running the state machine
+    StateMachineRunner* runner_ = nullptr;
+    
     /// Actual current state
-    StateMachineState *stateCurrent_ = nullptr;
+    StateMachineConfigState *stateCurrent_ = nullptr;
+    
+    /// Transition information
+    bool transition_ = false;
+    StateMachineConfigState *transitionStateFrom_ = nullptr;
+    StateMachineConfigTransition transitionData_;
     
 };
 
@@ -209,12 +237,9 @@ public:
     void RunStateMachine(SharedPtr<StateMachine> stateMachine);
     void StopStateMachine(SharedPtr<StateMachine> stateMachine);
     
-    void Update(float timeStep);
+    void Update(float timeStep, float elapsedTime);
     
 protected:
-    
-    float _transitionTime;
-    
     
     /// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
     void OnSceneSet(Scene* scene) override;
@@ -225,7 +250,6 @@ private:
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     
     HashMap<SharedPtr<StateMachine>, bool> stateMachines_;
-//    PODVector<SharedPtr<StateMachine>> stateMachines_;
     
 };
 

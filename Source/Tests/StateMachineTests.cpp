@@ -70,12 +70,12 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
     stateMachine->SetDelegate(&delegate);
     ASSERT_EQ(stateMachine->GetDelegate(), &delegate);
     
-    ASSERT_EQ(stateMachine->GetCurrentState(), "Locked");
+    ASSERT_EQ(stateMachine->GetCurrentState().state1_, "Locked");
     
     {
         bool success = stateMachine->Transit("abc");
         ASSERT_EQ(success, false);
-        ASSERT_EQ(stateMachine->GetCurrentState(), "Locked");
+        ASSERT_EQ(stateMachine->GetCurrentState().state1_, "Locked");
     }
     
     {
@@ -87,7 +87,7 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
         
         bool success = stateMachine->Transit("Unlock");
         ASSERT_EQ(success, true);
-        ASSERT_EQ(stateMachine->GetCurrentState(), "Closed");
+        ASSERT_EQ(stateMachine->GetCurrentState().state1_, "Closed");
     }
     
 }
@@ -102,5 +102,5 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     
     stateMachineRunner_->RunStateMachine(stateMachine);
         
-    stateMachineRunner_->Update(0);
+    stateMachineRunner_->Update(0, 0);
 }
