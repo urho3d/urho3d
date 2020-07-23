@@ -130,17 +130,12 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    bool BeginLoad(Deserializer& source) override;
-    /// Save resource. Return true if successful.
-    bool Save(Serializer& dest) const override;
-
     /// Create new state
     bool AddState(const String &stateName);
     /// Create new transition
     bool AddTransition(const StateMachineTransition &transition);
     /// Verify if transition is correct
-    bool CanTransitFromState(const String &stateName, const String &transitionName);
+    bool CanTransit(const String &stateName, const String &transitionName);
     
     /// Load from JSON data. Removes all existing child nodes and components first. Return true if successful.
     bool LoadJSON(const JSONValue& source);

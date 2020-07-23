@@ -67,16 +67,6 @@ void StateMachineConfig::RegisterObject(Context* context)
     context->RegisterFactory<StateMachineConfig>();
 }
 
-bool StateMachineConfig::BeginLoad(Deserializer& source)
-{
-    return true;
-}
-
-bool StateMachineConfig::Save(Serializer& dest) const
-{
-    return true;
-}
-
 bool StateMachineConfig::AddState(const String &stateName)
 {
     if (states_.Contains(stateName))
@@ -106,7 +96,7 @@ bool StateMachineConfig::AddTransition(const StateMachineTransition &transition)
     return state->AddTransition(transition);
 }
 
-bool StateMachineConfig::CanTransitFromState(const String &stateName, const String &transitionName)
+bool StateMachineConfig::CanTransit(const String &stateName, const String &transitionName)
 {
     auto stateIterator = states_.Find(stateName);
     if (stateIterator == states_.End())
