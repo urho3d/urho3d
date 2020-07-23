@@ -21,6 +21,6 @@
 # THE SOFTWARE.
 #
 
-$(dirname $0)/cmake_generic.sh "$@" -G Xcode
+$(dirname $0)/cmake_generic.sh "$@" -G Xcode -DURHO3D_UNITTESTS=true
 
 # vi: set ts=4 sw=4 expandtab:
