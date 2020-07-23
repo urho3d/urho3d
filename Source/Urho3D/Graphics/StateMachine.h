@@ -150,7 +150,7 @@ public:
 private:
     /// Available states
     HashMap<String, SharedPtr<StateMachineState>> states_;
-    
+
 };
 
 
@@ -208,6 +208,8 @@ public:
     
     void RunStateMachine(SharedPtr<StateMachine> stateMachine);
     void StopStateMachine(SharedPtr<StateMachine> stateMachine);
+    
+    void Update(float timeStep);
     
 protected:
     

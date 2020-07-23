@@ -243,7 +243,15 @@ void StateMachineRunner::RunStateMachine(SharedPtr<StateMachine> stateMachine)
 void StateMachineRunner::StopStateMachine(SharedPtr<StateMachine> stateMachine)
 {
     stateMachines_.Erase(stateMachine);
-}   
+}
+
+void StateMachineRunner::Update(float timeStep)
+{
+    for (auto i = stateMachines_.Begin(); i != stateMachines_.End(); i++) 
+    {
+        i->first_->OnUpdate(timeStep);
+    }
+}
 
 void StateMachineRunner::OnSceneSet(Scene* scene) 
 {
@@ -261,10 +269,7 @@ void StateMachineRunner::OnSceneSet(Scene* scene)
 void StateMachineRunner::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
     auto timeStep = eventData[SceneUpdate::P_TIMESTEP].GetFloat();
-    for (auto i = stateMachines_.Begin(); i != stateMachines_.End(); i++) 
-    {
-        i->first_->OnUpdate(timeStep);
-    }
+    Update(timeStep);
 }
 
 }

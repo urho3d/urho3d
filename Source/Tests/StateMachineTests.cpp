@@ -101,5 +101,6 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     ASSERT_EQ(stateMachine->GetDelegate(), &delegate);
     
     stateMachineRunner_->RunStateMachine(stateMachine);
-    
+        
+    stateMachineRunner_->Update(0);
 }
