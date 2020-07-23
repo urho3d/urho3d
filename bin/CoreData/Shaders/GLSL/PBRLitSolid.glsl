@@ -244,7 +244,6 @@ void PS()
 
         #ifdef IBL
           vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
-          float gamma = 0.0;
           finalColor.rgb += iblColor * ambientOcclusion;
         #endif
 

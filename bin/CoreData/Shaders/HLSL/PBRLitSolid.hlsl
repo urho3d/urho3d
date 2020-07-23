@@ -326,7 +326,6 @@ void PS(
 
         #ifdef IBL
             const float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, specColor, roughness, cubeColor);
-            const float gamma = 0;
             finalColor += iblColor * ambientOcclusion;
         #endif
 
