@@ -183,6 +183,7 @@ unsigned int StateMachineConfig::GetStatesCount() const
 StateMachine::StateMachine(StateMachineConfig *config, const String &initialState)
 :config_(config)
 ,stateCurrent_(config->states_[initialState].Get())
+,stateCurrentCombined_(stateCurrent_->GetName(), 1.0f, "", 0.0f)
 {
     
 }
@@ -212,41 +213,83 @@ bool StateMachine::Transit(const String &transitionName)
         // cancel?
         
         // clear data
-        transition_ = false;
-        transitionStateFrom_ = nullptr;
-        transitionData_ = StateMachineConfigTransition();
+        ClearTranitionData();
     }
     
-    // do
-    String oldStateName = stateCurrent_->GetName();
+    // do the transition
+    SharedPtr<StateMachineConfigState> oldState = stateCurrent_;
     StateMachineConfigTransition transitionData = stateCurrent_->transitions_[transitionName];
     stateCurrent_ = config_->states_[transitionData.stateTo_].Get();
     
-    if (transitionData.duration_ > 0.001) {
-        
+    if (transitionData.duration_ > 0.001f && runner_) 
+    {
+        transition_ = true;
+        transitionStartTime_ = runner_->GetElapsedTime();
+        transitionStateFrom_ = oldState;
+        transitionElapsedTime_ = 0;
+        transitionData_ = transitionData;
     }
     
+    UpdateStateCombined();
     
     if (delegate_)
     {
-        delegate_->StateMachineDidTransit(this, oldStateName, transitionName, stateCurrent_->GetName());
+        delegate_->StateMachineDidTransit(this, oldState->GetName(), transitionName, stateCurrent_->GetName());
     }
     return true;
 }
 
-StateMachineState StateMachine::GetCurrentState() const
-{
-    return StateMachineState(stateCurrent_->name_, 1, "", 0);
-}
-
 void StateMachine::OnUpdate(float time, float elapsedTime)
 {
+    if (!transition_) 
+    {
+        return;
+    }
     
+    transitionElapsedTime_ += elapsedTime;
+    if (transitionElapsedTime_ >= transitionData_.duration_) 
+    {
+        // transition is done
+        // clear data
+        ClearTranitionData();
+    }
+    
+    UpdateStateCombined();
+    
+    if (delegate_)
+    {
+        delegate_->StateMachineDidUpdateBlendState(this);
+    }
 }
 
 void StateMachine::OnRunnerSet(StateMachineRunner* runner)
 {
     runner_ = runner;
+}
+
+void StateMachine::ClearTranitionData()
+{
+    transition_ = false;
+    transitionStartTime_ = 0.0f;
+    transitionElapsedTime_ = 0.0f;
+    transitionStateFrom_ = nullptr;
+    transitionData_ = StateMachineConfigTransition();
+}
+
+void StateMachine::UpdateStateCombined()
+{
+    StateMachineState result(stateCurrent_->name_, 1.0f, "", 0.0f);
+    if (transition_) 
+    {
+        result.state2_ = transitionStateFrom_->GetName();
+        float duration = transitionData_.duration_;
+        float actual = transitionElapsedTime_;
+        float normalized = actual / duration;
+        result.weigth1_ = normalized;
+        result.weigth2_ = 1.0f - normalized;
+        result.transition_ = true;
+    }
+    stateCurrentCombined_ = result;
 }
 
 

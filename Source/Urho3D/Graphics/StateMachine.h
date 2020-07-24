@@ -113,6 +113,7 @@ class URHO3D_API StateMachineDelegate
 public:
     /// Called when state machine transits to a new state
     virtual void StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &transitionName, const String &stateTo) = 0;
+    virtual void StateMachineDidUpdateBlendState(StateMachine *sender) = 0;
 
 };
 
@@ -164,6 +165,8 @@ struct URHO3D_API StateMachineState
     String state2_;
     float weigth2_;
     
+    bool transition_ = false;
+    
     StateMachineState(const String &state1, float weigth1, const String &state2, float weigth2)
     :state1_(state1)
     ,weigth1_(weigth1)
@@ -193,7 +196,7 @@ public:
     bool Transit(const String &transitionName);
     
     /// Gets the current state name
-    StateMachineState GetCurrentState() const;
+    StateMachineState GetCurrentState() const { return stateCurrentCombined_; }
     /// Update transitions
     void OnUpdate(float timeStep, float elapsedTime);
     /// Indicates when state machine is assigned to runner
@@ -210,12 +213,19 @@ private:
     StateMachineRunner* runner_ = nullptr;
     
     /// Actual current state
-    StateMachineConfigState *stateCurrent_ = nullptr;
+    SharedPtr<StateMachineConfigState> stateCurrent_ = nullptr;
     
     /// Transition information
     bool transition_ = false;
-    StateMachineConfigState *transitionStateFrom_ = nullptr;
+    float transitionStartTime_ = 0; 
+    float transitionElapsedTime_ = 0; 
+    SharedPtr<StateMachineConfigState> transitionStateFrom_ = nullptr;
     StateMachineConfigTransition transitionData_;
+    
+    void ClearTranitionData();
+    
+    void UpdateStateCombined();
+    StateMachineState stateCurrentCombined_; 
     
 };
 
@@ -237,6 +247,8 @@ public:
     void RunStateMachine(SharedPtr<StateMachine> stateMachine);
     void StopStateMachine(SharedPtr<StateMachine> stateMachine);
     
+    float GetElapsedTime() const { return elapsedTime_; }
+    
     void Update(float timeStep, float elapsedTime);
     
 protected:
@@ -245,6 +257,9 @@ protected:
     void OnSceneSet(Scene* scene) override;
     
 private:
+    
+    /// Scene time
+    float elapsedTime_ = 0;
     
     /// Handle scene update event to control camera's pitch and yaw for all samples.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
