@@ -251,19 +251,21 @@ StateMachineDelegate *StateMachine::GetDelegate()
     return delegate_;
 }
 
-void StateMachine::OnUpdate(float time, float elapsedTime)
+void StateMachine::OnUpdate(float timeStep, float elapsedTime)
 {
     if (!transition_) 
     {
         return;
     }
     
-    transitionElapsedTime_ += time;
+    transitionElapsedTime_ += timeStep;
     if (transitionElapsedTime_ >= transitionData_.duration_) 
     {
         // transition is done
         // clear data
         ClearTranitionData();
+        
+        CheckTransitions();
     }
     
     UpdateStateCombined();
@@ -288,11 +290,11 @@ void StateMachine::ClearTranitionData()
     transitionData_ = StateMachineConfigTransition();
 }
 
-void StateMachine::UpdateTransitions()
+void StateMachine::CheckTransitions()
 {
     // Check if any transition condition satisfied;
     int transitionIndex = -1;
-    int conditionIndex = -1;
+    
     for (unsigned t = 0; t < stateCurrent_->transitions_.Size(); t++) 
     {
         auto &transition = stateCurrent_->transitions_[t];
@@ -301,6 +303,13 @@ void StateMachine::UpdateTransitions()
             continue;
         }
         
+        if (transition.conditions_.Size() == 0) 
+        {
+            transitionIndex = t;
+            break;
+        }
+        
+        int conditionIndex = -1;
         for (unsigned c = 0; c < transition.conditions_.Size(); c++) 
         {
             auto &condition = transition.conditions_[c];
@@ -317,6 +326,11 @@ void StateMachine::UpdateTransitions()
             transitionIndex = t;
             break;
         }
+    }
+    
+    if (transitionIndex == -1) 
+    {
+        return;
     }
     
     // do the transition
@@ -361,8 +375,9 @@ void StateMachine::OnParameterDidChangeValue(const String &parameterName, bool o
 {
     if (!transition_) 
     {
-        if (stateCurrent_->HaveTransitionsFor(parameterName)) {
-            UpdateTransitions();
+        if (stateCurrent_->HaveTransitionsFor(parameterName)) 
+        {
+            CheckTransitions();
         }
     }
 }

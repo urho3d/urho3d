@@ -6,7 +6,7 @@
                 "states": [
                     {
                         "name": "Locked",
-                        "speed": 1.0,
+                        "speed": 5.0,
                         "animationClip": "",
                         "hasBlendTree": false,
                         "blendTree": {
@@ -56,7 +56,7 @@
                     },
                     {
                         "name": "Closed",
-                        "speed": 1.0,
+                        "speed": 5.0,
                         "animationClip": "",
                         "hasBlendTree": false,
                         "blendTree": {
@@ -126,7 +126,7 @@
                     },
                     {
                         "name": "Opened",
-                        "speed": 1.0,
+                        "speed": 5.0,
                         "animationClip": "",
                         "hasBlendTree": false,
                         "blendTree": {
@@ -213,13 +213,7 @@
                                 "isExit": false,
                                 "mute": false,
                                 "solo": false,
-                                "conditions": [
-                                    {
-                                        "mode": 1,
-                                        "parameter": "Opened",
-                                        "threshold": 0.0
-                                    }
-                                ]
+                                "conditions": []
                             }
                         ],
                         "cycleOffset": 0.0
@@ -256,20 +250,14 @@
                                 "duration": 0.0,
                                 "hasFixedDuration": true,
                                 "canTransitionToSelf": true,
-                                "exitTime": 1.0,
+                                "exitTime": 0.0,
                                 "hasExitTime": true,
                                 "offset": 0.0,
                                 "orderedInterruption": true,
                                 "isExit": false,
                                 "mute": false,
                                 "solo": false,
-                                "conditions": [
-                                    {
-                                        "mode": 2,
-                                        "parameter": "Opened",
-                                        "threshold": 0.0
-                                    }
-                                ]
+                                "conditions": []
                             }
                         ],
                         "cycleOffset": 0.0

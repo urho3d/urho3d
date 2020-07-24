@@ -101,9 +101,15 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     parameterSource->Set("Locked", true);
     
     SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked", parameterSource));
-    MockDelegate delegate;
-    stateMachine->SetDelegate(&delegate);
-    EXPECT_EQ(stateMachine->GetDelegate(), &delegate);
+    
+    {
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        EXPECT_EQ(stateMachine->GetDelegate(), &delegate);
+        
+        stateMachine->SetDelegate(nullptr);
+        EXPECT_EQ(stateMachine->GetDelegate(), nullptr);
+    }
     
     stateMachineRunner_->RunStateMachine(stateMachine);
     DoFrame(0);
@@ -111,8 +117,13 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     {
         String from = "Locked";
         String to = "Closed";
-        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::AtLeast(1));
+        
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
         parameterSource->Set("Locked", false);
+        
+        stateMachine->SetDelegate(nullptr);
     }
      
     {    
@@ -125,9 +136,14 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     }
     
     {
-        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::AtLeast(1));
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
+
+        DoFrame(0.125);
+        
+        stateMachine->SetDelegate(nullptr);
     }
-    DoFrame(0.125);
     
     {    
         auto state = stateMachine->GetCurrentState();
@@ -139,11 +155,16 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     }
     
     {
-        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::AtLeast(1));
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        
+        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
+
+        // confirm that 2nd time it just stay idle
+        DoFrame(0.125);
+        
+        stateMachine->SetDelegate(nullptr);
     }
-    
-    // confirm that 2nd time it just stay idle
-    DoFrame(0.125);
     
     {    
         auto state = stateMachine->GetCurrentState();
@@ -156,10 +177,15 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     
     // transit to open state
     {
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        
         String from = "Closed";
         String to = "Opening";
-        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::AtLeast(1));
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
         parameterSource->Set("Opened", true);
+        
+        stateMachine->SetDelegate(nullptr);
     }
     
     {    
@@ -171,7 +197,15 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_FLOAT_EQ(state.weigth2_, 1);
     }
     
-    DoFrame(0.125);
+    {
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        
+        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
+        DoFrame(0.125);
+        
+        stateMachine->SetDelegate(nullptr);
+    }
     
     {    
         auto state = stateMachine->GetCurrentState();
@@ -182,5 +216,30 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_FLOAT_EQ(state.weigth2_, 0.5);
     }
     
+    {
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        
+        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
+        
+        String from = "Opening";
+        String to = "Opened";
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
+        DoFrame(0.125);
+        
+        stateMachine->SetDelegate(nullptr);
+    }
+    
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Opened");
+        EXPECT_EQ(state.state2_, "");
+        EXPECT_EQ(state.transition_, false);
+        EXPECT_FLOAT_EQ(state.weigth1_, 1);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0);
+    }
+    
+    // TODO:
+    // multiple instant transitions case?
     
 }

@@ -266,7 +266,7 @@ private:
     
     void ClearTranitionData();
     
-    void UpdateTransitions();
+    void CheckTransitions();
     void UpdateStateCombined();
     StateMachineState stateCurrentCombined_; 
     
