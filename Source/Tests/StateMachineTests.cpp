@@ -19,7 +19,6 @@ protected:
     float timeElapsed_ = 0.0f; 
     bool loaded_ = false;
     
-    
     void SetUp() override
     {
         UrhoBaseTest::SetUp();
@@ -49,8 +48,9 @@ protected:
 class MockDelegate : public StateMachineDelegate {
     
 public:
-    MOCK_METHOD4(StateMachineDidTransit, void(StateMachine *sender, const Urho3D::String &stateFrom, const Urho3D::String &transitionName, const Urho3D::String &stateTo));
+    MOCK_METHOD3(StateMachineDidTransit, void(StateMachine *sender, const Urho3D::String &stateFrom, const Urho3D::String &stateTo));
     MOCK_METHOD1(StateMachineDidUpdateBlendState, void(StateMachine *sender));
+    
 };
 
 }
@@ -61,20 +61,16 @@ public:
 TEST_F(StateMachineTest, StateMachineConfigLoadingTest)
 {
     EXPECT_EQ(loaded_, true);
-    EXPECT_EQ(stateMachineConfig_->GetStatesCount(), 3);
-}
-
-// Test the configuration
-TEST_F(StateMachineTest, StateMachineConfigLogicTests)
-{
-    EXPECT_EQ(stateMachineConfig_->CanTransit("Locked", "Unlock"), true);
-    EXPECT_EQ(stateMachineConfig_->CanTransit("Opened", "Close"), true);
+    EXPECT_EQ(stateMachineConfig_->GetStatesCount(), 5);
 }
 
 // Create instance and imitate life
 TEST_F(StateMachineTest, StateMachineLogicTests)
 {
-    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked"));
+    SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
+    parameterSource->Set("Locked", true);
+    
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked", parameterSource));
     MockDelegate delegate;
     stateMachine->SetDelegate(&delegate);
     EXPECT_EQ(stateMachine->GetDelegate(), &delegate);
@@ -82,20 +78,17 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
     EXPECT_EQ(stateMachine->GetCurrentState().state1_, "Locked");
     
     {
-        bool success = stateMachine->Transit("abc");
-        EXPECT_EQ(success, false);
+        parameterSource->Set("abc", true);
         EXPECT_EQ(stateMachine->GetCurrentState().state1_, "Locked");
     }
     
     {
         StateMachine *s = stateMachine.Get();
         String from = "Locked";
-        String trigger = "Unlock";
         String to = "Closed";
-        EXPECT_CALL(delegate, StateMachineDidTransit(s, from, trigger, to)).Times(testing::AtLeast(1));
+        EXPECT_CALL(delegate, StateMachineDidTransit(s, from, to)).Times(testing::AtLeast(1));
         
-        bool success = stateMachine->Transit("Unlock");
-        EXPECT_EQ(success, true);
+        parameterSource->Set("Locked", false);
         EXPECT_EQ(stateMachine->GetCurrentState().state1_, "Closed");
     }
     
@@ -104,7 +97,10 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
 // Confirm that state machine runner works correctly
 TEST_F(StateMachineTest, StateMachineRunnerTests)
 {
-    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked"));
+    SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
+    parameterSource->Set("Locked", true);
+    
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked", parameterSource));
     MockDelegate delegate;
     stateMachine->SetDelegate(&delegate);
     EXPECT_EQ(stateMachine->GetDelegate(), &delegate);
@@ -114,11 +110,9 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     
     {
         String from = "Locked";
-        String trigger = "Unlock";
         String to = "Closed";
-        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, trigger, to)).Times(testing::AtLeast(1));
-        bool success = stateMachine->Transit("Unlock");
-        EXPECT_EQ(success, true);
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::AtLeast(1));
+        parameterSource->Set("Locked", false);
     }
      
     {    
@@ -147,6 +141,8 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     {
         EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::AtLeast(1));
     }
+    
+    // confirm that 2nd time it just stay idle
     DoFrame(0.125);
     
     {    
@@ -157,5 +153,34 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_FLOAT_EQ(state.weigth1_, 1);
         EXPECT_FLOAT_EQ(state.weigth2_, 0);
     }
+    
+    // transit to open state
+    {
+        String from = "Closed";
+        String to = "Opening";
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::AtLeast(1));
+        parameterSource->Set("Opened", true);
+    }
+    
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Opening");
+        EXPECT_EQ(state.state2_, "Closed");
+        EXPECT_EQ(state.transition_, true);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0);
+        EXPECT_FLOAT_EQ(state.weigth2_, 1);
+    }
+    
+    DoFrame(0.125);
+    
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Opening");
+        EXPECT_EQ(state.state2_, "Closed");
+        EXPECT_EQ(state.transition_, true);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.5);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.5);
+    }
+    
     
 }

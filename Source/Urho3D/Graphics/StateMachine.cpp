@@ -31,25 +31,31 @@ StateMachineConfigState::~StateMachineConfigState()
     transitions_.Clear();
 }
 
-bool StateMachineConfigState::AddTransition(const StateMachineConfigTransition &transition)
+void StateMachineConfigState::AddTransition(const StateMachineConfigTransition &transition)
 {
-    if (transitions_.Contains(transition.name_))
-    {
-        return false;
-    }
-    
-    transitions_.Insert(Pair<String, StateMachineConfigTransition>(transition.name_, transition));
-    return true;
-}
-
-bool StateMachineConfigState::CanTransit(const String &transitionName)
-{
-    return transitions_.Contains(transitionName);
+    transitions_.Push(transition);
 }
 
 String StateMachineConfigState::GetName() const
 {
     return name_;
+}
+
+bool StateMachineConfigState::HaveTransitionsFor(const String &parameterName)
+{
+    for (unsigned t = 0; t < transitions_.Size(); t++) 
+    {
+        auto &transition = transitions_[t];
+        
+        for (unsigned c = 0; c < transition.conditions_.Size(); c++) 
+        {
+            auto &condition = transition.conditions_[c];
+            if (condition.parameter_ == parameterName) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 
@@ -66,6 +72,11 @@ StateMachineConfig::~StateMachineConfig()
 void StateMachineConfig::RegisterObject(Context* context)
 {
     context->RegisterFactory<StateMachineConfig>();
+}
+
+unsigned int StateMachineConfig::GetStatesCount() const
+{
+    return states_.Size();
 }
 
 bool StateMachineConfig::AddState(const String &stateName)
@@ -94,19 +105,8 @@ bool StateMachineConfig::AddTransition(const StateMachineConfigTransition &trans
     }
     
     StateMachineConfigState *state = states_[transition.stateFrom_].Get();
-    return state->AddTransition(transition);
-}
-
-bool StateMachineConfig::CanTransit(const String &stateName, const String &transitionName)
-{
-    auto stateIterator = states_.Find(stateName);
-    if (stateIterator == states_.End())
-    {
-        return false;
-    }
-    
-    StateMachineConfigState *state = stateIterator->second_.Get();
-    return state->CanTransit(transitionName);
+    state->AddTransition(transition);
+    return true;
 }
 
 bool StateMachineConfig::LoadJSON(const JSONValue& source)
@@ -123,20 +123,30 @@ bool StateMachineConfig::LoadJSON(const JSONValue& source)
         for (size_t j = 0; j < transitionsJson.Size(); j++) 
         {
             auto transitionJson = transitionsJson[j];    
-            auto conditionsJson = transitionJson["conditions"].GetArray();
-            if (conditionsJson.Size() == 0) {
-                continue;
-            }
             
-            String name = conditionsJson[0]["parameter"].GetString();
             String stateFrom = state->name_;
             String stateTo = transitionJson["destinationState"].GetString();
             
-            StateMachineConfigTransition transition(name, stateFrom, stateTo);
+            StateMachineConfigTransition transition(stateFrom, stateTo);
             transition.offset_ = transitionJson["offset"].GetFloat();
             transition.duration_ = transitionJson["duration"].GetFloat();
             transition.hasExitTime_ = transitionJson["duration"].GetFloat();
             transition.exitTime_ = transitionJson["exitTime"].GetFloat();
+            
+            auto conditionsJson = transitionJson["conditions"].GetArray();
+            
+            for (unsigned c = 0; c < conditionsJson.Size(); c++) 
+            {
+                auto conditionJson = conditionsJson[c];
+
+                String name = conditionJson["parameter"].GetString();
+                bool value = conditionJson["mode"].GetInt() == 1;
+                
+                StateMachineConfigTransitionCondition condition;
+                condition.parameter_ = name;
+                condition.value_ = value;
+                transition.conditions_.Push(condition);
+            }
             
             state->AddTransition(transition);
         }
@@ -158,37 +168,78 @@ bool StateMachineConfig::LoadUnityJSON(Deserializer& source)
     jsonFile.Load(source);
     
     auto root = jsonFile.GetRoot();
-    if (!root.Contains("layers")) {
+    if (!root.Contains("layers")) 
+    {
         return false;
     }
     auto layers = root["layers"].GetArray();
-    if (layers.Size() == 0) {
+    if (layers.Size() == 0) 
+    {
         return false;
     }
     auto firstLayer = layers[0];
-    if (!firstLayer.Contains("stateMachine")) {
+    if (!firstLayer.Contains("stateMachine")) 
+    {
         return false;
     }
     auto stateMachine = firstLayer["stateMachine"];
     return LoadJSON(stateMachine);
 }
 
-unsigned int StateMachineConfig::GetStatesCount() const
+
+
+bool StateMachineParameterSource::Get(const String &parameterName) const
 {
-    return states_.Size();
+    auto valueI = parameters_.Find(parameterName);
+    if (valueI != parameters_.End())
+    {
+        return valueI->second_;
+    }
+    
+    return false;
+}
+
+void StateMachineParameterSource::Set(const String &parameterName, bool value)
+{
+    bool oldValue = Get(parameterName);
+    if (oldValue == value) 
+    {
+        return;
+    }
+    
+    parameters_[parameterName] = value;
+    
+    for (auto i = listeners_.Begin(); i != listeners_.End(); i++) 
+    {
+        i->first_->OnParameterDidChangeValue(parameterName, oldValue, value);
+    }
+}
+
+void StateMachineParameterSource::Subscribe(StateMachineParameterSourceListener *listener)
+{
+    listeners_[listener] = true;
+}
+
+void StateMachineParameterSource::Unsubscribe(StateMachineParameterSourceListener *listener)
+{
+    listeners_.Erase(listener);
 }
 
 
 
-StateMachine::StateMachine(StateMachineConfig *config, const String &initialState)
+StateMachine::StateMachine(StateMachineConfig *config, const String &initialState, SharedPtr<StateMachineParameterSource> parameters)
 :config_(config)
 ,stateCurrent_(config->states_[initialState].Get())
+,parameters_(parameters)
 ,stateCurrentCombined_(stateCurrent_->GetName(), 1.0f, "", 0.0f)
 {
-    
+    parameters_->Subscribe(this);
 }
 
-StateMachine::~StateMachine() = default;
+StateMachine::~StateMachine() 
+{
+    parameters_->Unsubscribe(this);
+}
 
 void StateMachine::SetDelegate(StateMachineDelegate *delegate)
 {
@@ -200,45 +251,6 @@ StateMachineDelegate *StateMachine::GetDelegate()
     return delegate_;
 }
 
-bool StateMachine::Transit(const String &transitionName)
-{
-    if (!stateCurrent_->CanTransit(transitionName))
-    {
-        return false;
-    }
-    
-    if (transition_) 
-    {
-        // TODO smth?
-        // cancel?
-        
-        // clear data
-        ClearTranitionData();
-    }
-    
-    // do the transition
-    SharedPtr<StateMachineConfigState> oldState = stateCurrent_;
-    StateMachineConfigTransition transitionData = stateCurrent_->transitions_[transitionName];
-    stateCurrent_ = config_->states_[transitionData.stateTo_].Get();
-    
-    if (transitionData.duration_ > 0.001f && runner_) 
-    {
-        transition_ = true;
-        transitionStartTime_ = runner_->GetElapsedTime();
-        transitionStateFrom_ = oldState;
-        transitionElapsedTime_ = 0;
-        transitionData_ = transitionData;
-    }
-    
-    UpdateStateCombined();
-    
-    if (delegate_)
-    {
-        delegate_->StateMachineDidTransit(this, oldState->GetName(), transitionName, stateCurrent_->GetName());
-    }
-    return true;
-}
-
 void StateMachine::OnUpdate(float time, float elapsedTime)
 {
     if (!transition_) 
@@ -246,7 +258,7 @@ void StateMachine::OnUpdate(float time, float elapsedTime)
         return;
     }
     
-    transitionElapsedTime_ += elapsedTime;
+    transitionElapsedTime_ += time;
     if (transitionElapsedTime_ >= transitionData_.duration_) 
     {
         // transition is done
@@ -276,6 +288,59 @@ void StateMachine::ClearTranitionData()
     transitionData_ = StateMachineConfigTransition();
 }
 
+void StateMachine::UpdateTransitions()
+{
+    // Check if any transition condition satisfied;
+    int transitionIndex = -1;
+    int conditionIndex = -1;
+    for (unsigned t = 0; t < stateCurrent_->transitions_.Size(); t++) 
+    {
+        auto &transition = stateCurrent_->transitions_[t];
+        if (transition_ && transition == transitionData_) 
+        {
+            continue;
+        }
+        
+        for (unsigned c = 0; c < transition.conditions_.Size(); c++) 
+        {
+            auto &condition = transition.conditions_[c];
+            bool currentValue = parameters_->Get(condition.parameter_);
+            if (condition.value_ == currentValue) 
+            {
+                conditionIndex = c;
+                break;
+            }
+        }
+        
+        if (conditionIndex != -1) 
+        {
+            transitionIndex = t;
+            break;
+        }
+    }
+    
+    // do the transition
+    SharedPtr<StateMachineConfigState> oldState = stateCurrent_;
+    StateMachineConfigTransition transitionData = stateCurrent_->transitions_[transitionIndex];
+    stateCurrent_ = config_->states_[transitionData.stateTo_].Get();
+    
+    if (transitionData.duration_ > 0.001f && runner_) 
+    {
+        transition_ = true;
+        transitionStartTime_ = runner_->GetElapsedTime();
+        transitionStateFrom_ = oldState;
+        transitionElapsedTime_ = 0;
+        transitionData_ = transitionData;
+    }
+    
+    UpdateStateCombined();
+    
+    if (delegate_)
+    {
+        delegate_->StateMachineDidTransit(this, oldState->GetName(), stateCurrent_->GetName());
+    }
+}
+
 void StateMachine::UpdateStateCombined()
 {
     StateMachineState result(stateCurrent_->name_, 1.0f, "", 0.0f);
@@ -290,6 +355,16 @@ void StateMachine::UpdateStateCombined()
         result.transition_ = true;
     }
     stateCurrentCombined_ = result;
+}
+
+void StateMachine::OnParameterDidChangeValue(const String &parameterName, bool oldValue, bool newValue) 
+{
+    if (!transition_) 
+    {
+        if (stateCurrent_->HaveTransitionsFor(parameterName)) {
+            UpdateTransitions();
+        }
+    }
 }
 
 
