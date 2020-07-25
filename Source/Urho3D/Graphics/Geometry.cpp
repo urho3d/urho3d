@@ -39,6 +39,7 @@ Geometry::Geometry(Context* context) :
     primitiveType_(TRIANGLE_LIST),
     indexStart_(0),
     indexCount_(0),
+    baseVertexIndex_(0),
     vertexStart_(0),
     vertexCount_(0),
     rawVertexSize_(0),
@@ -145,6 +146,35 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     return true;
 }
 
+bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned vertexStart, unsigned vertexCount,
+    bool checkIllegal)
+{
+    if (indexBuffer_)
+    {
+        // We can allow setting an illegal draw range now if the caller guarantees to resize / fill the buffer later
+        if (checkIllegal && indexStart + indexCount > indexBuffer_->GetIndexCount())
+        {
+            URHO3D_LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) +
+                ", index buffer has " + String(indexBuffer_->GetIndexCount()) + " indices");
+            return false;
+        }
+    }
+    else if (!rawIndexData_)
+    {
+        indexStart = 0;
+        indexCount = 0;
+    }
+
+    primitiveType_ = type;
+    indexStart_ = indexStart;
+    indexCount_ = indexCount;
+    baseVertexIndex_ = baseVertexIndex;
+    vertexStart_ = vertexStart;
+    vertexCount_ = vertexCount;
+
+    return true;
+}
+
 void Geometry::SetLodDistance(float distance)
 {
     if (distance < 0.0f)
@@ -179,7 +209,7 @@ void Geometry::Draw(Graphics* graphics)
     {
         graphics->SetIndexBuffer(indexBuffer_);
         graphics->SetVertexBuffers(vertexBuffers_);
-        graphics->Draw(primitiveType_, indexStart_, indexCount_, vertexStart_, vertexCount_);
+        graphics->Draw(primitiveType_, indexStart_, indexCount_, baseVertexIndex_, vertexStart_, vertexCount_);
     }
     else if (vertexCount_ > 0)
     {

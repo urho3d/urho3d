@@ -56,6 +56,9 @@ public:
     /// Set the draw range.
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount,
         bool checkIllegal = true);
+    /// Set the draw range.
+    bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned vertexStart, unsigned vertexCount,
+        bool checkIllegal = true);
     /// Set the LOD distance.
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
@@ -123,6 +126,8 @@ private:
     unsigned indexStart_;
     /// Number of indices.
     unsigned indexCount_;
+    /// Base vertex index
+    unsigned baseVertexIndex_;
     /// First used vertex.
     unsigned vertexStart_;
     /// Number of used vertices.
