@@ -180,7 +180,7 @@ void StateMachineSample::CreateScene()
         ResourceCache *cache = context_->GetSubsystem<ResourceCache>();
         auto config = cache->GetResource<StateMachineConfig>("Animations/House/Door1AnimController.json");
         
-        stateMachineDoor_ = SharedPtr<StateMachine>(new StateMachine(config, "Locked", parameterSource_));
+        stateMachineDoor_ = SharedPtr<StateMachine>(new StateMachine(config, parameterSource_));
         stateMachineDoor_->SetDelegate(this);
         scene_->GetComponent<StateMachineRunner>()->RunStateMachine(stateMachineDoor_);
     }

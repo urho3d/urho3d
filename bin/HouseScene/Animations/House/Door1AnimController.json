@@ -75,6 +75,7 @@
                 }
             ]
         }
-    ]
+    ],
+    "anyStateTransitions": [],
+    "defaultState": "Locked"
 }
-

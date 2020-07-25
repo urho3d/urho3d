@@ -63,9 +63,9 @@ void StateMachineParameterSource::Unsubscribe(StateMachineParameterSourceListene
 
 
 
-StateMachine::StateMachine(StateMachineConfig *config, const String &initialState, SharedPtr<StateMachineParameterSource> parameters)
+StateMachine::StateMachine(StateMachineConfig *config, SharedPtr<StateMachineParameterSource> parameters)
 :config_(config)
-,stateCurrent_(config->states_[initialState].Get())
+,stateCurrent_(config->states_[config->GetDefaultState()].Get())
 ,parameters_(parameters)
 ,stateCurrentCombined_(stateCurrent_->GetName(), 1.0f, "", 0.0f)
 {
@@ -85,6 +85,14 @@ void StateMachine::SetDelegate(StateMachineDelegate *delegate)
 StateMachineDelegate *StateMachine::GetDelegate()
 {
     return delegate_;
+}
+
+void StateMachine::SetState(const String &state)
+{
+    assert(config_->states_.Contains(state));
+    
+    ClearTranitionData();
+    stateCurrent_ = config_->states_[state].Get();
 }
 
 void StateMachine::OnUpdate(float timeStep, float elapsedTime)

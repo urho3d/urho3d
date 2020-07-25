@@ -72,7 +72,7 @@ TEST_F(StateMachineTest, StateMachineLogicTests)
     SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
     parameterSource->Set("Locked", true);
     
-    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked", parameterSource));
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, parameterSource));
     MockDelegate delegate;
     stateMachine->SetDelegate(&delegate);
     EXPECT_EQ(stateMachine->GetDelegate(), &delegate);
@@ -102,7 +102,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
     parameterSource->Set("Locked", true);
     
-    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, "Locked", parameterSource));
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, parameterSource));
     
     {
         MockDelegate delegate;
@@ -223,7 +223,7 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
     
     SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
     parameterSource->Set("Locked", true);    
-    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig, "Locked", parameterSource));
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig, parameterSource));
     
     stateMachineRunner_->RunStateMachine(stateMachine);
     

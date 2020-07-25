@@ -115,6 +115,7 @@ bool StateMachineConfig::AddTransition(const StateMachineConfigTransition &trans
 
 bool StateMachineConfig::LoadJSON(const JSONValue& source)
 {
+    defaultState_ = source["defaultState"].GetString(); 
     auto states = source["states"].GetArray();
     for (size_t i = 0; i < states.Size(); i++) 
     {

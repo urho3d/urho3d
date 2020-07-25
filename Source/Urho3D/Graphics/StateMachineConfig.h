@@ -123,6 +123,8 @@ public:
 
     /// Get number of states
     unsigned int GetStatesCount() const;
+    /// Get the default state
+    String GetDefaultState() const { return defaultState_; }
     /// Create new state
     bool AddState(const String &stateName);
     /// Create new transition
@@ -134,6 +136,8 @@ public:
     bool LoadJSON(Deserializer& source);
 
 private:
+    /// Default state that should set for new instances
+    String defaultState_;
     /// Available states
     HashMap<String, SharedPtr<StateMachineConfigState>> states_;
 

@@ -114,7 +114,7 @@ class URHO3D_API StateMachine: public RefCounted, public StateMachineParameterSo
     
 public:
     /// Construct.
-    explicit StateMachine(StateMachineConfig *config, const String &initialState, SharedPtr<StateMachineParameterSource> parameters);
+    explicit StateMachine(StateMachineConfig *config, SharedPtr<StateMachineParameterSource> parameters);
     /// Destruct.
     ~StateMachine() override;
     
@@ -125,6 +125,8 @@ public:
     
     /// Gets the current state name
     StateMachineState GetCurrentState() const { return stateCurrentCombined_; }
+    /// Set new current state
+    void SetState(const String &state);
     /// Update transitions
     void OnUpdate(float timeStep, float elapsedTime);
     /// Indicates when state machine is assigned to runner
