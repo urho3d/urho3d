@@ -103,10 +103,10 @@
                             },
                             {
                                 "destinationState": "Opening",
-                                "duration": 0.25,
-                                "hasFixedDuration": true,
+                                "duration": 1.0,
+                                "hasFixedDuration": false,
                                 "canTransitionToSelf": true,
-                                "exitTime": 0.75,
+                                "exitTime": 0.25,
                                 "hasExitTime": true,
                                 "offset": 0.0,
                                 "orderedInterruption": true,
@@ -153,10 +153,10 @@
                         "transitions": [
                             {
                                 "destinationState": "Closing",
-                                "duration": 0.25,
-                                "hasFixedDuration": true,
+                                "duration": 1.0,
+                                "hasFixedDuration": false,
                                 "canTransitionToSelf": true,
-                                "exitTime": 0.75,
+                                "exitTime": 0.25,
                                 "hasExitTime": true,
                                 "offset": 0.0,
                                 "orderedInterruption": true,

@@ -386,7 +386,8 @@ void StateMachineSample::StateMachineDidTransit(StateMachine *sender, const Stri
             auto controller = node->CreateComponent<AnimationController>();
             controller->PlayExclusive("Animations/SampleScene/AnimationDoor1Open.ani", 0, false);
         }
-        else if (state == "Closing") {
+        else if (state == "Closing") 
+        {
             auto node = sceneData_->_objects["door1"]->_nodes["1"]._node;
             auto controller = node->CreateComponent<AnimationController>();
             controller->PlayExclusive("Animations/SampleScene/AnimationDoor1Close.ani", 0, false);
