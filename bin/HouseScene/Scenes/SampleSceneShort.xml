@@ -509,7 +509,7 @@
 			<attribute name="Bounding Box Min" value="-500 -500 -500" />
 			<attribute name="Bounding Box Max" value="500 500 500" />
 			<attribute name="Priority" value="1" />
-			<attribute name="Zone Texture" value="TextureCube;Scenes/SampleScene/ReflectionProbe-2.xml" />
+			<attribute name="Zone Texture" value="TextureCube;Scenes/SampleSceneShort/ReflectionProbe-3.xml" />
 		</component>
 	</node>
 	<node id="96">
