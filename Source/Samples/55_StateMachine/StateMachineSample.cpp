@@ -169,7 +169,7 @@ void StateMachineSample::CreateScene()
         text->SetPosition(Vector3(107, 2.5f, 108));
         text->SetDirection(Vector3(-1, 0, -1));
         auto* textComponent = text->CreateComponent<Text3D>();
-        textComponent->SetText(String("Click on the door"));
+        textComponent->SetText(String("Use \"T\" and \"Y\" to control the door"));
         textComponent->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
     }
     
