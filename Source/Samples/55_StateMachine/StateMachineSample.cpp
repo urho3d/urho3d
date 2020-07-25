@@ -169,6 +169,15 @@ void StateMachineSample::CreateScene()
         scene_->GetComponent<StateMachineRunner>()->RunStateMachine(stateMachineDoor_);
     }
     
+    {
+        Node* text = scene_->CreateChild("doorStateText");
+        text->SetPosition(Vector3(105.3, 2.6f, 107.5));
+        text->SetDirection(Vector3(0, 0, -1));
+        textDoorState_ = text->CreateComponent<Text3D>();
+        textDoorState_->SetText(String("Door state: ") + stateMachineDoor_->GetCurrentState().state1_);
+        textDoorState_->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
+    }
+    
 }
 
 void StateMachineSample::CreateUI()
@@ -442,13 +451,12 @@ void StateMachineSample::SwitchDoorState(Urho3D::Node *node)
     if (a%2 == 0) 
     {
         auto controller = node->CreateComponent<AnimationController>();
-        controller->PlayExclusive("_Animations/Door1Animations/Door1Animation.ani", 0, false);
+        controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Open.ani", 0, false);
     }
     else 
     {
         auto controller = node->CreateComponent<AnimationController>();
-        controller->PlayExclusive("_Animations/Door1Animations/Door1Animation.ani", 0, false);
-        controller->SetSpeed("_Animations/Door1Animations/Door1Animation.ani", -1);
+        controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Close.ani", 0, false);
     }
     a++;
 }
@@ -491,7 +499,22 @@ void StateMachineSample::StateMachineDidTransit(StateMachine *sender, const Stri
 
 void StateMachineSample::StateMachineDidUpdateBlendState(StateMachine *sender) 
 {
-    
+    if (sender == stateMachineDoor_.Get()) 
+    {
+        auto state = stateMachineDoor_->GetCurrentState().state1_;
+        textDoorState_->SetText(String("Door state: ") + state);
+        if (state == "Opening") 
+        {
+            auto node = sceneData_->_objects["door1"]->_nodes["1"]._node;
+            auto controller = node->CreateComponent<AnimationController>();
+            controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Open.ani", 0, false);
+        }
+        else if (state == "Closing") {
+            auto node = sceneData_->_objects["door1"]->_nodes["1"]._node;
+            auto controller = node->CreateComponent<AnimationController>();
+            controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Close.ani", 0, false);
+        }
+    }
 }
 
 

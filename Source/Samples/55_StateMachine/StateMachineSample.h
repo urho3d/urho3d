@@ -32,6 +32,7 @@ class Drawable;
 class Node;
 class Scene;
 class Zone;
+class Text3D;
 
 class StateMachine;
 class StateMachineParameterSource;
@@ -64,7 +65,13 @@ private:
     bool rDown_ = false;
     bool roofsShown_ = true;
     
+    Text3D *textLockedValue_ = nullptr;
+    Text3D *textOpenedValue_ = nullptr;
+    
+    Text3D *textDoorState_ = nullptr;
     SharedPtr<StateMachine> stateMachineDoor_ = nullptr;
+    
+    
     SharedPtr<StateMachineParameterSource> parameterSource_ = nullptr;
     
     /// Construct the scene content.
