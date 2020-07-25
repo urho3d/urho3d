@@ -362,7 +362,7 @@ void Node::AddTag(const String& tag)
     if (scene_)
     {
         scene_->NodeTagAdded(this, tag);
-
+        
         // Send event
         using namespace NodeTagAdded;
         VariantMap& eventData = GetEventDataMap();
@@ -371,7 +371,6 @@ void Node::AddTag(const String& tag)
         eventData[P_TAG] = tag;
         scene_->SendEvent(E_NODETAGADDED, eventData);
     }
-
     // Sync
     MarkNetworkUpdate();
 }
