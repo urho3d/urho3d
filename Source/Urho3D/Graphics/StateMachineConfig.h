@@ -47,16 +47,8 @@ struct URHO3D_API StateMachineConfigTransition
     String stateFrom_;
     /// Destination state
     String stateTo_;
-    /// The time at which the destination state will start. The offset is in normalized time of the destination state.
-    float offset_ = 0;
     /// The duration of the transition in seconds
     float duration_ = 0;
-    /// When active the transition will have an exit time condition.
-    bool hasExitTime_ = false;
-    /// If hasExitTime is true, exitTime represents the exact time at which the transition can take effect.
-    /// This is represented in normalized time, so for example an exit time of 0.75 means that on the first frame where 75% of the animation has played, the Exit Time condition will be true. On the next frame, the condition will be false.
-    /// Transitions with exit times greater than one will be evaluated only once, so they can be used to exit at a specific time, after a fixed number of loops. For example, a transition with an exit time of 3.5 will be evaluated once, after three and a half loops.
-    float exitTime_ = 0;
     /// Conditions for this transition
     Vector<StateMachineConfigTransitionCondition> conditions_;
     
@@ -103,10 +95,6 @@ private:
     
     // State name
     String name_;
-    /// The default speed of the motion.
-    float speed_ = 1.0;
-    /// Name of the corresponded animation clip if applicable
-    Urho3D::String animationClip_;// example "Animations/SampleScene/AnimationDoor1Close.ani",
     
     /// All transitions from this state
     /// key represents transition name (trigger or event that executes this transition)
@@ -144,14 +132,11 @@ public:
     bool LoadJSON(const JSONValue& source);
     /// Load from a JSON file. Return true if successful.
     bool LoadJSON(Deserializer& source);
-    /// Load from a unity JSON file. Return true if successful.
-    bool LoadUnityJSON(Deserializer& source);
 
 private:
     /// Available states
     HashMap<String, SharedPtr<StateMachineConfigState>> states_;
 
 };
-
 
 }

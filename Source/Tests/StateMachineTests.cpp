@@ -29,7 +29,7 @@ protected:
         SharedPtr<File> file = cache->GetFile("Animations/House/Door1AnimController.json");
         
         stateMachineConfig_ = SharedPtr<StateMachineConfig>(new StateMachineConfig(context_));
-        loaded_ = stateMachineConfig_->LoadUnityJSON(*file.Get());
+        loaded_ = stateMachineConfig_->LoadJSON(*file.Get());
         
         stateMachineRunner_ = context_->CreateObject<StateMachineRunner>();
     }
@@ -131,46 +131,6 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     {    
         auto state = stateMachine->GetCurrentState();
         EXPECT_EQ(state.state1_, "Closed");
-        EXPECT_EQ(state.state2_, "Locked");
-        EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0.0f);
-        EXPECT_FLOAT_EQ(state.weigth2_, 1.0f);
-    }
-    
-    {
-        MockDelegate delegate;
-        stateMachine->SetDelegate(&delegate);
-        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
-
-        DoFrame(0.125f);
-        
-        stateMachine->SetDelegate(nullptr);
-    }
-    
-    {    
-        auto state = stateMachine->GetCurrentState();
-        EXPECT_EQ(state.state1_, "Closed");
-        EXPECT_EQ(state.state2_, "Locked");
-        EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0.5f);
-        EXPECT_FLOAT_EQ(state.weigth2_, 0.5f);
-    }
-    
-    {
-        MockDelegate delegate;
-        stateMachine->SetDelegate(&delegate);
-        
-        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
-
-        // confirm that 2nd time it just stay idle
-        DoFrame(0.125f);
-        
-        stateMachine->SetDelegate(nullptr);
-    }
-    
-    {    
-        auto state = stateMachine->GetCurrentState();
-        EXPECT_EQ(state.state1_, "Closed");
         EXPECT_EQ(state.state2_, "");
         EXPECT_EQ(state.transition_, false);
         EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
@@ -204,7 +164,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         stateMachine->SetDelegate(&delegate);
         
         EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
-        DoFrame(0.125f);
+        DoFrame(0.5f);
         
         stateMachine->SetDelegate(nullptr);
     }
@@ -227,7 +187,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         String from = "Opening";
         String to = "Opened";
         EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
-        DoFrame(0.125f);
+        DoFrame(0.5f);
         
         stateMachine->SetDelegate(nullptr);
     }
@@ -254,7 +214,7 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
     SharedPtr<File> file = cache->GetFile("Animations/House/Door1AnimController.json");
     
     SharedPtr<StateMachineConfig> stateMachineConfig = SharedPtr<StateMachineConfig>(new StateMachineConfig(context_));
-    stateMachineConfig->LoadUnityJSON(*file.Get());
+    stateMachineConfig->LoadJSON(*file.Get());
     
     stateMachineConfig->AddState("Opened2");
     StateMachineConfigTransition transition("Opened", "Opened2");
@@ -274,14 +234,14 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
     {    
         auto state = stateMachine->GetCurrentState();
         EXPECT_EQ(state.state1_, "Closed");
-        EXPECT_EQ(state.state2_, "Locked");
-        EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0.0f);
-        EXPECT_FLOAT_EQ(state.weigth2_, 1.0f);
+        EXPECT_EQ(state.state2_, "");
+        EXPECT_EQ(state.transition_, false);
+        EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
     }
     
     {
-        DoFrame(0.25f);
+        DoFrame(1.0f);
     }
     
     {    
@@ -296,7 +256,7 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
     // transit to open state
     {
         parameterSource->Set("Opened", true);
-        DoFrame(0.125f);
+        DoFrame(0.5f);
     }
     
     {    
@@ -322,7 +282,7 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
         String from2 = "Opened";
         String to2 = "Opened2";
         EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from2, to2)).Times(testing::Exactly(1));
-        DoFrame(0.125f);
+        DoFrame(0.5f);
         
         stateMachine->SetDelegate(nullptr);
     }

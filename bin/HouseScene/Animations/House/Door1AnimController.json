@@ -1,269 +1,80 @@
 {
-    "name": "Door1AnimController",
-    "layers": [
+    "states": [
         {
-            "stateMachine": {
-                "states": [
-                    {
-                        "name": "Locked",
-                        "speed": 5.0,
-                        "animationClip": "",
-                        "hasBlendTree": false,
-                        "blendTree": {
-                            "name": "",
-                            "children": [],
-                            "blendParameter": "",
-                            "blendParameterY": "",
-                            "blendType": 0,
-                            "maxThreshold": 0.0,
-                            "minThreshold": 0.0,
-                            "useAutomaticThresholds": false,
-                            "apparentSpeed": 0.0,
-                            "averageAngularSpeed": 0.0,
-                            "averageDuration": 0.0,
-                            "averageSpeed": {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0
-                            },
-                            "isHumanMotion": false,
-                            "isLooping": false,
-                            "legacy": false
-                        },
-                        "transitions": [
-                            {
-                                "destinationState": "Closed",
-                                "duration": 0.0,
-                                "hasFixedDuration": true,
-                                "canTransitionToSelf": true,
-                                "exitTime": 0.75,
-                                "hasExitTime": false,
-                                "offset": 0.0,
-                                "orderedInterruption": true,
-                                "isExit": false,
-                                "mute": false,
-                                "solo": false,
-                                "conditions": [
-                                    {
-                                        "mode": 2,
-                                        "parameter": "Locked",
-                                        "threshold": 0.0
-                                    }
-                                ]
-                            }
-                        ],
-                        "cycleOffset": 0.0
-                    },
-                    {
-                        "name": "Closed",
-                        "speed": 5.0,
-                        "animationClip": "",
-                        "hasBlendTree": false,
-                        "blendTree": {
-                            "name": "",
-                            "children": [],
-                            "blendParameter": "",
-                            "blendParameterY": "",
-                            "blendType": 0,
-                            "maxThreshold": 0.0,
-                            "minThreshold": 0.0,
-                            "useAutomaticThresholds": false,
-                            "apparentSpeed": 0.0,
-                            "averageAngularSpeed": 0.0,
-                            "averageDuration": 0.0,
-                            "averageSpeed": {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0
-                            },
-                            "isHumanMotion": false,
-                            "isLooping": false,
-                            "legacy": false
-                        },
-                        "transitions": [
-                            {
-                                "destinationState": "Locked",
-                                "duration": 0.0,
-                                "hasFixedDuration": true,
-                                "canTransitionToSelf": true,
-                                "exitTime": 0.9965728521347046,
-                                "hasExitTime": false,
-                                "offset": 0.0,
-                                "orderedInterruption": true,
-                                "isExit": false,
-                                "mute": false,
-                                "solo": false,
-                                "conditions": [
-                                    {
-                                        "mode": 1,
-                                        "parameter": "Locked",
-                                        "threshold": 0.0
-                                    }
-                                ]
-                            },
-                            {
-                                "destinationState": "Opening",
-                                "duration": 1.0,
-                                "hasFixedDuration": false,
-                                "canTransitionToSelf": true,
-                                "exitTime": 0.25,
-                                "hasExitTime": true,
-                                "offset": 0.0,
-                                "orderedInterruption": true,
-                                "isExit": false,
-                                "mute": false,
-                                "solo": false,
-                                "conditions": [
-                                    {
-                                        "mode": 1,
-                                        "parameter": "Opened",
-                                        "threshold": 0.0
-                                    }
-                                ]
-                            }
-                        ],
-                        "cycleOffset": 0.0
-                    },
-                    {
-                        "name": "Opened",
-                        "speed": 5.0,
-                        "animationClip": "",
-                        "hasBlendTree": false,
-                        "blendTree": {
-                            "name": "",
-                            "children": [],
-                            "blendParameter": "",
-                            "blendParameterY": "",
-                            "blendType": 0,
-                            "maxThreshold": 0.0,
-                            "minThreshold": 0.0,
-                            "useAutomaticThresholds": false,
-                            "apparentSpeed": 0.0,
-                            "averageAngularSpeed": 0.0,
-                            "averageDuration": 0.0,
-                            "averageSpeed": {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0
-                            },
-                            "isHumanMotion": false,
-                            "isLooping": false,
-                            "legacy": false
-                        },
-                        "transitions": [
-                            {
-                                "destinationState": "Closing",
-                                "duration": 1.0,
-                                "hasFixedDuration": false,
-                                "canTransitionToSelf": true,
-                                "exitTime": 0.25,
-                                "hasExitTime": true,
-                                "offset": 0.0,
-                                "orderedInterruption": true,
-                                "isExit": false,
-                                "mute": false,
-                                "solo": false,
-                                "conditions": [
-                                    {
-                                        "mode": 2,
-                                        "parameter": "Opened",
-                                        "threshold": 0.0
-                                    }
-                                ]
-                            }
-                        ],
-                        "cycleOffset": 0.0
-                    },
-                    {
-                        "name": "Opening",
-                        "speed": 1.0,
-                        "animationClip": "Animations/SampleScene/AnimationDoor1Open.ani",
-                        "hasBlendTree": false,
-                        "blendTree": {
-                            "name": "",
-                            "children": [],
-                            "blendParameter": "",
-                            "blendParameterY": "",
-                            "blendType": 0,
-                            "maxThreshold": 0.0,
-                            "minThreshold": 0.0,
-                            "useAutomaticThresholds": false,
-                            "apparentSpeed": 0.0,
-                            "averageAngularSpeed": 0.0,
-                            "averageDuration": 0.0,
-                            "averageSpeed": {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0
-                            },
-                            "isHumanMotion": false,
-                            "isLooping": false,
-                            "legacy": false
-                        },
-                        "transitions": [
-                            {
-                                "destinationState": "Opened",
-                                "duration": 0.0,
-                                "hasFixedDuration": true,
-                                "canTransitionToSelf": true,
-                                "exitTime": 0.0,
-                                "hasExitTime": true,
-                                "offset": 0.0,
-                                "orderedInterruption": true,
-                                "isExit": false,
-                                "mute": false,
-                                "solo": false,
-                                "conditions": []
-                            }
-                        ],
-                        "cycleOffset": 0.0
-                    },
-                    {
-                        "name": "Closing",
-                        "speed": 1.0,
-                        "animationClip": "Animations/SampleScene/AnimationDoor1Close.ani",
-                        "hasBlendTree": false,
-                        "blendTree": {
-                            "name": "",
-                            "children": [],
-                            "blendParameter": "",
-                            "blendParameterY": "",
-                            "blendType": 0,
-                            "maxThreshold": 0.0,
-                            "minThreshold": 0.0,
-                            "useAutomaticThresholds": false,
-                            "apparentSpeed": 0.0,
-                            "averageAngularSpeed": 0.0,
-                            "averageDuration": 0.0,
-                            "averageSpeed": {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0
-                            },
-                            "isHumanMotion": false,
-                            "isLooping": false,
-                            "legacy": false
-                        },
-                        "transitions": [
-                            {
-                                "destinationState": "Closed",
-                                "duration": 0.0,
-                                "hasFixedDuration": true,
-                                "canTransitionToSelf": true,
-                                "exitTime": 0.0,
-                                "hasExitTime": true,
-                                "offset": 0.0,
-                                "orderedInterruption": true,
-                                "isExit": false,
-                                "mute": false,
-                                "solo": false,
-                                "conditions": []
-                            }
-                        ],
-                        "cycleOffset": 0.0
-                    }
-                ]
-            }
+            "name": "Locked",
+            "transitions": [
+                {
+                    "destinationState": "Closed",
+                    "duration": 0.0,
+                    "conditions": [
+                        {
+                            "mode": 2,
+                            "parameter": "Locked"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Closed",
+            "transitions": [
+                {
+                    "destinationState": "Locked",
+                    "duration": 0.0,
+                    "conditions": [
+                        {
+                            "mode": 1,
+                            "parameter": "Locked"
+                        }
+                    ]
+                },
+                {
+                    "destinationState": "Opening",
+                    "duration": 1.0,
+                    "conditions": [
+                        {
+                            "mode": 1,
+                            "parameter": "Opened"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Opened",
+            "transitions": [
+                {
+                    "destinationState": "Closing",
+                    "duration": 1.0,
+                    "conditions": [
+                        {
+                            "mode": 2,
+                            "parameter": "Opened"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Opening",
+            "transitions": [
+                {
+                    "destinationState": "Opened",
+                    "duration": 0.0,
+                    "conditions": []
+                }
+            ]
+        },
+        {
+            "name": "Closing",
+            "transitions": [
+                {
+                    "destinationState": "Closed",
+                    "duration": 0.0,
+                    "conditions": []
+                }
+            ]
         }
     ]
 }
+

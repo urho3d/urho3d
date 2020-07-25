@@ -76,7 +76,7 @@ void StateMachineConfig::RegisterObject(Context* context)
 
 bool StateMachineConfig::BeginLoad(Deserializer& source) 
 {
-    return LoadUnityJSON(source);
+    return LoadJSON(source);
 }
 
 unsigned int StateMachineConfig::GetStatesCount() const
@@ -120,8 +120,6 @@ bool StateMachineConfig::LoadJSON(const JSONValue& source)
     {
         auto stateJson = states[i];
         SharedPtr<StateMachineConfigState> state = SharedPtr<StateMachineConfigState>(new StateMachineConfigState(stateJson["name"].GetString()));
-        state->speed_ = stateJson["speed"].GetFloat();
-        state->animationClip_ = stateJson["animationClip"].GetString();
         
         auto transitionsJson = stateJson["transitions"].GetArray();
         for (size_t j = 0; j < transitionsJson.Size(); j++) 
@@ -130,15 +128,10 @@ bool StateMachineConfig::LoadJSON(const JSONValue& source)
             
             String stateFrom = state->name_;
             String stateTo = transitionJson["destinationState"].GetString();
-            
             StateMachineConfigTransition transition(stateFrom, stateTo);
-            transition.offset_ = transitionJson["offset"].GetFloat();
             transition.duration_ = transitionJson["duration"].GetFloat();
-            transition.hasExitTime_ = transitionJson["duration"].GetFloat();
-            transition.exitTime_ = transitionJson["exitTime"].GetFloat();
             
             auto conditionsJson = transitionJson["conditions"].GetArray();
-            
             for (unsigned c = 0; c < conditionsJson.Size(); c++) 
             {
                 auto conditionJson = conditionsJson[c];
@@ -164,30 +157,6 @@ bool StateMachineConfig::LoadJSON(Deserializer& source)
     JSONFile jsonFile(context_);
     jsonFile.Load(source);
     return LoadJSON(jsonFile.GetRoot());
-}
-
-bool StateMachineConfig::LoadUnityJSON(Deserializer& source)
-{
-    JSONFile jsonFile(context_);
-    jsonFile.Load(source);
-    
-    auto root = jsonFile.GetRoot();
-    if (!root.Contains("layers")) 
-    {
-        return false;
-    }
-    auto layers = root["layers"].GetArray();
-    if (layers.Size() == 0) 
-    {
-        return false;
-    }
-    auto firstLayer = layers[0];
-    if (!firstLayer.Contains("stateMachine")) 
-    {
-        return false;
-    }
-    auto stateMachine = firstLayer["stateMachine"];
-    return LoadJSON(stateMachine);
 }
 
 }
