@@ -111,10 +111,6 @@ void StateMachineSample::CreateScene()
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<PhysicsWorld>();
     scene_->CreateComponent<StateMachineRunner>();
-    
-//    scene_->CreateComponent<DebugRenderer>();
-//    DebugHud* debugHud = engine_->CreateDebugHud();
-//    debugHud->SetMode(DEBUGHUD_SHOW_ALL);
 
     // Load scene content prepared in the editor (XML format). GetFile() returns an open file from the resource system
     // which scene.LoadXML() will read
@@ -129,18 +125,6 @@ void StateMachineSample::CreateScene()
     
     sceneData_ = std::make_shared<GameSceneData>();
     sceneData_->analyse(scene_);
-    
-//    auto z = scene_->CreateComponent<Zone>();
-//    z->SetBoundingBox(BoundingBox(Vector3(-100, -100, -100), Vector3(1000, 1000, 1000)));
-//    float c = 0.1;
-//    z->SetAmbientColor(Color(c, c, c, 1));
-
-//    Node* sphereWithDynamicMatNode = scene_->GetChild("SphereWithDynamicMat");
-//    auto* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
-//    dynamicMaterial_ = staticModel->GetMaterial(0);
-
-//    Node* zoneNode = scene_->GetChild("Zone");
-//    zone_ = zoneNode->GetComponent<Zone>();
 
     // Create the camera (not included in the scene file)
     cameraNode_ = scene_->CreateChild("Camera");
@@ -168,12 +152,6 @@ void StateMachineSample::CreateScene()
         textComponent->SetText(String("Click on the door"));
         textComponent->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
     }
-    
-    
-//    SharedPtr<Material> m = cache->GetResource<Material>("Techniques/PBR/PBREmissive.xml")->Clone();
-//    m->SetShaderParameter("MatEmissiveColor", Variant(Vector3(1, 1, 1)));
-//    m->SetShaderParameter("MatDiffColor", Variant(Vector3(1, 1, 1)));
-//    boxText1->SetMaterial(m);
 }
 
 void StateMachineSample::CreateUI()
@@ -273,9 +251,6 @@ void StateMachineSample::SetupViewport()
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("_HouseScenePostprocess/Tonemap.xml"));
-    
-    // This one is very heavy
-//    effectRenderPath->Append(cache->GetResource<XMLFile>("HouseScenePostprocess/BloomHDRSimple.xml"));
 
     viewport->SetRenderPath(effectRenderPath);
     GetSubsystem<Input>()->SetMouseVisible(true);

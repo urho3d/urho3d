@@ -257,7 +257,7 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
     stateMachineConfig->AddState("Opened2");
     StateMachineConfigTransition transition("Opened", "Opened2");
     stateMachineConfig->AddTransition(transition);
-    EXPECT_EQ(stateMachineConfig->GetStatesCount(), 5);
+    EXPECT_EQ(stateMachineConfig->GetStatesCount(), 6);
     
     SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
     parameterSource->Set("Locked", true);    

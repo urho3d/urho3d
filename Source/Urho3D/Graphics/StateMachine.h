@@ -24,100 +24,17 @@
 
 #include "../Resource/Resource.h"
 #include "../Scene/Component.h"
+#include "../Graphics/StateMachineConfig.h"
 
 
 
 namespace Urho3D
 {
 
+class StateMachineConfig;
+class StateMachineConfigState;
 class StateMachine;
 class StateMachineRunner;
-
-
-
-/// State machine transition condition.
-struct StateMachineConfigTransitionCondition {
-    /// Variable name
-    String parameter_;
-    /// Desired value for condition to be satisfied
-    bool value_ = true;
-};
-
-
-
-/// State machine transition. Belongs to a single StateMachineState instance
-struct URHO3D_API StateMachineConfigTransition
-{
-    /// Initial state
-    String stateFrom_;
-    /// Destination state
-    String stateTo_;
-    /// The time at which the destination state will start. The offset is in normalized time of the destination state.
-    float offset_ = 0;
-    /// The duration of the transition in seconds
-    float duration_ = 0;
-    /// When active the transition will have an exit time condition.
-    bool hasExitTime_ = false;
-    /// If hasExitTime is true, exitTime represents the exact time at which the transition can take effect.
-    /// This is represented in normalized time, so for example an exit time of 0.75 means that on the first frame where 75% of the animation has played, the Exit Time condition will be true. On the next frame, the condition will be false.
-    /// Transitions with exit times greater than one will be evaluated only once, so they can be used to exit at a specific time, after a fixed number of loops. For example, a transition with an exit time of 3.5 will be evaluated once, after three and a half loops.
-    float exitTime_ = 0;
-    /// Conditions for this transition
-    Vector<StateMachineConfigTransitionCondition> conditions_;
-    
-    /// Construct.
-    /// This constructor is required for hashmap
-    StateMachineConfigTransition()
-    {
-        
-    }
-
-    /// Construct.
-    StateMachineConfigTransition(const String &stateFrom, const String &stateTo)
-    :stateFrom_(stateFrom)
-    ,stateTo_(stateTo)
-    {
-    }
-
-    bool operator ==(const StateMachineConfigTransition &other) {
-        return stateTo_ == other.stateTo_ && stateFrom_ == other.stateFrom_;
-    }
-    
-};
-
-
-/// Single state machine of a state machine. Belongs to a single StateMachineConfig instance
-class URHO3D_API StateMachineConfigState: public RefCounted
-{
-    friend class StateMachine;
-    friend class StateMachineConfig;
-    
-public:
-    /// Construct.
-    explicit StateMachineConfigState(const String &name);
-    ~StateMachineConfigState();
-    
-    /// Create new transition from this state to a given state with given transition name
-    void AddTransition(const StateMachineConfigTransition &transition);
-    /// Get the state name
-    String GetName() const;
-    /// Check if this parameter may cause transitions
-    bool HaveTransitionsFor(const String &parameterName);
-    
-private:
-    
-    // State name
-    String name_;
-    /// The default speed of the motion.
-    float speed_ = 1.0;
-    /// Name of the corresponded animation clip if applicable
-    Urho3D::String animationClip_;// example "Animations/SampleScene/AnimationDoor1Close.ani",
-    
-    /// All transitions from this state
-    /// key represents transition name (trigger or event that executes this transition)
-    Vector<StateMachineConfigTransition> transitions_;
-
-};
 
 
 
@@ -133,53 +50,18 @@ public:
 };
 
 
-
-/// State machine resource.
-class URHO3D_API StateMachineConfig : public ResourceWithMetadata
-{
-    URHO3D_OBJECT(StateMachineConfig, ResourceWithMetadata);
-    
-    friend class StateMachine;
-    
-public:
-    /// Construct.
-    explicit StateMachineConfig(Context* context);
-    /// Destruct.
-    ~StateMachineConfig() override;
-    /// Register object factory. Drawable must be registered first.
-    static void RegisterObject(Context* context);
-
-    /// Get number of states
-    unsigned int GetStatesCount() const;
-    /// Create new state
-    bool AddState(const String &stateName);
-    /// Create new transition
-    bool AddTransition(const StateMachineConfigTransition &transition);
-    
-    /// Load from JSON data. Removes all existing child nodes and components first. Return true if successful.
-    bool LoadJSON(const JSONValue& source);
-    /// Load from a JSON file. Return true if successful.
-    bool LoadJSON(Deserializer& source);
-    /// Load from a unity JSON file. Return true if successful.
-    bool LoadUnityJSON(Deserializer& source);
-
-private:
-    /// Available states
-    HashMap<String, SharedPtr<StateMachineConfigState>> states_;
-
-};
-
-
-
 /// Represents the actual state of the state machine instance. Including blending between 2 states
 struct URHO3D_API StateMachineState 
 {
+    /// First state and weight 
     String state1_;
     float weigth1_;
     
+    /// Second state and weight
     String state2_;
     float weigth2_;
     
+    /// Indicates if state machine is in transition state (state is blended)
     bool transition_ = false;
     
     StateMachineState(const String &state1, float weigth1, const String &state2, float weigth2)
@@ -196,10 +78,12 @@ struct URHO3D_API StateMachineState
 class URHO3D_API StateMachineParameterSourceListener {
 public:
     virtual void OnParameterDidChangeValue(const String &parameterName, bool oldValue, bool newValue) = 0;
+    
 };
 
 
 
+/// Storage for variables used by state machines
 class URHO3D_API StateMachineParameterSource: public RefCounted 
 {
 public:
@@ -208,13 +92,15 @@ public:
     /// Sets new value
     void Set(const String &parameterName, bool value);
     
+    /// Subscribe listener for updates
     void Subscribe(StateMachineParameterSourceListener *listener);
+    /// Unsubscribe listener from updates
     void Unsubscribe(StateMachineParameterSourceListener *listener);
     
 private:
     /// Available states
     HashMap<String, bool> parameters_;
-    
+    /// Subscribed listeners
     HashMap<StateMachineParameterSourceListener *, bool> listeners_;
 };
 
@@ -246,30 +132,36 @@ private:
     /// State machine configuration
     SharedPtr<StateMachineConfig> config_ = nullptr;
     
-    /// Delegate for listening for transitions
+    /// Delegate for listening this state machine transitions
     StateMachineDelegate *delegate_ = nullptr;
     
     /// Owner that is running the state machine
     StateMachineRunner* runner_ = nullptr;
     
-    /// Actual current state
+    /// Current state config
     SharedPtr<StateMachineConfigState> stateCurrent_ = nullptr;
-    
+    /// Parameter storage. It is a separate object because it can be shared across multiple state machines 
     SharedPtr<StateMachineParameterSource> parameters_ = nullptr;
+    /// Actualt current state including transition and blending information 
+    StateMachineState stateCurrentCombined_;
     
     /// Transition information
-    bool transition_ = false;
-    float transitionStartTime_ = 0; 
+    bool transition_ = false; 
     float transitionElapsedTime_ = 0; 
     SharedPtr<StateMachineConfigState> transitionStateFrom_ = nullptr;
     StateMachineConfigTransition transitionData_;
     
+    /// Clears the transition data by setting default values in there 
     void ClearTranitionData();
     
+    /// Do actual check for any available transitions
     void CheckTransitions();
+    /// Checks one transition. Return true if transition happend, false otherwise  
     bool CheckSingleTransition();
+    /// Update the blend state and report to listener
     void UpdateStateCombined();
-    StateMachineState stateCurrentCombined_; 
+    
+     
     
 public:
     // StateMachineParameterSourceListener 

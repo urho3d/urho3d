@@ -17,176 +17,12 @@
 
 #include "../DebugNew.h"
 
+#include "StateMachineConfig.h"
+
 
 
 namespace Urho3D
 {
-
-StateMachineConfigState::StateMachineConfigState(const String &name)
-:name_(name)
-{}
-
-StateMachineConfigState::~StateMachineConfigState()
-{
-    transitions_.Clear();
-}
-
-void StateMachineConfigState::AddTransition(const StateMachineConfigTransition &transition)
-{
-    transitions_.Push(transition);
-}
-
-String StateMachineConfigState::GetName() const
-{
-    return name_;
-}
-
-bool StateMachineConfigState::HaveTransitionsFor(const String &parameterName)
-{
-    for (unsigned t = 0; t < transitions_.Size(); t++) 
-    {
-        auto &transition = transitions_[t];
-        
-        for (unsigned c = 0; c < transition.conditions_.Size(); c++) 
-        {
-            auto &condition = transition.conditions_[c];
-            if (condition.parameter_ == parameterName) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-
-
-StateMachineConfig::StateMachineConfig(Context* context)
-:ResourceWithMetadata(context)
-{}
-
-StateMachineConfig::~StateMachineConfig()
-{
-    states_.Clear();
-}
-
-void StateMachineConfig::RegisterObject(Context* context)
-{
-    context->RegisterFactory<StateMachineConfig>();
-}
-
-unsigned int StateMachineConfig::GetStatesCount() const
-{
-    return states_.Size();
-}
-
-bool StateMachineConfig::AddState(const String &stateName)
-{
-    if (states_.Contains(stateName))
-    {
-        return false;
-    }
-
-    
-    states_.Insert(Pair<String, SharedPtr<StateMachineConfigState>>(stateName, SharedPtr<StateMachineConfigState>(new StateMachineConfigState(stateName))));
-    return true;
-}
-
-bool StateMachineConfig::AddTransition(const StateMachineConfigTransition &transition)
-{
-    auto stateIterator = states_.Find(transition.stateFrom_);
-    if (stateIterator == states_.End())
-    {
-        return false;
-    }
-    
-    if (!states_.Contains(transition.stateTo_))
-    {
-        return false;
-    }
-    
-    StateMachineConfigState *state = states_[transition.stateFrom_].Get();
-    state->AddTransition(transition);
-    return true;
-}
-
-bool StateMachineConfig::LoadJSON(const JSONValue& source)
-{
-    auto states = source["states"].GetArray();
-    for (size_t i = 0; i < states.Size(); i++) 
-    {
-        auto stateJson = states[i];
-        SharedPtr<StateMachineConfigState> state = SharedPtr<StateMachineConfigState>(new StateMachineConfigState(stateJson["name"].GetString()));
-        state->speed_ = stateJson["speed"].GetFloat();
-        state->animationClip_ = stateJson["animationClip"].GetString();
-        
-        auto transitionsJson = stateJson["transitions"].GetArray();
-        for (size_t j = 0; j < transitionsJson.Size(); j++) 
-        {
-            auto transitionJson = transitionsJson[j];    
-            
-            String stateFrom = state->name_;
-            String stateTo = transitionJson["destinationState"].GetString();
-            
-            StateMachineConfigTransition transition(stateFrom, stateTo);
-            transition.offset_ = transitionJson["offset"].GetFloat();
-            transition.duration_ = transitionJson["duration"].GetFloat();
-            transition.hasExitTime_ = transitionJson["duration"].GetFloat();
-            transition.exitTime_ = transitionJson["exitTime"].GetFloat();
-            
-            auto conditionsJson = transitionJson["conditions"].GetArray();
-            
-            for (unsigned c = 0; c < conditionsJson.Size(); c++) 
-            {
-                auto conditionJson = conditionsJson[c];
-
-                String name = conditionJson["parameter"].GetString();
-                bool value = conditionJson["mode"].GetInt() == 1;
-                
-                StateMachineConfigTransitionCondition condition;
-                condition.parameter_ = name;
-                condition.value_ = value;
-                transition.conditions_.Push(condition);
-            }
-            
-            state->AddTransition(transition);
-        }
-        states_[state->name_] = state;
-    }
-    return true;
-}
-
-bool StateMachineConfig::LoadJSON(Deserializer& source)
-{
-    JSONFile jsonFile(context_);
-    jsonFile.Load(source);
-    return LoadJSON(jsonFile.GetRoot());
-}
-
-bool StateMachineConfig::LoadUnityJSON(Deserializer& source)
-{
-    JSONFile jsonFile(context_);
-    jsonFile.Load(source);
-    
-    auto root = jsonFile.GetRoot();
-    if (!root.Contains("layers")) 
-    {
-        return false;
-    }
-    auto layers = root["layers"].GetArray();
-    if (layers.Size() == 0) 
-    {
-        return false;
-    }
-    auto firstLayer = layers[0];
-    if (!firstLayer.Contains("stateMachine")) 
-    {
-        return false;
-    }
-    auto stateMachine = firstLayer["stateMachine"];
-    return LoadJSON(stateMachine);
-}
-
-
 
 bool StateMachineParameterSource::Get(const String &parameterName) const
 {
@@ -284,7 +120,6 @@ void StateMachine::OnRunnerSet(StateMachineRunner* runner)
 void StateMachine::ClearTranitionData()
 {
     transition_ = false;
-    transitionStartTime_ = 0.0f;
     transitionElapsedTime_ = 0.0f;
     transitionStateFrom_ = nullptr;
     transitionData_ = StateMachineConfigTransition();
@@ -292,6 +127,8 @@ void StateMachine::ClearTranitionData()
 
 void StateMachine::CheckTransitions()
 {
+    assert(!transition_);
+    
     HashMap<String, bool> states;
     
     bool check = true;
@@ -308,6 +145,8 @@ void StateMachine::CheckTransitions()
 
 bool StateMachine::CheckSingleTransition()
 {
+    assert(!transition_);
+    
     // Check if any transition condition satisfied;
     int transitionIndex = -1;
     
@@ -357,7 +196,6 @@ bool StateMachine::CheckSingleTransition()
     if (transitionData.duration_ > 0.001f && runner_) 
     {
         transition_ = true;
-        transitionStartTime_ = runner_->GetElapsedTime();
         transitionStateFrom_ = oldState;
         transitionElapsedTime_ = 0;
         transitionData_ = transitionData;
@@ -398,59 +236,6 @@ void StateMachine::OnParameterDidChangeValue(const String &parameterName, bool o
             CheckTransitions();
         }
     }
-}
-
-
-
-StateMachineRunner::StateMachineRunner(Context* context)
-:Component(context)
-{}
-
-StateMachineRunner::~StateMachineRunner() = default;
-    
-void StateMachineRunner::RegisterObject(Context* context)
-{
-    context->RegisterFactory<StateMachineRunner>();
-}
-    
-void StateMachineRunner::RunStateMachine(SharedPtr<StateMachine> stateMachine)
-{
-    stateMachines_[stateMachine] = true;
-    stateMachine->OnRunnerSet(this);
-}
-
-void StateMachineRunner::StopStateMachine(SharedPtr<StateMachine> stateMachine)
-{
-    stateMachines_.Erase(stateMachine);
-    stateMachine->OnRunnerSet(nullptr);
-}
-
-void StateMachineRunner::Update(float timeStep, float elapsedTime)
-{
-    for (auto i = stateMachines_.Begin(); i != stateMachines_.End(); i++) 
-    {
-        i->first_->OnUpdate(timeStep, elapsedTime);
-    }
-}
-
-void StateMachineRunner::OnSceneSet(Scene* scene) 
-{
-    Component::OnSceneSet(scene);
-    
-    if (scene) {
-        // Subscribe scene update event
-        SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(StateMachineRunner, HandleSceneUpdate));
-    }
-    else {
-        UnsubscribeFromEvent(E_SCENEUPDATE);
-    }
-}
-
-void StateMachineRunner::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
-{
-    auto timeStep = eventData[SceneUpdate::P_TIMESTEP].GetFloat();
-    auto scene = static_cast<Scene *>(eventData[SceneUpdate::P_SCENE].GetPtr());
-    Update(timeStep, scene->GetElapsedTime());
 }
 
 }
