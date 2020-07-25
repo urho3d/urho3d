@@ -65,6 +65,13 @@ private:
     bool rDown_ = false;
     bool roofsShown_ = true;
     
+    bool tDown_ = false;
+    bool yDown_ = false;
+    
+    void UpdateTextLocked();
+    void UpdateTextOpened();
+    void UpdateTextDoorState();
+    
     Text3D *textLockedValue_ = nullptr;
     Text3D *textOpenedValue_ = nullptr;
     
@@ -84,24 +91,13 @@ private:
     void SubscribeToEvents();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// dfsd
-    void CheckClick();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Construct an instruction text to the UI.
     void CreateInstructions();
-    /// Handle the roughness slider drag event.
-    void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle the metallic slider drag event.
-    void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle the ambient HDR scale slider drag event.
-    void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData);
 
     /// Do 
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
-    ///
-    void SwitchDoorState(Urho3D::Node *node);
     
     ///
     void SwitchRoofs();

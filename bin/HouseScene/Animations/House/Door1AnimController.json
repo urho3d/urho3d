@@ -33,7 +33,7 @@
                         "transitions": [
                             {
                                 "destinationState": "Closed",
-                                "duration": 0.25,
+                                "duration": 0.0,
                                 "hasFixedDuration": true,
                                 "canTransitionToSelf": true,
                                 "exitTime": 0.75,

@@ -89,7 +89,7 @@ void StateMachineSample::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     auto* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use sliders to change Roughness and Metallic\n"
+    instructionText->SetText("Use R to toggle roof, T to toggle \"Locked\", Y to toggle \"Opened\"\n"
         "Hold RMB and use WASD keys and mouse to move");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     instructionText->SetTextAlignment(HA_CENTER);
@@ -98,6 +98,22 @@ void StateMachineSample::CreateInstructions()
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+}
+
+void StateMachineSample::UpdateTextLocked()
+{
+    textLockedValue_->SetText("\"Locked\": " + String(parameterSource_->Get("Locked")));
+}
+
+void StateMachineSample::UpdateTextOpened()
+{
+    textOpenedValue_->SetText("\"Opened\": " + String(parameterSource_->Get("Opened")));
+}
+
+void StateMachineSample::UpdateTextDoorState()
+{
+    auto state = stateMachineDoor_->GetCurrentState().state1_;
+    textDoorState_->SetText(String("Door state: ") + state);
 }
 
 void StateMachineSample::CreateScene()
@@ -174,8 +190,29 @@ void StateMachineSample::CreateScene()
         text->SetPosition(Vector3(105.3, 2.6f, 107.5));
         text->SetDirection(Vector3(0, 0, -1));
         textDoorState_ = text->CreateComponent<Text3D>();
-        textDoorState_->SetText(String("Door state: ") + stateMachineDoor_->GetCurrentState().state1_);
         textDoorState_->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
+        
+        UpdateTextDoorState();
+    }
+    
+    {
+        Node* text = scene_->CreateChild("doorLocked");
+        text->SetPosition(Vector3(105.3, 2.35f, 107.5));
+        text->SetDirection(Vector3(0, 0, -1));
+        textLockedValue_ = text->CreateComponent<Text3D>();
+        textLockedValue_->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
+        
+        UpdateTextLocked();
+    }
+    
+    {
+        Node* text = scene_->CreateChild("doorOpened");
+        text->SetPosition(Vector3(105.3, 2.1f, 107.5));
+        text->SetDirection(Vector3(0, 0, -1));
+        textOpenedValue_ = text->CreateComponent<Text3D>();
+        textOpenedValue_->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
+        
+        UpdateTextOpened();
     }
     
 }
@@ -188,76 +225,6 @@ void StateMachineSample::CreateUI()
     // Set up global UI style into the root UI element
     auto* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     ui->GetRoot()->SetDefaultStyle(style);
-
-    // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
-    // control the camera, and when visible, it will interact with the UI
-//    SharedPtr<Cursor> cursor(new Cursor(context_));
-//    cursor->SetStyleAuto();
-//    ui->SetCursor(cursor);
-//    // Set starting position of the cursor at the rendering window center
-//    auto* graphics = GetSubsystem<Graphics>();
-//    cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
-
-//    roughnessLabel_ = ui->GetRoot()->CreateChild<Text>();
-//    roughnessLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
-//    roughnessLabel_->SetPosition(370, 50);
-//    roughnessLabel_->SetTextEffect(TE_SHADOW);
-//
-//    metallicLabel_ = ui->GetRoot()->CreateChild<Text>();
-//    metallicLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
-//    metallicLabel_->SetPosition(370, 100);
-//    metallicLabel_->SetTextEffect(TE_SHADOW);
-//
-//    ambientLabel_ = ui->GetRoot()->CreateChild<Text>();
-//    ambientLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
-//    ambientLabel_->SetPosition(370, 150);
-//    ambientLabel_->SetTextEffect(TE_SHADOW);
-
-    auto* roughnessSlider = ui->GetRoot()->CreateChild<Slider>();
-    roughnessSlider->SetStyleAuto();
-    roughnessSlider->SetPosition(50, 50);
-    roughnessSlider->SetSize(300, 20);
-    roughnessSlider->SetRange(1.0f); // 0 - 1 range
-    SubscribeToEvent(roughnessSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachineSample, HandleRoughnessSliderChanged));
-    roughnessSlider->SetValue(0.5f);
-
-    auto* metallicSlider = ui->GetRoot()->CreateChild<Slider>();
-    metallicSlider->SetStyleAuto();
-    metallicSlider->SetPosition(50, 100);
-    metallicSlider->SetSize(300, 20);
-    metallicSlider->SetRange(1.0f); // 0 - 1 range
-    SubscribeToEvent(metallicSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachineSample, HandleMetallicSliderChanged));
-    metallicSlider->SetValue(0.5f);
-
-    auto* ambientSlider = ui->GetRoot()->CreateChild<Slider>();
-    ambientSlider->SetStyleAuto();
-    ambientSlider->SetPosition(50, 150);
-    ambientSlider->SetSize(300, 20);
-    ambientSlider->SetRange(10.0f); // 0 - 10 range
-    SubscribeToEvent(ambientSlider, E_SLIDERCHANGED, URHO3D_HANDLER(StateMachineSample, HandleAmbientSliderChanged));
-//    ambientSlider->SetValue(zone_->GetAmbientColor().a_);
-}
-
-void StateMachineSample::HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
-{
-    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
-//    dynamicMaterial_->SetShaderParameter("Roughness", newValue);
-//    roughnessLabel_->SetText("Roughness: " + String(newValue));
-}
-
-void StateMachineSample::HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
-{
-    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
-//    dynamicMaterial_->SetShaderParameter("Metallic", newValue);
-//    metallicLabel_->SetText("Metallic: " + String(newValue));
-}
-
-void StateMachineSample::HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
-{
-    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
-//    Color col = Color(0.0, 0.0, 0.0, newValue);
-//    zone_->SetAmbientColor(col);
-//    ambientLabel_->SetText("Ambient HDR Scale: " + String(zone_->GetAmbientColor().a_));
 }
 
 void StateMachineSample::SetupViewport()
@@ -336,6 +303,32 @@ void StateMachineSample::MoveCamera(float timeStep)
     else {
         rDown_ = true;
     }
+    
+    if (!input->GetKeyDown(KEY_T)) 
+    {
+        if (tDown_) {
+            tDown_ = false;
+            parameterSource_->Set("Locked", !parameterSource_->Get("Locked"));
+            
+            UpdateTextLocked();
+        }
+    }
+    else {
+        tDown_ = true;
+    }
+    
+    if (!input->GetKeyDown(KEY_Y)) 
+    {
+        if (yDown_) {
+            yDown_ = false;
+            parameterSource_->Set("Opened", !parameterSource_->Get("Opened"));
+            
+            UpdateTextOpened();
+        }
+    }
+    else {
+        yDown_ = true;
+    }
 }
 
 void StateMachineSample::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -347,118 +340,6 @@ void StateMachineSample::HandleUpdate(StringHash eventType, VariantMap& eventDat
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-    
-    //
-    CheckClick();
-}
-
-void StateMachineSample::CheckClick()
-{
-    auto* input = GetSubsystem<Input>();
-    if (input->GetMouseButtonDown(MOUSEB_LEFT)) {
-        mouseDown_ = true;
-        return;
-    }
-    bool checkClick = false;
-    if (mouseDown_) {
-        checkClick = true;
-        mouseDown_ = false;
-    }
-    if (!checkClick) {
-        return;
-    }
-    
-    UI* ui = scene_->GetSubsystem<UI>();
-    IntVector2 pos = ui->GetCursorPosition();
-    Graphics* graphics = scene_->GetSubsystem<Graphics>();
-    Camera* camera = cameraNode_->GetComponent<Camera>();
-    Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
-    PODVector<RayQueryResult> raycastResults;
-    RayOctreeQuery sceneQuery(raycastResults, cameraRay, RAY_TRIANGLE, 250, DRAWABLE_GEOMETRY);
-    scene_->GetComponent<Octree>()->Raycast(sceneQuery);
-    
-    if (raycastResults.Size() == 0) 
-    {
-        return;
-    }
-    
-    Node *node = nullptr;
-    ProjectNMetaData *metadata = nullptr;
-    float distance = 1000;
-    for (unsigned i = 0; i < raycastResults.Size(); i ++) 
-    {
-        RayQueryResult& thisResult = raycastResults[i];
-        if (!thisResult.node_) 
-        {
-            continue;
-        }
-        if (thisResult.node_ == node && distance < thisResult.distance_ + 0.01) 
-        {
-            continue;
-        }
-        
-        Node *thisNode = thisResult.node_;
-        ProjectNMetaData *thisMetadata = thisNode->GetComponent<ProjectNMetaData>();
-        while (thisMetadata == nullptr)
-        {
-            Node *parentNode = thisNode->GetParent();
-            if (!parentNode) {
-                break;
-            }
-            thisNode = parentNode;
-            
-            thisMetadata = thisNode->GetComponent<ProjectNMetaData>();
-        }
-        if (!thisMetadata) 
-        {
-            continue;
-        }
-        if (thisMetadata->_isRoof && !roofsShown_) 
-        {
-            continue;
-        }
-        if (distance < thisResult.distance_ + 0.01) 
-        {
-            continue;
-        }
-        
-        distance = thisResult.distance_;
-        metadata = thisMetadata;
-        node = thisNode;
-    }
-    
-    if (metadata == nullptr) 
-    {
-        return;
-    }
-    
-    if (metadata->_gameObjectType == ProjectNMetaData::ObjectType::Door) 
-    {
-        if (metadata->_gameObjectId == "door1") 
-        {
-            if (metadata->_gameObjectElementId == "1") 
-            {
-                SwitchDoorState(node);
-                return;
-            }
-        }
-    }
-}
-
-void StateMachineSample::SwitchDoorState(Urho3D::Node *node)
-{
-    static int a = 0;
-    if (a%2 == 0) 
-    {
-        auto controller = node->CreateComponent<AnimationController>();
-        controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Open.ani", 0, false);
-    }
-    else 
-    {
-        auto controller = node->CreateComponent<AnimationController>();
-        controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Close.ani", 0, false);
-    }
-    a++;
 }
 
 void StateMachineSample::SwitchRoofs()
@@ -494,27 +375,28 @@ void StateMachineSample::HandlePostRenderUpdate(StringHash eventType, VariantMap
 /// StateMachineDelegate
 void StateMachineSample::StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &stateTo)
 {
-    
-}
-
-void StateMachineSample::StateMachineDidUpdateBlendState(StateMachine *sender) 
-{
     if (sender == stateMachineDoor_.Get()) 
     {
+        UpdateTextDoorState();
+        
         auto state = stateMachineDoor_->GetCurrentState().state1_;
-        textDoorState_->SetText(String("Door state: ") + state);
         if (state == "Opening") 
         {
             auto node = sceneData_->_objects["door1"]->_nodes["1"]._node;
             auto controller = node->CreateComponent<AnimationController>();
-            controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Open.ani", 0, false);
+            controller->PlayExclusive("Animations/SampleScene/AnimationDoor1Open.ani", 0, false);
         }
         else if (state == "Closing") {
             auto node = sceneData_->_objects["door1"]->_nodes["1"]._node;
             auto controller = node->CreateComponent<AnimationController>();
-            controller->PlayExclusive("_Animations/Door1Animations/AnimationDoor1Close.ani", 0, false);
+            controller->PlayExclusive("Animations/SampleScene/AnimationDoor1Close.ani", 0, false);
         }
     }
+}
+
+void StateMachineSample::StateMachineDidUpdateBlendState(StateMachine *sender) 
+{
+    
 }
 
 
