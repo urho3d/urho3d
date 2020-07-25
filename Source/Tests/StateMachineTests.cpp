@@ -4,7 +4,9 @@
 #include <Urho3D/Math/Vector2.h>
 #include <Urho3D/Math/Vector3.h>
 #include <Urho3D/Math/Ray.h>
+#include <Urho3D/Graphics/StateMachineConfig.h>
 #include <Urho3D/Graphics/StateMachine.h>
+#include <Urho3D/Graphics/StateMachineRunner.h>
 
 
 

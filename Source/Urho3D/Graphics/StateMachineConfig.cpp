@@ -61,7 +61,7 @@ bool StateMachineConfigState::HaveTransitionsFor(const String &parameterName)
 
 
 StateMachineConfig::StateMachineConfig(Context* context)
-:ResourceWithMetadata(context)
+:Resource(context)
 {}
 
 StateMachineConfig::~StateMachineConfig()
@@ -72,6 +72,11 @@ StateMachineConfig::~StateMachineConfig()
 void StateMachineConfig::RegisterObject(Context* context)
 {
     context->RegisterFactory<StateMachineConfig>();
+}
+
+bool StateMachineConfig::BeginLoad(Deserializer& source) 
+{
+    return LoadUnityJSON(source);
 }
 
 unsigned int StateMachineConfig::GetStatesCount() const

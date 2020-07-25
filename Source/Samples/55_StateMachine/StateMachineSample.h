@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Sample.h"
+#include <Urho3D/Graphics/StateMachine.h>
 
 namespace Urho3D
 {
@@ -32,17 +33,19 @@ class Node;
 class Scene;
 class Zone;
 
+class StateMachine;
+class StateMachineParameterSource;
+
 }
 
 class GameSceneData;
 
-/// PBR materials example.
+/// State machine example.
 /// This sample demonstrates:
-///      - Loading a scene that showcases physically based materials & shaders
-///
-/// To use with deferred rendering, a PBR deferred renderpath should be chosen:
-/// CoreData/RenderPaths/PBRDeferred.xml or CoreData/RenderPaths/PBRDeferredHWDepth.xml
-class StateMachineSample : public Sample
+///      - Loading state machine  from config
+///      - Start update
+///      - Listening for state machine updates
+class StateMachineSample : public Sample, public Urho3D::StateMachineDelegate
 {
     URHO3D_OBJECT(StateMachineSample, Sample);
 
@@ -60,6 +63,9 @@ private:
     bool mouseDown_ = false;
     bool rDown_ = false;
     bool roofsShown_ = true;
+    
+    SharedPtr<StateMachine> stateMachineDoor_ = nullptr;
+    SharedPtr<StateMachineParameterSource> parameterSource_ = nullptr;
     
     /// Construct the scene content.
     void CreateScene();
@@ -92,4 +98,10 @@ private:
     
     ///
     void SwitchRoofs();
+    
+public:
+    /// StateMachineDelegate
+    void StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &stateTo) override;
+    void StateMachineDidUpdateBlendState(StateMachine *sender) override;
+
 };

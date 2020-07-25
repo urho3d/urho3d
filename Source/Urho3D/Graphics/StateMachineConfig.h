@@ -117,9 +117,9 @@ private:
 
 
 /// State machine resource.
-class URHO3D_API StateMachineConfig : public ResourceWithMetadata
+class URHO3D_API StateMachineConfig : public Resource
 {
-    URHO3D_OBJECT(StateMachineConfig, ResourceWithMetadata);
+    URHO3D_OBJECT(StateMachineConfig, Resource);
     
     friend class StateMachine;
     
@@ -130,6 +130,8 @@ public:
     ~StateMachineConfig() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
+    
+    bool BeginLoad(Deserializer& source) override;
 
     /// Get number of states
     unsigned int GetStatesCount() const;

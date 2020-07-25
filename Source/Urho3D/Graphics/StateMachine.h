@@ -38,18 +38,6 @@ class StateMachineRunner;
 
 
 
-/// State machine listener interface definition
-class URHO3D_API StateMachineDelegate 
-{
-    
-public:
-    /// Called when state machine transits to a new state
-    virtual void StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &stateTo) = 0;
-    virtual void StateMachineDidUpdateBlendState(StateMachine *sender) = 0;
-
-};
-
-
 /// Represents the actual state of the state machine instance. Including blending between 2 states
 struct URHO3D_API StateMachineState 
 {
@@ -75,6 +63,7 @@ struct URHO3D_API StateMachineState
 
 
 
+/// Parameter source listener interface 
 class URHO3D_API StateMachineParameterSourceListener {
 public:
     virtual void OnParameterDidChangeValue(const String &parameterName, bool oldValue, bool newValue) = 0;
@@ -102,6 +91,19 @@ private:
     HashMap<String, bool> parameters_;
     /// Subscribed listeners
     HashMap<StateMachineParameterSourceListener *, bool> listeners_;
+};
+
+
+
+/// State machine listener interface definition
+class URHO3D_API StateMachineDelegate 
+{
+    
+public:
+    /// Called when state machine transits to a new state
+    virtual void StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &stateTo) = 0;
+    virtual void StateMachineDidUpdateBlendState(StateMachine *sender) = 0;
+
 };
 
 
@@ -161,50 +163,9 @@ private:
     /// Update the blend state and report to listener
     void UpdateStateCombined();
     
-     
-    
 public:
     // StateMachineParameterSourceListener 
     void OnParameterDidChangeValue(const String &parameterName, bool oldValue, bool newValue) override;
-    
-};
-
-
-
-/// Scene component that bypass scene update to all state machines
-class URHO3D_API StateMachineRunner : public Component
-{
-    URHO3D_OBJECT(StateMachineRunner, Component);
-
-public:
-    /// Construct.
-    explicit StateMachineRunner(Context* context);
-    /// Destruct.
-    ~StateMachineRunner() override;
-    /// Register object factory.
-    static void RegisterObject(Context* context);
-    
-    void RunStateMachine(SharedPtr<StateMachine> stateMachine);
-    void StopStateMachine(SharedPtr<StateMachine> stateMachine);
-    
-    float GetElapsedTime() const { return elapsedTime_; }
-    
-    void Update(float timeStep, float elapsedTime);
-    
-protected:
-    
-    /// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
-    void OnSceneSet(Scene* scene) override;
-    
-private:
-    
-    /// Scene time
-    float elapsedTime_ = 0;
-    
-    /// Handle scene update event to control camera's pitch and yaw for all samples.
-    void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
-    
-    HashMap<SharedPtr<StateMachine>, bool> stateMachines_;
     
 };
 

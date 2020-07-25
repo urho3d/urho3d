@@ -29,15 +29,9 @@
 
 namespace Urho3D
 {
+
 class Scene;
 class StateMachine;
-
-
-
-class URHO3D_API StateMachineParameterSourceListener {
-public:
-    virtual void OnParameterDidChangeValue(const String &parameterName, bool oldValue, bool newValue) = 0;
-};
 
 
 

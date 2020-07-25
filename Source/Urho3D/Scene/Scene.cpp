@@ -43,7 +43,7 @@
 #include "../Scene/UnknownComponent.h"
 #include "../Scene/ValueAnimation.h"
 #include "../Graphics/StateMachine.h"
-
+#include "../Graphics/StateMachineRunner.h"
 #include "../DebugNew.h"
 
 namespace Urho3D
@@ -1537,6 +1537,7 @@ void RegisterSceneLibrary(Context* context)
     SmoothedTransform::RegisterObject(context);
     UnknownComponent::RegisterObject(context);
     SplinePath::RegisterObject(context);
+    StateMachineConfig::RegisterObject(context);
     StateMachineRunner::RegisterObject(context);
 }
 

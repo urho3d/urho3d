@@ -49,6 +49,10 @@
 #include "StateMachineSample.h"
 #include "StateMachineComponents.h"
 
+#include <Urho3D/Graphics/StateMachine.h>
+#include <Urho3D/Graphics/StateMachineConfig.h>
+#include <Urho3D/Graphics/StateMachineRunner.h>
+
 #include <Urho3D/DebugNew.h>
 
 URHO3D_DEFINE_APPLICATION_MAIN(StateMachineSample)
@@ -152,6 +156,19 @@ void StateMachineSample::CreateScene()
         textComponent->SetText(String("Click on the door"));
         textComponent->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 34);
     }
+    
+    {
+        parameterSource_ = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
+        parameterSource_->Set("Locked", true);
+        
+        ResourceCache *cache = context_->GetSubsystem<ResourceCache>();
+        auto config = cache->GetResource<StateMachineConfig>("Animations/House/Door1AnimController.json");
+        
+        stateMachineDoor_ = SharedPtr<StateMachine>(new StateMachine(config, "Locked", parameterSource_));
+        stateMachineDoor_->SetDelegate(this);
+        scene_->GetComponent<StateMachineRunner>()->RunStateMachine(stateMachineDoor_);
+    }
+    
 }
 
 void StateMachineSample::CreateUI()
@@ -465,3 +482,16 @@ void StateMachineSample::HandlePostRenderUpdate(StringHash eventType, VariantMap
         }
     }
 }
+
+/// StateMachineDelegate
+void StateMachineSample::StateMachineDidTransit(StateMachine *sender, const String &stateFrom, const String &stateTo)
+{
+    
+}
+
+void StateMachineSample::StateMachineDidUpdateBlendState(StateMachine *sender) 
+{
+    
+}
+
+

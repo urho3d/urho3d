@@ -17,6 +17,7 @@
 
 #include "../DebugNew.h"
 
+#include "StateMachineRunner.h"
 #include "StateMachineConfig.h"
 #include "StateMachine.h"
 
