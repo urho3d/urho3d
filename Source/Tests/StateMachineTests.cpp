@@ -112,7 +112,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
     }
     
     stateMachineRunner_->RunStateMachine(stateMachine);
-    DoFrame(0);
+    DoFrame(0.0f);
     
     {
         String from = "Locked";
@@ -131,8 +131,8 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_EQ(state.state1_, "Closed");
         EXPECT_EQ(state.state2_, "Locked");
         EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0);
-        EXPECT_FLOAT_EQ(state.weigth2_, 1);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 1.0f);
     }
     
     {
@@ -140,7 +140,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         stateMachine->SetDelegate(&delegate);
         EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
 
-        DoFrame(0.125);
+        DoFrame(0.125f);
         
         stateMachine->SetDelegate(nullptr);
     }
@@ -150,8 +150,8 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_EQ(state.state1_, "Closed");
         EXPECT_EQ(state.state2_, "Locked");
         EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0.5);
-        EXPECT_FLOAT_EQ(state.weigth2_, 0.5);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.5f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.5f);
     }
     
     {
@@ -161,7 +161,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
 
         // confirm that 2nd time it just stay idle
-        DoFrame(0.125);
+        DoFrame(0.125f);
         
         stateMachine->SetDelegate(nullptr);
     }
@@ -171,8 +171,8 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_EQ(state.state1_, "Closed");
         EXPECT_EQ(state.state2_, "");
         EXPECT_EQ(state.transition_, false);
-        EXPECT_FLOAT_EQ(state.weigth1_, 1);
-        EXPECT_FLOAT_EQ(state.weigth2_, 0);
+        EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
     }
     
     // transit to open state
@@ -193,8 +193,8 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_EQ(state.state1_, "Opening");
         EXPECT_EQ(state.state2_, "Closed");
         EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0);
-        EXPECT_FLOAT_EQ(state.weigth2_, 1);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 1.0f);
     }
     
     {
@@ -202,7 +202,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         stateMachine->SetDelegate(&delegate);
         
         EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
-        DoFrame(0.125);
+        DoFrame(0.125f);
         
         stateMachine->SetDelegate(nullptr);
     }
@@ -212,8 +212,8 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_EQ(state.state1_, "Opening");
         EXPECT_EQ(state.state2_, "Closed");
         EXPECT_EQ(state.transition_, true);
-        EXPECT_FLOAT_EQ(state.weigth1_, 0.5);
-        EXPECT_FLOAT_EQ(state.weigth2_, 0.5);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.5f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.5f);
     }
     
     {
@@ -225,7 +225,7 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         String from = "Opening";
         String to = "Opened";
         EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
-        DoFrame(0.125);
+        DoFrame(0.125f);
         
         stateMachine->SetDelegate(nullptr);
     }
@@ -235,11 +235,105 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_EQ(state.state1_, "Opened");
         EXPECT_EQ(state.state2_, "");
         EXPECT_EQ(state.transition_, false);
-        EXPECT_FLOAT_EQ(state.weigth1_, 1);
-        EXPECT_FLOAT_EQ(state.weigth2_, 0);
+        EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
     }
     
     // TODO:
     // multiple instant transitions case?
     
+    stateMachineRunner_->StopStateMachine(stateMachine);
 }
+
+TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
+{
+    // Load config once again and and add instant transition
+    ResourceCache *cache = context_->GetSubsystem<ResourceCache>();
+    SharedPtr<File> file = cache->GetFile("Animations/House/Door1AnimController.json");
+    
+    SharedPtr<StateMachineConfig> stateMachineConfig = SharedPtr<StateMachineConfig>(new StateMachineConfig(context_));
+    stateMachineConfig->LoadUnityJSON(*file.Get());
+    
+    stateMachineConfig->AddState("Opened2");
+    StateMachineConfigTransition transition("Opened", "Opened2");
+    stateMachineConfig->AddTransition(transition);
+    EXPECT_EQ(stateMachineConfig->GetStatesCount(), 5);
+    
+    SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());
+    parameterSource->Set("Locked", true);    
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig, "Locked", parameterSource));
+    
+    stateMachineRunner_->RunStateMachine(stateMachine);
+    
+    {
+        parameterSource->Set("Locked", false);
+    }
+     
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Closed");
+        EXPECT_EQ(state.state2_, "Locked");
+        EXPECT_EQ(state.transition_, true);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 1.0f);
+    }
+    
+    {
+        DoFrame(0.25f);
+    }
+    
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Closed");
+        EXPECT_EQ(state.state2_, "");
+        EXPECT_EQ(state.transition_, false);
+        EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
+    }
+    
+    // transit to open state
+    {
+        parameterSource->Set("Opened", true);
+        DoFrame(0.125f);
+    }
+    
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Opening");
+        EXPECT_EQ(state.state2_, "Closed");
+        EXPECT_EQ(state.transition_, true);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.5f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.5f);
+    }
+    
+    // Key thig here - 2 consecutive transitions will happen on a single frame 
+    // Both transitions shoud be reported in StateMachineDidTransit
+    {
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        
+        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
+        
+        String from = "Opening";
+        String to = "Opened";
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
+        String from2 = "Opened";
+        String to2 = "Opened2";
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from2, to2)).Times(testing::Exactly(1));
+        DoFrame(0.125f);
+        
+        stateMachine->SetDelegate(nullptr);
+    }
+    
+    // Check that we actually transitted into Opened2
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Opened2");
+        EXPECT_EQ(state.state2_, "");
+        EXPECT_EQ(state.transition_, false);
+        EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
+    }
+}
+
+

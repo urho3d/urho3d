@@ -292,6 +292,22 @@ void StateMachine::ClearTranitionData()
 
 void StateMachine::CheckTransitions()
 {
+    HashMap<String, bool> states;
+    
+    bool check = true;
+    
+    // check - transition was made
+    // transition_ - transition is not instant. if not instant - abort
+    // states.Contains(stateCurrent_->name_) - continuous loop! abort checking
+    while (check && !transition_ && !states.Contains(stateCurrent_->name_)) 
+    {
+        states[stateCurrent_->name_] = true;
+        check = CheckSingleTransition();
+    }
+}
+
+bool StateMachine::CheckSingleTransition()
+{
     // Check if any transition condition satisfied;
     int transitionIndex = -1;
     
@@ -330,7 +346,7 @@ void StateMachine::CheckTransitions()
     
     if (transitionIndex == -1) 
     {
-        return;
+        return false;
     }
     
     // do the transition
@@ -353,6 +369,8 @@ void StateMachine::CheckTransitions()
     {
         delegate_->StateMachineDidTransit(this, oldState->GetName(), stateCurrent_->GetName());
     }
+    
+    return true;
 }
 
 void StateMachine::UpdateStateCombined()
