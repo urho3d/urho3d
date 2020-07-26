@@ -166,25 +166,19 @@ bool StateMachine::CheckSingleTransition()
             continue;
         }
         
-        if (transition.conditions_.Size() == 0) 
-        {
-            transitionIndex = t;
-            break;
-        }
-        
-        int conditionIndex = -1;
+        bool valid = true;
         for (unsigned c = 0; c < transition.conditions_.Size(); c++) 
         {
             auto &condition = transition.conditions_[c];
             bool currentValue = parameters_->Get(condition.parameter_);
-            if (condition.value_ == currentValue) 
+            if (condition.value_ != currentValue) 
             {
-                conditionIndex = c;
+                valid = false;
                 break;
             }
         }
         
-        if (conditionIndex != -1) 
+        if (valid) 
         {
             transitionIndex = t;
             break;
