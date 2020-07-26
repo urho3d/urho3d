@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Sample.h"
-#include <memory.h>
+#include <memory>
 #include <Urho3D/Graphics/StateMachine.h>
 
 namespace Urho3D
