@@ -77,7 +77,7 @@ class URHO3D_API StateMachineParameterSource: public RefCounted
 {
 public:
     /// Retrieve value
-    bool Get(const String &parameterName) const;
+    bool Get(const String &parameterName, bool *exists = nullptr) const;
     /// Sets new value
     void Set(const String &parameterName, bool value);
     

@@ -55,6 +55,13 @@ public:
     
 };
 
+class MockParameterSourceListener : public StateMachineParameterSourceListener {
+    
+public:
+    MOCK_METHOD3(OnParameterDidChangeValue, void(const String &parameterName, bool oldValue, bool newValue));
+    
+};
+
 }
 
 
@@ -201,9 +208,6 @@ TEST_F(StateMachineTest, StateMachineRunnerTests)
         EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
     }
     
-    // TODO:
-    // multiple instant transitions case?
-    
     stateMachineRunner_->StopStateMachine(stateMachine);
 }
 
@@ -296,6 +300,81 @@ TEST_F(StateMachineTest, StateMachineMultipleInstantTransitionTests)
         EXPECT_FLOAT_EQ(state.weigth1_, 1.0f);
         EXPECT_FLOAT_EQ(state.weigth2_, 0.0f);
     }
+    
+    stateMachineRunner_->StopStateMachine(stateMachine);
+}
+
+// Confirm that parameter source will call its listener
+TEST_F(StateMachineTest, StateMachineParameterSourceTests)
+{    
+    StateMachineParameterSource parameterSource;
+
+    String parameterName = "someValue";
+    {
+        // set false 1st time - should report to listener
+        MockParameterSourceListener listener;
+        parameterSource.Subscribe(&listener);
+        
+        EXPECT_CALL(listener, OnParameterDidChangeValue(parameterName, false, false)).Times(testing::Exactly(1));
+        parameterSource.Set(parameterName, false);
+        
+        parameterSource.Unsubscribe(&listener);
+    }
+    
+    {
+        // set false 2nd time - no report
+        MockParameterSourceListener listener;
+        parameterSource.Subscribe(&listener);
+        
+        EXPECT_CALL(listener, OnParameterDidChangeValue(parameterName, false, false)).Times(testing::Exactly(0));
+        parameterSource.Set(parameterName, false);
+        
+        parameterSource.Unsubscribe(&listener);
+    }
+}
+
+TEST_F(StateMachineTest, StateMachineSetStateTests)
+{
+    SharedPtr<StateMachineParameterSource> parameterSource = SharedPtr<StateMachineParameterSource>(new StateMachineParameterSource());    
+    
+    SharedPtr<StateMachine> stateMachine = SharedPtr<StateMachine>(new StateMachine(stateMachineConfig_, parameterSource));
+    
+    stateMachineRunner_->RunStateMachine(stateMachine);
+    DoFrame(0.0f);
+    parameterSource->Set("Locked", false);
+
+    // go to closed state instantly
+    // opened is false
+    
+    // set the state instantly and confirm that machine will report and start moving to closed state 
+    // since opened is still false
+    {
+        MockDelegate delegate;
+        stateMachine->SetDelegate(&delegate);
+        
+        String from = "Closed";
+        String to = "Opened";
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from, to)).Times(testing::Exactly(1));
+        String from2 = "Opened";
+        String to2 = "Closing";
+        EXPECT_CALL(delegate, StateMachineDidTransit(stateMachine.Get(), from2, to2)).Times(testing::Exactly(1));
+        
+        EXPECT_CALL(delegate, StateMachineDidUpdateBlendState(stateMachine.Get())).Times(testing::Exactly(1));
+        stateMachine->SetState("Opened");
+        
+        stateMachine->SetDelegate(nullptr);
+    }
+    
+    {    
+        auto state = stateMachine->GetCurrentState();
+        EXPECT_EQ(state.state1_, "Closing");
+        EXPECT_EQ(state.state2_, "Opened");
+        EXPECT_EQ(state.transition_, true);
+        EXPECT_FLOAT_EQ(state.weigth1_, 0.0f);
+        EXPECT_FLOAT_EQ(state.weigth2_, 1.0f);
+    }
+    
+    stateMachineRunner_->StopStateMachine(stateMachine);
 }
 
 

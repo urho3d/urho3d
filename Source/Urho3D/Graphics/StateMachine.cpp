@@ -24,21 +24,29 @@
 namespace Urho3D
 {
 
-bool StateMachineParameterSource::Get(const String &parameterName) const
+bool StateMachineParameterSource::Get(const String &parameterName, bool *exists) const
 {
     auto valueI = parameters_.Find(parameterName);
     if (valueI != parameters_.End())
     {
+        if (exists != nullptr) 
+        {
+            *exists = true;
+        }
         return valueI->second_;
     }
-    
+    if (exists != nullptr) 
+    {
+        *exists = false;
+    }
     return false;
 }
 
 void StateMachineParameterSource::Set(const String &parameterName, bool value)
 {
-    bool oldValue = Get(parameterName);
-    if (oldValue == value) 
+    bool exists = false;
+    bool oldValue = Get(parameterName, &exists);
+    if (exists && oldValue == value) 
     {
         return;
     }
@@ -91,8 +99,32 @@ void StateMachine::SetState(const String &state)
 {
     assert(config_->states_.Contains(state));
     
-    ClearTranitionData();
+    if (state == stateCurrent_->name_) 
+    {
+        return;
+    }
+    
+    bool transition = transition_;
+    if (transition) 
+    {
+        ClearTranitionData();
+    }
+    
+    SharedPtr<StateMachineConfigState> oldState = stateCurrent_;
     stateCurrent_ = config_->states_[state].Get();
+    
+    if (delegate_)
+    {
+        delegate_->StateMachineDidTransit(this, oldState->GetName(), stateCurrent_->GetName());
+    }
+    
+    CheckTransitions();
+    UpdateStateCombined();
+    
+    if (delegate_)
+    {
+        delegate_->StateMachineDidUpdateBlendState(this);
+    }
 }
 
 void StateMachine::OnUpdate(float timeStep, float elapsedTime)
