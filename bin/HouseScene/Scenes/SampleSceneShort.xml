@@ -1,14 +1,14 @@
 <node id="1">
-	<node id="500">
+	<node id="3">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Terrain" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="2.419991 -0.02999973 1.900002" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<node id="501">
+		<node id="4">
 		<attribute name="Position" value="100 0 100" />
-		<component type="Terrain" id="502">
+		<component type="Terrain" id="5">
 			<attribute name="Height Map" value="Image;Scenes/SampleSceneShortTerrain.Heightmap.tga" />
 			<attribute name="Material" value="Material;Scenes/SampleSceneShortTerrain.Material.xml" />
 			<attribute name="Vertex Spacing" value="3.076923 0 3.076923" />
@@ -28,7 +28,7 @@
 		<attribute name="Position" value="10.12222 3.46879 11.56317" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="Skybox" id="505">
+		<component type="Skybox" id="9">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Skybox_Mat.xml" />
 		</component>

@@ -135,13 +135,7 @@ void StateMachineSample::CreateScene()
     // Load scene content prepared in the editor (XML format). GetFile() returns an open file from the resource system
     // which scene.LoadXML() will read
     SharedPtr<File> file = cache->GetFile("Scenes/SampleSceneShort.xml");
-    
-    XMLFile xmlFile(scene_->GetContext());
-    xmlFile.Load(*file.Get());
-    
-    Urho3D::Node *node = new Urho3D::Node(scene_->GetContext());
-    node->LoadXML(xmlFile.GetRoot());
-    scene_->AddChild(node);
+    scene_->InstantiateXML(*file.Get(), Vector3(), Quaternion::IDENTITY);
     
     sceneData_ = std::make_shared<GameSceneData>();
     sceneData_->analyse(scene_);
