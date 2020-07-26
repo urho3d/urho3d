@@ -141,9 +141,9 @@ void PS()
 
     // Blend factor between water and diffuse overlay 
     #ifdef ALPHAMASK
-        float overlayFactor = ((overlay.a < 0.5)?0.0:overlay.a) * vColor.z;
+        float overlayFactor = ((overlay.a < 0.5)?0.0:overlay.a) * vColor.z * 1.5;
     #else
-        float overlayFactor = overlay.a * vColor.z;
+        float overlayFactor = overlay.a * vColor.z * 1.5;
     #endif
 
     // Get normal

@@ -226,9 +226,9 @@ void PS(
 
     // Blend factor between water and diffuse overlay 
     #ifdef ALPHAMASK
-        const float overlayFactor = ((overlay.a < 0.5)?0.0:overlay.a) * iColor.b;
+        const float overlayFactor = ((overlay.a < 0.5)?0.0:overlay.a) * iColor.b * 1.5;
     #else
-        const float overlayFactor = overlay.a * iColor.b;
+        const float overlayFactor = overlay.a * iColor.b * 1.5;
     #endif
 
     // Get normal
