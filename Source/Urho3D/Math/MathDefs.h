@@ -233,7 +233,7 @@ template <class T> inline int CeilToInt(T x) { return static_cast<int>(ceil(x));
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
 {
-    return !(value & (value - 1));
+    return !(value & (value - 1)) && value;
 }
 
 /// Round up to next power of two.
