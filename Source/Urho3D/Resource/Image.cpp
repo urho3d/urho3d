@@ -1875,6 +1875,10 @@ SharedPtr<Image> Image::GetNextLevel() const
                                                       inOuterLower[x * 2 + 2] + inOuterLower[x * 2 + 6] +
                                                       inInnerUpper[x * 2 + 2] + inInnerUpper[x * 2 + 6] +
                                                       inInnerLower[x * 2 + 2] + inInnerLower[x * 2 + 6]) >> 3);
+                        out[x + 3] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 3] + inOuterUpper[x * 2 + 7] +
+                                                      inOuterLower[x * 2 + 3] + inOuterLower[x * 2 + 7] +
+                                                      inInnerUpper[x * 2 + 3] + inInnerUpper[x * 2 + 7] +
+                                                      inInnerLower[x * 2 + 3] + inInnerLower[x * 2 + 7]) >> 3);
                     }
                 }
             }
