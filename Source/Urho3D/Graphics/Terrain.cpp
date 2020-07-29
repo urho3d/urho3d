@@ -691,15 +691,19 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         unsigned lodExpand = (1u << (occlusionLevel)) - 1;
         unsigned halfLodExpand = (1u << (occlusionLevel)) / 2;
 
-        for (unsigned z = 0; z <= patchSize_; ++z)
+        int zPos = coords.y_ * patchSize_;
+        const float xPosUVStep = 1.0f / (float)(numVertices_.x_ - 1);
+        const float zPosUVStep = 1.0f / (float)(numVertices_.y_ - 1);
+        float zPosUV = zPos * zPosUVStep;
+        for (unsigned z = 0; z <= patchSize_; ++z, ++zPos, zPosUV += zPosUVStep)
         {
-            for (unsigned x = 0; x <= patchSize_; ++x)
+            int xPos = coords.x_ * patchSize_;
+            float xPosUV = xPos * xPosUVStep;
+            const float *heightPtr = heightData_ + zPos * numVertices_.x_ + xPos;
+            for (unsigned x = 0; x <= patchSize_; ++x, ++xPos, xPosUV += xPosUVStep)
             {
-                int xPos = coords.x_ * patchSize_ + x;
-                int zPos = coords.y_ * patchSize_ + z;
-
                 // Position
-                Vector3 position((float)x * spacing_.x_, GetRawHeight(xPos, zPos), (float)z * spacing_.z_);
+                const Vector3 position((float)x * spacing_.x_, *heightPtr++, (float)z * spacing_.z_);
                 *vertexData++ = position.x_;
                 *vertexData++ = position.y_;
                 *vertexData++ = position.z_;
@@ -735,7 +739,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = normal.z_;
 
                 // Texture coordinate
-                Vector2 texCoord((float)xPos / (float)(numVertices_.x_ - 1), 1.0f - (float)zPos / (float)(numVertices_.y_ - 1));
+                const Vector2 texCoord(xPosUV, 1.0f - zPosUV);
                 *vertexData++ = texCoord.x_;
                 *vertexData++ = texCoord.y_;
 
