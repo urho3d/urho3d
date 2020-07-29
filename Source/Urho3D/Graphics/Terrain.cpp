@@ -1493,15 +1493,21 @@ void Terrain::HandleNeighborTerrainCreated(StringHash /*eventType*/, VariantMap&
 
 void Terrain::UpdateEdgePatchNeighbors()
 {
+    unsigned int idx0 = 1;
+    unsigned int idx1 = 1 + (numPatches_.y_ - 1) * numPatches_.x_;
     for (int x = 1; x < numPatches_.x_ - 1; ++x)
     {
-        SetPatchNeighbors(GetPatch(x, 0));
-        SetPatchNeighbors(GetPatch(x, numPatches_.y_ - 1));
+        SetPatchNeighbors(patches_[idx0++]);
+        SetPatchNeighbors(patches_[idx1++]);
     }
+    idx0 = numPatches_.x_;
+    idx1 = numPatches_.x_ + numPatches_.x_ - 1;
     for (int z = 1; z < numPatches_.y_ - 1; ++z)
     {
-        SetPatchNeighbors(GetPatch(0, z));
-        SetPatchNeighbors(GetPatch(numPatches_.x_ - 1, z));
+        SetPatchNeighbors(patches_[idx0]);
+        idx0 += numPatches_.x_;
+        SetPatchNeighbors(patches_[idx1]);
+        idx1 += numPatches_.x_;
     }
 
     SetPatchNeighbors(GetPatch(0, 0));
