@@ -966,9 +966,10 @@ void Terrain::CreateGeometry()
 
             for (int z = 0; z < numVertices_.y_; ++z)
             {
+                const unsigned char *row = src + imgRow * (numVertices_.y_ - 1 - z);
                 for (int x = 0; x < numVertices_.x_; ++x)
                 {
-                    float newHeight = (float)src[imgRow * (numVertices_.y_ - 1 - z) + x] * spacing_.y_;
+                    const float newHeight = (float)*row++ * spacing_.y_;
 
                     if (updateAll)
                         *dest = newHeight;
@@ -992,10 +993,11 @@ void Terrain::CreateGeometry()
             // If more than 1 component, use the green channel for more accuracy
             for (int z = 0; z < numVertices_.y_; ++z)
             {
+                const unsigned char *row = src + imgRow * (numVertices_.y_ - 1 - z);
                 for (int x = 0; x < numVertices_.x_; ++x)
                 {
-                    float newHeight = ((float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x] +
-                                       (float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x + 1] / 256.0f) * spacing_.y_;
+                    const float newHeight = ((float)row[0] + (float)row[1] / 256.0f) * spacing_.y_;
+                    row += imgComps;
 
                     if (updateAll)
                         *dest = newHeight;
