@@ -41,6 +41,16 @@
 
 #include "../DebugNew.h"
 
+struct CachedIndexBuffer
+{
+  Urho3D::Mutex mutex;
+  unsigned patchSize;
+  unsigned numLodLevels;
+  Urho3D::SharedPtr<Urho3D::IndexBuffer> indexBuffer;
+  Urho3D::PODVector<Urho3D::Pair<unsigned, unsigned> > drawRanges;
+};
+static CachedIndexBuffer cachedIndexBuffer{{}, 0, 0, {}, {}};
+
 namespace Urho3D
 {
 
@@ -1138,6 +1148,16 @@ void Terrain::CreateIndexData()
 {
     URHO3D_PROFILE(CreateIndexData);
 
+    {
+      MutexLock lock(cachedIndexBuffer.mutex);
+      if (patchSize_ == cachedIndexBuffer.patchSize && numLodLevels_ == cachedIndexBuffer.numLodLevels)
+      {
+          indexBuffer_ = cachedIndexBuffer.indexBuffer;
+          drawRanges_ = cachedIndexBuffer.drawRanges;
+          return;
+      }
+    }
+
     PODVector<unsigned short> indices;
     drawRanges_.Clear();
     auto row = (unsigned)(patchSize_ + 1);
@@ -1292,6 +1312,12 @@ void Terrain::CreateIndexData()
 
     indexBuffer_->SetSize(indices.Size(), false);
     indexBuffer_->SetData(&indices[0]);
+
+    MutexLock lock(cachedIndexBuffer.mutex);
+    cachedIndexBuffer.indexBuffer = indexBuffer_;
+    cachedIndexBuffer.drawRanges = drawRanges_;
+    cachedIndexBuffer.patchSize = patchSize_;
+    cachedIndexBuffer.numLodLevels = numLodLevels_;
 }
 
 float Terrain::GetRawHeight(int x, int z) const
