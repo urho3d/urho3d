@@ -120,7 +120,8 @@ Terrain::Terrain(Context* context) :
     westID_(0),
     eastID_(0),
     recreateTerrain_(false),
-    neighborsDirty_(false)
+    neighborsDirty_(false),
+    enableTangents_(true)
 {
     indexBuffer_->SetShadowed(true);
 }
@@ -669,7 +670,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     Geometry* occlusionGeometry = patch->GetOcclusionGeometry();
 
     if (vertexBuffer->GetVertexCount() != row * row)
-        vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+        vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | (enableTangents_ ? MASK_TANGENT : MASK_NONE));
 
     SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
     SharedArrayPtr<unsigned char> occlusionCpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
@@ -738,11 +739,14 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = texCoord.y_;
 
                 // Tangent
-                Vector3 xyz = (Vector3::RIGHT - normal * normal.DotProduct(Vector3::RIGHT)).Normalized();
-                *vertexData++ = xyz.x_;
-                *vertexData++ = xyz.y_;
-                *vertexData++ = xyz.z_;
-                *vertexData++ = 1.0f;
+                if (enableTangents_)
+                {
+                    const Vector3 xyz = (Vector3::RIGHT - normal * normal.DotProduct(Vector3::RIGHT)).Normalized();
+                    *vertexData++ = xyz.x_;
+                    *vertexData++ = xyz.y_;
+                    *vertexData++ = xyz.z_;
+                    *vertexData++ = 1.0f;
+                }
             }
         }
 
@@ -1490,6 +1494,15 @@ void Terrain::UpdateEdgePatchNeighbors()
     SetPatchNeighbors(GetPatch(numPatches_.x_ - 1, 0));
     SetPatchNeighbors(GetPatch(0, numPatches_.y_ - 1));
     SetPatchNeighbors(GetPatch(numPatches_.x_ - 1, numPatches_.y_ - 1));
+}
+
+void Terrain::EnableTangents(bool enable)
+{
+    if (enable == enableTangents_)
+        return;
+    enableTangents_ = enable;
+    CreateGeometry();
+    MarkNetworkUpdate();
 }
 
 }

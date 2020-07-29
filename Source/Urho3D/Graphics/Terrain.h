@@ -211,6 +211,8 @@ public:
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
 
+    void EnableTangents(bool enable);
+
 private:
     /// Regenerate terrain geometry.
     void CreateGeometry();
@@ -325,6 +327,8 @@ private:
     bool recreateTerrain_;
     /// Terrain neighbor attributes dirty flag.
     bool neighborsDirty_;
+    /// Whether to calculate tangents
+    bool enableTangents_;
 };
 
 }
