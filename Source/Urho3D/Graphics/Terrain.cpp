@@ -1347,26 +1347,31 @@ float Terrain::GetSourceHeight(int x, int z) const
     return sourceHeightData_[z * numVertices_.x_ + x];
 }
 
+static_assert(MAX_LOD_LEVELS == 4, "Update the lodDivisors table");
+static const float lodDivisors[MAX_LOD_LEVELS] = { 1.0f / (1u << 0), 1.0f / (1u << 1), 1.0f / (1u << 2), 1.0f / (1u << 3) };
 float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
 {
     unsigned offset = 1u << lodLevel;
-    auto xFrac = (float)(x % offset) / offset;
-    auto zFrac = (float)(z % offset) / offset;
+    auto xFrac = (float)(x % offset) * lodDivisors[lodLevel];
+    auto zFrac = (float)(z % offset) * lodDivisors[lodLevel];
     float h1, h2, h3;
 
+    const float *heightPtr = heightData_ + z * numVertices_.x_ + x;
+    const int dx = x < numVertices_.x_ - 1 ? 1 : 0;
+    const int dz = z < numVertices_.y_ - 1 ? numVertices_.x_ : 0;
     if (xFrac + zFrac >= 1.0f)
     {
-        h1 = GetRawHeight(x + offset, z + offset);
-        h2 = GetRawHeight(x, z + offset);
-        h3 = GetRawHeight(x + offset, z);
+        h1 = *(heightPtr + dx + dz);
+        h2 = *(heightPtr + dz);
+        h3 = *(heightPtr + dx);
         xFrac = 1.0f - xFrac;
         zFrac = 1.0f - zFrac;
     }
     else
     {
-        h1 = GetRawHeight(x, z);
-        h2 = GetRawHeight(x + offset, z);
-        h3 = GetRawHeight(x, z + offset);
+        h1 = *(heightPtr);
+        h2 = *(heightPtr + dx);
+        h3 = *(heightPtr + dz);
     }
 
     return h1 * (1.0f - xFrac - zFrac) + h2 * xFrac + h3 * zFrac;
