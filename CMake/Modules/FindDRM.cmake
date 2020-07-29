@@ -20,17 +20,17 @@
 # THE SOFTWARE.
 #
 
-# Find RoarAudio development library
+# Find Direct Rendering Manager development library
 #
-#  SNDIO_FOUND
-#  SNDIO_INCLUDE_DIRS
-#  SNDIO_LIBRARIES
+#  DRM_FOUND
+#  DRM_INCLUDE_DIRS
+#  DRM_LIBRARIES
 #
 
-find_path (SNDIO_INCLUDE_DIRS NAMES RoarAudio.h DOC "RoarAudio include directory")
-find_library (SNDIO_LIBRARIES NAMES RoarAudio DOC "RoarAudio library")
+find_path (DRM_INCLUDE_DIRS NAMES drm.h PATH_SUFFIXES libdrm DOC "DirectRenderingManager include directory")
+find_library (DRM_LIBRARIES NAMES drm PATH_SUFFIXES aarch64-linux-gnu DOC "DirectRenderingManager library")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (RoarAudio REQUIRED_VARS SNDIO_LIBRARIES SNDIO_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find RoarAudio development library")
+find_package_handle_standard_args (DRM REQUIRED_VARS DRM_LIBRARIES DRM_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Direct Rendering Manager development library")
 
-mark_as_advanced (SNDIO_INCLUDE_DIRS SNDIO_LIBRARIES)
+mark_as_advanced (DRM_INCLUDE_DIRS DRM_LIBRARIES)

@@ -320,7 +320,7 @@ dep_option(WAYLAND_SHARED      "Dynamically load Wayland support" ON VIDEO_WAYLA
 # Urho3D - change the VIDEO_WAYLAND_QT_TOUCH default value to FALSE (this is only needed by Sailfish[?] but we don't know way to auto-detect that yet)
 dep_option(VIDEO_WAYLAND_QT_TOUCH  "QtWayland server support for Wayland video driver" OFF VIDEO_WAYLAND OFF)
 # Urho3D - only make VIDEO_RPI option available on Raspberry-Pi platform
-dep_option(VIDEO_RPI           "Use Raspberry Pi video driver" ON RPI OFF)
+dep_option(VIDEO_RPI           "Use Raspberry Pi video driver" ON "RPI AND NOT RPI_ABI STREQUAL RPI4" OFF)
 # Urho3D - bug fix - make VIDEO_X11 build option available for desktop UNIX (including OSX) only
 dep_option(VIDEO_X11           "Use X11 video driver" ON "UNIX_SYS OR APPLE\;NOT RPI AND NOT IOS AND NOT TVOS" OFF)
 dep_option(X11_SHARED          "Dynamically load X11 support" ON VIDEO_X11 OFF)
