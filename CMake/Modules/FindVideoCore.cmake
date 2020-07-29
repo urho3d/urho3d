@@ -29,8 +29,8 @@
 #
 
 # Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
-set (VIDEOCORE_INC_SEARCH_PATH /opt/vc/include)
-set (VIDEOCORE_LIB_SEARCH_PATH /opt/vc/lib)
+set (VIDEOCORE_INC_SEARCH_PATH /opt/vc/include /usr/include)
+set (VIDEOCORE_LIB_SEARCH_PATH /opt/vc/lib /usr/lib/aarch64-linux-gnu)
 
 find_path (VIDEOCORE_INCLUDE_DIRS bcm_host.h PATHS ${VIDEOCORE_INC_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore include directory")
 find_library (VIDEOCORE_LIBRARIES bcm_host PATHS ${VIDEOCORE_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore BCM_HOST library")

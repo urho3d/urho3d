@@ -168,7 +168,7 @@ A number of build options can be defined when invoking the build scripts or when
 |DIRECT3D_DLL_REDIST_SEARCH_PATHS|-|Additional search paths to find DirectX runtime DLL (MinGW only); should only be used for older MinGW version that still uses 'd3dcompiler_43.dll' or 'd3dcompiler_42.dll'.|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
-|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
+|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are RPI0, RPI1, RPI2, RPI3, RPI4|
 |ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)|
 |ARM_SYSROOT          |-|Path to ARM system root (ARM on Linux cross-compiling build only)|
 |ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|

@@ -1404,6 +1404,7 @@ From 1.7 to master:
 - Build system - introduce a new Emscripten-specific build option "EMSCRIPTEN_AUTO_SHELL" (default to TRUE), which cause the build system to automatically add an HTML shell-file if one is not explicitly given. Switch to LLVM WASM backend with the implication of removing the "EMSCRIPTEN_WASM" build option (WASM is now always enabled and we do not support asm.js anymore), also removing the SHARED and MODULE library types for Web platform (they do not build correctly with LLVM backend).
 - Build system - the 'WIN32' build option for 'cmake_generic.sh' is renamed to 'MINGW' to be consistent with 'cmake_generic.bat'.
 - Build system - CMake version 3.10.2 is now minimum version required for building Urho3D library on any host systems, except when targeting Android where version 3.17.3 is required.
+- Build system - RPI_ABI build option values are simplified to 'RPI0', 'RPI1', 'RPI2', 'RPI3', and 'RPI4'. Added 64-bit build support on RPI 4.
 
 */
 
