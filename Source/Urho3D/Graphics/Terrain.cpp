@@ -1381,25 +1381,27 @@ float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
 
 Vector3 Terrain::GetRawNormal(int x, int z) const
 {
-    float baseHeight = GetRawHeight(x, z);
-    float nSlope = GetRawHeight(x, z - 1) - baseHeight;
-    float neSlope = GetRawHeight(x + 1, z - 1) - baseHeight;
-    float eSlope = GetRawHeight(x + 1, z) - baseHeight;
-    float seSlope = GetRawHeight(x + 1, z + 1) - baseHeight;
-    float sSlope = GetRawHeight(x, z + 1) - baseHeight;
-    float swSlope = GetRawHeight(x - 1, z + 1) - baseHeight;
-    float wSlope = GetRawHeight(x - 1, z) - baseHeight;
-    float nwSlope = GetRawHeight(x - 1, z - 1) - baseHeight;
-    float up = 0.5f * (spacing_.x_ + spacing_.z_);
-
-    return (Vector3(0.0f, up, nSlope) +
-            Vector3(-neSlope, up, neSlope) +
-            Vector3(-eSlope, up, 0.0f) +
-            Vector3(-seSlope, up, -seSlope) +
-            Vector3(0.0f, up, -sSlope) +
-            Vector3(swSlope, up, -swSlope) +
-            Vector3(wSlope, up, 0.0f) +
-            Vector3(nwSlope, up, nwSlope)).Normalized();
+    if (!heightData_)
+      return Vector3::UP;
+    const int dx0 = x > 0 ? - 1 : 0;
+    const int dx1 = x < numVertices_.x_ - 1 ? 1 : 0;
+    const int dz0 = z > 0 ? -numVertices_.x_ : 0;
+    const int dz1 = z < numVertices_.y_ - 1 ? numVertices_.x_ : 0;
+    const float *heightPtr = heightData_ + z * numVertices_.x_ + x;
+    const float nSlope = *(heightPtr + dz0);
+    const float neSlope = *(heightPtr + dx1 + dz0);
+    const float eSlope = *(heightPtr + dx1);
+    const float seSlope = *(heightPtr + dx1 + dz1);
+    const float sSlope = *(heightPtr + dz1);
+    const float swSlope = *(heightPtr + dx0 + dz1);
+    const float wSlope = *(heightPtr + dx0);
+    const float nwSlope = *(heightPtr + dx0 + dz0);
+    const float up = 4 * (spacing_.x_ + spacing_.z_);
+    return Vector3(
+        nwSlope + wSlope + swSlope - seSlope - eSlope - neSlope,
+        up,
+        nSlope + neSlope - seSlope - sSlope - swSlope + nwSlope
+    ).Normalized();
 }
 
 void Terrain::CalculateLodErrors(TerrainPatch* patch)
