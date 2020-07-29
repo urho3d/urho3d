@@ -1419,30 +1419,28 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
     int zEnd = zStart + patchSize_;
 
     for (unsigned i = 0; i < numLodLevels_; ++i)
+        lodErrors.Push(0.0f);
+    float *localLodErrors = lodErrors.Buffer();
+    for (int z = zStart; z <= zEnd; ++z)
     {
-        float maxError = 0.0f;
-        int divisor = 1u << i;
-
-        if (i > 0)
+        for (int x = xStart; x <= xEnd; ++x)
         {
-            for (int z = zStart; z <= zEnd; ++z)
+            const float local = GetRawHeight(x, z);
+            for (unsigned i = 1; i < numLodLevels_; ++i)
             {
-                for (int x = xStart; x <= xEnd; ++x)
+                const int divisor = 1u << i;
+                const int mask = divisor - 1;
+                if ((x|z) & mask)
                 {
-                    if (x % divisor || z % divisor)
-                    {
-                        float error = Abs(GetLodHeight(x, z, i) - GetRawHeight(x, z));
-                        maxError = Max(error, maxError);
-                    }
+                    const float error = Abs(GetLodHeight(x, z, i) - local);
+                    localLodErrors[i] = Max(error, localLodErrors[i]);
                 }
             }
-
-            // Set error to be at least same as (half vertex spacing x LOD) to prevent horizontal stretches getting too inaccurate
-            maxError = Max(maxError, 0.25f * (spacing_.x_ + spacing_.z_) * (float)(1u << i));
         }
-
-        lodErrors.Push(maxError);
     }
+
+    for (unsigned i = 1; i < numLodLevels_; ++i)
+        lodErrors[i] = Max(lodErrors[i], 0.25f * (spacing_.x_ + spacing_.z_) * (float)(1u << i));
 }
 
 void Terrain::SetPatchNeighbors(TerrainPatch* patch)
