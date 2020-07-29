@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <stdio.h>
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
@@ -1041,12 +1042,14 @@ void Terrain::CreateGeometry()
             URHO3D_PROFILE(CreatePatches);
 
             // Create patches and set node transforms
+            const bool empty = node_->GetNumChildren() == 0;
             for (int z = 0; z < numPatches_.y_; ++z)
             {
                 for (int x = 0; x < numPatches_.x_; ++x)
                 {
-                    String nodeName = "Patch_" + String(x) + "_" + String(z);
-                    Node* patchNode = node_->GetChild(nodeName);
+                    char nodeName[32];
+                    snprintf(nodeName, sizeof(nodeName), "Patch_%u_%u", x, z);
+                    Node* patchNode = empty ? NULL : node_->GetChild(nodeName);
 
                     if (!patchNode)
                     {
