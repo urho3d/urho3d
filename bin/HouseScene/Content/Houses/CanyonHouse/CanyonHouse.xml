@@ -1,202 +1,202 @@
 <node id="1">
 	<attribute name="Is Enabled" value="true" />
-	<attribute name="Name" value="testHouse0" />
+	<attribute name="Name" value="CanyonHouse" />
 	<attribute name="Tags"><string value="Untagged" /></attribute>
 	<attribute name="Position" value="0 0 0" />
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<node id="2">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Дверь" />
+		<attribute name="Name" value="Base" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="0.8478884 0.2976168 1.683706" />
+		<attribute name="Position" value="-74.66887 157.0043 -185.1761" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="3">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="4">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Крыша" />
+		<attribute name="Name" value="Base.001" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-0.7360446 4.442315 -2.901727" />
+		<attribute name="Position" value="143.907 92.57623 271.2375" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="5">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.001.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="6">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Крыша.001" />
+		<attribute name="Name" value="Base.002" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="2.781715 3.26432 1.942188" />
+		<attribute name="Position" value="-48.04514 29.27707 -279.2425" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="7">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.001.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.002.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="8">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Основа" />
+		<attribute name="Name" value="Base.003" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-0.7466887 1.570043 -1.851761" />
+		<attribute name="Position" value="287.3548 14.27716 194.6075" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="9">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.003.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="10">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Основа.001" />
+		<attribute name="Name" value="Door" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="1.43907 0.9257623 2.712374" />
+		<attribute name="Position" value="84.78883 29.76168 168.3706" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="11">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.001.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseDoor.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="12">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Основа.002" />
+		<attribute name="Name" value="Galass" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-0.4804514 0.2927707 -2.792425" />
+		<attribute name="Position" value="-393.8188 154.677 -425.4926" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="13">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.002.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="14">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Основа.003" />
+		<attribute name="Name" value="Galass.001" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="2.873548 0.1427715 1.946074" />
+		<attribute name="Position" value="325.2048 185.877 -534.6926" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="15">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.003.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.001.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="16">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Стекла" />
+		<attribute name="Name" value="Galass.002" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-3.938188 1.54677 -4.254926" />
+		<attribute name="Position" value="325.2048 185.877 -316.2926" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="17">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.002.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="18">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Стекла.001" />
+		<attribute name="Name" value="Galass.003" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="3.252048 1.85877 -5.346926" />
+		<attribute name="Position" value="-190.1951 466.6769 -487.8925" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="19">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.001.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.003.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="20">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Стекла.002" />
+		<attribute name="Name" value="Galass.004" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="3.252048 1.85877 -3.162926" />
+		<attribute name="Position" value="-190.1951 466.677 -222.6925" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="21">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.002.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.004.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="22">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Стекла.003" />
+		<attribute name="Name" value="Galass.005" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-1.901951 4.666769 -4.878925" />
+		<attribute name="Position" value="-190.0251 466.6771 42.50733" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="23">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.003.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.005.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="24">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Стекла.004" />
+		<attribute name="Name" value="Roof" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-1.901951 4.66677 -2.226926" />
+		<attribute name="Position" value="-73.60446 444.2315 -290.1727" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="25">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.004.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseRoof.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="26">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Стекла.005" />
+		<attribute name="Name" value="Roof.001" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="-1.900251 4.666771 0.4250734" />
+		<attribute name="Position" value="278.1715 326.432 194.2188" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="27">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.005.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseRoof.001.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="28">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Ступеньки_1" />
+		<attribute name="Name" value="Steps_1" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="5.7752 0.09929407 1.418127" />
+		<attribute name="Position" value="577.52 9.929407 141.8127" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="29">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_1.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseSteps_1.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
 	<node id="30">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Ступеньки_2" />
+		<attribute name="Name" value="Steps_2" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="1.815869 0.09929467 5.02459" />
+		<attribute name="Position" value="181.5869 9.929468 502.459" />
 		<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
 		<attribute name="Scale" value="100 100 100" />
 		<component type="StaticModel" id="31">
-			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_2.mdl" />
-			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouse0/No Name.xml" />
+			<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseSteps_2.mdl" />
+			<attribute name="Material" value="Material;Content/Houses/CanyonHouse/CanyonHouse/No Name.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>

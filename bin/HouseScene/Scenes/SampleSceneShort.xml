@@ -1,46 +1,414 @@
 <node id="1">
+	<node id="2">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Main Camera" />
+		<attribute name="Tags"><string value="MainCamera" /></attribute>
+		<attribute name="Position" value="109.1 8.5 118.1" />
+		<attribute name="Rotation" value="0.4907946 0.221544 -0.7680172 0.3466822" />
+		<attribute name="Scale" value="1 1 1" />
+	</node>
 	<node id="3">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="CanyonHouse" />
+		<attribute name="Tags"><string value="Untagged" /></attribute>
+		<attribute name="Position" value="104.1247 -0.02999973 104.9341" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<node id="4">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Base" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-0.7466887 1.570043 -1.851761" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="CollisionShape" id="5">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.mdl" />
+			</component>
+			<component type="RigidBody" id="6">
+				<attribute name="Physics Position" value="105.378 1.540043 105.0824" />
+			</component>
+			<component type="StaticModel" id="7">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="8">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Base.001" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="1.43907 0.9257623 2.712374" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="CollisionShape" id="9">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.001.mdl" />
+			</component>
+			<component type="RigidBody" id="10">
+				<attribute name="Physics Position" value="107.5638 0.8957626 109.6465" />
+			</component>
+			<component type="StaticModel" id="11">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.001.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="12">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Base.002" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-0.4804514 0.2927707 -2.792425" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="13">
+				<attribute name="groundPathClickable" value="True" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="False" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="StaticModel" id="14">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.002.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="15">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Base.003" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="2.873548 0.1427716 1.946074" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="16">
+				<attribute name="groundPathClickable" value="True" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="False" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="CollisionShape" id="17">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.003.mdl" />
+			</component>
+			<component type="RigidBody" id="18">
+				<attribute name="Physics Position" value="108.9983 0.1127718 108.8802" />
+			</component>
+			<component type="StaticModel" id="19">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseBase.003.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="20">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Door" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="0.8478883 0.2976168 1.683706" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="21">
+				<attribute name="groundPathClickable" value="False" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="False" />
+				<attribute name="gameObjectType" value="1" />
+				<attribute name="gameObjectId" value="door1" />
+				<attribute name="gameObjectElementId" value="1" />
+			</component>
+			<component type="CollisionShape" id="22">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseDoor.mdl" />
+			</component>
+			<component type="RigidBody" id="23">
+				<attribute name="Physics Position" value="106.9726 0.267617 108.6178" />
+			</component>
+			<component type="StaticModel" id="24">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseDoor.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="25">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Galass" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-3.938188 1.54677 -4.254926" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="CollisionShape" id="26">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.mdl" />
+			</component>
+			<component type="RigidBody" id="27">
+				<attribute name="Physics Position" value="102.1865 1.51677 102.6792" />
+			</component>
+			<component type="StaticModel" id="28">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.mdl" />
+				<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="29">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Galass.001" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="3.252048 1.85877 -5.346926" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="CollisionShape" id="30">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.001.mdl" />
+			</component>
+			<component type="RigidBody" id="31">
+				<attribute name="Physics Position" value="109.3768 1.82877 101.5872" />
+			</component>
+			<component type="StaticModel" id="32">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.001.mdl" />
+				<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="33">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Galass.002" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="3.252048 1.85877 -3.162926" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="CollisionShape" id="34">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.002.mdl" />
+			</component>
+			<component type="RigidBody" id="35">
+				<attribute name="Physics Position" value="109.3768 1.828771 103.7712" />
+			</component>
+			<component type="StaticModel" id="36">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.002.mdl" />
+				<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="37">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Galass.003" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-1.901951 4.666769 -4.878925" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="38">
+				<attribute name="groundPathClickable" value="False" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="True" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="CollisionShape" id="39">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.003.mdl" />
+			</component>
+			<component type="RigidBody" id="40">
+				<attribute name="Physics Position" value="104.2228 4.636769 102.0552" />
+			</component>
+			<component type="StaticModel" id="41">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.003.mdl" />
+				<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="42">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Galass.004" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-1.901951 4.66677 -2.226925" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="43">
+				<attribute name="groundPathClickable" value="False" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="True" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="CollisionShape" id="44">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.004.mdl" />
+			</component>
+			<component type="RigidBody" id="45">
+				<attribute name="Physics Position" value="104.2228 4.63677 104.7072" />
+			</component>
+			<component type="StaticModel" id="46">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.004.mdl" />
+				<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="47">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Galass.005" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-1.900251 4.666771 0.4250733" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="48">
+				<attribute name="groundPathClickable" value="False" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="True" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="CollisionShape" id="49">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.005.mdl" />
+			</component>
+			<component type="RigidBody" id="50">
+				<attribute name="Physics Position" value="104.2245 4.636771 107.3592" />
+			</component>
+			<component type="StaticModel" id="51">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseGalass.005.mdl" />
+				<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="52">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Roof" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="-0.7360446 4.442315 -2.901727" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="53">
+				<attribute name="groundPathClickable" value="False" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="True" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="CollisionShape" id="54">
+				<attribute name="Shape Type" value="TriangleMesh" />
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseRoof.mdl" />
+			</component>
+			<component type="RigidBody" id="55">
+				<attribute name="Physics Position" value="105.3887 4.412315 104.0324" />
+			</component>
+			<component type="StaticModel" id="56">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseRoof.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="57">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Roof.001" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="2.781715 3.26432 1.942188" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="58">
+				<attribute name="groundPathClickable" value="False" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="True" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="StaticModel" id="59">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseRoof.001.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="60">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Steps_1" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="5.7752 0.09929407 1.418127" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="61">
+				<attribute name="groundPathClickable" value="True" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="False" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="StaticModel" id="62">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseSteps_1.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+		<node id="63">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Steps_2" />
+			<attribute name="Tags"><string value="Untagged" /></attribute>
+			<attribute name="Position" value="1.815869 0.09929468 5.02459" />
+			<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
+			<attribute name="Scale" value="1 1 1" />
+			<component type="ProjectNMetaData" id="64">
+				<attribute name="groundPathClickable" value="True" />
+				<attribute name="bulletObstacle" value="False" />
+				<attribute name="isRoof" value="False" />
+				<attribute name="gameObjectType" value="0" />
+				<attribute name="gameObjectId" value="" />
+				<attribute name="gameObjectElementId" value="" />
+			</component>
+			<component type="StaticModel" id="65">
+				<attribute name="Model" value="Model;Content/Houses/CanyonHouse/CanyonHouseSteps_2.mdl" />
+				<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+		</node>
+	</node>
+	<node id="66">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Terrain" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="2.419991 -0.02999973 1.900002" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<node id="4">
+		<node id="67">
 		<attribute name="Position" value="100 0 100" />
-		<component type="Terrain" id="5">
+		<component type="Terrain" id="68">
 			<attribute name="Height Map" value="Image;Scenes/SampleSceneShortTerrain.Heightmap.tga" />
 			<attribute name="Material" value="Material;Scenes/SampleSceneShortTerrain.Material.xml" />
 			<attribute name="Vertex Spacing" value="3.076923 0 3.076923" />
 		</component>
-		<component type="CollisionShape" id="6">
+		<component type="CollisionShape" id="69">
 		<attribute name="Shape Type" value="Terrain" />
 		</component>
-		<component type="RigidBody" id="7">
+		<component type="RigidBody" id="70">
 		<attribute name="Physics Position" value="102.42 -0.02999973 101.9" />
 		</component>
 		</node>
 	</node>
-	<node id="8">
+	<node id="71">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Skybox" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="10.12222 3.46879 11.56317" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="Skybox" id="9">
+		<component type="Skybox" id="72">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Skybox_Mat.xml" />
 		</component>
 	</node>
-	<node id="10">
+	<node id="73">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Directional Light" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="74.21532 3.402659 103.6166" />
 		<attribute name="Rotation" value="0.5213338 0.7064338 0.4777144 0.03084357" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="Light" id="11">
+		<component type="Light" id="74">
 			<attribute name="Light Type" value="Directional" />
 			<attribute name="CSM Splits" value="8.533334 25.6 59.73333 128" />
 			<attribute name="Color" value="1 1 1 1" />
@@ -50,460 +418,64 @@
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
-	<node id="12">
+	<node id="75">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Houses" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="0 0 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<node id="13">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="canyonHouse" />
-			<attribute name="Tags"><string value="Untagged" /></attribute>
-			<attribute name="Position" value="0 0 0" />
-			<attribute name="Rotation" value="1 0 0 0" />
-			<attribute name="Scale" value="1 1 1" />
-			<node id="14">
-				<attribute name="Is Enabled" value="true" />
-				<attribute name="Name" value="testHouse0" />
-				<attribute name="Tags"><string value="Untagged" /></attribute>
-				<attribute name="Position" value="102.8984 -0.1545302 105.3498" />
-				<attribute name="Rotation" value="1 0 0 0" />
-				<attribute name="Scale" value="1 1 1" />
-				<node id="15">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Дверь" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="0.8478884 0.2976168 1.683706" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="16">
-						<attribute name="groundPathClickable" value="False" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="False" />
-						<attribute name="gameObjectType" value="1" />
-						<attribute name="gameObjectId" value="door1" />
-						<attribute name="gameObjectElementId" value="1" />
-					</component>
-					<component type="CollisionShape" id="17">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
-					</component>
-					<component type="RigidBody" id="18">
-						<attribute name="Physics Position" value="103.7463 0.1430867 107.0335" />
-					</component>
-					<component type="StaticModel" id="19">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Дверь.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="20">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Крыша" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-0.7360446 4.442315 -2.901727" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="21">
-						<attribute name="groundPathClickable" value="False" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="True" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="22">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.mdl" />
-					</component>
-					<component type="RigidBody" id="23">
-						<attribute name="Physics Position" value="102.1623 4.287785 102.4481" />
-					</component>
-					<component type="StaticModel" id="24">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="25">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Крыша.001" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="2.781715 3.26432 1.942188" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="26">
-						<attribute name="groundPathClickable" value="False" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="True" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="27">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.001.mdl" />
-					</component>
-					<component type="RigidBody" id="28">
-						<attribute name="Physics Position" value="105.6801 3.109789 107.292" />
-					</component>
-					<component type="StaticModel" id="29">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Крыша.001.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="30">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Основа" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-0.7466887 1.570043 -1.851761" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="CollisionShape" id="31">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.mdl" />
-					</component>
-					<component type="RigidBody" id="32">
-						<attribute name="Physics Position" value="102.1517 1.415513 103.498" />
-					</component>
-					<component type="StaticModel" id="33">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="34">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Основа.001" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="1.43907 0.9257623 2.712374" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="CollisionShape" id="35">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.001.mdl" />
-					</component>
-					<component type="RigidBody" id="36">
-						<attribute name="Physics Position" value="104.3374 0.7712321 108.0622" />
-					</component>
-					<component type="StaticModel" id="37">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.001.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="38">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Основа.002" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-0.4804514 0.2927707 -2.792425" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="39">
-						<attribute name="groundPathClickable" value="True" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="False" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="40">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.002.mdl" />
-					</component>
-					<component type="RigidBody" id="41">
-						<attribute name="Physics Position" value="102.4179 0.1382406 102.5574" />
-					</component>
-					<component type="StaticModel" id="42">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.002.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="43">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Основа.003" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="2.873548 0.1427715 1.946074" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="44">
-						<attribute name="groundPathClickable" value="True" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="False" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="45">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.003.mdl" />
-					</component>
-					<component type="RigidBody" id="46">
-						<attribute name="Physics Position" value="105.7719 -0.01175863 107.2959" />
-					</component>
-					<component type="StaticModel" id="47">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Основа.003.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="48">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Стекла" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-3.938188 1.54677 -4.254926" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="CollisionShape" id="49">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.mdl" />
-					</component>
-					<component type="RigidBody" id="50">
-						<attribute name="Physics Position" value="98.96018 1.39224 101.0949" />
-					</component>
-					<component type="StaticModel" id="51">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.mdl" />
-						<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="52">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Стекла.001" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="3.252048 1.85877 -5.346926" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="CollisionShape" id="53">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.001.mdl" />
-					</component>
-					<component type="RigidBody" id="54">
-						<attribute name="Physics Position" value="106.1504 1.70424 100.0029" />
-					</component>
-					<component type="StaticModel" id="55">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.001.mdl" />
-						<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="56">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Стекла.002" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="3.252048 1.85877 -3.162926" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="CollisionShape" id="57">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.002.mdl" />
-					</component>
-					<component type="RigidBody" id="58">
-						<attribute name="Physics Position" value="106.1504 1.70424 102.1869" />
-					</component>
-					<component type="StaticModel" id="59">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.002.mdl" />
-						<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="60">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Стекла.003" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-1.901951 4.666769 -4.878925" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="61">
-						<attribute name="groundPathClickable" value="False" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="True" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="62">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.003.mdl" />
-					</component>
-					<component type="RigidBody" id="63">
-						<attribute name="Physics Position" value="100.9964 4.512239 100.4709" />
-					</component>
-					<component type="StaticModel" id="64">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.003.mdl" />
-						<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="65">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Стекла.004" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-1.901951 4.66677 -2.226926" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="66">
-						<attribute name="groundPathClickable" value="False" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="True" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="67">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.004.mdl" />
-					</component>
-					<component type="RigidBody" id="68">
-						<attribute name="Physics Position" value="100.9964 4.51224 103.1229" />
-					</component>
-					<component type="StaticModel" id="69">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.004.mdl" />
-						<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="70">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Стекла.005" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="-1.900251 4.666771 0.4250734" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="71">
-						<attribute name="groundPathClickable" value="False" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="True" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="72">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.005.mdl" />
-					</component>
-					<component type="RigidBody" id="73">
-						<attribute name="Physics Position" value="100.9981 4.512241 105.7749" />
-					</component>
-					<component type="StaticModel" id="74">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Стекла.005.mdl" />
-						<attribute name="Material" value="Material;Content/_System/Materials/Glass.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="75">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Ступеньки_1" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="5.7752 0.09929407 1.418127" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="76">
-						<attribute name="groundPathClickable" value="True" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="False" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="77">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_1.mdl" />
-					</component>
-					<component type="RigidBody" id="78">
-						<attribute name="Physics Position" value="108.6736 -0.0552361 106.7679" />
-					</component>
-					<component type="StaticModel" id="79">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_1.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-				<node id="80">
-					<attribute name="Is Enabled" value="true" />
-					<attribute name="Name" value="Ступеньки_2" />
-					<attribute name="Tags"><string value="Untagged" /></attribute>
-					<attribute name="Position" value="1.815869 0.09929467 5.02459" />
-					<attribute name="Rotation" value="0.7071067 -0.7071068 0 0" />
-					<attribute name="Scale" value="100 100 100" />
-					<component type="ProjectNMetaData" id="81">
-						<attribute name="groundPathClickable" value="True" />
-						<attribute name="bulletObstacle" value="False" />
-						<attribute name="isRoof" value="False" />
-						<attribute name="gameObjectType" value="0" />
-						<attribute name="gameObjectId" value="" />
-						<attribute name="gameObjectElementId" value="" />
-					</component>
-					<component type="CollisionShape" id="82">
-						<attribute name="Shape Type" value="TriangleMesh" />
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_2.mdl" />
-					</component>
-					<component type="RigidBody" id="83">
-						<attribute name="Physics Position" value="104.7142 -0.0552355 110.3744" />
-					</component>
-					<component type="StaticModel" id="84">
-						<attribute name="Model" value="Model;Content/Houses/CanyonHouse/testHouse0Ступеньки_2.mdl" />
-						<attribute name="Material" value="Material;Content/Houses/CanyonHouse/testHouseMaterial.xml" />
-						<attribute name="Cast Shadows" value="true" />
-					</component>
-				</node>
-			</node>
-		</node>
 	</node>
-	<node id="85">
+	<node id="76">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="CubeInternal" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="90.07999 2.98 116.9276" />
 		<attribute name="Rotation" value="0.9858179 0 0 -0.1678189" />
 		<attribute name="Scale" value="4.33 0.7499999 0.75" />
-		<component type="CollisionShape" id="86">
+		<component type="CollisionShape" id="77">
 			<attribute name="Size" value="1 1 1" />
 			<attribute name="Offset Position" value="0 0 0" />
 		</component>
-		<component type="RigidBody" id="87">
+		<component type="RigidBody" id="78">
 			<attribute name="Physics Position" value="90.07999 2.98 116.9276" />
 			<attribute name="Mass" value="1" />
 		</component>
-		<component type="StaticModel" id="88">
+		<component type="StaticModel" id="79">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Default.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
-	<node id="89">
+	<node id="80">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="CubeParent" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="94.23 5.26 111.7076" />
 		<attribute name="Rotation" value="0.9858179 0 0 -0.1678189" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="CollisionShape" id="90">
+		<component type="CollisionShape" id="81">
 			<attribute name="Size" value="1 1 1" />
 			<attribute name="Offset Position" value="0 0 0" />
 		</component>
-		<component type="RigidBody" id="91">
+		<component type="RigidBody" id="82">
 			<attribute name="Physics Position" value="94.23 5.26 111.7076" />
 			<attribute name="Mass" value="1" />
 		</component>
-		<component type="StaticModel" id="92">
+		<component type="StaticModel" id="83">
 			<attribute name="Model" value="Model;Library/unity default resourcesCube.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/Default.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
-	<node id="93">
+	<node id="84">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Reflection Probe (1)" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
 		<attribute name="Position" value="134.74 3.98 146" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="Zone" id="94">
+		<component type="Zone" id="85">
 			<attribute name="Ambient Color" value="0.03696759 0.04214946 0.05455384 1" />
 			<attribute name="Override Mode" value="false" />
 			<attribute name="Bounding Box Min" value="-500 -500 -500" />
@@ -512,14 +484,14 @@
 			<attribute name="Zone Texture" value="TextureCube;Scenes/SampleSceneShort/ReflectionProbe-3.xml" />
 		</component>
 	</node>
-	<node id="95">
+	<node id="86">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Water (1)" />
 		<attribute name="Tags"><string value="Untagged" /></attribute>
-		<attribute name="Position" value="99.61 -0.022 122.34" />
+		<attribute name="Position" value="106.48 -0.022 119.41" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
-		<component type="ProjectNMetaData" id="96">
+		<component type="ProjectNMetaData" id="87">
 			<attribute name="groundPathClickable" value="True" />
 			<attribute name="bulletObstacle" value="False" />
 			<attribute name="isRoof" value="False" />
@@ -527,7 +499,7 @@
 			<attribute name="gameObjectId" value="" />
 			<attribute name="gameObjectElementId" value="" />
 		</component>
-		<component type="StaticModel" id="97">
+		<component type="StaticModel" id="88">
 			<attribute name="Model" value="Model;Scenes/SampleSceneShort/PolybrushMesh-17450.mdl" />
 			<attribute name="Material" value="Material;Content/_System/Materials/WaterRiverDefault.xml" />
 			<attribute name="Cast Shadows" value="false" />
