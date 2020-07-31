@@ -41,7 +41,7 @@ class IKEffector;
  */
 class URHO3D_API IKSolver : public Component
 {
-    URHO3D_OBJECT(IKSolver, Component)
+    URHO3D_OBJECT(IKSolver, Component);
 
 public:
 
