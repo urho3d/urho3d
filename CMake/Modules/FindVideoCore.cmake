@@ -33,7 +33,7 @@ set (VIDEOCORE_INC_SEARCH_PATH /opt/vc/include)
 set (VIDEOCORE_LIB_SEARCH_PATH /opt/vc/lib)
 
 find_path (VIDEOCORE_INCLUDE_DIRS bcm_host.h PATHS ${VIDEOCORE_INC_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore include directory")
-find_library (VIDEOCORE_LIBRARIES bcm_host PATHS ${VIDEOCORE_LIB_SEARCH_PATH} PATH_SUFFIXES vc aarch64-linux-gnu DOC "Broadcom VideoCore BCM_HOST library")
+find_library (VIDEOCORE_LIBRARIES bcm_host PATHS ${VIDEOCORE_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore BCM_HOST library")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (VideoCore REQUIRED_VARS VIDEOCORE_LIBRARIES VIDEOCORE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Broadcom VideoCore firmware")

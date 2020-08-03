@@ -28,7 +28,7 @@
 #
 
 find_path (DRM_INCLUDE_DIRS NAMES drm.h PATH_SUFFIXES libdrm DOC "DirectRenderingManager include directory")
-find_library (DRM_LIBRARIES NAMES drm PATH_SUFFIXES aarch64-linux-gnu DOC "DirectRenderingManager library")
+find_library (DRM_LIBRARIES NAMES drm DOC "DirectRenderingManager library")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (DRM REQUIRED_VARS DRM_LIBRARIES DRM_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Direct Rendering Manager development library")
