@@ -214,7 +214,7 @@ static void RegisterImage(asIScriptEngine* engine)
 
     RegisterResource<Image>(engine, "Image");
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, int, unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SetPixel(int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SetPixel(int, int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, int, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, uint)", asMETHODPR(Image, SetPixelInt, (int, int, unsigned), void), asCALL_THISCALL);
