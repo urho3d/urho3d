@@ -46,6 +46,7 @@ public:
     ~Terrain() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
+    static void Cleanup();
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;

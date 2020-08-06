@@ -160,6 +160,15 @@ void Terrain::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
+void Terrain::Cleanup()
+{
+    MutexLock lock(cachedIndexBuffer.mutex);
+    cachedIndexBuffer.patchSize = 0;
+    cachedIndexBuffer.numLodLevels = 0;
+    cachedIndexBuffer.indexBuffer = nullptr;
+    cachedIndexBuffer.drawRanges.Clear();
+}
+
 void Terrain::ApplyAttributes()
 {
     if (recreateTerrain_)
