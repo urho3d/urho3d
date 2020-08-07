@@ -755,7 +755,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 // Tangent
                 if (enableTangents_)
                 {
-                    const Vector3 xyz = (Vector3::RIGHT - normal * normal.DotProduct(Vector3::RIGHT)).Normalized();
+                    const Vector3 xyz = (Vector3::RIGHT - normal * normal.DotProduct(Vector3::RIGHT)).NormalizedApproximateFast();
                     *vertexData++ = xyz.x_;
                     *vertexData++ = xyz.y_;
                     *vertexData++ = xyz.z_;
@@ -1414,7 +1414,7 @@ Vector3 Terrain::GetRawNormal(int x, int z) const
         nwSlope + wSlope + swSlope - seSlope - eSlope - neSlope,
         up,
         nSlope + neSlope - seSlope - sSlope - swSlope + nwSlope
-    ).Normalized();
+    ).NormalizedApproximateFast();
 }
 
 void Terrain::CalculateLodErrors(TerrainPatch* patch)
