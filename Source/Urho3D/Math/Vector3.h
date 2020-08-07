@@ -22,8 +22,13 @@
 
 #pragma once
 
+#include <math.h>
 #include "../Math/Vector2.h"
 #include "../Math/MathDefs.h"
+
+#if !defined __GNUC__ || !defined __x86_64__ || defined __llvm__
+static inline float __builtin_ia32_rsqrtf(float x) { return 1.0f / sqrtf(x); }
+#endif
 
 namespace Urho3D
 {
@@ -341,6 +346,18 @@ public:
         }
     }
 
+    void NormalizeApproximateFast()
+    {
+        float lenSquared = LengthSquared();
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        {
+            float invLen = __builtin_ia32_rsqrtf(lenSquared);
+            x_ *= invLen;
+            y_ *= invLen;
+            z_ *= invLen;
+        }
+    }
+
     /// Return length.
     float Length() const { return sqrtf(x_ * x_ + y_ * y_ + z_ * z_); }
 
@@ -451,6 +468,19 @@ public:
         const float len = sqrtf(lenSquared);
         const float newLen = Clamp(len, minLength, maxLength);
         return *this * (newLen / len);
+    }
+
+    /// Return normalized to unit length.
+    Vector3 NormalizedApproximateFast() const
+    {
+        float lenSquared = LengthSquared();
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        {
+            float invLen = __builtin_ia32_rsqrtf(lenSquared);
+            return *this * invLen;
+        }
+        else
+            return *this;
     }
 
     /// Return float data.
