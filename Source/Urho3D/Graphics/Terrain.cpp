@@ -727,14 +727,16 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 float minHeight = position.y_;
                 if (halfLodExpand > 0 && (x & lodExpand) == 0 && (z & lodExpand) == 0)
                 {
-                    int minX = Max(xPos - halfLodExpand, 0);
-                    int maxX = Min(xPos + halfLodExpand, numVertices_.x_ - 1);
-                    int minZ = Max(zPos - halfLodExpand, 0);
-                    int maxZ = Min(zPos + halfLodExpand, numVertices_.y_ - 1);
-                    for (int nZ = minZ; nZ <= maxZ; ++nZ)
+                    const int minX = Clamp<int>(xPos - halfLodExpand, 0, numVertices_.x_ - 1);
+                    const int maxX = Clamp<int>(xPos + halfLodExpand, 0, numVertices_.x_ - 1);
+                    const int minZ = Clamp<int>(zPos - halfLodExpand, 0, numVertices_.y_ - 1);
+                    const int maxZ = Clamp<int>(zPos + halfLodExpand, 0, numVertices_.y_ - 1);
+                    const int rowSkip = numVertices_.x_ - (maxX - minX + 1);
+                    const float *heightPtr = heightData_ + minZ * numVertices_.x_ + minX;
+                    for (int nZ = minZ; nZ <= maxZ; ++nZ, heightPtr += rowSkip)
                     {
-                        for (int nX = minX; nX <= maxX; ++nX)
-                            minHeight = Min(minHeight, GetRawHeight(nX, nZ));
+                        for (int nX = minX; nX <= maxX; ++nX, ++heightPtr)
+                            minHeight = Min(minHeight, *heightPtr);
                     }
                 }
                 *occlusionData++ = position.x_;
