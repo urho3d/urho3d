@@ -34,6 +34,7 @@
 
 namespace Urho3D {
 class Material;
+class Technique;
 }
 
 
@@ -66,7 +67,7 @@ public:
     
     static void RegisterObject(Urho3D::Context* context);
     
-    void setRoofVisible(bool visible);
+    void setRoofVisible(bool visible, std::map<Urho3D::SharedPtr<Urho3D::Material>, Urho3D::SharedPtr<Urho3D::Material>> &roofMaterials, std::map<Urho3D::SharedPtr<Urho3D::Technique>, Urho3D::SharedPtr<Urho3D::Technique>> &roofTechniques);
     
 };
 

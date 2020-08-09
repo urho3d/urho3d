@@ -24,6 +24,8 @@
 
 #include "Sample.h"
 #include <memory>
+#include <map>
+#include <Urho3D/Container/Ptr.h>
 #include <Urho3D/Graphics/StateMachine.h>
 
 namespace Urho3D
@@ -34,7 +36,8 @@ class Node;
 class Scene;
 class Zone;
 class Text3D;
-
+class Technique;
+class Technique;
 class StateMachine;
 class StateMachineParameterSource;
 
@@ -61,6 +64,9 @@ public:
 private:
     
     std::shared_ptr<GameSceneData> sceneData_;
+    
+    std::map<SharedPtr<Material>, SharedPtr<Material>> roofHiddenMaterials_;
+    std::map<SharedPtr<Technique>, SharedPtr<Technique>> roofHiddenTechniques_;
     
     bool mouseDown_ = false;
     bool rDown_ = false;

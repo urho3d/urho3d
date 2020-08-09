@@ -34,6 +34,7 @@
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/AnimationController.h>
 #include <Urho3D/Graphics/StateMachine.h>
+#include <Urho3D/Graphics/Technique.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Font.h>
@@ -340,7 +341,7 @@ void StateMachineSample::SwitchRoofs()
 {
     roofsShown_ = !roofsShown_;
     for (size_t i = 0; i < sceneData_->_roofs.size(); i++) {
-        sceneData_->_roofs[i]->GetComponent<ProjectNMetaData>()->setRoofVisible(roofsShown_);
+        sceneData_->_roofs[i]->GetComponent<ProjectNMetaData>()->setRoofVisible(roofsShown_, roofHiddenMaterials_, roofHiddenTechniques_);
     }
 }
 

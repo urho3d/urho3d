@@ -67,11 +67,8 @@ void ProjectNMetaData::RegisterObject(Urho3D::Context* context)
     context->RegisterFactory<ProjectNMetaData>("ProjectNMetaData");
 }
 
-void ProjectNMetaData::setRoofVisible(bool visible)
+void ProjectNMetaData::setRoofVisible(bool visible, std::map<Urho3D::SharedPtr<Urho3D::Material>, Urho3D::SharedPtr<Urho3D::Material>> &roofMaterials, std::map<Urho3D::SharedPtr<Urho3D::Technique>, Urho3D::SharedPtr<Urho3D::Technique>> &roofTechniques)
 {
-    static std::map<SharedPtr<Material>, SharedPtr<Material>> _roofMaterials;
-    static std::map<SharedPtr<Technique>, SharedPtr<Technique>> _roofTechniques;
-    
     if (_roofVisible == visible) {
         return;
     }
@@ -103,8 +100,8 @@ void ProjectNMetaData::setRoofVisible(bool visible)
         SharedPtr<Material> material = model->GetBatches()[i].material_;
         _visibleMaterials.push_back(material);
         
-        auto replaceMaterial = _roofMaterials.find(material);
-        if (replaceMaterial != _roofMaterials.end()) {
+        auto replaceMaterial = roofMaterials.find(material);
+        if (replaceMaterial != roofMaterials.end()) {
             // already have necessary material
             model->SetMaterial(i, replaceMaterial->second);
         }
@@ -116,9 +113,9 @@ void ProjectNMetaData::setRoofVisible(bool visible)
                 
                 SharedPtr<Technique> technique = SharedPtr<Technique>(newMaterial->GetTechnique(t));
                 SharedPtr<Technique> newTechnique = nullptr;
-                auto replaceTechnique = _roofTechniques.find(technique);
+                auto replaceTechnique = roofTechniques.find(technique);
                 
-                if (replaceTechnique != _roofTechniques.end()) {
+                if (replaceTechnique != roofTechniques.end()) {
                     newMaterial->SetTechnique(t, replaceTechnique->second);
                 }
                 else {
@@ -131,13 +128,13 @@ void ProjectNMetaData::setRoofVisible(bool visible)
                         }
                         newTechnique->RemovePass(names[p]);
                     }
-                    _roofTechniques[technique] = newTechnique;
+                    roofTechniques[technique] = newTechnique;
                     newMaterial->SetTechnique(t, newTechnique);
                 }
             }
             
             model->SetMaterial(i, newMaterial);
-            _roofMaterials[material] = newMaterial;
+            roofMaterials[material] = newMaterial;
             _invisibleMaterials.push_back(newMaterial);
         }
     }
