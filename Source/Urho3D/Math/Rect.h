@@ -417,7 +417,7 @@ public:
     /// Test if another rect is inside, outside or intersects.
     Intersection IsInside(const IntRect& rect) const
     {
-        if (rect.right_ <= left_ || rect.left_ >= right_ || rect.bottom_ <= top_ || rect.top_ >= bottom_)
+        if (rect.right_ < left_ || rect.left_ >= right_ || rect.bottom_ < top_ || rect.top_ >= bottom_)
             return OUTSIDE;
         else if (rect.left_ < left_ || rect.right_ > right_ || rect.top_ < top_ || rect.bottom_ > bottom_)
             return INTERSECTS;
