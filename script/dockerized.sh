@@ -41,6 +41,8 @@ if ! docker --version >/dev/null 2>&1; then
         run_option="--security-opt label=disable"
         # Podman mount volume as 'noexec' by default but we need 'exec' for Android build (aapt2 permission denied otherwise)
         mount_option=,exec
+        # Podman by default pull from other OS registries before trying 'docker.io', so we need to be more explicit to avoid the retries
+        registry=docker.io/
     else
         echo "Could not find Docker client or podman"
         exit 1
@@ -57,9 +59,9 @@ d () {
 
 if [[ $TRAVIS ]]; then
   # Workaround Travis-CI intermittent network I/O error
-  while (! d pull "urho3d/dockerized$BuildEnvironment:$DBE_TAG"); do sleep 10; done;
+  while (! d pull "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG"); do sleep 10; done;
 elif [[ $DBE_REFRESH == 1 ]]; then
-  d pull "urho3d/dockerized$BuildEnvironment:$DBE_TAG"
+  d pull "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG"
 fi
 
 if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( BASH_REMATCH[1] * 100 + BASH_REMATCH[2] >= 1809 )) ); then
@@ -69,7 +71,7 @@ if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\
         --env-file "$PROJECT_DIR/script/.env-file" \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
         --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d$mount_option \
-        "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
+        "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 else
     # Fallback workaround on older Docker CLI version
     d run -it --rm -h fishtank \
