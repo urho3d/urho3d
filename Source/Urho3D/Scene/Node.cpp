@@ -1402,7 +1402,7 @@ Component* Node::GetComponent(StringHash type, bool recursive) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        if ((*i)->GetType() == type)
+        if ((*i)->IsInstanceOf(type))
             return *i;
     }
 
