@@ -572,6 +572,9 @@ public:
     /// Return child elements either recursively or non-recursively.
     void GetChildren(PODVector<UIElement*>& dest, bool recursive = false) const;
 
+    /// Return child elements, optionally recursive.
+    PODVector<UIElement*> GetChildren(bool recursive) const;
+
     /// Return parent element.
     UIElement* GetParent() const { return parent_; }
 
