@@ -283,7 +283,8 @@ set_option(DUMMYAUDIO          "Support the dummy audio driver" ON)
 set_option(VIDEO_DIRECTFB      "Use DirectFB video driver" OFF)
 dep_option(DIRECTFB_SHARED     "Dynamically load directfb support" ON VIDEO_DIRECTFB OFF)
 set_option(VIDEO_DUMMY         "Use dummy video driver" ON)
-set_option(VIDEO_OPENGL        "Include OpenGL support" ON)
+# Urho3D - hide OpenGL option from all non-desktop platforms
+dep_option(VIDEO_OPENGL        "Include OpenGL support" ON "NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT ARM AND NOT WEB" OFF)
 # Urho3D - hide OpenGLES option from all desktop platforms, although a few of them appears to have the necessary header file to build SDL OpenGLES video driver
 dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "ANDROID OR IOS OR TVOS OR ARM OR WEB" OFF)
 # Urho3D - only make PTHREADS option available on UNIX-like platforms
