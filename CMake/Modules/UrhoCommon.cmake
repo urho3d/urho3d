@@ -130,9 +130,12 @@ elseif (APPLE AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0.0)
     set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-no_weak_imports")
 endif ()
 if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_CROSSCOMPILING AND CMAKE_LIBRARY_ARCHITECTURE)
-    # Cannot do this in the toolchain file because CMAKE_LIBRARY_ARCHITECTURE is not yet defined when CMake is processing toolchain file
-    # Probably don't need this in the future when the linker from the cross-compiling toolchain has the '129_multiarch_libpath.patch' applied to upstream
-    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${CMAKE_SYSROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}\"")
+    # Check if the "cross" linker has already the library search path patched, see '129_multiarch_libpath.patch'
+    execute_process (COMMAND ${CMAKE_LINKER} --verbose COMMAND grep -i search OUTPUT_VARIABLE LD_SEARCH_PATHS)  # We only support *nix system for cross-compiling
+    if (NOT LD_SEARCH_PATHS MATCHES /lib/${CMAKE_LIBRARY_ARCHITECTURE})
+        # If not yet patched then the linker needs the following in order to link correctly
+        set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${CMAKE_SYSROOT}/usr/local/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${CMAKE_SYSROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}\"")
+    endif ()
 endif ()
 set (CMAKE_REQUIRED_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
