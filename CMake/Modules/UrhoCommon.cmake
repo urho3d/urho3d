@@ -1140,7 +1140,6 @@ endmacro ()
 include (GenerateExportHeader)
 
 # Macro for precompiling header (On MSVC, the dummy C++ or C implementation file for precompiling the header file would be generated if not already exists)
-# This macro should be called before the CMake target has been added
 # Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_files() macro
 macro (enable_pch HEADER_PATHNAME)
     # No op when PCH support is not enabled
@@ -1171,10 +1170,24 @@ macro (enable_pch HEADER_PATHNAME)
             # Clang or MSVC
             set (PCH_FILENAME ${HEADER_FILENAME}.pch)
         endif ()
-
-        if (MSVC)
-            get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
-            if (TARGET ${TARGET_NAME})
+        if (TARGET ${TARGET_NAME})
+            if (MSVC)
+                # Add the dummy C++ or C implementation file if necessary
+                get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
+                set (${LANG}_FILENAME ${NAME_WE}.${EXT})
+                get_filename_component (PATH ${HEADER_PATHNAME} PATH)
+                if (PATH)
+                    set (PATH ${PATH}/)
+                endif ()
+                list (FIND SOURCE_FILES ${PATH}${${LANG}_FILENAME} ${LANG}_FILENAME_FOUND)
+                if (${LANG}_FILENAME_FOUND STREQUAL -1)
+                    if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${${LANG}_FILENAME})
+                        # Only generate it once so that its timestamp is not touched unnecessarily
+                        file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${${LANG}_FILENAME} "// This is a generated file. DO NOT EDIT!\n\n#include \"${HEADER_FILENAME}\"")
+                    endif ()
+                    target_sources (${TARGET_NAME} PRIVATE ${${LANG}_FILENAME})
+                endif ()
+                source_group ("Source Files\\Generated" FILES ${${LANG}_FILENAME})
                 if (VS)
                     # VS is multi-config, the exact path is only known during actual build time based on effective build config
                     set (PCH_PATHNAME "$(IntDir)${PCH_FILENAME}")
@@ -1193,46 +1206,17 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                 endforeach ()
                 unset (${TARGET_NAME}_HEADER_PATHNAME)
-            else ()
-                # The target has not been created yet, so set an internal variable to come back here again later
-                set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
-                # But proceed to add the dummy C++ or C implementation file if necessary
-                set (${LANG}_FILENAME ${NAME_WE}.${EXT})
-                get_filename_component (PATH ${HEADER_PATHNAME} PATH)
-                if (PATH)
-                    set (PATH ${PATH}/)
-                endif ()
-                list (FIND SOURCE_FILES ${PATH}${${LANG}_FILENAME} ${LANG}_FILENAME_FOUND)
-                if (${LANG}_FILENAME_FOUND STREQUAL -1)
-                    if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${${LANG}_FILENAME})
-                        # Only generate it once so that its timestamp is not touched unnecessarily
-                        file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${${LANG}_FILENAME} "// This is a generated file. DO NOT EDIT!\n\n#include \"${HEADER_FILENAME}\"")
-                    endif ()
-                    list (INSERT SOURCE_FILES 0 ${${LANG}_FILENAME})
-                endif ()
-                source_group ("Source Files\\Generated" FILES ${${LANG}_FILENAME})
-            endif ()
-        elseif (XCODE)
-            if (TARGET ${TARGET_NAME})
+            elseif (XCODE)
                 # Precompiling and using precompiled header file
                 set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${ABS_HEADER_PATHNAME})
                 unset (${TARGET_NAME}_HEADER_PATHNAME)
-            else ()
-                # The target has not been created yet, so set an internal variable to come back here again later
-                set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
-            endif ()
-        else ()
-            # GCC or Clang
-            if (TARGET ${TARGET_NAME})
+            else () # GCC or Clang
                 # Precompiling header file
                 get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
                 get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
                 get_target_property (TYPE ${TARGET_NAME} TYPE)
                 if (TYPE MATCHES SHARED)
                     list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
-                    if (LANG STREQUAL CXX)
-                        _test_compiler_hidden_visibility ()
-                    endif ()
                 endif ()
                 # Use PIC flags as necessary, except when compiling using MinGW which already uses PIC flags for all codes
                 if (NOT MINGW)
@@ -1240,6 +1224,16 @@ macro (enable_pch HEADER_PATHNAME)
                     if (PIC)
                         set (PIC_FLAGS -fPIC)
                     endif ()
+                endif ()
+                get_target_property (VISIBILITY_PRESET ${TARGET_NAME} ${LANG}_VISIBILITY_PRESET)
+                set (CVP -fvisibility=${VISIBILITY_PRESET})
+                get_target_property (VISIBILITY_INLINES_HIDDEN ${TARGET_NAME} VISIBILITY_INLINES_HIDDEN)
+                if (VISIBILITY_INLINES_HIDDEN)
+                    set (VID -fvisibility-inlines-hidden)
+                endif ()
+                if (LANG STREQUAL CXX)
+                    get_target_property (CXX_STANDARD ${TARGET_NAME} CXX_STANDARD)
+                    set (CXX_STANDARD -std=c++${CXX_STANDARD})
                 endif ()
                 string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
                 string (REPLACE "\"" "\\\"" COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
@@ -1253,7 +1247,7 @@ macro (enable_pch HEADER_PATHNAME)
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} -std=c++11 ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    file (WRITE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${PIC_FLAGS} ${CVP} ${VID} ${CXX_STANDARD} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
                     execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new ${ABS_PATH_PCH}.${CONFIG}.pch.rsp)
                     file (REMOVE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new)
                     if (NOT ${TARGET_NAME}_PCH_DEPS)
@@ -1282,10 +1276,7 @@ macro (enable_pch HEADER_PATHNAME)
                 # Using precompiled header file
                 set (CMAKE_${LANG}_FLAGS "${CMAKE_${LANG}_FLAGS} -include \"${ABS_PATH_PCH}\" -Winvalid-pch")   # Catch the invalid PCH sooner
                 unset (${TARGET_NAME}_HEADER_PATHNAME)
-            else ()
-                # The target has not been created yet, so set an internal variable to come back here again later
-                set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
-                # But proceed to add the dummy source file(s) to trigger the custom command output rule
+                # Add the dummy source file(s) to trigger the custom command output rule
                 if (CMAKE_CONFIGURATION_TYPES)
                     # Multi-config, trigger all rules and let the compiler to choose which precompiled header is suitable to use
                     foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
@@ -1295,8 +1286,11 @@ macro (enable_pch HEADER_PATHNAME)
                     # Single-config, just trigger the corresponding rule matching the current build configuration
                     set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
                 endif ()
-                list (APPEND SOURCE_FILES ${TRIGGERS})
+                target_sources (${TARGET_NAME} PRIVATE ${TRIGGERS})
             endif ()
+        else ()
+            # The target has not been created yet, so set an internal variable to come back here again later
+            set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
         endif ()
     endif ()
 endmacro ()

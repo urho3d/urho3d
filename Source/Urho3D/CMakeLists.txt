@@ -154,7 +154,7 @@ if (APPLE AND NOT ARM)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for macOS platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP)
 
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
@@ -260,18 +260,6 @@ if (URHO3D_LUA)
     source_group ("Source Files\\LuaScript\\Generated" FILES ${LUA_GEN_CPP_FILES})
 endif ()
 
-# Generate platform specific export header file
-if (MSVC)
-    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n\n#if _MSC_VER < 1900\n#define strtoll _strtoi64\n#define strtoull _strtoui64\n#endif\n\n")
-endif ()
-if (URHO3D_CLANG_TOOLS)
-    set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
-endif ()
-generate_export_header (${TARGET_NAME} ${URHO3D_LIB_TYPE} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new)
-execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
-file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
-source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
-
 # Aggregate all source files
 list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${LUA_GEN_CPP_FILES} librevision.h Urho3D.h ${SYMBOLIC_SOURCES})
 
@@ -308,8 +296,31 @@ endif ()
 if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
-
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
+
+# Generate platform specific export header file (can only be called after the target has been added)
+if (MSVC)
+    set (APPENDIX "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n\n#if _MSC_VER < 1900\n#define strtoll _strtoi64\n#define strtoull _strtoui64\n#endif\n")
+endif ()
+if (URHO3D_CLANG_TOOLS)
+    set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
+endif ()
+set (APPENDIX "${APPENDIX}\n#define NONSCRIPTABLE ${ANNOTATE_NONSCRIPTABLE}\n\n")
+foreach (DEFINE URHO3D_STATIC_DEFINE URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING CLANG_PRE_STANDARD)
+    if (${DEFINE})
+        set (APPENDIX "${APPENDIX}#define ${DEFINE}\n")
+    endif ()
+endforeach()
+generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new CUSTOM_CONTENT_FROM_VARIABLE APPENDIX)
+file (READ Precompiled.h COPYRIGHT LIMIT 1128)
+file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new EXPORT_HEADER)
+file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${COPYRIGHT}${EXPORT_HEADER})
+execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
+source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+
+# Precompile the header after the export header file has been generated
+enable_pch (Precompiled.h)
 
 if (NOT ANDROID AND NOT WEB)
     file (READ .soversion SOVERSION)
