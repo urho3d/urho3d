@@ -1218,6 +1218,10 @@ macro (enable_pch HEADER_PATHNAME)
                 if (TYPE MATCHES SHARED)
                     list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
                 endif ()
+                # Clang for Android platform requires additional target compiler flag
+                if (ANDROID)
+                    set (ARCH "--target=${ANDROID_LLVM_TRIPLE} --gcc-toolchain=${ANDROID_TOOLCHAIN_ROOT}")  # Stringify here to ensure they are not treated as list
+                endif ()
                 # Use PIC flags as necessary, except when compiling using MinGW which already uses PIC flags for all codes
                 if (NOT MINGW)
                     get_target_property (PIC ${TARGET_NAME} POSITION_INDEPENDENT_CODE)
@@ -1247,7 +1251,7 @@ macro (enable_pch HEADER_PATHNAME)
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${PIC_FLAGS} ${CVP} ${VID} ${CXX_STANDARD} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    file (WRITE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new "${ARCH} ${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${PIC_FLAGS} ${CVP} ${VID} ${CXX_STANDARD} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
                     execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new ${ABS_PATH_PCH}.${CONFIG}.pch.rsp)
                     file (REMOVE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new)
                     if (NOT ${TARGET_NAME}_PCH_DEPS)
