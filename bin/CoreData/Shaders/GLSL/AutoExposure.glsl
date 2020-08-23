@@ -19,7 +19,7 @@ uniform vec2 cLum4InvSize;
 float GatherAvgLum(sampler2D texSampler, vec2 texCoord, vec2 texelSize)
 {
     float lumAvg = 0.0;
-    lumAvg += texture2D(texSampler, texCoord + vec2(1.0, -1.0) * texelSize).r;
+    lumAvg += texture2D(texSampler, texCoord + vec2(-1.0, -1.0) * texelSize).r;
     lumAvg += texture2D(texSampler, texCoord + vec2(-1.0, 1.0) * texelSize).r;
     lumAvg += texture2D(texSampler, texCoord + vec2(1.0, 1.0) * texelSize).r;
     lumAvg += texture2D(texSampler, texCoord + vec2(1.0, -1.0) * texelSize).r;
