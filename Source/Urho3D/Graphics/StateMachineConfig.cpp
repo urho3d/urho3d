@@ -64,6 +64,11 @@ StateMachineConfig::StateMachineConfig(Context* context)
 :Resource(context)
 {}
 
+StateMachineConfig::StateMachineConfig(Context* context, const Urho3D::String &defaultState)
+:Resource(context)
+,defaultState_(defaultState)
+{}
+
 StateMachineConfig::~StateMachineConfig()
 {
     states_.Clear();

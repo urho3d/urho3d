@@ -114,6 +114,8 @@ class URHO3D_API StateMachineConfig : public Resource
 public:
     /// Construct.
     explicit StateMachineConfig(Context* context);
+    /// Construct with default state.
+    explicit StateMachineConfig(Context* context, const Urho3D::String &defaultState);
     /// Destruct.
     ~StateMachineConfig() override;
     /// Register object factory. Drawable must be registered first.
