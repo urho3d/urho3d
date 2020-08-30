@@ -1405,6 +1405,7 @@ From 1.7 to master:
 - Build system - the 'WIN32' build option for 'cmake_generic.sh' is renamed to 'MINGW' to be consistent with 'cmake_generic.bat'.
 - Build system - CMake version 3.10.2 is now minimum version required for building Urho3D library on any host systems, except when targeting Android where version 3.17.3 is required.
 - Build system - RPI_ABI build option values are simplified to 'RPI0', 'RPI1', 'RPI2', 'RPI3', and 'RPI4'. Added 64-bit build support on RPI 4.
+- Build system: Reconfigure Apple build to not using the 'no_weak_imports' linker flags. This means the new build artifacts may not run correctly on old macOS/iOS/tvOS.  It is up to the devs to handle the weak symbols during runtime in their own apps if they needs to be run on old systems.
 
 */
 
