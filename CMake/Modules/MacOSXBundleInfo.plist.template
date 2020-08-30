@@ -26,14 +26,16 @@
     <string>????</string>
     <key>CFBundleVersion</key>
     <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
     <key>CSResourcesFileMapped</key>
-    <true/>
-    <key>LSRequiresCarbon</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
     <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+    <key>NSHighResolutionCapable</key>
+    <string>True</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+    <key>LSRequiresCarbon</key>
+    <true/>
     <key>LSEnvironment</key>
     <dict>
         <key>URHO3D_PREFIX_PATH</key>

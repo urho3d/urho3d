@@ -28,14 +28,16 @@
     <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
     <key>CSResourcesFileMapped</key>
     <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+    <key>NSHighResolutionCapable</key>
+    <string>True</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>UIRequiredDeviceCapabilities</key>
     <array>
         <string>arm64</string>
     </array>
-    <key>NSHumanReadableCopyright</key>
-    <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
     <key>CFBundleIconFiles</key>
     <array>
         <string>${MACOSX_BUNDLE_ICON_FILE}</string>
