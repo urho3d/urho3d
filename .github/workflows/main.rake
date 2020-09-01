@@ -20,6 +20,9 @@
 # THE SOFTWARE.
 #
 
+desc 'Continuous integration'
 task :ci do
-  puts "CI on #{ENV['HOST']} targeting #{ENV['PLATFORM']} platform"
+  Rake::Task['build'].invoke
 end
+
+# vi: set ts=2 sw=2 expandtab:

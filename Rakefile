@@ -20,6 +20,18 @@
 # THE SOFTWARE.
 #
 
+task default: 'build'
+
+desc 'Invoke CMake to configure and generate a build tree'
+task :cmake do
+  puts "TODO: cmake"
+end
+
+desc 'Build the software'
+task build: [:cmake] do
+  puts "TODO: build"
+end
+
 # Load custom rake scripts
 Dir['.github/workflows/*.rake'].each { |r| load r }
 Dir['.rake/*.rake'].each { |r| load r }
