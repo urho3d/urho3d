@@ -30,7 +30,7 @@ on:
     branches: ['*']
 jobs:
   linux:
-    name: Linux-host
+    name: Linux
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -38,45 +38,70 @@ jobs:
         platform:
           - native
           - mingw
-          - android
           - rpi
           - arm
-          - web
+        lib-type:
+          - STATIC
+          - SHARED
+        architecture:
+          - 32-bit
+          - 64-bit
+        include:
+          - {platform: android, lib-type: STATIC}
+          - {platform: android, lib-type: SHARED}
+          - {platform: web, lib-type: STATIC, architecture: wasm}
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
+      LIB_TYPE: ${{ matrix.lib-type }}
+      ARCH: ${{ matrix.architecure }}
     steps:
       - uses: actions/checkout@v2        
       - name: CI
         run: rake ci
   macOS:
-    name: macOS-host
+    name: macOS
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         platform:
-          - native
-          - iOS
-          - tvOS
+          - native-xcode
+          - natvie-make
+        lib-type:
+          - STATIC
+          - SHARED
+        include:
+          - {platform: iOS, lib-type: STATIC}
+          - {platform: tvOS, lib-type: STATIC}
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
+      LIB_TYPE: ${{ matrix.lib-type }}
     steps:
       - uses: actions/checkout@v2        
       - name: CI
         run: rake ci
   windows:
-    name: Windows-host
+    name: Win
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         platform:
-          - native
+          - native-vs
+          - native-gcc
+        lib-type:
+          - STATIC
+          - SHARED
+        architecture:
+          - 32-bit
+          - 64-bit
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
+      LIB_TYPE: ${{ matrix.lib-type }}
+      ARCH: ${{ matrix.architecure }}
     steps:
       - uses: actions/checkout@v2        
       - name: CI
