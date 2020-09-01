@@ -20,8 +20,65 @@
 # THE SOFTWARE.
 #
 
-# Load custom rake scripts
-Dir['.github/workflows/*.rake'].each { |r| load r }
-Dir['.rake/*.rake'].each { |r| load r }
+---
+
+name: CI/CD
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ['*']
+jobs:
+  host1:
+    name: Linux-host
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - native
+          - mingw
+          - android
+          - rpi
+          - arm
+          - web
+    env:
+      PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2        
+      - name: CI
+        run: rake ci
+  host2:
+    name: macOS-host
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - native
+          - iOS
+          - tvOS
+    env:
+      PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2        
+      - name: CI
+        run: rake ci
+  host3:
+    name: Windows-host
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - native
+    env:
+      PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2        
+      - name: CI
+        run: rake ci
+
+...
 
 # vi: set ts=2 sw=2 expandtab:

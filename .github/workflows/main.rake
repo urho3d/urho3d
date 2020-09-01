@@ -20,8 +20,6 @@
 # THE SOFTWARE.
 #
 
-# Load custom rake scripts
-Dir['.github/workflows/*.rake'].each { |r| load r }
-Dir['.rake/*.rake'].each { |r| load r }
-
-# vi: set ts=2 sw=2 expandtab:
+task :ci do
+  puts "Hello CI!"
+end
