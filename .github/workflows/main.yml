@@ -29,7 +29,7 @@ on:
   pull_request:
     branches: ['*']
 jobs:
-  host1:
+  linux:
     name: Linux-host
     runs-on: ubuntu-latest
     strategy:
@@ -43,12 +43,13 @@ jobs:
           - arm
           - web
     env:
+      HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2        
       - name: CI
         run: rake ci
-  host2:
+  macOS:
     name: macOS-host
     runs-on: macos-latest
     strategy:
@@ -59,12 +60,13 @@ jobs:
           - iOS
           - tvOS
     env:
+      HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2        
       - name: CI
         run: rake ci
-  host3:
+  windows:
     name: Windows-host
     runs-on: windows-latest
     strategy:
@@ -73,6 +75,7 @@ jobs:
         platform:
           - native
     env:
+      HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2        

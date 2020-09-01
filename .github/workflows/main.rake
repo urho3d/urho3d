@@ -21,5 +21,5 @@
 #
 
 task :ci do
-  puts "Hello CI!"
+  puts "CI on #{ENV['HOST']} targeting #{ENV['PLATFORM']} platform"
 end
