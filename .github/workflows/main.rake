@@ -22,7 +22,14 @@
 
 desc 'Continuous integration'
 task :ci do
-  Rake::Task['build'].invoke
+  ENV['CI'] = '1'
+  platform_modifier = /(.*)-(.+)/.match(ENV['PLATFORM'])
+  if platform_modifier
+    ENV['PLATFORM'] = platform_modifier[1]
+    ENV['MODIFIER'] = platform_modifier[2]
+  end
+  # Show CMake version
+  system 'cmake --version' or abort 'Failed to find CMake'
 end
 
 # vi: set ts=2 sw=2 expandtab:

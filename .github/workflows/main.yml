@@ -45,8 +45,8 @@ jobs:
           - STATIC
           - SHARED
         architecture:
-          - 32-bit
-          - 64-bit
+          - 32bit
+          - 64bit
         include:
           - {platform: android, lib-type: STATIC}
           - {platform: android, lib-type: SHARED}
@@ -56,10 +56,11 @@ jobs:
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
       ARCH: ${{ matrix.architecure }}
+      DBE_TAG: latest
     steps:
       - uses: actions/checkout@v2        
-      - name: CI
-        run: rake ci
+      - name: Build
+        run: rake ci build
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -81,8 +82,8 @@ jobs:
       LIB_TYPE: ${{ matrix.lib-type }}
     steps:
       - uses: actions/checkout@v2        
-      - name: CI
-        run: rake ci
+      - name: Build
+        run: rake ci build
   windows:
     name: 🪟
     runs-on: windows-latest
@@ -90,14 +91,14 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - native-vs
+          - native-msvc
           - native-gcc
         lib-type:
           - STATIC
           - SHARED
         architecture:
-          - 32-bit
-          - 64-bit
+          - 32bit
+          - 64bit
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -105,8 +106,8 @@ jobs:
       ARCH: ${{ matrix.architecure }}
     steps:
       - uses: actions/checkout@v2        
-      - name: CI
-        run: rake ci
+      - name: Build
+        run: rake ci build
 
 ...
 

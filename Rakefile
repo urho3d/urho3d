@@ -25,12 +25,11 @@ task default: 'build'
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake do
   puts "TODO: cmake"
-  system "cmake --version" or abort 'CMake is not installed'
 end
 
 desc 'Build the software'
 task build: [:cmake] do
-  puts "TODO: build"
+  puts "TODO: build #{ENV['CI']} #{ENV['PLATFORM']} #{ENV['MODIFIER']}"
 end
 
 # Load custom rake scripts
