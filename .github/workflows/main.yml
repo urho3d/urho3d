@@ -30,13 +30,14 @@ on:
     branches: ['*']
 jobs:
   linux:
-    name: Linux
+    name: 🐧
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         platform:
-          - native
+          - native-gcc
+          - native-clang
           - mingw
           - rpi
           - arm
@@ -60,7 +61,7 @@ jobs:
       - name: CI
         run: rake ci
   macOS:
-    name: macOS
+    name: 🍏
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -83,7 +84,7 @@ jobs:
       - name: CI
         run: rake ci
   windows:
-    name: Win
+    name: 🪟
     runs-on: windows-latest
     strategy:
       fail-fast: false
