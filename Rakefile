@@ -24,6 +24,10 @@ task default: 'build'
 
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake do
+  if ENV['CI']
+    # Show CMake version
+    system 'cmake --version' or abort 'Failed to find CMake'
+  end
   puts "TODO: cmake"
 end
 

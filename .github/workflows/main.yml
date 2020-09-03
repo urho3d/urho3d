@@ -50,7 +50,7 @@ jobs:
         include:
           - {platform: android, lib-type: STATIC}
           - {platform: android, lib-type: SHARED}
-          - {platform: web, lib-type: STATIC, architecture: wasm}
+          - {platform: web, lib-type: STATIC}
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -58,7 +58,12 @@ jobs:
       ARCH: ${{ matrix.architecure }}
       DBE_TAG: latest
     steps:
-      - uses: actions/checkout@v2        
+      - name: Unshallow
+        run: echo '::set-env name=FETCH_DEPTH::0'
+        if: startsWith(github.ref, 'refs/tags/')
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
         run: rake ci build
   macOS:
@@ -81,7 +86,12 @@ jobs:
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
     steps:
-      - uses: actions/checkout@v2        
+      - name: Unshallow
+        run: echo '::set-env name=FETCH_DEPTH::0'
+        if: startsWith(github.ref, 'refs/tags/')
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
         run: rake ci build
   windows:
@@ -105,7 +115,12 @@ jobs:
       LIB_TYPE: ${{ matrix.lib-type }}
       ARCH: ${{ matrix.architecure }}
     steps:
-      - uses: actions/checkout@v2        
+      - name: Unshallow
+        run: echo '::set-env name=FETCH_DEPTH::0'
+        if: startsWith(github.ref, 'refs/tags/')
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
         run: rake ci build
 
