@@ -85,7 +85,7 @@ jobs:
       - name: Build
         run: rake ci build
   windows:
-    name: 🪟
+    name: 🔲
     runs-on: windows-latest
     strategy:
       fail-fast: false
