@@ -25,7 +25,7 @@ import org.gradle.plugin.use.PluginDependencySpec
 import java.io.File
 
 const val ndkSideBySideVersion = "21.3.6528147"
-const val cmakeVersion = "3.17.3"
+const val cmakeVersion = "3.17.3+"
 
 /**
  * Apply Urho3D custom plugin for the given platform.

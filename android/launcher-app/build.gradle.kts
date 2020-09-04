@@ -100,8 +100,8 @@ dependencies {
     implementation(project(":android:urho3d-lib"))
     implementation(kotlin("stdlib-jdk8", embeddedKotlinVersion))
     testImplementation("junit:junit:4.13")
-    androidTestImplementation("androidx.test:runner:1.2.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 
 // Ensure IDE "gradle sync" evaluate the urho3d-lib module first
