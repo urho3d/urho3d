@@ -55,7 +55,7 @@ jobs:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
-      ARCH: ${{ matrix.architecure }}
+      ARCH: ${{ matrix.architecture }}
       DBE_TAG: latest
     steps:
       - name: Unshallow
@@ -65,7 +65,7 @@ jobs:
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
-        run: rake ci build
+        run: script/dockerized.sh ${PLATFORM/-*} rake ci build
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -74,7 +74,7 @@ jobs:
       matrix:
         platform:
           - native-xcode
-          - natvie-make
+          - native-make
         lib-type:
           - STATIC
           - SHARED
@@ -113,7 +113,7 @@ jobs:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
-      ARCH: ${{ matrix.architecure }}
+      ARCH: ${{ matrix.architecture }}
     steps:
       - name: Unshallow
         run: echo '::set-env name=FETCH_DEPTH::0'

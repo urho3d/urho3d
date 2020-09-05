@@ -25,10 +25,31 @@ task default: 'build'
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake do
   if ENV['CI']
-    # Show CMake version
     system 'cmake --version' or abort 'Failed to find CMake'
+    puts
   end
-  puts "TODO: cmake"
+  ENV['PLATFORM'] = 'native' unless ENV['PLATFORM']
+  build_tree = ENV["#{ENV['PLATFORM']}_BUILD_TREE"] || ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM']}"
+  next if Dir.exist?("'#{build_tree}'")
+  unless ENV['GENERATOR']
+    case ENV['HOST'] || RUBY_PLATFORM
+    when /linux/
+      ENV['GENERATOR'] = 'generic'
+    when /darwin|macOS/
+      ENV['GENERATOR'] = 'xcode'
+    when /win32|mingw|mswin|windows/
+      ENV['GENERATOR'] = 'vs'
+    else
+      abort "Unsupported host system: #{ENV['HOST'] || RUBY_PLATFORM}"
+    end
+  end
+  script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
+  build_options = ENV['PLATFORM'] == 'native' ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
+  File.readlines('script/.build-options').each { |var|
+    var.chomp!
+    build_options = "#{build_options} -D #{var}=#{ENV[var]}" if ENV[var]
+  }
+  system "#{script} '#{build_tree}' #{build_options}" or abort
 end
 
 desc 'Build the software'

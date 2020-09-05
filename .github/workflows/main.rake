@@ -20,14 +20,30 @@
 # THE SOFTWARE.
 #
 
-desc 'Continuous integration'
+desc 'Prepare environment for CI'
 task :ci do
   ENV['CI'] = '1'
+  ENV['BUILD_TREE'] = 'build/ci'
   platform_modifier = /(.*)-(.+)/.match(ENV['PLATFORM'])
   if platform_modifier
     ENV['PLATFORM'] = platform_modifier[1]
     ENV['MODIFIER'] = platform_modifier[2]
   end
+  case ENV['HOST']
+  when 'macOS'
+    ENV['GENERATOR'] = 'generic' if ENV['MODIFIER'] == 'make'
+  when 'windows'
+    ENV['GENERATOR'] = 'mingw' if ENV['MODIFIER'] == 'gcc'
+  else
+    if ENV['MODIFIER'] == 'clang'
+      ENV['CC'] = 'clang'
+      ENV['CXX'] = 'clang++'
+    end
+  end
+  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32bit' ? '0' : '1'
+  ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE']
+  # Enable all the bells and whistles
+  %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
 end
 
 # vi: set ts=2 sw=2 expandtab:

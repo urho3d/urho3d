@@ -57,16 +57,15 @@ d () {
     fi
 }
 
-if [[ $TRAVIS ]]; then
-  # Workaround Travis-CI intermittent network I/O error
-  while (! d pull "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG"); do sleep 10; done;
-elif [[ $DBE_REFRESH == 1 ]]; then
+if [[ $DBE_REFRESH == 1 ]]; then
   d pull "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG"
 fi
-
+if [[ ! $GITHUB_ACTIONS ]]; then
+  interactive=-i
+fi
 if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( BASH_REMATCH[1] * 100 + BASH_REMATCH[2] >= 1809 )) ); then
     # podman or newer Docker client
-    d run -it --rm -h fishtank $run_option \
+    d run $interactive -t --rm -h fishtank $run_option \
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
         --env-file "$PROJECT_DIR/script/.env-file" \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
@@ -74,7 +73,7 @@ if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\
         "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 else
     # Fallback workaround on older Docker CLI version
-    d run -it --rm -h fishtank \
+    d run $interactive -t --rm -h fishtank \
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
         --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$PROJECT_DIR/script/.env-file") \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
