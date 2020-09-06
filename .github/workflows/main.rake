@@ -39,7 +39,7 @@ task :ci do
     end
   end
   ENV['BUILD_TREE'] = 'build/ci'
-  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32bit' ? '0' : '1'
+  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32bit' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE']
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
