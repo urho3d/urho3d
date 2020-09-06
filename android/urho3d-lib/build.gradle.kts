@@ -44,37 +44,23 @@ android {
         externalNativeBuild {
             cmake {
                 arguments.apply {
-                    System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
-                    add("-DGRADLE_BUILD_DIR=$buildDir")
-                    // Pass along matching Gradle properties as CMake build options
-                    addAll(
-                        listOf(
-                            "URHO3D_LIB_TYPE",
-                            "URHO3D_ANGELSCRIPT",
-                            "URHO3D_LUA",
-                            "URHO3D_LUAJIT",
-                            "URHO3D_LUAJIT_AMALG",
-                            "URHO3D_IK",
-                            "URHO3D_NETWORK",
-                            "URHO3D_PHYSICS",
-                            "URHO3D_NAVIGATION",
-                            "URHO3D_URHO2D",
-                            "URHO3D_PCH",
-                            "URHO3D_DATABASE_SQLITE",
-                            "URHO3D_WEBP",
-                            "URHO3D_FILEWATCHER",
-                            "URHO3D_PROFILING",
-                            "URHO3D_LOGGING",
-                            "URHO3D_THREADING"
-                        )
-                            .filter { project.hasProperty(it) }
-                            .map { "-D$it=${project.property(it)}" }
-                    )
+                    System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
+                    add("-D GRADLE_BUILD_DIR=$buildDir")
                     // In order to get clean module segregation, always exclude player/samples from AAR
-                    addAll(listOf(
-                        "URHO3D_PLAYER",
-                        "URHO3D_SAMPLES"
-                    ).map { "-D$it=0" })
+                    val excludes = listOf("URHO3D_PLAYER", "URHO3D_SAMPLES")
+                    addAll(excludes.map { "-D $it=0" })
+                    // Pass along matching Gradle properties (higher precedence) or env-vars as CMake build options
+                    val vars = project.file("../../script/.build-options")
+                        .readLines()
+                        .filterNot { excludes.contains(it) }
+                    addAll(vars
+                        .filter { project.hasProperty(it) }
+                        .map { "-D $it=${project.property(it)}" }
+                    )
+                    addAll(vars
+                        .filterNot { project.hasProperty(it) }
+                        .map { variable -> System.getenv(variable)?.let { "-D $variable=$it" } ?: "" }
+                    )
                 }
                 targets.add("Urho3D")
             }

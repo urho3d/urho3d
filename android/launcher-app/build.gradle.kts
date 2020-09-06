@@ -42,26 +42,20 @@ android {
         externalNativeBuild {
             cmake {
                 arguments.apply {
-                    System.getenv("ANDROID_CCACHE")?.let { add("-DANDROID_CCACHE=$it") }
-                    add("-DGRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
-                    addAll(
-                        listOf(
-                            "URHO3D_LIB_TYPE",
-                            // TODO: "URHO3D_PACKAGING",
-                            "URHO3D_ANGELSCRIPT",
-                            "URHO3D_LUA"
-                        )
-                            .filter { project.hasProperty(it) }
-                            .map { "-D$it=${project.property(it)}" }
-                    )
+                    System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
+                    add("-D GRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
                     // In order to get clean module segregation, only build player/samples here
-                    // unless it is explicitly excluded
-                    addAll(
-                        listOf(
-                            "URHO3D_PLAYER",
-                            "URHO3D_SAMPLES"
-                        )
-                            .map { "-D$it=${project.findProperty(it) ?: "1"}" }
+                    val includes = listOf("URHO3D_PLAYER", "URHO3D_SAMPLES")
+                    addAll(includes.map { "-D $it=1" })
+                    // Pass along matching Gradle properties (higher precedence) or env-vars as CMake build options
+                    val vars = project.file("../../script/.build-options").readLines()
+                    addAll(vars
+                        .filter { project.hasProperty(it) }
+                        .map { "-D $it=${project.property(it)}" }
+                    )
+                    addAll(vars
+                        .filterNot { project.hasProperty(it) }
+                        .map { variable -> System.getenv(variable)?.let { "-D $variable=$it" } ?: "" }
                     )
                 }
             }
