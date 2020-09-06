@@ -22,8 +22,6 @@
 
 desc 'Prepare environment for CI'
 task :ci do
-  ENV['CI'] = '1'
-  ENV['BUILD_TREE'] = 'build/ci'
   platform_modifier = /(.*)-(.+)/.match(ENV['PLATFORM'])
   if platform_modifier
     ENV['PLATFORM'] = platform_modifier[1]
@@ -40,6 +38,7 @@ task :ci do
       ENV['CXX'] = 'clang++'
     end
   end
+  ENV['BUILD_TREE'] = 'build/ci'
   ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32bit' ? '0' : '1'
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE']
   # Enable all the bells and whistles

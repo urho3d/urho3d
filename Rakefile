@@ -22,12 +22,18 @@
 
 task default: 'build'
 
+desc 'Invoke the specified Gradle task via wrapper'
+task :gradle, [:task] do |_, args|
+  system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
+end
+
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
     puts
   end
+  next if ENV['PLATFORM'] == 'android' # Let Android plugin to invoke CMake internally
   ENV['PLATFORM'] = 'native' unless ENV['PLATFORM']
   build_tree = ENV["#{ENV['PLATFORM']}_BUILD_TREE"] || ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM']}"
   next if Dir.exist?("'#{build_tree}'")
@@ -50,10 +56,15 @@ task :cmake do
     build_options = "#{build_options} -D #{var}=#{ENV[var]}" if ENV[var]
   }
   system "#{script} '#{build_tree}' #{build_options}" or abort
+  puts
 end
 
 desc 'Build the software'
 task build: [:cmake] do
+  if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('build') # Delegate to Gradle
+    next
+  end
   puts "TODO: build #{ENV['CI']} #{ENV['PLATFORM']} #{ENV['MODIFIER']}"
 end
 
