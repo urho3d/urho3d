@@ -65,7 +65,12 @@ jobs:
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci build
+        run: |
+          if [[ '$PLATFORM' == 'android' ]]; then
+            # Clean up to get some more disk space
+            sudo rm -rf microsoft mssql-toos cni hostedtoolcache /usr/local/share/boost /usr/share/dotnet /usr/local/lib/android /opt/ghc "$AGENT_TOOLSDIRECTORY"
+          fi
+          script/dockerized.sh ${PLATFORM/-*} rake ci build
   macOS:
     name: 🍏
     runs-on: macos-latest
