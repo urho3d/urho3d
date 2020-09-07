@@ -61,16 +61,16 @@ jobs:
       - name: Unshallow
         run: echo '::set-env name=FETCH_DEPTH::0'
         if: startsWith(github.ref, 'refs/tags/')
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
+      - name: Setup
+        # Clean up to get some more disk space
+        run: sudo rm -rf microsoft mssql-toos cni hostedtoolcache /usr/local/share/boost /usr/share/dotnet /usr/local/lib/android /opt/ghc "$AGENT_TOOLSDIRECTORY"
+        if: matrix.platform == 'android'
       - name: Build
-        run: |
-          if [[ '$PLATFORM' == 'android' ]]; then
-            # Clean up to get some more disk space
-            sudo rm -rf microsoft mssql-toos cni hostedtoolcache /usr/local/share/boost /usr/share/dotnet /usr/local/lib/android /opt/ghc "$AGENT_TOOLSDIRECTORY"
-          fi
-          script/dockerized.sh ${PLATFORM/-*} rake ci build
+        run: script/dockerized.sh ${PLATFORM/-*} rake ci build
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -94,7 +94,8 @@ jobs:
       - name: Unshallow
         run: echo '::set-env name=FETCH_DEPTH::0'
         if: startsWith(github.ref, 'refs/tags/')
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
@@ -123,9 +124,17 @@ jobs:
       - name: Unshallow
         run: echo '::set-env name=FETCH_DEPTH::0'
         if: startsWith(github.ref, 'refs/tags/')
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
+      - name: Setup
+        run: |
+          if ($env:PLATFORM -match "msvc") {
+            & "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars$($env:ARCH.substring(0, 2)).bat"
+          } else {
+            & "should error here"
+          }
       - name: Build
         run: rake ci build
 
