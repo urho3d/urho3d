@@ -22,23 +22,14 @@
 
 task default: 'build'
 
-desc 'Invoke the specified Gradle task via wrapper'
-task :gradle, [:task] do |_, args|
-  system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
-end
-
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
     puts
   end
-  next if ENV['PLATFORM'] == 'android' # Let Android plugin to invoke CMake internally
-  ENV['PLATFORM'] = 'native' unless ENV['PLATFORM']
-  build_tree = ENV["#{ENV['PLATFORM']}_BUILD_TREE"] || ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM']}"
-  next if Dir.exist?("'#{build_tree}'")
   unless ENV['GENERATOR']
-    case ENV['HOST'] || RUBY_PLATFORM
+    case build_host
     when /linux/
       ENV['GENERATOR'] = 'generic'
     when /darwin|macOS/
@@ -46,9 +37,10 @@ task :cmake do
     when /win32|mingw|mswin|windows/
       ENV['GENERATOR'] = 'vs'
     else
-      abort "Unsupported host system: #{ENV['HOST'] || RUBY_PLATFORM}"
+      abort "Unsupported host system: #{build_host}"
     end
   end
+  next if ENV['PLATFORM'] == 'android' || Dir.exist?("#{build_tree}")
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = ENV['PLATFORM'] == 'native' ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
@@ -59,14 +51,66 @@ task :cmake do
   puts
 end
 
+desc 'Clean the build tree'
+task :clean do
+  if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('clean')
+    next
+  end
+  system %Q{cmake --build "#{build_tree}" --target clean} or abort
+end
+
 desc 'Build the software'
 task build: [:cmake] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('build') # Delegate to Gradle
+    Rake::Task['gradle'].invoke('build')
     next
   end
-  puts "TODO: build #{ENV['CI']} #{ENV['PLATFORM']} #{ENV['MODIFIER']}"
+  config = /xcode|vs/ =~ ENV['GENERATOR'] ? "--config #{ENV.fetch('CONFIG', 'Release')}" : ''
+  target = ENV['TARGET'] ? "--target #{ENV['TARGET']}" : ''
+  case ENV['GENERATOR']
+  when 'xcode'
+    concurrent = '' # Assume xcodebuild will do the right things without the '-jobs'
+  when 'vs'
+    concurrent = '/maxCpuCount'
+  else
+    case build_host
+    when /linux/
+      $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
+    when /darwin|macOS/
+      $max_jobs = `sysctl -n hw.logicalcpu`.chomp
+    when /win32|mingw|mswin|windows/
+      require 'win32ole'
+      WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
+        $max_jobs = it.NumberOfLogicalProcessors
+      }
+    else
+      $max_jobs = 1
+    end
+    concurrent = "-j#{$max_jobs}"
+  end
+  system %Q{cmake --build "#{build_tree}" #{config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']}} or abort
 end
+
+
+### Internal tasks ###
+
+task :gradle, [:task] do |_, args|
+  system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
+end
+
+
+### Internal methods ###
+
+def build_host
+  ENV['HOST'] || RUBY_PLATFORM
+end
+
+def build_tree
+  ENV['PLATFORM'] = 'native' unless ENV['PLATFORM']
+  ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM']}"
+end
+
 
 # Load custom rake scripts
 Dir['.github/workflows/*.rake'].each { |r| load r }

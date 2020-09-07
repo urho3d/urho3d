@@ -29,7 +29,9 @@ task :ci do
   end
   case ENV['HOST']
   when 'macOS'
-    ENV['GENERATOR'] = 'generic' if ENV['MODIFIER'] == 'make'
+    ENV['GENERATOR'] = ENV['URHO3D_DEPLOYMENT_TARGET'] = 'generic' if ENV['MODIFIER'] == 'make'
+    ENV['BUILD_PARAMS'] = '-sdk iphonesimulator' if ENV['PLATFORM'] == 'iOS'
+    ENV['BUILD_PARAMS'] = '-sdk appletvsimulator' if ENV['PLATFORM'] == 'tvOS'
   when 'windows'
     ENV['GENERATOR'] = 'mingw' if ENV['MODIFIER'] == 'gcc'
   else
