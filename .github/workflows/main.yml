@@ -45,8 +45,8 @@ jobs:
           - STATIC
           - SHARED
         architecture:
-          - 32bit
           - 64bit
+          - 32bit
         include:
           - {platform: android, lib-type: STATIC}
           - {platform: android, lib-type: SHARED}
@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
-      - name: Setup
+      - name: Prepare
         # Clean up to get some more disk space
         run: sudo rm -rf microsoft mssql-toos cni hostedtoolcache /usr/local/share/boost /usr/share/dotnet /usr/local/lib/android /opt/ghc "$AGENT_TOOLSDIRECTORY"
         if: matrix.platform == 'android'
@@ -113,8 +113,8 @@ jobs:
           - STATIC
           - SHARED
         architecture:
-          - 32bit
           - 64bit
+          - 32bit
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -128,12 +128,24 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
-      - name: Setup
+      - name: Prepare
         run: |
           if ($env:PLATFORM -match "msvc") {
             & "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars$($env:ARCH.substring(0, 2)).bat"
           } else {
-            & "should error here"
+            if ($env:ARCH -match "64") {
+              $url = "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z"
+            } else {
+              $url = "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z"
+            }
+            $dir = "c:\tools\mingw$($env:ARCH.substring(0, 2))"
+            if (!(test-path $dir)) {
+              "Installing MinGW compiler toolchain to $dir"
+              curl -fsSLo mingw.7z "$url"
+              7z x -y -o"C:\tools" mingw.7z >$nul
+              remove-item -path mingw.7z
+            }
+            "::add-path::$dir\bin"
           }
       - name: Build
         run: rake ci build
