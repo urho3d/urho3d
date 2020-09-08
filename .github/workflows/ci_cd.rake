@@ -42,6 +42,16 @@ task :ci do
   end
   ENV['BUILD_TREE'] = 'build/ci'
   ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32bit' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
+  case ENV['GRAPHICS_API']
+  when 'DX11'
+    ENV['URHO3D_D3D11'] = '1'
+  when 'DX9'
+    ENV['URHO3D_OPENGL'] = '0'
+  when 'OGL'
+    ENV['URHO3D_OPENGL'] = '1'
+  else
+    # Do nothing
+  end
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE']
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
