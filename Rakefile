@@ -40,7 +40,7 @@ task :cmake do
       abort "Unsupported host system: #{build_host}"
     end
   end
-  next if ENV['PLATFORM'] == 'android' || Dir.exist?("#{build_tree}")
+  next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{build_tree}") and not ARGV.include?('cmake'))
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
