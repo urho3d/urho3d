@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - native-gcc
-          - native-clang
+          - linux-gcc
+          - linux-clang
           - mingw
           - rpi
           - arm
@@ -77,8 +77,8 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - native-xcode
-          # native-make
+          - macOS-xcode
+          # macOS-make
         lib-type:
           - STATIC
           - SHARED
@@ -106,15 +106,15 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - native-msvc
-          - native-gcc
+          - win-msvc
+          - win-gcc
         lib-type:
           - STATIC
           - SHARED
         graphics-api:
           - DX11
           - DX9
-          - OGL
+          - OpenGL
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}

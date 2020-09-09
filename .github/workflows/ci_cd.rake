@@ -46,8 +46,8 @@ task :ci do
   when 'DX11'
     ENV['URHO3D_D3D11'] = '1'
   when 'DX9'
-    ENV['URHO3D_OPENGL'] = '0'
-  when 'OGL'
+    ENV['URHO3D_OPENGL'] = '0'  # Need to make this explicit because 'MINGW' default to use OpenGL otherwise
+  when 'OpenGL'
     ENV['URHO3D_OPENGL'] = '1'
   else
     # Do nothing

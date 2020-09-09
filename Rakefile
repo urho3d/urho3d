@@ -42,7 +42,7 @@ task :cmake do
   end
   next if ENV['PLATFORM'] == 'android' || Dir.exist?("#{build_tree}")
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
-  build_options = ENV['PLATFORM'] == 'native' ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
+  build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
     var.chomp!
     build_options = "#{build_options} -D #{var}=#{ENV[var]}" if ENV[var]
@@ -85,7 +85,7 @@ task build: [:cmake] do
         $max_jobs = it.NumberOfLogicalProcessors
       }
     else
-      $max_jobs = 1
+      abort "Unsupported host system: #{build_host}"
     end
     concurrent = "-j#{$max_jobs}"
   end
@@ -107,8 +107,19 @@ def build_host
 end
 
 def build_tree
-  ENV['PLATFORM'] = 'native' unless ENV['PLATFORM']
-  ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM']}"
+  unless ENV['PLATFORM']
+    case build_host
+    when /linux/
+      ENV['PLATFORM'] = 'linux'
+    when /darwin|macOS/
+      ENV['PLATFORM'] = 'macOS'
+    when /win32|mingw|mswin|windows/
+      ENV['PLATFORM'] = 'win'
+    else
+      abort "Unsupported host system: #{build_host}"
+    end
+  end
+  ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM'].downcase}"
 end
 
 
