@@ -79,10 +79,10 @@ jobs:
             build/cache/.gradle/caches
             build/cache/.gradle/wrapper
           key: |
-            test2-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}-${{ steps.source_checksum.outputs.hexdigest }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}-${{ steps.source_checksum.outputs.hexdigest }}
           restore-keys: |
-            test2-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}
-            test2-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
       - name: Build
         run: |
           docker volume create $(id -u).urho3d_home_dir >/dev/null

@@ -33,8 +33,12 @@ task :ci do
     ENV['BUILD_PARAMS'] = '-sdk iphonesimulator' if ENV['PLATFORM'] == 'iOS'
     ENV['BUILD_PARAMS'] = '-sdk appletvsimulator' if ENV['PLATFORM'] == 'tvOS'
   when 'windows'
-    ENV['GENERATOR'] = 'mingw' if ENV['MODIFIER'] == 'gcc'
+    if ENV['MODIFIER'] == 'gcc'
+      ENV['URHO3D_DEPLOYMENT_TARGET'] = 'generic'
+      ENV['GENERATOR'] = 'mingw'
+    end
   else
+    ENV['URHO3D_DEPLOYMENT_TARGET'] = 'generic' if /linux|mingw/ =~ ENV['PLATFORM']
     if ENV['MODIFIER'] == 'clang'
       ENV['CC'] = 'clang'
       ENV['CXX'] = 'clang++'
