@@ -57,4 +57,15 @@ task :ci do
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
 end
 
+desc 'Generate the SHA256 digest based on all the C/C++ source files'
+task :source_checksum do
+  require 'digest'
+  sha256_final = Digest::SHA256.new
+  sha256_iter = Digest::SHA256
+  Dir['Source/**/*.{c,h}*'].each { |it|
+    sha256_final << sha256_iter.file(it).hexdigest
+  }
+  puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
+end
+
 # vi: set ts=2 sw=2 expandtab:

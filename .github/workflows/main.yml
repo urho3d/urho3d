@@ -25,9 +25,9 @@
 name: CI/CD
 on:
   push:
-    branches: ['*']
+    branches: [ '*' ]
   pull_request:
-    branches: ['*']
+    branches: [ '*' ]
 jobs:
   linux:
     name: 🐧
@@ -48,9 +48,9 @@ jobs:
           - 64bit
           - 32bit
         include:
-          - {platform: android, lib-type: STATIC}
-          - {platform: android, lib-type: SHARED}
-          - {platform: web, lib-type: STATIC}
+          - { platform: android, lib-type: STATIC }
+          - { platform: android, lib-type: SHARED }
+          - { platform: web, lib-type: STATIC }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -68,6 +68,9 @@ jobs:
       - name: Free up space
         run: sudo rm -rf microsoft mssql-toos cni hostedtoolcache /usr/local/share/boost /usr/share/dotnet /usr/local/lib/android /opt/ghc "$AGENT_TOOLSDIRECTORY"
         if: matrix.platform == 'android'
+      - name: Source checksum
+        id: source_checksum
+        run: rake source_checksum
       - name: Cache
         uses: actions/cache@v2
         with:
@@ -75,8 +78,11 @@ jobs:
             build/cache/.ccache
             build/cache/.gradle/caches
             build/cache/.gradle/wrapper
-          key: ${{ env.DBE_TAG }}-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ github.sha }}
-          restore-keys: ${{ env.DBE_TAG }}-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
+          key: |
+            test2-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}-${{ steps.source_checksum.outputs.hexdigest }}
+          restore-keys: |
+            test2-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}
+            test2-${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
       - name: Build
         run: |
           docker volume create $(id -u).urho3d_home_dir >/dev/null
@@ -97,8 +103,8 @@ jobs:
           - STATIC
           - SHARED
         include:
-          - {platform: iOS, lib-type: STATIC}
-          - {platform: tvOS, lib-type: STATIC}
+          - { platform: iOS, lib-type: STATIC }
+          - { platform: tvOS, lib-type: STATIC }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}

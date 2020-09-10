@@ -65,6 +65,8 @@ task build: [:cmake] do
   system "ccache -z" if ENV['CI'] && ENV['USE_CCACHE']
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('build')
+    puts
+    system "ccache -s" if ENV['CI'] && ENV['USE_CCACHE']
     next
   end
   config = /xcode|vs/ =~ ENV['GENERATOR'] ? "--config #{ENV.fetch('CONFIG', 'Release')}" : ''
@@ -91,6 +93,7 @@ task build: [:cmake] do
     concurrent = "-j#{$max_jobs}"
   end
   system %Q{cmake --build "#{build_tree}" #{config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']}} or abort
+  puts
   system "ccache -s" if ENV['CI'] && ENV['USE_CCACHE']
 end
 
