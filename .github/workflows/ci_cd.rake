@@ -22,6 +22,7 @@
 
 desc 'Prepare environment for CI'
 task :ci do
+  ENV['URHO3D_PCH'] = '0' if ENV['PLATFORM'] == 'linux-gcc' # TODO - PCH causes cache miss on initial build for Linux/GCC, why?
   platform_modifier = /(.*)-(.+)/.match(ENV['PLATFORM'])
   if platform_modifier
     ENV['PLATFORM'] = platform_modifier[1]
@@ -50,7 +51,7 @@ task :ci do
   when 'DX11'
     ENV['URHO3D_D3D11'] = '1'
   when 'DX9'
-    ENV['URHO3D_OPENGL'] = '0'  # Need to make this explicit because 'MINGW' default to use OpenGL otherwise
+    ENV['URHO3D_OPENGL'] = '0' # Need to make this explicit because 'MINGW' default to use OpenGL otherwise
   when 'OpenGL'
     ENV['URHO3D_OPENGL'] = '1'
   else
