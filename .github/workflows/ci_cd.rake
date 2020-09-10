@@ -58,6 +58,7 @@ task :ci do
     # Do nothing
   end
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE']
+  ENV['URHO3D_TESTING'] = '1' if /linux|macOS|win/ =~ ENV['PLATFORM']
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
 end
@@ -67,9 +68,7 @@ task :source_checksum do
   require 'digest'
   sha256_final = Digest::SHA256.new
   sha256_iter = Digest::SHA256
-  Dir['Source/**/*.{c,h}*'].each { |it|
-    sha256_final << sha256_iter.file(it).hexdigest
-  }
+  Dir['Source/**/*.{c,h}*'].each { |it| sha256_final << sha256_iter.file(it).hexdigest }
   puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
 end
 

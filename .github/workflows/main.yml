@@ -66,7 +66,7 @@ jobs:
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Free up space
-        run: sudo rm -rf microsoft mssql-toos cni hostedtoolcache /usr/local/share/boost /usr/share/dotnet /usr/local/lib/android /opt/ghc "$AGENT_TOOLSDIRECTORY"
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android
         if: matrix.platform == 'android'
       - name: Source checksum
         id: source_checksum
@@ -90,6 +90,9 @@ jobs:
           mkdir -p build/cache
           sudo ln -s $(pwd)/build/cache /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data
           script/dockerized.sh ${PLATFORM/-*} rake ci build
+      - name: Test
+        run: script/dockerized.sh ${PLATFORM/-*} rake ci test
+        if: startsWith(matrix.platform, 'linux')
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -119,6 +122,9 @@ jobs:
           fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
         run: rake ci build
+      - name: Test
+        run: rake ci test
+        if: startsWith(matrix.platform, 'macOS')
   windows:
     name: 🔲
     runs-on: windows-latest
@@ -150,6 +156,8 @@ jobs:
           fetch-depth: ${{ env.FETCH_DEPTH }}
       - name: Build
         run: rake ci build
+      - name: Test
+        run: rake ci test
 
 ...
 

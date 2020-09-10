@@ -27,26 +27,15 @@ task :cmake do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
   end
-  unless ENV['GENERATOR']
-    case build_host
-    when /linux/
-      ENV['GENERATOR'] = 'generic'
-    when /darwin|macOS/
-      ENV['GENERATOR'] = 'xcode'
-    when /win32|mingw|mswin|windows/
-      ENV['GENERATOR'] = 'vs'
-    else
-      abort "Unsupported host system: #{build_host}"
-    end
-  end
-  next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{build_tree}") and not ARGV.include?('cmake'))
+  dir = build_tree
+  next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{dir}") and not ARGV.include?('cmake'))
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
     var.chomp!
     build_options = "#{build_options} -D #{var}=#{ENV[var]}" if ENV[var]
   }
-  system %Q{#{script} "#{build_tree}" #{build_options}} or abort
+  system %Q{#{script} "#{dir}" #{build_options}} or abort
 end
 
 desc 'Clean the build tree'
@@ -55,19 +44,18 @@ task :clean do
     Rake::Task['gradle'].invoke('clean')
     next
   end
-  system %Q{cmake --build "#{build_tree}" --target clean} or abort
+  system %Q{cmake --build "#{build_tree}" #{build_config} --target clean} or abort
 end
 
 desc 'Build the software'
 task build: [:cmake] do
-  system "ccache -z" if ENV['CI'] && ENV['USE_CCACHE']
+  system "ccache -z" if ENV['USE_CCACHE']
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('build')
-    system "ccache -s" if ENV['CI'] && ENV['USE_CCACHE']
+    Rake::Task['gradle'].invoke('build -x test')
+    system "ccache -s" if ENV['USE_CCACHE']
     next
   end
-  config = /xcode|vs/ =~ ENV['GENERATOR'] ? "--config #{ENV.fetch('CONFIG', 'Release')}" : ''
-  target = ENV['TARGET'] ? "--target #{ENV['TARGET']}" : ''
+  target = ENV['TARGET'] ? "--target #{ENV['TARGET']}" : '' # Build all by default
   case ENV['GENERATOR']
   when 'xcode'
     concurrent = '' # Assume xcodebuild will do the right things without the '-jobs'
@@ -89,8 +77,20 @@ task build: [:cmake] do
     end
     concurrent = "-j#{$max_jobs}"
   end
-  system %Q{cmake --build "#{build_tree}" #{config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']}} or abort
-  system "ccache -s" if ENV['CI'] && ENV['USE_CCACHE']
+  system %Q{cmake --build "#{build_tree}" #{build_config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']}} or abort
+  system "ccache -s" if ENV['USE_CCACHE']
+end
+
+desc 'Test the software'
+task :test do
+  if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('test')
+    next
+  end
+  dir = build_tree
+  wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
+  test = /xcode|vs/ =~ ENV['GENERATOR'] ? 'RUN_TESTS' : 'test'
+  system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target #{test}} or abort
 end
 
 
@@ -108,6 +108,27 @@ def build_host
 end
 
 def build_tree
+  init_default
+  ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM'].downcase}"
+end
+
+def build_config
+  /xcode|vs/ =~ ENV['GENERATOR'] ? "--config #{ENV.fetch('CONFIG', 'Release')}" : ''
+end
+
+def init_default
+  unless ENV['GENERATOR']
+    case build_host
+    when /linux/
+      ENV['GENERATOR'] = 'generic'
+    when /darwin|macOS/
+      ENV['GENERATOR'] = 'xcode'
+    when /win32|mingw|mswin|windows/
+      ENV['GENERATOR'] = 'vs'
+    else
+      abort "Unsupported host system: #{build_host}"
+    end
+  end
   unless ENV['PLATFORM']
     case build_host
     when /linux/
@@ -120,7 +141,6 @@ def build_tree
       abort "Unsupported host system: #{build_host}"
     end
   end
-  ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM'].downcase}"
 end
 
 
