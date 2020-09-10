@@ -8093,6 +8093,7 @@ Properties:
 Methods:
 
 - int Clip(const IntRect&)
+- Intersection IsInside(const IntRect&) const
 - Intersection IsInside(const IntVector2&) const
 - int Merge(const IntRect&)
 
