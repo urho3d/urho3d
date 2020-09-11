@@ -117,29 +117,18 @@ def build_config
 end
 
 def init_default
-  unless ENV['GENERATOR']
-    case build_host
-    when /linux/
-      ENV['GENERATOR'] = 'generic'
-    when /darwin|macOS/
-      ENV['GENERATOR'] = 'xcode'
-    when /win32|mingw|mswin|windows/
-      ENV['GENERATOR'] = 'vs'
-    else
-      abort "Unsupported host system: #{build_host}"
-    end
-  end
-  unless ENV['PLATFORM']
-    case build_host
-    when /linux/
-      ENV['PLATFORM'] = 'linux'
-    when /darwin|macOS/
-      ENV['PLATFORM'] = 'macOS'
-    when /win32|mingw|mswin|windows/
-      ENV['PLATFORM'] = 'win'
-    else
-      abort "Unsupported host system: #{build_host}"
-    end
+  case build_host
+  when /linux/
+    ENV['GENERATOR'] = 'generic' unless ENV['GENERATOR']
+    ENV['PLATFORM'] = 'linux' unless ENV['PLATFORM']
+  when /darwin|macOS/
+    ENV['GENERATOR'] = 'xcode' unless ENV['GENERATOR']
+    ENV['PLATFORM'] = 'macOS' unless ENV['PLATFORM']
+  when /win32|mingw|mswin|windows/
+    ENV['GENERATOR'] = 'vs' unless ENV['GENERATOR']
+    ENV['PLATFORM'] = 'win' unless ENV['PLATFORM']
+  else
+    abort "Unsupported host system: #{build_host}"
   end
 end
 
