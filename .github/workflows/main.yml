@@ -83,13 +83,15 @@ jobs:
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
-      - name: Build
+      - name: CMake
         run: |
           docker volume create $(id -u).urho3d_home_dir >/dev/null
           sudo rm -rf /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data
           mkdir -p build/cache
           sudo ln -s $(pwd)/build/cache /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data
-          script/dockerized.sh ${PLATFORM/-*} rake ci build
+          script/dockerized.sh ${PLATFORM/-*} rake ci cmake
+      - name: Build
+        run: script/dockerized.sh ${PLATFORM/-*} rake ci build
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake ci test
         if: startsWith(matrix.platform, 'linux')
@@ -120,6 +122,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
+      - name: CMake
+        run: rake ci cmake
       - name: Build
         run: rake ci build
       - name: Test
@@ -154,6 +158,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
+      - name: CMake
+        run: rake ci cmake
       - name: Build
         run: rake ci build
       - name: Test
