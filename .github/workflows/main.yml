@@ -166,6 +166,7 @@ jobs:
         run: rake ci build
       - name: Test
         run: rake ci test
+        if: matrix.graphics-api != 'OpenGL'
 
 ...
 
