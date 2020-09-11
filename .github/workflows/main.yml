@@ -106,7 +106,7 @@ jobs:
       matrix:
         platform:
           - macOS-xcode
-          # macOS-make
+          - macOS-make
         lib-type:
           - STATIC
           - SHARED
@@ -125,6 +125,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: ${{ env.FETCH_DEPTH }}
+      - name: Install headers
+        run: sudo cp -rp $(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/* /usr/local/include
+        if: matrix.platform == 'macOS-make'
       - name: CMake
         run: rake ci cmake
       - name: Build
