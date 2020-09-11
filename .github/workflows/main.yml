@@ -92,6 +92,7 @@ jobs:
           script/dockerized.sh ${PLATFORM/-*} env
       - name: CMake
         run: script/dockerized.sh ${PLATFORM/-*} rake ci cmake
+        if: matrix.platform != 'android'
       - name: Build
         run: script/dockerized.sh ${PLATFORM/-*} rake ci build
       - name: Test
