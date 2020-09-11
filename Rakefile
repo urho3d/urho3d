@@ -56,9 +56,11 @@ task build: [:cmake] do
     next
   end
   target = ENV['TARGET'] ? "--target #{ENV['TARGET']}" : '' # Build all by default
+  filter = ''
   case ENV['GENERATOR']
   when 'xcode'
     concurrent = '' # Assume xcodebuild will do the right things without the '-jobs'
+    filter = '|xcpretty -c && exit ${PIPESTATUS[0]}' if system('xcpretty -v >/dev/null 2>&1')
   when 'vs'
     concurrent = '/maxCpuCount'
   else
@@ -77,7 +79,7 @@ task build: [:cmake] do
     end
     concurrent = "-j#{$max_jobs}"
   end
-  system %Q{cmake --build "#{build_tree}" #{build_config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']}} or abort
+  system %Q{cmake --build "#{build_tree}" #{build_config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']} #{filter}} or abort
   system "ccache -s" if ENV['USE_CCACHE']
 end
 
