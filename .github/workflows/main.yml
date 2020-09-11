@@ -83,6 +83,8 @@ jobs:
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
+      - name: DBE
+        run: script/dockerized.sh ${PLATFORM/-*} env
       - name: CMake
         run: |
           docker volume create $(id -u).urho3d_home_dir >/dev/null
