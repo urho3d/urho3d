@@ -42,18 +42,22 @@ jobs:
           - rpi
           - arm
         lib-type:
-          - STATIC
-          - SHARED
+          - static
+          - shared
         architecture:
-          - 64bit
-          - 32bit
+          - 64
+          - 32
+        build-type:
+          - rel
+          - dbg
         include:
-          - { platform: android, lib-type: STATIC }
-          - { platform: android, lib-type: SHARED }
-          - { platform: web, lib-type: STATIC }
+          - { platform: android, lib-type: static }
+          - { platform: android, lib-type: shared }
+          - { platform: web, lib-type: static }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
+      BUILD_TYPE: ${{ matrix.build-type }}
       LIB_TYPE: ${{ matrix.lib-type }}
       ARCH: ${{ matrix.architecture }}
       DBE_TAG: latest
@@ -79,10 +83,10 @@ jobs:
             build/cache/.gradle/caches
             build/cache/.gradle/wrapper
           key: |
-            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}-${{ steps.source_checksum.outputs.hexdigest }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}-${{ steps.source_checksum.outputs.hexdigest }}
           restore-keys: |
-            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ env.DBE_TAG }}
-            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
       - name: DBE
         run: |
           docker volume create $(id -u).urho3d_home_dir >/dev/null
@@ -108,11 +112,11 @@ jobs:
           - macOS-xcode
           - macOS-make
         lib-type:
-          - STATIC
-          - SHARED
+          - static
+          - shared
         include:
-          - { platform: iOS, lib-type: STATIC }
-          - { platform: tvOS, lib-type: STATIC }
+          - { platform: iOS, lib-type: static }
+          - { platform: tvOS, lib-type: static }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -145,8 +149,8 @@ jobs:
           - win-vs
           - win-gcc
         lib-type:
-          - STATIC
-          - SHARED
+          - static
+          - shared
         graphics-api:
           - DX11
           - DX9

@@ -46,7 +46,8 @@ task :ci do
     end
   end
   ENV['BUILD_TREE'] = 'build/ci'
-  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32bit' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
+  ENV['CMAKE_BUILD_TYPE'] = ENV['BUILD_TYPE'] == 'dbg' ? 'Debug' : 'Release' unless ENV.fetch('BUILD_TYPE', '').empty?
+  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
   case ENV['GRAPHICS_API']
   when 'DX11'
     ENV['URHO3D_D3D11'] = '1'
@@ -57,7 +58,7 @@ task :ci do
   else
     # Do nothing
   end
-  ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE']
+  ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE'].upcase
   ENV['URHO3D_TESTING'] = '1' if /linux|macOS|win/ =~ ENV['PLATFORM']
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
