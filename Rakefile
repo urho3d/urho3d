@@ -64,20 +64,7 @@ task build: [:cmake] do
   when 'vs'
     concurrent = '/maxCpuCount'
   else
-    case build_host
-    when /linux/
-      $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
-    when /darwin|macOS/
-      $max_jobs = `sysctl -n hw.logicalcpu`.chomp
-    when /win32|mingw|mswin|windows/
-      require 'win32ole'
-      WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
-        $max_jobs = it.NumberOfLogicalProcessors
-      }
-    else
-      abort "Unsupported host system: #{build_host}"
-    end
-    concurrent = "-j#{$max_jobs}"
+    concurrent = "-j #{$max_jobs}"
   end
   system %Q{cmake --build "#{build_tree}" #{build_config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']} #{filter}} or abort
   system "ccache -s" if ENV['USE_CCACHE']
@@ -121,12 +108,18 @@ end
 def init_default
   case build_host
   when /linux/
+    $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
     ENV['GENERATOR'] = 'generic' unless ENV['GENERATOR']
     ENV['PLATFORM'] = 'linux' unless ENV['PLATFORM']
   when /darwin|macOS/
+    $max_jobs = `sysctl -n hw.logicalcpu`.chomp
     ENV['GENERATOR'] = 'xcode' unless ENV['GENERATOR']
     ENV['PLATFORM'] = 'macOS' unless ENV['PLATFORM']
   when /win32|mingw|mswin|windows/
+    require 'win32ole'
+    WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
+      $max_jobs = it.NumberOfLogicalProcessors
+    }
     ENV['GENERATOR'] = 'vs' unless ENV['GENERATOR']
     ENV['PLATFORM'] = 'win' unless ENV['PLATFORM']
   else
