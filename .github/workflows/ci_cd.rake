@@ -23,7 +23,7 @@
 desc 'Prepare environment for CI'
 task :ci do
   ENV['URHO3D_PCH'] = '0' if ENV['PLATFORM'] == 'linux-gcc' # TODO - PCH causes cache miss on initial build for Linux/GCC, why?
-  platform_modifier = /(.*)-(.+)/.match(ENV['PLATFORM'])
+  platform_modifier = /(.+?)-(.+)/.match(ENV['PLATFORM'])
   if platform_modifier
     ENV['PLATFORM'] = platform_modifier[1]
     ENV['MODIFIER'] = platform_modifier[2]
@@ -40,7 +40,7 @@ task :ci do
     end
   else
     ENV['URHO3D_DEPLOYMENT_TARGET'] = 'generic' if /linux|mingw/ =~ ENV['PLATFORM']
-    if ENV['MODIFIER'] == 'clang'
+    if /clang/ =~ ENV['MODIFIER']
       ENV['CC'] = 'clang'
       ENV['CXX'] = 'clang++'
     end
@@ -60,6 +60,7 @@ task :ci do
   end
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE'].upcase
   ENV['URHO3D_TESTING'] = '1' if /linux|macOS|win/ =~ ENV['PLATFORM']
+  ENV['URHO3D_LINT'] = '1' if ENV['MODIFIER'] == 'clang-tidy'
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
 end

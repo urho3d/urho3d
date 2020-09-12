@@ -434,6 +434,9 @@ if (URHO3D_LUA)
             COMMENT "Generating tolua++ API binding on the fly for ${DIR}")
     endforeach ()
     source_group ("Source Files\\LuaScript\\Generated" FILES ${LUA_GEN_CPP_FILES})
+    if (URHO3D_LINT)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/.clang-tidy ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
+    endif ()
 endif ()
 
 # Aggregate all source files

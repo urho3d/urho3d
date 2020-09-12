@@ -54,6 +54,7 @@ jobs:
           - { platform: android, lib-type: static }
           - { platform: android, lib-type: shared }
           - { platform: web, lib-type: static }
+          - { platform: linux-clang-tidy, lib-type: static}
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}

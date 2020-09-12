@@ -65,6 +65,7 @@ task build: [:cmake] do
     concurrent = '/maxCpuCount'
   else
     concurrent = "-j #{$max_jobs}"
+    filter = "2>#{lint_err_file}" if ENV['URHO3D_LINT']
   end
   system %Q{cmake --build "#{build_tree}" #{build_config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']} #{filter}} or abort
   system "ccache -s" if ENV['USE_CCACHE']
@@ -74,6 +75,9 @@ desc 'Test the software'
 task :test do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('test')
+    next
+  elsif ENV['URHO3D_LINT']
+    Rake::Task['lint'].invoke
     next
   end
   dir = build_tree
@@ -89,6 +93,12 @@ task :gradle, [:task] do |_, args|
   system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
 end
 
+task :lint do
+  lint_err = File.read(lint_err_file)
+  puts lint_err
+  abort 'Failed to pass linter checks' unless lint_err.empty?
+  puts 'Passed the linter checks'
+end
 
 ### Internal methods ###
 
@@ -125,6 +135,10 @@ def init_default
   else
     abort "Unsupported host system: #{build_host}"
   end
+end
+
+def lint_err_file
+  'build/clang-tidy.out'
 end
 
 
