@@ -96,8 +96,9 @@ end
 task :lint do
   lint_err = File.read(lint_err_file)
   puts lint_err
-  abort 'Failed to pass linter checks' unless lint_err.empty?
-  puts 'Passed the linter checks'
+  # TODO: Tighten the check by failing the job later
+  # abort 'Failed to pass linter checks' unless lint_err.empty?
+  # puts 'Passed the linter checks'
 end
 
 ### Internal methods ###
