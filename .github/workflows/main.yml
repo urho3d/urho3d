@@ -51,9 +51,10 @@ jobs:
           - rel
           - dbg
         include:
+          - { platform: web, lib-type: static, build-type: rel }
+          - { platform: web, lib-type: static, build-type: dbg }
           - { platform: android, lib-type: static }
           - { platform: android, lib-type: shared }
-          - { platform: web, lib-type: static }
           - { platform: linux-clang-tidy, lib-type: static}
     env:
       HOST: ${{ github.job }}
