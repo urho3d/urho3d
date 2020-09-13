@@ -26,8 +26,8 @@ if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh linux|mingw|android|rpi|arm|w
 PROJECT_DIR=$(cd "${0%/*}/.." || exit 1; pwd)
 
 if [[ ! $DBE_TAG ]]; then
-    # If the command failed or not on a tag then use 'master' by default; TRAVIS_COMMIT should be empty for non-CI usage
-    DBE_TAG=$(git describe --exact-match "$TRAVIS_COMMIT" 2>/dev/null || echo master)
+    # If the command failed or not on a tag then use 'master' by default
+    DBE_TAG=$(git describe --exact-match 2>/dev/null || echo master)
 fi
 
 BuildEnvironment=-$1; shift
@@ -60,7 +60,11 @@ d () {
 if [[ $DBE_REFRESH == 1 ]]; then
   d pull "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG"
 fi
-if [[ ! $GITHUB_ACTIONS ]]; then
+if [[ $GITHUB_ACTIONS ]]; then
+  mkdir -p build/cache
+  mount_home_dir="--mount type=bind,source=$PROJECT_DIR/build/cache,target=/home/urho3d$mount_option"
+else
+  mount_home_dir="--mount type=volume,source=$(id -u).urho3d_home_dir,target=/home/urho3d$mount_option"
   interactive=-i
 fi
 if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\.0*([0-9]+)\. ]] && (( BASH_REMATCH[1] * 100 + BASH_REMATCH[2] >= 1809 )) ); then
@@ -69,7 +73,7 @@ if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
         --env-file "$PROJECT_DIR/script/.env-file" \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
-        --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d$mount_option \
+        $mount_home_dir \
         "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 else
     # Fallback workaround on older Docker CLI version
@@ -77,7 +81,7 @@ else
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
         --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$PROJECT_DIR/script/.env-file") \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
-        --mount type=volume,source="$(id -u).urho3d_home_dir",target=/home/urho3d \
+        $mount_home_dir \
         "urho3d/dockerized$BuildEnvironment:$DBE_TAG" "$@"
 fi
 

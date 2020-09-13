@@ -90,12 +90,7 @@ jobs:
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
       - name: DBE
-        run: |
-          docker volume create $(id -u).urho3d_home_dir >/dev/null
-          sudo rm -rf /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data
-          mkdir -p build/cache
-          sudo ln -s $(pwd)/build/cache /var/lib/docker/volumes/$(id -u).urho3d_home_dir/_data
-          script/dockerized.sh ${PLATFORM/-*} env
+        run: script/dockerized.sh ${PLATFORM/-*} env
       - name: CMake
         run: script/dockerized.sh ${PLATFORM/-*} rake ci cmake
         if: matrix.platform != 'android'
