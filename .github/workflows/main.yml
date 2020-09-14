@@ -65,13 +65,10 @@ jobs:
       ARCH: ${{ matrix.architecture }}
       DBE_TAG: latest
     steps:
-      - name: Unshallow
-        run: echo '::set-env name=FETCH_DEPTH::0'
-        if: startsWith(github.ref, 'refs/tags/') || matrix.platform == 'linux-clang-format'
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: ${{ env.FETCH_DEPTH }}
+          fetch-depth: 0
       - name: Free up space
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android
         if: matrix.platform == 'android'
@@ -127,13 +124,10 @@ jobs:
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
     steps:
-      - name: Unshallow
-        run: echo '::set-env name=FETCH_DEPTH::0'
-        if: startsWith(github.ref, 'refs/tags/')
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: ${{ env.FETCH_DEPTH }}
+          fetch-depth: 0
       - name: Install dependencies
         run: while ! brew install doxygen graphviz; do sleep 1; done
       - name: Install headers
@@ -172,13 +166,10 @@ jobs:
       LIB_TYPE: ${{ matrix.lib-type }}
       GRAPHICS_API: ${{ matrix.graphics-api }}
     steps:
-      - name: Unshallow
-        run: echo '::set-env name=FETCH_DEPTH::0'
-        if: startsWith(github.ref, 'refs/tags/')
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: ${{ env.FETCH_DEPTH }}
+          fetch-depth: 0
       - name: Install dependencies
         run: do { choco install --no-progress doxygen.install graphviz } until ($?)
       - name: CMake
