@@ -79,6 +79,9 @@ task :test do
   elsif ENV['URHO3D_LINT']
     Rake::Task['lint'].invoke
     next
+  elsif ENV['URHO3D_STYLE']
+    Rake::Task['style'].invoke
+    next
   end
   dir = build_tree
   wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
@@ -100,6 +103,12 @@ task :lint do
   # abort 'Failed to pass linter checks' unless lint_err.empty?
   # puts 'Passed the linter checks'
 end
+
+task :style do
+  system "git diff --name-only HEAD~ -- Source |grep -v ThirdParty |grep -P '\\.(?:c|cpp|h|hpp)' |xargs clang-format -n -Werror" or abort 'Failed to pass style checks'
+  puts 'Passed the style checks'
+end
+
 
 ### Internal methods ###
 

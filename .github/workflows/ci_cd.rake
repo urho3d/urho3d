@@ -61,6 +61,7 @@ task :ci do
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE'].upcase
   ENV['URHO3D_TESTING'] = '1' if /linux|macOS|win/ =~ ENV['PLATFORM']
   ENV['URHO3D_LINT'] = '1' if ENV['MODIFIER'] == 'clang-tidy'
+  ENV['URHO3D_STYLE'] = '1' if ENV['MODIFIER'] == 'clang-format'
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
 end

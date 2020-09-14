@@ -55,7 +55,8 @@ jobs:
           - { platform: web, lib-type: static, build-type: dbg }
           - { platform: android, lib-type: static }
           - { platform: android, lib-type: shared }
-          - { platform: linux-clang-tidy, lib-type: static}
+          - { platform: linux-clang-tidy, lib-type: static }
+          - { platform: linux-clang-format, lib-type: static }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -66,7 +67,7 @@ jobs:
     steps:
       - name: Unshallow
         run: echo '::set-env name=FETCH_DEPTH::0'
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || matrix.platform == 'linux-clang-format'
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -93,9 +94,10 @@ jobs:
         run: script/dockerized.sh ${PLATFORM/-*} env
       - name: CMake
         run: script/dockerized.sh ${PLATFORM/-*} rake ci cmake
-        if: matrix.platform != 'android'
+        if: matrix.platform != 'android' && matrix.platform != 'linux-clang-format'
       - name: Build
         run: script/dockerized.sh ${PLATFORM/-*} rake ci build
+        if: matrix.platform != 'linux-clang-format'
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake ci test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
