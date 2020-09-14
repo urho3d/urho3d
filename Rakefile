@@ -91,8 +91,16 @@ end
 
 desc 'Generate documentation'
 task :doc do
-  next if ENV['PLATFORM'] == 'android' || ENV['URHO3D_LINT'] == '1' || ENV['URHO3D_STYLE'] == '1'
+  next if ENV['PLATFORM'] == 'android'
   system %Q{cmake --build "#{build_tree}" #{build_config} --target doc} or abort
+end
+
+desc 'Package build artifact'
+task :package do
+  next if ENV['PLATFORM'] == 'android'
+  dir = build_tree
+  wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
+  system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target package} or abort
 end
 
 
