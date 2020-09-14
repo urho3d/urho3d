@@ -76,10 +76,10 @@ task :test do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('test')
     next
-  elsif ENV['URHO3D_LINT']
+  elsif ENV['URHO3D_LINT'] == '1'
     Rake::Task['lint'].invoke
     next
-  elsif ENV['URHO3D_STYLE']
+  elsif ENV['URHO3D_STYLE'] == '1'
     Rake::Task['style'].invoke
     next
   end
@@ -87,6 +87,12 @@ task :test do
   wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
   test = /xcode|vs/ =~ ENV['GENERATOR'] ? 'RUN_TESTS' : 'test'
   system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target #{test}} or abort
+end
+
+desc 'Generate documentation'
+task :doc do
+  next if ENV['PLATFORM'] == 'android' || ENV['URHO3D_LINT'] == '1' || ENV['URHO3D_STYLE'] == '1'
+  system %Q{cmake --build "#{build_tree}" #{build_config} --target doc} or abort
 end
 
 

@@ -101,6 +101,9 @@ jobs:
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake ci test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
+      - name: Documentation
+        run: script/dockerized.sh ${PLATFORM/-*} rake ci doc
+        if: matrix.platform != 'android' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -140,6 +143,8 @@ jobs:
       - name: Test
         run: rake ci test
         if: startsWith(matrix.platform, 'macOS')
+      - name: Documentation
+        run: rake ci doc
   windows:
     name: 🔲
     runs-on: windows-latest
@@ -178,6 +183,8 @@ jobs:
       - name: Test
         run: rake ci test
         if: matrix.graphics-api != 'OpenGL'
+      - name: Documentation
+        run: rake ci doc
 
 ...
 
