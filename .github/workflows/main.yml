@@ -91,7 +91,7 @@ jobs:
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
       - name: DBE
-        run: script/dockerized.sh ${PLATFORM/-*} env
+        run: script/dockerized.sh ${PLATFORM/-*} env && rake update_dot_files
       - name: CMake
         run: script/dockerized.sh ${PLATFORM/-*} rake ci cmake
         if: matrix.platform != 'android' && matrix.platform != 'linux-clang-format'

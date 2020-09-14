@@ -75,4 +75,16 @@ task :source_checksum do
   puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
 end
 
+desc 'Ensure all dot files are up-to-date'
+task :update_dot_files do
+  system 'bash', '-c', %q(
+    perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && \
+    echo URHO3D_LINT >>script/.build-options && \
+    cat script/.build-options <(perl -ne 'while (/([A-Z_]+):.+?/g) {print "$1\n"}' .github/workflows/main.yml) \
+      <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) \
+      <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) \
+    |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file
+  ) or abort 'Failed to update dot files'
+end
+
 # vi: set ts=2 sw=2 expandtab:
