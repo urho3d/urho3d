@@ -103,7 +103,7 @@ jobs:
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake ci package
-        if: matrix.platform != 'android' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
   macOS:
     name: 🍏
     runs-on: macos-latest

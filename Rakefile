@@ -101,6 +101,7 @@ end
 desc 'Package build artifact'
 task :package do
   if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('zipBuildTreeDebug zipBuildTreeRelease')
     next
   elsif ENV['PLATFORM'] =~ /iOS|tvOS/
     # Don't have signing key for creating the actual package, so invoke CPack directly to pack the 'simulator' binaries only
