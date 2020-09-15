@@ -109,16 +109,15 @@ task :package do
   system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target package} or abort
 end
 
-desc 'Invoke CPack to generate a tarball'
-task :cpack do
-  Dir.chdir(build_tree) { system 'cpack -G TGZ' } or abort
-end
-
 
 ### Internal tasks ###
 
 task :gradle, [:task] do |_, args|
   system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
+end
+
+task :cpack do
+  Dir.chdir(build_tree) { system 'cpack -G TGZ' } or abort
 end
 
 task :lint do
