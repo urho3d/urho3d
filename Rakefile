@@ -91,7 +91,10 @@ end
 
 desc 'Generate documentation'
 task :doc do
-  next if ENV['PLATFORM'] == 'android'
+  if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('documentationZip')
+    next
+  end
   system %Q{cmake --build "#{build_tree}" #{build_config} --target doc} or abort
 end
 

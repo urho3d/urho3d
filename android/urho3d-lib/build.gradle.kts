@@ -22,7 +22,6 @@
 
 import org.gradle.internal.io.NullOutputStream
 import org.gradle.internal.os.OperatingSystem
-import java.time.Duration
 
 plugins {
     id("com.android.library")
@@ -108,8 +107,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 
-lateinit var docABI: String
-
 afterEvaluate {
     // Part of the our external native build tree resided in Gradle buildDir
     // When the buildDir is cleaned then we need a way to re-configure that part back
@@ -142,16 +139,7 @@ afterEvaluate {
                                 into("tree/$config/$abi/$it")
                             }
                         }
-                        if (config == "Release") {
-                            docABI = abi
-                        }
                     }
-                }
-            }
-            if (System.getenv("CI") != null) {
-                "externalNativeBuild$config" {
-                    @Suppress("UnstableApiUsage")
-                    timeout.set(Duration.ofMinutes(25))
                 }
             }
         }
@@ -169,7 +157,7 @@ tasks {
         standardOutput = NullOutputStream.INSTANCE
         args("--build", ".", "--target", "doc")
         dependsOn("makeDocConfigurer")
-        mustRunAfter("zipBuildTreeRelease")
+        mustRunAfter("zipBuildTreeDebug")
     }
     register<Zip>("documentationZip") {
         archiveClassifier.set("documentation")
@@ -177,7 +165,8 @@ tasks {
     }
     register<Task>("makeDocConfigurer") {
         doLast {
-            val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/release/$docABI")
+            val docABI = File(buildDir, "tree/Debug").list()?.first()
+            val buildTree = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/debug/$docABI")
             named<Exec>("makeDoc") {
                 // This is a hack - expect the first line to contain the path to the CMake executable
                 executable = File(buildTree, "build_command.txt").readLines().first().split(":").last().trim()
@@ -209,23 +198,19 @@ publishing {
             artifact(tasks["sourcesJar"])
             artifact(tasks["documentationZip"])
             pom {
-                @Suppress("UnstableApiUsage")
                 inceptionYear.set("2008")
-                @Suppress("UnstableApiUsage")
                 licenses {
                     license {
                         name.set("MIT License")
                         url.set("https://github.com/urho3d/Urho3D/blob/master/LICENSE")
                     }
                 }
-                @Suppress("UnstableApiUsage")
                 developers {
                     developer {
                         name.set("Urho3D contributors")
                         url.set("https://github.com/urho3d/Urho3D/graphs/contributors")
                     }
                 }
-                @Suppress("UnstableApiUsage")
                 scm {
                     url.set("https://github.com/urho3d/Urho3D.git")
                     connection.set("scm:git:ssh://git@github.com:urho3d/Urho3D.git")
@@ -263,7 +248,7 @@ bintray {
         desc = project.description
         version.apply {
             name = project.version.toString()
-            desc = "Continuous delivery from Travis-CI."
+            desc = "Continuous delivery from GitHub Actions."
         }
     }
 }

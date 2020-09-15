@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-import java.time.Duration
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -114,10 +112,6 @@ afterEvaluate {
         tasks {
             "externalNativeBuild$config" {
                 mustRunAfter(":android:urho3d-lib:externalNativeBuild$config")
-                if (System.getenv("CI") != null) {
-                    @Suppress("UnstableApiUsage")
-                    timeout.set(Duration.ofMinutes(15))
-                }
             }
         }
     }
