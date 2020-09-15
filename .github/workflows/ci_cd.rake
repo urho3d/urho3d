@@ -47,7 +47,6 @@ task :ci do
   end
   ENV['BUILD_TREE'] = 'build/ci'
   ENV['CMAKE_BUILD_TYPE'] = ENV['BUILD_TYPE'] == 'dbg' ? 'Debug' : 'Release' unless ENV.fetch('BUILD_TYPE', '').empty?
-  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
   case ENV['GRAPHICS_API']
   when 'DX11'
     ENV['URHO3D_D3D11'] = '1'

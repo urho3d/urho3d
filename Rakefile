@@ -97,10 +97,21 @@ end
 
 desc 'Package build artifact'
 task :package do
-  next if ENV['PLATFORM'] == 'android'
+  if ENV['PLATFORM'] == 'android'
+    next
+  elsif ENV['PLATFORM'] =~ /iOS|tvOS/
+    # Don't have signing key for creating the actual package, so invoke CPack directly to pack the 'simulator' binaries only
+    Rake::Task['cpack'].invoke
+    next
+  end
   dir = build_tree
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
   system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target package} or abort
+end
+
+desc 'Invoke CPack to generate a tarball'
+task :cpack do
+  Dir.chdir(build_tree) { system 'cpack -G TGZ' } or abort
 end
 
 
@@ -159,6 +170,8 @@ def init_default
   else
     abort "Unsupported host system: #{build_host}"
   end
+  # The 'ARCH' env-var, when set, has higher precedence than the 'URHO3D_64BIT' env-var
+  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
 end
 
 def lint_err_file
