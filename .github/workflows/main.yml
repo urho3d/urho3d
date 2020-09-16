@@ -51,12 +51,12 @@ jobs:
           - rel
           - dbg
         include:
-          - { platform: web, lib-type: static, build-type: rel }
-          - { platform: web, lib-type: static, build-type: dbg }
-          - { platform: android, lib-type: static }
-          - { platform: android, lib-type: shared }
-          - { platform: linux-clang-tidy, lib-type: static }
-          - { platform: linux-clang-format, lib-type: static }
+          - { platform: web, lib-type: static, architecture: wasm, build-type: rel }
+          - { platform: web, lib-type: static, architecture: wasm, build-type: dbg }
+          - { platform: android, lib-type: static, architecture: all, build-type: both }
+          - { platform: android, lib-type: shared, architecture: all, build-type: both }
+          - { platform: linux-clang-tidy }
+          - { platform: linux-clang-format }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -155,7 +155,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.platform }}-${{ matrix.lib-type }}--rel
+          name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
           path: build/ci/*.tar.gz
   windows:
     name: 🔲

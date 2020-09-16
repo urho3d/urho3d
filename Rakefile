@@ -181,7 +181,7 @@ def init_default
     abort "Unsupported host system: #{build_host}"
   end
   # The 'ARCH' env-var, when set, has higher precedence than the 'URHO3D_64BIT' env-var
-  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' unless ENV.fetch('ARCH', '').empty?
+  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' if /32|64/ =~ ENV['ARCH']
 end
 
 def lint_err_file

@@ -46,7 +46,7 @@ task :ci do
     end
   end
   ENV['BUILD_TREE'] = 'build/ci'
-  ENV['CMAKE_BUILD_TYPE'] = ENV['BUILD_TYPE'] == 'dbg' ? 'Debug' : 'Release' unless ENV.fetch('BUILD_TYPE', '').empty?
+  ENV['CMAKE_BUILD_TYPE'] = ENV['BUILD_TYPE'] == 'dbg' ? 'Debug' : 'Release' if /dbg|rel/ =~ ENV['BUILD_TYPE']
   case ENV['GRAPHICS_API']
   when 'DX11'
     ENV['URHO3D_D3D11'] = '1'
@@ -57,7 +57,7 @@ task :ci do
   else
     # Do nothing
   end
-  ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE'].upcase
+  ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE'].upcase if /static|shared/ =~ ENV['LIB_TYPE']
   ENV['URHO3D_TESTING'] = '1' if /linux|macOS|win/ =~ ENV['PLATFORM']
   ENV['URHO3D_LINT'] = '1' if ENV['MODIFIER'] == 'clang-tidy'
   ENV['URHO3D_STYLE'] = '1' if ENV['MODIFIER'] == 'clang-format'
