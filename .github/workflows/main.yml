@@ -100,10 +100,10 @@ jobs:
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
       - name: Documentation
         run: script/dockerized.sh ${PLATFORM/-*} rake ci doc
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+        if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake ci package
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+        if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
@@ -112,6 +112,7 @@ jobs:
             build/ci/*.tar.gz
             android/urho3d-lib/build/distributions/*.aar
             build/*.out
+        if: github.event_name == 'push' || matrix.platform == 'linux-clang-tidy' == matrix.platform != 'linux-clang-format'
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -150,13 +151,16 @@ jobs:
         if: startsWith(matrix.platform, 'macOS')
       - name: Documentation
         run: rake ci doc
+        if: github.event_name == 'push'
       - name: Package
         run: rake ci package
+        if: github.event_name == 'push'
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
           path: build/ci/*.tar.gz
+        if: github.event_name == 'push'
   windows:
     name: 🔲
     runs-on: windows-latest
@@ -194,13 +198,16 @@ jobs:
         if: matrix.graphics-api != 'OpenGL'
       - name: Documentation
         run: rake ci doc
+        if: github.event_name == 'push'
       - name: Package
         run: rake ci package
+        if: github.event_name == 'push'
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
           path: build/ci/*.zip
+        if: github.event_name == 'push'
 
 ...
 
