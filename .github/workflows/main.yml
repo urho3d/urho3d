@@ -111,7 +111,7 @@ jobs:
           path: |
             build/ci/*.tar.gz
             android/urho3d-lib/build/distributions/*.aar
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+            build/*.out
   macOS:
     name: 🍏
     runs-on: macos-latest

@@ -133,7 +133,14 @@ task :lint do
 end
 
 task :style do
-  system "git diff --name-only HEAD~ -- Source |grep -v ThirdParty |grep -P '\\.(?:c|cpp|h|hpp)' |xargs clang-format -n -Werror" or abort 'Failed to pass style checks'
+  system 'bash', '-c', %q{
+    git diff --name-only HEAD~ -- Source \
+      |grep -v ThirdParty \
+      |grep -P '\.(?:c|cpp|h|hpp)' \
+      |xargs clang-format -n -Werror 2>&1 \
+      |tee build/clang-format.out \
+      && exit ${PIPESTATUS[3]}
+  } or abort 'Failed to pass style checks'
   puts 'Passed the style checks'
 end
 
