@@ -46,7 +46,7 @@ class URHO3D_API Database : public Object
 
 public:
     /// Construct.
-    explicit Database(Context* context_);
+    explicit Database(Context* context);
     /// Return the underlying database API.
     static DBAPI GetAPI();
 

@@ -93,7 +93,7 @@ public:
     unsigned color_{};
     /// Gradient flag.
     bool useGradient_{};
-    /// Custom material
+    /// Custom material.
     Material* customMaterial_{};
 
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.

@@ -31,6 +31,6 @@ find_path (GBM_INCLUDE_DIRS NAMES gbm.h DOC "GenericBufferManagement include dir
 find_library (GBM_LIBRARIES NAMES gbm DOC "GenericBufferManagement library")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (GenericBufferManagement REQUIRED_VARS GBM_LIBRARIES GBM_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Direct Generic Buffer Management development library")
+find_package_handle_standard_args (GBM REQUIRED_VARS GBM_LIBRARIES GBM_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Direct Generic Buffer Management development library")
 
 mark_as_advanced (GBM_INCLUDE_DIRS GBM_LIBRARIES)

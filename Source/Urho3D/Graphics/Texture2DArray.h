@@ -35,7 +35,7 @@ class Image;
 /// 2D texture array resource.
 class URHO3D_API Texture2DArray : public Texture
 {
-    URHO3D_OBJECT(Texture2DArray, Texture)
+    URHO3D_OBJECT(Texture2DArray, Texture);
 
 public:
     /// Construct.

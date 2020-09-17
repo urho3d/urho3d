@@ -851,7 +851,7 @@ SOURCE_GROUP( open3dgc FILES ${open3dgc_SRCS})
 # has implementation for different platforms: WIN32, __MACH__ and other ("else" block).
 # Urho3D: Only perform the dependency search on non-MSVC build
 IF (NOT MSVC)
-  FIND_PACKAGE(RT QUIET)
+  FIND_PACKAGE(rt QUIET)
 ENDIF ()
 IF (RT_FOUND OR MSVC)
   SET( ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC 1 )

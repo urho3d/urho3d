@@ -122,7 +122,7 @@ public:
         overlayContainer_->SetChildOffset(IntVector2(-x + panelBorder.left_, -y + panelBorder.top_));
     }
 
-    /// Handle mouse click on overlays by toggling the expansion state of the corresponding item
+    /// Handle mouse click on overlays by toggling the expansion state of the corresponding item.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     {
         using namespace UIMouseClick;

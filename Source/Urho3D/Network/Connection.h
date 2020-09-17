@@ -57,7 +57,7 @@ class PackageFile;
 /// Queued remote event.
 struct RemoteEvent
 {
-    /// Remote sender node ID (0 if not a remote node event.)
+    /// Remote sender node ID (0 if not a remote node event).
     unsigned senderID_;
     /// Event type.
     StringHash eventType_;
@@ -97,7 +97,7 @@ struct PackageUpload
     SharedPtr<File> file_;
     /// Current fragment index.
     unsigned fragment_;
-    /// Total number of fragments
+    /// Total number of fragments.
     unsigned totalFragments_;
 };
 
@@ -107,6 +107,14 @@ enum ObserverPositionSendMode
     OPSM_NONE = 0,
     OPSM_POSITION,
     OPSM_POSITION_ROTATION
+};
+
+/// Packet types for outgoing buffers. Outgoing messages are grouped by their type
+enum PacketType {
+    PT_UNRELIABLE_UNORDERED,
+    PT_UNRELIABLE_ORDERED,
+    PT_RELIABLE_UNORDERED,
+    PT_RELIABLE_ORDERED
 };
 
 /// %Connection to a remote network host.
@@ -120,6 +128,8 @@ public:
     /// Destruct.
     ~Connection() override;
 
+    /// Get packet type based on the message parameters
+    PacketType GetPacketType(bool reliable, bool inOrder);
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Send a message.
@@ -153,10 +163,14 @@ public:
     void SendRemoteEvents();
     /// Send package files to client. Called by network.
     void SendPackages();
+    /// Send out buffered messages by their type
+    void SendBuffer(PacketType type);
+    /// Send out all buffered messages
+    void SendAllBuffers();
     /// Process pending latest data for nodes and components.
     void ProcessPendingLatestData();
     /// Process a message from the server or client. Called by Network.
-    bool ProcessMessage(int msgID, MemoryBuffer& msg);
+    bool ProcessMessage(int msgID, MemoryBuffer& buffer);
     /// Ban this connections IP address.
     void Ban(const String& reason);
     /// Return the RakNet address/guid.
@@ -165,7 +179,6 @@ public:
     String GetGUID();
     /// Set the the RakNet address/guid.
     void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
-
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
 
@@ -239,6 +252,9 @@ public:
 
     /// Set network simulation parameters. Called by Network.
     void ConfigureNetworkSimulator(int latencyMs, float packetLoss);
+    /// Buffered packet size limit, when reached, packet is sent out immediately
+    void SetPacketSizeLimit(int limit);
+
     /// Current controls.
     Controls controls_;
     /// Controls timestamp. Incremented after each sent update.
@@ -281,7 +297,9 @@ private:
     void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
     /// Process a SyncPackagesInfo message from server.
     void ProcessPackageInfo(int msgID, MemoryBuffer& msg);
-    /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set)
+    /// Process unknown message. All unknown messages are forwarded as an events
+    void ProcessUnknownMessage(int msgID, MemoryBuffer& msg);
+    /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set).
     bool RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
@@ -338,17 +356,24 @@ private:
     SLNet::AddressOrGUID* address_;
     /// Raknet peer object.
     SLNet::RakPeerInterface* peer_;
-    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out
+    /// Temporary variable to hold packet count in the next second, x - packets in, y - packets out.
     IntVector2 tempPacketCounter_;
-    /// Packet count in the last second, x - packets in, y - packets out
+    /// Packet count in the last second, x - packets in, y - packets out.
     IntVector2 packetCounter_;
-    /// Packet count timer which resets every 1s
+    /// Packet count timer which resets every 1s.
     Timer packetCounterTimer_;
-    /// Last heard timer, resets when new packet is incoming
+    /// Last heard timer, resets when new packet is incoming.
     Timer lastHeardTimer_;
+
     /// Connection IP address
     String ipAddress_;
-    bool ready_{};
+    /// Is the connection ready
+    bool ready_;
+
+    /// Outgoing packet buffer which can contain multiple messages
+    HashMap<int, VectorBuffer> outgoingBuffer_;
+    /// Outgoing packet size limit
+    int packedMessageLimit_;
 };
 
 }

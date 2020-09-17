@@ -85,14 +85,14 @@ struct URHO3D_API AnimationTrack
     AnimationKeyFrame* GetKeyFrame(unsigned index);
     /// Return number of keyframes.
     unsigned GetNumKeyFrames() const { return keyFrames_.Size(); }
-    /// Return keyframe index based on time and previous index.
-    void GetKeyFrameIndex(float time, unsigned& index) const;
+    /// Return keyframe index based on time and previous index. Return false if animation is empty.
+    bool GetKeyFrameIndex(float time, unsigned& index) const;
 
     /// Bone or scene node name.
     String name_;
     /// Name hash.
     StringHash nameHash_;
-    /// Bitmask of included data (position, rotation, scale.)
+    /// Bitmask of included data (position, rotation, scale).
     AnimationChannelFlags channelMask_{};
     /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;

@@ -273,7 +273,7 @@ public:
     StringHash psExtraDefinesHash_;
 };
 
-/// Queue for shadow map draw calls
+/// Queue for shadow map draw calls.
 struct ShadowBatchQueue
 {
     /// Shadow map camera.
@@ -297,9 +297,9 @@ struct LightBatchQueue
     bool negative_;
     /// Shadow map depth texture.
     Texture2D* shadowMap_;
-    /// Lit geometry draw calls, base (replace blend mode)
+    /// Lit geometry draw calls, base (replace blend mode).
     BatchQueue litBaseBatches_;
-    /// Lit geometry draw calls, non-base (additive)
+    /// Lit geometry draw calls, non-base (additive).
     BatchQueue litBatches_;
     /// Shadow map split queues.
     Vector<ShadowBatchQueue> shadowSplits_;

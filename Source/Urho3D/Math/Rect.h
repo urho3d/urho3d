@@ -260,9 +260,9 @@ public:
     /// Maximum vector.
     Vector2 max_;
 
-    /// Rect in the range (-1, -1) - (1, 1)
+    /// Rect in the range (-1, -1) - (1, 1).
     static const Rect FULL;
-    /// Rect in the range (0, 0) - (1, 1)
+    /// Rect in the range (0, 0) - (1, 1).
     static const Rect POSITIVE;
     /// Zero-sized rect.
     static const Rect ZERO;
@@ -410,6 +410,17 @@ public:
     {
         if (point.x_ < left_ || point.y_ < top_ || point.x_ >= right_ || point.y_ >= bottom_)
             return OUTSIDE;
+        else
+            return INSIDE;
+    }
+
+    /// Test if another rect is inside, outside or intersects.
+    Intersection IsInside(const IntRect& rect) const
+    {
+        if (rect.right_ < left_ || rect.left_ >= right_ || rect.bottom_ < top_ || rect.top_ >= bottom_)
+            return OUTSIDE;
+        else if (rect.left_ < left_ || rect.right_ > right_ || rect.top_ < top_ || rect.bottom_ > bottom_)
+            return INTERSECTS;
         else
             return INSIDE;
     }

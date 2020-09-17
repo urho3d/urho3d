@@ -152,7 +152,7 @@ void Localization::Reset()
     strings_.Clear();
 }
 
-void Localization::LoadJSONFile(const String& name, const String language)
+void Localization::LoadJSONFile(const String& name, const String& language)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     auto* jsonFile = cache->GetResource<JSONFile>(name);

@@ -113,7 +113,7 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     BorderImage::GetBatches(batches, vertexData, currentScissor);
 }
 
-void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     UIElement::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 
@@ -126,7 +126,7 @@ void Window::OnHover(const IntVector2& position, const IntVector2& screenPositio
         SetCursorShape(dragMode_, cursor);
 }
 
-void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
 
@@ -144,7 +144,7 @@ void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPos
 }
 
 void Window::OnDragMove(const IntVector2& /*position*/, const IntVector2& screenPosition, const IntVector2& /*deltaPos*/,
-    int /*buttons*/, int /*qualifiers*/, Cursor* cursor)
+    MouseButtonFlags /*buttons*/, QualifierFlags /*qualifiers*/, Cursor* cursor)
 {
     if (dragMode_ == DRAG_NONE)
         return;
@@ -229,17 +229,17 @@ void Window::OnDragMove(const IntVector2& /*position*/, const IntVector2& screen
     SetCursorShape(dragMode_, cursor);
 }
 
-void Window::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+void Window::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor)
 {
-    UIElement::OnDragEnd(position, screenPosition, dragButtons, buttons, cursor);
+    UIElement::OnDragEnd(position, screenPosition, dragButtons, releaseButtons, cursor);
 
     dragMode_ = DRAG_NONE;
 }
 
-void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
+void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags cancelButtons,
     Cursor* cursor)
 {
-    UIElement::OnDragCancel(position, screenPosition, dragButtons, buttons, cursor);
+    UIElement::OnDragCancel(position, screenPosition, dragButtons, cancelButtons, cursor);
 
     if (dragButtons == MOUSEB_LEFT && dragMode_ != DRAG_NONE)
     {

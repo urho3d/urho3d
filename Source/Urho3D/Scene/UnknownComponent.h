@@ -93,7 +93,7 @@ private:
     String typeName_;
     /// XML format attribute infos.
     Vector<AttributeInfo> xmlAttributeInfos_;
-    /// XML format attribute data (as strings)
+    /// XML format attribute data (as strings).
     Vector<String> xmlAttributes_;
     /// Binary attributes.
     PODVector<unsigned char> binaryAttributes_;

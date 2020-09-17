@@ -192,7 +192,7 @@ public:
     bool useQuantize_;
 
 private:
-    /// Shared vertex/index data used in the collision
+    /// Shared vertex/index data used in the collision.
     Vector<SharedArrayPtr<unsigned char> > dataArrays_;
 };
 

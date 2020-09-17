@@ -103,6 +103,9 @@ void RenderSurface::OnDeviceLost()
     // Clean up also from non-active FBOs
     graphics->CleanupRenderSurface(this);
 
+    if (renderBuffer_ && !graphics->IsDeviceLost())
+        glDeleteRenderbuffersEXT(1, &renderBuffer_);
+
     renderBuffer_ = 0;
 }
 

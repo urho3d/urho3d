@@ -38,7 +38,7 @@ namespace Urho3D
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.
 class URHO3D_API SplinePath : public Component
 {
-    URHO3D_OBJECT(SplinePath, Component)
+    URHO3D_OBJECT(SplinePath, Component);
 
 public:
     /// Construct an Empty SplinePath.
@@ -78,7 +78,7 @@ public:
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
 
-    /// Get the length of SplinePath;
+    /// Get the length of SplinePath.
     float GetLength() const { return length_; }
 
     /// Get the parent Node's last position on the spline.

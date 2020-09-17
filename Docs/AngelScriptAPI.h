@@ -6017,6 +6017,7 @@ IntRect(const IntVector2&in, const IntVector2&in);
 IntRect(int[]&inout);
 // Methods:
 int Clip(const IntRect&);
+Intersection IsInside(const IntRect&) const;
 Intersection IsInside(const IntVector2&) const;
 int Merge(const IntRect&);
 
@@ -6844,7 +6845,7 @@ String GetLanguage(int);
 int GetLanguageIndex(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
-void LoadJSONFile(const String&, const String = String ( "" ) const);
+void LoadJSONFile(const String&, const String& = String ( "" ) const);
 void LoadMultipleLanguageJSON(const JSONValue&);
 void LoadSingleLanguageJSON(const JSONValue&, const String& = String ( "" ) const);
 void Reset();

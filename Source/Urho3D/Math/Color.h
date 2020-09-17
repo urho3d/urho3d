@@ -50,7 +50,7 @@ public:
     /// Mask for 0xAARRGGBB layout.
     static const ChannelMask ARGB;
 
-    /// Construct with default values (opaque white.)
+    /// Construct with default values (opaque white).
     Color() noexcept :
         r_(1.0f),
         g_(1.0f),

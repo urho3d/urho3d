@@ -108,7 +108,7 @@ void RigidBody2D::SetBodyType(BodyType2D type)
     if (body_)
     {
         body_->SetType(bodyType);
-        // Mass data was reset to keep it legal (e.g. static body should have mass 0.)
+        // Mass data was reset to keep it legal (e.g. static body should have mass 0).
         // If not using fixture mass, reassign our mass data now
         if (!useFixtureMass_)
             body_->SetMassData(&massData_);
@@ -234,7 +234,7 @@ void RigidBody2D::SetFixedRotation(bool fixedRotation)
     if (body_)
     {
         body_->SetFixedRotation(fixedRotation);
-        // Mass data was reset to keep it legal (e.g. non-rotating body should have inertia 0.)
+        // Mass data was reset to keep it legal (e.g. non-rotating body should have inertia 0).
         // If not using fixture mass, reassign our mass data now
         if (!useFixtureMass_)
             body_->SetMassData(&massData_);

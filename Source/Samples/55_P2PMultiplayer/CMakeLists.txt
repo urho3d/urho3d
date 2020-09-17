@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2020 the Urho3D project.
+# Copyright (c) 2008-2018 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,18 @@
 # THE SOFTWARE.
 #
 
-# Post process to glue the main module and side module(s) together
-
-string (REPLACE " " .js',' SIDE_MODULES "'${SIDE_MODULES}.js'")              # Stringify for string replacement
-if (HAS_SHELL_FILE)
-    file (READ ${TARGET_FILE} CONTENT)
-    string (REPLACE ${TARGET_NAME}.js libUrho3D.js CONTENT "${CONTENT}")     # Stringify to preserve semicolons
-    # Assume HTML shell-file has Module object without the 'dynamicLibraries' prop defined yet
-    string (REGEX REPLACE "(var Module *= *{)" \\1dynamicLibraries:[${SIDE_MODULES}], CONTENT "${CONTENT}")
-    file (WRITE ${TARGET_FILE} "${CONTENT}")
-else ()
-    file (READ ${TARGET_DIR}/libUrho3D.js CONTENT)
-    file (WRITE ${TARGET_DIR}/${TARGET_NAME}.main.js "var Module={dynamicLibraries:[${SIDE_MODULES}]};${CONTENT}")
+if (NOT URHO3D_NETWORK)
+    return ()
 endif ()
+
+# Define target name
+set (TARGET_NAME 55_P2PMultiplayer)
+
+# Define source files
+define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
+
+# Setup target with resource copying
+setup_main_executable ()
+
+# Setup test cases
+setup_test ()

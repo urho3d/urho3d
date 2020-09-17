@@ -37,6 +37,10 @@ env:
     - LINUX=1 URHO3D_LIB_TYPE=SHARED
     - LINUX=1 URHO3D_LIB_TYPE=STATIC CC=clang CXX=clang++                                                     # Clang
     - LINUX=1 URHO3D_LIB_TYPE=SHARED CC=clang CXX=clang++
+    - LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_SSL=1
+    - LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_SSL=1
+    - LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_SSL=1 URHO3D_SSL_DYNAMIC=1
+    - LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_SSL=1 URHO3D_SSL_DYNAMIC=1
     # Linux native 32-bit
     - LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
@@ -129,9 +133,9 @@ environment:
   URHO3D_D3D11: 1
   URHO3D_LUAJIT: 1
   MINGW: 1
-  # MinGW-w64 on Windows is NOT multilib capable but we are installing the ones that support C++14 standard
-  x86_64-posix-seh: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/6.3.0/threads-posix/seh/x86_64-6.3.0-release-posix-seh-rt_v5-rev1.7z
-  i686-posix-dwarf: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/6.3.0/threads-posix/dwarf/i686-6.3.0-release-posix-dwarf-rt_v5-rev1.7z
+  # MinGW-w64 on Windows is NOT multilib capable
+  x86_64-posix-seh: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z
+  i686-posix-dwarf: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
@@ -151,7 +155,7 @@ before_build:
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
   - if "%PLATFORM%" == "x64" (set "URHO3D_64BIT=1" && set "MINGW_URL=%x86_64-posix-seh%" && set "ARCH=64") else (set "MINGW_URL=%i686-posix-dwarf%" && set "ARCH=32")
-  - if not exist "C:\tools\mingw%ARCH%" curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
+  - if not exist "C:\tools\mingw%ARCH%" curl -fsSLo "mingw.7z" "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
   - set "PATH=C:\tools\mingw%ARCH%\bin;%PATH%"
 build_script:
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
@@ -268,12 +272,12 @@ env:
     - numjobs=4
     - RPI=1
   matrix:
-    # RPI 1
-    - URHO3D_LIB_TYPE=STATIC
-    - URHO3D_LIB_TYPE=SHARED
-    # RPI 2/3
-    - URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
-    - URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
+    # RPI 4 64-bit
+    - URHO3D_LIB_TYPE=STATIC RPI_ABI=RPI4
+    - URHO3D_LIB_TYPE=SHARED RPI_ABI=RPI4
+    # RPI 3
+    - URHO3D_64BIT=0 URHO3D_LIB_TYPE=STATIC RPI_ABI=RPI3
+    - URHO3D_64BIT=0 URHO3D_LIB_TYPE=SHARED RPI_ABI=RPI3
 stage: release build configuration
 before_script:
   - rake ci_timer
@@ -362,7 +366,7 @@ cache:
   directories:
     - $HOME/.ccache
     - $HOME/initial-build-tree
-osx_image: xcode11
+osx_image: xcode11.6
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -372,10 +376,10 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
   matrix:
-    - XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=13.0 sdk=appletvsimulator
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=13.0 sdk=iphonesimulator
-    - XCODE=1 URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.14 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.14
+    - XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=13.4 sdk=appletvsimulator
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=13.4 sdk=iphonesimulator
+    - XCODE=1 URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.15 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1 URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.15
     - MAKEFILE=1 URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
     - MAKEFILE=1 URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
 stage: release build configuration

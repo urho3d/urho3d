@@ -53,6 +53,12 @@
 #endif
 
 #ifdef __EMSCRIPTEN__
+#include "../Input/Input.h"
+#include "../UI/Cursor.h"
+#include "../UI/UI.h"
+#include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
+
 // Emscripten provides even all GL extension functions via static linking. However there is
 // no GLES2-specific extension header at the moment to include instanced rendering declarations,
 // so declare them manually from GLES3 gl2ext.h. Emscripten will provide these when linking final output.
@@ -61,6 +67,71 @@ extern "C"
     GL_APICALL void GL_APIENTRY glDrawArraysInstancedANGLE (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
     GL_APICALL void GL_APIENTRY glDrawElementsInstancedANGLE (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
     GL_APICALL void GL_APIENTRY glVertexAttribDivisorANGLE (GLuint index, GLuint divisor);
+}
+
+// Helper functions to support emscripten canvas resolution change
+static const Urho3D::Context *appContext;
+
+static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
+{
+    URHO3D_LOGINFOF("JSCanvasSize: width=%d height=%d fullscreen=%d ui scale=%f", width, height, fullscreen, scale);
+
+    using namespace Urho3D;
+
+    if (appContext)
+    {
+        bool uiCursorVisible = false;
+        bool systemCursorVisible = false;
+        MouseMode mouseMode{};
+
+        // Detect current system pointer state
+        Input* input = appContext->GetSubsystem<Input>();
+        if (input)
+        {
+            systemCursorVisible = input->IsMouseVisible();
+            mouseMode = input->GetMouseMode();
+        }
+
+        UI* ui = appContext->GetSubsystem<UI>();
+        if (ui)
+        {
+            ui->SetScale(scale);
+
+            // Detect current UI pointer state
+            Cursor* cursor = ui->GetCursor();
+            if (cursor)
+                uiCursorVisible = cursor->IsVisible();
+        }
+
+        // Apply new resolution
+        appContext->GetSubsystem<Graphics>()->SetMode(width, height);
+
+        // Reset the pointer state as it was before resolution change
+        if (input)
+        {
+            if (uiCursorVisible)
+                input->SetMouseVisible(false);
+            else
+                input->SetMouseVisible(systemCursorVisible);
+
+            input->SetMouseMode(mouseMode);
+        }
+
+        if (ui)
+        {
+            Cursor* cursor = ui->GetCursor();
+            if (cursor)
+            {
+                cursor->SetVisible(uiCursorVisible);
+                cursor->SetPosition(input->GetMousePosition());
+            }
+        }
+    }
+}
+
+using namespace emscripten;
+EMSCRIPTEN_BINDINGS(Module) {
+    function("JSCanvasSize", &JSCanvasSize);
 }
 #endif
 
@@ -242,6 +313,10 @@ Graphics::Graphics(Context* context) :
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
+
+#ifdef __EMSCRIPTEN__
+    appContext = context_;
+#endif
 }
 
 Graphics::~Graphics()
@@ -254,106 +329,34 @@ Graphics::~Graphics()
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
-    bool tripleBuffer, int multiSample, int monitor, int refreshRate)
+bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& params, bool maximize)
 {
     URHO3D_PROFILE(SetScreenMode);
 
-    bool maximize = false;
+    // Ensure that parameters are properly filled
+    ScreenModeParams newParams = params;
+    AdjustScreenMode(width, height, newParams, maximize);
 
-#if defined(IOS) || defined(TVOS)
-    // iOS and tvOS app always take the fullscreen (and with status bar hidden)
-    fullscreen = true;
-#endif
-
-    // Make sure monitor index is not bigger than the currently detected monitors
-    int monitors = SDL_GetNumVideoDisplays();
-    if (monitor >= monitors || monitor < 0)
-        monitor = 0; // this monitor is not present, use first monitor
-
-    // Fullscreen or Borderless can not be resizable
-    if (fullscreen || borderless)
-        resizable = false;
-
-    // Borderless cannot be fullscreen, they are mutually exclusive
-    if (borderless)
-        fullscreen = false;
-
-    multiSample = Clamp(multiSample, 1, 16);
-
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ &&
-        monitor == monitor_ && refreshRate == refreshRate_)
+    if (IsInitialized() && width == width_ && height == height_ && screenParams_ == newParams)
         return true;
 
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && monitor == monitor_ &&
-        refreshRate == refreshRate_ && vsync != vsync_)
+    if (IsInitialized() && width == width_ && height == height_
+        && screenParams_.EqualsExceptVSync(newParams) && screenParams_.vsync_ != newParams.vsync_)
     {
-        SDL_GL_SetSwapInterval(vsync ? 1 : 0);
-        vsync_ = vsync;
+        SDL_GL_SetSwapInterval(newParams.vsync_ ? 1 : 0);
+        screenParams_.vsync_ = newParams.vsync_;
         return true;
     }
 
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size.
-    // If zero in fullscreen, use desktop mode
-    if (!width || !height)
-    {
-        if (fullscreen || borderless)
-        {
-            SDL_DisplayMode mode;
-            SDL_GetDesktopDisplayMode(monitor, &mode);
-            width = mode.w;
-            height = mode.h;
-        }
-        else
-        {
-            maximize = resizable;
-            width = 1024;
-            height = 768;
-        }
-    }
-
-    // Check fullscreen mode validity (desktop only). Use a closest match if not found
-#ifdef DESKTOP_GRAPHICS
-    if (fullscreen)
-    {
-        PODVector<IntVector3> resolutions = GetResolutions(monitor);
-        if (resolutions.Size())
-        {
-            unsigned best = 0;
-            unsigned bestError = M_MAX_UNSIGNED;
-
-            for (unsigned i = 0; i < resolutions.Size(); ++i)
-            {
-                unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
-                if (refreshRate != 0)
-                    error += (unsigned)(Abs(resolutions[i].z_ - refreshRate));
-                if (error < bestError)
-                {
-                    best = i;
-                    bestError = error;
-                }
-            }
-
-            width = resolutions[best].x_;
-            height = resolutions[best].y_;
-            refreshRate = resolutions[best].z_;
-        }
-    }
-#endif
+    // Track if the window was repositioned and don't update window position in this case
+    bool reposition = false;
 
     // With an external window, only the size can change after initial setup, so do not recreate context
     if (!externalWindow_ || !impl_->context_)
     {
         // Close the existing window and OpenGL context, mark GPU objects as lost
         Release(false, true);
-
-#ifdef IOS
-        // On iOS window needs to be resizable to handle orientation changes properly
-        resizable = true;
-#endif
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
@@ -387,10 +390,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
 
-        if (multiSample > 1)
+        if (newParams.multiSample_ > 1)
         {
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, newParams.multiSample_);
         }
         else
         {
@@ -399,21 +402,24 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         }
 
         SDL_Rect display_rect;
-        SDL_GetDisplayBounds(monitor, &display_rect);
-        bool reposition = fullscreen || (borderless && width >= display_rect.w && height >= display_rect.h);
+        SDL_GetDisplayBounds(newParams.monitor_, &display_rect);
+        reposition = newParams.fullscreen_ || (newParams.borderless_ && width >= display_rect.w && height >= display_rect.h);
 
-        int x = reposition ? display_rect.x : position_.x_;
-        int y = reposition ? display_rect.y : position_.y_;
+        const int x = reposition ? display_rect.x : position_.x_;
+        const int y = reposition ? display_rect.y : position_.y_;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-        if (fullscreen)
+        if (newParams.fullscreen_)
             flags |= SDL_WINDOW_FULLSCREEN;
-        if (borderless)
+        if (newParams.borderless_)
             flags |= SDL_WINDOW_BORDERLESS;
-        if (resizable)
+        if (newParams.resizable_)
             flags |= SDL_WINDOW_RESIZABLE;
-        if (highDPI)
+
+#ifndef __EMSCRIPTEN__
+        if (newParams.highDPI_)
             flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
 
         SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
@@ -426,7 +432,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 #ifndef __EMSCRIPTEN__
                 if (!window_)
                     window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
-                fullscreen = false;
+                newParams.fullscreen_ = false;
 #endif
             }
 
@@ -434,10 +440,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 break;
             else
             {
-                if (multiSample > 1)
+                if (newParams.multiSample_ > 1)
                 {
                     // If failed with multisampling, retry first without
-                    multiSample = 1;
+                    newParams.multiSample_ = 1;
                     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
                     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
                 }
@@ -470,29 +476,22 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     }
 
     // Set vsync
-    SDL_GL_SetSwapInterval(vsync ? 1 : 0);
+    SDL_GL_SetSwapInterval(newParams.vsync_ ? 1 : 0);
 
     // Store the system FBO on iOS/tvOS now
 #if defined(IOS) || defined(TVOS)
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
 #endif
 
-    fullscreen_ = fullscreen;
-    borderless_ = borderless;
-    resizable_ = resizable;
-    vsync_ = vsync;
-    tripleBuffer_ = tripleBuffer;
-    multiSample_ = multiSample;
-    monitor_ = monitor;
-    refreshRate_ = refreshRate;
+    screenParams_ = newParams;
 
     SDL_GL_GetDrawableSize(window_, &width_, &height_);
-    if (!fullscreen)
+    if (!reposition)
         SDL_GetWindowPosition(window_, &position_.x_, &position_.y_);
 
     int logicalWidth, logicalHeight;
     SDL_GetWindowSize(window_, &logicalWidth, &logicalHeight);
-    highDPI_ = (width_ != logicalWidth) || (height_ != logicalHeight);
+    screenParams_.highDPI_ = (width_ != logicalWidth) || (height_ != logicalHeight);
 
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
@@ -505,39 +504,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 #ifdef URHO3D_LOGGING
     URHO3D_LOGINFOF("Adapter used %s %s", (const char *) glGetString(GL_VENDOR), (const char *) glGetString(GL_RENDERER));
-
-    String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d rate %d Hz %s monitor %d", width_, height_, refreshRate_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
-    if (borderless_)
-        msg.Append(" borderless");
-    if (resizable_)
-        msg.Append(" resizable");
-    if (highDPI_)
-        msg.Append(" highDPI");
-    if (multiSample > 1)
-        msg.AppendWithFormat(" multisample %d", multiSample);
-    URHO3D_LOGINFO(msg);
 #endif
 
-    using namespace ScreenMode;
-
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WIDTH] = width_;
-    eventData[P_HEIGHT] = height_;
-    eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_BORDERLESS] = borderless_;
-    eventData[P_RESIZABLE] = resizable_;
-    eventData[P_HIGHDPI] = highDPI_;
-    eventData[P_MONITOR] = monitor_;
-    eventData[P_REFRESHRATE] = refreshRate_;
-    SendEvent(E_SCREENMODE, eventData);
-
+    OnScreenModeChanged();
     return true;
-}
-
-bool Graphics::SetMode(int width, int height)
-{
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -2252,7 +2222,7 @@ void Graphics::OnWindowResized()
 
     int logicalWidth, logicalHeight;
     SDL_GetWindowSize(window_, &logicalWidth, &logicalHeight);
-    highDPI_ = (width_ != logicalWidth) || (height_ != logicalHeight);
+    screenParams_.highDPI_ = (width_ != logicalWidth) || (height_ != logicalHeight);
 
     // Reset rendertargets and viewport for the new screen size. Also clean up any FBO's, as they may be screen size dependent
     CleanupFramebuffers();
@@ -2260,21 +2230,27 @@ void Graphics::OnWindowResized()
 
     URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
 
+#ifdef __EMSCRIPTEN__
+    EM_ASM({
+        Module.SetRendererSize($0, $1);
+    }, width_, height_);
+#endif
+
     using namespace ScreenMode;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
-    eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
-    eventData[P_BORDERLESS] = borderless_;
-    eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_FULLSCREEN] = screenParams_.fullscreen_;
+    eventData[P_RESIZABLE] = screenParams_.resizable_;
+    eventData[P_BORDERLESS] = screenParams_.borderless_;
+    eventData[P_HIGHDPI] = screenParams_.highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
 void Graphics::OnWindowMoved()
 {
-    if (!window_ || fullscreen_)
+    if (!window_ || screenParams_.fullscreen_)
         return;
 
     int newX, newY;
@@ -2409,7 +2385,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
 #if defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
-    if (closeWindow && fullscreen_ && !externalWindow_)
+    if (closeWindow && screenParams_.fullscreen_ && !externalWindow_)
         SDL_SetWindowFullscreen(window_, 0);
 #endif
 

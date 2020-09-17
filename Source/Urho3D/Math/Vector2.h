@@ -389,7 +389,7 @@ public:
     static const Vector2 ONE;
 };
 
-/// Multiply Vector2 with a scalar
+/// Multiply Vector2 with a scalar.
 inline Vector2 operator *(float lhs, const Vector2& rhs) { return rhs * lhs; }
 
 /// Multiply IntVector2 with a scalar.

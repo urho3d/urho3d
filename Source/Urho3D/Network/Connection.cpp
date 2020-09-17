@@ -77,7 +77,9 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     connectPending_(false),
     sceneLoaded_(false),
     logStatistics_(false),
-    address_(nullptr)
+    address_(nullptr),
+    packedMessageLimit_(1024),
+    ready_(false)
 {
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
@@ -95,6 +97,20 @@ Connection::~Connection()
     address_ = nullptr;
 }
 
+PacketType Connection::GetPacketType(bool reliable, bool inOrder)
+{
+    if (reliable && inOrder)
+        return PT_RELIABLE_ORDERED;
+
+    if (reliable && !inOrder)
+        return PT_RELIABLE_UNORDERED;
+
+    if (!reliable && inOrder)
+        return PT_UNRELIABLE_ORDERED;
+
+    return PT_UNRELIABLE_UNORDERED;
+}
+
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
 {
     SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
@@ -108,15 +124,21 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
         return;
     }
 
-    VectorBuffer buffer;
-    buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
-    buffer.WriteUInt((unsigned int)msgID);
-    buffer.Write(data, numBytes);
-    PacketReliability reliability = reliable ? (inOrder ? RELIABLE_ORDERED : RELIABLE) : (inOrder ? UNRELIABLE_SEQUENCED : UNRELIABLE);
-    if (peer_) {
-        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0, *address_, false);
-        tempPacketCounter_.y_++;
+    PacketType type = GetPacketType(reliable, inOrder);
+    VectorBuffer& buffer = outgoingBuffer_[type];
+
+    if (buffer.GetSize() + numBytes >= packedMessageLimit_)
+        SendBuffer(type);
+
+    if (buffer.GetSize() == 0)
+    {
+        buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
+        buffer.WriteUInt((unsigned int)MSG_PACKED_MESSAGE);
     }
+
+    buffer.WriteUInt((unsigned int) msgID);
+    buffer.WriteUInt(numBytes);
+    buffer.Write(data, numBytes);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -363,6 +385,39 @@ void Connection::SendPackages()
     }
 }
 
+void Connection::SendBuffer(PacketType type)
+{
+    VectorBuffer& buffer = outgoingBuffer_[type];
+    if (buffer.GetSize() == 0)
+        return;
+
+    PacketReliability reliability = PacketReliability::UNRELIABLE;
+    if (type == PT_UNRELIABLE_ORDERED)
+        reliability = PacketReliability::UNRELIABLE_SEQUENCED;
+
+    if (type == PT_RELIABLE_ORDERED)
+        reliability = PacketReliability::RELIABLE_ORDERED;
+
+    if (type == PT_RELIABLE_UNORDERED)
+        reliability = PacketReliability::RELIABLE;
+
+    if (peer_) {
+        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0,
+                    *address_, false);
+        tempPacketCounter_.y_++;
+    }
+
+    buffer.Clear();
+}
+
+void Connection::SendAllBuffers()
+{
+    SendBuffer(PT_RELIABLE_ORDERED);
+    SendBuffer(PT_RELIABLE_UNORDERED);
+    SendBuffer(PT_UNRELIABLE_ORDERED);
+    SendBuffer(PT_UNRELIABLE_UNORDERED);
+}
+
 void Connection::ProcessPendingLatestData()
 {
     if (!scene_ || !sceneLoaded_)
@@ -400,71 +455,83 @@ void Connection::ProcessPendingLatestData()
     }
 }
 
-bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
+bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
 {
-    //URHO3D_LOGINFO("Process message " + String(msgID));
     // New incomming message, reset last heard timer
     lastHeardTimer_.Reset();
+
     tempPacketCounter_.x_++;
-    bool processed = true;
+    if (buffer.GetSize() == 0)
+        return false;
 
-    switch (msgID)
+    if (msgID != MSG_PACKED_MESSAGE)
     {
-    case MSG_IDENTITY:
-        processed = ProcessIdentity(msgID, msg);
-        break;
-
-    case MSG_CONTROLS:
-        ProcessControls(msgID, msg);
-        break;
-
-    case MSG_SCENELOADED:
-        ProcessSceneLoaded(msgID, msg);
-        break;
-
-    case MSG_REQUESTPACKAGE:
-    case MSG_PACKAGEDATA:
-        ProcessPackageDownload(msgID, msg);
-        break;
-
-    case MSG_LOADSCENE:
-        ProcessLoadScene(msgID, msg);
-        break;
-
-    case MSG_SCENECHECKSUMERROR:
-        ProcessSceneChecksumError(msgID, msg);
-        break;
-
-    case MSG_CREATENODE:
-    case MSG_NODEDELTAUPDATE:
-    case MSG_NODELATESTDATA:
-    case MSG_REMOVENODE:
-    case MSG_CREATECOMPONENT:
-    case MSG_COMPONENTDELTAUPDATE:
-    case MSG_COMPONENTLATESTDATA:
-    case MSG_REMOVECOMPONENT:
-        ProcessSceneUpdate(msgID, msg);
-        break;
-
-    case MSG_REMOTEEVENT:
-    case MSG_REMOTENODEEVENT:
-        ProcessRemoteEvent(msgID, msg);
-        break;
-
-    case MSG_PACKAGEINFO:
-        ProcessPackageInfo(msgID, msg);
-        break;
-
-    case MSG_P2P_JOIN_REQUEST_DENIED:
-        ProcessP2PRequest(msgID);
-        break;
-
-    default:
-        processed = false;
-        break;
+        ProcessUnknownMessage(msgID, buffer);
+        return true;
     }
 
-    return processed;
+    while (!buffer.IsEof()) {
+        msgID = buffer.ReadUInt();
+        unsigned int packetSize = buffer.ReadUInt();
+        MemoryBuffer msg(buffer.GetData() + buffer.GetPosition(), packetSize);
+        buffer.Seek(buffer.GetPosition() + packetSize);
+
+        switch (msgID)
+        {
+            case MSG_IDENTITY:
+                ProcessIdentity(msgID, msg);
+                break;
+
+            case MSG_CONTROLS:
+                ProcessControls(msgID, msg);
+                break;
+
+            case MSG_SCENELOADED:
+                ProcessSceneLoaded(msgID, msg);
+                break;
+
+            case MSG_REQUESTPACKAGE:
+            case MSG_PACKAGEDATA:
+                ProcessPackageDownload(msgID, msg);
+                break;
+
+            case MSG_LOADSCENE:
+                ProcessLoadScene(msgID, msg);
+                break;
+
+            case MSG_SCENECHECKSUMERROR:
+                ProcessSceneChecksumError(msgID, msg);
+                break;
+
+            case MSG_CREATENODE:
+            case MSG_NODEDELTAUPDATE:
+            case MSG_NODELATESTDATA:
+            case MSG_REMOVENODE:
+            case MSG_CREATECOMPONENT:
+            case MSG_COMPONENTDELTAUPDATE:
+            case MSG_COMPONENTLATESTDATA:
+            case MSG_REMOVECOMPONENT:
+                ProcessSceneUpdate(msgID, msg);
+                break;
+
+            case MSG_P2P_JOIN_REQUEST_DENIED:
+                ProcessP2PRequest(msgID);
+                break;
+
+            case MSG_REMOTEEVENT:
+            case MSG_REMOTENODEEVENT:
+                ProcessRemoteEvent(msgID, msg);
+                break;
+
+            case MSG_PACKAGEINFO:
+                ProcessPackageInfo(msgID, msg);
+                break;
+            default:
+                ProcessUnknownMessage(msgID, msg);
+                break;
+        }
+    }
+    return true;
 }
 
 void Connection::Ban(const String& reason)
@@ -1138,6 +1205,11 @@ void Connection::ConfigureNetworkSimulator(int latencyMs, float packetLoss)
         peer_->ApplyNetworkSimulator(packetLoss, latencyMs, 0);
 }
 
+void Connection::SetPacketSizeLimit(int limit)
+{
+    packedMessageLimit_ = limit;
+}
+
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
 {
     sceneLoaded_ = true;
@@ -1600,6 +1672,17 @@ void Connection::ProcessP2PRequest(int msgID)
     URHO3D_LOGERROR("P2P join request denied!");
 }
 
+void Connection::ProcessUnknownMessage(int msgID, MemoryBuffer& msg)
+{
+    // If message was not handled internally, forward as an event
+    using namespace NetworkMessage;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_CONNECTION] = this;
+    eventData[P_MESSAGEID] = (int)msgID;
+    eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
+    SendEvent(E_NETWORKMESSAGE, eventData);
+}
 
 String Connection::GetAddress() const {
     return String(address_->ToString(false /*write port*/)); 

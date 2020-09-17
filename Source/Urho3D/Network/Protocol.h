@@ -27,7 +27,7 @@ namespace Urho3D
 
 /// Client->server: send VariantMap of identity and authentication data.
 static const int MSG_IDENTITY = 0x87;
-/// Client->server: send controls (buttons and mouse movement.)
+/// Client->server: send controls (buttons and mouse movement).
 static const int MSG_CONTROLS = 0x88;
 /// Client->server: scene has been loaded and client is ready to proceed.
 static const int MSG_SCENELOADED = 0x89;
@@ -67,6 +67,9 @@ static const int MSG_PACKAGEINFO = 0x98;
 static const int MSG_P2P_JOIN_REQUEST = 0x99;
 /// Server->client deny P2P join request
 static const int MSG_P2P_JOIN_REQUEST_DENIED = 0x9A;
+
+/// Packet that includes all the above messages
+static const int MSG_PACKED_MESSAGE = 0x99;
 
 /// Fixed content ID for client controls update.
 static const unsigned CONTROLS_CONTENT_ID = 1;

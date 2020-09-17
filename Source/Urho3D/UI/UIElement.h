@@ -153,30 +153,30 @@ public:
     /// Return UI rendering batches for debug draw.
     virtual void GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to mouse hover.
-    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor);
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) { }
     /// React to mouse click end.
     virtual void OnClickEnd
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor,
             UIElement* beginElement) { }
     /// React to double mouse click.
     virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) { }
     /// React to mouse drag begin.
     virtual void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
     virtual void OnDragMove
-        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
+        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers,
             Cursor* cursor);
     /// React to mouse drag end.
     virtual void
-        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int releaseButton, Cursor* cursor);
-    /// React to a mouse drag cancel event (ie, when an extra button is pressed)
+        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor);
+    /// React to a mouse drag cancel event (ie, when an extra button is pressed).
     virtual void OnDragCancel
-        (const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int cancelButton, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags cancelButtons, Cursor* cursor);
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
     virtual bool OnDragDropTest(UIElement* source);
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
@@ -261,11 +261,11 @@ public:
     void SetVerticalAlignment(VerticalAlignment align);
     /// Enable automatic positioning & sizing of the element relative to its parent using min/max anchor and min/max offset. Default false.
     void SetEnableAnchor(bool enable);
-    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
     void SetMinAnchor(const Vector2& anchor);
     /// Set minimum anchor.
     void SetMinAnchor(float x, float y);
-    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
     void SetMaxAnchor(const Vector2& anchor);
     /// Set maximum anchor.
     void SetMaxAnchor(float x, float y);
@@ -273,9 +273,9 @@ public:
     void SetMinOffset(const IntVector2& offset);
     /// Set offset of element's bottom right from the maximum anchor in pixels. No effect when anchor is not enabled.
     void SetMaxOffset(const IntVector2& offset);
-    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal & vertical alignment.
     void SetPivot(const Vector2& pivot);
-    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal & vertical alignment.
     void SetPivot(float x, float y);
     /// Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
@@ -378,7 +378,7 @@ public:
     void SetTags(const StringVector& tags);
     /// Add a tag.
     void AddTag(const String& tag);
-    /// Add tags with the specified separator, by default ;
+    /// Add tags with the specified separator (; by default).
     void AddTags(const String& tags, char separator = ';');
     /// Add tags.
     void AddTags(const StringVector& tags);
@@ -483,7 +483,7 @@ public:
     /// Return opacity.
     float GetOpacity() const { return opacity_; }
 
-    /// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
+    /// Return derived opacity (affected by parent elements). If UseDerivedOpacity is false, returns same as element's own opacity.
     float GetDerivedOpacity() const;
 
     /// Return whether should be brought to front when focused.
@@ -522,7 +522,7 @@ public:
     /// Return whether element itself should be visible. Elements can be also hidden due to the parent being not visible, use IsVisibleEffective() to check.
     bool IsVisible() const { return visible_; }
 
-    /// Return whether element is effectively visible (parent element chain is visible.)
+    /// Return whether element is effectively visible (parent element chain is visible).
     bool IsVisibleEffective() const;
 
     /// Return whether the cursor is hovering on this element.
@@ -572,6 +572,9 @@ public:
     /// Return child elements either recursively or non-recursively.
     void GetChildren(PODVector<UIElement*>& dest, bool recursive = false) const;
 
+    /// Return child elements, optionally recursive.
+    PODVector<UIElement*> GetChildren(bool recursive) const;
+
     /// Return parent element.
     UIElement* GetParent() const { return parent_; }
 
@@ -598,7 +601,7 @@ public:
     PODVector<UIElement*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return the drag button combo if this element is being dragged.
-    int GetDragButtonCombo() const { return dragButtonCombo_; }
+    MouseButtonFlags GetDragButtonCombo() const { return dragButtonCombo_; }
 
     /// Return the number of buttons dragging this element.
     unsigned GetDragButtonCount() const { return dragButtonCount_; }
@@ -740,7 +743,7 @@ protected:
     /// Applied style.
     String appliedStyle_;
     /// Drag button combo.
-    int dragButtonCombo_{};
+    MouseButtonFlags dragButtonCombo_{};
     /// Drag button count.
     unsigned dragButtonCount_{};
 
@@ -788,7 +791,7 @@ private:
     Vector2 anchorMin_;
     /// Anchor maximum position.
     Vector2 anchorMax_;
-    /// Pivot Position
+    /// Pivot Position.
     Vector2 pivot_;
     /// Opacity.
     float opacity_{1.0f};
@@ -798,7 +801,7 @@ private:
     mutable Color derivedColor_;
     /// Derived opacity dirty flag.
     mutable bool opacityDirty_{true};
-    /// Derived color dirty flag (only used when no gradient.)
+    /// Derived color dirty flag (only used when no gradient).
     mutable bool derivedColorDirty_{true};
     /// Child priority sorting dirty flag.
     bool sortOrderDirty_{};

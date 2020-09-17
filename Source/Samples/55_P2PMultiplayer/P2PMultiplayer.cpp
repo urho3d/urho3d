@@ -122,7 +122,7 @@ void P2PMultplayer::CreateUI()
     hostInfo_ = CreateLabel("Host: ", IntVector2(20, marginTop));
 
     marginTop = 340;
-    CreateLabel("Give the host role to other peers", IntVector2(20, marginTop));
+    CreateLabel("Give the 'host' role to other peers. Whoever is the host acts as a server.", IntVector2(20, marginTop));
     marginTop = 360;
     resetHost_ = CreateButton("Reset host", 240, IntVector2(20, marginTop));
 

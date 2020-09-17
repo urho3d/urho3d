@@ -269,93 +269,32 @@ Graphics::~Graphics()
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
-    int multiSample, int monitor, int refreshRate)
+bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& params, bool maximize)
 {
     URHO3D_PROFILE(SetScreenMode);
 
-    highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
-
-    bool maximize = false;
-
-    // Make sure monitor index is not bigger than the currently detected monitors
-    int monitors = SDL_GetNumVideoDisplays();
-    if (monitor >= monitors || monitor < 0)
-        monitor = 0; // this monitor is not present, use first monitor
+    // Ensure that parameters are properly filled
+    ScreenModeParams newParams = params;
+    AdjustScreenMode(width, height, newParams, maximize);
 
     // Find out the full screen mode display format (match desktop color depth)
     SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(monitor, &mode);
-    DXGI_FORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? DXGI_FORMAT_B5G6R5_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
-
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
-    if (!width || !height)
-    {
-        if (fullscreen || borderless)
-        {
-            width = mode.w;
-            height = mode.h;
-        }
-        else
-        {
-            maximize = resizable;
-            width = 1024;
-            height = 768;
-        }
-    }
-
-    // Fullscreen or Borderless can not be resizable
-    if (fullscreen || borderless)
-        resizable = false;
-
-    // Borderless cannot be fullscreen, they are mutually exclusive
-    if (borderless)
-        fullscreen = false;
+    SDL_GetDesktopDisplayMode(newParams.monitor_, &mode);
+    const DXGI_FORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? DXGI_FORMAT_B5G6R5_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
 
     // If nothing changes, do not reset the device
-    if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
-        resizable == resizable_ && vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ &&
-        monitor == monitor_ && refreshRate == refreshRate_)
+    if (width == width_ && height == height_ && newParams == screenParams_)
         return true;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
     if (!window_)
     {
-        if (!OpenWindow(width, height, resizable, borderless))
+        if (!OpenWindow(width, height, newParams.resizable_, newParams.borderless_))
             return false;
     }
 
-    // Check fullscreen mode validity. Use a closest match if not found
-    if (fullscreen)
-    {
-        PODVector<IntVector3> resolutions = GetResolutions(monitor);
-        if (resolutions.Size())
-        {
-            unsigned best = 0;
-            unsigned bestError = M_MAX_UNSIGNED;
-
-            for (unsigned i = 0; i < resolutions.Size(); ++i)
-            {
-                unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
-                if (refreshRate != 0)
-                    error += (unsigned)Abs(resolutions[i].z_ - refreshRate);
-                if (error < bestError)
-                {
-                    best = i;
-                    bestError = error;
-                }
-            }
-
-            width = resolutions[best].x_;
-            height = resolutions[best].y_;
-            refreshRate = resolutions[best].z_;
-        }
-    }
-
-    AdjustWindow(width, height, fullscreen, borderless, monitor);
-    monitor_ = monitor;
-    refreshRate_ = refreshRate;
+    AdjustWindow(width, height, newParams.fullscreen_, newParams.borderless_, newParams.monitor_);
 
     if (maximize)
     {
@@ -363,55 +302,19 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_GetWindowSize(window_, &width, &height);
     }
 
-    if (!impl_->device_ || multiSample_ != multiSample)
-        CreateDevice(width, height, multiSample);
-    UpdateSwapChain(width, height);
+    const int oldMultiSample = screenParams_.multiSample_;
+    screenParams_ = newParams;
 
-    fullscreen_ = fullscreen;
-    borderless_ = borderless;
-    resizable_ = resizable;
-    highDPI_ = highDPI;
-    vsync_ = vsync;
-    tripleBuffer_ = tripleBuffer;
+    if (!impl_->device_ || screenParams_.multiSample_ != oldMultiSample)
+        CreateDevice(width, height);
+    UpdateSwapChain(width, height);
 
     // Clear the initial window contents to black
     Clear(CLEAR_COLOR);
     impl_->swapChain_->Present(0, 0);
 
-#ifdef URHO3D_LOGGING
-    String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d rate %d Hz %s monitor %d", width_, height_, refreshRate_,
-        (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
-    if (borderless_)
-        msg.Append(" borderless");
-    if (resizable_)
-        msg.Append(" resizable");
-    if (highDPI_)
-        msg.Append(" highDPI");
-    if (multiSample > 1)
-        msg.AppendWithFormat(" multisample %d", multiSample);
-    URHO3D_LOGINFO(msg);
-#endif
-
-    using namespace ScreenMode;
-
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WIDTH] = width_;
-    eventData[P_HEIGHT] = height_;
-    eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_BORDERLESS] = borderless_;
-    eventData[P_RESIZABLE] = resizable_;
-    eventData[P_HIGHDPI] = highDPI_;
-    eventData[P_MONITOR] = monitor_;
-    eventData[P_REFRESHRATE] = refreshRate_;
-    SendEvent(E_SCREENMODE, eventData);
-
+    OnScreenModeChanged();
     return true;
-}
-
-bool Graphics::SetMode(int width, int height)
-{
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -423,7 +326,7 @@ void Graphics::SetSRGB(bool enable)
         if (impl_->swapChain_)
         {
             // Recreate swap chain for the new backbuffer format
-            CreateDevice(width_, height_, multiSample_);
+            CreateDevice(width_, height_);
             UpdateSwapChain(width_, height_);
         }
     }
@@ -496,7 +399,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     ID3D11Resource* source = nullptr;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
-    if (multiSample_ > 1)
+    if (screenParams_.multiSample_ > 1)
     {
         // If backbuffer is multisampled, need another DEFAULT usage texture to resolve the data to first
         CreateResolveTexture();
@@ -563,7 +466,7 @@ bool Graphics::BeginFrame()
     {
         // To prevent a loop of endless device loss and flicker, do not attempt to render when in fullscreen
         // and the window is minimized
-        if (fullscreen_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED))
+        if (screenParams_.fullscreen_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED))
             return false;
     }
 
@@ -590,7 +493,7 @@ void Graphics::EndFrame()
         URHO3D_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
-        impl_->swapChain_->Present(vsync_ ? 1 : 0, 0);
+        impl_->swapChain_->Present(screenParams_.vsync_ ? 1 : 0, 0);
     }
 
     // Clean up too large scratch buffers
@@ -683,7 +586,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     srcBox.back = 1;
 
     ID3D11Resource* source = nullptr;
-    bool resolve = multiSample_ > 1;
+    const bool resolve = screenParams_.multiSample_ > 1;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
     if (!resolve)
@@ -1845,16 +1748,16 @@ void Graphics::OnWindowResized()
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
-    eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
-    eventData[P_BORDERLESS] = borderless_;
-    eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_FULLSCREEN] = screenParams_.fullscreen_;
+    eventData[P_RESIZABLE] = screenParams_.resizable_;
+    eventData[P_BORDERLESS] = screenParams_.borderless_;
+    eventData[P_HIGHDPI] = screenParams_.highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
 void Graphics::OnWindowMoved()
 {
-    if (!impl_->device_ || !window_ || fullscreen_)
+    if (!impl_->device_ || !window_ || screenParams_.fullscreen_)
         return;
 
     int newX, newY;
@@ -2075,6 +1978,10 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
 {
     if (!externalWindow_)
     {
+        // Keep current window position because it may change in intermediate callbacks
+        const IntVector2 oldPosition = position_;
+        bool reposition = false;
+        bool resizePostponed = false;
         if (!newWidth || !newHeight)
         {
             SDL_MaximizeWindow(window_);
@@ -2085,13 +1992,18 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_Rect display_rect;
             SDL_GetDisplayBounds(monitor, &display_rect);
 
-            if (newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h))
+            reposition = newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h);
+            if (reposition)
             {
                 // Reposition the window on the specified monitor if it's supposed to cover the entire monitor
                 SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
             }
 
-            SDL_SetWindowSize(window_, newWidth, newHeight);
+            // Postpone window resize if exiting fullscreen to avoid redundant resolution change
+            if (!newFullscreen && screenParams_.fullscreen_)
+                resizePostponed = true;
+            else
+                SDL_SetWindowSize(window_, newWidth, newHeight);
         }
 
         // Turn off window fullscreen mode so it gets repositioned to the correct monitor
@@ -2101,6 +2013,16 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
         if (!newFullscreen) SDL_ShowWindow(window_);
+
+        // Resize now if was postponed
+        if (resizePostponed)
+            SDL_SetWindowSize(window_, newWidth, newHeight);
+
+        // Ensure that window keeps its position
+        if (!reposition)
+            SDL_SetWindowPosition(window_, oldPosition.x_, oldPosition.y_);
+        else
+            position_ = oldPosition;
     }
     else
     {
@@ -2110,7 +2032,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     }
 }
 
-bool Graphics::CreateDevice(int width, int height, int multiSample)
+bool Graphics::CreateDevice(int width, int height)
 {
     // Device needs only to be created once
     if (!impl_->device_)
@@ -2143,8 +2065,8 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
 
     // Check that multisample level is supported
     PODVector<int> multiSampleLevels = GetMultiSampleLevels();
-    if (!multiSampleLevels.Contains(multiSample))
-        multiSample = 1;
+    if (!multiSampleLevels.Contains(screenParams_.multiSample_))
+        screenParams_.multiSample_ = 1;
 
     // Create swap chain. Release old if necessary
     if (impl_->swapChain_)
@@ -2163,7 +2085,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     DXGI_RATIONAL refreshRateRational = {};
     IDXGIOutput* dxgiOutput = nullptr;
     UINT numModes = 0;
-    dxgiAdapter->EnumOutputs(monitor_, &dxgiOutput);
+    dxgiAdapter->EnumOutputs(screenParams_.monitor_, &dxgiOutput);
     dxgiOutput->GetDisplayModeList(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, 0);
 
     // find the best matching refresh rate with the specified resolution
@@ -2179,7 +2101,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
                 continue;
 
             float rate = (float)modes[i].RefreshRate.Numerator / modes[i].RefreshRate.Denominator;
-            unsigned error = (unsigned)(Abs(rate - refreshRate_));
+            unsigned error = (unsigned)(Abs(rate - screenParams_.refreshRate_));
             if (error < bestError)
             {
                 bestMatchingRateIndex = i;
@@ -2206,8 +2128,8 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.BufferDesc.RefreshRate.Numerator = refreshRateRational.Numerator;
     swapChainDesc.BufferDesc.RefreshRate.Denominator = refreshRateRational.Denominator;
     swapChainDesc.OutputWindow = GetWindowHandle(window_);
-    swapChainDesc.SampleDesc.Count = (UINT)multiSample;
-    swapChainDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(swapChainDesc.BufferDesc.Format, multiSample);
+    swapChainDesc.SampleDesc.Count = static_cast<UINT>(screenParams_.multiSample_);
+    swapChainDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(swapChainDesc.BufferDesc.Format, screenParams_.multiSample_);
     swapChainDesc.Windowed = TRUE;
     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -2234,7 +2156,6 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
         return false;
     }
 
-    multiSample_ = multiSample;
     return true;
 }
 
@@ -2301,8 +2222,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
     depthDesc.MipLevels = 1;
     depthDesc.ArraySize = 1;
     depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthDesc.SampleDesc.Count = (UINT)multiSample_;
-    depthDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(depthDesc.Format, multiSample_);
+    depthDesc.SampleDesc.Count = static_cast<UINT>(screenParams_.multiSample_);
+    depthDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(depthDesc.Format, screenParams_.multiSample_);
     depthDesc.Usage = D3D11_USAGE_DEFAULT;
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depthDesc.CPUAccessFlags = 0;

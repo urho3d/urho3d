@@ -99,11 +99,11 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     {
         offset += disabledOffset_;
     }
-    
+
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
-void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers,
     Cursor* cursor)
 {
     if (button == MOUSEB_LEFT)
@@ -120,7 +120,7 @@ void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPo
     }
 }
 
-void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers,
     Cursor* cursor, UIElement* beginElement)
 {
     if (pressed_ && button == MOUSEB_LEFT)
@@ -138,8 +138,8 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
     }
 }
 
-void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
-    int qualifiers, Cursor* cursor)
+void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons,
+    QualifierFlags qualifiers, Cursor* cursor)
 {
     SetPressed(true);
 }
@@ -149,8 +149,8 @@ void Button::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
     if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {
         // Simulate LMB click
-        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr);
-        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr, nullptr);
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, MOUSEB_NONE, QUAL_NONE, nullptr);
+        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, MOUSEB_NONE, QUAL_NONE, nullptr, nullptr);
     }
 }
 

@@ -1500,7 +1500,7 @@ void Renderer::UpdateQueuedViewport(unsigned index)
 
     auto* octree = scene->GetComponent<Octree>();
 
-    // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
+    // Update octree (perform early update for drawables which need that, and reinsert moved drawables).
     // However, if the same scene is viewed from multiple cameras, update the octree only once
     if (!updatedOctrees_.Contains(octree))
     {

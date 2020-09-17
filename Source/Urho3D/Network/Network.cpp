@@ -351,15 +351,6 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
         MemoryBuffer msg(data, (unsigned)numBytes);
         if (connection->ProcessMessage((int)msgID, msg))
             return;
-
-        // If message was not handled internally, forward as an event
-        using namespace NetworkMessage;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_CONNECTION] = connection;
-        eventData[P_MESSAGEID] = (int)msgID;
-        eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
-        connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
     else {
         URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()) + " => " + source.rakNetGuid.ToString());
@@ -378,7 +369,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection, c
 
     // It is possible that in P2P mode the incomming connection is already registered
     if (networkMode_ == PEER_TO_PEER && clientConnections_[connection]) {
-        //TODO proper scene state management
+        // TODO: proper scene state management
         clientConnections_[connection]->SetSceneLoaded(true);
         SendOutIdentityToPeers();
         return;
@@ -915,16 +906,16 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
             SLNet::RakNetGUID remoteGuid;
             NewConnectionEstablished(packet->guid, packet->systemAddress.ToString(false));
 
-//            for (unsigned int i=0; i < count; i++)
-//            {
-//                bsIn.Read(remoteAddress);
-//                bsIn.Read(remoteGuid);
-//                if (!remoteAddress.EqualsExcludingPort(*natPunchServerAddress_)) {
-//                    URHO3D_LOGINFO("BBBB GUID " + String(remoteGuid.ToString()));
-//                    NewConnectionEstablished(remoteGuid, remoteAddress.ToString(false));
-//
-//                }
-//            }
+            for (unsigned int i=0; i < count; i++)
+            {
+                bsIn.Read(remoteAddress);
+                bsIn.Read(remoteGuid);
+                if (!remoteAddress.EqualsExcludingPort(*natPunchServerAddress_)) {
+                    URHO3D_LOGINFO("BBBB GUID " + String(remoteGuid.ToString()));
+                    NewConnectionEstablished(remoteGuid, remoteAddress.ToString(false));
+
+                }
+            }
         }
 
         packetHandled = true;
@@ -1247,9 +1238,10 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         else {
             // we are client in either P2P or server-client mode
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            bool processed = serverConnection_->ProcessMessage(messageID, buffer);
-            if (!processed) {
-                HandleMessage(packet->guid, 0, messageID, (const char *) (packet->data + dataStart), packet->length - dataStart);
+            bool processed = serverConnection_ && serverConnection_->ProcessMessage(messageID, buffer);
+            if (!processed)
+            {
+                HandleMessage(packet->systemAddress, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
             }
         }
         packetHandled = true;
@@ -1341,6 +1333,7 @@ void Network::PostUpdate(float timeStep)
                     i->second_->SendServerUpdate();
                     i->second_->SendRemoteEvents();
                     i->second_->SendPackages();
+                    i->second_->SendAllBuffers();
                 }
             }
         }
@@ -1352,10 +1345,12 @@ void Network::PostUpdate(float timeStep)
                 // Send the client update
                 serverConnection_->SendClientUpdate();
                 serverConnection_->SendRemoteEvents();
+                serverConnection_->SendAllBuffers();
             } else if (networkMode_ == SERVER_CLIENT) {
                 // Send the client update
                 serverConnection_->SendClientUpdate();
                 serverConnection_->SendRemoteEvents();
+                serverConnection_->SendAllBuffers();
             }
         }
 

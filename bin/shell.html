@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+    <meta charset=utf-8>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>Urho3D</title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .emscripten {
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        div.emscripten {
+            text-align: center;
+        }
+
+        #fullscreen-button {
+            position: absolute;
+            width: 2em;
+            height: 2em;
+            left: 50%;
+            top: 4px;
+            -moz-transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+            stroke: #999999;
+            stroke-width: 10px;
+        }
+
+        #fullscreen-button:hover {
+            fill: #999999;
+            cursor: pointer;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            border: 1px solid #000000;
+            border: none;
+            cursor: default !important;
+        }
+
+        .centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -moz-transform: translateX(-50%) translateY(-50%);
+            -webkit-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="centered">
+        <div class="emscripten" id="status">Downloading...</div>
+        <progress hidden id="progress" max=100 value=10></progress>
+    </div>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 width=100 height=100 style="display: none;"></canvas>
+    <div id="fullscreen-button" onclick="enterFullscreen()" style="display: none;">
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+             viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+            <path d="M93.1,139.6l46.5-46.5L93.1,46.5L139.6,0H0v139.6l46.5-46.5L93.1,139.6z M93.1,372.4l-46.5,46.5L0,372.4V512h139.6
+                l-46.5-46.5l46.5-46.5L93.1,372.4z M372.4,139.6H139.6v232.7h232.7V139.6z M325.8,325.8H186.2V186.2h139.6V325.8z M372.4,0
+                l46.5,46.5l-46.5,46.5l46.5,46.5l46.5-46.5l46.5,46.5V0H372.4z M418.9,372.4l-46.5,46.5l46.5,46.5L372.4,512H512V372.4l-46.5,46.5
+                L418.9,372.4z"/>
+        </svg>
+    </div>
+    <script>
+        var canvasElement = document.getElementById('canvas');
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        var canvasWidth = 0;
+        var canvasHeight = 0;
+
+        // Detect the visible width and height of the window
+        function calculateCanvasSize() {
+            canvasWidth = parseInt(window.getComputedStyle(canvasElement).getPropertyValue('width')) * devicePixelRatio;
+            canvasHeight = parseInt(window.getComputedStyle(canvasElement).getPropertyValue('height')) * devicePixelRatio;
+        }
+        calculateCanvasSize();
+
+        // Detect fullscreen change and resize canvas resolution accordingly
+        function viewportResizeHandler() {
+            if (document.hidden) {
+                return;
+            }
+
+            calculateCanvasSize();
+            if (Module['JSCanvasSize']) {
+                if (isFullScreen()) {
+                    Module.JSCanvasSize(screen.width * devicePixelRatio, screen.height * devicePixelRatio, true, devicePixelRatio);
+                } else {
+                    Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
+                }
+            }
+        }
+
+        function visibilityChanged() {
+            if (document.hidden) {
+                return;
+            }
+
+            // Overwrite some emscripten functions that break the input
+            __registerFocusEventCallback = function() {
+                if (!JSEvents.focusEvent) JSEvents.focusEvent = _malloc(256);
+            };
+            __registerFullscreenChangeEventCallback = function() {
+                if (!JSEvents.fullscreenChangeEvent) JSEvents.fullscreenChangeEvent = _malloc(280);
+            };
+
+            setTimeout(() => {
+                viewportResizeHandler();
+            }, 100);
+        }
+
+        document.addEventListener('fullscreenchange', viewportResizeHandler, false);
+        document.addEventListener('mozfullscreenchange', viewportResizeHandler, false);
+        document.addEventListener('webkitfullscreenchange', viewportResizeHandler, false);
+        document.addEventListener('MSFullscreenChange', viewportResizeHandler, false);
+
+        document.addEventListener('visibilitychange', visibilityChanged, false);
+        document.addEventListener('msvisibilitychange', visibilityChanged, false);
+        document.addEventListener('webkitvisibilitychange', visibilityChanged, false);
+
+        var resizeTimeout = false;
+        // When window size has changed, resize the canvas accordingly
+        window.addEventListener('resize', function(evt) {
+            // resize event is called before the resizing has finished, we must wait a bit so the new calculations use the new viewport size
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
+            }
+            resizeTimeout = setTimeout(() => {
+                viewportResizeHandler(evt);
+            }, 1000);
+        });
+
+        // Enter the fullscreen mode
+        function enterFullscreen(show) {
+            if (show === undefined) show = !isFullScreen();
+            if (show) {
+                if (canvasElement.requestFullscreen) canvasElement.requestFullscreen();
+                else if (canvasElement.webkitRequestFullScreen) canvasElement.webkitRequestFullScreen();
+                else if (canvasElement.mozRequestFullScreen) canvasElement.mozRequestFullScreen();
+                else if (canvasElement.msRequestFullscreen) canvasElement.msRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+        }
+
+        function isFullScreen() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        }
+
+        // App is ready to launch, make canvas and fullscreen button visible
+        function ready() {
+            document.getElementById('canvas').style.display = 'block';
+            document.getElementById('fullscreen-button').style.display = 'block';
+
+            if (document.hidden) {
+                return;
+            }
+
+            // Overwrite some emscripten functions that break the input
+            __registerFocusEventCallback = function() {
+                if (!JSEvents.focusEvent) JSEvents.focusEvent = _malloc(256);
+            };
+            __registerFullscreenChangeEventCallback = function() {
+                if (!JSEvents.fullscreenChangeEvent) JSEvents.fullscreenChangeEvent = _malloc(280);
+            };
+
+            setTimeout(() => {
+                viewportResizeHandler();
+            }, 100);
+        }
+
+        var Module = {
+            preRun: [],
+            postRun: [],
+            canvas: canvasElement,
+            forcedAspectRatio: false,
+
+            print: function (text) {
+                console.log(text);
+            },
+
+            printErr: function(text) {
+                console.error(text);
+            },
+
+            // Urho3D called method which tells the canvas the current renderer resolution, based on E_SCREENMODE event values
+            SetRendererSize: function(width, height) {
+                console.log('Engine renderer size changed to', width, height);
+                calculateCanvasSize();
+
+                if (document.hidden) {
+                    return;
+                }
+
+                var aspectRatio = width / height;
+                canvasElement.width = width;
+                canvasElement.height = height;
+
+                // Compare calculated canvas resolution with the actual renderer resolution
+                if (canvasWidth === width && canvasHeight === height) {
+                    return;
+                }
+
+                // Renderer resolution is wrong, update it with the calculated values
+                console.log('Renderer and canvas resolution mismatch, updating renderer resolution width', this.canvas.width, 'to', width, 'and height', this.canvas.height, 'to', height);
+                Module.JSCanvasSize(canvasWidth, canvasHeight, false, devicePixelRatio);
+            },
+
+            // Retrieve the current status of the application
+            setStatus: function(text) {
+                if (text === 'Running...') {
+                    ready();
+                }
+                if (Module.setStatus.interval) clearInterval(Module.setStatus.interval);
+                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+                var statusElement = document.getElementById('status');
+                var progressElement = document.getElementById('progress');
+                if (m) {
+                    text = m[1];
+                    progressElement.value = parseInt(m[2])*100;
+                    progressElement.max = parseInt(m[4])*100;
+                    progressElement.hidden = false;
+                } else {
+                    progressElement.value = null;
+                    progressElement.max = null;
+                    progressElement.hidden = true;
+                }
+                statusElement.innerHTML = text;
+            },
+
+            totalDependencies: 0,
+            monitorRunDependencies: function(left) {
+                this.totalDependencies = Math.max(this.totalDependencies, left);
+                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+            },
+        };
+        Module.setStatus('Downloading...');
+    </script>
+    {{{ SCRIPT }}}
+</body>
+</html>

@@ -151,7 +151,7 @@ private:
     unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
-    /// Emit particle time
+    /// Emit particle time.
     float emitParticleTime_;
     /// Currently emitting flag.
     bool emitting_;

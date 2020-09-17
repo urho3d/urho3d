@@ -77,6 +77,64 @@ struct ScratchBuffer
     bool reserved_;
 };
 
+/// Screen mode parameters.
+struct ScreenModeParams
+{
+    /// Whether to use fullscreen mode.
+    bool fullscreen_{};
+    /// Whether to hide window borders. Window is always borderless in fullscreen.
+    bool borderless_{};
+    /// Whether the window is resizable.
+    bool resizable_{};
+    /// Whether the high DPI is enabled.
+    /// TODO: Explain what exactly it means.
+    bool highDPI_{};
+    /// Whether the vertical synchronization is used.
+    bool vsync_{};
+    /// Whether the triple bufferization is used.
+    bool tripleBuffer_{};
+    /// Level of multisampling.
+    int multiSample_{ 1 };
+    /// Monitor for fullscreen mode. Has no effect in windowed mode.
+    int monitor_{};
+    /// Refresh rate. 0 to pick automatically.
+    int refreshRate_{};
+
+    /// Compare contents except vsync flag.
+    bool EqualsExceptVSync(const ScreenModeParams& rhs) const
+    {
+        return fullscreen_ == rhs.fullscreen_
+            && borderless_ == rhs.borderless_
+            && resizable_ == rhs.resizable_
+            && highDPI_ == rhs.highDPI_
+            // && vsync_ == rhs.vsync_
+            && tripleBuffer_ == rhs.tripleBuffer_
+            && multiSample_ == rhs.multiSample_
+            && monitor_ == rhs.monitor_
+            && refreshRate_ == rhs.refreshRate_;
+    }
+
+    /// Compare for equality with another parameter set.
+    bool operator ==(const ScreenModeParams& rhs) const
+    {
+        return vsync_ == rhs.vsync_ && EqualsExceptVSync(rhs);
+    }
+
+    /// Compare for inequality with another parameter set.
+    bool operator !=(const ScreenModeParams& rhs) const { return !(*this == rhs); }
+};
+
+/// Window mode parameters.
+struct WindowModeParams
+{
+    /// Width of the window. 0 to pick automatically.
+    int width_{};
+    /// Height of the window. 0 to pick automatically.
+    int height_{};
+    /// Screen mode parameters.
+    ScreenModeParams screenParams_;
+};
+
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class URHO3D_API Graphics : public Object
 {
@@ -99,10 +157,20 @@ public:
     /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
-    bool SetMode
-        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
-            int multiSample, int monitor, int refreshRate);
+    /// Don't use SetScreenMode if ToggleFullscreen is used directly or indirectly.
+    bool SetScreenMode(int width, int height, const ScreenModeParams& params, bool maximize = false);
     /// Set screen resolution only. Return true if successful.
+    /// Don't use SetScreenMode if ToggleFullscreen is used directly or indirectly.
+    bool SetScreenMode(int width, int height);
+    /// Set window modes to be rotated by ToggleFullscreen. Apply primary window settings immeditally.
+    /// Window may be maximized if requested and possible. Return true if successful.
+    bool SetWindowModes(const WindowModeParams& windowMode, const WindowModeParams& secondaryWindowMode, bool maximize = false);
+    /// Set default window modes. Return true if successful.
+    bool SetDefaultWindowModes(int width, int height, const ScreenModeParams& params);
+    /// Set default window modes. Deprecated. Return true if successful.
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable,
+        bool highDPI, bool vsync, bool tripleBuffer, int multiSample, int monitor, int refreshRate);
+    /// Set screen resolution only. Deprecated. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
@@ -279,35 +347,38 @@ public:
     /// Return window height in pixels.
     int GetHeight() const { return height_; }
 
-    /// Return multisample mode (1 = no multisampling.)
-    int GetMultiSample() const { return multiSample_; }
+    /// Return screen mode parameters.
+    const ScreenModeParams& GetScreenModeParams() const { return screenParams_; }
+
+    /// Return multisample mode (1 = no multisampling).
+    int GetMultiSample() const { return screenParams_.multiSample_; }
 
     /// Return window size in pixels.
     IntVector2 GetSize() const { return IntVector2(width_, height_); }
 
     /// Return whether window is fullscreen.
-    bool GetFullscreen() const { return fullscreen_; }
+    bool GetFullscreen() const { return screenParams_.fullscreen_; }
 
     /// Return whether window is borderless.
-    bool GetBorderless() const { return borderless_; }
+    bool GetBorderless() const { return screenParams_.borderless_; }
 
     /// Return whether window is resizable.
-    bool GetResizable() const { return resizable_; }
+    bool GetResizable() const { return screenParams_.resizable_; }
 
     /// Return whether window is high DPI.
-    bool GetHighDPI() const { return highDPI_; }
+    bool GetHighDPI() const { return screenParams_.highDPI_; }
 
     /// Return whether vertical sync is on.
-    bool GetVSync() const { return vsync_; }
+    bool GetVSync() const { return screenParams_.vsync_; }
 
     /// Return refresh rate when using vsync in fullscreen
-    int GetRefreshRate() const { return refreshRate_; }
+    int GetRefreshRate() const { return screenParams_.refreshRate_; }
 
     /// Return the current monitor index. Effective on in fullscreen
-    int GetMonitor() const { return monitor_; }
+    int GetMonitor() const { return screenParams_.monitor_; }
 
     /// Return whether triple buffering is enabled.
-    bool GetTripleBuffer() const { return tripleBuffer_; }
+    bool GetTripleBuffer() const { return screenParams_.tripleBuffer_; }
 
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
@@ -368,6 +439,8 @@ public:
 
     /// Return supported fullscreen resolutions (third component is refreshRate). Will be empty if listing the resolutions is not supported on the platform (e.g. Web).
     PODVector<IntVector3> GetResolutions(int monitor) const;
+    /// Return index of the best resolution for requested width, height and refresh rate.
+    unsigned FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
     /// Return the desktop resolution.
@@ -576,10 +649,14 @@ private:
     bool OpenWindow(int width, int height, bool resizable, bool borderless);
     /// Create the application window icon.
     void CreateWindowIcon();
+    /// Adjust parameters according to the platform. Fill in missing paramters and resolve possible conflicts.
+    void AdjustScreenMode(int& newWidth, int& newHeight, ScreenModeParams& params, bool& maximize) const;
+    /// Called when screen mode is successfully changed by the backend.
+    void OnScreenModeChanged();
     /// Adjust the window for new resolution and fullscreen mode.
     void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor);
     /// Create the Direct3D11 device and swap chain. Requires an open window. Can also be called again to recreate swap chain. Return true on success.
-    bool CreateDevice(int width, int height, int multiSample);
+    bool CreateDevice(int width, int height);
     /// Update Direct3D11 swap chain state for a new mode and create views for the backbuffer & default depth buffer. Return true on success.
     bool UpdateSwapChain(int width, int height);
     /// Create the Direct3D9 interface.
@@ -639,30 +716,19 @@ private:
     WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_{};
+    /// Most recently applied window mode. It may not represent actual window state
+    /// if window was resized by user or Graphics::SetScreenMode was explicitly called.
+    WindowModeParams primaryWindowMode_;
+    /// Secondary window mode to be applied on Graphics::ToggleFullscreen.
+    WindowModeParams secondaryWindowMode_;
     /// Window width in pixels.
     int width_{};
     /// Window height in pixels.
     int height_{};
     /// Window position.
     IntVector2 position_;
-    /// Multisampling mode.
-    int multiSample_{1};
-    /// Fullscreen flag.
-    bool fullscreen_{};
-    /// Borderless flag.
-    bool borderless_{};
-    /// Resizable flag.
-    bool resizable_{};
-    /// High DPI flag.
-    bool highDPI_{};
-    /// Vertical sync flag.
-    bool vsync_{};
-    /// Refresh rate in Hz. Only used in fullscreen, 0 when windowed
-    int refreshRate_{};
-    /// Monitor index. Only used in fullscreen, 0 when windowed
-    int monitor_{};
-    /// Triple buffering flag.
-    bool tripleBuffer_{};
+    /// Screen mode parameters.
+    ScreenModeParams screenParams_;
     /// Flush GPU command buffer flag.
     bool flushGPU_{};
     /// Force OpenGL 2 flag. Only used on OpenGL.

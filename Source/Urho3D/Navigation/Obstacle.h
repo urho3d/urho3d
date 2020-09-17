@@ -33,18 +33,18 @@ class DynamicNavigationMesh;
 /// Obstacle for dynamic navigation mesh.
 class URHO3D_API Obstacle : public Component
 {
-    URHO3D_OBJECT(Obstacle, Component)
+    URHO3D_OBJECT(Obstacle, Component);
 
     friend class DynamicNavigationMesh;
 
 public:
     /// Construct.
-    explicit Obstacle(Context*);
+    explicit Obstacle(Context* context);
     /// Destruct.
     ~Obstacle() override;
 
     /// Register Obstacle with engine context.
-    static void RegisterObject(Context*);
+    static void RegisterObject(Context* context);
 
     /// Update the owning mesh when enabled status has changed.
     void OnSetEnabled() override;

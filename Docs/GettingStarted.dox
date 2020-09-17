@@ -36,12 +36,15 @@ Although all required third-party libraries are included as source code, there a
     - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.
     - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
     - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+  + HTTPS support (optional).
+    - libssl-dev (Debian-based)
+    - openssl (OS X using homebrew)
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian) or libevdev (Pidora).
 
 - For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed. Homebrew is required to install 'cmake' and some of the optional development packages, such as ccache, doxygen, graphviz, and readline.
 
-- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed.
+- For Android, the Android Studio (version 4.0 or later) should include everything necessary. Make sure the Android NDK r21d is installed with the Android SDK Manager and CMake version 3.17.3 is installed on the host machine. Adjust the "buildSrc/src/main/kotlin/UrhoCommon.kt" accordingly if your host has different NDK and CMake version.
 
 - For Web, the Emscripten SDK (version 1.39.0 or later) needs to be installed with the upstream LLVM WASM backend is activated. On Windows host also MinGW-W64 compiler toolchain is required.
 
@@ -114,6 +117,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
 |URHO3D_IK            |1|Enable inverse kinematics support|
 |URHO3D_NETWORK       |1|Enable Networking support|
+|URHO3D_SSL           |0|Enable HTTPS support for HttpRequest. Requires URHO3D_NETWORK build option to be enabled|
+|URHO3D_SSL_DYNAMIC   |0|Enables dynamic SSL library loading, requires URHO3D_SSL build option to be enabled|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
@@ -163,7 +168,7 @@ A number of build options can be defined when invoking the build scripts or when
 |DIRECT3D_DLL_REDIST_SEARCH_PATHS|-|Additional search paths to find DirectX runtime DLL (MinGW only); should only be used for older MinGW version that still uses 'd3dcompiler_43.dll' or 'd3dcompiler_42.dll'.|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
-|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
+|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are RPI0, RPI1, RPI2, RPI3, RPI4|
 |ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)|
 |ARM_SYSROOT          |-|Path to ARM system root (ARM on Linux cross-compiling build only)|
 |ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
@@ -174,6 +179,7 @@ A number of build options can be defined when invoking the build scripts or when
 |EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten only); default to 128 MB, must be in multiple of 64 KB|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten only)|
 |EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten only), use 'emrun --list_browsers' command to get the list of possible values|
+|OPENSSL_ROOT_DIR|-|Root path to OpenSSL directory|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by executing cmake_clean.bat or cmake_clean.sh with the location of the build tree as the first argument or by executing it in the build tree itself.
 
@@ -355,7 +361,7 @@ Urho3D should be built as a shared library if your application consists of multi
 
 If "URHO3D_DOCS" or "URHO3D_DOCS_QUIET" build option is set then a normal build would not only build Urho3D binaries but also Urho3D documentation automatically. If the option is not set then the documentation can still be built by manually invoking 'make doc' command or using its equivalent built-in target in IDE.
 
-The additional prerequisite for documentation build is Doxygen. Also Graphviz (optional) if you wish to generate graphical diagrams in the documentation. MSVC users on Windows host system may install HTML help compiler tool (optional) in order to get the compressed help file (*.chm). When optional tool is not available in the host system, the corresponding build process is skipped accordingly. The internal host tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built. When the build tree is being configured not to build any host tools then the 'doc' target will simply instruct Doxygen to process the existing API dump files that are already pre-generated in the repository.
+The additional prerequisite for documentation build is Doxygen. Also Graphviz (optional) if you wish to generate graphical diagrams in the documentation. MSVC users on Windows host system may install HTML Help Workshop (optional) in order to get the compressed help file (*.chm).  When optional tool is not available in the host system, the corresponding build process is skipped accordingly. The internal host tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built. When the build tree is being configured not to build any host tools then the 'doc' target will simply instruct Doxygen to process the existing API dump files that are already pre-generated in the repository.
 
 \section Building_Clang_tools Clang-tools build (EXPERIMENTAL)
 
@@ -596,20 +602,8 @@ The physical project root directory is also the logical project source tree in C
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
-# Set CMake minimum version and CMake policy required by UrhoCommon module
+# Set CMake minimum version
 cmake_minimum_required (VERSION 3.10.2)
-if (COMMAND cmake_policy)
-    # Libraries linked via full path no longer produce linker search paths
-    cmake_policy (SET CMP0003 NEW)
-    # INTERFACE_LINK_LIBRARIES defines the link interface
-    cmake_policy (SET CMP0022 NEW)
-    # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-    cmake_policy (SET CMP0026 OLD)
-    # MACOSX_RPATH is enabled by default
-    cmake_policy (SET CMP0042 NEW)
-    # Honor the visibility properties for SHARED target types only
-    cmake_policy (SET CMP0063 OLD)
-endif ()
 
 # Set project name
 project (MyProjectName)
