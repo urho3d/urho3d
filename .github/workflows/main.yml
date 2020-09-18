@@ -104,7 +104,7 @@ jobs:
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake ci package
         if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
@@ -113,7 +113,7 @@ jobs:
             android/urho3d-lib/build/distributions/*.aar
             build/*.out
         if: github.event_name == 'push' || matrix.platform == 'linux-clang-tidy' == matrix.platform != 'linux-clang-format'
-      - name: Publish artifact
+      - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: script/dockerized.sh ${PLATFORM/-*} rake ci publish
@@ -160,7 +160,7 @@ jobs:
       - name: Package
         run: rake ci package
         if: github.event_name == 'push'
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
@@ -207,7 +207,7 @@ jobs:
       - name: Package
         run: rake ci package
         if: github.event_name == 'push'
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
