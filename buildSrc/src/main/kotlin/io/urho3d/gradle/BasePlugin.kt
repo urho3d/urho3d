@@ -20,24 +20,9 @@
 // THE SOFTWARE.
 //
 
-package com.github.urho3d
+package io.urho3d.gradle
 
-import android.content.Context
-import org.libsdl.app.SDLActivity
-import java.io.File
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
-open class UrhoActivity : SDLActivity() {
-
-    companion object {
-        private val regex = Regex("^lib(.*)\\.so$")
-
-        @JvmStatic
-        fun getLibraryNames(context: Context) = File(context.applicationInfo.nativeLibraryDir)
-                    .listFiles { _, it -> regex.matches(it) }!!
-                    .sortedBy { it.lastModified() }
-                    .map {
-                        regex.find(it.name)?.groupValues?.last() ?: throw IllegalStateException()
-                    }
-    }
-
-}
+abstract class BasePlugin : Plugin<Project>

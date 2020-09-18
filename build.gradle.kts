@@ -24,7 +24,7 @@ import org.gradle.internal.io.NullOutputStream
 import java.io.ByteArrayOutputStream
 
 allprojects {
-    group = "com.github.urho3d"
+    group = "io.urho3d"
     version = determineVersion()
     description = """
         Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and

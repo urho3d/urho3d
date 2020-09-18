@@ -33,7 +33,7 @@ const val cmakeVersion = "3.17.3+"
  * Current supported platforms: android.
  */
 @Suppress("unused")
-fun PluginDependenciesSpec.urho3d(platform: String): PluginDependencySpec = id("com.github.urho3d.$platform")
+fun PluginDependenciesSpec.urho3d(platform: String): PluginDependencySpec = id("io.urho3d.$platform")
 
 /**
  * Naive implementation of "touch" command.

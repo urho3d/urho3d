@@ -20,10 +20,8 @@
 // THE SOFTWARE.
 //
 
-package com.github.urho3d.gradle
+package io.urho3d.gradle.android
 
-open class BaseExtension {
+import io.urho3d.gradle.BaseExtension
 
-    var libraryType = "STATIC"
-
-}
+open class AndroidPluginExtension : BaseExtension()

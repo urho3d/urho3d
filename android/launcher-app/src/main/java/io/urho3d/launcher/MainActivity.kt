@@ -20,21 +20,34 @@
 // THE SOFTWARE.
 //
 
-package com.github.urho3d.gradle.android
+package io.urho3d.launcher
 
-import com.github.urho3d.gradle.BasePlugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.invoke
+import io.urho3d.UrhoActivity
 
-open class AndroidPlugin : BasePlugin() {
+class MainActivity : UrhoActivity() {
 
-    override fun apply(target: Project) {
-        target.run {
-            val extension = extensions.create("urho3d", AndroidPluginExtension::class.java)
-            tasks {
-                // TODO: declare custom tasks here
-            }
-        }
+    companion object {
+        const val argument = "argument"
+    }
+
+    private lateinit var arguments: List<String>
+
+    override fun getArguments() = arguments.toTypedArray()
+
+    override fun onLoadLibrary(libraryNames: MutableList<String>) {
+        // All runtime shared libraries must always be loaded if available
+        val regex = Regex("^(?:Urho3D|.+_shared)\$")
+        libraryNames.retainAll { regex.matches(it) }
+
+        // Parse the argument string
+        val argumentString = intent.getStringExtra(argument)
+        if (argumentString != null) arguments = argumentString.split(':')
+        else throw IllegalArgumentException("The MainActivity requires an argument to start")
+
+        // Must add the chosen sample library to the last of the list
+        libraryNames.add(arguments[0])
+
+        super.onLoadLibrary(libraryNames)
     }
 
 }

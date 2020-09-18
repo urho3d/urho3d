@@ -20,9 +20,10 @@
 // THE SOFTWARE.
 //
 
-package com.github.urho3d.gradle
+package io.urho3d.gradle
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+open class BaseExtension {
 
-abstract class BasePlugin : Plugin<Project>
+    var libraryType = "STATIC"
+
+}

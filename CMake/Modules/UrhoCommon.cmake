@@ -535,7 +535,7 @@ if (APPLE)
     if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         # Only set the bundle properties to its default when they are not explicitly specified by user
         if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
-            set (MACOSX_BUNDLE_GUI_IDENTIFIER com.github.urho3d.\${PRODUCT_NAME:rfc1034identifier:lower})
+            set (MACOSX_BUNDLE_GUI_IDENTIFIER io.urho3d.\${PRODUCT_NAME:rfc1034identifier:lower})
         endif ()
         if (NOT MACOSX_BUNDLE_BUNDLE_NAME)
             set (MACOSX_BUNDLE_BUNDLE_NAME \${PRODUCT_NAME})

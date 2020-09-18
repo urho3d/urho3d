@@ -20,8 +20,21 @@
 // THE SOFTWARE.
 //
 
-package com.github.urho3d.gradle.android
+package io.urho3d.gradle.android
 
-import com.github.urho3d.gradle.BaseExtension
+import io.urho3d.gradle.BasePlugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.invoke
 
-open class AndroidPluginExtension : BaseExtension()
+open class AndroidPlugin : BasePlugin() {
+
+    override fun apply(target: Project) {
+        target.run {
+            val extension = extensions.create("urho3d", AndroidPluginExtension::class.java)
+            tasks {
+                // TODO: declare custom tasks here
+            }
+        }
+    }
+
+}
