@@ -28,13 +28,10 @@ pluginManagement {
                     useModule("com.android.tools.build:gradle:4.0.1")
                 requested.id.id.startsWith("org.jetbrains.kotlin.") ->
                     useVersion(embeddedKotlinVersion)
-                requested.id.id == "com.jfrog.bintray" ->
-                    useVersion("1.8.5")
             }
         }
     }
     repositories {
-        @Suppress("UnstableApiUsage")
         gradlePluginPortal()
         google()
         jcenter()

@@ -25,7 +25,6 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("com.android.library")
-    id("com.jfrog.bintray")
     kotlin("android")
     kotlin("android.extensions")
     `maven-publish`
@@ -183,17 +182,16 @@ tasks {
 
 publishing {
     publications {
-        register<MavenPublication>("mavenAndroid") {
+        register<MavenPublication>("Urho") {
+            groupId = project.group.toString()
             artifactId = "${project.name}-${project.libraryType}"
             if (project.hasProperty("ANDROID_ABI")) {
                 artifactId = "$artifactId-${(project.property("ANDROID_ABI") as String).replace(',', '-')}"
             }
             afterEvaluate {
-                // Exclude publishing STATIC-debug AAR because its size exceeds 250MB limit allowed by Bintray
-                android.buildTypes
-                    .map { it.name }
-                    .filter { System.getenv("CI") == null || project.libraryType == "SHARED" || it == "release" }
-                    .forEach { artifact(tasks["zipBuildTree${it.capitalize()}"]) }
+                android.buildTypes.forEach {
+                    artifact(tasks["zipBuildTree${it.name.capitalize()}"])
+                }
             }
             artifact(tasks["sourcesJar"])
             artifact(tasks["documentationZip"])
@@ -226,32 +224,17 @@ publishing {
             }
         }
     }
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publish = true
-    override = true
-    setPublications("mavenAndroid")
-    pkg.apply {
-        repo = "maven"
-        name = project.name
-        setLicenses("MIT")
-        vcsUrl = "https://github.com/urho3d/Urho3D.git"
-        userOrg = "urho3d"
-        setLabels("android", "game-development", "game-engine", "open-source", "urho3d")
-        websiteUrl = "https://urho3d.github.io/"
-        issueTrackerUrl = "https://github.com/urho3d/Urho3D/issues"
-        githubRepo = "urho3d/Urho3D"
-        publicDownloadNumbers = true
-        desc = project.description
-        version.apply {
-            name = project.version.toString()
-            desc = "Continuous delivery from GitHub Actions."
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/urho3d/Urho3D")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
 
 val Project.libraryType: String
-    get() = findProperty("URHO3D_LIB_TYPE") as String? ?: "STATIC"
+    get() = findProperty("URHO3D_LIB_TYPE") as String? ?: System.getenv("URHO3D_LIB_TYPE") ?: "static"

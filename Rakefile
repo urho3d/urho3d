@@ -113,6 +113,16 @@ task :package do
   system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target package} or abort
 end
 
+desc 'Publish build artifact'
+task :publish do
+  if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('publish')
+    next
+  end
+  init_default
+  abort "The 'publish' task is currently not supported on '#{ENV['PLATFORM']}' platform"
+end
+
 
 ### Internal tasks ###
 

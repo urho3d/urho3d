@@ -113,6 +113,11 @@ jobs:
             android/urho3d-lib/build/distributions/*.aar
             build/*.out
         if: github.event_name == 'push' || matrix.platform == 'linux-clang-tidy' == matrix.platform != 'linux-clang-format'
+      - name: Publish artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: script/dockerized.sh ${PLATFORM/-*} rake ci publish
+        if: github.event_name == 'push' && matrix.platform == 'android'
   macOS:
     name: 🍏
     runs-on: macos-latest
