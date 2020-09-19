@@ -93,10 +93,13 @@ public:
     /// Set owner.
     void SetOwner(void* owner);
     /// Set interpolation method.
+    /// @property
     void SetInterpolationMethod(InterpMethod method);
     /// Set spline tension, should be between 0.0f and 1.0f, but this is not a must.
+    /// @property
     void SetSplineTension(float tension);
     /// Set value type.
+    /// @property
     void SetValueType(VariantType valueType);
 
     /// Set key frame.
@@ -111,12 +114,15 @@ public:
     void* GetOwner() const { return owner_; }
 
     /// Return interpolation method.
+    /// @property
     InterpMethod GetInterpolationMethod() const { return interpolationMethod_; }
 
     /// Return spline tension.
+    /// @property
     float GetSplineTension() const { return splineTension_; }
 
     /// Return value type.
+    /// @property
     VariantType GetValueType() const { return valueType_; }
 
     /// Return begin time.

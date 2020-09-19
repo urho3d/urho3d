@@ -59,6 +59,7 @@ public:
     /// Set uncompressed sound data format.
     void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
     /// Set loop on/off. If loop is enabled, sets the full sound as loop range.
+    /// @property
     void SetLooped(bool enable);
     /// Define loop.
     void SetLoop(unsigned repeatOffset, unsigned endOffset);
@@ -79,30 +80,37 @@ public:
     signed char* GetEnd() const { return end_; }
 
     /// Return length in seconds.
+    /// @property
     float GetLength() const;
 
     /// Return total sound data size.
     unsigned GetDataSize() const { return dataSize_; }
 
     /// Return sample size.
+    /// @property
     unsigned GetSampleSize() const;
 
     /// Return default frequency as a float.
+    /// @property
     float GetFrequency() const { return (float)frequency_; }
 
     /// Return default frequency as an integer.
     unsigned GetIntFrequency() const { return frequency_; }
 
     /// Return whether is looped.
+    /// @property
     bool IsLooped() const { return looped_; }
 
     /// Return whether data is sixteen bit.
+    /// @property
     bool IsSixteenBit() const { return sixteenBit_; }
 
     /// Return whether data is stereo.
+    /// @property
     bool IsStereo() const { return stereo_; }
 
     /// Return whether is compressed.
+    /// @property
     bool IsCompressed() const { return compressed_; }
 
     /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot). Called internally, does not normally need to be called, unless the sound data is modified manually on the fly.

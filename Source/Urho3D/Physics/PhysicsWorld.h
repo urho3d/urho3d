@@ -166,20 +166,28 @@ public:
     /// Refresh collisions only without updating dynamics.
     void UpdateCollisions();
     /// Set simulation substeps per second.
+    /// @property
     void SetFps(int fps);
     /// Set gravity.
+    /// @property
     void SetGravity(const Vector3& gravity);
     /// Set maximum number of physics substeps per frame. 0 (default) is unlimited. Positive values cap the amount. Use a negative value to enable an adaptive timestep. This may cause inconsistent physics behavior.
+    /// @property
     void SetMaxSubSteps(int num);
     /// Set number of constraint solver iterations.
+    /// @property
     void SetNumIterations(int num);
     /// Enable or disable automatic physics simulation during scene update. Enabled by default.
+    /// @property
     void SetUpdateEnabled(bool enable);
     /// Set whether to interpolate between simulation steps.
+    /// @property
     void SetInterpolation(bool enable);
     /// Set whether to use Bullet's internal edge utility for trimesh collisions. Disabled by default.
+    /// @property
     void SetInternalEdge(bool enable);
     /// Set split impulse collision mode. This is more accurate, but slower. Disabled by default.
+    /// @property
     void SetSplitImpulse(bool enable);
     /// Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
@@ -212,27 +220,35 @@ public:
     void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
 
     /// Return gravity.
+    /// @property
     Vector3 GetGravity() const;
 
     /// Return maximum number of physics substeps per frame.
+    /// @property
     int GetMaxSubSteps() const { return maxSubSteps_; }
 
     /// Return number of constraint solver iterations.
+    /// @property
     int GetNumIterations() const;
 
     /// Return whether physics world will automatically simulate during scene update.
+    /// @property
     bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether interpolation between simulation steps is enabled.
+    /// @property
     bool GetInterpolation() const { return interpolation_; }
 
     /// Return whether Bullet's internal edge utility for trimesh collisions is enabled.
+    /// @property
     bool GetInternalEdge() const { return internalEdge_; }
 
     /// Return whether split impulse collision mode is enabled.
+    /// @property
     bool GetSplitImpulse() const;
 
     /// Return simulation steps per second.
+    /// @property
     int GetFps() const { return fps_; }
 
     /// Return maximum angular velocity for network replication.

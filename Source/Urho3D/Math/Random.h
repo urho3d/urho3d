@@ -36,6 +36,7 @@ URHO3D_API void SetRandomSeed(unsigned seed);
 /// Return the current random seed.
 URHO3D_API unsigned GetRandomSeed();
 /// Return a random number between 0-32767. Should operate similarly to MSVC rand().
+/// @alias{RandomInt}
 URHO3D_API int Rand();
 /// Return a standard normal distributed number.
 URHO3D_API float RandStandardNormal();

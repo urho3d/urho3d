@@ -46,69 +46,95 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
+    /// @property
     void SetBoundingBox(const BoundingBox& box);
     /// Set ambient color.
+    /// @property
     void SetAmbientColor(const Color& color);
     /// Set fog color.
+    /// @property
     void SetFogColor(const Color& color);
     /// Set fog start distance.
+    /// @property
     void SetFogStart(float start);
     /// Set fog end distance.
+    /// @property
     void SetFogEnd(float end);
     /// Set fog height distance relative to the scene node's world position. Effective only in height fog mode.
+    /// @property
     void SetFogHeight(float height);
     /// Set fog height scale. Effective only in height fog mode.
+    /// @property
     void SetFogHeightScale(float scale);
     /// Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
+    /// @property
     void SetPriority(int priority);
     /// Set height fog mode.
+    /// @property
     void SetHeightFog(bool enable);
     /// Set override mode. If camera is inside an override zone, that zone will be used for all rendered objects instead of their own zone.
+    /// @property
     void SetOverride(bool enable);
     /// Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
+    /// @property
     void SetAmbientGradient(bool enable);
     /// Set zone texture. This will be bound to the zone texture unit when rendering objects inside the zone. Note that the default shaders do not use it.
+    /// @property
     void SetZoneTexture(Texture* texture);
 
     /// Return inverse world transform.
+    /// @property
     const Matrix3x4& GetInverseWorldTransform() const;
 
     /// Return zone's own ambient color, disregarding gradient mode.
+    /// @property
     const Color& GetAmbientColor() const { return ambientColor_; }
 
     /// Return ambient start color. Not safe to call from worker threads due to possible octree query.
+    /// @property
     const Color& GetAmbientStartColor();
     /// Return ambient end color. Not safe to call from worker threads due to possible octree query.
+    /// @property
     const Color& GetAmbientEndColor();
 
     /// Return fog color.
+    /// @property
     const Color& GetFogColor() const { return fogColor_; }
 
     /// Return fog start distance.
+    /// @property
     float GetFogStart() const { return fogStart_; }
 
     /// Return fog end distance.
+    /// @property
     float GetFogEnd() const { return fogEnd_; }
 
     /// Return fog height distance relative to the scene node's world position.
+    /// @property
     float GetFogHeight() const { return fogHeight_; }
 
     /// Return fog height scale.
+    /// @property
     float GetFogHeightScale() const { return fogHeightScale_; }
 
     /// Return zone priority.
+    /// @property
     int GetPriority() const { return priority_; }
 
     /// Return whether height fog mode is enabled.
+    /// @property
     bool GetHeightFog() const { return heightFog_; }
 
     /// Return whether override mode is enabled.
+    /// @property
     bool GetOverride() const { return override_; }
 
     /// Return whether ambient gradient mode is enabled.
+    /// @property
     bool GetAmbientGradient() const { return ambientGradient_; }
 
     /// Return zone texture.
+    /// @property
     Texture* GetZoneTexture() const { return zoneTexture_; }
 
     /// Check whether a point is inside.

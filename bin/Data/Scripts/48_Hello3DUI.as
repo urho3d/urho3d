@@ -84,7 +84,7 @@ void InitScene()
     scene_.CreateComponent("Octree");
     Zone@ zone = scene_.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000.0f, 1000.0f);
-    zone.fogColor = GRAY;
+    zone.fogColor = Color::GRAY;
     zone.fogStart = 100.0f;
     zone.fogEnd = 300.0f;
 

@@ -26,7 +26,7 @@ String demoFilename = "";
 Node@ character2DNode;
 
 
-void CreateCollisionShapesFromTMXObjects(Node@ tileMapNode, TileMapLayer2D@ tileMapLayer, TileMapInfo2D@ info)
+void CreateCollisionShapesFromTMXObjects(Node@ tileMapNode, TileMapLayer2D@ tileMapLayer, const TileMapInfo2D@ info)
 {
     // Create rigid body to the root node
     RigidBody2D@ body = tileMapNode.CreateComponent("RigidBody2D");
@@ -58,7 +58,7 @@ void CreateCollisionShapesFromTMXObjects(Node@ tileMapNode, TileMapLayer2D@ tile
     }
 }
 
-CollisionBox2D@ CreateRectangleShape(Node@ node, TileMapObject2D@ object, Vector2 size, TileMapInfo2D@ info)
+CollisionBox2D@ CreateRectangleShape(Node@ node, TileMapObject2D@ object, Vector2 size, const TileMapInfo2D@ info)
 {
     CollisionBox2D@ shape = node.CreateComponent("CollisionBox2D");
     shape.size = size;
@@ -75,7 +75,7 @@ CollisionBox2D@ CreateRectangleShape(Node@ node, TileMapObject2D@ object, Vector
     return shape;
 }
 
-CollisionCircle2D@ CreateCircleShape(Node@ node, TileMapObject2D@ object, float radius, TileMapInfo2D@ info)
+CollisionCircle2D@ CreateCircleShape(Node@ node, TileMapObject2D@ object, float radius, const TileMapInfo2D@ info)
 {
     CollisionCircle2D@ shape = node.CreateComponent("CollisionCircle2D");
     Vector2 size = object.size;
@@ -92,7 +92,7 @@ CollisionCircle2D@ CreateCircleShape(Node@ node, TileMapObject2D@ object, float 
     return shape;
 }
 
-CollisionPolygon2D@ CreatePolygonShape(Node@ node, TileMapObject2D@ object)
+CollisionPolygon2D@ CreatePolygonShape(Node@ node, const TileMapObject2D@ object)
 {
     CollisionPolygon2D@ shape = node.CreateComponent("CollisionPolygon2D");
     uint numVertices = object.numPoints;
@@ -118,7 +118,7 @@ CollisionChain2D@ CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
     return shape;
 }
 
-void CreateCharacter(TileMapInfo2D@ info, bool createObject, float friction, Vector3 position, float scale)
+void CreateCharacter(const TileMapInfo2D@ info, bool createObject, float friction, Vector3 position, float scale)
 {
     character2DNode = scene_.CreateChild("Imp");
     character2DNode.position = position;
@@ -525,7 +525,7 @@ void PlaySound(String soundName)
     source.Play(cache.GetResource("Sound", "Sounds/" + soundName));
 }
 
-void CreateBackgroundSprite(TileMapInfo2D@ info, float scale, String texture, bool animate)
+void CreateBackgroundSprite(const TileMapInfo2D@ info, float scale, String texture, bool animate)
 {
     Node@ node = scene_.CreateChild("Background");
     node.position = Vector3(info.mapWidth, info.mapHeight, 0) / 2;

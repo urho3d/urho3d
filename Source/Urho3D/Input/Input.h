@@ -54,9 +54,11 @@ class XMLFile;
 const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
 /// %Input state for a finger touch.
+/// @fakeref
 struct TouchState
 {
     /// Return last touched UI element, used by scripting integration.
+    /// @property
     UIElement* GetTouchedElement();
 
     /// Touch (finger) ID.
@@ -74,6 +76,7 @@ struct TouchState
 };
 
 /// %Input state for a joystick.
+/// @fakeref
 struct JoystickState
 {
     /// Initialize the number of buttons, axes and hats and set them to neutral state.
@@ -82,27 +85,35 @@ struct JoystickState
     void Reset();
 
     /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
+    /// @property
     bool IsController() const { return controller_ != nullptr; }
 
     /// Return number of buttons.
+    /// @property
     unsigned GetNumButtons() const { return buttons_.Size(); }
 
     /// Return number of axes.
+    /// @property
     unsigned GetNumAxes() const { return axes_.Size(); }
 
     /// Return number of hats.
+    /// @property
     unsigned GetNumHats() const { return hats_.Size(); }
 
     /// Check if a button is held down.
+    /// @property
     bool GetButtonDown(unsigned index) const { return index < buttons_.Size() ? buttons_[index] : false; }
 
     /// Check if a button has been pressed on this frame.
+    /// @property
     bool GetButtonPress(unsigned index) const { return index < buttonPress_.Size() ? buttonPress_[index] : false; }
 
     /// Return axis position.
+    /// @property
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
 
     /// Return hat position.
+    /// @property
     int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : int(HAT_CENTER); }
 
     /// SDL joystick.
@@ -147,6 +158,7 @@ public:
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
     /// Set whether ALT-ENTER fullscreen toggle is enabled.
+    /// @property
     void SetToggleFullscreen(bool enable);
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visibility event can be suppressed-- this also recalls any unsuppressed SetMouseVisible which can be returned by ResetMouseVisible().
     void SetMouseVisible(bool enable, bool suppressEvent = false);
@@ -192,10 +204,13 @@ public:
      */
     bool RemoveScreenJoystick(SDL_JoystickID id);
     /// Set whether the virtual joystick is visible.
+    /// @property
     void SetScreenJoystickVisible(SDL_JoystickID id, bool enable);
     /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
+    /// @property
     void SetScreenKeyboardVisible(bool enable);
     /// Set touch emulation by mouse. Only available on desktop platforms. When enabled, actual mouse events are no longer sent and the mouse cursor is forced visible.
+    /// @property
     void SetTouchEmulation(bool enable);
     /// Begin recording a touch gesture. Return true if successful. The E_GESTURERECORDED event (which contains the ID for the new gesture) will be sent when recording finishes.
     bool RecordGesture();
@@ -210,6 +225,7 @@ public:
     /// Remove all in-memory gestures.
     void RemoveAllGestures();
     /// Set the mouse cursor position. Uses the backbuffer (Graphics width/height) coordinates.
+    /// @property
     void SetMousePosition(const IntVector2& position);
     /// Center the mouse position.
     void CenterMousePosition();
@@ -227,77 +243,109 @@ public:
     /// Return name of key from scancode.
     String GetScancodeName(Scancode scancode) const;
     /// Check if a key is held down.
+    /// @property
     bool GetKeyDown(Key key) const;
     /// Check if a key has been pressed on this frame.
+    /// @property
     bool GetKeyPress(Key key) const;
     /// Check if a key is held down by scancode.
+    /// @property
     bool GetScancodeDown(Scancode scancode) const;
     /// Check if a key has been pressed on this frame by scancode.
+    /// @property
     bool GetScancodePress(Scancode scancode) const;
     /// Check if a mouse button is held down.
+    /// @property
     bool GetMouseButtonDown(MouseButtonFlags button) const;
     /// Check if a mouse button has been pressed on this frame.
+    /// @property
     bool GetMouseButtonPress(MouseButtonFlags button) const;
     /// Check if a qualifier key is held down.
+    /// @property
     bool GetQualifierDown(Qualifier qualifier) const;
     /// Check if a qualifier key has been pressed on this frame.
+    /// @property
     bool GetQualifierPress(Qualifier qualifier) const;
     /// Return the currently held down qualifiers.
+    /// @property
     QualifierFlags GetQualifiers() const;
     /// Return mouse position within window. Should only be used with a visible mouse cursor. Uses the backbuffer (Graphics width/height) coordinates.
+    /// @property
     IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
+    /// @property
     IntVector2 GetMouseMove() const;
     /// Return horizontal mouse movement since last frame.
+    /// @property
     int GetMouseMoveX() const;
     /// Return vertical mouse movement since last frame.
+    /// @property
     int GetMouseMoveY() const;
     /// Return mouse wheel movement since last frame.
+    /// @property
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
     /// Return input coordinate scaling. Should return non-unity on High DPI display.
+    /// @property
     Vector2 GetInputScale() const { return inputScale_; }
 
     /// Return number of active finger touches.
+    /// @property
     unsigned GetNumTouches() const { return touches_.Size(); }
     /// Return active finger touch by index.
+    /// @property{get_touches}
     TouchState* GetTouch(unsigned index) const;
 
     /// Return number of connected joysticks.
+    /// @property
     unsigned GetNumJoysticks() const { return joysticks_.Size(); }
     /// Return joystick state by ID, or null if does not exist.
+    /// @property{get_joysticks}
     JoystickState* GetJoystick(SDL_JoystickID id);
     /// Return joystick state by index, or null if does not exist. 0 = first connected joystick.
+    /// @property{get_joysticksByIndex}
     JoystickState* GetJoystickByIndex(unsigned index);
     /// Return joystick state by name, or null if does not exist.
+    /// @property{get_joysticksByName}
     JoystickState* GetJoystickByName(const String& name);
 
     /// Return whether fullscreen toggle is enabled.
+    /// @property
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
 
     /// Return whether a virtual joystick is visible.
+    /// @property
     bool IsScreenJoystickVisible(SDL_JoystickID id) const;
     /// Return whether on-screen keyboard is supported.
+    /// @property
     bool GetScreenKeyboardSupport() const;
     /// Return whether on-screen keyboard is being shown.
+    /// @property
     bool IsScreenKeyboardVisible() const;
 
     /// Return whether touch emulation is enabled.
+    /// @property
     bool GetTouchEmulation() const { return touchEmulation_; }
 
     /// Return whether the operating system mouse cursor is visible.
+    /// @property
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether the mouse is currently being grabbed by an operation.
+    /// @property
     bool IsMouseGrabbed() const { return mouseGrabbed_; }
     /// Return whether the mouse is locked to the window.
+    /// @property
     bool IsMouseLocked() const;
 
     /// Return the mouse mode.
+    /// @property
     MouseMode GetMouseMode() const { return mouseMode_; }
 
     /// Return whether application window has input focus.
+    /// @property{get_focus}
     bool HasFocus() { return inputFocus_; }
 
     /// Return whether application window is minimized.
+    /// @property
     bool IsMinimized() const;
 
 private:

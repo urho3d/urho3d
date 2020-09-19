@@ -246,7 +246,7 @@ void RefreshMaterialTextures(bool fullUpdate = true)
 
         for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         {
-            String tuName = GetTextureUnitName(TextureUnit(i));
+            String tuName = Material::GetTextureUnitName(TextureUnit(i));
             tuName[0] = ToUpper(tuName[0]);
 
             UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, "Unit " + i + " " + tuName, i, 0, false);
@@ -266,7 +266,7 @@ void RefreshMaterialTextures(bool fullUpdate = true)
 
             if (editMaterial !is null)
             {
-                Texture@ texture = editMaterial.textures[i];
+                Texture@ texture = editMaterial.textures[TextureUnit(i)];
                 if (texture !is null)
                     nameEdit.text = texture.name;
             }
@@ -285,7 +285,7 @@ void RefreshMaterialTextures(bool fullUpdate = true)
             String textureName;
             if (editMaterial !is null)
             {
-                Texture@ texture = editMaterial.textures[i];
+                Texture@ texture = editMaterial.textures[TextureUnit(i)];
                 if (texture !is null)
                     textureName = texture.name;
             }
@@ -691,7 +691,7 @@ void PickMaterialTextureDone(StringHash eventType, VariantMap& eventData)
     if (res !is null && editMaterial !is null)
     {
         BeginMaterialEdit();
-        editMaterial.textures[resourcePickIndex] = res;
+        editMaterial.textures[TextureUnit(resourcePickIndex)] = res;
         EndMaterialEdit();
 
         RefreshMaterialTextures(false);
@@ -714,10 +714,10 @@ void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
     if (!textureName.empty)
     {
         Texture@ texture = cache.GetResource(GetExtension(textureName) == ".xml" ? "TextureCube" : "Texture2D", textureName);
-        editMaterial.textures[index] = texture;
+        editMaterial.textures[TextureUnit(index)] = texture;
     }
     else
-        editMaterial.textures[index] = null;
+        editMaterial.textures[TextureUnit(index)] = null;
 
     EndMaterialEdit();
 }

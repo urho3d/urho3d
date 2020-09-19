@@ -41,19 +41,25 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set owner body anchor.
+    /// @property
     void SetOwnerBodyAnchor(const Vector2& anchor);
     /// Set other body anchor.
+    /// @property
     void SetOtherBodyAnchor(const Vector2& anchor);
     /// Set max length.
+    /// @property
     void SetMaxLength(float maxLength);
 
     /// Return owner body anchor.
+    /// @property
     const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
 
     /// Return other body anchor.
+    /// @property
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
 
     /// Return max length.
+    /// @property
     float GetMaxLength() const { return jointDef_.maxLength; }
 
 private:

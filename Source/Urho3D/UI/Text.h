@@ -53,6 +53,7 @@ struct CharLocation
 };
 
 /// Glyph and its location within the text. Used when preparing text rendering.
+/// @nobind
 struct GlyphLocation
 {
     /// Construct.
@@ -100,88 +101,119 @@ public:
     /// Set font and font size. Return true if successful.
     bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
+    /// @property
     bool SetFontSize(float size);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
+    /// @property
     void SetText(const String& text);
     /// Set row alignment.
+    /// @property
     void SetTextAlignment(HorizontalAlignment align);
     /// Set row spacing, 1.0 for original font spacing.
+    /// @property
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
+    /// @property
     void SetWordwrap(bool enable);
     /// The text will be automatically translated. The text value used as string identifier.
+    /// @property
     void SetAutoLocalizable(bool enable);
     /// Set selection. When length is not provided, select until the text ends.
     void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
     /// Clear selection.
     void ClearSelection();
     /// Set text effect.
+    /// @property
     void SetTextEffect(TextEffect textEffect);
     /// Set shadow offset.
+    /// @property
     void SetEffectShadowOffset(const IntVector2& offset);
     /// Set stroke thickness.
+    /// @property
     void SetEffectStrokeThickness(int thickness);
     /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    /// @property
     void SetEffectRoundStroke(bool roundStroke);
     /// Set effect color.
+    /// @property
     void SetEffectColor(const Color& effectColor);
 
     /// Return font.
+    /// @property
     Font* GetFont() const { return font_; }
 
     /// Return font size.
+    /// @property
     float GetFontSize() const { return fontSize_; }
 
     /// Return text.
+    /// @property
     const String& GetText() const { return text_; }
 
     /// Return row alignment.
+    /// @property
     HorizontalAlignment GetTextAlignment() const { return textAlignment_; }
 
     /// Return row spacing.
+    /// @property
     float GetRowSpacing() const { return rowSpacing_; }
 
     /// Return wordwrap mode.
+    /// @property
     bool GetWordwrap() const { return wordWrap_; }
 
     /// Return auto localizable mode.
+    /// @property
     bool GetAutoLocalizable() const { return autoLocalizable_; }
 
     /// Return selection start.
+    /// @property
     unsigned GetSelectionStart() const { return selectionStart_; }
 
     /// Return selection length.
+    /// @property
     unsigned GetSelectionLength() const { return selectionLength_; }
 
     /// Return text effect.
+    /// @property
     TextEffect GetTextEffect() const { return textEffect_; }
 
     /// Return effect shadow offset.
+    /// @property
     const IntVector2& GetEffectShadowOffset() const { return shadowOffset_; }
 
     /// Return effect stroke thickness.
+    /// @property
     int GetEffectStrokeThickness() const { return strokeThickness_; }
 
     /// Return effect round stroke.
+    /// @property
     bool GetEffectRoundStroke() const { return roundStroke_; }
 
     /// Return effect color.
+    /// @property
     const Color& GetEffectColor() const { return effectColor_; }
 
     /// Return row height.
+    /// @property
     float GetRowHeight() const { return rowHeight_; }
 
     /// Return number of rows.
+    /// @property
     unsigned GetNumRows() const { return rowWidths_.Size(); }
 
     /// Return number of characters.
+    /// @property
     unsigned GetNumChars() const { return unicodeText_.Size(); }
 
     /// Return width of row by index.
+    /// @property{get_rowWidths}
     float GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
+    /// @property{get_charPositions}
     Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
+    /// @property{get_charSizes}
     Vector2 GetCharSize(unsigned index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.

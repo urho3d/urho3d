@@ -65,29 +65,38 @@ public:
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Set orientation type.
+    /// @property
     void SetOrientation(Orientation orientation);
     /// Set slider range maximum value (minimum value is always 0).
+    /// @property
     void SetRange(float range);
     /// Set slider current value.
+    /// @property
     void SetValue(float value);
     /// Change value by a delta.
     void ChangeValue(float delta);
     /// Set paging minimum repeat rate (number of events per second).
+    /// @property
     void SetRepeatRate(float rate);
 
     /// Return orientation type.
+    /// @property
     Orientation GetOrientation() const { return orientation_; }
 
     /// Return slider range.
+    /// @property
     float GetRange() const { return range_; }
 
     /// Return slider current value.
+    /// @property
     float GetValue() const { return value_; }
 
     /// Return knob element.
+    /// @property
     BorderImage* GetKnob() const { return knob_; }
 
     /// Return paging minimum repeat rate (number of events per second).
+    /// @property
     float GetRepeatRate() const { return repeatRate_; }
 
 protected:

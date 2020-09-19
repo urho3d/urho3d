@@ -85,25 +85,33 @@ public:
     /// Close the log file.
     void Close();
     /// Set logging level.
+    /// @property
     void SetLevel(int level);
     /// Set whether to timestamp log messages.
+    /// @property
     void SetTimeStamp(bool enable);
     /// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
+    /// @property
     void SetQuiet(bool quiet);
 
     /// Return logging level.
+    /// @property
     int GetLevel() const { return level_; }
 
     /// Return whether log messages are timestamped.
+    /// @property
     bool GetTimeStamp() const { return timeStamp_; }
 
     /// Return last log message.
+    /// @property
     String GetLastMessage() const { return lastMessage_; }
 
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
+    /// @property
     bool IsQuiet() const { return quiet_; }
 
     /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
+    /// @nobind
     static void Write(int level, const String& message);
     /// Write raw output to the log.
     static void WriteRaw(const String& message, bool error = false);

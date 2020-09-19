@@ -98,15 +98,18 @@ public:
     void SetName(const String& name);
 
     /// Return the open mode.
+    /// @property
     FileMode GetMode() const { return mode_; }
 
     /// Return whether is open.
+    /// @property
     bool IsOpen() const;
 
     /// Return the file handle.
     void* GetHandle() const { return handle_; }
 
     /// Return whether the file originates from a package.
+    /// @property
     bool IsPackaged() const { return offset_ != 0; }
 
 private:

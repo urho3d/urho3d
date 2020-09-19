@@ -49,12 +49,16 @@ environment:
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
   URHO3D_LUAJIT: 1
+  URHO3D_GENERATEBINDINGS: 1
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
 before_build:
   - rake ci_timer
-  - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) };
+  - ps: if ($env:URHO3D_GENERATEBINDINGS -eq "1") {
+          do { "Installing doxygen..."; choco install doxygen.install >$null } until ($?);
+        }
+        if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) };
         if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
         if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE))))
         {

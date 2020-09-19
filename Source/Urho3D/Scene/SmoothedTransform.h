@@ -56,26 +56,35 @@ public:
     /// Update smoothing.
     void Update(float constant, float squaredSnapThreshold);
     /// Set target position in parent space.
+    /// @property
     void SetTargetPosition(const Vector3& position);
     /// Set target rotation in parent space.
+    /// @property
     void SetTargetRotation(const Quaternion& rotation);
     /// Set target position in world space.
+    /// @property
     void SetTargetWorldPosition(const Vector3& position);
     /// Set target rotation in world space.
+    /// @property
     void SetTargetWorldRotation(const Quaternion& rotation);
 
     /// Return target position in parent space.
+    /// @property
     const Vector3& GetTargetPosition() const { return targetPosition_; }
 
     /// Return target rotation in parent space.
+    /// @property
     const Quaternion& GetTargetRotation() const { return targetRotation_; }
 
     /// Return target position in world space.
+    /// @property
     Vector3 GetTargetWorldPosition() const;
     /// Return target rotation in world space.
+    /// @property
     Quaternion GetTargetWorldRotation() const;
 
     /// Return whether smoothing is in progress.
+    /// @property
     bool IsInProgress() const { return smoothingMask_ != SMOOTH_NONE; }
 
 protected:
