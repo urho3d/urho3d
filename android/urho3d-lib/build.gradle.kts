@@ -184,7 +184,7 @@ publishing {
     publications {
         register<MavenPublication>("Urho") {
             groupId = project.group.toString()
-            artifactId = "${project.name}-${project.libraryType}"
+            artifactId = "${project.name}-${project.libraryType.toLowerCase()}"
             if (project.hasProperty("ANDROID_ABI")) {
                 artifactId = "$artifactId-${(project.property("ANDROID_ABI") as String).replace(',', '-')}"
             }
@@ -235,6 +235,3 @@ publishing {
         }
     }
 }
-
-val Project.libraryType: String
-    get() = findProperty("URHO3D_LIB_TYPE") as String? ?: System.getenv("URHO3D_LIB_TYPE") ?: "static"

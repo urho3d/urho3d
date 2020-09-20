@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+import org.gradle.api.Project
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 import java.io.File
@@ -32,11 +33,15 @@ const val cmakeVersion = "3.17.3+"
  *
  * Current supported platforms: android.
  */
-@Suppress("unused")
 fun PluginDependenciesSpec.urho3d(platform: String): PluginDependencySpec = id("io.urho3d.$platform")
 
 /**
  * Naive implementation of "touch" command.
  */
-@Suppress("unused")
 fun File.touch() = createNewFile() || setLastModified(System.currentTimeMillis())
+
+/**
+ * Return the Urho3D library type. Default to 'STATIC' when it is not explicitly specified.
+ */
+val Project.libraryType: String
+    get() = findProperty("URHO3D_LIB_TYPE") as String? ?: System.getenv("URHO3D_LIB_TYPE") ?: "STATIC"

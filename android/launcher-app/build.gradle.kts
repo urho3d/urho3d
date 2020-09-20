@@ -42,9 +42,9 @@ android {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
                     add("-D GRADLE_BUILD_DIR=${findProject(":android:urho3d-lib")?.buildDir}")
-                    // In order to get clean module segregation, only build player/samples here
-                    val includes = listOf("URHO3D_PLAYER", "URHO3D_SAMPLES")
-                    addAll(includes.map { "-D $it=1" })
+                    // Only enable 'URHO3D_PLAYER' build option for 'STATIC' lib type to reduce the spacetime requirement
+                    add("-D URHO3D_PLAYER=1")
+                    add("-D URHO3D_SAMPLES=${if (project.libraryType == "STATIC") "0" else "1"}")
                     // Pass along matching Gradle properties (higher precedence) or env-vars as CMake build options
                     val vars = project.file("../../script/.build-options").readLines()
                     addAll(vars
