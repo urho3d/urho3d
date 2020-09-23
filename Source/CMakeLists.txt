@@ -89,6 +89,10 @@ if (URHO3D_NETWORK)
     add_subdirectory (ThirdParty/SLikeNet)
 endif ()
 
+if (URHO3D_WEBSOCKETS)
+    add_subdirectory (ThirdParty/libwebsockets)
+endif ()
+
 if (URHO3D_DATABASE_ODBC)
     add_subdirectory (ThirdParty/nanodbc)
 endif ()

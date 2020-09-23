@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="libwebsockets"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="clang"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake\;CMake Files\lib\;CMake Files\lib\plat\;CMake Files\lib\plat\unix\;CMake Files\lib\core\;CMake Files\lib\misc\;CMake Files\lib\system\;CMake Files\lib\system\smd\;CMake Files\lib\core-net\;CMake Files\lib\roles\;CMake Files\lib\roles\http\;CMake Files\lib\roles\h1\;CMake Files\lib\roles\ws\;CMake Files\lib\roles\raw-skt\;CMake Files\lib\roles\listen\;CMake Files\lib\event-libs\;CMake Files\lib\event-libs\poll\;CMake Files\plugins\;CMake Files\lwsws\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/strip">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 install/strip"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/local">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 install/local"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="list_install_components">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 list_install_components"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GENHDR">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 GENHDR"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="dist">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 dist"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 install"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 test"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Nightly">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 Nightly"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Continuous">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 Continuous"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Experimental">
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 Experimental"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="websockets">
+				<Option output="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/libwebsockets.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DLWS_BUILDING_STATIC"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/include"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/./async-dns"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/smd/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/./compression"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/h1/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/raw-skt/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/listen/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/poll/../poll"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 websockets"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="websockets/fast">
+				<Option output="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/libwebsockets.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DLWS_BUILDING_STATIC"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/include"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/./async-dns"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/smd/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/./compression"/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/h1/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/raw-skt/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/listen/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/."/>
+					<Add directory="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/poll/../poll"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 websockets/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lib/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake-build-debug/lws_config.h">
+			<Option target="GENHDR"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/adopt.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/client/client.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/client/connect.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/client/connect2.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/client/connect3.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/client/connect4.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/close.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/dummy-callback.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/network.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/output.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/pollfd.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/sequencer.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/server.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/service.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/sorted-usec-list.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/state.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/vhost.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/wsi-timeout.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/wsi.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/alloc.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/buflist.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/context.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/libwebsockets.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/logs.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/lws_dll2.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/vfs.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/poll/poll.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/base64-decode.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/dir.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/lejp.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/lws-ring.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/lwsac/cached-file.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/lwsac/lwsac.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/sha-1.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-caps.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-fds.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-file.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-init.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-misc.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-pipe.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-service.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/unix-sockets.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/h1/ops-h1.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/client/client-http.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/date.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/header.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/parsers.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/server/lejp-conf.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/server/lws-spa.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/server/server.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/listen/ops-listen.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/pipe/ops-pipe.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/raw-skt/ops-raw-skt.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/client-parser-ws.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/client-ws.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/ops-ws.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/server-ws.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/smd/smd.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/system.c">
+			<Option target="websockets"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/CMakeLists-implied-options.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake/libwebsockets-config-version.cmake.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake/libwebsockets-config.cmake.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake/lws_config.h.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/cmake/lws_config_private.h.in">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/plat/unix/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\plat\unix\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\core\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/misc/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\misc\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\system\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/system/smd/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\system\smd\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/core-net/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\core-net\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\roles\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/http/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\roles\http\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/h1/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\roles\h1\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/ws/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\roles\ws\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/raw-skt/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\roles\raw-skt\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/roles/listen/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\roles\listen\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\event-libs\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lib/event-libs/poll/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\event-libs\poll\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/plugins/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\plugins\"/>
+		</Unit>
+		<Unit filename="/Users/arnislielturks/playground/Urho3D-Original/Source/ThirdParty/libwebsockets/lwsws/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lwsws\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

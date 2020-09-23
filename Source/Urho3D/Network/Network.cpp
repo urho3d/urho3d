@@ -38,6 +38,12 @@
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
 
+#ifdef URHO3D_WEBSOCKETS
+#include "WS/WSServer.h"
+#include "WS/WSClient.h"
+#include "WS/WSConnection.h"
+#endif
+
 #include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/NatPunchthroughClient.h>
 #include <SLikeNet/peerinterface.h>
@@ -48,6 +54,7 @@
 #endif
 
 #include "../DebugNew.h"
+#include "../../../cmake-build-debug/include/Urho3D/Network/Network.h"
 
 namespace Urho3D
 {
@@ -205,6 +212,12 @@ Network::Network(Context* context) :
     natPunchServerAddress_(nullptr),
     remoteGUID_(nullptr)
 {
+
+#ifdef URHO3D_WEBSOCKETS
+    wsClient_ = nullptr;
+    wsServer_ = nullptr;
+#endif
+
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
@@ -305,6 +318,15 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
         URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()));
 }
 
+void Network::NewConnectionEstablished(const SharedPtr<Connection> newConnection)
+{
+    using namespace ClientConnected;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_CONNECTION] = newConnection;
+    newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
+}
+
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     // Create a new client connection corresponding to this MessageConnection
@@ -313,12 +335,21 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
     clientConnections_[connection] = newConnection;
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
 
-    using namespace ClientConnected;
-
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_CONNECTION] = newConnection;
-    newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
+    NewConnectionEstablished(clientConnections_[connection]);
 }
+
+#ifdef URHO3D_WEBSOCKETS
+void Network::NewConnectionEstablished(lws* ws)
+{
+    // Create a new client connection corresponding to this MessageConnection
+    SharedPtr<Connection> newConnection(new Connection(context_, true, ws, wsServer_));
+    newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+    websocketClientConnections_[WSConnection(ws)] = newConnection;
+    URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
+
+    NewConnectionEstablished(websocketClientConnections_[WSConnection(ws)]);
+}
+#endif
 
 void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
 {
@@ -409,6 +440,23 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     }
 }
 
+#ifdef URHO3D_WEBSOCKETS
+bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
+{
+    URHO3D_PROFILE(ConnectWS);
+    wsClient_ = new WSClient(this);
+    int result = wsClient_->Connect();
+
+    serverConnection_ = new Connection(context_, false, nullptr, wsClient_);
+    serverConnection_->SetScene(scene);
+    serverConnection_->SetIdentity(identity);
+    serverConnection_->SetConnectPending(true);
+    serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
+    return result == 0;
+}
+#endif
+
 void Network::Disconnect(int waitMSec)
 {
     if (!serverConnection_)
@@ -424,6 +472,10 @@ bool Network::StartServer(unsigned short port, unsigned int maxConnections)
         return true;
 
     URHO3D_PROFILE(StartServer);
+#ifdef URHO3D_WEBSOCKETS
+    wsServer_ = new WSServer(this);
+    wsServer_->StartServer();
+#endif
     
     SLNet::SocketDescriptor socket;//(port, AF_INET);
     socket.port = port;
@@ -665,6 +717,22 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
     }
 }
 
+#ifdef URHO3D_WEBSOCKETS
+Connection* Network::GetConnection(lws* ws) const
+{
+    if (serverConnection_ && serverConnection_->GetWSHandler() == wsClient_)
+        return serverConnection_;
+    else
+    {
+        HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Find(WSConnection(ws));
+        if (i != clientConnections_.End())
+            return i->second_;
+        else
+            return nullptr;
+    }
+}
+#endif
+
 Connection* Network::GetServerConnection() const
 {
     return serverConnection_;
@@ -677,11 +745,25 @@ Vector<SharedPtr<Connection> > Network::GetClientConnections() const
          i != clientConnections_.End(); ++i)
         ret.Push(i->second_);
 
+#ifdef URHO3D_WEBSOCKETS
+    for (HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Begin();
+         i != websocketClientConnections_.End(); ++i)
+        ret.Push(i->second_);
+#endif
+
     return ret;
 }
 
 bool Network::IsServerRunning() const
 {
+#ifdef URHO3D_WEBSOCKETS
+    if (!wsServer_ && !rakPeer_)
+        return false;
+
+    if (wsServer_)
+        return true;
+#endif
+
     if (!rakPeer_)
         return false;
     return rakPeer_->IsActive() && isServer_;
@@ -886,10 +968,54 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 
 }
 
+void Network::HandleIncomingPacket(lws* ws, VectorBuffer& buffer, bool isServer)
+{
+    // SLikeNet reserved byte must be ignored
+    int id = buffer.ReadUByte();
+    int messageID = buffer.ReadUInt();
+    int padding = sizeof(char) + sizeof(int);
+    if (buffer.GetBuffer().Size() < padding) {
+        URHO3D_LOGERRORF("Invalid packet received with length %d", buffer.GetBuffer().Size());
+        return;
+    }
+    MemoryBuffer msg(buffer.GetData() + padding, buffer.GetSize() - padding);
+    // Only process messages from known sources
+    Connection * connection = GetConnection(ws);
+    if (isServer) {
+        if (connection) {
+            if (connection->ProcessMessage((int) messageID, msg)) {
+                return;
+            } else {
+                URHO3D_LOGERRORF("Unable to process incoming message as server %d", messageID);
+            }
+        }
+    } else {
+        bool processed = serverConnection_ && serverConnection_->ProcessMessage(messageID, msg);
+        if (!processed)
+        {
+            if (connection) {
+                if (connection->ProcessMessage((int) messageID, msg)) {
+                    return;
+                } else {
+                    URHO3D_LOGERRORF("Unable to process incoming message as client %d", messageID);
+                }
+            }
+        }
+    }
+}
+
 void Network::Update(float timeStep)
 {
     URHO3D_PROFILE(UpdateNetwork);
 
+#ifdef URHO3D_WEBSOCKETS
+    if (wsServer_) {
+        wsServer_->Update(timeStep);
+    }
+    if (wsClient_) {
+        wsClient_->Update(timeStep);
+    }
+#endif
     //Process all incoming messages for the server
     if (rakPeer_->IsActive())
     {
@@ -939,6 +1065,16 @@ void Network::PostUpdate(float timeStep)
                         networkScenes_.Insert(scene);
                 }
 
+#ifdef URHO3D_WEBSOCKETS
+                for (HashMap<WSConnection, SharedPtr<Connection> >::Iterator i = websocketClientConnections_.Begin();
+                     i != websocketClientConnections_.End(); ++i)
+                {
+                    Scene* scene = i->second_->GetScene();
+                    if (scene)
+                        networkScenes_.Insert(scene);
+                }
+#endif
+
                 for (HashSet<Scene*>::ConstIterator i = networkScenes_.Begin(); i != networkScenes_.End(); ++i)
                     (*i)->PrepareNetworkUpdate();
             }
@@ -946,7 +1082,7 @@ void Network::PostUpdate(float timeStep)
             {
                 URHO3D_PROFILE(SendServerUpdate);
 
-                // Then send server updates for each client connection
+                // Then send server updates for each UDP client connection
                 for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
                 {
@@ -955,6 +1091,18 @@ void Network::PostUpdate(float timeStep)
                     i->second_->SendPackages();
                     i->second_->SendAllBuffers();
                 }
+
+#ifdef URHO3D_WEBSOCKETS
+                // Then send server updates for each Websocket client connection
+                for (HashMap<WSConnection, SharedPtr<Connection> >::Iterator i = websocketClientConnections_.Begin();
+                        i != websocketClientConnections_.End(); ++i)
+                {
+                    i->second_->SendServerUpdate();
+                    i->second_->SendRemoteEvents();
+                    i->second_->SendPackages();
+                    i->second_->SendAllBuffers();
+                }
+#endif
             }
         }
 
@@ -998,6 +1146,21 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
 
     SendEvent(E_SERVERCONNECTED);
 }
+
+void Network::OnServerConnected(lws* ws)
+{
+    serverConnection_->SetWS(ws);
+    serverConnection_->SetConnectPending(false);
+    URHO3D_LOGINFO("Connected to server!");
+
+    // Send the identity map now
+    VectorBuffer msg;
+    msg.WriteVariantMap(serverConnection_->GetIdentity());
+    serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg);
+
+    SendEvent(E_SERVERCONNECTED);
+}
+
 
 void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
 {

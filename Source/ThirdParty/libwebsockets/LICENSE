@@ -1,0 +1,56 @@
+Libwebsockets and included programs are provided under the terms of the
+MIT license shown below, with the exception that some sources are under
+a similar permissive license like BSD, or are explicitly CC0 / public
+domain to remove any obstacles from basing differently-licensed code on
+them.
+
+Original liberal license retained:
+
+  - lib/misc/sha-1.c          - 3-clause BSD license retained, link to original
+  - win32port/zlib            - ZLIB license (see zlib.h)
+  - lib/tls/mbedtls/wrapper   - Apache 2.0 (only built if linked against mbedtls)
+  - lib/misc/base64-decode.c  - already MIT
+
+Relicensed to MIT:
+
+  - lib/misc/daemonize.c               - relicensed from Public Domain to MIT,
+                                         link to original Public Domain version
+  - lib/plat/windows/windows-resolv.c  - relicensed from "Beerware v42" to MIT
+
+Public Domain (CC-zero) to simplify reuse:
+
+  - test-apps/*.c
+  - test-apps/*.h
+  - minimal-examples/*
+  - lwsws/*
+
+Although libwebsockets is available under a permissive license, it does not
+change the reality of dealing with large lumps of external code... if your
+copy diverges it is guaranteed to contain security problems after a while
+and can be very painful to pick backports (especially since historically,
+we are very hot on cleaning and refactoring the codebase).  The least
+painful and lowest risk way remains sending your changes and fixes upstream
+to us so you can easily use later releases and fixes.
+
+MIT License applied to libwebsockets:
+
+https://opensource.org/licenses/MIT 
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ IN THE SOFTWARE.
+

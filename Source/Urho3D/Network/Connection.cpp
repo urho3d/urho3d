@@ -42,6 +42,12 @@
 #include <SLikeNet/peerinterface.h>
 #include <SLikeNet/statistics.h>
 
+#ifdef URHO3D_WEBSOCKETS
+#include <libwebsockets.h>
+#include "WS/WSPacket.h"
+#include "WS/WSHandler.h"
+#endif
+
 #ifdef SendMessage
 #undef SendMessage
 #endif
@@ -78,12 +84,45 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     sceneLoaded_(false),
     logStatistics_(false),
     address_(nullptr),
+#ifdef URHO3D_WEBSOCKETS
+    ws_(nullptr),
+    wsHandler_(nullptr),
+#endif
     packedMessageLimit_(1024)
 {
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
     SetAddressOrGUID(address);
 }
+
+#ifdef URHO3D_WEBSOCKETS
+Connection::Connection(Context* context, bool isClient, lws *ws, WSHandler* wsHandler):
+    Object(context),
+    timeStamp_(0),
+    sendMode_(OPSM_NONE),
+    isClient_(isClient),
+    connectPending_(false),
+    sceneLoaded_(false),
+    logStatistics_(false),
+    address_(nullptr),
+    packedMessageLimit_(1024),
+    ws_(ws),
+    peer_(nullptr),
+    wsHandler_(wsHandler)
+{
+    sceneState_.connection_ = this;
+}
+
+void Connection::SetWS(lws* ws)
+{
+    ws_ = ws;
+}
+
+void Connection::SetWSHandler(WSHandler* wsHandler)
+{
+    wsHandler_ = wsHandler;
+}
+#endif
 
 Connection::~Connection()
 {
@@ -253,7 +292,8 @@ void Connection::SetLogStatistics(bool enable)
 
 void Connection::Disconnect(int waitMSec)
 {
-    peer_->CloseConnection(*address_, true);
+    if (peer_)
+        peer_->CloseConnection(*address_, true);
 }
 
 void Connection::SendServerUpdate()
@@ -391,13 +431,27 @@ void Connection::SendBuffer(PacketType type)
     if (type == PT_RELIABLE_UNORDERED)
         reliability = PacketReliability::RELIABLE;
 
-    if (peer_) {
-        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0,
-                    *address_, false);
+    bool sentOut = false;
+    if (peer_)
+    {
+        peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0, *address_, false);
         tempPacketCounter_.y_++;
+        sentOut = true;
     }
 
-    buffer.Clear();
+#ifdef URHO3D_WEBSOCKETS
+    if (wsHandler_)
+    {
+        wsHandler_->AddOutgoingPacket(WSPacket(ws_, buffer));
+        tempPacketCounter_.y_++;
+        sentOut = true;
+    }
+#endif
+
+    if (!sentOut)
+        URHO3D_LOGERRORF("Message has not yet been sent out");
+    else
+        buffer.Clear();
 }
 
 void Connection::SendAllBuffers()
@@ -457,9 +511,70 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
         return true;
     }
 
+    URHO3D_LOGINFOF("Server: %d", isClient_);
     while (!buffer.IsEof()) {
         msgID = buffer.ReadUInt();
         unsigned int packetSize = buffer.ReadUInt();
+
+        switch (msgID) {
+            case MSG_IDENTITY:
+                URHO3D_LOGINFO("Received message MSG_IDENTITY");
+                break;
+//            case MSG_CONTROLS:
+//                URHO3D_LOGINFO("Received message MSG_CONTROLS");
+//                break;
+            case MSG_SCENELOADED:
+                URHO3D_LOGINFO("Received message MSG_SCENELOADED");
+                break;
+            case MSG_REQUESTPACKAGE:
+                URHO3D_LOGINFO("Received message MSG_REQUESTPACKAGE");
+                break;
+            case MSG_PACKAGEDATA:
+                URHO3D_LOGINFO("Received message MSG_PACKAGEDATA");
+                break;
+            case MSG_LOADSCENE:
+                URHO3D_LOGINFO("Received message MSG_LOADSCENE");
+                break;
+            case MSG_SCENECHECKSUMERROR:
+                URHO3D_LOGINFO("Received message MSG_SCENECHECKSUMERROR");
+                break;
+            case MSG_CREATENODE:
+                URHO3D_LOGINFO("Received message MSG_CREATENODE");
+                break;
+            case MSG_NODEDELTAUPDATE:
+                URHO3D_LOGINFO("Received message MSG_NODEDELTAUPDATE");
+                break;
+            case MSG_NODELATESTDATA:
+                URHO3D_LOGINFO("Received message MSG_NODELATESTDATA");
+                break;
+            case MSG_REMOVENODE:
+                URHO3D_LOGINFO("Received message MSG_REMOVENODE");
+                break;
+            case MSG_CREATECOMPONENT:
+                URHO3D_LOGINFO("Received message MSG_CREATECOMPONENT");
+                break;
+            case MSG_COMPONENTDELTAUPDATE:
+                URHO3D_LOGINFO("Received message MSG_COMPONENTDELTAUPDATE");
+                break;
+            case MSG_COMPONENTLATESTDATA:
+                URHO3D_LOGINFO("Received message MSG_COMPONENTLATESTDATA");
+                break;
+            case MSG_REMOVECOMPONENT:
+                URHO3D_LOGINFO("Received message MSG_REMOVECOMPONENT");
+                break;
+            case MSG_REMOTEEVENT:
+                URHO3D_LOGINFO("Received message MSG_REMOTEEVENT");
+                break;
+            case MSG_REMOTENODEEVENT:
+                URHO3D_LOGINFO("Received message MSG_REMOTENODEEVENT");
+                break;
+            case MSG_PACKAGEINFO:
+                URHO3D_LOGINFO("Received message MSG_PACKAGEINFO");
+                break;
+            case MSG_PACKED_MESSAGE:
+                URHO3D_LOGINFO("Received message MSG_PACKED_MESSAGE");
+                break;
+        }
         MemoryBuffer msg(buffer.GetData() + buffer.GetPosition(), packetSize);
         buffer.Seek(buffer.GetPosition() + packetSize);
 
@@ -602,17 +717,20 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     {
     case MSG_CREATENODE:
         {
+            URHO3D_LOGINFOF("MSG_CREATENODE received with size %d", msg.GetSize());
             unsigned nodeID = msg.ReadNetID();
             // In case of the root node (scene), it should already exist. Do not create in that case
             Node* node = scene_->GetNode(nodeID);
             if (!node)
             {
+                URHO3D_LOGINFOF("CREATE NODE 1: %d", nodeID);
                 // Add initially to the root level. May be moved as we receive the parent attribute
                 node = scene_->CreateChild(nodeID, REPLICATED);
                 // Create smoothed transform component
                 node->CreateComponent<SmoothedTransform>(LOCAL);
             }
 
+            URHO3D_LOGINFOF("CREATE NODE 2: %d", nodeID);
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg);
             auto* transform = node->GetComponent<SmoothedTransform>();
@@ -621,6 +739,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();
+            URHO3D_LOGINFOF("CREATE NODE 3");
             while (numVars)
             {
                 StringHash key = msg.ReadStringHash();
@@ -628,10 +747,14 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 --numVars;
             }
 
+            URHO3D_LOGINFOF("CREATE NODE 4");
+
             // Read components
             unsigned numComponents = msg.ReadVLE();
+            URHO3D_LOGINFOF("NUm components %d", numComponents);
             while (numComponents)
             {
+                URHO3D_LOGINFOF("CREATE NODE 5");
                 --numComponents;
 
                 StringHash type = msg.ReadStringHash();
@@ -644,6 +767,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                     if (component)
                         component->Remove();
                     component = node->CreateComponent(type, REPLICATED, componentID);
+                    URHO3D_LOGINFOF("CREATE NODE 6");
                 }
 
                 // If was unable to create the component, would desync the message and therefore have to abort
@@ -656,6 +780,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // Read initial attributes and apply
                 component->ReadDeltaUpdate(msg);
                 component->ApplyAttributes();
+                URHO3D_LOGINFOF("CREATE NODE 7");
             }
         }
         break;
@@ -1120,7 +1245,15 @@ int Connection::GetPacketsOutPerSec() const
 
 String Connection::ToString() const
 {
-    return GetAddress() + ":" + String(GetPort());
+    if (peer_)
+        return GetAddress() + ":" + String(GetPort());
+
+#ifdef URHO3D_WEBSOCKETS
+    if (ws_)
+        return "WS connection";
+#endif
+
+    return String::EMPTY;
 }
 
 unsigned Connection::GetNumDownloads() const
@@ -1270,6 +1403,7 @@ void Connection::ProcessNewNode(Node* node)
 
     // Write node's components
     msg_.WriteVLE(node->GetNumNetworkComponents());
+    URHO3D_LOGINFOF("Sending MSG_CREATE [%d] node with %d network components", node->GetID(), node->GetNumNetworkComponents());
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (unsigned i = 0; i < components.Size(); ++i)
     {
@@ -1289,7 +1423,10 @@ void Connection::ProcessNewNode(Node* node)
         component->WriteInitialDeltaUpdate(msg_, timeStamp_);
     }
 
+    URHO3D_LOGINFOF("MSG_CREATENODE sending with size %d", msg_.GetSize());
     SendMessage(MSG_CREATENODE, true, true, msg_);
+//    auto test = MemoryBuffer(msg_.GetData(), msg_.GetSize());
+//    ProcessSceneUpdate(MSG_CREATENODE, test);
 
     nodeState.markedDirty_ = false;
     sceneState_.dirtyNodes_.Erase(node->GetID());
@@ -1577,6 +1714,7 @@ void Connection::OnSceneLoadFailed()
 
     using namespace NetworkSceneLoadFailed;
 
+    URHO3D_LOGERRORF("Failed to load scene");
     VariantMap& eventData = GetEventDataMap();
     eventData[P_CONNECTION] = this;
     SendEvent(E_NETWORKSCENELOADFAILED, eventData);

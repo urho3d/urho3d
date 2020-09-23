@@ -62,6 +62,8 @@ void Sample::Setup()
     engineParameters_[EP_FULL_SCREEN]  = false;
     engineParameters_[EP_HEADLESS]     = false;
     engineParameters_[EP_SOUND]        = false;
+    engineParameters_[EP_WINDOW_WIDTH] = 640;
+    engineParameters_[EP_WINDOW_HEIGHT] = 480;
 
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree

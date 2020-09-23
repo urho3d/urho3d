@@ -27,6 +27,11 @@
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
 
+#ifdef URHO3D_WEBSOCKETS
+// libwebsockets internal struct
+struct lws;
+#endif
+
 namespace Urho3D
 {
 
@@ -34,10 +39,21 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
+#ifdef URHO3D_WEBSOCKETS
+class WSServer;
+class WSClient;
+class WSConnection;
+#endif
+
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object
 {
     URHO3D_OBJECT(Network, Object);
+
+#ifdef URHO3D_WEBSOCKETS
+    friend WSClient;
+    friend WSServer;
+#endif
 
 public:
     /// Construct.
@@ -47,8 +63,14 @@ public:
 
     /// Handle an inbound message.
     void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
-    /// Handle a new client connection.
+    // Handle new client connection
+    void NewConnectionEstablished(const SharedPtr<Connection> newConnection);
+    /// Handle new UDP client connection.
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+#ifdef URHO3D_WEBSOCKETS
+    /// Handle new Websockets client connection.
+    void NewConnectionEstablished(lws* ws);
+#endif
     /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
 
@@ -62,6 +84,14 @@ public:
     void SetNATServerInfo(const String& address, unsigned short port);
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+#ifdef URHO3D_WEBSOCKETS
+    /// Connect to a server using Websockets connection. Return true if connection process successfully started.
+    bool ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Return a client or server connection by Websocket connection, or null if none exist.
+    Connection* GetConnection(lws* ws) const;
+    /// Handle server connection.
+    void OnServerConnected(lws* ws);
+#endif
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
@@ -143,8 +173,12 @@ private:
     void OnServerDisconnected(const SLNet::AddressOrGUID& address);
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
-    /// All incoming packages are handled here.
+    /// All incoming UDP packets are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
+#ifdef URHO3D_WEBSOCKETS
+    /// All incoming websocket packets are handled here.
+    void HandleIncomingPacket(lws* ws, VectorBuffer& buffer, bool isServer);
+#endif
 
     /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
@@ -152,8 +186,12 @@ private:
     SLNet::RakPeerInterface* rakPeerClient_;
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
-    /// Server's client connections.
+    /// SLikeNet server's client connections.
     HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> > clientConnections_;
+#ifdef URHO3D_WEBSOCKETS
+    /// Websocket server's client connections.
+    HashMap<WSConnection, SharedPtr<Connection> > websocketClientConnections_;
+#endif
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
     /// Remote event fixed blacklist.
@@ -168,7 +206,7 @@ private:
     float simulatedPacketLoss_;
     /// Update time interval.
     float updateInterval_;
-    /// Update time accumulator.
+    /// Update time accumulator.GetConnection
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
@@ -190,6 +228,11 @@ private:
     SLNet::RakNetGUID* remoteGUID_;
     /// Local server GUID.
     String guid_;
+
+#ifdef URHO3D_WEBSOCKETS
+    WSServer* wsServer_;
+    WSClient* wsClient_;
+#endif
 };
 
 /// Register Network library objects.

@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#define URHO3D_WEBSOCKETS
+
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
@@ -69,6 +71,8 @@ static const unsigned CTRL_RIGHT = 8;
 
 URHO3D_DEFINE_APPLICATION_MAIN(SceneReplication)
 
+bool isClient = false;
+
 SceneReplication::SceneReplication(Context* context) :
     Sample(context)
 {
@@ -93,6 +97,9 @@ void SceneReplication::Start()
 
     // Set the mouse mode to use in the sample
     Sample::InitMouseMode(MM_RELATIVE);
+
+    auto* network = GetSubsystem<Network>();
+    network->SetUpdateFps(30);
 }
 
 void SceneReplication::CreateScene()
@@ -322,6 +329,13 @@ void SceneReplication::MoveCamera()
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
 
+    if (input->GetKeyPress(KEY_P)) {
+//        scene_->SetUpdateEnabled(!scene_->IsUpdateEnabled());
+//        scene_->CreateComponent<PhysicsWorld>(LOCAL);
+//        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+//        SubscribeToEvent(E_PHYSICSPRESTEP, URHO3D_HANDLER(SceneReplication, HandlePhysicsPreStep));
+    }
+
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch and only move the camera
     // when the cursor is hidden
     if (!ui->GetCursor()->IsVisible())
@@ -360,8 +374,8 @@ void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventD
 
     if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection())
     {
-        packetsIn_->SetText("Packets  in: " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsInPerSec()));
-        packetsOut_->SetText("Packets out: " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
+        packetsIn_->SetText("Packets  in (as client) : " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsInPerSec()));
+        packetsOut_->SetText("Packets out (as client): " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
         packetCounterTimer_.Reset();
     }
     if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetClientConnections().Size())
@@ -373,8 +387,8 @@ void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventD
             packetsIn += (*it)->GetPacketsInPerSec();
             packetsOut += (*it)->GetPacketsOutPerSec();
         }
-        packetsIn_->SetText("Packets  in: " + String(packetsIn));
-        packetsOut_->SetText("Packets out: " + String(packetsOut));
+        packetsIn_->SetText("Packets  in (as server)[" + String(connections.Size()) + "] : " + String(packetsIn));
+        packetsOut_->SetText("Packets out (as server)[" + String(connections.Size()) + "]: " + String(packetsOut));
         packetCounterTimer_.Reset();
     }
 }
@@ -387,6 +401,9 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
     auto* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
 
+    if (isClient) {
+        serverConnection;
+    }
     // Client: collect controls
     if (serverConnection)
     {
@@ -444,6 +461,8 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
                 body->ApplyTorque(rotation * Vector3::FORWARD * MOVE_TORQUE);
             if (controls.buttons_ & CTRL_RIGHT)
                 body->ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
+
+            body->ApplyTorque(rotation * Vector3::RIGHT * MOVE_TORQUE * 0.1);
         }
     }
 }
@@ -457,8 +476,10 @@ void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData
 
     // Connect to server, specify scene to use as a client for replication
     clientObjectID_ = 0; // Reset own object ID from possible previous connection
-    network->Connect(address, SERVER_PORT, scene_);
+//    network->Connect(address, SERVER_PORT, scene_);
+    network->ConnectWS(address, SERVER_PORT, scene_);
 
+    isClient = true;
     UpdateButtons();
 }
 
@@ -508,6 +529,7 @@ void SceneReplication::HandleClientConnected(StringHash eventType, VariantMap& e
     // Then create a controllable object for that client
     Node* newObject = CreateControllableObject();
     serverObjects_[newConnection] = newObject;
+    cameraNode_->SetPosition(newObject->GetWorldPosition());
 
     // Finally send the object's node ID using a remote event
     VariantMap remoteEventData;
@@ -531,4 +553,5 @@ void SceneReplication::HandleClientDisconnected(StringHash eventType, VariantMap
 void SceneReplication::HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
     clientObjectID_ = eventData[P_ID].GetUInt();
+    URHO3D_LOGINFOF("Received client object ID %d", clientObjectID_);
 }

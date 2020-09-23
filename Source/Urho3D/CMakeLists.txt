@@ -117,6 +117,9 @@ if (URHO3D_SSL)
     endif ()
 endif ()
 
+if (NOT URHO3D_WEBSOCKETS)
+    list (APPEND EXCLUDED_SOURCE_DIRS Network/WS)
+endif ()
 # Define source files
 foreach (DIR IK Navigation Network Physics Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)
@@ -270,6 +273,11 @@ if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${THIRD_PARTY_INCLUDE_DIR}/Bullet)
+endif ()
+if (URHO3D_WEBSOCKETS)
+    list (APPEND INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Source/ThirdParty/libwebsockets/include)
+    add_definitions (-DURHO3D_WEBSOCKETS)
+else ()
 endif ()
 if (URHO3D_NAVIGATION)
     # DetourTileCache and DetourCrowd libraries depend on Detour's include dir to be added in the header search path

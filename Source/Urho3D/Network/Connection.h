@@ -41,6 +41,11 @@ namespace SLNet
     class RakPeerInterface;
 }
 
+#ifdef URHO3D_WEBSOCKETS
+// libwebsockets struct
+struct lws;
+#endif
+
 namespace Urho3D
 {
 
@@ -50,6 +55,7 @@ class Node;
 class Scene;
 class Serializable;
 class PackageFile;
+class WSHandler;
 
 /// Queued remote event.
 struct RemoteEvent
@@ -122,6 +128,13 @@ class URHO3D_API Connection : public Object
 public:
     /// Construct with context, RakNet connection address and Raknet peer pointer.
     Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer);
+#ifdef URHO3D_WEBSOCKETS
+    /// Construct with context, Websocket connection
+    Connection(Context* context, bool isClient, lws *ws, WSHandler* wsHandler);
+    void SetWS(lws* ws);
+    void SetWSHandler(WSHandler* server);
+    const WSHandler* GetWSHandler() { return wsHandler_; }
+#endif
     /// Destruct.
     ~Connection() override;
 
@@ -349,6 +362,12 @@ private:
     HashMap<int, VectorBuffer> outgoingBuffer_;
     /// Outgoing packet size limit
     int packedMessageLimit_;
+#ifdef URHO3D_WEBSOCKETS
+    /// Websocket connection
+    lws *ws_;
+    /// Websocket connection handler
+    WSHandler* wsHandler_;
+#endif
 };
 
 }
