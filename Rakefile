@@ -23,23 +23,22 @@
 task default: 'build'
 
 desc 'Invoke CMake to configure and generate a build tree'
-task :cmake do
+task :cmake => [:init] do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
   end
-  dir = build_tree
-  next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{dir}") and not ARGV.include?('cmake'))
+  next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{build_tree}") and not ARGV.include?('cmake'))
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
     var.chomp!
     build_options = "#{build_options} -D #{var}=#{ENV[var]}" if ENV[var]
   }
-  system %Q{#{script} "#{dir}" #{build_options}} or abort
+  system %Q{#{script} "#{build_tree}" #{build_options}} or abort
 end
 
 desc 'Clean the build tree'
-task :clean do
+task :clean => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('clean')
     next
@@ -55,7 +54,6 @@ task :build, [:target] => [:cmake] do |_, args|
     system "ccache -s" if ENV['USE_CCACHE']
     next
   end
-  init_default
   filter = ''
   case ENV['GENERATOR']
   when 'xcode'
@@ -72,7 +70,7 @@ task :build, [:target] => [:cmake] do |_, args|
 end
 
 desc 'Test the software'
-task :test do
+task :test => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('test')
     next
@@ -83,14 +81,13 @@ task :test do
     Rake::Task['style'].invoke
     next
   end
-  init_default
   wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
   test = /xcode|vs/ =~ ENV['GENERATOR'] ? 'RUN_TESTS' : 'test'
   system "#{wrapper} #{build_target(test)}" or abort
 end
 
 desc 'Generate documentation'
-task :doc do
+task :doc => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('documentationZip')
     next
@@ -99,7 +96,7 @@ task :doc do
 end
 
 desc 'Package build artifact'
-task :package do
+task :package => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('zipBuildTreeDebug zipBuildTreeRelease')
     next
@@ -108,23 +105,47 @@ task :package do
     Rake::Task['cpack'].invoke
     next
   end
-  init_default
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
   system "#{wrapper} #{build_target('package')}" or abort
 end
 
 desc 'Publish build artifact'
-task :publish do
+task :publish => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('publish')
     next
   end
-  init_default
   abort "The 'publish' task is currently not supported on '#{ENV['PLATFORM']}' platform"
 end
 
 
 ### Internal tasks ###
+
+task :init do
+  next if $max_jobs
+  Rake::Task['ci'].invoke if ENV['CI']
+  case build_host
+  when /linux/
+    $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
+    ENV['GENERATOR'] = 'generic' unless ENV['GENERATOR']
+    ENV['PLATFORM'] = 'linux' unless ENV['PLATFORM']
+  when /darwin|macOS/
+    $max_jobs = `sysctl -n hw.logicalcpu`.chomp
+    ENV['GENERATOR'] = 'xcode' unless ENV['GENERATOR']
+    ENV['PLATFORM'] = 'macOS' unless ENV['PLATFORM']
+  when /win32|mingw|mswin|windows/
+    require 'win32ole'
+    WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
+      $max_jobs = it.NumberOfLogicalProcessors
+    }
+    ENV['GENERATOR'] = 'vs' unless ENV['GENERATOR']
+    ENV['PLATFORM'] = 'win' unless ENV['PLATFORM']
+  else
+    abort "Unsupported host system: #{build_host}"
+  end
+  # The 'ARCH' env-var, when set, has higher precedence than the 'URHO3D_64BIT' env-var
+  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' if /32|64/ =~ ENV['ARCH']
+end
 
 task :gradle, [:task] do |_, args|
   system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
@@ -162,7 +183,6 @@ def build_host
 end
 
 def build_tree
-  init_default
   ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM'].downcase}"
 end
 
@@ -172,30 +192,6 @@ end
 
 def build_target(tgt)
   %Q{cmake --build "#{build_tree}" #{build_config} #{tgt ? "--target #{tgt}" : ''}}
-end
-
-def init_default
-  case build_host
-  when /linux/
-    $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
-    ENV['GENERATOR'] = 'generic' unless ENV['GENERATOR']
-    ENV['PLATFORM'] = 'linux' unless ENV['PLATFORM']
-  when /darwin|macOS/
-    $max_jobs = `sysctl -n hw.logicalcpu`.chomp
-    ENV['GENERATOR'] = 'xcode' unless ENV['GENERATOR']
-    ENV['PLATFORM'] = 'macOS' unless ENV['PLATFORM']
-  when /win32|mingw|mswin|windows/
-    require 'win32ole'
-    WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
-      $max_jobs = it.NumberOfLogicalProcessors
-    }
-    ENV['GENERATOR'] = 'vs' unless ENV['GENERATOR']
-    ENV['PLATFORM'] = 'win' unless ENV['PLATFORM']
-  else
-    abort "Unsupported host system: #{build_host}"
-  end
-  # The 'ARCH' env-var, when set, has higher precedence than the 'URHO3D_64BIT' env-var
-  ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' if /32|64/ =~ ENV['ARCH']
 end
 
 def lint_err_file

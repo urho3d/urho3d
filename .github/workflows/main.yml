@@ -88,21 +88,21 @@ jobs:
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}
             ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
       - name: DBE
-        run: script/dockerized.sh ${PLATFORM/-*} env && rake update_dot_files
+        run: rake update_dot_files && script/dockerized.sh ${PLATFORM/-*} env
       - name: CMake
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci cmake
+        run: script/dockerized.sh ${PLATFORM/-*} rake cmake
         if: matrix.platform != 'android' && matrix.platform != 'linux-clang-format'
       - name: Build
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci build
+        run: script/dockerized.sh ${PLATFORM/-*} rake build
         if: matrix.platform != 'linux-clang-format'
       - name: Test
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci test
+        run: script/dockerized.sh ${PLATFORM/-*} rake test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
       - name: Documentation
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci doc
+        run: script/dockerized.sh ${PLATFORM/-*} rake doc
         if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci package
+        run: script/dockerized.sh ${PLATFORM/-*} rake package
         if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -116,7 +116,7 @@ jobs:
       - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: script/dockerized.sh ${PLATFORM/-*} rake ci publish
+        run: script/dockerized.sh ${PLATFORM/-*} rake publish
         if: github.event_name == 'push' && matrix.platform == 'android'
   macOS:
     name: 🍏
@@ -148,17 +148,17 @@ jobs:
         run: sudo cp -rp $(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/* /usr/local/include
         if: matrix.platform == 'macOS-make'
       - name: CMake
-        run: rake ci cmake
+        run: rake cmake
       - name: Build
-        run: rake ci build
+        run: rake build
       - name: Test
-        run: rake ci test
+        run: rake test
         if: startsWith(matrix.platform, 'macOS')
       - name: Documentation
-        run: rake ci doc
+        run: rake doc
         if: github.event_name == 'push'
       - name: Package
-        run: rake ci package
+        run: rake package
         if: github.event_name == 'push'
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -195,17 +195,17 @@ jobs:
       - name: Install dependencies
         run: do { choco install --no-progress doxygen.install graphviz } until ($?)
       - name: CMake
-        run: rake ci cmake
+        run: rake cmake
       - name: Build
-        run: rake ci build
+        run: rake build
       - name: Test
-        run: rake ci test
+        run: rake test
         if: matrix.graphics-api != 'OpenGL'
       - name: Documentation
-        run: rake ci doc
+        run: rake doc
         if: github.event_name == 'push'
       - name: Package
-        run: rake ci package
+        run: rake package
         if: github.event_name == 'push'
       - name: Upload
         uses: actions/upload-artifact@v2
