@@ -44,18 +44,18 @@ task :clean do
     Rake::Task['gradle'].invoke('clean')
     next
   end
-  system %Q{cmake --build "#{build_tree}" #{build_config} --target clean} or abort
+  system build_target('clean') or abort
 end
 
 desc 'Build the software'
-task build: [:cmake] do
+task :build, [:target] => [:cmake] do |_, args|
   system "ccache -z" if ENV['USE_CCACHE']
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('build -x test')
     system "ccache -s" if ENV['USE_CCACHE']
     next
   end
-  target = ENV['TARGET'] ? "--target #{ENV['TARGET']}" : '' # Build all by default
+  init_default
   filter = ''
   case ENV['GENERATOR']
   when 'xcode'
@@ -67,7 +67,7 @@ task build: [:cmake] do
     concurrent = "-j #{$max_jobs}"
     filter = "2>#{lint_err_file}" if ENV['URHO3D_LINT']
   end
-  system %Q{cmake --build "#{build_tree}" #{build_config} #{target} -- #{concurrent} #{ENV['BUILD_PARAMS']} #{filter}} or abort
+  system "#{build_target(args[:target])} -- #{concurrent} #{ENV['BUILD_PARAMS']} #{filter}" or abort
   system "ccache -s" if ENV['USE_CCACHE']
 end
 
@@ -83,10 +83,10 @@ task :test do
     Rake::Task['style'].invoke
     next
   end
-  dir = build_tree
+  init_default
   wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
   test = /xcode|vs/ =~ ENV['GENERATOR'] ? 'RUN_TESTS' : 'test'
-  system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target #{test}} or abort
+  system "#{wrapper} #{build_target(test)}" or abort
 end
 
 desc 'Generate documentation'
@@ -95,7 +95,7 @@ task :doc do
     Rake::Task['gradle'].invoke('documentationZip')
     next
   end
-  system %Q{cmake --build "#{build_tree}" #{build_config} --target doc} or abort
+  system build_target('doc') or abort
 end
 
 desc 'Package build artifact'
@@ -108,9 +108,9 @@ task :package do
     Rake::Task['cpack'].invoke
     next
   end
-  dir = build_tree
+  init_default
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
-  system %Q{#{wrapper} cmake --build "#{dir}" #{build_config} --target package} or abort
+  system "#{wrapper} #{build_target('package')}" or abort
 end
 
 desc 'Publish build artifact'
@@ -168,6 +168,10 @@ end
 
 def build_config
   /xcode|vs/ =~ ENV['GENERATOR'] ? "--config #{ENV.fetch('CONFIG', 'Release')}" : ''
+end
+
+def build_target(tgt)
+  %Q{cmake --build "#{build_tree}" #{build_config} #{tgt ? "--target #{tgt}" : ''}}
 end
 
 def init_default
