@@ -244,7 +244,7 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
 
     RegisterRefCounted<PropertySet2D>(engine, "PropertySet2D");
     engine->RegisterObjectMethod("PropertySet2D", "bool HasProperty(const String&in) const", asMETHOD(PropertySet2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PropertySet2D", "const String& GetProperty(const String&in) const", asMETHOD(PropertySet2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PropertySet2D", "const String& GetProperty(const String&in) const", asMETHOD(PropertySet2D, GetProperty), asCALL_THISCALL);
 
     engine->RegisterGlobalProperty("const uint FLIP_HORIZONTAL", (void*)&FLIP_HORIZONTAL);
     engine->RegisterGlobalProperty("const uint FLIP_VERTICAL", (void*)&FLIP_VERTICAL);
@@ -259,7 +259,7 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Tile2D", "bool get_swapXY() const", asMETHOD(Tile2D, GetSwapXY), asCALL_THISCALL);
     engine->RegisterObjectMethod("Tile2D", "Sprite2D@+ get_sprite() const", asMETHOD(Tile2D, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod("Tile2D", "bool HasProperty(const String&in) const", asMETHOD(Tile2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHOD(Tile2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHOD(Tile2D, GetProperty), asCALL_THISCALL);
 
     RegisterRefCounted<TileMapObject2D>(engine, "TileMapObject2D");
     engine->RegisterObjectMethod("TileMapObject2D", "TileObjectType2D get_objectType() const", asMETHOD(TileMapObject2D, GetObjectType), asCALL_THISCALL);
@@ -294,7 +294,7 @@ static void RegisterTileMapLayer2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapLayer2D", "void set_visible(bool)", asMETHOD(TileMapLayer2D, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "bool get_visible() const", asMETHOD(TileMapLayer2D, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "bool HasProperty(const String&in) const", asMETHOD(TileMapLayer2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapLayer2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapLayer2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapLayer2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapLayer2D, GetProperty), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "TileMapLayerType2D get_layerType() const", asMETHOD(TileMapLayer2D, GetLayerType), asCALL_THISCALL);
 
     // For tile layer only
