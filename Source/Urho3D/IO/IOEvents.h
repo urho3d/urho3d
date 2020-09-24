@@ -41,4 +41,9 @@ URHO3D_EVENT(E_ASYNCEXECFINISHED, AsyncExecFinished)
     URHO3D_PARAM(P_EXITCODE, ExitCode);            // int
 }
 
+// Notify posted from platform part
+URHO3D_EVENT(E_PLATFORM_NOTIFY, PlatformNotify) {
+    URHO3D_PARAM(P_DATA, Data);	   // String
+}
+
 }

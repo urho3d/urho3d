@@ -25,9 +25,50 @@ package com.github.urho3d
 import android.content.Context
 import org.libsdl.app.SDLActivity
 import java.io.File
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import android.os.Handler
+import android.os.Message
+import android.util.Log
+import android.os.Bundle
 
 open class UrhoActivity : SDLActivity() {
-
+    private fun processData(data: String) {
+        try {
+            val js = JSONObject(data)
+            val methodName = js.getString("method")
+            val method = javaClass.getDeclaredMethod(methodName, JSONObject::class.java!!)
+            method.setAccessible(true)
+            method.invoke(this, js)
+        } catch (e:ClassCastException) {
+            Log.e("Urho3D", "onUnhandledMessage ClassCastException", e)
+        } catch (e:JSONException) {
+            Log.e("Urho3D", "onUnhandledMessage JSONException", e)
+        } catch (e:SecurityException) {
+            Log.e("Urho3D", "onUnhandledMessage SecurityException", e)
+        } catch (e:NoSuchMethodException) {
+            Log.e("Urho3D", "onUnhandledMessage NoSuchMethodException", e)
+        } catch (e:Exception) {
+            Log.e("Urho3D", "onUnhandledMessage Exception", e)
+        }
+    }
+    fun notifyGame(source:String, event:String, params:JSONObject) {
+        try {
+            params.put("source", source)
+            params.put("event", event)
+            nativeUserActivityCallback(params.toString())
+        } catch (e:JSONException) {}
+    }
+    fun notifyGame(source:String, event:String) {
+        notifyGame(source, event, JSONObject())
+    }
+    private val mHandler = object:Handler() {
+        override fun handleMessage(msg:Message) {
+            processData(msg.obj as String)
+        }
+    }
+    
     companion object {
         private val regex = Regex("^lib(.*)\\.so$")
 
@@ -38,6 +79,13 @@ open class UrhoActivity : SDLActivity() {
                     .map {
                         regex.find(it.name)?.groupValues?.last() ?: throw IllegalStateException()
                     }
+        @JvmStatic
+        external fun nativeUserActivityCallback(json:String)
+        @JvmStatic
+        fun postDataToUI(data:String) {
+            val msg = (SDLActivity.mSingleton as UrhoActivity).mHandler.obtainMessage()
+            msg.obj = data
+            (SDLActivity.mSingleton as UrhoActivity).mHandler.sendMessage(msg)
+        }
     }
-
 }

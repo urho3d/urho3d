@@ -140,6 +140,7 @@ Script::Script(Context* context) :
 #endif
     RegisterScriptAPI(scriptEngine_);
     RegisterEngineAPI(scriptEngine_);
+    RegisterPlatformAPI(scriptEngine_);
 
     // Subscribe to console commands
     SetExecuteConsoleCommands(true);

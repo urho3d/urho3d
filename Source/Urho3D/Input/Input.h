@@ -440,5 +440,6 @@ private:
     bool emscriptenPointerLock_;
 #endif
 };
-
+/// Used for post events to game's main SDL thread loop
+extern int sdlUserEventType;
 }
