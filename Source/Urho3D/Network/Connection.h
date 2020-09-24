@@ -31,6 +31,10 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
 
+#ifdef URHO3D_WEBSOCKETS
+#include "WS/WSConnection.h"
+#endif
+
 namespace SLNet
 {
     class SystemAddress;
@@ -40,11 +44,6 @@ namespace SLNet
     class NatPunchthroughClient;
     class RakPeerInterface;
 }
-
-#ifdef URHO3D_WEBSOCKETS
-// libwebsockets struct
-struct lws;
-#endif
 
 namespace Urho3D
 {
@@ -56,6 +55,7 @@ class Scene;
 class Serializable;
 class PackageFile;
 class WSHandler;
+class WSConnection;
 
 /// Queued remote event.
 struct RemoteEvent
@@ -130,8 +130,8 @@ public:
     Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer);
 #ifdef URHO3D_WEBSOCKETS
     /// Construct with context, Websocket connection
-    Connection(Context* context, bool isClient, lws *ws, WSHandler* wsHandler);
-    void SetWS(lws* ws);
+    Connection(Context* context, bool isClient, const WSConnection& ws, WSHandler* wsHandler);
+    void SetWS(const WSConnection& ws);
     void SetWSHandler(WSHandler* server);
     const WSHandler* GetWSHandler() { return wsHandler_; }
 #endif
@@ -364,7 +364,7 @@ private:
     int packedMessageLimit_;
 #ifdef URHO3D_WEBSOCKETS
     /// Websocket connection
-    lws *ws_;
+    WSConnection ws_;
     /// Websocket connection handler
     WSHandler* wsHandler_;
 #endif

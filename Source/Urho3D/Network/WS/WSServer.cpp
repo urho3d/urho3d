@@ -1,40 +1,40 @@
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
-#include "WSServer.h"
-#include "WSHandler.h"
+//
+// Copyright (c) 2008-2020 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
 #include "../Network.h"
-#include "../../IO/MemoryBuffer.h"
-
-//#define LWS_WITH_NETWORK TRUE
-//#define LWS_ROLE_H1 TRUE
-//#define LWS_ROLE_WS TRUE
-//#define LWS_WITH_SERVER TRUE
-
+#include "../../Core/WorkQueue.h"
 #include "../../IO/Log.h"
+#include "../../IO/MemoryBuffer.h"
+#include "WSHandler.h"
+#include "WSServer.h"
+
 #include <libwebsockets.h>
-#include <string.h>
 #include <signal.h>
+#include <string.h>
 
-#define LWS_PLUGIN_STATIC
-
-#if !defined (LWS_PLUGIN_STATIC)
-#define LWS_DLL
-#define LWS_INTERNAL
-#include <libwebsockets.h>
-#endif
-
-const int ID_USER_PACKET_ENUM = 134;
 static Urho3D::WSServer* WSServerInstance = nullptr;
 static struct lws_context *context;
 
-static int ws_server_callback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
-
-static struct lws_protocols protocols[] = {
-        { "ws-server", ws_server_callback, 0, 0 },
-        { NULL, NULL, 0, 0 } /* terminator */
-};
-
-static int ws_server_callback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
-{
+static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len) {
     URHO3D_LOGINFOF("Incoming server messsage reason %d", reason);
 
     switch (reason) {
@@ -43,28 +43,20 @@ static int ws_server_callback(struct lws *wsi, enum lws_callback_reasons reason,
 
         case LWS_CALLBACK_ESTABLISHED:
             if (WSServerInstance) {
-                WSServerInstance->GetNetworkInstance()->NewConnectionEstablished(wsi);
+                WSServerInstance->AddPendingConnection(wsi);
             }
             break;
-
-        case LWS_CALLBACK_CLOSED:
-            // TODO: Handle client disconnected
-            break;
-
 
         case LWS_CALLBACK_SERVER_WRITEABLE:
         case LWS_CALLBACK_CLIENT_WRITEABLE:
             if (WSServerInstance) {
-//                Urho3D::MutexLock lock(WSServerInstance->GetOutgoingMutex());
-                auto* packets = WSServerInstance->GetOutgoingPackets();
+                Urho3D::MutexLock lock(WSServerInstance->GetOutgoingMutex());
+                auto* packets = WSServerInstance->GetOutgoingPackets(wsi);
                 for (auto it = packets->Begin(); it != packets->End(); ++it) {
                     WSPacket& packet = (*it);
-                    if (wsi != packet.first_) {
-                        continue;
-                    }
                     unsigned char buf[LWS_PRE + packet.second_.GetSize()];
                     memcpy(&buf[LWS_PRE], packet.second_.GetData(), packet.second_.GetSize());
-                    int retval = lws_write(packet.first_, &buf[LWS_PRE], packet.second_.GetSize(), LWS_WRITE_BINARY);
+                    int retval = lws_write(packet.first_.GetWS(), &buf[LWS_PRE], packet.second_.GetSize(), LWS_WRITE_BINARY);
                     if (retval < packet.second_.GetSize()) {
                         URHO3D_LOGERRORF("Failed to write to WS, ret = %d", retval);
                         break;
@@ -74,12 +66,11 @@ static int ws_server_callback(struct lws *wsi, enum lws_callback_reasons reason,
                     break;
                 }
             }
-            lws_callback_on_writable(wsi);
             break;
 
         case LWS_CALLBACK_RECEIVE: {
             Urho3D::VectorBuffer b((unsigned char*)in, len);
-            if (b.GetData()[0] == ID_USER_PACKET_ENUM) {
+            if (b.GetData()[0] == URHO3D_MESSAGE) {
                 WSPacket packet(wsi, b);
                 if (WSServerInstance) {
                     WSServerInstance->AddIncomingPacket(packet);
@@ -87,7 +78,14 @@ static int ws_server_callback(struct lws *wsi, enum lws_callback_reasons reason,
             } else {
                 URHO3D_LOGINFOF("Received message that is not part of the engine %d", b.GetData()[0]);
             }
-            lws_callback_on_writable(wsi);
+            break;
+        }
+
+        case LWS_CALLBACK_CLOSED: {
+            if (WSServerInstance) {
+                WSServerInstance->AddClosedConnection(wsi);
+            }
+            URHO3D_LOGINFOF("LWS_CALLBACK_CLOSED");
             break;
         }
         default:
@@ -96,6 +94,12 @@ static int ws_server_callback(struct lws *wsi, enum lws_callback_reasons reason,
 
     return 0;
 }
+
+static struct lws_protocols protocols[] = {
+        { "ws-server", WSCallback, 0, 0 },
+        { NULL, NULL, 0, 0 } /* terminator */
+};
+
 
 static int interrupted;
 
@@ -106,8 +110,25 @@ void sigint_handler(int sig)
 
 using namespace Urho3D;
 
-WSServer::WSServer(Urho3D::Network* networkInstance):
-    WSHandler(networkInstance)
+static void RunService(const WorkItem* item, unsigned threadIndex) {
+    auto packets = WSServerInstance->GetAllOutgoingPackets();
+    for (auto it = packets->Begin(); it != packets->End(); ++it) {
+        if (!(*it).second_.Empty()) {
+            auto ws = (*it).second_.Front().first_;
+            URHO3D_LOGINFOF("Outgoing packet count (server) %d", WSServerInstance->GetNumOutgoingPackets(ws));
+            lws_callback_on_writable(ws.GetWS());
+        }
+    }
+
+    int result = lws_service(context, 0);
+    if (result < 0 && WSServerInstance) {
+        WSServerInstance->StopServer();
+    }
+    URHO3D_LOGINFOF("Running server service");
+}
+
+WSServer::WSServer(Context* context):
+    Object(context)
 {
     WSServerInstance = this;
 }
@@ -164,6 +185,8 @@ int WSServer::StartServer()
 
     lwsl_err("Server started");
 
+    SubscribeToEvent(E_WORKITEMCOMPLETED, URHO3D_HANDLER(WSServer, HandleWorkItemFinished));
+
     return 0;
 //	struct lws_context_creation_info info;
 //	memset(&info, 0, sizeof(info));
@@ -189,27 +212,74 @@ int WSServer::StartServer()
 
 void WSServer::Update(float timestep)
 {
+    if (currentState_ == WSS_RUNNING && nextState_ == WSS_STOPPED) {
+        GetSubsystem<Network>()->StopServer();
+    }
+    while(!closedConnections.Empty()) {
+        auto ws = closedConnections.Front().GetWS();
+        GetSubsystem<Network>()->ClientDisconnected(closedConnections.Front());
+        auto packets = GetAllOutgoingPackets();
+        packets->Erase(ws);
+        closedConnections.PopFront();
+    }
+    while(!pendingConnections_.Empty()) {
+        auto ws = pendingConnections_.Front();
+        GetSubsystem<Network>()->NewConnectionEstablished(ws);
+        pendingConnections_.PopFront();
+    }
     if (context) {
-        int result = lws_service(context, 0);
-        if (result < 0) {
-            StopServer();
+        if (!serviceWorkItem_) {
+            WorkQueue *workQueue = GetSubsystem<WorkQueue>();
+            serviceWorkItem_ = workQueue->GetFreeItem();
+            serviceWorkItem_->priority_ = M_MAX_INT;
+            serviceWorkItem_->workFunction_ = RunService;
+            serviceWorkItem_->aux_ = this;
+            serviceWorkItem_->sendEvent_ = true;
+            workQueue->AddWorkItem(serviceWorkItem_);
         }
-        if (GetNumOutgoingPackets()) {
-            URHO3D_LOGINFOF("Outgoing packet count (server) %d", GetNumOutgoingPackets());
-            lws_callback_on_writable(GetOutgoingPacket().first_);
-        }
-        while (GetNumIncomingPackets()) {
-            WSPacket& packet = GetIncomingPacket();
-            networkInstance_->HandleIncomingPacket(packet.first_, packet.second_, true);
-            RemoveIncomingPacket();
-        }
+    }
+    while (GetNumIncomingPackets()) {
+        auto packet = GetIncomingPacket();
+        GetSubsystem<Network>()->HandleIncomingPacket(packet, true);
+        RemoveIncomingPacket();
+    }
+    if (currentState_ != nextState_) {
+        currentState_ = nextState_;
     }
 }
 
 void WSServer::StopServer()
 {
-    lws_context_destroy(context);
-    context = nullptr;
+    SetState(WSS_STOPPED);
+    if (context) {
+        lws_context_destroy(context);
+        context = nullptr;
+    }
 }
 
-#endif
+void WSServer::HandleWorkItemFinished(StringHash eventType, VariantMap& eventData)
+{
+    using namespace WorkItemCompleted;
+    WorkItem *workItem = reinterpret_cast<WorkItem *>(eventData[P_ITEM].GetPtr());
+    if (workItem->aux_ != this) {
+        return;
+    }
+    if (workItem->workFunction_ == RunService) {
+        serviceWorkItem_.Reset();
+    }
+}
+
+void WSServer::AddPendingConnection(lws* ws)
+{
+    pendingConnections_.Push(ws);
+}
+
+void WSServer::AddClosedConnection(lws* ws)
+{
+    closedConnections.Push(ws);
+}
+
+void WSServer::SetState(WSServerState state)
+{
+    nextState_ = state;
+}

@@ -42,6 +42,7 @@
 #include "WS/WSServer.h"
 #include "WS/WSClient.h"
 #include "WS/WSConnection.h"
+#include "WS/WSPacket.h"
 #endif
 
 #include <SLikeNet/MessageIdentifiers.h>
@@ -339,7 +340,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 }
 
 #ifdef URHO3D_WEBSOCKETS
-void Network::NewConnectionEstablished(lws* ws)
+void Network::NewConnectionEstablished(const WSConnection& ws)
 {
     // Create a new client connection corresponding to this MessageConnection
     SharedPtr<Connection> newConnection(new Connection(context_, true, ws, wsServer_));
@@ -348,6 +349,25 @@ void Network::NewConnectionEstablished(lws* ws)
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
 
     NewConnectionEstablished(websocketClientConnections_[WSConnection(ws)]);
+}
+
+void Network::ClientDisconnected(const WSConnection& ws)
+{
+    // Remove the client connection that corresponds to this MessageConnection
+    HashMap<WSConnection, SharedPtr<Connection> >::Iterator i = websocketClientConnections_.Find(ws);
+    if (i != websocketClientConnections_.End())
+    {
+        Connection* connection = i->second_;
+        URHO3D_LOGINFO("Client " + connection->ToString() + " disconnected");
+
+        using namespace ClientDisconnected;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_CONNECTION] = connection;
+        connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
+
+        websocketClientConnections_.Erase(i);
+    }
 }
 #endif
 
@@ -444,7 +464,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
 bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
     URHO3D_PROFILE(ConnectWS);
-    wsClient_ = new WSClient(this);
+    wsClient_ = new WSClient(context_);
     int result = wsClient_->Connect();
 
     serverConnection_ = new Connection(context_, false, nullptr, wsClient_);
@@ -473,7 +493,7 @@ bool Network::StartServer(unsigned short port, unsigned int maxConnections)
 
     URHO3D_PROFILE(StartServer);
 #ifdef URHO3D_WEBSOCKETS
-    wsServer_ = new WSServer(this);
+    wsServer_ = new WSServer(context_);
     wsServer_->StartServer();
 #endif
     
@@ -503,11 +523,18 @@ void Network::StopServer()
 {
     clientConnections_.Clear();
 
+#ifdef URHO3D_WEBSOCKETS
+    if (wsServer_)
+        wsServer_->StopServer();
+        wsServer_.Reset();
+#endif
+
     if (!rakPeer_)
         return;
 
     if (!IsServerRunning())
         return;
+
     // Provide 300 ms to notify
     rakPeer_->Shutdown(300);
 
@@ -718,7 +745,7 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
 }
 
 #ifdef URHO3D_WEBSOCKETS
-Connection* Network::GetConnection(lws* ws) const
+Connection* Network::GetConnection(const WSConnection& ws) const
 {
     if (serverConnection_ && serverConnection_->GetWSHandler() == wsClient_)
         return serverConnection_;
@@ -968,8 +995,9 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 
 }
 
-void Network::HandleIncomingPacket(lws* ws, VectorBuffer& buffer, bool isServer)
+void Network::HandleIncomingPacket(const WSPacket* packet, bool isServer)
 {
+    auto buffer = packet->second_;
     // SLikeNet reserved byte must be ignored
     int id = buffer.ReadUByte();
     int messageID = buffer.ReadUInt();
@@ -980,7 +1008,7 @@ void Network::HandleIncomingPacket(lws* ws, VectorBuffer& buffer, bool isServer)
     }
     MemoryBuffer msg(buffer.GetData() + padding, buffer.GetSize() - padding);
     // Only process messages from known sources
-    Connection * connection = GetConnection(ws);
+    Connection * connection = GetConnection(packet->first_);
     if (isServer) {
         if (connection) {
             if (connection->ProcessMessage((int) messageID, msg)) {
@@ -1184,6 +1212,26 @@ void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
         SendEvent(E_CONNECTFAILED);
     }
 }
+
+#ifdef URHO3D_WEBSOCKETS
+void Network::OnServerDisconnected(const WSConnection& ws, bool failedConnect)
+{
+    serverConnection_.Reset();
+    if (wsClient_)
+        wsClient_.Reset();
+
+    if (!failedConnect)
+    {
+        URHO3D_LOGINFO("Disconnected from server");
+        SendEvent(E_SERVERDISCONNECTED);
+    }
+    else
+    {
+        URHO3D_LOGERROR("Failed to connect to server");
+        SendEvent(E_CONNECTFAILED);
+    }
+}
+#endif
 
 void Network::ConfigureNetworkSimulator()
 {

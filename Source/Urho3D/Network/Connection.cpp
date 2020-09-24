@@ -43,9 +43,10 @@
 #include <SLikeNet/statistics.h>
 
 #ifdef URHO3D_WEBSOCKETS
-#include <libwebsockets.h>
 #include "WS/WSPacket.h"
 #include "WS/WSHandler.h"
+#include "WS/WSConnection.h"
+#include "WS/WSClient.h"
 #endif
 
 #ifdef SendMessage
@@ -96,7 +97,7 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
 }
 
 #ifdef URHO3D_WEBSOCKETS
-Connection::Connection(Context* context, bool isClient, lws *ws, WSHandler* wsHandler):
+Connection::Connection(Context* context, bool isClient, const WSConnection& ws, WSHandler* wsHandler):
     Object(context),
     timeStamp_(0),
     sendMode_(OPSM_NONE),
@@ -106,14 +107,14 @@ Connection::Connection(Context* context, bool isClient, lws *ws, WSHandler* wsHa
     logStatistics_(false),
     address_(nullptr),
     packedMessageLimit_(1024),
-    ws_(ws),
     peer_(nullptr),
+    ws_(ws),
     wsHandler_(wsHandler)
 {
     sceneState_.connection_ = this;
 }
 
-void Connection::SetWS(lws* ws)
+void Connection::SetWS(const WSConnection& ws)
 {
     ws_ = ws;
 }
@@ -294,6 +295,11 @@ void Connection::Disconnect(int waitMSec)
 {
     if (peer_)
         peer_->CloseConnection(*address_, true);
+
+#ifdef URHO3D_WEBSOCKETS
+    if (!isClient_ && wsHandler_)
+        static_cast<WSClient*>(wsHandler_)->Disconnect();
+#endif
 }
 
 void Connection::SendServerUpdate()
@@ -1249,7 +1255,7 @@ String Connection::ToString() const
         return GetAddress() + ":" + String(GetPort());
 
 #ifdef URHO3D_WEBSOCKETS
-    if (ws_)
+    if (ws_.GetWS())
         return "WS connection";
 #endif
 

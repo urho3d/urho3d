@@ -378,7 +378,7 @@ void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventD
         packetsOut_->SetText("Packets out (as client): " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
         packetCounterTimer_.Reset();
     }
-    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetClientConnections().Size())
+    else if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->IsServerRunning())
     {
         int packetsIn = 0;
         int packetsOut = 0;
@@ -390,6 +390,9 @@ void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventD
         packetsIn_->SetText("Packets  in (as server)[" + String(connections.Size()) + "] : " + String(packetsIn));
         packetsOut_->SetText("Packets out (as server)[" + String(connections.Size()) + "]: " + String(packetsOut));
         packetCounterTimer_.Reset();
+    } else if (packetCounterTimer_.GetMSec(false) > 1000) {
+        packetsIn_->SetText("Packets in : 0");
+        packetsOut_->SetText("Packets out : 0");
     }
 }
 

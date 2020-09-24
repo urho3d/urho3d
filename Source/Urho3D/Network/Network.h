@@ -26,11 +26,7 @@
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
-
-#ifdef URHO3D_WEBSOCKETS
-// libwebsockets internal struct
-struct lws;
-#endif
+#include "WS/WSPacket.h"
 
 namespace Urho3D
 {
@@ -40,9 +36,9 @@ class MemoryBuffer;
 class Scene;
 
 #ifdef URHO3D_WEBSOCKETS
-class WSServer;
 class WSClient;
 class WSConnection;
+class WSServer;
 #endif
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
@@ -69,7 +65,9 @@ public:
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
 #ifdef URHO3D_WEBSOCKETS
     /// Handle new Websockets client connection.
-    void NewConnectionEstablished(lws* ws);
+    void NewConnectionEstablished(const WSConnection& ws);
+    /// Handle a client disconnection.
+    void ClientDisconnected(const WSConnection& ws);
 #endif
     /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
@@ -88,7 +86,7 @@ public:
     /// Connect to a server using Websockets connection. Return true if connection process successfully started.
     bool ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Return a client or server connection by Websocket connection, or null if none exist.
-    Connection* GetConnection(lws* ws) const;
+    Connection* GetConnection(const WSConnection& ws) const;
     /// Handle server connection.
     void OnServerConnected(lws* ws);
 #endif
@@ -177,7 +175,9 @@ private:
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
 #ifdef URHO3D_WEBSOCKETS
     /// All incoming websocket packets are handled here.
-    void HandleIncomingPacket(lws* ws, VectorBuffer& buffer, bool isServer);
+    void HandleIncomingPacket(const WSPacket* packet, bool isServer);
+    /// Handle server disconnection.
+    void OnServerDisconnected(const WSConnection& ws, bool failedConnect = false);
 #endif
 
     /// SLikeNet peer instance for server connection.
@@ -230,8 +230,8 @@ private:
     String guid_;
 
 #ifdef URHO3D_WEBSOCKETS
-    WSServer* wsServer_;
-    WSClient* wsClient_;
+    SharedPtr<WSServer> wsServer_;
+    SharedPtr<WSClient> wsClient_;
 #endif
 };
 
