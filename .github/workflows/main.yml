@@ -118,6 +118,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: script/dockerized.sh ${PLATFORM/-*} rake publish
         if: github.event_name == 'push' && matrix.platform == 'android'
+      - name: Install
+        run: script/dockerized.sh ${PLATFORM/-*} rake install[$GITHUB_WORKSPACE/build/stage]
+        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -166,6 +169,8 @@ jobs:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
           path: build/ci/*.tar.gz
         if: github.event_name == 'push'
+      - name: Install
+        run: sudo -E rake install
   windows:
     name: 🔲
     runs-on: windows-latest
@@ -213,6 +218,8 @@ jobs:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
           path: build/ci/*.zip
         if: github.event_name == 'push'
+      - name: Install
+        run: rake install
 
 ...
 

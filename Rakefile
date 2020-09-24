@@ -95,6 +95,15 @@ task :doc => [:init] do
   system build_target('doc') or abort
 end
 
+desc 'Install the software'
+task :install, [:prefix] => [:init] do |_, args|
+  if ENV['PLATFORM'] == 'android'
+    Rake::Task['gradle'].invoke('publishToMavenLocal')
+    next
+  end
+  system "#{args[:prefix] && !ENV['OS'] ? "DESTDIR=#{args[:prefix]}" : ''} #{build_target('install')}" or abort
+end
+
 desc 'Package build artifact'
 task :package => [:init] do
   if ENV['PLATFORM'] == 'android'
