@@ -59,7 +59,6 @@
 #endif
 
 #include "../DebugNew.h"
-#include "../../../cmake-build-debug/include/Urho3D/Network/Network.h"
 
 namespace Urho3D
 {
