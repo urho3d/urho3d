@@ -481,6 +481,7 @@ bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene
     return result == 0;
 #else
         WEBSOCKETS_NOT_ENABLED();
+        return false;
 #endif
 }
 
@@ -800,6 +801,7 @@ Connection* Network::GetConnection(const WSConnection& ws) const
     }
 #else
     WEBSOCKETS_NOT_ENABLED();
+    return nullptr;
 #endif
 }
 
