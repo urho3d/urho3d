@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#ifdef URHO3D_WEBSOCKETS
+
 #include "../../Core/WorkQueue.h"
 #include "../../IO/MemoryBuffer.h"
 #include "../../IO/Log.h"
@@ -29,7 +31,6 @@
 
 #include <libwebsockets.h>
 #include <string.h>
-#include <signal.h>
 
 static Urho3D::WSClient* WSClientInstance = nullptr;
 static struct lws_context *context;
@@ -40,11 +41,8 @@ static struct lws_context *context;
 #undef pid_t
 #endif
 #endif
-#include <pthread.h>
 
 static struct lws *client_wsi;
-static int interrupted, port = 9292, ssl_connection = LCCSCF_USE_SSL;
-static const char *server_address = "127.0.0.1", *pro = "ws-server";
 static lws_sorted_usec_list_t sul;
 
 static const lws_retry_bo_t retry = {
@@ -61,18 +59,17 @@ static void connect_cb(lws_sorted_usec_list_t *_sul)
     memset(&i, 0, sizeof(i));
 
     i.context = context;
-    i.port = port;
-    i.address = server_address;
+    i.port = WSClientInstance->GetPort();
+    i.address = WSClientInstance->GetAddress().CString();
     i.path = "/";
     i.host = i.address;
     i.origin = i.address;
-//    i.ssl_connection = ssl_connection;
-    i.protocol = pro; // Server protocol name to connect to
+    i.protocol = WSClientInstance->GetServerProtocol().CString();
     i.alpn = "http/1.1";
 
     i.local_protocol_name = "ws_client";
     i.pwsi = &client_wsi;
-//    i.retry_and_idle_policy = &retry;
+    i.retry_and_idle_policy = &retry;
 
     if (!lws_client_connect_via_info(&i))
         lws_sul_schedule(context, 0, _sul, connect_cb, 5 * LWS_USEC_PER_SEC);
@@ -80,7 +77,7 @@ static void connect_cb(lws_sorted_usec_list_t *_sul)
 
 static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
-    URHO3D_LOGINFOF("Incoming client messsage reason %d", reason);
+//    URHO3D_LOGINFOF("Incoming client messsage reason %d", reason);
     switch (reason) {
         case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
             if (WSClientInstance) {
@@ -146,19 +143,9 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
 
 
 static const struct lws_protocols protocols[] = {
-        {
-                "ws_client",
-                WSCallback,
-                      0,
-                         0,
-        },
+        {"ws_client", WSCallback,0,0,},
         { NULL, NULL, 0, 0 }
 };
-
-static void sigint_handler(int sig)
-{
-    interrupted = 1;
-}
 
 using namespace Urho3D;
 
@@ -183,40 +170,22 @@ WSClient::~WSClient()
     WSClientInstance = nullptr;
 }
 
-int WSClient::Connect()
+int WSClient::Connect(const String& address, unsigned short port)
 {
     struct lws_context_creation_info info;
-    const char *p;
-    int n = 0, logs = LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE
-    /* for LLL_ verbosity above NOTICE to be built into lws,
-     * lws must have been configured and built with
-     * -DCMAKE_BUILD_TYPE=DEBUG instead of =RELEASE */
-    /* | LLL_INFO */ /* | LLL_PARSER */ /* | LLL_HEADER */
-    /* | LLL_EXT */ /* | LLL_CLIENT */ /* | LLL_LATENCY */
-    /* | LLL_DEBUG */;
+    lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, OutputWSLog);
 
-    signal(SIGINT, sigint_handler);
+    address_ = address;
+    port_ = port;
+    serverProtocol_ = "ws-server";
 
-    lws_set_log_level(logs, OutputWSLog);
-    lwsl_user("LWS minimal ws client PING\n");
-
-    memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
-//    info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
-    info.port = CONTEXT_PORT_NO_LISTEN; /* we do not run any server */
+    memset(&info, 0, sizeof info);
+    info.port = CONTEXT_PORT_NO_LISTEN;
     info.protocols = protocols;
-#if defined(LWS_WITH_MBEDTLS) || defined(USE_WOLFSSL)
-    /*
-	 * OpenSSL uses the system trust store.  mbedTLS has to be told which
-	 * CA to trust explicitly.
-	 */
-	info.client_ssl_ca_filepath = "./libwebsockets.org.cer";
-#endif
-
-//    info.fd_limit_per_thread = 1 + 1 + 1;
 
     context = lws_create_context(&info);
     if (!context) {
-        lwsl_err("lws init failed\n");
+        URHO3D_LOGERROR("Failed to start Websocket client");
         return 1;
     }
 
@@ -291,3 +260,5 @@ void WSClient::HandleWorkItemFinished(StringHash eventType, VariantMap& eventDat
         serviceWorkItem_.Reset();
     }
 }
+
+#endif

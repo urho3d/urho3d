@@ -31,32 +31,51 @@
 #include "WSPacket.h"
 
 namespace Urho3D {
+
+    /// Basic Websocket connection handler used by WS client and server
     class WSHandler {
     public:
+        /// Construct.
         WSHandler();
+        /// Destruct.
         ~WSHandler();
 
+        /// Get incoming packet mutex
         Mutex& GetIncomingMutex() { return incomingMutex_; }
+        /// Add incoming packet to the buffer
         void AddIncomingPacket(const WSPacket& packet);
+        /// Get first incoming packet
         WSPacket* GetIncomingPacket();
+        /// Remove first incoming packet
         void RemoveIncomingPacket();
+        /// Get total number of incoming packets
         int GetNumIncomingPackets() { return incomingPackets_.Size(); }
 
+        /// Get outgoing packet mutex
         Mutex& GetOutgoingMutex() { return outgoingMutex_; }
+        /// Add outgoing packet to the buffer
         void AddOutgoingPacket(const WSPacket& packet);
+        /// Get first outgoing packet for specific WS connection
         WSPacket* GetOutgoingPacket(const WSConnection& ws);
+        /// Remove first outgoing packet for specific WS connection
         void RemoveOutgoingPacket(const WSConnection& ws);
+        /// Get total number of outgoing packets for specific WS connection
         int GetNumOutgoingPackets(const WSConnection& ws);
+        /// Get all outgoing packets for specific WS connection
         List<WSPacket>* GetOutgoingPackets(const WSConnection& ws);
+        /// Retur all connection buffered outgoing packets
         HashMap<WSConnection, List<WSPacket>>* GetAllOutgoingPackets() { return &outgoingPackets_; };
-
+        /// Handle all libwebsocket logs
         static void OutputWSLog(int level, const char *line);
 
     protected:
-
+        /// Incoming packet mutex
         Mutex incomingMutex_;
+        /// Outgoing packet mutex
         Mutex outgoingMutex_;
+        /// Incoming packet buffer
         List<WSPacket> incomingPackets_;
+        /// Outgoing packet buffer
         HashMap<WSConnection, List<WSPacket>> outgoingPackets_;
     };
 }

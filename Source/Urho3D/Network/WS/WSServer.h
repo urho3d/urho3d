@@ -33,32 +33,51 @@ namespace Urho3D {
 class Network;
 class WorkItem;
 
+/// Server state
 enum WSServerState {
     WSS_STOPPED,
     WSS_RUNNING
 };
 
+/// Websocket server handler
 class WSServer: public WSHandler, public Object {
     URHO3D_OBJECT(WSServer, Object);
 public:
-    WSServer(Context* context);
+    /// Construct.
+    explicit WSServer(Context* context);
+    /// Destruct.
     ~WSServer();
 
-    int StartServer();
+    /// Start whe Websockets server
+    int StartServer(unsigned short port, unsigned int maxConnections);
+    /// Stop the Websockets server
     void StopServer();
+    /// Run the update loop to send/fetch all the buffered messages
     void Update(float timestep);
+    /// New client connection to the server established, add it to the queue
     void AddPendingConnection(lws* ws);
+    /// Client connection lost, add it to the queue
     void AddClosedConnection(lws* ws);
+    /// Set the server state
     void SetState(WSServerState state);
+    /// Get maximum number of connections allowed
+    unsigned short GetMaxConnections() { return maxConnections_; };
 
 private:
+    /// Handle work item finished event
     void HandleWorkItemFinished(StringHash eventType, VariantMap& eventData);
 
+    /// Work item which runs the WS service loop
     SharedPtr<WorkItem> serviceWorkItem_;
+    /// Pending connections queue that should be processed inside the engine
     List<WSConnection> pendingConnections_;
+    /// Close connections queue that should be cleared up from the engine
     List<WSConnection> closedConnections;
-
+    /// Current state of the server
     WSServerState currentState_;
+    /// Next state of the server that will be handled in the next update loop
     WSServerState nextState_;
+    /// Max allowed connections to the server
+    unsigned int maxConnections_;
 };
 }

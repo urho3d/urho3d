@@ -35,21 +35,17 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
-#ifdef URHO3D_WEBSOCKETS
 class WSClient;
 class WSConnection;
 class WSServer;
-#endif
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object
 {
     URHO3D_OBJECT(Network, Object);
 
-#ifdef URHO3D_WEBSOCKETS
     friend WSClient;
     friend WSServer;
-#endif
 
 public:
     /// Construct.
@@ -63,12 +59,10 @@ public:
     void NewConnectionEstablished(const SharedPtr<Connection> newConnection);
     /// Handle new UDP client connection.
     void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
-#ifdef URHO3D_WEBSOCKETS
     /// Handle new Websockets client connection.
     void NewConnectionEstablished(const WSConnection& ws);
     /// Handle a client disconnection.
     void ClientDisconnected(const WSConnection& ws);
-#endif
     /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
 
@@ -82,20 +76,25 @@ public:
     void SetNATServerInfo(const String& address, unsigned short port);
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-#ifdef URHO3D_WEBSOCKETS
     /// Connect to a server using Websockets connection. Return true if connection process successfully started.
     bool ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Return a client or server connection by Websocket connection, or null if none exist.
     Connection* GetConnection(const WSConnection& ws) const;
     /// Handle server connection.
-    void OnServerConnected(lws* ws);
-#endif
+    void OnServerConnected(const WSConnection& ws);
+
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
     bool StartServer(unsigned short port, unsigned int maxConnections = 128);
+    /// Start a server on a port using Websockets protocol. Return true if successful.
+    bool StartWSServer(unsigned short port, unsigned int maxConnections = 128);
     /// Stop the server.
     void StopServer();
+    /// Stop the server.
+    void StopUDPServer();
+    /// Stop the server.
+    void StopWSServer();
     /// Start NAT punchtrough client to allow remote connections.
     void StartNATClient();
     /// Get local server GUID.
@@ -149,6 +148,10 @@ public:
     Vector<SharedPtr<Connection> > GetClientConnections() const;
     /// Return whether the server is running.
     bool IsServerRunning() const;
+    /// Return whether the UDP server is running.
+    bool IsUDPServerRunning() const;
+    /// Return whether the websockets server is running.
+    bool IsWSServerRunning() const;
     /// Return whether a remote event is allowed to be received.
     bool CheckRemoteEvent(StringHash eventType) const;
 
@@ -167,18 +170,16 @@ private:
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
-    /// Handle server disconnection.
+    /// Handle UDP server disconnection.
     void OnServerDisconnected(const SLNet::AddressOrGUID& address);
+    /// Handle Websockets server disconnection.
+    void OnServerDisconnected(const WSConnection& ws, bool failedConnect = false);
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
     /// All incoming UDP packets are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
-#ifdef URHO3D_WEBSOCKETS
     /// All incoming websocket packets are handled here.
     void HandleIncomingPacket(const WSPacket* packet, bool isServer);
-    /// Handle server disconnection.
-    void OnServerDisconnected(const WSConnection& ws, bool failedConnect = false);
-#endif
 
     /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
@@ -188,10 +189,8 @@ private:
     SharedPtr<Connection> serverConnection_;
     /// SLikeNet server's client connections.
     HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> > clientConnections_;
-#ifdef URHO3D_WEBSOCKETS
     /// Websocket server's client connections.
     HashMap<WSConnection, SharedPtr<Connection> > websocketClientConnections_;
-#endif
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
     /// Remote event fixed blacklist.
@@ -229,10 +228,8 @@ private:
     /// Local server GUID.
     String guid_;
 
-#ifdef URHO3D_WEBSOCKETS
-    SharedPtr<WSServer> wsServer_;
-    SharedPtr<WSClient> wsClient_;
-#endif
+    WSServer* wsServer_;
+    WSClient* wsClient_;
 };
 
 /// Register Network library objects.

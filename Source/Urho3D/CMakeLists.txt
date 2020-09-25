@@ -117,9 +117,6 @@ if (URHO3D_SSL)
     endif ()
 endif ()
 
-if (NOT URHO3D_WEBSOCKETS)
-    list (APPEND EXCLUDED_SOURCE_DIRS Network/WS)
-endif ()
 # Define source files
 foreach (DIR IK Navigation Network Physics Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)

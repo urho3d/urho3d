@@ -463,7 +463,7 @@ void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData
 
     // Connect to server, specify scene to use as a client for replication
     clientObjectID_ = 0; // Reset own object ID from possible previous connection
-    network->Connect(address, SERVER_PORT, scene_);
+    network->ConnectWS(address, SERVER_PORT, scene_);
 
     UpdateButtons();
 }
@@ -493,7 +493,7 @@ void SceneReplication::HandleDisconnect(StringHash eventType, VariantMap& eventD
 void SceneReplication::HandleStartServer(StringHash eventType, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
-    network->StartServer(SERVER_PORT);
+    network->StartWSServer(SERVER_PORT, 2);
 
     UpdateButtons();
 }

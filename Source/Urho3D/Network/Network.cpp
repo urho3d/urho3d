@@ -54,6 +54,10 @@
 #undef SendMessage
 #endif
 
+#ifndef URHO3D_WEBSOCKETS
+#define WEBSOCKETS_NOT_ENABLED() URHO3D_LOGERROR("Engine built without websocket support")
+#endif
+
 #include "../DebugNew.h"
 #include "../../../cmake-build-debug/include/Urho3D/Network/Network.h"
 
@@ -214,10 +218,8 @@ Network::Network(Context* context) :
     remoteGUID_(nullptr)
 {
 
-#ifdef URHO3D_WEBSOCKETS
     wsClient_ = nullptr;
     wsServer_ = nullptr;
-#endif
 
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
@@ -339,9 +341,9 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
     NewConnectionEstablished(clientConnections_[connection]);
 }
 
-#ifdef URHO3D_WEBSOCKETS
 void Network::NewConnectionEstablished(const WSConnection& ws)
 {
+#ifdef URHO3D_WEBSOCKETS
     // Create a new client connection corresponding to this MessageConnection
     SharedPtr<Connection> newConnection(new Connection(context_, true, ws, wsServer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
@@ -349,10 +351,14 @@ void Network::NewConnectionEstablished(const WSConnection& ws)
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
 
     NewConnectionEstablished(websocketClientConnections_[WSConnection(ws)]);
+#else
+    WEBSOCKETS_NOT_ENABLED();
+#endif
 }
 
 void Network::ClientDisconnected(const WSConnection& ws)
 {
+#ifdef URHO3D_WEBSOCKETS
     // Remove the client connection that corresponds to this MessageConnection
     HashMap<WSConnection, SharedPtr<Connection> >::Iterator i = websocketClientConnections_.Find(ws);
     if (i != websocketClientConnections_.End())
@@ -368,8 +374,8 @@ void Network::ClientDisconnected(const WSConnection& ws)
 
         websocketClientConnections_.Erase(i);
     }
-}
 #endif
+}
 
 void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
 {
@@ -460,12 +466,12 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     }
 }
 
-#ifdef URHO3D_WEBSOCKETS
 bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
+#ifdef URHO3D_WEBSOCKETS
     URHO3D_PROFILE(ConnectWS);
     wsClient_ = new WSClient(context_);
-    int result = wsClient_->Connect();
+    int result = wsClient_->Connect(address, port);
 
     serverConnection_ = new Connection(context_, false, nullptr, wsClient_);
     serverConnection_->SetScene(scene);
@@ -474,8 +480,10 @@ bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene
     serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 
     return result == 0;
-}
+#else
+        WEBSOCKETS_NOT_ENABLED();
 #endif
+}
 
 void Network::Disconnect(int waitMSec)
 {
@@ -488,14 +496,10 @@ void Network::Disconnect(int waitMSec)
 
 bool Network::StartServer(unsigned short port, unsigned int maxConnections)
 {
-    if (IsServerRunning())
+    if (IsUDPServerRunning())
         return true;
 
     URHO3D_PROFILE(StartServer);
-#ifdef URHO3D_WEBSOCKETS
-    wsServer_ = new WSServer(context_);
-    wsServer_->StartServer();
-#endif
     
     SLNet::SocketDescriptor socket;//(port, AF_INET);
     socket.port = port;
@@ -519,28 +523,66 @@ bool Network::StartServer(unsigned short port, unsigned int maxConnections)
     }
 }
 
+
+bool Network::StartWSServer(unsigned short port, unsigned int maxConnections)
+{
+    if (IsWSServerRunning())
+        return true;
+
+    URHO3D_PROFILE(StartWSServer);
+
+#ifdef URHO3D_WEBSOCKETS
+    wsServer_ = new WSServer(context_);
+    int result = wsServer_->StartServer(port, maxConnections);
+    if (result != 0) {
+        delete wsServer_;
+        wsServer_ = nullptr;
+        return false;
+    }
+
+    return true;
+#endif
+}
+
 void Network::StopServer()
 {
     clientConnections_.Clear();
+    URHO3D_PROFILE(StopServer);
+    StopUDPServer();
+    StopWSServer();
+}
+
+void Network::StopUDPServer()
+{
+    clientConnections_.Clear();
+    URHO3D_PROFILE(StopUDPServer);
+
+    if (IsUDPServerRunning())
+    {
+        if (!rakPeer_)
+            return;
+
+        // Provide 300 ms to notify
+        rakPeer_->Shutdown(300);
+
+        URHO3D_LOGINFO("Stopped UDP server");
+    }
+}
+
+void Network::StopWSServer()
+{
+    clientConnections_.Clear();
+    URHO3D_PROFILE(StopWSServer);
 
 #ifdef URHO3D_WEBSOCKETS
-    if (wsServer_)
+    if (IsWSServerRunning())
+    {
         wsServer_->StopServer();
-        wsServer_.Reset();
+        delete wsServer_;
+        wsServer_ = nullptr;
+        URHO3D_LOGINFO("Stopped Websockets server");
+    }
 #endif
-
-    if (!rakPeer_)
-        return;
-
-    if (!IsServerRunning())
-        return;
-
-    // Provide 300 ms to notify
-    rakPeer_->Shutdown(300);
-
-    URHO3D_PROFILE(StopServer);
-
-    URHO3D_LOGINFO("Stopped server");
 }
 
 void Network::SetNATServerInfo(const String& address, unsigned short port)
@@ -744,9 +786,9 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
     }
 }
 
-#ifdef URHO3D_WEBSOCKETS
 Connection* Network::GetConnection(const WSConnection& ws) const
 {
+#ifdef URHO3D_WEBSOCKETS
     if (serverConnection_ && serverConnection_->GetWSHandler() == wsClient_)
         return serverConnection_;
     else
@@ -757,8 +799,10 @@ Connection* Network::GetConnection(const WSConnection& ws) const
         else
             return nullptr;
     }
-}
+#else
+    WEBSOCKETS_NOT_ENABLED();
 #endif
+}
 
 Connection* Network::GetServerConnection() const
 {
@@ -783,17 +827,23 @@ Vector<SharedPtr<Connection> > Network::GetClientConnections() const
 
 bool Network::IsServerRunning() const
 {
-#ifdef URHO3D_WEBSOCKETS
-    if (!wsServer_ && !rakPeer_)
-        return false;
+    return IsWSServerRunning() || IsUDPServerRunning();
+}
 
-    if (wsServer_)
-        return true;
-#endif
-
+bool Network::IsUDPServerRunning() const
+{
     if (!rakPeer_)
         return false;
+
     return rakPeer_->IsActive() && isServer_;
+}
+
+bool Network::IsWSServerRunning() const
+{
+    if (wsServer_)
+        return true;
+
+    return false;
 }
 
 bool Network::CheckRemoteEvent(StringHash eventType) const
@@ -1175,8 +1225,9 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
     SendEvent(E_SERVERCONNECTED);
 }
 
-void Network::OnServerConnected(lws* ws)
+void Network::OnServerConnected(const WSConnection& ws)
 {
+#ifdef URHO3D_WEBSOCKETS
     serverConnection_->SetWS(ws);
     serverConnection_->SetConnectPending(false);
     URHO3D_LOGINFO("Connected to server!");
@@ -1187,6 +1238,7 @@ void Network::OnServerConnected(lws* ws)
     serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg);
 
     SendEvent(E_SERVERCONNECTED);
+#endif
 }
 
 
@@ -1213,12 +1265,15 @@ void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
     }
 }
 
-#ifdef URHO3D_WEBSOCKETS
 void Network::OnServerDisconnected(const WSConnection& ws, bool failedConnect)
 {
+#ifdef URHO3D_WEBSOCKETS
     serverConnection_.Reset();
     if (wsClient_)
-        wsClient_.Reset();
+    {
+        delete wsClient_;
+        wsClient_ = nullptr;
+    }
 
     if (!failedConnect)
     {
@@ -1230,8 +1285,8 @@ void Network::OnServerDisconnected(const WSConnection& ws, bool failedConnect)
         URHO3D_LOGERROR("Failed to connect to server");
         SendEvent(E_CONNECTFAILED);
     }
-}
 #endif
+}
 
 void Network::ConfigureNetworkSimulator()
 {

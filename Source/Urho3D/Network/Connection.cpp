@@ -85,10 +85,8 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     sceneLoaded_(false),
     logStatistics_(false),
     address_(nullptr),
-#ifdef URHO3D_WEBSOCKETS
     ws_(nullptr),
     wsHandler_(nullptr),
-#endif
     packedMessageLimit_(1024)
 {
     sceneState_.connection_ = this;
@@ -96,7 +94,6 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     SetAddressOrGUID(address);
 }
 
-#ifdef URHO3D_WEBSOCKETS
 Connection::Connection(Context* context, bool isClient, const WSConnection& ws, WSHandler* wsHandler):
     Object(context),
     timeStamp_(0),
@@ -116,14 +113,17 @@ Connection::Connection(Context* context, bool isClient, const WSConnection& ws, 
 
 void Connection::SetWS(const WSConnection& ws)
 {
+#ifdef URHO3D_WEBSOCKETS
     ws_ = ws;
+#endif
 }
 
 void Connection::SetWSHandler(WSHandler* wsHandler)
 {
+#ifdef URHO3D_WEBSOCKETS
     wsHandler_ = wsHandler;
-}
 #endif
+}
 
 Connection::~Connection()
 {

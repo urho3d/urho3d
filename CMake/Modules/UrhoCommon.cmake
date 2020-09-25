@@ -895,7 +895,7 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
-    # ThirdParty/Civetweb external dependency
+    # Urho3D external dependency
     if (${TARGET} MATCHES Urho3D)
         if (URHO3D_WEBSOCKETS)
             list (APPEND LIBS websockets)

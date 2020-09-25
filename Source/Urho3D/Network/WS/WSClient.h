@@ -29,9 +29,11 @@
 #include "WSHandler.h"
 
 namespace Urho3D {
+
 class Network;
 class WorkItem;
 
+/// Client state
 enum WSClientState {
     WCS_CONNECTING,
     WCS_CONNECTED,
@@ -39,25 +41,51 @@ enum WSClientState {
     WCS_DISCONNECTED,
 };
 
+/// Websocket client handler
 class WSClient: public WSHandler, public Object {
     URHO3D_OBJECT(WSClient, Object);
 public:
+    /// Construct.
     WSClient(Context* context);
+    /// Destruct.
     ~WSClient();
-    int Connect();
-    void Update(float timestep);
-    void Disconnect();
 
+    /// Connect to Websockets server
+    int Connect(const String& address, unsigned short port);
+    /// Run the update loop to send/fetch all the buffered messages
+    void Update(float timestep);
+    /// Disconnect from the server
+    void Disconnect();
+    /// Set the client connection state
     void SetState(WSClientState state);
+    /// Set the Websocket connection information for this client
     void SetWSConnection(lws *ws);
+    /// Get Websocket connection information for this client
     lws* GetWSConnection() { return ws_; };
+    /// Get server address
+    const String& GetAddress() const { return address_; };
+    /// Get server port
+    unsigned short GetPort() { return port_; };
+    /// Get server protocol used for connection
+    const String& GetServerProtocol() const { return serverProtocol_; };
 
 private:
+    /// Handle work item finished event
     void HandleWorkItemFinished(StringHash eventType, VariantMap& eventData);
 
-    struct lws *ws_;
+    /// Work item which runs the WS service loop
     SharedPtr<WorkItem> serviceWorkItem_;
-    WSClientState nextState_;
+    /// Websocket connection information
+    struct lws *ws_;
+    /// Current state of the client
     WSClientState currentState_;
+    /// Next state of the client that will be handled in the next update loop
+    WSClientState nextState_;
+    /// Server address
+    String address_;
+    /// server port
+    unsigned short port_;
+    /// Server protocol used for connection
+    String serverProtocol_;
 };
 }

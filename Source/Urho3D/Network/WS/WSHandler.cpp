@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#ifdef URHO3D_WEBSOCKETS
 
 #include "../../IO/Log.h"
 #include "WSHandler.h"
@@ -118,3 +119,5 @@ void WSHandler::OutputWSLog(int level, const char *line)
             break;
     }
 }
+
+#endif

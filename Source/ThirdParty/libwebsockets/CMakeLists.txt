@@ -879,7 +879,7 @@ if (NOT LWS_WITHOUT_TESTAPPS)
 	add_subdirectory(test-apps)
 endif()
 
-add_subdirectory(plugins)
+#add_subdirectory(plugins)
 add_subdirectory(lwsws)
 
 # Generate the lws_config.h that includes all the public compilation settings.

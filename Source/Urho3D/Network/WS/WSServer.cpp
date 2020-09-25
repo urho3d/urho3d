@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#ifdef URHO3D_WEBSOCKETS
+
 #include "../Network.h"
 #include "../../Core/WorkQueue.h"
 #include "../../IO/Log.h"
@@ -28,14 +30,13 @@
 #include "WSServer.h"
 
 #include <libwebsockets.h>
-#include <signal.h>
 #include <string.h>
 
 static Urho3D::WSServer* WSServerInstance = nullptr;
 static struct lws_context *context;
 
 static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len) {
-    URHO3D_LOGINFOF("Incoming server messsage reason %d", reason);
+//    URHO3D_LOGINFOF("Incoming server messsage reason %d", reason);
 
     switch (reason) {
         case LWS_CALLBACK_PROTOCOL_INIT:
@@ -43,6 +44,11 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
 
         case LWS_CALLBACK_ESTABLISHED:
             if (WSServerInstance) {
+                int currentConnectionCount = WSServerInstance->GetSubsystem<Urho3D::Network>()->GetClientConnections().Size();
+                if (currentConnectionCount >= WSServerInstance->GetMaxConnections()) {
+                    // Drop the connection, server is full
+                    return -1;
+                }
                 WSServerInstance->AddPendingConnection(wsi);
             }
             break;
@@ -100,14 +106,6 @@ static struct lws_protocols protocols[] = {
         { NULL, NULL, 0, 0 } /* terminator */
 };
 
-
-static int interrupted;
-
-void sigint_handler(int sig)
-{
-    interrupted = 1;
-}
-
 using namespace Urho3D;
 
 static void RunService(const WorkItem* item, unsigned threadIndex) {
@@ -138,76 +136,30 @@ WSServer::~WSServer()
     WSServerInstance = nullptr;
 }
 
-int WSServer::StartServer()
+int WSServer::StartServer(unsigned short port, unsigned int maxConnections)
 {
+    maxConnections_ = maxConnections;
+
     struct lws_context_creation_info info;
-    const char *p;
-    int n = 0, logs = LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE
-    /* for LLL_ verbosity above NOTICE to be built into lws,
-     * lws must have been configured and built with
-     * -DCMAKE_BUILD_TYPE=DEBUG instead of =RELEASE */
-    /* | LLL_INFO */ /* | LLL_PARSER */ /* | LLL_HEADER */
-    /* | LLL_EXT */ /* | LLL_CLIENT */ /* | LLL_LATENCY */
-    /* | LLL_DEBUG */;
-
-    signal(SIGINT, sigint_handler);
-
-    lws_set_log_level(logs, OutputWSLog);
-    lwsl_user("LWS minimal ws server | visit http://localhost:9292 (-s = use TLS / https)\n");
-
-    memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
-    info.port = 9292;
-//    info.mounts = &mount;
+    lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, OutputWSLog);
+    memset(&info, 0, sizeof info);
+    info.port = port;
     info.protocols = protocols;
-//    info.vhost_name = "localhost";
     info.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
     info.gid = -1;
     info.uid = -1;
-//    info.username = "";
-//    info.groupname = "";
 
-#if defined(LWS_WITH_TLS)
-    if (lws_cmdline_option(argc, argv, "-s")) {
-		lwsl_user("Server using TLS\n");
-		info.options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
-		info.ssl_cert_filepath = "localhost-100y.cert";
-		info.ssl_private_key_filepath = "localhost-100y.key";
-	}
-#endif
-
-    lwsl_err("creating context");
     context = lws_create_context(&info);
-    lwsl_err("context started");
     if (!context) {
-        lwsl_err("lws init failed\n");
+        URHO3D_LOGERROR("Failed to start websocket server");
         return 1;
     }
 
-    lwsl_err("Server started");
+    URHO3D_LOGINFOF("Websockets server started on port %d", port);
 
     SubscribeToEvent(E_WORKITEMCOMPLETED, URHO3D_HANDLER(WSServer, HandleWorkItemFinished));
 
     return 0;
-//	struct lws_context_creation_info info;
-//	memset(&info, 0, sizeof(info));
-//	info.protocols = protocols2;
-//	info.port = 9090;//config.port;
-//	info.gid = -1;
-//	info.uid = -1;
-//#define WS_OPT(member, var) info.member = (!var.empty()) ? var.c_str() : NULL
-//	WS_OPT(iface, config.iface);
-//	WS_OPT(ssl_cert_filepath, config.sslCertFile);
-//	WS_OPT(ssl_private_key_filepath, config.sslPrivateKeyFile);
-//	WS_OPT(ssl_ca_filepath, config.sslCACertFile);
-//	WS_OPT(ssl_cipher_list, config.sslCipherList);
-//    WS_OPT(http_proxy_address, config.httpProxyAddress);
-//#undef WS_OPT
-
-//	context = libwebsocket_create_context(&info);
-//
-//
-//	initialized_ = true;
-	return 0;
 }
 
 void WSServer::Update(float timestep)
@@ -283,3 +235,5 @@ void WSServer::SetState(WSServerState state)
 {
     nextState_ = state;
 }
+
+#endif

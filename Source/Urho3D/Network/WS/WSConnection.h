@@ -25,20 +25,21 @@
 #include <cstdint>
 #include <stddef.h>
 
+/// libwebsockets struct that must be declared outside of Urho3D namespace
 struct lws;
 
 namespace Urho3D {
 
     class WSConnection {
     public:
-        WSConnection():
-        ws_(nullptr)
-        {}
-        WSConnection(lws* ws):
-        ws_(ws)
-        {}
+        /// Construct.
+        WSConnection(): ws_(nullptr) {}
+        /// Construct.
+        WSConnection(lws* ws): ws_(ws) {}
 
+        /// Get WS connection
         lws* GetWS() const { return ws_; }
+
         inline bool operator==( WSConnection const& connA) const { return connA.ws_ == ws_;}
 
         unsigned ToHash() const
@@ -46,6 +47,7 @@ namespace Urho3D {
             return ((unsigned)(size_t)(reinterpret_cast<intptr_t>(ws_) >> 9));
         }
     private:
+        /// Websocket connection
         lws* ws_;
     };
 }

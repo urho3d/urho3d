@@ -30,10 +30,7 @@
 #include "../Input/Controls.h"
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
-
-#ifdef URHO3D_WEBSOCKETS
 #include "WS/WSConnection.h"
-#endif
 
 namespace SLNet
 {
@@ -128,13 +125,15 @@ class URHO3D_API Connection : public Object
 public:
     /// Construct with context, RakNet connection address and Raknet peer pointer.
     Connection(Context* context, bool isClient, const SLNet::AddressOrGUID& address, SLNet::RakPeerInterface* peer);
-#ifdef URHO3D_WEBSOCKETS
     /// Construct with context, Websocket connection
     Connection(Context* context, bool isClient, const WSConnection& ws, WSHandler* wsHandler);
+    /// Set Websocket connection information
     void SetWS(const WSConnection& ws);
+    /// Set Websocket handler for this connection
     void SetWSHandler(WSHandler* server);
+    /// Get current Websocket handler for this connection
     const WSHandler* GetWSHandler() { return wsHandler_; }
-#endif
+
     /// Destruct.
     ~Connection() override;
 
@@ -362,12 +361,10 @@ private:
     HashMap<int, VectorBuffer> outgoingBuffer_;
     /// Outgoing packet size limit
     int packedMessageLimit_;
-#ifdef URHO3D_WEBSOCKETS
     /// Websocket connection
     WSConnection ws_;
     /// Websocket connection handler
     WSHandler* wsHandler_;
-#endif
 };
 
 }
