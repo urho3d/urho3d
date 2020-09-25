@@ -541,6 +541,8 @@ bool Network::StartWSServer(unsigned short port, unsigned int maxConnections)
     }
 
     return true;
+#else
+    return false;
 #endif
 }
 
