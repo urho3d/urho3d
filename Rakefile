@@ -109,10 +109,6 @@ task :package => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task['gradle'].invoke('zipBuildTreeDebug zipBuildTreeRelease')
     next
-  elsif ENV['PLATFORM'] =~ /iOS|tvOS/
-    # Don't have signing key for creating the actual package, so invoke CPack directly to pack the 'simulator' binaries only
-    Rake::Task['cpack'].invoke
-    next
   end
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
   system "#{wrapper} #{build_target('package')}" or abort
@@ -158,10 +154,6 @@ end
 
 task :gradle, [:task] do |_, args|
   system "./gradlew #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
-end
-
-task :cpack do
-  Dir.chdir(build_tree) { system 'cpack -G TGZ' } or abort
 end
 
 task :lint do
