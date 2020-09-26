@@ -212,7 +212,7 @@ jobs:
       - name: Scaffolding test - install
         run: rake install
       - name: Scaffolding test - cleanup
-        run: rd /s /q "C:/Program Files (x86)/Urho3D"
+        run: rm -r -fo 'C:/Program Files/Urho3D'
       - name: Package
         run: rake package
         if: github.event_name == 'push'
