@@ -67,8 +67,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
       - name: Free up space
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android
         if: matrix.platform == 'android'
@@ -100,7 +99,13 @@ jobs:
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
       - name: Documentation
         run: script/dockerized.sh ${PLATFORM/-*} rake doc
-        if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+      - name: Scaffolding test - install
+        run: script/dockerized.sh ${PLATFORM/-*} rake install[$GITHUB_WORKSPACE/build/stage]
+        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+      - name: Scaffolding test - cleanup
+        run: if [[ $PLATFORM == android ]]; then rm -rf build/cache/.m2; else rm -rf build/stage; fi
+        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake package
         if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
@@ -118,9 +123,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: script/dockerized.sh ${PLATFORM/-*} rake publish
         if: github.event_name == 'push' && matrix.platform == 'android'
-      - name: Install
-        run: script/dockerized.sh ${PLATFORM/-*} rake install[$GITHUB_WORKSPACE/build/stage]
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
   macOS:
     name: 🍏
     runs-on: macos-latest
@@ -143,8 +145,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
       - name: Install dependencies
         run: while ! brew install doxygen graphviz; do sleep 1; done
       - name: Install headers
@@ -159,7 +160,10 @@ jobs:
         if: startsWith(matrix.platform, 'macOS')
       - name: Documentation
         run: rake doc
-        if: github.event_name == 'push'
+      - name: Scaffolding test - install
+        run: rake install[$GITHUB_WORKSPACE/build/stage]
+      - name: Scaffolding test - cleanup
+        run: rm -rf build/stage
       - name: Package
         run: rake package
         if: github.event_name == 'push'
@@ -169,8 +173,6 @@ jobs:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
           path: build/ci/*.tar.gz
         if: github.event_name == 'push'
-      - name: Install
-        run: sudo -E rake install
   windows:
     name: 🔲
     runs-on: windows-latest
@@ -195,8 +197,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
       - name: Install dependencies
         run: do { choco install --no-progress doxygen.install graphviz } until ($?)
       - name: CMake
@@ -208,7 +209,10 @@ jobs:
         if: matrix.graphics-api != 'OpenGL'
       - name: Documentation
         run: rake doc
-        if: github.event_name == 'push'
+      - name: Scaffolding test - install
+        run: rake install
+      - name: Scaffolding test - cleanup
+        run: rd /s /q "C:/Program Files (x86)/Urho3D"
       - name: Package
         run: rake package
         if: github.event_name == 'push'
@@ -218,8 +222,6 @@ jobs:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
           path: build/ci/*.zip
         if: github.event_name == 'push'
-      - name: Install
-        run: rake install
 
 ...
 
