@@ -116,6 +116,8 @@ jobs:
           path: |
             build/ci/*.tar.gz
             android/urho3d-lib/build/distributions/*.aar
+            android/urho3d-lib/build/distributions/*.zip
+            android/urho3d-lib/build/libs/*.jar
             build/*.out
         if: github.event_name == 'push' || matrix.platform == 'linux-clang-tidy' == matrix.platform != 'linux-clang-format'
       - name: Publish
