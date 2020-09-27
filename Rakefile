@@ -83,7 +83,7 @@ task :test => [:init] do
   end
   wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
   test = /xcode|vs/ =~ ENV['GENERATOR'] ? 'RUN_TESTS' : 'test'
-  system "#{wrapper} #{build_target(test)}" or abort
+  system build_target(test, wrapper) or abort
 end
 
 desc 'Generate documentation'
@@ -101,7 +101,8 @@ task :install, [:prefix] => [:init] do |_, args|
     Rake::Task['gradle'].invoke('publishToMavenLocal')
     next
   end
-  system "#{args[:prefix] && !ENV['OS'] ? "DESTDIR=#{args[:prefix]}" : ''} #{build_target('install')}" or abort
+  wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{args[:prefix]}" : ''
+  system build_target('install', wrapper) or abort
 end
 
 desc 'Package build artifact'
@@ -111,7 +112,7 @@ task :package => [:init] do
     next
   end
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
-  system "#{wrapper} #{build_target('package')}" or abort
+  system build_target('package', wrapper) or abort
 end
 
 desc 'Publish build artifact'
@@ -191,8 +192,8 @@ def build_config
   /xcode|vs/ =~ ENV['GENERATOR'] ? "--config #{ENV.fetch('CONFIG', 'Release')}" : ''
 end
 
-def build_target(tgt)
-  %Q{cmake --build "#{build_tree}" #{build_config} #{tgt ? "--target #{tgt}" : ''}}
+def build_target(tgt, wrapper = '')
+  %Q{#{wrapper} cmake --build "#{build_tree}" #{build_config} #{tgt ? "--target #{tgt}" : ''}}
 end
 
 def lint_err_file
