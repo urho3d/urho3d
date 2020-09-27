@@ -103,6 +103,9 @@ jobs:
       - name: Scaffolding test - install
         run: script/dockerized.sh ${PLATFORM/-*} rake install[$GITHUB_WORKSPACE/build/stage]
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+      - name: Scaffolding test - new
+        run: script/dockerized.sh ${PLATFORM/-*} rake new[build/scaffolding]
+        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding test - cleanup
         run: if [[ $PLATFORM == android ]]; then rm -rf build/cache/.m2; else rm -rf build/stage; fi
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
@@ -164,6 +167,8 @@ jobs:
         run: rake doc
       - name: Scaffolding test - install
         run: rake install[$GITHUB_WORKSPACE/build/stage]
+      - name: Scaffolding test - new
+        run: rake new[build/scaffolding]
       - name: Scaffolding test - cleanup
         run: rm -rf build/stage
       - name: Package
@@ -213,6 +218,8 @@ jobs:
         run: rake doc
       - name: Scaffolding test - install
         run: rake install
+      - name: Scaffolding test - new
+        run: rake new[build/scaffolding]
       - name: Scaffolding test - cleanup
         run: rm -r -fo 'C:/Program Files/Urho3D'
       - name: Package

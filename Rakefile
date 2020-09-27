@@ -101,7 +101,7 @@ task :install, [:prefix] => [:init] do |_, args|
     Rake::Task['gradle'].invoke('publishToMavenLocal')
     next
   end
-  wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{args[:prefix]}" : ''
+  wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{verify_path(args[:prefix])}" : ''
   system build_target('install', wrapper) or abort
 end
 
@@ -122,6 +122,27 @@ task :publish => [:init] do
     next
   end
   abort "The 'publish' task is currently not supported on '#{ENV['PLATFORM']}' platform"
+end
+
+desc 'Create a new project'
+task :new, [:dir] => [:init] do |_, args|
+  abort 'Usage: rake new[/path/to/new/project]' unless args[:dir]
+  dir = verify_path(args[:dir])
+  abort "The directory '#{dir}' already exists!" if Dir.exists?(dir)
+  FileUtils.mkdir_p(%W[#{dir}/src #{dir}/bin/Data])
+  FileUtils.ln_sf(verify_path('bin/CoreData'), "#{dir}/bin")
+  %w[CMake Rakefile script].each { |it| FileUtils.ln_sf(verify_path(it), dir) }
+  File.write("#{dir}/CMakeLists.txt", <<EOF)
+cmake_minimum_required (VERSION 3.10.2)
+project (UrhoApp)
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+include (UrhoCommon)
+set (TARGET_NAME UrhoApp)
+define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h RECURSE GROUP)
+setup_main_executable ()
+setup_test ()
+EOF
+  %w[Source/Tools/Urho3DPlayer/Urho3DPlayer.cpp Source/Tools/Urho3DPlayer/Urho3DPlayer.h].each { |it| FileUtils.cp(it, "#{dir}/src") }
 end
 
 
@@ -198,6 +219,15 @@ end
 
 def lint_err_file
   'build/clang-tidy.out'
+end
+
+def verify_path(path)
+  require 'pathname'
+  begin
+    Pathname.new(path).realdirpath.to_s
+  rescue
+    abort "The specified path '#{path}' is invalid!"
+  end
 end
 
 
