@@ -206,7 +206,7 @@ def build_host
 end
 
 def build_tree
-  ENV['BUILD_TREE'] || "build/#{ENV['PLATFORM'].downcase}"
+  ENV['BUILD_TREE'] || "build/#{File.exists?('/entrypoint.sh') ? 'dockerized-' : ''}#{ENV['PLATFORM'].downcase}"
 end
 
 def build_config
