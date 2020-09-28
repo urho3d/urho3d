@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-task default: 'build'
+task default: :build
 
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake => [:init] do
@@ -40,7 +40,7 @@ end
 desc 'Clean the build tree'
 task :clean => [:init] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('clean')
+    Rake::Task[:gradle].invoke('clean')
     next
   end
   system build_target('clean') or abort
@@ -50,7 +50,7 @@ desc 'Build the software'
 task :build, [:target] => [:cmake] do |_, args|
   system "ccache -z" if ENV['USE_CCACHE']
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('build -x test')
+    Rake::Task[:gradle].invoke('build -x test')
     system "ccache -s" if ENV['USE_CCACHE']
     next
   end
@@ -72,13 +72,13 @@ end
 desc 'Test the software'
 task :test => [:init] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('test')
+    Rake::Task[:gradle].invoke('test')
     next
   elsif ENV['URHO3D_LINT'] == '1'
-    Rake::Task['lint'].invoke
+    Rake::Task[:lint].invoke
     next
   elsif ENV['URHO3D_STYLE'] == '1'
-    Rake::Task['style'].invoke
+    Rake::Task[:style].invoke
     next
   end
   wrapper = ENV['CI'] && ENV['PLATFORM'] == 'linux' ? 'xvfb-run' : ''
@@ -89,7 +89,7 @@ end
 desc 'Generate documentation'
 task :doc => [:init] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('documentationZip')
+    Rake::Task[:gradle].invoke('documentationZip')
     next
   end
   system build_target('doc') or abort
@@ -98,7 +98,7 @@ end
 desc 'Install the software'
 task :install, [:prefix] => [:init] do |_, args|
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('publishToMavenLocal')
+    Rake::Task[:gradle].invoke('publishToMavenLocal')
     next
   end
   wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{verify_path(args[:prefix])}" : ''
@@ -108,7 +108,7 @@ end
 desc 'Package build artifact'
 task :package => [:init] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('zipBuildTreeDebug zipBuildTreeRelease')
+    Rake::Task[:gradle].invoke('zipBuildTreeDebug zipBuildTreeRelease')
     next
   end
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
@@ -118,7 +118,7 @@ end
 desc 'Publish build artifact'
 task :publish => [:init] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task['gradle'].invoke('publish')
+    Rake::Task[:gradle].invoke('publish')
     next
   end
   abort "The 'publish' task is currently not supported on '#{ENV['PLATFORM']}' platform"
@@ -150,7 +150,7 @@ end
 
 task :init do
   next if $max_jobs
-  Rake::Task['ci'].invoke if ENV['CI']
+  Rake::Task[:ci].invoke if ENV['CI']
   case build_host
   when /linux/
     $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
