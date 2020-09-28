@@ -101,13 +101,13 @@ jobs:
         run: script/dockerized.sh ${PLATFORM/-*} rake doc
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding test - install
-        run: script/dockerized.sh ${PLATFORM/-*} rake install[$GITHUB_WORKSPACE/build/stage]
+        run: script/dockerized.sh ${PLATFORM/-*} rake install[~/stage]
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding test - new
         run: script/dockerized.sh ${PLATFORM/-*} rake new[build/scaffolding]
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding test - cleanup
-        run: if [[ $PLATFORM == android ]]; then rm -rf build/cache/.m2; else rm -rf build/stage; fi
+        run: if [[ $PLATFORM == android ]]; then rm -rf build/cache/.m2; else rm -rf build/cache/stage; fi
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake package
@@ -166,11 +166,11 @@ jobs:
       - name: Documentation
         run: rake doc
       - name: Scaffolding test - install
-        run: rake install[$GITHUB_WORKSPACE/build/stage]
+        run: rake install[~/stage]
       - name: Scaffolding test - new
         run: rake new[build/scaffolding]
       - name: Scaffolding test - cleanup
-        run: rm -rf build/stage
+        run: rm -rf ~/stage
       - name: Package
         run: rake package
         if: github.event_name == 'push'

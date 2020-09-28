@@ -224,7 +224,7 @@ end
 def verify_path(path)
   require 'pathname'
   begin
-    Pathname.new(path).realdirpath.to_s
+    Pathname.new(File.expand_path(path)).realdirpath.to_s
   rescue
     abort "The specified path '#{path}' is invalid!"
   end
