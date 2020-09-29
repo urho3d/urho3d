@@ -125,24 +125,29 @@ task :publish => [:init] do
 end
 
 desc 'Create a new project'
-task :new, [:dir] => [:init] do |_, args|
-  abort 'Usage: rake new[/path/to/new/project]' unless args[:dir]
-  dir = verify_path(args[:dir])
+task :new, [:name, :parent_dir, :use_copy] => [:init] do |_, args|
+  args.with_defaults(:name => 'UrhoApp', :parent_dir => '~/projects', :use_copy => false)
+  parent_dir = verify_path(args[:parent_dir])
+  dir = "#{parent_dir}/#{args[:name]}"
   abort "The directory '#{dir}' already exists!" if Dir.exists?(dir)
+  puts "Creating a new project in #{dir}..."
   FileUtils.mkdir_p(%W[#{dir}/src #{dir}/bin/Data])
-  FileUtils.ln_sf(verify_path('bin/CoreData'), "#{dir}/bin")
-  %w[CMake Rakefile script].each { |it| FileUtils.ln_sf(verify_path(it), dir) }
+  use_copy = args[:use_copy] || dockerized?
+  func = FileUtils.method(use_copy ? :cp_r : :ln_s)
+  func.call(verify_path('bin/CoreData'), "#{dir}/bin")
+  %w[CMake Rakefile script].each { |it| func.call(verify_path(it), dir) }
   File.write("#{dir}/CMakeLists.txt", <<EOF)
 cmake_minimum_required (VERSION 3.10.2)
-project (UrhoApp)
+project (#{args[:name]})
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 include (UrhoCommon)
-set (TARGET_NAME UrhoApp)
+set (TARGET_NAME #{args[:name]})
 define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h RECURSE GROUP)
 setup_main_executable ()
 setup_test ()
 EOF
   %w[Source/Tools/Urho3DPlayer/Urho3DPlayer.cpp Source/Tools/Urho3DPlayer/Urho3DPlayer.h].each { |it| FileUtils.cp(it, "#{dir}/src") }
+  puts "Done!"
 end
 
 
@@ -206,7 +211,7 @@ def build_host
 end
 
 def build_tree
-  ENV['BUILD_TREE'] || "build/#{File.exists?('/entrypoint.sh') ? 'dockerized-' : ''}#{ENV['PLATFORM'].downcase}"
+  ENV['BUILD_TREE'] || "build/#{dockerized? ? 'dockerized-' : ''}#{ENV['PLATFORM'].downcase}"
 end
 
 def build_config
@@ -228,6 +233,10 @@ def verify_path(path)
   rescue
     abort "The specified path '#{path}' is invalid!"
   end
+end
+
+def dockerized?
+  File.exists?('/entrypoint.sh')
 end
 
 
