@@ -53,18 +53,20 @@ public:
     /// Destruct.
     ~Network() override;
 
-    /// Handle an inbound message.
-    void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
+#ifndef __EMSCRIPTEN__
+        /// Handle an inbound message.
+        void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
+        /// Handle new UDP client connection.
+        void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+        /// Handle a client disconnection.
+        void ClientDisconnected(const SLNet::AddressOrGUID& connection);
+#endif
     // Handle new client connection
     void NewConnectionEstablished(const SharedPtr<Connection> newConnection);
-    /// Handle new UDP client connection.
-    void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
     /// Handle new Websockets client connection.
     void NewConnectionEstablished(const WSConnection& ws);
     /// Handle a client disconnection.
     void ClientDisconnected(const WSConnection& ws);
-    /// Handle a client disconnection.
-    void ClientDisconnected(const SLNet::AddressOrGUID& connection);
 
     /// Set the data that will be used for a reply to attempts at host discovery on LAN/subnet.
     void SetDiscoveryBeacon(const VariantMap& data);
@@ -140,8 +142,10 @@ public:
     /// Return simulated packet loss probability.
     float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
 
+#ifndef __EMSCRIPTEN__
     /// Return a client or server connection by RakNet connection address, or null if none exist.
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
+#endif
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
@@ -168,10 +172,12 @@ private:
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle render update frame event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+#ifndef __EMSCRIPTEN__
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle UDP server disconnection.
     void OnServerDisconnected(const SLNet::AddressOrGUID& address);
+#endif
     /// Handle Websockets server disconnection.
     void OnServerDisconnected(const WSConnection& ws, bool failedConnect = false);
     /// Reconfigure network simulator parameters on all existing connections.
@@ -187,8 +193,10 @@ private:
     SLNet::RakPeerInterface* rakPeerClient_;
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
+#ifndef __EMSCRIPTEN__
     /// SLikeNet server's client connections.
     HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> > clientConnections_;
+#endif
     /// Websocket server's client connections.
     HashMap<WSConnection, SharedPtr<Connection> > websocketClientConnections_;
     /// Allowed remote events.

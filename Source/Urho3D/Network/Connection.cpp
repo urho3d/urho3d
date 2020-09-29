@@ -38,9 +38,11 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
+#ifndef __EMSCRIPTEN__ 1
 #include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/peerinterface.h>
 #include <SLikeNet/statistics.h>
+#endif
 
 #ifdef URHO3D_WEBSOCKETS
 #include "WS/WSPacket.h"
@@ -90,7 +92,9 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     packedMessageLimit_(1024)
 {
     sceneState_.connection_ = this;
+#ifndef __EMSCRIPTEN__
     port_ = address.systemAddress.GetPort();
+#endif
     SetAddressOrGUID(address);
 }
 
@@ -170,7 +174,11 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
 
     if (buffer.GetSize() == 0)
     {
+#ifndef __EMSCRIPTEN__
         buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
+#else
+        buffer.WriteUByte((unsigned char)URHO3D_MESSAGE);
+#endif
         buffer.WriteUInt((unsigned int)MSG_PACKED_MESSAGE);
     }
 
@@ -293,8 +301,10 @@ void Connection::SetLogStatistics(bool enable)
 
 void Connection::Disconnect(int waitMSec)
 {
+#ifndef __EMSCRIPTEN__
     if (peer_)
         peer_->CloseConnection(*address_, true);
+#endif
 
 #ifdef URHO3D_WEBSOCKETS
     if (!isClient_ && wsHandler_)
@@ -427,6 +437,9 @@ void Connection::SendBuffer(PacketType type)
     if (buffer.GetSize() == 0)
         return;
 
+    bool sentOut = false;
+
+#ifndef __EMSCRIPTEN__
     PacketReliability reliability = PacketReliability::UNRELIABLE;
     if (type == PT_UNRELIABLE_ORDERED)
         reliability = PacketReliability::UNRELIABLE_SEQUENCED;
@@ -437,13 +450,13 @@ void Connection::SendBuffer(PacketType type)
     if (type == PT_RELIABLE_UNORDERED)
         reliability = PacketReliability::RELIABLE;
 
-    bool sentOut = false;
     if (peer_)
     {
         peer_->Send((const char *) buffer.GetData(), (int) buffer.GetSize(), HIGH_PRIORITY, reliability, (char) 0, *address_, false);
         tempPacketCounter_.y_++;
         sentOut = true;
     }
+#endif
 
 #ifdef URHO3D_WEBSOCKETS
     if (wsHandler_)
@@ -640,10 +653,12 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
 
 void Connection::Ban()
 {
+#ifndef __EMSCRIPTEN__
     if (peer_)
     {
         peer_->AddToBanList(address_->ToString(false), 0);
     }
+#endif
 }
 
 void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
@@ -1198,17 +1213,24 @@ Scene* Connection::GetScene() const
 
 bool Connection::IsConnected() const
 {
+#ifndef __EMSCRIPTEN__
     return peer_ && peer_->IsActive();
+#else
+    if (ws_.GetWS())
+        return true;
+#endif
 }
 
 float Connection::GetRoundTripTime() const
 {
+#ifndef __EMSCRIPTEN__
     if (peer_)
     {
         SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)peer_->GetAveragePing(*address_);
     }
+#endif
     return 0.0f;
 }
 
@@ -1219,23 +1241,27 @@ unsigned Connection::GetLastHeardTime() const
 
 float Connection::GetBytesInPerSec() const
 {
+#ifndef __EMSCRIPTEN__
     if (peer_)
     {
         SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_RECEIVED];
     }
+#endif
     return 0.0f;
 }
 
 float Connection::GetBytesOutPerSec() const
 {
+#ifndef __EMSCRIPTEN__
     if (peer_)
     {
         SLNet::RakNetStatistics stats{};
         if (peer_->GetStatistics(address_->systemAddress, &stats))
             return (float)stats.valueOverLastSecond[SLNet::ACTUAL_BYTES_SENT];
     }
+#endif
     return 0.0f;
 }
 
@@ -1314,8 +1340,10 @@ void Connection::SendPackageToClient(PackageFile* package)
 
 void Connection::ConfigureNetworkSimulator(int latencyMs, float packetLoss)
 {
+#ifndef __EMSCRIPTEN__
     if (peer_)
         peer_->ApplyNetworkSimulator(packetLoss, latencyMs, 0);
+#endif
 }
 
 void Connection::SetPacketSizeLimit(int limit)
@@ -1798,14 +1826,20 @@ void Connection::ProcessUnknownMessage(int msgID, MemoryBuffer& msg)
 }
 
 String Connection::GetAddress() const {
-    return String(address_->ToString(false /*write port*/)); 
+#ifndef __EMSCRIPTEN__
+    return String(address_->ToString(false /*write port*/));
+#else
+    return String::EMPTY;
+#endif
 }
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
-{ 
+{
+#ifndef __EMSCRIPTEN__
     delete address_;
     address_ = nullptr;
     address_ = new SLNet::AddressOrGUID(addr);
+#endif
 }
 
 }

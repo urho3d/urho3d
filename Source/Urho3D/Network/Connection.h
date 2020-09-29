@@ -129,6 +129,8 @@ public:
     Connection(Context* context, bool isClient, const WSConnection& ws, WSHandler* wsHandler);
     /// Set Websocket connection information
     void SetWS(const WSConnection& ws);
+    /// Get Websocket connection information
+    const WSConnection& GetWS() const { return ws_; };
     /// Set Websocket handler for this connection
     void SetWSHandler(WSHandler* server);
     /// Get current Websocket handler for this connection

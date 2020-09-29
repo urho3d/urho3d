@@ -32,8 +32,11 @@
 #include <libwebsockets.h>
 #include <string.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 static Urho3D::WSClient* WSClientInstance = nullptr;
-static struct lws_context *context;
 
 #if defined(WIN32)
 #define HAVE_STRUCT_TIMESPEC
@@ -42,14 +45,17 @@ static struct lws_context *context;
 #endif
 #endif
 
+#ifndef __EMSCRIPTEN__
 static struct lws *client_wsi;
 static lws_sorted_usec_list_t sul;
-
+static struct lws_context *context;
 static const lws_retry_bo_t retry = {
         .secs_since_valid_ping = 3,
         .secs_since_valid_hangup = 10,
 };
+#endif
 
+#ifndef __EMSCRIPTEN__
 static void connect_cb(lws_sorted_usec_list_t *_sul)
 {
     struct lws_client_connect_info i;
@@ -74,6 +80,7 @@ static void connect_cb(lws_sorted_usec_list_t *_sul)
     if (!lws_client_connect_via_info(&i))
         lws_sul_schedule(context, 0, _sul, connect_cb, 5 * LWS_USEC_PER_SEC);
 }
+#endif
 
 static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
@@ -110,6 +117,34 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
 
         case LWS_CALLBACK_CLIENT_WRITEABLE:
             if (WSClientInstance) {
+#ifdef __EMSCRIPTEN__
+                if(WSClientInstance->GetNumOutgoingPackets(wsi))
+                {
+                    auto packet = WSClientInstance->GetOutgoingPacket(wsi);
+                    if (packet)
+                    {
+                        return EM_ASM_INT({
+                            var socket = Module.__libwebsocket.socket;
+                            if( ! socket ) {
+                                return -1;
+                            }
+
+                            // alloc a Uint8Array backed by the incoming data.
+                            var data_in = new Uint8Array(Module.HEAPU8.buffer, $1, $2 );
+                            // allow the dest array
+                            var data = new Uint8Array($2);
+                            // set the dest from the src
+                            data.set(data_in);
+
+                            socket.send( data );
+
+                            return $2;
+
+                        }, packet->second_.GetData(), packet->second_.GetSize());
+                        WSClientInstance->RemoveOutgoingPacket(wsi);
+                    }
+                }
+#else
                 if(WSClientInstance->GetNumOutgoingPackets(wsi)) {
                     auto packet = WSClientInstance->GetOutgoingPacket(wsi);
                     if (packet) {
@@ -124,6 +159,7 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                     }
                 }
                 lws_callback_on_writable(wsi);
+#endif
             }
             break;
 
@@ -141,20 +177,32 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
     return 0;
 }
 
+#ifdef __EMSCRIPTEN__
+extern "C" int EMSCRIPTEN_KEEPALIVE WSHelper(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len ) {
+        return WSCallback(wsi, reason, user, in, len);
+}
+#endif
 
+#ifndef __EMSCRIPTEN__
 static const struct lws_protocols protocols[] = {
         {"ws_client", WSCallback,0,0,},
         { NULL, NULL, 0, 0 }
 };
+#endif
 
 using namespace Urho3D;
 
 static void RunService(const WorkItem* item, unsigned threadIndex) {
+#ifdef __EMSCRIPTEN
+    // Trigger writing on the socket
+    WSCallback(nullptr, LWS_CALLBACK_CLIENT_WRITEABLE, nullptr, nullptr, 0);
+#else
     int result = lws_service(context, 0);
     if (result < 0 && WSClientInstance) {
         WSClientInstance->Disconnect();
     }
     URHO3D_LOGINFOF("Running client service");
+#endif
 }
 
 WSClient::WSClient(Context* context):
@@ -172,12 +220,15 @@ WSClient::~WSClient()
 
 int WSClient::Connect(const String& address, unsigned short port)
 {
-    struct lws_context_creation_info info;
-    lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, OutputWSLog);
-
     address_ = address;
     port_ = port;
     serverProtocol_ = "ws-server";
+
+    SetState(WCS_CONNECTING);
+    SubscribeToEvent(E_WORKITEMCOMPLETED, URHO3D_HANDLER(WSClient, HandleWorkItemFinished));
+
+    struct lws_context_creation_info info;
+    lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, OutputWSLog);
 
     memset(&info, 0, sizeof info);
     info.port = CONTEXT_PORT_NO_LISTEN;
@@ -189,9 +240,82 @@ int WSClient::Connect(const String& address, unsigned short port)
         return 1;
     }
 
+#ifndef __EMSCRIPTEN__
     lws_sul_schedule(context, 0, &sul, connect_cb, 50);
-    SubscribeToEvent(E_WORKITEMCOMPLETED, URHO3D_HANDLER(WSClient, HandleWorkItemFinished));
-    SetState(WCS_CONNECTING);
+#else
+    EM_ASM_({
+		var libwebsocket = {};
+
+		libwebsocket.socket = false;
+		libwebsocket.on_event = Module.cwrap('WSHelper', 'number', ['number', 'number', 'number', 'number', 'number']);
+		libwebsocket.connect = function( url, protocol, user_data ) {
+			try {
+				var socket = new WebSocket(url,protocol);
+				socket.binaryType = "arraybuffer";
+				socket.user_data = user_data;
+
+				socket.onopen = this.on_connect;
+				socket.onmessage = this.on_message;
+				socket.onclose = this.on_close;
+				socket.onerror = this.on_error;
+				socket.destroy = this.destroy;
+
+				this.socket = socket;
+				return socket;
+			} catch(e) {
+				Module.print("Socket creation failed:" + e);
+				return 0;
+			}
+		};
+		libwebsocket.on_connect = function() {
+			var stack = stackSave();
+			// filter protocol //
+			var ret = libwebsocket.on_event(this.id, 9, this.user_data, allocate(intArrayFromString(this.protocol), 'i8', ALLOC_STACK), this.protocol.length);
+			if( !ret ) {
+				// client established
+				ret = libwebsocket.on_event(this.id, 3, this.user_data, 0, 0);
+			}
+			if( ret ) {
+				this.close();
+			}
+			stackRestore(stack);
+		};
+		libwebsocket.on_message = function(event) {
+			var stack = stackSave();
+			var len = event.data.byteLength;
+			var ptr = allocate( len, 'i8', ALLOC_STACK);
+
+			var data = new Uint8Array( event.data );
+
+			for(var i =0, buf = ptr; i < len; ++i ) {
+				setValue(buf, data[i], 'i8');
+				buf++;
+			}
+
+			// client receive //
+			if(libwebsocket.on_event(this.id, 6, this.user_data, ptr, len)) {
+				this.close();
+			}
+			stackRestore(stack);
+		};
+		libwebsocket.on_close = function() {
+			// closed //
+			libwebsocket.on_event(this.protocol_id, ctx, this.id, 4, this.user_data, 0, 0);
+			this.destroy();
+		};
+		libwebsocket.on_error = function() {
+			// client connection error //
+			libwebsocket.on_event(this.protocol_id, ctx, this.id, 2, this.user_data, 0, 0);
+			this.destroy();
+		};
+		libwebsocket.destroy = function() {
+			libwebsocket.socket = false;
+			libwebsocket.on_event(this.protocol_id, ctx, this.id, 11, this.user_data, 0, 0);
+		};
+
+		Module.__libwebsocket = libwebsocket;
+	});
+#endif
     return 0;
 }
 
@@ -206,6 +330,7 @@ void WSClient::Update(float timestep)
     if (nextState_ == WCS_CONNECTION_FAILED) {
         GetSubsystem<Network>()->OnServerDisconnected(GetWSConnection(), true);
     }
+
     if (context) {
         if (!serviceWorkItem_ && currentState_ != WCS_DISCONNECTED) {
             WorkQueue *workQueue = GetSubsystem<WorkQueue>();
@@ -232,11 +357,13 @@ void WSClient::Update(float timestep)
 void WSClient::Disconnect()
 {
     SetState(WCS_DISCONNECTED);
+#ifndef __EMSCRIPTEN__
     if (context)
     {
         lws_context_destroy(context);
         context = nullptr;
     }
+#endif
 }
 
 void WSClient::SetWSConnection(lws *ws)

@@ -45,10 +45,12 @@
 #include "WS/WSPacket.h"
 #endif
 
+#ifndef __EMSCRIPTEN__
 #include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/NatPunchthroughClient.h>
 #include <SLikeNet/peerinterface.h>
 #include <SLikeNet/statistics.h>
+#endif
 
 #ifdef SendMessage
 #undef SendMessage
@@ -63,6 +65,7 @@
 namespace Urho3D
 {
 
+#ifndef __EMSCRIPTEN__
 static const char* RAKNET_MESSAGEID_STRINGS[] = {
     "ID_CONNECTED_PING",  
     "ID_UNCONNECTED_PING",
@@ -200,6 +203,7 @@ static const char* RAKNET_MESSAGEID_STRINGS[] = {
     "ID_RESERVED_9",
     "ID_USER_PACKET_ENUM"
 };
+#endif
 
 static const int DEFAULT_UPDATE_FPS = 30;
 static const int SERVER_TIMEOUT_TIME = 10000;
@@ -220,16 +224,20 @@ Network::Network(Context* context) :
     wsClient_ = nullptr;
     wsServer_ = nullptr;
 
+#ifndef __EMSCRIPTEN__
     rakPeer_ = SLNet::RakPeerInterface::GetInstance();
     rakPeerClient_ = SLNet::RakPeerInterface::GetInstance();
     rakPeer_->SetTimeoutTime(SERVER_TIMEOUT_TIME, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+#endif
+
     SetPassword("");
     SetDiscoveryBeacon(VariantMap());
 
+#ifndef __EMSCRIPTEN__
     natPunchthroughClient_ = new SLNet::NatPunchthroughClient;
     natPunchthroughServerClient_ = new SLNet::NatPunchthroughClient;
-
     SetNATServerInfo("127.0.0.1", 61111);
+#endif
 
     // Register Network library object factories
     RegisterNetworkLibrary(context_);
@@ -283,13 +291,18 @@ Network::Network(Context* context) :
 
 Network::~Network()
 {
+#ifndef __EMSCRIPTEN__
     rakPeer_->DetachPlugin(natPunchthroughServerClient_);
     rakPeerClient_->DetachPlugin(natPunchthroughClient_);
+#endif
+
     // If server connection exists, disconnect, but do not send an event because we are shutting down
     Disconnect(100);
     serverConnection_.Reset();
 
+#ifndef __EMSCRIPTEN__
     clientConnections_.Clear();
+#endif
 
     delete natPunchthroughServerClient_;
     natPunchthroughServerClient_ = nullptr;
@@ -300,12 +313,16 @@ Network::~Network()
     delete natPunchServerAddress_;
     natPunchServerAddress_ = nullptr;
 
+#ifndef __EMSCRIPTEN__
     SLNet::RakPeerInterface::DestroyInstance(rakPeer_);
     SLNet::RakPeerInterface::DestroyInstance(rakPeerClient_);
+#endif
+
     rakPeer_ = nullptr;
     rakPeerClient_ = nullptr;
 }
 
+#ifndef __EMSCRIPTEN__
 void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes)
 {
     // Only process messages from known sources
@@ -319,6 +336,7 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
     else
         URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()));
 }
+#endif
 
 void Network::NewConnectionEstablished(const SharedPtr<Connection> newConnection)
 {
@@ -329,6 +347,7 @@ void Network::NewConnectionEstablished(const SharedPtr<Connection> newConnection
     newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
 }
 
+#ifndef __EMSCRIPTEN__
 void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 {
     // Create a new client connection corresponding to this MessageConnection
@@ -339,6 +358,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 
     NewConnectionEstablished(clientConnections_[connection]);
 }
+#endif
 
 void Network::NewConnectionEstablished(const WSConnection& ws)
 {
@@ -376,6 +396,7 @@ void Network::ClientDisconnected(const WSConnection& ws)
 #endif
 }
 
+#ifndef __EMSCRIPTEN__
 void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
 {
     // Remove the client connection that corresponds to this MessageConnection
@@ -394,18 +415,22 @@ void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
         clientConnections_.Erase(i);
     }
 }
+#endif
 
 void Network::SetDiscoveryBeacon(const VariantMap& data)
 {
+#ifndef __EMSCRIPTEN__
     VectorBuffer buffer;
     buffer.WriteVariantMap(data);
     if (buffer.GetSize() > 400)
         URHO3D_LOGERROR("Discovery beacon of size: " + String(buffer.GetSize()) + " bytes is too large, modify MAX_OFFLINE_DATA_LENGTH in RakNet or reduce size");
     rakPeer_->SetOfflinePingResponse((const char*)buffer.GetData(), buffer.GetSize());
+#endif
 }
 
 void Network::DiscoverHosts(unsigned port)
 {
+#ifndef __EMSCRIPTEN__
     // JSandusky: Contrary to the manual, we actually do have to perform Startup first before we can Ping
     if (!rakPeerClient_->IsActive())
     {
@@ -414,16 +439,20 @@ void Network::DiscoverHosts(unsigned port)
         rakPeerClient_->Startup(1, &socket, 1);
     }
     rakPeerClient_->Ping("255.255.255.255", port, false);
+#endif
 }
 
 void Network::SetPassword(const String& password)
 {
+#ifndef __EMSCRIPTEN__
     rakPeer_->SetIncomingPassword(password.CString(), password.Length());
+#endif
     password_ = password;
 }
 
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
+#ifndef __EMSCRIPTEN__
     URHO3D_PROFILE(Connect);
 
     if (!rakPeerClient_->IsActive())
@@ -463,6 +492,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         SendEvent(E_CONNECTFAILED);
         return false;
     }
+#endif
 }
 
 bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
@@ -496,6 +526,7 @@ void Network::Disconnect(int waitMSec)
 
 bool Network::StartServer(unsigned short port, unsigned int maxConnections)
 {
+#ifndef __EMSCRIPTEN__
     if (IsUDPServerRunning())
         return true;
 
@@ -521,6 +552,9 @@ bool Network::StartServer(unsigned short port, unsigned int maxConnections)
         URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String((int)startResult));
         return false;
     }
+#else
+    return false;
+#endif
 }
 
 
@@ -548,14 +582,17 @@ bool Network::StartWSServer(unsigned short port, unsigned int maxConnections)
 
 void Network::StopServer()
 {
+#ifndef __EMSCRIPTEN__
     clientConnections_.Clear();
     URHO3D_PROFILE(StopServer);
     StopUDPServer();
     StopWSServer();
+#endif
 }
 
 void Network::StopUDPServer()
 {
+#ifndef __EMSCRIPTEN__
     clientConnections_.Clear();
     URHO3D_PROFILE(StopUDPServer);
 
@@ -569,10 +606,12 @@ void Network::StopUDPServer()
 
         URHO3D_LOGINFO("Stopped UDP server");
     }
+#endif
 }
 
 void Network::StopWSServer()
 {
+#ifndef __EMSCRIPTEN__
     clientConnections_.Clear();
     URHO3D_PROFILE(StopWSServer);
 
@@ -585,18 +624,22 @@ void Network::StopWSServer()
         URHO3D_LOGINFO("Stopped Websockets server");
     }
 #endif
+#endif
 }
 
 void Network::SetNATServerInfo(const String& address, unsigned short port)
 {
+#ifndef __EMSCRIPTEN__
     if (!natPunchServerAddress_)
         natPunchServerAddress_ = new SLNet::SystemAddress;
 
     natPunchServerAddress_->FromStringExplicitPort(address.CString(), port);
+#endif
 }
 
 void Network::StartNATClient()
 {
+#ifndef __EMSCRIPTEN__
     if (!rakPeer_) {
         URHO3D_LOGERROR("Unable to start NAT client, client not initialized!");
         return;
@@ -610,10 +653,12 @@ void Network::StartNATClient()
     guid_ = String(rakPeer_->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
     URHO3D_LOGINFO("GUID: " + guid_);
     rakPeer_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
+#endif
 }
 
 void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity)
 {
+#ifndef __EMSCRIPTEN__
     scene_ = scene;
     identity_ = identity;
     if (!remoteGUID_)
@@ -631,6 +676,7 @@ void Network::AttemptNATPunchtrough(const String& guid, Scene* scene, const Vari
     }
 
     rakPeerClient_->Connect(natPunchServerAddress_->ToString(false), natPunchServerAddress_->GetPort(), nullptr, 0);
+#endif
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -641,6 +687,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const Vec
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
     unsigned contentID)
 {
+#ifndef __EMSCRIPTEN__
     if (!rakPeer_) 
         return;
 
@@ -653,22 +700,54 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
         rakPeer_->Send((const char*)msgData.GetData(), (int)msgData.GetSize(), HIGH_PRIORITY, RELIABLE, (char)0, SLNet::UNASSIGNED_RAKNET_GUID, true);
     else
         URHO3D_LOGERROR("Server not running, can not broadcast messages");
+#endif
+
+#ifdef URHO3D_WEBSOCKETS
+    if (wsServer_) {
+        VectorBuffer msgData;
+        msgData.WriteUByte((unsigned char)URHO3D_MESSAGE);
+        msgData.WriteUInt((unsigned int)msgID);
+        msgData.Write(data, numBytes);
+
+        for (HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Begin();
+             i != websocketClientConnections_.End(); ++i)
+        {
+            wsServer_->AddOutgoingPacket(WSPacket(i->second_->GetWS(), msgData));
+        }
+    }
+#endif
 }
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
+#ifndef __EMSCRIPTEN__
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
         i->second_->SendRemoteEvent(eventType, inOrder, eventData);
+#endif
+
+#ifdef URHO3D_WEBSOCKETS
+    for (HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Begin();
+         i != websocketClientConnections_.End(); ++i)
+        i->second_->SendRemoteEvent(eventType, inOrder, eventData);
+#endif
 }
 
 void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
+#ifndef __EMSCRIPTEN__
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
             i->second_->SendRemoteEvent(eventType, inOrder, eventData);
     }
+#endif
+
+#ifdef URHO3D_WEBSOCKETS
+    for (HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Begin();
+         i != websocketClientConnections_.End(); ++i)
+        i->second_->SendRemoteEvent(eventType, inOrder, eventData);
+#endif
 }
 
 void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -685,12 +764,22 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
     }
 
     Scene* scene = node->GetScene();
+#ifndef __EMSCRIPTEN__
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
             i->second_->SendRemoteEvent(node, eventType, inOrder, eventData);
     }
+
+#endif
+
+#ifdef URHO3D_WEBSOCKETS
+    for (HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Begin();
+         i != websocketClientConnections_.End(); ++i)
+        if (i->second_->GetScene() == scene)
+            i->second_->SendRemoteEvent(node, eventType, inOrder, eventData);
+#endif
 }
 
 void Network::SetUpdateFps(int fps)
@@ -751,8 +840,17 @@ void Network::SendPackageToClients(Scene* scene, PackageFile* package)
         return;
     }
 
+#ifndef __EMSCRIPTEN__
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
+    {
+        if (i->second_->GetScene() == scene)
+            i->second_->SendPackageToClient(package);
+    }
+#endif
+
+    for (HashMap<WSConnection, SharedPtr<Connection> >::Iterator i = websocketClientConnections_.Begin();
+         i != websocketClientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
             i->second_->SendPackageToClient(package);
@@ -771,9 +869,12 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
 
 void Network::BanAddress(const String& address)
 {
+#ifndef __EMSCRIPTEN__
     rakPeer_->AddToBanList(address.CString(), 0);
+#endif
 }
 
+#ifndef __EMSCRIPTEN__
 Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
 {
     if (serverConnection_ && serverConnection_->GetAddressOrGUID() == connection)
@@ -787,6 +888,7 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
             return nullptr;
     }
 }
+#endif
 
 Connection* Network::GetConnection(const WSConnection& ws) const
 {
@@ -796,7 +898,7 @@ Connection* Network::GetConnection(const WSConnection& ws) const
     else
     {
         HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Find(WSConnection(ws));
-        if (i != clientConnections_.End())
+        if (i != websocketClientConnections_.End())
             return i->second_;
         else
             return nullptr;
@@ -815,9 +917,11 @@ Connection* Network::GetServerConnection() const
 Vector<SharedPtr<Connection> > Network::GetClientConnections() const
 {
     Vector<SharedPtr<Connection> > ret;
+#ifndef __EMSCRIPTEN__
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         ret.Push(i->second_);
+#endif
 
 #ifdef URHO3D_WEBSOCKETS
     for (HashMap<WSConnection, SharedPtr<Connection> >::ConstIterator i = websocketClientConnections_.Begin();
@@ -835,10 +939,14 @@ bool Network::IsServerRunning() const
 
 bool Network::IsUDPServerRunning() const
 {
+#ifndef __EMSCRIPTEN__
     if (!rakPeer_)
         return false;
 
     return rakPeer_->IsActive() && isServer_;
+#else
+    return false;
+#endif
 }
 
 bool Network::IsWSServerRunning() const
@@ -856,6 +964,7 @@ bool Network::CheckRemoteEvent(StringHash eventType) const
 
 void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 {
+#ifndef __EMSCRIPTEN__
     unsigned char packetID = packet->data[0];
     bool packetHandled = false;
 
@@ -1045,7 +1154,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         URHO3D_LOGERROR("Unhandled network packet: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
     else if (!packetHandled)
         URHO3D_LOGERRORF("Unhandled network packet: %i", packetID);
-
+#endif
 }
 
 void Network::HandleIncomingPacket(const WSPacket* packet, bool isServer)
@@ -1097,6 +1206,8 @@ void Network::Update(float timeStep)
         wsClient_->Update(timeStep);
     }
 #endif
+
+#ifndef __EMSCRIPTEN__
     //Process all incoming messages for the server
     if (rakPeer_->IsActive())
     {
@@ -1116,6 +1227,7 @@ void Network::Update(float timeStep)
             rakPeerClient_->DeallocatePacket(packet);
         }
     }
+#endif
 }
 
 void Network::PostUpdate(float timeStep)
@@ -1138,6 +1250,7 @@ void Network::PostUpdate(float timeStep)
                 URHO3D_PROFILE(PrepareServerUpdate);
 
                 networkScenes_.Clear();
+#ifndef __EMSCRIPTEN__
                 for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
                 {
@@ -1145,6 +1258,7 @@ void Network::PostUpdate(float timeStep)
                     if (scene)
                         networkScenes_.Insert(scene);
                 }
+#endif
 
 #ifdef URHO3D_WEBSOCKETS
                 for (HashMap<WSConnection, SharedPtr<Connection> >::Iterator i = websocketClientConnections_.Begin();
@@ -1163,6 +1277,7 @@ void Network::PostUpdate(float timeStep)
             {
                 URHO3D_PROFILE(SendServerUpdate);
 
+#ifndef __EMSCRIPTEN__
                 // Then send server updates for each UDP client connection
                 for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
@@ -1172,6 +1287,7 @@ void Network::PostUpdate(float timeStep)
                     i->second_->SendPackages();
                     i->second_->SendAllBuffers();
                 }
+#endif
 
 #ifdef URHO3D_WEBSOCKETS
                 // Then send server updates for each Websocket client connection
@@ -1214,6 +1330,7 @@ void Network::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
+#ifndef __EMSCRIPTEN__
 void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
 {
     serverConnection_->SetConnectPending(false);
@@ -1227,6 +1344,7 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
 
     SendEvent(E_SERVERCONNECTED);
 }
+#endif
 
 void Network::OnServerConnected(const WSConnection& ws)
 {
@@ -1244,7 +1362,7 @@ void Network::OnServerConnected(const WSConnection& ws)
 #endif
 }
 
-
+#ifndef __EMSCRIPTEN__
 void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
 {
     if (natPunchServerAddress_ && *natPunchServerAddress_ == address.systemAddress) {
@@ -1267,6 +1385,7 @@ void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
         SendEvent(E_CONNECTFAILED);
     }
 }
+#endif
 
 void Network::OnServerDisconnected(const WSConnection& ws, bool failedConnect)
 {
@@ -1296,9 +1415,11 @@ void Network::ConfigureNetworkSimulator()
     if (serverConnection_)
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 
+#ifndef __EMSCRIPTEN__
     for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+#endif
 }
 
 void RegisterNetworkLibrary(Context* context)
