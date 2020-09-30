@@ -26,7 +26,11 @@
 #include "../IO/Log.h"
 #include "../Network/HttpRequest.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
 #include <Civetweb/civetweb.h>
+#endif
 
 #include "../DebugNew.h"
 
@@ -118,6 +122,40 @@ void HttpRequest::ThreadFunction()
             headersStr += header + "\r\n";
     }
 
+#ifdef __EMSCRIPTEN__
+    EM_ASM({
+        let protocol = UTF8ToString($0);
+        let host = UTF8ToString($1);
+        let port = $2;
+        let path = UTF8ToString($3);
+        console.log('Http request params:');
+        console.log('protocol: ', protocol);
+        console.log('host: ', host);
+        console.log('port: ', port);
+        console.log('path: ', path);
+        let url = protocol + '://' + host + ':' + port + '/' + path;
+        console.log('result: ', url);
+
+        let response = await fetch(url);
+
+        fetch(url)
+          .then(response => response.arrayBuffer())
+          .then(data => {
+              // Copy data to Emscripten heap (directly accessed from Module.HEAPU8)
+              const nDataBytes = data.length * data.BYTES_PER_ELEMENT
+              const dataPtr = Module._malloc(nDataBytes)
+              const dataHeap = new Uint8Array(Module.HEAPU8.buffer, dataPtr, nDataBytes)
+              dataHeap.set(new Uint8Array(data.buffer))
+
+              // const float_multiply_array = Module.cwrap(
+              //   'MultiplyArray', 'number', ['number', 'number', 'number']
+              // );
+              // Call function and get result
+              //Module.MultiplyArray(2, dataHeap.byteOffset, data.length)
+              Module._free(dataHeap.byteOffset)
+          });
+    }, protocol.CString(), host.CString(), port, path.CString());
+#else
     // Initiate the connection. This may block due to DNS query
     mg_connection* connection = nullptr;
 
@@ -200,6 +238,7 @@ void HttpRequest::ThreadFunction()
     // Close the connection
     mg_close_connection(connection);
 
+#endif
     {
         MutexLock lock(mutex_);
         state_ = HTTP_CLOSED;

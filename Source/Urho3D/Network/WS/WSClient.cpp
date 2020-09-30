@@ -123,7 +123,7 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                     auto packet = WSClientInstance->GetOutgoingPacket(wsi);
                     if (packet)
                     {
-                        return EM_ASM_INT({
+                        int retval = EM_ASM_INT({
                             var socket = Module.__libwebsocket.socket;
                             if( ! socket ) {
                                 return -1;
@@ -141,6 +141,10 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                             return $2;
 
                         }, packet->second_.GetData(), packet->second_.GetSize());
+                        if (retval <  packet->second_.GetSize()) {
+                            URHO3D_LOGERRORF("Failed to write to WS, bytes written = %d", retval);
+                            break;
+                        }
                         WSClientInstance->RemoveOutgoingPacket(wsi);
                     }
                 }
@@ -152,7 +156,7 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                         memcpy(&buf[LWS_PRE],  packet->second_.GetData(),  packet->second_.GetSize());
                         int retval = lws_write(wsi, &buf[LWS_PRE],  packet->second_.GetSize(), LWS_WRITE_BINARY);
                         if (retval <  packet->second_.GetSize()) {
-                            URHO3D_LOGERRORF("Failed to write to WS, ret = %d", retval);
+                            URHO3D_LOGERRORF("Failed to write to WS, bytes written = %d", retval);
                             break;
                         }
                         WSClientInstance->RemoveOutgoingPacket(wsi);
@@ -243,7 +247,7 @@ int WSClient::Connect(const String& address, unsigned short port)
 #ifndef __EMSCRIPTEN__
     lws_sul_schedule(context, 0, &sul, connect_cb, 50);
 #else
-    EM_ASM_({
+    EM_ASM({
 		var libwebsocket = {};
 
 		libwebsocket.socket = false;
