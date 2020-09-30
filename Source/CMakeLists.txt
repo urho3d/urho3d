@@ -84,7 +84,7 @@ if (URHO3D_LUA)
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
 
-if (URHO3D_NETWORK)
+if (URHO3D_NETWORK AND NOT WEB)
     add_subdirectory (ThirdParty/Civetweb)
     add_subdirectory (ThirdParty/SLikeNet)
 endif ()
