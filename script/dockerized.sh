@@ -61,8 +61,8 @@ if [[ $DBE_REFRESH == 1 ]]; then
   d pull "${registry}urho3d/dockerized$BuildEnvironment:$DBE_TAG"
 fi
 if [[ $GITHUB_ACTIONS ]]; then
-  mkdir -p build/cache
-  mount_home_dir="--mount type=bind,source=$PROJECT_DIR/build/cache,target=/home/urho3d$mount_option"
+  mkdir -p $GITHUB_WORKSPACE/build/cache
+  mount_home_dir="--mount type=bind,source=$GITHUB_WORKSPACE/build/cache,target=/home/urho3d$mount_option"
 else
   mount_home_dir="--mount type=volume,source=$(id -u).urho3d_home_dir,target=/home/urho3d$mount_option"
   interactive=-i
