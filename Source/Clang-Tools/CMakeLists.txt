@@ -34,7 +34,7 @@ else ()
     project (Urho3D-ExternalProject-${URHO3D_CLANG_TOOLS})
 
     # Set CMake modules search path
-    set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
+    set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/cmake/Modules)
 
     # Include UrhoCommon.cmake module after setting project name
     include (UrhoCommon)

@@ -135,11 +135,11 @@ task :new, [:name, :parent_dir, :use_copy] => [:init] do |_, args|
   use_copy = args[:use_copy] || dockerized?
   func = FileUtils.method(use_copy ? :cp_r : :ln_s)
   func.call(verify_path('bin/CoreData'), "#{dir}/bin")
-  %w[CMake Rakefile script].each { |it| func.call(verify_path(it), dir) }
+  %w[cmake rakefile script].each { |it| func.call(verify_path(it), dir) }
   File.write("#{dir}/CMakeLists.txt", <<EOF)
 cmake_minimum_required (VERSION 3.10.2)
 project (#{args[:name]})
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 include (UrhoCommon)
 set (TARGET_NAME #{args[:name]})
 define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h RECURSE GROUP)
@@ -211,7 +211,7 @@ task :update_dot_files do
       |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && \
     echo URHO3D_LINT >>script/.build-options && \
     cat script/.build-options <(perl -ne 'while (/([A-Z_]+):.+?/g) {print "$1\n"}' .github/workflows/main.yml) \
-      <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' Rakefile) \
+      <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' rakefile) \
       <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) \
       |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file
   } or abort 'Failed to update dot files'

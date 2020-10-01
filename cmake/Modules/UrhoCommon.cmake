@@ -808,7 +808,7 @@ macro (check_source_files)
                 "CMakeLists.txt where the macro is being called and the macro would set the SOURCE_FILES variable automatically. "
                 "If your source files are not located in the same directory as the CMakeLists.txt or your source files are "
                 "more than just C++ language then you probably have to pass in extra arguments when calling the macro in order to make it works. "
-                "See the define_source_files() macro definition in the CMake/Modules/UrhoCommon.cmake for more detail.")
+                "See the define_source_files() macro definition in the cmake/Modules/UrhoCommon.cmake for more detail.")
         endif ()
     endif ()
 endmacro ()
@@ -1735,7 +1735,7 @@ macro (setup_main_executable)
         foreach (DIR ${RESOURCE_DIRS})
             list (FIND INSTALLED_RESOURCE_DIRS ${DIR} FOUND_INDEX)
             if (FOUND_INDEX EQUAL -1)
-                install (DIRECTORY ${DIR} DESTINATION ${DEST_SHARE_DIR}/Resources)
+                install (DIRECTORY ${DIR} DESTINATION ${DEST_SHARE_DIR}/resources)
                 list (APPEND INSTALLED_RESOURCE_DIRS ${DIR})
             endif ()
             # This cache variable is used to keep track of whether a resource directory has been instructed to be installed by CMake or not
