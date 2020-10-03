@@ -127,26 +127,25 @@ end
 desc 'Create a new project'
 task :new, [:name, :parent_dir, :use_copy] => [:init] do |_, args|
   args.with_defaults(:name => 'UrhoApp', :parent_dir => '~/projects', :use_copy => false)
+  name = args[:name]
   parent_dir = verify_path(args[:parent_dir])
-  dir = "#{parent_dir}/#{args[:name]}"
+  dir = "#{parent_dir}/#{name}"
   abort "The directory '#{dir}' already exists!" if Dir.exists?(dir)
   puts "Creating a new project in #{dir}..."
-  FileUtils.mkdir_p(%W[#{dir}/src #{dir}/bin/Data])
+  FileUtils.mkdir_p(%W[#{dir}/src #{dir}/bin/Data/Materials #{dir}/bin/Data/Models #{dir}/bin/Data/Music #{dir}/bin/Data/Textures])
   use_copy = args[:use_copy] || dockerized?
   func = FileUtils.method(use_copy ? :cp_r : :ln_s)
   func.call(verify_path('bin/CoreData'), "#{dir}/bin")
-  %w[cmake rakefile script].each { |it| func.call(verify_path(it), dir) }
-  File.write("#{dir}/CMakeLists.txt", <<EOF)
-cmake_minimum_required (VERSION 3.10.2)
-project (#{args[:name]})
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
-include (UrhoCommon)
-set (TARGET_NAME #{args[:name]})
-define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h RECURSE GROUP)
-setup_main_executable ()
-setup_test ()
-EOF
-  %w[Source/Tools/Urho3DPlayer/Urho3DPlayer.cpp Source/Tools/Urho3DPlayer/Urho3DPlayer.h].each { |it| FileUtils.cp(it, "#{dir}/src") }
+  %w[.clang-format .clang-tidy cmake rakefile script].each { |it| func.call(verify_path(it), dir) }
+  func.call(verify_path('bin/Data/Materials/Mushroom.xml'), "#{dir}/bin/Data/Materials")
+  func.call(verify_path('bin/Data/Models/Mushroom.mdl'), "#{dir}/bin/Data/Models")
+  func.call(verify_path('bin/Data/Music/Ninja Gods.ogg'), "#{dir}/bin/Data/Music")
+  Dir.chdir("bin/Data/Textures") do
+    %w[Mushroom.dds UrhoIcon.icns UrhoIcon.png].each { |it| func.call(verify_path(it), "#{dir}/bin/Data/Textures") }
+  end
+  File.write("#{dir}/CMakeLists.txt", cmake_lists_txt(name))
+  File.write("#{dir}/src/#{name}.h", urho_app_h(name))
+  File.write("#{dir}/src/#{name}.cpp", urho_app_cpp(name))
   puts "Done!"
 end
 
@@ -301,6 +300,92 @@ end
 
 def dockerized?
   File.exists?('/entrypoint.sh')
+end
+
+def cmake_lists_txt(name)
+  <<EOF
+cmake_minimum_required(VERSION 3.10.2)
+project(#{name})
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+include(UrhoCommon)
+
+set(TARGET_NAME #{name})
+define_source_files(GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h RECURSE GROUP)
+setup_main_executable()
+setup_test()
+EOF
+end
+
+def urho_app_h(name)
+  <<EOF
+#pragma once
+
+#include <Urho3D/Urho3DAll.h>
+
+class #{name} : public Application
+{
+    URHO3D_OBJECT(#{name}, Application);
+
+public:
+    explicit #{name}(Context* context);
+    void Start() override;
+
+private:
+    SharedPtr<Scene> scene_;
+};
+EOF
+end
+
+def urho_app_cpp(name)
+  <<EOF
+#include "#{name}.h"
+
+URHO3D_DEFINE_APPLICATION_MAIN(#{name});
+
+#{name}::#{name}(Context* context)
+    : Application(context)
+{
+}
+
+void #{name}::Start()
+{
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* graphics = GetSubsystem<Graphics>();
+    graphics->SetWindowIcon(cache->GetResource<Image>("Textures/UrhoIcon.png"));
+    graphics->SetWindowTitle("#{name}");
+
+    scene_ = new Scene(context_);
+    scene_->CreateComponent<Octree>();
+
+    Node* objectNode = scene_->CreateChild();
+    auto* object = objectNode->CreateComponent<StaticModel>();
+    object->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
+    object->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
+
+    auto* sound = scene_->CreateComponent<SoundSource>();
+    sound->SetSoundType(SOUND_MUSIC);
+    auto* music = cache->GetResource<Sound>("Music/Ninja Gods.ogg");
+    music->SetLooped(true);
+    sound->Play(music);
+
+    Node* lightNode = scene_->CreateChild();
+    auto* light = lightNode->CreateComponent<Light>();
+    light->SetLightType(LIGHT_DIRECTIONAL);
+    lightNode->SetDirection(Vector3(0.6f, -1.f, 0.8f));
+
+    Node* cameraNode = scene_->CreateChild();
+    auto* camera = cameraNode->CreateComponent<Camera>();
+    cameraNode->SetPosition(Vector3(0.f, 0.3f, -3.f));
+
+    GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, scene_, camera));
+
+    SubscribeToEvent(E_KEYUP, [&](StringHash, VariantMap&) { engine_->Exit(); });
+    SubscribeToEvent(E_UPDATE, [=](StringHash, VariantMap& eventData) {
+        objectNode->Yaw(eventData[Update::P_TIMESTEP].GetFloat());
+    });
+}
+EOF
 end
 
 
