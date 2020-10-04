@@ -130,22 +130,19 @@ task :new, [:name, :parent_dir, :use_copy] => [:init] do |_, args|
   name = args[:name]
   parent_dir = verify_path(args[:parent_dir])
   dir = "#{parent_dir}/#{name}"
+  use_copy = args[:use_copy] || dockerized?
   abort "The directory '#{dir}' already exists!" if Dir.exists?(dir)
   puts "Creating a new project in #{dir}..."
-  FileUtils.mkdir_p(%W[#{dir}/src #{dir}/bin/Data/Materials #{dir}/bin/Data/Models #{dir}/bin/Data/Music #{dir}/bin/Data/Textures])
-  use_copy = args[:use_copy] || dockerized?
   func = FileUtils.method(use_copy ? :cp_r : :ln_s)
-  func.call(verify_path('bin/CoreData'), "#{dir}/bin")
-  %w[.clang-format .clang-tidy cmake rakefile script].each { |it| func.call(verify_path(it), dir) }
-  func.call(verify_path('bin/Data/Materials/Mushroom.xml'), "#{dir}/bin/Data/Materials")
-  func.call(verify_path('bin/Data/Models/Mushroom.mdl'), "#{dir}/bin/Data/Models")
-  func.call(verify_path('bin/Data/Music/Ninja Gods.ogg'), "#{dir}/bin/Data/Music")
-  Dir.chdir("bin/Data/Textures") do
-    %w[Mushroom.dds UrhoIcon.icns UrhoIcon.png].each { |it| func.call(verify_path(it), "#{dir}/bin/Data/Textures") }
+  source_tree(name).split("\n").each do |it|
+    dirname, basename = /\// =~ it ? it.match(/(.+)\/(.+)/).captures : ['.', it]
+    FileUtils.mkdir_p("#{dir}/#{dirname}")
+    if (matched = basename.match(/(?<basename>\S+)\s*<-\s*:(?<symbol>\S+)/))
+      File.write("#{dir}/#{dirname}/#{matched[:basename]}", method(matched[:symbol].to_sym).call(name))
+    else
+      func.call(verify_path(it), "#{dir}/#{dirname}")
+    end
   end
-  File.write("#{dir}/CMakeLists.txt", cmake_lists_txt(name))
-  File.write("#{dir}/src/#{name}.h", urho_app_h(name))
-  File.write("#{dir}/src/#{name}.cpp", urho_app_cpp(name))
   puts "Done!"
 end
 
@@ -302,8 +299,28 @@ def dockerized?
   File.exists?('/entrypoint.sh')
 end
 
+def source_tree(name)
+  <<-EOF
+bin/CoreData
+bin/Data/Materials/Mushroom.xml
+bin/Data/Models/Mushroom.mdl
+bin/Data/Music/Ninja Gods.ogg
+bin/Data/Textures/Mushroom.dds
+bin/Data/Textures/UrhoIcon.icns
+bin/Data/Textures/UrhoIcon.png
+cmake
+script
+src/main/cpp/#{name}.cpp <- :urho_app_cpp
+src/main/cpp/#{name}.h <- :urho_app_h
+CMakeLists.txt <- :cmake_lists_txt
+rakefile
+.clang-format
+.clang-tidy
+  EOF
+end
+
 def cmake_lists_txt(name)
-  <<EOF
+  <<-EOF
 cmake_minimum_required(VERSION 3.10.2)
 project(#{name})
 
@@ -311,14 +328,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 include(UrhoCommon)
 
 set(TARGET_NAME #{name})
-define_source_files(GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h RECURSE GROUP)
+define_source_files(GLOB_CPP_PATTERNS src/main/cpp/*.cpp GLOB_H_PATTERNS src/main/cpp/*.h RECURSE GROUP)
 setup_main_executable()
 setup_test()
-EOF
+  EOF
 end
 
 def urho_app_h(name)
-  <<EOF
+  <<-EOF
 #pragma once
 
 #include <Urho3D/Urho3DAll.h>
@@ -334,11 +351,11 @@ public:
 private:
     SharedPtr<Scene> scene_;
 };
-EOF
+  EOF
 end
 
 def urho_app_cpp(name)
-  <<EOF
+  <<-EOF
 #include "#{name}.h"
 
 URHO3D_DEFINE_APPLICATION_MAIN(#{name});
@@ -385,7 +402,7 @@ void #{name}::Start()
         objectNode->Yaw(eventData[Update::P_TIMESTEP].GetFloat());
     });
 }
-EOF
+  EOF
 end
 
 
