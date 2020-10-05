@@ -178,11 +178,7 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
 endif ()
 
 # Setup SDK-like include dir in the build tree for building the Urho3D library
-if (ANDROID AND GRADLE_BUILD_DIR)
-    set (THIRD_PARTY_INCLUDE_DIR ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI}/${DEST_INCLUDE_DIR}/ThirdParty)
-else ()
-    set (THIRD_PARTY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
-endif ()
+set (THIRD_PARTY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 file (MAKE_DIRECTORY ${THIRD_PARTY_INCLUDE_DIR})
 
 # Urho3D source

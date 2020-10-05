@@ -25,7 +25,7 @@ pluginManagement {
         eachPlugin {
             when {
                 requested.id.id.startsWith("com.android.") ->
-                    useModule("com.android.tools.build:gradle:4.0.1")
+                    useModule("com.android.tools.build:gradle:4.0.2")
                 requested.id.id.startsWith("org.jetbrains.kotlin.") ->
                     useVersion(embeddedKotlinVersion)
             }

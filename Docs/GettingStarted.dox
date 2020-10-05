@@ -242,34 +242,15 @@ gradlew.bat build
 
 After the command finishes successfully, the AAR (Android library) and the APK (Android application) should have been generated in the "build/output" directory of the respective Gradle modules.
 
-For Android Studio user, open the project using the IDE. It should prompt you to auto-import the Gradle project, accept the default. After the “gradle sync” completes without any error, press Ctrl+F9 to build the project or Shift+F10 to run the launcher app in the Android device or emulator.
+For Android Studio and IntelliJ IDEA users, open the project using the IDE. It should prompt you to auto-import the Gradle project, accept the default. After the “gradle sync” completes without any error (you may have to retry a few times to get the IDE sync-ed up with the Gradle), press Ctrl+F9 to build the project or Shift+F10 to run the launcher app in the Android device or emulator.
 
-The Gradle build script has been setup to automatically pass the matching Gradle properties as CMake build options. The following is the list of supported Gradle properties.
+The Gradle build script has been setup to automatically pass the matching environment variable as CMake build options, e.g.: "URHO3D_LIB_TYPE=SHARED ./gradlew build". Additionally, it also supports the following Gradle properties.
 
 |Gradle Property|Description    |
 |---------------|---------------|
 |ANDROID_ABI|A comma-separated list of ABIs for split build configuration; when not specified defaults to universal build|
-|URHO3D_ANGELSCRIPT|Pass-through as CMake build option|
-|URHO3D_DATABASE_SQLITE|Pass-through as CMake build option|
-|URHO3D_FILEWATCHER|Pass-through as CMake build option|
-|URHO3D_IK|Pass-through as CMake build option|
-|URHO3D_LIB_TYPE|Pass-through as CMake build option|
-|URHO3D_LUA|Pass-through as CMake build option|
-|URHO3D_LUAJIT|Pass-through as CMake build option|
-|URHO3D_LUAJIT_AMALG|Pass-through as CMake build option|
-|URHO3D_LOGGING|Pass-through as CMake build option|
-|URHO3D_NAVIGATION|Pass-through as CMake build option|
-|URHO3D_NETWORK|Pass-through as CMake build option|
-|URHO3D_PCH|Pass-through as CMake build option|
-|URHO3D_PLAYER|Pass-through as CMake build option|
-|URHO3D_PHYSICS|Pass-through as CMake build option|
-|URHO3D_PROFILING|Pass-through as CMake build option|
-|URHO3D_SAMPLES|Pass-through as CMake build option|
-|URHO3D_THREADING|Pass-through as CMake build option|
-|URHO3D_URHO2D|Pass-through as CMake build option|
-|URHO3D_WEBP|Pass-through as CMake build option|
 
-The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P URHO3D_LUA=0 build" to build without Lua subsystem.
+The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P ANDROID_ABI=x86 build".
 
 \section Building_iOS_tvOS iOS and tvOS build process (tvOS is still EXPERIMENTAL)
 

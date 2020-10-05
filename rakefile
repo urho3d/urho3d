@@ -107,10 +107,7 @@ end
 
 desc 'Package build artifact'
 task :package => [:init] do
-  if ENV['PLATFORM'] == 'android'
-    Rake::Task[:gradle].invoke('zipBuildTreeDebug zipBuildTreeRelease')
-    next
-  end
+  next if ENV['PLATFORM'] == 'android'
   wrapper = /linux|rpi|arm/ =~ ENV['PLATFORM'] && ENV['URHO3D_64BIT'] == '0' ? 'setarch i686' : ''
   system build_target('package', wrapper) or abort
 end
@@ -119,9 +116,7 @@ desc 'Publish build artifact'
 task :publish => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task[:gradle].invoke('publish')
-    next
   end
-  abort "The 'publish' task is currently not supported on '#{ENV['PLATFORM']}' platform"
 end
 
 desc 'Create a new project'
@@ -135,10 +130,13 @@ task :new, [:name, :parent_dir, :use_copy] => [:init] do |_, args|
   puts "Creating a new project in #{dir}..."
   func = FileUtils.method(use_copy ? :cp_r : :ln_s)
   source_tree(name).split("\n").each do |it|
-    dirname, basename = /\// =~ it ? it.match(/(.+)\/(.+)/).captures : ['.', it]
+    next if it.empty?
+    dirname, basename = /\// =~ it.split(/\s*<-\s*/).first ? it.match(/([^\s<]+)\/(.+)/).captures : ['.', it]
     FileUtils.mkdir_p("#{dir}/#{dirname}")
     if (matched = basename.match(/(?<basename>\S+)\s*<-\s*:(?<symbol>\S+)/))
       File.write("#{dir}/#{dirname}/#{matched[:basename]}", method(matched[:symbol].to_sym).call(name))
+    elsif (matched = basename.match(/(?<basename>\S+)\s*<-\s*(?<dirname>\S+)/))
+      func.call(verify_path("#{matched[:dirname]}/#{matched[:basename]}"), "#{dir}/#{dirname}")
     else
       func.call(verify_path(it), "#{dir}/#{dirname}")
     end
@@ -309,13 +307,230 @@ bin/Data/Textures/Mushroom.dds
 bin/Data/Textures/UrhoIcon.icns
 bin/Data/Textures/UrhoIcon.png
 cmake
+gradle
 script
 src/main/cpp/#{name}.cpp <- :urho_app_cpp
 src/main/cpp/#{name}.h <- :urho_app_h
+src/main/java/io/urho3d/#{name.downcase}/MainActivity.kt <- :main_activity_kt
+#{Dir.chdir('android/launcher-app') { (Dir['src/main/res/{drawable,mipmap}*'] + ['']).join("<- android/launcher-app/src/main/res\n") }}
+src/main/res/values/strings.xml <- :strings_xml
+src/main/AndroidManifest.xml <- :android_manifest_xml
+build.gradle.kts <- :build_gradle_kts
 CMakeLists.txt <- :cmake_lists_txt
+proguard-rules.pro <- android/launcher-app
+gradle.properties
+gradlew
+gradlew.bat
 rakefile
+settings.gradle.kts <- :settings_gradle_kts
 .clang-format
 .clang-tidy
+.gitattributes <- :gitattributes
+.gitignore <- :gitignore
+  EOF
+end
+
+def settings_gradle_kts(name)
+  <<-EOF
+pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            when {
+                requested.id.id.startsWith("com.android.") ->
+                    useModule("com.android.tools.build:gradle:4.0.2")
+                requested.id.id.startsWith("org.jetbrains.kotlin.") ->
+                    useVersion(embeddedKotlinVersion)
+            }
+        }
+    }
+    repositories {
+        gradlePluginPortal()
+        google()
+        jcenter()
+    }
+}
+
+rootProject.name = "#{name}"
+  EOF
+end
+
+def build_gradle_kts(name)
+  type = ENV.fetch('URHO3D_LIB_TYPE', 'STATIC').downcase
+  <<-EOF
+plugins {
+    id("com.android.application")
+    kotlin("android")
+    kotlin("android.extensions")
+}
+
+android {
+    ndkVersion = "21.3.6528147"
+    compileSdkVersion(30)
+    defaultConfig {
+        minSdkVersion(18)
+        targetSdkVersion(30)
+        applicationId = "io.urho3d.#{name}"
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                arguments.apply {
+                    System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
+                    add("-D JNI_DIR=${project.file(".cxx")}")
+                    // Pass along matching env-vars as CMake build options
+                    addAll(project.file("script/.build-options")
+                        .readLines()
+                        .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
+                    )
+                }
+            }
+        }
+        splits {
+            abi {
+                isEnable = project.hasProperty("ANDROID_ABI")
+                reset()
+                include(
+                    *(project.findProperty("ANDROID_ABI") as String? ?: "")
+                        .split(',')
+                        .toTypedArray()
+                )
+            }
+        }
+    }
+    buildTypes {
+        named("release") {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+    lintOptions {
+        isAbortOnError = false
+    }
+    externalNativeBuild {
+        cmake {
+            version = "3.17.3+"
+            path = project.file("CMakeLists.txt")
+            setBuildStagingDirectory(".cxx")
+        }
+    }
+    sourceSets {
+        named("main") {
+            assets.srcDir("bin")
+        }
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+    // Remove below two repos if you are only using released AAR from JCenter 
+    mavenLocal()
+    if (System.getenv("GITHUB_ACTOR") != null && System.getenv("GITHUB_TOKEN") != null) {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/urho3d/Urho3D")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+val urhoReleaseImpl by configurations.creating { isCanBeResolved = true }
+configurations.releaseImplementation.get().extendsFrom(urhoReleaseImpl)
+
+val urhoDebugImpl by configurations.creating { isCanBeResolved = true }
+configurations.debugImplementation.get().extendsFrom(urhoDebugImpl)
+
+dependencies {
+    urhoReleaseImpl("io.urho3d:urho3d-lib-#{type}:1.8-ALPHA-SNAPSHOT")
+    urhoDebugImpl("io.urho3d:urho3d-lib-#{type}-debug:1.8-ALPHA-SNAPSHOT")
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$embeddedKotlinVersion")
+    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.2")
+    testImplementation("junit:junit:4.13.1")
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+}
+
+afterEvaluate {
+    android.buildTypes.forEach { buildType ->
+        val config = buildType.name.capitalize()
+        val unzipTaskName = "unzipJni$config"
+        tasks {
+            "generateJsonModel$config" {
+                dependsOn(unzipTaskName)
+            }
+            register<Copy>(unzipTaskName) {
+                val dir = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/${config.toLowerCase()}")
+                if (!dir.exists()) {
+                    val aar = configurations["urho${config}Impl"].resolve().first { it.name.startsWith("urho3d-lib") }
+                    from(zipTree(aar))
+                    include("jni/**")
+                    into(dir)
+                }
+            }
+        }
+    }
+}
+
+tasks {
+    register<Delete>("cleanAll") {
+        dependsOn("clean")
+        delete = setOf(android.externalNativeBuild.cmake.buildStagingDirectory)
+    }
+}
+  EOF
+end
+
+def strings_xml(name)
+  <<-EOF
+<resources>
+    <string name="app_name">#{name}</string>
+</resources>
+  EOF
+end
+
+def android_manifest_xml(name)
+  <<-EOF
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.urho3d.#{name.downcase}">
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true">
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+  EOF
+end
+
+def main_activity_kt(name)
+  <<-EOF
+package io.urho3d.#{name.downcase}
+
+import io.urho3d.UrhoActivity
+
+class MainActivity : UrhoActivity()
   EOF
 end
 
@@ -402,6 +617,54 @@ void #{name}::Start()
         objectNode->Yaw(eventData[Update::P_TIMESTEP].GetFloat());
     });
 }
+  EOF
+end
+
+def gitattributes(_)
+  <<-EOF
+*.h linguist-language=C++
+  EOF
+end
+
+def gitignore(_)
+  <<-EOF
+# Code::Blocks project settings
+/*.cbp
+
+# Codelite project settings
+/*.project
+/*.workspace
+
+# Gradle project settings
+/local.properties
+.gradle/
+build/
+.cxx/
+
+# JetBrains IDE project settings
+/.idea/
+/cmake-build-*/
+*.iml
+
+# KDevelop project settings
+/*.kdev?
+
+# Qt Creator project settings
+/CMakeLists.txt.user
+
+# Visual Studio project settings
+/CMakeSettings.json
+/.vs/
+/out/
+
+# Misc.
+*~
+*.swp
+.DS_Store
+*.log
+*.bak
+Thumbs.db
+.directory
   EOF
 end
 

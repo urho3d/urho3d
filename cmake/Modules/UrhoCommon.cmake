@@ -122,11 +122,6 @@ elseif (XCODE)
     set (DEPLOYMENT_TARGET_SAVED ${CMAKE_OSX_DEPLOYMENT_TARGET} CACHE INTERNAL "Last known deployment target")
 endif ()
 
-# To support Android Gradle build system on Windows host system
-if (ANDROID AND GRADLE_BUILD_DIR)
-    file (TO_CMAKE_PATH "${GRADLE_BUILD_DIR}" GRADLE_BUILD_DIR)
-endif ()
-
 include (CheckHost)
 include (CheckCompilerToolchain)
 
@@ -1400,11 +1395,7 @@ macro (install_header_files)
         # Reparse the arguments for the create_symlink macro to "install" the header files in the build tree
         if (NOT ARG_BASE)
             # Use build tree as base path
-            if (ANDROID AND GRADLE_BUILD_DIR)
-                set (ARG_BASE ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI})
-            else ()
-                set (ARG_BASE ${CMAKE_BINARY_DIR})
-            endif ()
+            set (ARG_BASE ${CMAKE_BINARY_DIR})
         endif ()
         foreach (INSTALL_SOURCE ${INSTALL_SOURCES})
             if (NOT IS_ABSOLUTE ${INSTALL_SOURCE})

@@ -121,7 +121,7 @@ jobs:
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake package
-        if: github.event_name == 'push' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+        if: github.event_name == 'push' && matrix.platform != 'android' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
