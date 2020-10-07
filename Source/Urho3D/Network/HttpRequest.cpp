@@ -28,6 +28,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/bind.h>
 #else
 #include <Civetweb/civetweb.h>
 #endif
@@ -66,13 +67,52 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     }
 #endif
 
-#ifdef URHO3D_THREADING
+#if defined(__EMSCRIPTEN__)
+    EM_ASM({
+        let url = UTF8ToString($0);
+        let handler = $1;
+        fetch(url)
+          .then(response => response.arrayBuffer())
+          .then(data => {
+              // Copy data to Emscripten heap (directly accessed from Module.HEAPU8)
+              const nDataBytes = data.byteLength;
+              const dataPtr = Module._malloc(nDataBytes);
+              const dataHeap = new Uint8Array(Module.HEAPU8.buffer, dataPtr, nDataBytes);
+              dataHeap.set(new Uint8Array(data));
+              if (Module.JSResponse) {
+                Module.JSResponse(handler, dataHeap.byteOffset, nDataBytes);
+              } else {
+                console.error('Module.JSResponse() methoddoes not exist');
+              }
+              Module._free(dataHeap.byteOffset);
+          });
+    }, url.CString(), this);
+#elif defined(URHO3D_THREADING)
     // Start the worker thread to actually create the connection and read the response data.
     Run();
 #else
     URHO3D_LOGERROR("HTTP request will not execute as threading is disabled");
 #endif
 }
+
+#ifdef __EMSCRIPTEN__
+void JSResponse(intptr_t requester, intptr_t data, int length)
+{
+    auto handler = reinterpret_cast<HttpRequest*>(requester);
+    if (handler) {
+        MutexLock lock(handler->mutex_);
+        memcpy(handler->readBuffer_.Get(), reinterpret_cast<void*>(data), (size_t)length);
+        handler->writePosition_ = length;
+        handler->writePosition_ &= READ_BUFFER_SIZE - 1;
+        handler->state_ = HTTP_CLOSED;
+    }
+}
+
+using namespace emscripten;
+EMSCRIPTEN_BINDINGS(HttpRequestHandler) {
+    function("JSResponse", &JSResponse);
+}
+#endif
 
 HttpRequest::~HttpRequest()
 {
@@ -122,40 +162,7 @@ void HttpRequest::ThreadFunction()
             headersStr += header + "\r\n";
     }
 
-#ifdef __EMSCRIPTEN__
-    EM_ASM({
-        let protocol = UTF8ToString($0);
-        let host = UTF8ToString($1);
-        let port = $2;
-        let path = UTF8ToString($3);
-        console.log('Http request params:');
-        console.log('protocol: ', protocol);
-        console.log('host: ', host);
-        console.log('port: ', port);
-        console.log('path: ', path);
-        let url = protocol + '://' + host + ':' + port + '/' + path;
-        console.log('result: ', url);
-
-        let response = await fetch(url);
-
-        fetch(url)
-          .then(response => response.arrayBuffer())
-          .then(data => {
-              // Copy data to Emscripten heap (directly accessed from Module.HEAPU8)
-              const nDataBytes = data.length * data.BYTES_PER_ELEMENT
-              const dataPtr = Module._malloc(nDataBytes)
-              const dataHeap = new Uint8Array(Module.HEAPU8.buffer, dataPtr, nDataBytes)
-              dataHeap.set(new Uint8Array(data.buffer))
-
-              // const float_multiply_array = Module.cwrap(
-              //   'MultiplyArray', 'number', ['number', 'number', 'number']
-              // );
-              // Call function and get result
-              //Module.MultiplyArray(2, dataHeap.byteOffset, data.length)
-              Module._free(dataHeap.byteOffset)
-          });
-    }, protocol.CString(), host.CString(), port, path.CString());
-#else
+#ifndef __EMSCRIPTEN__
     // Initiate the connection. This may block due to DNS query
     mg_connection* connection = nullptr;
 
@@ -247,7 +254,7 @@ void HttpRequest::ThreadFunction()
 
 unsigned HttpRequest::Read(void* dest, unsigned size)
 {
-#ifdef URHO3D_THREADING
+#if defined(URHO3D_THREADING) || defined(__EMSCRIPTEN__)
     mutex_.Acquire();
 
     auto* destPtr = (unsigned char*)dest;

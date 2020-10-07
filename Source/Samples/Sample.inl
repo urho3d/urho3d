@@ -82,7 +82,7 @@ void Sample::Start()
         SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Sample, HandleTouchBegin));
 
     // Create logo
-    CreateLogo();
+    //CreateLogo();
 
     // Set custom window Title & Icon
     SetWindowTitleAndIcon();

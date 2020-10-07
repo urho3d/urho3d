@@ -898,7 +898,7 @@ macro (define_dependency_libs TARGET)
 
     # Urho3D external dependency
     if (${TARGET} MATCHES Urho3D)
-        if (URHO3D_WEBSOCKETS)
+        if (URHO3D_WEBSOCKETS AND NOT WEB)
             list (APPEND LIBS websockets)
         endif ()
     endif ()

@@ -459,7 +459,7 @@ void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData
     auto* network = GetSubsystem<Network>();
     String address = textEdit_->GetText().Trimmed();
     if (address.Empty())
-        address = "localhost"; // Use localhost to connect if nothing else specified
+        address = "wss://echo.websocket.org"; // Use localhost to connect if nothing else specified
 
     // Connect to server, specify scene to use as a client for replication
     clientObjectID_ = 0; // Reset own object ID from possible previous connection

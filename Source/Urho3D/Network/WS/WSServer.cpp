@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#ifdef URHO3D_WEBSOCKETS
+#if defined(URHO3D_WEBSOCKETS) && !defined(__EMSCRIPTEN__)
 
 #include "../Network.h"
 #include "../../Core/WorkQueue.h"

@@ -493,6 +493,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         return false;
     }
 #endif
+    return false;
 }
 
 bool Network::ConnectWS(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
@@ -565,7 +566,7 @@ bool Network::StartWSServer(unsigned short port, unsigned int maxConnections)
 
     URHO3D_PROFILE(StartWSServer);
 
-#ifdef URHO3D_WEBSOCKETS
+#if defined(URHO3D_WEBSOCKETS) && !defined(__EMSCRIPTEN__)
     wsServer_ = new WSServer(context_);
     int result = wsServer_->StartServer(port, maxConnections);
     if (result != 0) {
@@ -615,7 +616,7 @@ void Network::StopWSServer()
     clientConnections_.Clear();
     URHO3D_PROFILE(StopWSServer);
 
-#ifdef URHO3D_WEBSOCKETS
+#if defined(URHO3D_WEBSOCKETS) && !defined(__EMSCRIPTEN__)
     if (IsWSServerRunning())
     {
         wsServer_->StopServer();
@@ -702,7 +703,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
         URHO3D_LOGERROR("Server not running, can not broadcast messages");
 #endif
 
-#ifdef URHO3D_WEBSOCKETS
+#if defined(URHO3D_WEBSOCKETS) && !defined(__EMSCRIPTEN__)
     if (wsServer_) {
         VectorBuffer msgData;
         msgData.WriteUByte((unsigned char)URHO3D_MESSAGE);
@@ -1198,10 +1199,13 @@ void Network::Update(float timeStep)
 {
     URHO3D_PROFILE(UpdateNetwork);
 
-#ifdef URHO3D_WEBSOCKETS
+#if defined(URHO3D_WEBSOCKETS) && !defined(__EMSCRIPTEN__)
     if (wsServer_) {
         wsServer_->Update(timeStep);
     }
+#endif
+
+#if defined(URHO3D_WEBSOCKETS)
     if (wsClient_) {
         wsClient_->Update(timeStep);
     }

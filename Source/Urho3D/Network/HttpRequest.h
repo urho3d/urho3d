@@ -45,6 +45,11 @@ enum HttpRequestState
 /// An HTTP connection with response data stream.
 class URHO3D_API HttpRequest : public RefCounted, public Deserializer, public Thread
 {
+
+#ifdef __EMSCRIPTEN__
+    friend void JSResponse(intptr_t requester, intptr_t data, int length);
+#endif
+
 public:
     /// Construct with parameters.
     HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData);

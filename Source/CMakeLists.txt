@@ -89,7 +89,7 @@ if (URHO3D_NETWORK AND NOT WEB)
     add_subdirectory (ThirdParty/SLikeNet)
 endif ()
 
-if (URHO3D_WEBSOCKETS)
+if (URHO3D_WEBSOCKETS AND NOT WEB)
     add_subdirectory (ThirdParty/libwebsockets)
 endif ()
 

@@ -121,7 +121,7 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 #endif
 
                 if (val.IsNull())
-                    text_->SetText("Invalid JSON response retrieved!");
+                    text_->SetText("Invalid JSON response retrieved! '" + message_ + "'");
                 else
                     text_->SetText("Your IP is: " + val.GetString());
 
