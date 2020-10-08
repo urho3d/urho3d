@@ -54,7 +54,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-// UDP port we will use
+// TCP port we will use
 static const unsigned short SERVER_PORT = 2345;
 // Identifier for our custom remote event we use to tell the client which object they control
 static const StringHash E_CLIENTOBJECTID("ClientObjectID");
@@ -74,28 +74,39 @@ SceneReplication::SceneReplication(Context* context) :
 {
 }
 
+void SceneReplication::Setup()
+{
+    Sample::Setup();
+    engineParameters_[EP_HEADLESS] = true;
+}
+
 void SceneReplication::Start()
 {
-    // Execute base class startup
-    Sample::Start();
+    if (!GetSubsystem<Engine>()->IsHeadless()) {
+        // Execute base class startup
+        Sample::Start();
+
+        // Create the UI content
+        CreateUI();
+
+        // Set the mouse mode to use in the sample
+        Sample::InitMouseMode(MM_RELATIVE);
+
+        // Setup the viewport for displaying the scene
+        SetupViewport();
+    }
 
     // Create the scene content
     CreateScene();
 
-    // Create the UI content
-    CreateUI();
-
-    // Setup the viewport for displaying the scene
-    SetupViewport();
-
     // Hook up to necessary events
     SubscribeToEvents();
 
-    // Set the mouse mode to use in the sample
-    Sample::InitMouseMode(MM_RELATIVE);
-
     auto* network = GetSubsystem<Network>();
     network->SetUpdateFps(30);
+
+    if (GetSubsystem<Engine>()->IsHeadless())
+        StartServer();
 }
 
 void SceneReplication::CreateScene()
@@ -322,6 +333,14 @@ void SceneReplication::MoveCamera()
     auto* input = GetSubsystem<Input>();
     ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
 
+    if (input->GetKeyPress(KEY_P)) {
+        auto network = GetSubsystem<Network>();
+        auto connections = network->GetClientConnections();
+        for (auto it = connections.Begin(); it != connections.End(); ++it) {
+            (*it)->Disconnect();
+            URHO3D_LOGINFOF("Disconnecting client!");
+        }
+    }
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
 
@@ -358,30 +377,34 @@ void SceneReplication::MoveCamera()
 
 void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // We only rotate the camera according to mouse movement since last frame, so do not need the time step
-    MoveCamera();
-
-    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection())
+    if (!GetSubsystem<Engine>()->IsHeadless())
     {
-        packetsIn_->SetText("Packets  in (as client) : " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsInPerSec()));
-        packetsOut_->SetText("Packets out (as client): " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
-        packetCounterTimer_.Reset();
+        // We only rotate the camera according to mouse movement since last frame, so do not need the time step
+        MoveCamera();
     }
-    else if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->IsServerRunning())
-    {
-        int packetsIn = 0;
-        int packetsOut = 0;
-        auto connections = GetSubsystem<Network>()->GetClientConnections();
-        for (auto it = connections.Begin(); it != connections.End(); ++it ) {
-            packetsIn += (*it)->GetPacketsInPerSec();
-            packetsOut += (*it)->GetPacketsOutPerSec();
+
+    if (packetsIn_ && packetsOut_ ) {
+        if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection()) {
+            packetsIn_->SetText("Packets  in (as client) : " +
+                                String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsInPerSec()));
+            packetsOut_->SetText("Packets out (as client): " +
+                                 String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
+            packetCounterTimer_.Reset();
+        } else if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->IsServerRunning()) {
+            int packetsIn = 0;
+            int packetsOut = 0;
+            auto connections = GetSubsystem<Network>()->GetClientConnections();
+            for (auto it = connections.Begin(); it != connections.End(); ++it) {
+                packetsIn += (*it)->GetPacketsInPerSec();
+                packetsOut += (*it)->GetPacketsOutPerSec();
+            }
+            packetsIn_->SetText("Packets  in (as server)[" + String(connections.Size()) + "] : " + String(packetsIn));
+            packetsOut_->SetText("Packets out (as server)[" + String(connections.Size()) + "]: " + String(packetsOut));
+            packetCounterTimer_.Reset();
+        } else if (packetCounterTimer_.GetMSec(false) > 1000) {
+            packetsIn_->SetText("Packets in : 0");
+            packetsOut_->SetText("Packets out : 0");
         }
-        packetsIn_->SetText("Packets  in (as server)[" + String(connections.Size()) + "] : " + String(packetsIn));
-        packetsOut_->SetText("Packets out (as server)[" + String(connections.Size()) + "]: " + String(packetsOut));
-        packetCounterTimer_.Reset();
-    } else if (packetCounterTimer_.GetMSec(false) > 1000) {
-        packetsIn_->SetText("Packets in : 0");
-        packetsOut_->SetText("Packets out : 0");
     }
 }
 
@@ -459,7 +482,7 @@ void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData
     auto* network = GetSubsystem<Network>();
     String address = textEdit_->GetText().Trimmed();
     if (address.Empty())
-        address = "wss://echo.websocket.org"; // Use localhost to connect if nothing else specified
+        address = "127.0.0.1"; // Use localhost to connect if nothing else specified
 
     // Connect to server, specify scene to use as a client for replication
     clientObjectID_ = 0; // Reset own object ID from possible previous connection
@@ -492,9 +515,7 @@ void SceneReplication::HandleDisconnect(StringHash eventType, VariantMap& eventD
 
 void SceneReplication::HandleStartServer(StringHash eventType, VariantMap& eventData)
 {
-    auto* network = GetSubsystem<Network>();
-    network->StartWSServer(SERVER_PORT, 2);
-
+    StartServer();
     UpdateButtons();
 }
 
@@ -537,4 +558,10 @@ void SceneReplication::HandleClientDisconnected(StringHash eventType, VariantMap
 void SceneReplication::HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
     clientObjectID_ = eventData[P_ID].GetUInt();
+}
+
+void SceneReplication::StartServer()
+{
+    auto* network = GetSubsystem<Network>();
+    network->StartWSServer(SERVER_PORT, 2);
 }

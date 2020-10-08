@@ -40,7 +40,8 @@ namespace Urho3D {
         /// Get WS connection
         lws* GetWS() const { return ws_; }
 
-        inline bool operator==( WSConnection const& connA) const { return connA.ws_ == ws_;}
+        inline bool operator==( WSConnection const& connB) const { return connB.ws_ == ws_;}
+        inline bool operator!=( WSConnection const& connB) const { return connB.ws_ != ws_;}
 
         unsigned ToHash() const
         {

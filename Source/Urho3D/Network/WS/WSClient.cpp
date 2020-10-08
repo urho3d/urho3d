@@ -34,7 +34,6 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/bind.h>
-static bool context = false;
 
 enum lws_callback_reasons {
     LWS_CALLBACK_ESTABLISHED = 0,
@@ -66,37 +65,33 @@ static Urho3D::WSClient* WSClientInstance = nullptr;
 #ifndef __EMSCRIPTEN__
 static struct lws *client_wsi;
 static lws_sorted_usec_list_t sul;
-static struct lws_context *context;
+static struct lws_context *wsContext;
 static const lws_retry_bo_t retry = {
         .secs_since_valid_ping = 3,
         .secs_since_valid_hangup = 10,
 };
-#endif
 
-#ifndef __EMSCRIPTEN__
-static void connect_cb(lws_sorted_usec_list_t *_sul)
+/// Connect to server with retry functionality
+static void ConnectToServer(lws_sorted_usec_list_t *_sul)
 {
-    struct lws_client_connect_info i;
+    struct lws_client_connect_info info;
+    memset(&info, 0, sizeof(info));
 
-    lwsl_notice("%s: connecting\n", __func__);
+    info.context = wsContext;
+    info.port = WSClientInstance->GetPort();
+    info.address = WSClientInstance->GetAddress().CString();
+    info.path = "/";
+    info.host = info.address;
+    info.origin = info.address;
+    info.protocol = WSClientInstance->GetServerProtocol().CString();
+    info.alpn = "http/1.1";
 
-    memset(&i, 0, sizeof(i));
+    info.local_protocol_name = "ws_client";
+    info.pwsi = &client_wsi;
+    info.retry_and_idle_policy = &retry;
 
-    i.context = context;
-    i.port = WSClientInstance->GetPort();
-    i.address = WSClientInstance->GetAddress().CString();
-    i.path = "/";
-    i.host = i.address;
-    i.origin = i.address;
-    i.protocol = WSClientInstance->GetServerProtocol().CString();
-    i.alpn = "http/1.1";
-
-    i.local_protocol_name = "ws_client";
-    i.pwsi = &client_wsi;
-    i.retry_and_idle_policy = &retry;
-
-    if (!lws_client_connect_via_info(&i))
-        lws_sul_schedule(context, 0, _sul, connect_cb, 5 * LWS_USEC_PER_SEC);
+    if (!lws_client_connect_via_info(&info))
+        lws_sul_schedule(wsContext, 0, _sul, ConnectToServer, 5 * LWS_USEC_PER_SEC);
 }
 #endif
 
@@ -116,7 +111,6 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                 WSClientInstance->SetWSConnection(wsi);
                 WSClientInstance->SetState(Urho3D::WCS_CONNECTED);
             }
-            // lwsl_user("%s: established\n", __func__);
             break;
 
         case LWS_CALLBACK_CLIENT_RECEIVE: {
@@ -157,7 +151,6 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                             data.set(data_in);
                             socket.send(data);
 
-                            // TODO: possible memory leak?
                             return $2;
 
                         }, packet->second_.GetData(), packet->second_.GetSize());
@@ -202,11 +195,7 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
 }
 
 #ifdef __EMSCRIPTEN__
-// static int WSHelper(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len ) {
-//         return WSCallback(wsi, reason, user, in, len);
-// }
 static int WSHelper(intptr_t wsi, int reason, intptr_t user, intptr_t in, int len ) {
-    URHO3D_LOGINFOF("WSHelper called");
     return WSCallback(reinterpret_cast<struct lws *>(wsi), static_cast<enum lws_callback_reasons>(reason), reinterpret_cast<void*>(user), reinterpret_cast<void*>(in), (size_t)len);
 }
 using namespace emscripten;
@@ -225,15 +214,11 @@ static const struct lws_protocols protocols[] = {
 using namespace Urho3D;
 
 static void RunService(const WorkItem* item, unsigned threadIndex) {
-#ifdef __EMSCRIPTEN__
-    // Trigger writing on the socket
-    WSCallback(nullptr, LWS_CALLBACK_CLIENT_WRITEABLE, nullptr, nullptr, 0);
-#else
-    int result = lws_service(context, 0);
+#ifndef __EMSCRIPTEN__
+    int result = lws_service(wsContext, 0);
     if (result < 0 && WSClientInstance) {
         WSClientInstance->Disconnect();
     }
-    URHO3D_LOGINFOF("Running client service");
 #endif
 }
 
@@ -248,8 +233,7 @@ ws_(nullptr)
     EM_ASM({
         var libwebsocket = {};
         libwebsocket.socket = false;
-        // libwebsocket.on_event = function(){ console.log('on_event'); };//Module.cwrap('WSHelper', 'number', ['number', 'number', 'number', 'number', 'number']);
-        libwebsocket.on_event = Module.WSHelper;//Module.cwrap('WSHelper', 'number', ['number', 'number', 'number', 'number', 'number']);
+        libwebsocket.on_event = Module.WSHelper;
         libwebsocket.connect = function( url, protocol, user_data ) {
             try {
                 var socket = new WebSocket(url,protocol);
@@ -353,15 +337,14 @@ int WSClient::Connect(const String& address, unsigned short port)
     info.port = CONTEXT_PORT_NO_LISTEN;
     info.protocols = protocols;
 
-    context = lws_create_context(&info);
-    if (!context) {
+    wsContext = lws_create_context(&info);
+    if (!wsContext) {
         URHO3D_LOGERROR("Failed to start Websocket client");
         return 1;
     }
 
-    lws_sul_schedule(context, 0, &sul, connect_cb, 50);
+    lws_sul_schedule(wsContext, 0, &sul, ConnectToServer, 50);
 #else
-    context = true;
     EM_ASM({
         let address = UTF8ToString($0);
         let port = $1;
@@ -369,6 +352,7 @@ int WSClient::Connect(const String& address, unsigned short port)
         Module.__libwebsocket.connect(address);
     }, address_.CString(), port, serverProtocol_.CString());
 #endif
+
     return 0;
 }
 
@@ -385,7 +369,8 @@ void WSClient::Update(float timestep)
         GetSubsystem<Network>()->OnServerDisconnected(GetWSConnection(), true);
     }
 
-    if (context) {
+#ifndef __EMSCRIPTEN__
+    if (wsContext) {
         if (!serviceWorkItem_ && currentState_ != WCS_DISCONNECTED) {
             WorkQueue *workQueue = GetSubsystem<WorkQueue>();
             serviceWorkItem_ = workQueue->GetFreeItem();
@@ -396,6 +381,7 @@ void WSClient::Update(float timestep)
             workQueue->AddWorkItem(serviceWorkItem_);
         }
     }
+#endif
 
     while (GetNumIncomingPackets()) {
         auto packet = GetIncomingPacket();
@@ -412,11 +398,15 @@ void WSClient::Disconnect()
 {
     SetState(WCS_DISCONNECTED);
 #ifndef __EMSCRIPTEN__
-    if (context)
+    if (wsContext)
     {
-        lws_context_destroy(context);
-        context = nullptr;
+        lws_context_destroy(wsContext);
+        wsContext = nullptr;
     }
+#else
+    EM_ASM({
+        Module.__libwebsocket.destroy();
+    });
 #endif
 }
 

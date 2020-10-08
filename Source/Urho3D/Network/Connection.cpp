@@ -49,6 +49,7 @@
 #include "WS/WSHandler.h"
 #include "WS/WSConnection.h"
 #include "WS/WSClient.h"
+#include "WS/WSServer.h"
 #endif
 
 #ifdef SendMessage
@@ -309,6 +310,11 @@ void Connection::Disconnect(int waitMSec)
 #ifdef URHO3D_WEBSOCKETS
     if (!isClient_ && wsHandler_)
         static_cast<WSClient*>(wsHandler_)->Disconnect();
+
+#ifndef __EMSCRIPTEN__
+    if (isClient_ && wsHandler_)
+        static_cast<WSServer*>(wsHandler_)->MarkForDisconnect(ws_);
+#endif
 #endif
 }
 
@@ -534,66 +540,6 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
     while (!buffer.IsEof()) {
         msgID = buffer.ReadUInt();
         unsigned int packetSize = buffer.ReadUInt();
-
-        switch (msgID) {
-            case MSG_IDENTITY:
-                URHO3D_LOGINFO("Received message MSG_IDENTITY");
-                break;
-//            case MSG_CONTROLS:
-//                URHO3D_LOGINFO("Received message MSG_CONTROLS");
-//                break;
-            case MSG_SCENELOADED:
-                URHO3D_LOGINFO("Received message MSG_SCENELOADED");
-                break;
-            case MSG_REQUESTPACKAGE:
-                URHO3D_LOGINFO("Received message MSG_REQUESTPACKAGE");
-                break;
-            case MSG_PACKAGEDATA:
-                URHO3D_LOGINFO("Received message MSG_PACKAGEDATA");
-                break;
-            case MSG_LOADSCENE:
-                URHO3D_LOGINFO("Received message MSG_LOADSCENE");
-                break;
-            case MSG_SCENECHECKSUMERROR:
-                URHO3D_LOGINFO("Received message MSG_SCENECHECKSUMERROR");
-                break;
-            case MSG_CREATENODE:
-                URHO3D_LOGINFO("Received message MSG_CREATENODE");
-                break;
-            case MSG_NODEDELTAUPDATE:
-                URHO3D_LOGINFO("Received message MSG_NODEDELTAUPDATE");
-                break;
-            case MSG_NODELATESTDATA:
-                URHO3D_LOGINFO("Received message MSG_NODELATESTDATA");
-                break;
-            case MSG_REMOVENODE:
-                URHO3D_LOGINFO("Received message MSG_REMOVENODE");
-                break;
-            case MSG_CREATECOMPONENT:
-                URHO3D_LOGINFO("Received message MSG_CREATECOMPONENT");
-                break;
-            case MSG_COMPONENTDELTAUPDATE:
-                URHO3D_LOGINFO("Received message MSG_COMPONENTDELTAUPDATE");
-                break;
-            case MSG_COMPONENTLATESTDATA:
-                URHO3D_LOGINFO("Received message MSG_COMPONENTLATESTDATA");
-                break;
-            case MSG_REMOVECOMPONENT:
-                URHO3D_LOGINFO("Received message MSG_REMOVECOMPONENT");
-                break;
-            case MSG_REMOTEEVENT:
-                URHO3D_LOGINFO("Received message MSG_REMOTEEVENT");
-                break;
-            case MSG_REMOTENODEEVENT:
-                URHO3D_LOGINFO("Received message MSG_REMOTENODEEVENT");
-                break;
-            case MSG_PACKAGEINFO:
-                URHO3D_LOGINFO("Received message MSG_PACKAGEINFO");
-                break;
-            case MSG_PACKED_MESSAGE:
-                URHO3D_LOGINFO("Received message MSG_PACKED_MESSAGE");
-                break;
-        }
         MemoryBuffer msg(buffer.GetData() + buffer.GetPosition(), packetSize);
         buffer.Seek(buffer.GetPosition() + packetSize);
 

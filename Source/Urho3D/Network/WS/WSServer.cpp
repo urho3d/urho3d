@@ -56,6 +56,10 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
         case LWS_CALLBACK_SERVER_WRITEABLE:
         case LWS_CALLBACK_CLIENT_WRITEABLE:
             if (WSServerInstance) {
+                if (WSServerInstance->IsMarkedForDisconnect(wsi)) {
+                    WSServerInstance->RemoveDisconnected(wsi);
+                    return -1;
+                }
                 Urho3D::MutexLock lock(WSServerInstance->GetOutgoingMutex());
                 auto* packets = WSServerInstance->GetOutgoingPackets(wsi);
                 for (auto it = packets->Begin(); it != packets->End(); ++it) {
@@ -122,7 +126,6 @@ static void RunService(const WorkItem* item, unsigned threadIndex) {
     if (result < 0 && WSServerInstance) {
         WSServerInstance->StopServer();
     }
-    URHO3D_LOGINFOF("Running server service");
 }
 
 WSServer::WSServer(Context* context):
@@ -203,7 +206,8 @@ void WSServer::Update(float timestep)
 void WSServer::StopServer()
 {
     SetState(WSS_STOPPED);
-    if (context) {
+    if (context)
+    {
         lws_context_destroy(context);
         context = nullptr;
     }
@@ -213,12 +217,11 @@ void WSServer::HandleWorkItemFinished(StringHash eventType, VariantMap& eventDat
 {
     using namespace WorkItemCompleted;
     WorkItem *workItem = reinterpret_cast<WorkItem *>(eventData[P_ITEM].GetPtr());
-    if (workItem->aux_ != this) {
+    if (workItem->aux_ != this)
         return;
-    }
-    if (workItem->workFunction_ == RunService) {
+
+    if (workItem->workFunction_ == RunService)
         serviceWorkItem_.Reset();
-    }
 }
 
 void WSServer::AddPendingConnection(lws* ws)
@@ -236,4 +239,30 @@ void WSServer::SetState(WSServerState state)
     nextState_ = state;
 }
 
+void WSServer::MarkForDisconnect(const WSConnection& ws)
+{
+    MutexLock lock(GetOutgoingMutex());
+    pendingDisconnects_.Push(ws);
+}
+
+bool WSServer::IsMarkedForDisconnect(lws* ws)
+{
+    MutexLock lock(GetOutgoingMutex());
+    if (pendingDisconnects_.Contains(ws))
+        return true;
+
+    return false;
+}
+
+void WSServer::RemoveDisconnected(lws* ws)
+{
+    MutexLock lock(GetOutgoingMutex());
+    auto pIt = pendingDisconnects_.Find(ws);
+    if (pIt != pendingDisconnects_.End())
+        pendingDisconnects_.Erase(pIt);
+
+    auto oIt = outgoingPackets_.Find(ws);
+    if (oIt != outgoingPackets_.End())
+        outgoingPackets_.Erase(oIt);
+}
 #endif

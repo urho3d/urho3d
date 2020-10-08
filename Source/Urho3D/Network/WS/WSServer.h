@@ -58,6 +58,12 @@ public:
     void AddPendingConnection(lws* ws);
     /// Client connection lost, add it to the queue
     void AddClosedConnection(lws* ws);
+    /// Mark client for disconnection
+    void MarkForDisconnect(const WSConnection& ws);
+    /// Check if connection should be closed
+    bool IsMarkedForDisconnect(lws* ws);
+    /// Remove close connection
+    void RemoveDisconnected(lws* ws);
     /// Set the server state
     void SetState(WSServerState state);
     /// Get maximum number of connections allowed
@@ -71,6 +77,8 @@ private:
     SharedPtr<WorkItem> serviceWorkItem_;
     /// Pending connections queue that should be processed inside the engine
     List<WSConnection> pendingConnections_;
+    /// Connections that should be closed in the next service loop
+    List<WSConnection> pendingDisconnects_;
     /// Close connections queue that should be cleared up from the engine
     List<WSConnection> closedConnections;
     /// Current state of the server

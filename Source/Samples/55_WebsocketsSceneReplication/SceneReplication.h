@@ -49,6 +49,8 @@ public:
     /// Construct.
     explicit SceneReplication(Context* context);
 
+    /// Setup before engine initialization. Modifies the engine parameters.
+    void Setup() override;
     /// Setup after engine initialization and before running the main loop.
     void Start() override;
 
@@ -97,6 +99,8 @@ private:
     void HandleClientDisconnected(StringHash eventType, VariantMap& eventData);
     /// Handle remote event from server which tells our controlled object node ID.
     void HandleClientObjectID(StringHash eventType, VariantMap& eventData);
+    /// Start the server
+    void StartServer();
 
     /// Mapping from client connections to controllable objects.
     HashMap<Connection*, WeakPtr<Node> > serverObjects_;
