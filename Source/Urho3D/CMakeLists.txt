@@ -158,8 +158,11 @@ define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cp
 
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
-    execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrhoRevision.cmake
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_COMMAND}
+        -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h
+        -P CMake/Modules/GetUrhoRevision.cmake
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_QUIET ERROR_QUIET)
 endif ()
 set (URHO3D_DEPS ${STATIC_LIBRARY_TARGETS})
 if (TARGET LuaJIT_universal)

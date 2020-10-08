@@ -33,11 +33,53 @@ endif ()
 execute_process (COMMAND git describe ${ARG} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_VARIABLE LIB_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 if (NOT GIT_EXIT_CODE EQUAL 0)
     # No GIT command line tool or not a GIT repository
-    set (LIB_REVISION Unversioned)
+    set (LIB_REVISION "0.0-Unversioned")
 endif ()
+
+# Output just major.minor.patch number to stdout
+string (REGEX MATCH "[^.]+\\.[^-]+" URHO_VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format
+if (URHO_VERSION)
+    string (REGEX MATCH "${URHO_VERSION}-([^-]+)" PATCH ${LIB_REVISION})     # Subsequent commits count after a release tag is treated as patch number
+    if (PATCH)
+        set (URHO_VERSION ${URHO_VERSION}.${CMAKE_MATCH_1})
+    endif ()
+else ()
+    set (URHO_VERSION 0.0.0)
+endif ()
+
+set (URHO3D_VERSION_MAJOR 0)
+set (URHO3D_VERSION_MINOR 0)
+set (URHO3D_VERSION_PATCH 0)
+
+string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO_VERSION})
+if (MATCHED)
+    set (URHO3D_VERSION_MAJOR ${CMAKE_MATCH_1})
+    set (URHO3D_VERSION_MINOR ${CMAKE_MATCH_2})
+    set (URHO3D_VERSION_PATCH ${CMAKE_MATCH_3})
+
+    string (REGEX MATCH "([0-9]+)-([^-]+)" MINOR_NUM ${URHO3D_VERSION_MINOR})
+    if (MINOR_NUM)
+        set (URHO3D_VERSION_MINOR ${CMAKE_MATCH_1})
+    endif ()
+    
+    string (REGEX MATCH "(^[0-9]+)" PATCH_NUM ${URHO3D_VERSION_PATCH})
+    if (NOT PATCH_NUM)
+        set (URHO3D_VERSION_PATCH 0)
+    endif ()
+endif ()
+
 if (FILENAME)
     # Output complete revision number to a file
-    file (WRITE ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n")
+    file (WRITE ${FILENAME} "#pragma once"
+        "\n\nnamespace Urho3D"
+        "\n{"
+        "\n\nconst char* revision=\"${LIB_REVISION}\";"
+        "\n\n///Printable format: \"%d.%d.%d\", MAJOR, MINOR, PATCHLEVEL"
+        "\n#define URHO3D_MAJOR_VERSION   " ${URHO3D_VERSION_MAJOR}
+        "\n#define URHO3D_MINOR_VERSION   " ${URHO3D_VERSION_MINOR}
+        "\n#define URHO3D_PATCHLEVEL      " ${URHO3D_VERSION_PATCH}
+        "\n\n}")
+
 else ()
     # Output just major.minor.patch number to stdout
     string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format with possible pre-release identifier

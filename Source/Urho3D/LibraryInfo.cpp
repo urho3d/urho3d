@@ -22,11 +22,22 @@
 
 #include "Precompiled.h"
 
-#include "LibraryInfo.h"
 #include "librevision.h"
+
+#include "LibraryInfo.h"
 
 namespace Urho3D
 {
+
+void GetVersion(UrhoVersion* ver)
+{
+    URHO3D_VERSION(ver);
+}
+
+unsigned GetRevisionNumber()
+{
+    return URHO3D_COMPILEDVERSION;
+}
 
 const char* GetRevision()
 {
