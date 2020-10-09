@@ -87,10 +87,9 @@ endif ()
 if (URHO3D_NETWORK AND NOT WEB)
     add_subdirectory (ThirdParty/Civetweb)
     add_subdirectory (ThirdParty/SLikeNet)
-endif ()
-
-if (URHO3D_WEBSOCKETS AND NOT WEB)
-    add_subdirectory (ThirdParty/libwebsockets)
+    if (URHO3D_WEBSOCKETS)
+        add_subdirectory (ThirdParty/libwebsockets)
+    endif ()
 endif ()
 
 if (URHO3D_DATABASE_ODBC)

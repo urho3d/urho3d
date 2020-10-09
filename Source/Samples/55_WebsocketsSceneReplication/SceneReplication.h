@@ -107,7 +107,9 @@ private:
     /// Button container element.
     SharedPtr<UIElement> buttonContainer_;
     /// Server address line editor element.
-    SharedPtr<LineEdit> textEdit_;
+    SharedPtr<LineEdit> serverAddress_;
+    /// Server port
+    SharedPtr<LineEdit> serverPort_;
     /// Connect button.
     SharedPtr<Button> connectButton_;
     /// Disconnect button.

@@ -66,10 +66,7 @@ static Urho3D::WSClient* WSClientInstance = nullptr;
 static struct lws *client_wsi;
 static lws_sorted_usec_list_t sul;
 static struct lws_context *wsContext;
-static const lws_retry_bo_t retry = {
-        .secs_since_valid_ping = 3,
-        .secs_since_valid_hangup = 10,
-};
+static lws_retry_bo_t retry{};
 
 /// Connect to server with retry functionality
 static void ConnectToServer(lws_sorted_usec_list_t *_sul)
@@ -88,6 +85,9 @@ static void ConnectToServer(lws_sorted_usec_list_t *_sul)
 
     info.local_protocol_name = "ws_client";
     info.pwsi = &client_wsi;
+    retry.secs_since_valid_ping = 3;
+    retry.secs_since_valid_ping = 10;
+
     info.retry_and_idle_policy = &retry;
 
     if (!lws_client_connect_via_info(&info))
@@ -114,7 +114,6 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
             break;
 
         case LWS_CALLBACK_CLIENT_RECEIVE: {
-            URHO3D_LOGINFOF("Received buffer of size %d", len);
             Urho3D::VectorBuffer b((unsigned char*)in, len);
             if (b.GetData()[0] == URHO3D_MESSAGE) {
                 WSPacket packet(wsi, b);
@@ -362,11 +361,14 @@ void WSClient::Update(float timestep)
         GetSubsystem<Network>()->OnServerConnected(GetWSConnection());
         URHO3D_LOGINFOF("WSclient OnServerConnected");
     }
+
     if (nextState_ == WCS_DISCONNECTED) {
         GetSubsystem<Network>()->OnServerDisconnected(GetWSConnection(), false);
+        return;
     }
     if (nextState_ == WCS_CONNECTION_FAILED) {
         GetSubsystem<Network>()->OnServerDisconnected(GetWSConnection(), true);
+        return;
     }
 
 #ifndef __EMSCRIPTEN__

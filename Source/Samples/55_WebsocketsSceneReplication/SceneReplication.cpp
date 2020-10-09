@@ -77,11 +77,18 @@ SceneReplication::SceneReplication(Context* context) :
 void SceneReplication::Setup()
 {
     Sample::Setup();
-    engineParameters_[EP_HEADLESS] = true;
+
+    auto params = Engine::ParseParameters(GetArguments());
+    if (params.Contains(EP_HEADLESS)) {
+        engineParameters_[EP_HEADLESS] = params[EP_HEADLESS];
+    }
 }
 
 void SceneReplication::Start()
 {
+    // Create the scene content
+    CreateScene();
+
     if (!GetSubsystem<Engine>()->IsHeadless()) {
         // Execute base class startup
         Sample::Start();
@@ -95,9 +102,6 @@ void SceneReplication::Start()
         // Setup the viewport for displaying the scene
         SetupViewport();
     }
-
-    // Create the scene content
-    CreateScene();
 
     // Hook up to necessary events
     SubscribeToEvents();
@@ -219,8 +223,13 @@ void SceneReplication::CreateUI()
     buttonContainer_->SetPosition(20, 20);
     buttonContainer_->SetLayoutMode(LM_HORIZONTAL);
 
-    textEdit_ = buttonContainer_->CreateChild<LineEdit>();
-    textEdit_->SetStyleAuto();
+    serverAddress_ = buttonContainer_->CreateChild<LineEdit>();
+    serverAddress_->SetStyleAuto();
+    serverAddress_->SetText("ws.arnis.dev");
+
+    serverPort_ = buttonContainer_->CreateChild<LineEdit>();
+    serverPort_->SetStyleAuto();
+    serverPort_->SetText(String(SERVER_PORT));
 
     connectButton_ = CreateButton("Connect", 90);
     disconnectButton_ = CreateButton("Disconnect", 100);
@@ -292,7 +301,8 @@ void SceneReplication::UpdateButtons()
     connectButton_->SetVisible(!serverConnection && !serverRunning);
     disconnectButton_->SetVisible(serverConnection || serverRunning);
     startServerButton_->SetVisible(!serverConnection && !serverRunning);
-    textEdit_->SetVisible(!serverConnection && !serverRunning);
+    serverAddress_->SetVisible(!serverConnection && !serverRunning);
+    serverPort_->SetVisible(!serverConnection && !serverRunning);
 }
 
 Node* SceneReplication::CreateControllableObject()
@@ -480,13 +490,13 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
 void SceneReplication::HandleConnect(StringHash eventType, VariantMap& eventData)
 {
     auto* network = GetSubsystem<Network>();
-    String address = textEdit_->GetText().Trimmed();
+    String address = serverAddress_->GetText().Trimmed();
     if (address.Empty())
         address = "127.0.0.1"; // Use localhost to connect if nothing else specified
 
     // Connect to server, specify scene to use as a client for replication
     clientObjectID_ = 0; // Reset own object ID from possible previous connection
-    network->ConnectWS(address, SERVER_PORT, scene_);
+    network->ConnectWS(address, ToInt(serverPort_->GetText()), scene_);
 
     UpdateButtons();
 }

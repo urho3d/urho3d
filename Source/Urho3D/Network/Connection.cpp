@@ -38,7 +38,7 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
-#ifndef __EMSCRIPTEN__ 1
+#ifndef __EMSCRIPTEN__
 #include <SLikeNet/MessageIdentifiers.h>
 #include <SLikeNet/peerinterface.h>
 #include <SLikeNet/statistics.h>
@@ -536,7 +536,6 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
         return true;
     }
 
-    URHO3D_LOGINFOF("Server: %d", isClient_);
     while (!buffer.IsEof()) {
         msgID = buffer.ReadUInt();
         unsigned int packetSize = buffer.ReadUInt();
