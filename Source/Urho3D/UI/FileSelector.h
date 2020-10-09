@@ -67,7 +67,7 @@ public:
     /// Set button texts.
     void SetButtonTexts(const String& okText, const String& cancelText);
     /// Set current path.
-    void SetPath(const String& path);
+    void SetPath(const Path& path);
     /// Set current filename.
     void SetFileName(const String& fileName);
     /// Set filters.
@@ -111,7 +111,7 @@ public:
     const String& GetTitle() const;
 
     /// Return current path.
-    const String& GetPath() const { return path_; }
+    const Path& GetPath() const { return path_; }
 
     /// Return current filename.
     const String& GetFileName() const;
@@ -176,7 +176,7 @@ private:
     /// Button layout.
     UIElement* buttonLayout_;
     /// Current directory.
-    String path_;
+    Path path_;
     /// Filters.
     Vector<String> filters_;
     /// File entries.

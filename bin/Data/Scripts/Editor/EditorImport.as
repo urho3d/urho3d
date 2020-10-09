@@ -26,9 +26,9 @@ int ExecuteAssetImporter(Array<String>@ args)
         if (GetPlatform() == "Windows")
             exeSuffix = ".exe";
         // Try both with and without the tool directory; a packaged build may not have the tool directory
-        assetImporterPath = fileSystem.programDir + "tool/AssetImporter" + exeSuffix;
+        assetImporterPath = fileSystem.programDir.ToString() + "tool/AssetImporter" + exeSuffix;
         if (!fileSystem.FileExists(assetImporterPath))
-            assetImporterPath = fileSystem.programDir + "AssetImporter" + exeSuffix;
+            assetImporterPath = fileSystem.programDir.ToString() + "AssetImporter" + exeSuffix;
     }
 
     return fileSystem.SystemRun(assetImporterPath, args);
@@ -471,7 +471,7 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
         args.Push("\"" + xmlFileName + "\"");
         args.Push("\"" + outFileName + "\"");
         args.Push("-a");
-        fileSystem.SystemRun(fileSystem.programDir + "tool/OgreImporter", args);
+        fileSystem.SystemRun(fileSystem.programDir.ToString() + "tool/OgreImporter", args);
     }
 
     convertedModels.Push(modelName);

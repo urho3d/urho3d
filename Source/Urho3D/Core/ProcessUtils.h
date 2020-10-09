@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Container/Str.h"
+#include "../Core/Path.h"
 
 #include <cstdlib>
 
@@ -68,9 +69,9 @@ URHO3D_API unsigned GetNumPhysicalCPUs();
 /// Return the number of logical CPUs (different from physical if hyperthreading is used).
 URHO3D_API unsigned GetNumLogicalCPUs();
 /// Set minidump write location as an absolute path. If empty, uses default (UserProfile/AppData/Roaming/urho3D/crashdumps) Minidumps are only supported on MSVC compiler.
-URHO3D_API void SetMiniDumpDir(const String& pathName);
+URHO3D_API void SetMiniDumpDir(const Path& pathName);
 /// Return minidump write location.
-URHO3D_API String GetMiniDumpDir();
+URHO3D_API Path GetMiniDumpDir();
 /// Return the total amount of usable memory in bytes.
 URHO3D_API unsigned long long GetTotalMemory();
 /// Return the name of the currently logged in user, or (?) if not identified.

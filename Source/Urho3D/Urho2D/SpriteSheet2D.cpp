@@ -53,13 +53,13 @@ void SpriteSheet2D::RegisterObject(Context* context)
 
 bool SpriteSheet2D::BeginLoad(Deserializer& source)
 {
-    if (GetName().Empty())
-        SetName(source.GetName());
+    if (GetNamePath().Empty())
+        SetNamePath(source.GetNamePath());
 
     loadTextureName_.Clear();
     spriteMapping_.Clear();
 
-    String extension = GetExtension(source.GetName());
+    String extension = source.GetNamePath().GetExtension();
     if (extension == ".plist")
         return BeginLoadFromPListFile(source);
 
@@ -139,7 +139,7 @@ bool SpriteSheet2D::BeginLoadFromPListFile(Deserializer& source)
     const String& textureFileName = metadata["realTextureFileName"]->GetString();
 
     // If we're async loading, request the texture now. Finish during EndLoad().
-    loadTextureName_ = GetParentPath(GetName()) + textureFileName;
+    loadTextureName_ = GetNamePath().GetParentPath() / textureFileName;
     if (GetAsyncLoadState() == ASYNC_LOADING)
         GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(loadTextureName_, true, this);
 
@@ -152,7 +152,7 @@ bool SpriteSheet2D::EndLoadFromPListFile()
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
-        URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
+        URHO3D_LOGERROR("Could not load texture " + loadTextureName_.ToString());
         loadPListFile_.Reset();
         loadTextureName_.Clear();
         return false;
@@ -215,7 +215,7 @@ bool SpriteSheet2D::BeginLoadFromXMLFile(Deserializer& source)
     }
 
     // If we're async loading, request the texture now. Finish during EndLoad().
-    loadTextureName_ = GetParentPath(GetName()) + rootElem.GetAttribute("imagePath");
+    loadTextureName_ = GetNamePath().GetParentPath() / rootElem.GetPath("imagePath");
     if (GetAsyncLoadState() == ASYNC_LOADING)
         GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(loadTextureName_, true, this);
 
@@ -228,7 +228,7 @@ bool SpriteSheet2D::EndLoadFromXMLFile()
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
-        URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
+        URHO3D_LOGERROR("Could not load texture " + loadTextureName_.ToString());
         loadXMLFile_.Reset();
         loadTextureName_.Clear();
         return false;
@@ -289,7 +289,7 @@ bool SpriteSheet2D::BeginLoadFromJSONFile(Deserializer& source)
     }
 
     // If we're async loading, request the texture now. Finish during EndLoad().
-    loadTextureName_ = GetParentPath(GetName()) + rootElem.Get("imagePath").GetString();
+    loadTextureName_ = GetNamePath().GetParentPath() / rootElem.Get("imagePath").GetString();
     if (GetAsyncLoadState() == ASYNC_LOADING)
         GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(loadTextureName_, true, this);
 
@@ -302,7 +302,7 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
-        URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
+        URHO3D_LOGERROR("Could not load texture " + loadTextureName_.ToString());
         loadJSONFile_.Reset();
         loadTextureName_.Clear();
         return false;

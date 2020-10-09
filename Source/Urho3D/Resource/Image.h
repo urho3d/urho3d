@@ -95,7 +95,7 @@ public:
     /// Save the image to a stream. Regardless of original format, the image is saved as png. Compressed image data is not supported. Return true if successful.
     bool Save(Serializer& dest) const override;
     /// Save the image to a file. Format of the image is determined by file extension. JPG is saved with maximum quality.
-    bool SaveFile(const String& fileName) const override;
+    bool SaveFile(const Path& fileName) const override;
 
     /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
     bool SetSize(int width, int height, unsigned components);
@@ -124,17 +124,17 @@ public:
     /// Clear the image with an integer color. R component is in the 8 lowest bits.
     void ClearInt(unsigned uintColor);
     /// Save in BMP format. Return true if successful.
-    bool SaveBMP(const String& fileName) const;
+    bool SaveBMP(const Path& fileName) const;
     /// Save in PNG format. Return true if successful.
-    bool SavePNG(const String& fileName) const;
+    bool SavePNG(const Path& fileName) const;
     /// Save in TGA format. Return true if successful.
-    bool SaveTGA(const String& fileName) const;
+    bool SaveTGA(const Path& fileName) const;
     /// Save in JPG format with specified quality. Return true if successful.
-    bool SaveJPG(const String& fileName, int quality) const;
+    bool SaveJPG(const Path& fileName, int quality) const;
     /// Save in DDS format. Only uncompressed RGBA images are supported. Return true if successful.
-    bool SaveDDS(const String& fileName) const;
+    bool SaveDDS(const Path& fileName) const;
     /// Save in WebP format with minimum (fastest) or specified compression. Return true if successful. Fails always if WebP support is not compiled in.
-    bool SaveWEBP(const String& fileName, float compression = 0.0f) const;
+    bool SaveWEBP(const Path& fileName, float compression = 0.0f) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.

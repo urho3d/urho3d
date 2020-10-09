@@ -96,7 +96,7 @@ bool Font::BeginLoad(Deserializer& source)
         return false;
     }
 
-    String ext = GetExtension(GetName());
+    String ext = GetNamePath().GetExtension();
     if (ext == ".ttf" || ext == ".otf" || ext == ".woff")
     {
         fontType_ = FONT_FREETYPE;
@@ -192,7 +192,7 @@ void Font::ReleaseFaces()
 void Font::LoadParameters()
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
+    Path xmlName = GetNamePath().WithReplacedExtension(".xml");
     SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, false);
     if (!xml)
         return;

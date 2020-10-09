@@ -375,11 +375,10 @@ void Graphics::PrecacheShaders(Deserializer& source)
     ShaderPrecache::LoadShaders(this, source);
 }
 
-void Graphics::SetShaderCacheDir(const String& path)
+void Graphics::SetShaderCacheDir(const Path& path)
 {
-    String trimmedPath = path.Trimmed();
-    if (trimmedPath.Length())
-        shaderCacheDir_ = AddTrailingSlash(trimmedPath);
+    if (!path.Empty())
+        shaderCacheDir_ = path.WithTrailingSlash();
 }
 
 void Graphics::AddGPUObject(GPUObject* object)

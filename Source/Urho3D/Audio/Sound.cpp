@@ -86,9 +86,10 @@ bool Sound::BeginLoad(Deserializer& source)
     URHO3D_PROFILE(LoadSound);
 
     bool success;
-    if (GetExtension(source.GetName()) == ".ogg")
+    String extension = source.GetNamePath().GetExtension();
+    if (extension == ".ogg")
         success = LoadOggVorbis(source);
-    else if (GetExtension(source.GetName()) == ".wav")
+    else if (extension == ".wav")
         success = LoadWav(source);
     else
         success = LoadRaw(source);
@@ -341,7 +342,7 @@ unsigned Sound::GetSampleSize() const
 void Sound::LoadParameters()
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
+    Path xmlName = GetNamePath().WithReplacedExtension(".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
     if (!file)

@@ -884,9 +884,9 @@ void AnimationController::RemoveAnimationState(AnimationState* state)
     }
 }
 
-void AnimationController::FindAnimation(const String& name, unsigned& index, AnimationState*& state) const
+void AnimationController::FindAnimation(const Path& name, unsigned& index, AnimationState*& state) const
 {
-    StringHash nameHash(GetInternalPath(name));
+    StringHash nameHash(name);
 
     // Find the AnimationState
     state = GetAnimationState(nameHash);

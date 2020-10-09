@@ -6,27 +6,27 @@ static const unsigned SCAN_HIDDEN;
 
 class FileSystem : public Object
 {
-    bool SetCurrentDir(const String pathName);
-    bool CreateDir(const String pathName);
+    bool SetCurrentDir(const Path pathName);
+    bool CreateDir(const Path pathName);
     void SetExecuteConsoleCommands(bool enable);
     int SystemCommand(const String commandLine, bool redirectStdOutToLog = false);
-    int SystemRun(const String fileName, const Vector<String>& arguments);
+    int SystemRun(const Path fileName, const Vector<String>& arguments);
     unsigned SystemCommandAsync(const String commandLine);
-    unsigned SystemRunAsync(const String fileName, const Vector<String>& arguments);
-    bool SystemOpen(const String fileName, const String mode = String::EMPTY);
-    bool Copy(const String srcFileName, const String destFileName);
-    bool Rename(const String srcFileName, const String destFileName);
-    bool Delete(const String fileName);
-    bool SetLastModifiedTime(const String fileName, unsigned newTime);
-    String GetCurrentDir() const;
+    unsigned SystemRunAsync(const Path fileName, const Vector<String>& arguments);
+    bool SystemOpen(const Path fileName, const String mode = String::EMPTY);
+    bool Copy(const Path srcFileName, const Path destFileName);
+    bool Rename(const Path srcFileName, const Path destFileName);
+    bool Delete(const Path fileName);
+    bool SetLastModifiedTime(const Path fileName, unsigned newTime);
+    Path GetCurrentDir() const;
     bool GetExecuteConsoleCommands() const;
     bool HasRegisteredPaths() const;
-    bool CheckAccess(const String pathName) const;
-    unsigned GetLastModifiedTime(const String fileName) const;
-    bool FileExists(const String fileName) const;
-    bool DirExists(const String pathName) const;
+    bool CheckAccess(const Path pathName) const;
+    unsigned GetLastModifiedTime(const Path fileName) const;
+    bool FileExists(const Path fileName) const;
+    bool DirExists(const Path pathName) const;
     
-    tolua_outside const Vector<String>& FileSystemScanDir @ ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const;
+    tolua_outside const Vector<Path>& FileSystemScanDir @ ScanDir(const Path pathName, const String filter, unsigned flags, bool recursive) const;
     
     String GetProgramDir() const;
     String GetUserDocumentsDir() const;
@@ -60,9 +60,9 @@ static int tolua_IOLuaAPI_GetFileSystem00(lua_State* tolua_S)
 #define TOLUA_DISABLE_tolua_get_fileSystem_ptr
 #define tolua_get_fileSystem_ptr tolua_IOLuaAPI_GetFileSystem00
 
-static const Vector<String>& FileSystemScanDir(const FileSystem* fileSystem, const String pathName, const String filter, unsigned flags, bool recursive)
+static const Vector<Path>& FileSystemScanDir(const FileSystem* fileSystem, const Path pathName, const String filter, unsigned flags, bool recursive)
 {
-    static Vector<String> result;
+    static Vector<Path> result;
     fileSystem->ScanDir(result, pathName, filter, flags, recursive);
     return result;
 }

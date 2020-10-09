@@ -712,7 +712,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
 
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
-    Vector<String> includeFiles;
+    Vector<Path> includeFiles;
     unsigned pos = 0;
     while (pos < dataSize)
     {
@@ -744,18 +744,18 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                     if (t == asTC_VALUE && len > 2 && buffer[pos] == '"')
                     {
                         // Get the include file
-                        String includeFile(&buffer[pos + 1], (unsigned)(len - 2));
+                        Path includeFile(String(&buffer[pos + 1], (unsigned)(len - 2)));
                         pos += len;
 
                         // If the file is not found as it is, add the path of current file but only if it is found there
                         if (!cache->Exists(includeFile))
                         {
-                            String prefixedIncludeFile = GetPath(GetName()) + includeFile;
+                            Path prefixedIncludeFile = GetNamePath().GetDirectoryPath() + includeFile;
                             if (cache->Exists(prefixedIncludeFile))
                                 includeFile = prefixedIncludeFile;
                         }
 
-                        String includeFileLower = includeFile.ToLower();
+                        String includeFileLower = includeFile.ToString().ToLower();
 
                         // If not included yet, store it for later processing
                         if (!includeFiles_.Contains(includeFileLower))
@@ -816,7 +816,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         }
         else
         {
-            URHO3D_LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
+            URHO3D_LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i].ToString());
             return false;
         }
     }

@@ -69,12 +69,14 @@ public:
     virtual bool Save(Serializer& dest) const;
 
     /// Load resource from file.
-    bool LoadFile(const String& fileName);
+    bool LoadFile(const Path& fileName);
     /// Save resource to file.
-    virtual bool SaveFile(const String& fileName) const;
+    virtual bool SaveFile(const Path& fileName) const;
 
-    /// Set name.
+    /// Set name from a string (will be converted to internal format).
     void SetName(const String& name);
+    /// Set name from a Path).
+    void SetNamePath(const Path& name);
     /// Set memory use in bytes, possibly approximate.
     void SetMemoryUse(unsigned size);
     /// Reset last used timer.
@@ -82,8 +84,10 @@ public:
     /// Set the asynchronous loading state. Called by ResourceCache. Resources in the middle of asynchronous loading are not normally returned to user.
     void SetAsyncLoadState(AsyncLoadState newState);
 
-    /// Return name.
-    const String& GetName() const { return name_; }
+    /// Return name as a String.
+    const String& GetName() const { return namePath_.ToString(); }
+    /// Return name as a Path.
+    const Path& GetNamePath() const { return namePath_; }
 
     /// Return name hash.
     StringHash GetNameHash() const { return nameHash_; }
@@ -99,7 +103,7 @@ public:
 
 private:
     /// Name.
-    String name_;
+    Path namePath_;
     /// Name hash.
     StringHash nameHash_;
     /// Last used timer.

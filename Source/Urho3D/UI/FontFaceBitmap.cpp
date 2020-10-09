@@ -84,7 +84,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     textures_.Reserve(pages);
 
     auto* resourceCache = font_->GetSubsystem<ResourceCache>();
-    String fontPath = GetPath(font_->GetName());
+    Path fontPath = font_->GetNamePath().GetDirectoryPath();
     unsigned totalTextureSize = 0;
 
     XMLElement pageElem = pagesElem.GetChild("page");
@@ -97,7 +97,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         }
 
         // Assume the font image is in the same directory as the font description file
-        String textureFile = fontPath + pageElem.GetAttribute("file");
+        Path textureFile = fontPath + pageElem.GetPath("file");
 
         // Load texture manually to allow controlling the alpha channel mode
         SharedPtr<File> fontFile = resourceCache->GetFile(textureFile);
@@ -160,7 +160,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         }
     }
 
-    URHO3D_LOGDEBUGF("Bitmap font face %s has %d glyphs", GetFileName(font_->GetName()).CString(), count);
+    URHO3D_LOGDEBUGF("Bitmap font face %s has %d glyphs", font_->GetNamePath().GetFileName().CString(), count);
 
     font_->SetMemoryUse(font_->GetMemoryUse() + totalTextureSize);
     return true;
@@ -271,7 +271,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
 
     // Information
     XMLElement childElem = rootElem.CreateChild("info");
-    String fileName = GetFileName(font_->GetName());
+    String fileName = font_->GetNamePath().GetFileName();
     childElem.SetAttribute("face", fileName);
     childElem.SetAttribute("size", String(pointSize));
 
@@ -282,14 +282,15 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     childElem.SetUInt("pages", pages);
 
     // Construct the path to store the texture
-    String pathName;
+    Path pathName;
     auto* file = dynamic_cast<File*>(&dest);
     if (file)
         // If serialize to file, use the file's path
-        pathName = GetPath(file->GetName());
+        pathName = file->GetNamePath().GetDirectoryPath();
     else
         // Otherwise, use the font resource's path
-        pathName = "Data/" + GetPath(font_->GetName());
+        pathName = "Data/" + font_->GetNamePath().GetDirectoryPath();
+        // TODO: Why is data hard coded?
 
     // Pages
     childElem = rootElem.CreateChild("pages");
@@ -365,7 +366,7 @@ SharedPtr<Image> FontFaceBitmap::SaveFaceTexture(Texture2D* texture)
     return image;
 }
 
-bool FontFaceBitmap::SaveFaceTexture(Texture2D* texture, const String& fileName)
+bool FontFaceBitmap::SaveFaceTexture(Texture2D* texture, const Path& fileName)
 {
     SharedPtr<Image> image = SaveFaceTexture(texture);
     return image ? image->SavePNG(fileName) : false;

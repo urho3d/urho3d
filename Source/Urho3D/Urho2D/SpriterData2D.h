@@ -24,6 +24,10 @@
 
 #pragma once
 
+#include "../Container/Str.h"
+#include "../Container/Vector.h"
+#include "../Core/Path.h"
+
 namespace pugi
 {
 class xml_node;
@@ -92,7 +96,7 @@ struct File
 
     Folder* folder_{};
     int id_{};
-    String name_;
+    Path name_;
     float width_{};
     float height_{};
     float pivotX_{};

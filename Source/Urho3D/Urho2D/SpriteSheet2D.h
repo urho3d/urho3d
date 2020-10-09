@@ -91,7 +91,7 @@ private:
     /// JSON file used while loading.
     SharedPtr<JSONFile> loadJSONFile_;
     /// Texture name used while loading.
-    String loadTextureName_;
+    Path loadTextureName_;
 };
 
 }

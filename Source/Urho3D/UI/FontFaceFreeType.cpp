@@ -144,7 +144,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     face_ = face;
 
     auto numGlyphs = (unsigned)face->num_glyphs;
-    URHO3D_LOGDEBUGF("Font face %s (%fpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
+    URHO3D_LOGDEBUGF("Font face %s (%fpt) has %d glyphs", font_->GetNamePath().GetFileName().CString(), pointSize, numGlyphs);
 
     PODVector<unsigned> charCodes(numGlyphs + 1, 0);
 

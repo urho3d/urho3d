@@ -610,9 +610,9 @@ void Network::UnregisterAllRemoteEvents()
     allowedRemoteEvents_.Clear();
 }
 
-void Network::SetPackageCacheDir(const String& path)
+void Network::SetPackageCacheDir(const Path& path)
 {
-    packageCacheDir_ = AddTrailingSlash(path);
+    packageCacheDir_ = path.WithTrailingSlash();
 }
 
 void Network::SendPackageToClients(Scene* scene, PackageFile* package)

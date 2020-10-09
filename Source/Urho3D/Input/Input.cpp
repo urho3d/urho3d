@@ -2379,7 +2379,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             using namespace DropFile;
 
             VariantMap& eventData = GetEventDataMap();
-            eventData[P_FILENAME] = GetInternalPath(String(evt.drop.file));
+            eventData[P_FILENAME] = Path(evt.drop.file);
             SDL_free(evt.drop.file);
 
             SendEvent(E_DROPFILE, eventData);

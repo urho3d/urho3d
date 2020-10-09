@@ -118,7 +118,7 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
     if (newPath.empty)
         return;
     if (!IsAbsolutePath(newPath))
-        newPath = fileSystem.currentDir + newPath;
+        newPath = fileSystem.currentDir.ToString() + newPath;
 
     if (usePreferredDir)
         newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
@@ -135,8 +135,8 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
         renderer.ReloadShaders();
 
         String check = AddTrailingSlash(sceneResourcePath);
-        bool isDefaultResourcePath = check.Compare(fileSystem.programDir + "Data/", false) == 0 ||
-            check.Compare(fileSystem.programDir + "CoreData/", false) == 0;
+        bool isDefaultResourcePath = check.Compare(fileSystem.programDir.ToString() + "Data/", false) == 0 ||
+            check.Compare(fileSystem.programDir.ToString() + "CoreData/", false) == 0;
 
         if (!sceneResourcePath.empty && !isDefaultResourcePath)
             cache.RemoveResourceDir(sceneResourcePath);

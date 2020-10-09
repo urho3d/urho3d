@@ -28,6 +28,7 @@ namespace Urho3D
 {
 
 class StringHashRegister;
+class Path;
 
 /// 32-bit hash value for a string.
 class URHO3D_API StringHash
@@ -52,6 +53,9 @@ public:
     StringHash(const char* str) noexcept;        // NOLINT(google-explicit-constructor)
     /// Construct from a string.
     StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
+
+    /// Construct from a path. We use these for filenames, but they are basically just a wrapper on a String.
+    explicit StringHash(const Path& path) noexcept;
 
     /// Assign from another hash.
     StringHash& operator =(const StringHash& rhs) noexcept = default;

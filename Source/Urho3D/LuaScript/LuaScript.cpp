@@ -234,7 +234,7 @@ bool LuaScript::HasEventHandler(Object* sender, const String& eventName) const
     return eventInvoker_->HasSubscribedToEvent(sender, eventName);
 }
 
-bool LuaScript::ExecuteFile(const String& fileName)
+bool LuaScript::ExecuteFile(const Path& fileName)
 {
     URHO3D_PROFILE(ExecuteFile);
 
@@ -265,12 +265,14 @@ bool LuaScript::ExecuteString(const String& string)
 
 bool LuaScript::LoadRawFile(const String& fileName)
 {
+#warning FIXME
+#if 0
     URHO3D_PROFILE(LoadRawFile);
 
     URHO3D_LOGINFO("Finding Lua file on file system: " + fileName);
 
     auto* cache = GetSubsystem<ResourceCache>();
-    String filePath = cache->GetResourceFileName(fileName);
+    Path filePath = cache->GetResourceFileName(fileName);
 
     if (filePath.Empty())
     {
@@ -293,6 +295,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
     URHO3D_LOGINFO("Lua file loaded: " + filePath);
 
     return true;
+#endif
 }
 
 bool LuaScript::ExecuteRawFile(const String& fileName)

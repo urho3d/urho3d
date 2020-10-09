@@ -50,12 +50,12 @@ class ScriptResourceRouter : public ResourceRouter
     }
 
     /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available).
-    void Route(String& name, ResourceRequest requestType) override
+    void Route(Path& name, ResourceRequest requestType) override
     {
-        String extension = GetExtension(name);
+        String extension = name.GetExtension();
         if (extension == ".as")
         {
-            String replaced = ReplaceExtension(name, ".asc");
+            Path replaced = name.WithReplacedExtension(".asc");
             // Note: ResourceCache prevents recursive calls to the resource routers so this is OK, the nested Exists()
             // check does not go through the router again
             auto* cache = GetSubsystem<ResourceCache>();

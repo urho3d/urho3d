@@ -95,19 +95,19 @@ ResourceCache::~ResourceCache()
 #endif
 }
 
-bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
+bool ResourceCache::AddResourceDir(const Path& pathName, unsigned priority)
 {
     MutexLock lock(resourceMutex_);
 
     auto* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem || !fileSystem->DirExists(pathName))
     {
-        URHO3D_LOGERROR("Could not open directory " + pathName);
+        URHO3D_LOGERROR("Could not open directory " + pathName.ToString());
         return false;
     }
 
     // Convert path to absolute
-    String fixedPath = SanitateResourceDirName(pathName);
+    Path fixedPath = SanitateResourceDirName(pathName);
 
     // Check that the same path does not already exist
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
@@ -129,7 +129,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
         fileWatchers_.Push(watcher);
     }
 
-    URHO3D_LOGINFO("Added resource path " + fixedPath);
+    URHO3D_LOGINFO("Added resource path " + fixedPath.ToString());
     return true;
 }
 
@@ -153,7 +153,7 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
     return true;
 }
 
-bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
+bool ResourceCache::AddPackageFile(const Path& fileName, unsigned priority)
 {
     SharedPtr<PackageFile> package(new PackageFile(context_));
     return package->Open(fileName) && AddPackageFile(package, priority);
@@ -180,11 +180,11 @@ bool ResourceCache::AddManualResource(Resource* resource)
     return true;
 }
 
-void ResourceCache::RemoveResourceDir(const String& pathName)
+void ResourceCache::RemoveResourceDir(const Path& pathName)
 {
     MutexLock lock(resourceMutex_);
 
-    String fixedPath = SanitateResourceDirName(pathName);
+    Path fixedPath = SanitateResourceDirName(pathName);
 
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
@@ -200,7 +200,7 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
                     break;
                 }
             }
-            URHO3D_LOGINFO("Removed resource path " + fixedPath);
+            URHO3D_LOGINFO("Removed resource path " + fixedPath.ToString());
             return;
         }
     }
@@ -223,16 +223,16 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
     }
 }
 
-void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResources, bool forceRelease)
+void ResourceCache::RemovePackageFile(const Path& fileName, bool releaseResources, bool forceRelease)
 {
     MutexLock lock(resourceMutex_);
 
     // Compare the name and extension only, not the path
-    String fileNameNoPath = GetFileNameAndExtension(fileName);
+    String fileNameNoPath = fileName.GetFileNameAndExtension();
 
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
-        if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
+        if (!(*i)->GetNamePath().GetFileNameAndExtension().Compare(fileNameNoPath, false))
         {
             if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
@@ -243,9 +243,12 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
     }
 }
 
-void ResourceCache::ReleaseResource(StringHash type, const String& name, bool force)
+void ResourceCache::ReleaseResource(StringHash type, const Path& name, bool force)
 {
     StringHash nameHash(name);
+
+    // TODO: Why does this not Sanitate the path name? (Probalby it shouldn't so a resource can release itself regardless of name?
+
     const SharedPtr<Resource>& existingRes = FindResource(type, nameHash);
     if (!existingRes)
         return;
@@ -406,7 +409,7 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
         ReloadResource(resource);
     }
     // Always perform dependency resource check for resource loaded from XML file as it could be used in inheritance
-    if (!resource || GetExtension(resource->GetName()) == ".xml")
+    if (!resource || resource->GetNamePath().GetExtension() == ".xml")
     {
         // Check if this is a dependency resource, reload dependents
         HashMap<StringHash, HashSet<StringHash> >::ConstIterator j = dependentResources_.Find(fileNameHash);
@@ -485,11 +488,11 @@ void ResourceCache::RemoveResourceRouter(ResourceRouter* router)
     }
 }
 
-SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailure)
+SharedPtr<File> ResourceCache::GetFile(const Path& name, bool sendEventOnFailure)
 {
     MutexLock lock(resourceMutex_);
 
-    String sanitatedName = SanitateResourceName(name);
+    Path sanitatedName = SanitateResourceName(name);
     if (!isRouting_)
     {
         isRouting_ = true;
@@ -522,9 +525,9 @@ SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailu
     if (sendEventOnFailure)
     {
         if (resourceRouters_.Size() && sanitatedName.Empty() && !name.Empty())
-            URHO3D_LOGERROR("Resource request " + name + " was blocked");
+            URHO3D_LOGERROR("Resource request " + name.ToString() + " was blocked");
         else
-            URHO3D_LOGERROR("Could not find resource " + sanitatedName);
+            URHO3D_LOGERROR("Could not find resource " + sanitatedName.ToString());
 
         if (Thread::IsMainThread())
         {
@@ -539,13 +542,13 @@ SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailu
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetExistingResource(StringHash type, const String& name)
+Resource* ResourceCache::GetExistingResource(StringHash type, const Path& name)
 {
-    String sanitatedName = SanitateResourceName(name);
+    Path sanitatedName = SanitateResourceName(name);
 
     if (!Thread::IsMainThread())
     {
-        URHO3D_LOGERROR("Attempted to get resource " + sanitatedName + " from outside the main thread");
+        URHO3D_LOGERROR("Attempted to get resource " + sanitatedName.ToString() + " from outside the main thread");
         return nullptr;
     }
 
@@ -559,13 +562,13 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const String& name
     return existing;
 }
 
-Resource* ResourceCache::GetResource(StringHash type, const String& name, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const Path& name, bool sendEventOnFailure)
 {
-    String sanitatedName = SanitateResourceName(name);
+    Path sanitatedName = SanitateResourceName(name);
 
     if (!Thread::IsMainThread())
     {
-        URHO3D_LOGERROR("Attempted to get resource " + sanitatedName + " from outside the main thread");
+        URHO3D_LOGERROR("Attempted to get resource " + sanitatedName.ToString() + " from outside the main thread");
         return nullptr;
     }
 
@@ -608,8 +611,8 @@ Resource* ResourceCache::GetResource(StringHash type, const String& name, bool s
     if (!file)
         return nullptr;   // Error is already logged
 
-    URHO3D_LOGDEBUG("Loading resource " + sanitatedName);
-    resource->SetName(sanitatedName);
+    URHO3D_LOGDEBUG("Loading resource " + sanitatedName.ToString());
+    resource->SetName(sanitatedName.ToString());
 
     if (!resource->Load(*(file.Get())))
     {
@@ -635,11 +638,11 @@ Resource* ResourceCache::GetResource(StringHash type, const String& name, bool s
     return resource;
 }
 
-bool ResourceCache::BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure, Resource* caller)
+bool ResourceCache::BackgroundLoadResource(StringHash type, const Path& name, bool sendEventOnFailure, Resource* caller)
 {
 #ifdef URHO3D_THREADING
     // If empty name, fail immediately
-    String sanitatedName = SanitateResourceName(name);
+    Path sanitatedName = SanitateResourceName(name);
     if (sanitatedName.Empty())
         return false;
 
@@ -655,9 +658,9 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const String& name, 
 #endif
 }
 
-SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& name, bool sendEventOnFailure)
+SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const Path& name, bool sendEventOnFailure)
 {
-    String sanitatedName = SanitateResourceName(name);
+    Path sanitatedName = SanitateResourceName(name);
 
     // If empty name, return null pointer immediately
     if (sanitatedName.Empty())
@@ -687,7 +690,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     if (!file)
         return SharedPtr<Resource>();  // Error is already logged
 
-    URHO3D_LOGDEBUG("Loading temporary resource " + sanitatedName);
+    URHO3D_LOGDEBUG("Loading temporary resource " + sanitatedName.ToString());
     resource->SetName(file->GetName());
 
     if (!resource->Load(*(file.Get())))
@@ -729,11 +732,11 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) 
     }
 }
 
-bool ResourceCache::Exists(const String& name) const
+bool ResourceCache::Exists(const Path& name) const
 {
     MutexLock lock(resourceMutex_);
 
-    String sanitatedName = SanitateResourceName(name);
+    Path sanitatedName = SanitateResourceName(name);
     if (!isRouting_)
     {
         isRouting_ = true;
@@ -782,7 +785,12 @@ unsigned long long ResourceCache::GetTotalMemoryUse() const
     return total;
 }
 
-String ResourceCache::GetResourceFileName(const String& name) const
+Path ResourceCache::GetResourceFileName(const Path& name) const
+{
+    return GetResourceFilePath(name).ToString();
+}
+
+Path ResourceCache::GetResourceFilePath(const Path& name) const
 {
     auto* fileSystem = GetSubsystem<FileSystem>();
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
@@ -791,10 +799,10 @@ String ResourceCache::GetResourceFileName(const String& name) const
             return resourceDirs_[i] + name;
     }
 
-    if (IsAbsolutePath(name) && fileSystem->FileExists(name))
+    if (name.IsAbsolute() && fileSystem->FileExists(name))
         return name;
     else
-        return String();
+        return {};
 }
 
 ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
@@ -802,9 +810,9 @@ ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
     return index < resourceRouters_.Size() ? resourceRouters_[index] : nullptr;
 }
 
-String ResourceCache::GetPreferredResourceDir(const String& path) const
+Path ResourceCache::GetPreferredResourceDir(Path path) const
 {
-    String fixedPath = AddTrailingSlash(path);
+    path.AddTrailingSlash();
 
     bool pathHasKnownDirs = false;
     bool parentHasKnownDirs = false;
@@ -813,7 +821,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
 
     for (unsigned i = 0; checkDirs[i] != nullptr; ++i)
     {
-        if (fileSystem->DirExists(fixedPath + checkDirs[i]))
+        if (fileSystem->DirExists(path + checkDirs[i]))
         {
             pathHasKnownDirs = true;
             break;
@@ -821,7 +829,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
     }
     if (!pathHasKnownDirs)
     {
-        String parentPath = GetParentPath(fixedPath);
+        Path parentPath = path.GetParentPath();
         for (unsigned i = 0; checkDirs[i] != nullptr; ++i)
         {
             if (fileSystem->DirExists(parentPath + checkDirs[i]))
@@ -832,64 +840,61 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
         }
         // If path does not have known subdirectories, but the parent path has, use the parent instead
         if (parentHasKnownDirs)
-            fixedPath = parentPath;
+            path = parentPath;
     }
 
-    return fixedPath;
+    return path;
 }
 
-String ResourceCache::SanitateResourceName(const String& name) const
+Path ResourceCache::SanitateResourceName(const Path& name) const
 {
     // Sanitate unsupported constructs from the resource name
-    String sanitatedName = GetInternalPath(name);
-    sanitatedName.Replace("../", "");
-    sanitatedName.Replace("./", "");
+    Path sanitatedName = name.ToString().Replaced("../","");
+
+    // TODO: Do ^ more efficiently and properly by finding the last relative path and using Substring
 
     // If the path refers to one of the resource directories, normalize the resource name
     auto* fileSystem = GetSubsystem<FileSystem>();
     if (resourceDirs_.Size())
     {
-        String namePath = GetPath(sanitatedName);
-        String exePath = fileSystem->GetProgramDir().Replaced("/./", "/");
+        String namePath = sanitatedName.GetDirectoryPath().ToString();
+        String exePath = fileSystem->GetProgramDir().ToString();
         for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
         {
-            String relativeResourcePath = resourceDirs_[i];
+            String relativeResourcePath = resourceDirs_[i].ToString();
             if (relativeResourcePath.StartsWith(exePath))
                 relativeResourcePath = relativeResourcePath.Substring(exePath.Length());
 
-            if (namePath.StartsWith(resourceDirs_[i], false))
+            if (namePath.StartsWith(resourceDirs_[i].ToString(), false))
                 namePath = namePath.Substring(resourceDirs_[i].Length());
             else if (namePath.StartsWith(relativeResourcePath, false))
                 namePath = namePath.Substring(relativeResourcePath.Length());
         }
 
-        sanitatedName = namePath + GetFileNameAndExtension(sanitatedName);
+        sanitatedName = Path{namePath + sanitatedName.GetFileNameAndExtension()};
     }
 
-    return sanitatedName.Trimmed();
+    return sanitatedName;
 }
 
-String ResourceCache::SanitateResourceDirName(const String& name) const
+Path ResourceCache::SanitateResourceDirName(Path name) const
 {
-    String fixedPath = AddTrailingSlash(name);
-    if (!IsAbsolutePath(fixedPath))
-        fixedPath = GetSubsystem<FileSystem>()->GetCurrentDir() + fixedPath;
+    name.AddTrailingSlash();
+    if (!name.IsAbsolute())
+        name = GetSubsystem<FileSystem>()->GetCurrentDir() + name;
 
-    // Sanitate away /./ construct
-    fixedPath.Replace("/./", "/");
-
-    return fixedPath.Trimmed();
+    return name;
 }
 
-void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)
+void ResourceCache::StoreResourceDependency(Resource* resource, const Path& dependency)
 {
     if (!resource)
         return;
 
     MutexLock lock(resourceMutex_);
 
-    StringHash nameHash(resource->GetName());
-    HashSet<StringHash>& dependents = dependentResources_[dependency];
+    StringHash nameHash = resource->GetNameHash();
+    HashSet<StringHash>& dependents = dependentResources_[StringHash{dependency}];
     dependents.Insert(nameHash);
 }
 
@@ -1004,8 +1009,8 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
 {
     HashSet<StringHash> affectedGroups;
 
-    const HashMap<String, PackageEntry>& entries = package->GetEntries();
-    for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
+    const HashMap<Path, PackageEntry>& entries = package->GetEntries();
+    for (auto i = entries.Begin(); i != entries.End(); ++i)
     {
         StringHash nameHash(i->first_);
 
@@ -1098,7 +1103,7 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 #endif
 }
 
-File* ResourceCache::SearchResourceDirs(const String& name)
+File* ResourceCache::SearchResourceDirs(const Path& name)
 {
     auto* fileSystem = GetSubsystem<FileSystem>();
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
@@ -1120,7 +1125,7 @@ File* ResourceCache::SearchResourceDirs(const String& name)
     return nullptr;
 }
 
-File* ResourceCache::SearchPackages(const String& name)
+File* ResourceCache::SearchPackages(const Path& name)
 {
     for (unsigned i = 0; i < packages_.Size(); ++i)
     {

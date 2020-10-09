@@ -299,11 +299,11 @@ void StaticModel::SetOcclusionLodLevel(unsigned level)
     MarkNetworkUpdate();
 }
 
-void StaticModel::ApplyMaterialList(const String& fileName)
+void StaticModel::ApplyMaterialList(const Path& fileName)
 {
-    String useFileName = fileName;
-    if (useFileName.Trimmed().Empty() && model_)
-        useFileName = ReplaceExtension(model_->GetName(), ".txt");
+    Path useFileName = fileName;
+    if (useFileName.Empty() && model_)
+        useFileName = model_->GetNamePath().WithReplacedExtension(".txt");
 
     auto* cache = GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(useFileName, false);

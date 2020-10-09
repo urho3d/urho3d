@@ -113,7 +113,7 @@ private:
     /// Has sprite sheet.
     bool hasSpriteSheet_;
     /// Sprite sheet file path.
-    String spriteSheetFilePath_;
+    Path spriteSheetFilePath_;
     /// Sprite sheet.
     SharedPtr<SpriteSheet2D> spriteSheet_;
     /// Spriter sprites.

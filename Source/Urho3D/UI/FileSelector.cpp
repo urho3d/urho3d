@@ -190,20 +190,20 @@ void FileSelector::SetButtonTexts(const String& okText, const String& cancelText
     cancelButtonText_->SetText(cancelText);
 }
 
-void FileSelector::SetPath(const String& path)
+void FileSelector::SetPath(const Path& path)
 {
     auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem->DirExists(path))
     {
-        path_ = AddTrailingSlash(path);
-        SetLineEditText(pathEdit_, path_);
+        path_ = path.WithTrailingSlash();
+        SetLineEditText(pathEdit_, path_.ToString());
         RefreshFiles();
     }
     else
     {
         // If path was invalid, restore the old path to the line edit
-        if (pathEdit_->GetText() != path_)
-            SetLineEditText(pathEdit_, path_);
+        if (pathEdit_->GetText() != path_.ToString())
+            SetLineEditText(pathEdit_, path_.ToString());
     }
 }
 
@@ -293,8 +293,8 @@ void FileSelector::RefreshFiles()
     fileList_->RemoveAllItems();
     fileEntries_.Clear();
 
-    Vector<String> directories;
-    Vector<String> files;
+    Vector<Path> directories;
+    Vector<Path> files;
     fileSystem->ScanDir(directories, path_, "*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
 
@@ -303,7 +303,7 @@ void FileSelector::RefreshFiles()
     for (unsigned i = 0; i < directories.Size(); ++i)
     {
         FileSelectorEntry newEntry;
-        newEntry.name_ = directories[i];
+        newEntry.name_ = directories[i].ToString();
         newEntry.directory_ = true;
         fileEntries_.Push(newEntry);
     }
@@ -311,7 +311,7 @@ void FileSelector::RefreshFiles()
     for (unsigned i = 0; i < files.Size(); ++i)
     {
         FileSelectorEntry newEntry;
-        newEntry.name_ = files[i];
+        newEntry.name_ = files[i].ToString();
         newEntry.directory_ = false;
         fileEntries_.Push(newEntry);
     }
@@ -358,7 +358,7 @@ bool FileSelector::EnterFile()
             SetPath(path_ + newPath);
         else if (newPath == "..")
         {
-            String parentPath = GetParentPath(path_);
+            Path parentPath = path_.GetParentPath();
             SetPath(parentPath);
         }
 

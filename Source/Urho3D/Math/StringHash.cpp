@@ -68,6 +68,8 @@ StringHash::StringHash(const String& str) noexcept :
 #endif
 }
 
+StringHash::StringHash(const Path& path) noexcept: StringHash(path.ToString()) {}
+
 unsigned StringHash::Calculate(const char* str, unsigned hash)
 {
     if (!str)

@@ -496,7 +496,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         Image@ screenshot = Image();
         graphics.TakeScreenShot(screenshot);
         // Here we save in the Data folder with date and time appended
-        screenshot.SavePNG(fileSystem.programDir + "Data/Screenshot_" +
+        screenshot.SavePNG(fileSystem.programDir.ToString() + "Data/Screenshot_" +
             time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
     }
     // Allow pause only in singleplayer

@@ -81,7 +81,7 @@ public:
     ~Log() override;
 
     /// Open the log file.
-    void Open(const String& fileName);
+    void Open(const Path& fileName);
     /// Close the log file.
     void Close();
     /// Set logging level.

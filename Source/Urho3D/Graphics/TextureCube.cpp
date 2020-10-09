@@ -99,8 +99,9 @@ bool TextureCube::BeginLoad(Deserializer& source)
 
     cache->ResetDependencies(this);
 
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
+    Path texPath;
+    String texName, texExt;
+    GetNamePath().Split(texPath, texName, texExt);
 
     loadParameters_ = (new XMLFile(context_));
     if (!loadParameters_->Load(source))
@@ -116,10 +117,11 @@ bool TextureCube::BeginLoad(Deserializer& source)
     // Single image and multiple faces with layout
     if (imageElem)
     {
-        String name = imageElem.GetAttribute("name");
+        Path name = imageElem.GetPath("name");
         // If path is empty, add the XML file path
-        if (GetPath(name).Empty())
+        if (name.GetDirectoryPath().Empty())
             name = texPath + name;
+        // TODO: This ^ should just be removed and "./" relative paths should be used instead?
 
         SharedPtr<Image> image = cache->GetTempResource<Image>(name);
         if (!image)
@@ -209,10 +211,10 @@ bool TextureCube::BeginLoad(Deserializer& source)
         XMLElement faceElem = textureElem.GetChild("face");
         while (faceElem)
         {
-            String name = faceElem.GetAttribute("name");
+            Path name = faceElem.GetPath("name");
 
             // If path is empty, add the XML file path
-            if (GetPath(name).Empty())
+            if (name.GetDirectoryPath().Empty())
                 name = texPath + name;
 
             loadImages_.Push(cache->GetTempResource<Image>(name));

@@ -326,7 +326,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     // Remove all resource paths and packages
     if (removeOld)
     {
-        Vector<String> resourceDirs = cache->GetResourceDirs();
+        Vector<Path> resourceDirs = cache->GetResourceDirs();
         Vector<SharedPtr<PackageFile> > packageFiles = cache->GetPackageFiles();
         for (unsigned i = 0; i < resourceDirs.Size(); ++i)
             cache->RemoveResourceDir(resourceDirs[i]);
@@ -335,23 +335,22 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     }
 
     // Add resource paths
-    Vector<String> resourcePrefixPaths = GetParameter(parameters, EP_RESOURCE_PREFIX_PATHS, String::EMPTY).GetString().Split(';', true);
+    Vector<Path> resourcePrefixPaths = Path::SplitPathsStringStatic(GetParameter(parameters, EP_RESOURCE_PREFIX_PATHS, Path::EMPTY).GetPathString(),';', true);
     for (unsigned i = 0; i < resourcePrefixPaths.Size(); ++i)
-        resourcePrefixPaths[i] = AddTrailingSlash(
-            IsAbsolutePath(resourcePrefixPaths[i]) ? resourcePrefixPaths[i] : fileSystem->GetProgramDir() + resourcePrefixPaths[i]);
-    Vector<String> resourcePaths = GetParameter(parameters, EP_RESOURCE_PATHS, "Data;CoreData").GetString().Split(';');
-    Vector<String> resourcePackages = GetParameter(parameters, EP_RESOURCE_PACKAGES).GetString().Split(';');
-    Vector<String> autoLoadPaths = GetParameter(parameters, EP_AUTOLOAD_PATHS, "Autoload").GetString().Split(';');
+        resourcePrefixPaths[i] = (resourcePrefixPaths[i].IsAbsolute() ? resourcePrefixPaths[i] : fileSystem->GetProgramDir() + resourcePrefixPaths[i]).WithTrailingSlash();
+    Vector<Path> resourcePaths = Path::SplitPathsStringStatic(GetParameter(parameters, EP_RESOURCE_PATHS, "Data;CoreData").GetPathString(),';');
+    Vector<Path> resourcePackages = Path::SplitPathsStringStatic(GetParameter(parameters, EP_RESOURCE_PACKAGES).GetPathString(), ';');
+    Vector<Path> autoLoadPaths = Path::SplitPathsStringStatic(GetParameter(parameters, EP_AUTOLOAD_PATHS, "Autoload").GetString(), ';');
 
-    for (unsigned i = 0; i < resourcePaths.Size(); ++i)
+    for (Path& resourcePath : resourcePaths)
     {
         // If path is not absolute, prefer to add it as a package if possible
-        if (!IsAbsolutePath(resourcePaths[i]))
+        if (!resourcePath.IsAbsolute())
         {
             unsigned j = 0;
             for (; j < resourcePrefixPaths.Size(); ++j)
             {
-                String packageName = resourcePrefixPaths[j] + resourcePaths[i] + ".pak";
+                Path packageName = resourcePrefixPaths[j] + resourcePath + ".pak";
                 if (fileSystem->FileExists(packageName))
                 {
                     if (cache->AddPackageFile(packageName))
@@ -359,7 +358,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
                     else
                         return false;   // The root cause of the error should have already been logged
                 }
-                String pathName = resourcePrefixPaths[j] + resourcePaths[i];
+                Path pathName = resourcePrefixPaths[j] + resourcePath;
                 if (fileSystem->DirExists(pathName))
                 {
                     if (cache->AddResourceDir(pathName))
@@ -372,13 +371,13 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
             {
                 URHO3D_LOGERRORF(
                     "Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
-                    resourcePaths[i].CString());
+                    resourcePath.ToString().CString());
                 return false;
             }
         }
         else
         {
-            String pathName = resourcePaths[i];
+            Path pathName = resourcePath;
             if (fileSystem->DirExists(pathName))
                 if (!cache->AddResourceDir(pathName))
                     return false;
@@ -391,7 +390,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
         unsigned j = 0;
         for (; j < resourcePrefixPaths.Size(); ++j)
         {
-            String packageName = resourcePrefixPaths[j] + resourcePackages[i];
+            Path packageName = resourcePrefixPaths[j] + resourcePackages[i];
             if (fileSystem->FileExists(packageName))
             {
                 if (cache->AddPackageFile(packageName))
@@ -404,7 +403,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
         {
             URHO3D_LOGERRORF(
                 "Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
-                resourcePackages[i].CString());
+                resourcePackages[i].ToString().CString());
             return false;
         }
     }
@@ -416,8 +415,8 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
 
         for (unsigned j = 0; j < resourcePrefixPaths.Size(); ++j)
         {
-            String autoLoadPath(autoLoadPaths[i]);
-            if (!IsAbsolutePath(autoLoadPath))
+            Path autoLoadPath(autoLoadPaths[i]);
+            if (!autoLoadPath.IsAbsolute())
                 autoLoadPath = resourcePrefixPaths[j] + autoLoadPath;
 
             if (fileSystem->DirExists(autoLoadPath))
@@ -425,29 +424,27 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
                 autoLoadPathExist = true;
 
                 // Add all the subdirs (non-recursive) as resource directory
-                Vector<String> subdirs;
+                Vector<Path> subdirs;
                 fileSystem->ScanDir(subdirs, autoLoadPath, "*", SCAN_DIRS, false);
-                for (unsigned y = 0; y < subdirs.Size(); ++y)
+                for (const Path& dir : subdirs)
                 {
-                    String dir = subdirs[y];
-                    if (dir.StartsWith("."))
+                    if (dir.ToString().StartsWith("."))
                         continue;
 
-                    String autoResourceDir = autoLoadPath + "/" + dir;
+                    Path autoResourceDir = autoLoadPath / dir;
                     if (!cache->AddResourceDir(autoResourceDir, 0))
                         return false;
                 }
 
                 // Add all the found package files (non-recursive)
-                Vector<String> paks;
+                Vector<Path> paks;
                 fileSystem->ScanDir(paks, autoLoadPath, "*.pak", SCAN_FILES, false);
-                for (unsigned y = 0; y < paks.Size(); ++y)
+                for (const Path& pak : paks)
                 {
-                    String pak = paks[y];
-                    if (pak.StartsWith("."))
+                    if (pak.ToString().StartsWith("."))
                         continue;
 
-                    String autoPackageName = autoLoadPath + "/" + pak;
+                    Path autoPackageName = autoLoadPath / pak;
                     if (!cache->AddPackageFile(autoPackageName, 0))
                         return false;
                 }
@@ -462,7 +459,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
         if (!autoLoadPathExist && (autoLoadPaths.Size() > 1 || autoLoadPaths[0] != "Autoload"))
             URHO3D_LOGDEBUGF(
                 "Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
-                autoLoadPaths[i].CString());
+                autoLoadPaths[i].ToString().CString());
     }
 
     return true;

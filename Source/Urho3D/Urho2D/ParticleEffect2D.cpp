@@ -127,7 +127,7 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
         return false;
 
     String texture = rootElem.GetChild("texture").GetAttribute("name");
-    loadSpriteName_ = GetParentPath(GetName()) + texture;
+    loadSpriteName_ = GetNamePath().GetParentPath() + texture;
     // If async loading, request the sprite beforehand
     if (GetAsyncLoadState() == ASYNC_LOADING)
         GetSubsystem<ResourceCache>()->BackgroundLoadResource<Sprite2D>(loadSpriteName_, true, this);
@@ -216,7 +216,7 @@ bool ParticleEffect2D::EndLoad()
         auto* cache = GetSubsystem<ResourceCache>();
         sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
         if (!sprite_)
-            URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
+            URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_.ToString() + " for particle effect");
 
         loadSpriteName_.Clear();
     }
@@ -232,8 +232,8 @@ bool ParticleEffect2D::Save(Serializer& dest) const
     XMLFile xmlFile(context_);
     XMLElement rootElem = xmlFile.CreateRoot("particleEmitterConfig");
 
-    String fileName = GetFileNameAndExtension(sprite_->GetName());
-    rootElem.CreateChild("texture").SetAttribute("name", fileName);
+    Path fileName = sprite_->GetNamePath().GetFileNameAndExtension();
+    rootElem.CreateChild("texture").SetPath("name", fileName);
 
     WriteVector2(rootElem, "sourcePosition", Vector2::ZERO);
     WriteVector2(rootElem, "sourcePositionVariance", sourcePositionVariance_);

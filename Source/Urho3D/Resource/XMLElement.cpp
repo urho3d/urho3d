@@ -344,6 +344,11 @@ bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& v
         return SetBuffer(name, &value[0], value.Size());
 }
 
+bool XMLElement::SetPath(const String& name, const Path& value)
+{
+    return SetAttribute(name, value.ToString());
+}
+
 bool XMLElement::SetColor(const String& name, const Color& value)
 {
     return SetAttribute(name, value.ToString());
@@ -763,6 +768,11 @@ BoundingBox XMLElement::GetBoundingBox() const
     ret.min_ = GetVector3("min");
     ret.max_ = GetVector3("max");
     return ret;
+}
+
+Path XMLElement::GetPath(const String& name) const
+{
+    return GetAttribute(name);
 }
 
 PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const

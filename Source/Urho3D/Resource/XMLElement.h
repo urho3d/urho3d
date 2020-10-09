@@ -118,6 +118,8 @@ public:
     bool SetBuffer(const String& name, const void* data, unsigned size);
     /// Set a buffer attribute.
     bool SetBuffer(const String& name, const PODVector<unsigned char>& value);
+    /// Set a path attribute.
+    bool SetPath(const String& name, const Path& value);
     /// Set a color attribute.
     bool SetColor(const String& name, const Color& value);
     /// Set a float attribute.
@@ -227,6 +229,8 @@ public:
     bool GetBuffer(const String& name, void* dest, unsigned size) const;
     /// Return bounding box attribute, or empty if missing.
     BoundingBox GetBoundingBox() const;
+    /// Return a path attribute, or empty if missing.
+    Path GetPath(const String& name) const;
     /// Return a color attribute, or default if missing.
     Color GetColor(const String& name) const;
     /// Return a float attribute, or zero if missing.

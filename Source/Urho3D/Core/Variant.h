@@ -26,6 +26,7 @@
 
 #include "../Container/HashMap.h"
 #include "../Container/Ptr.h"
+#include "../Core/Path.h"
 #include "../Math/Color.h"
 #include "../Math/Matrix3.h"
 #include "../Math/Matrix3x4.h"
@@ -50,6 +51,7 @@ enum VariantType
     VAR_QUATERNION,
     VAR_COLOR,
     VAR_STRING,
+    VAR_PATH,
     VAR_BUFFER,
     VAR_VOIDPTR,
     VAR_RESOURCEREF,
@@ -301,6 +303,7 @@ union VariantValue
     Quaternion quaternion_;
     Color color_;
     String string_;
+    Path path_;
     StringVector stringVector_;
     VariantVector variantVector_;
     VariantMap variantMap_;
@@ -413,6 +416,12 @@ public:
 
     /// Construct from a C string.
     Variant(const char* value)          // NOLINT(google-explicit-constructor)
+    {
+        *this = value;
+    }
+
+    /// Construct from a path.
+    Variant(const Path& value)        // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
@@ -685,6 +694,14 @@ public:
         return *this;
     }
 
+    /// Assign from a path.
+    Variant& operator =(const Path& rhs)
+    {
+        SetType(VAR_PATH);
+        value_.path_ = rhs;
+        return *this;
+    }
+
     /// Assign from a buffer.
     Variant& operator =(const PODVector<unsigned char>& rhs)
     {
@@ -876,6 +893,12 @@ public:
         return type_ == VAR_STRING ? value_.string_ == rhs : false;
     }
 
+    /// Test for equality with a string. To return true, both the type and value must match.
+    bool operator ==(const Path& rhs) const
+    {
+        return type_ == VAR_PATH ? value_.path_ == rhs : false;
+    }
+
     /// Test for equality with a buffer. To return true, both the type and value must match.
     bool operator ==(const PODVector<unsigned char>& rhs) const;
     /// Test for equality with a %VectorBuffer. To return true, both the type and value must match.
@@ -1016,6 +1039,9 @@ public:
 
     /// Test for inequality with a string.
     bool operator !=(const String& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with a path.
+    bool operator !=(const Path& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a buffer.
     bool operator !=(const PODVector<unsigned char>& rhs) const { return !(*this == rhs); }
@@ -1195,6 +1221,12 @@ public:
 
     /// Return string or empty on type mismatch.
     const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
+
+    /// Return string or empty on type mismatch.
+    const Path& GetPath() const { return type_ == VAR_PATH ? value_.path_ : Path::EMPTY; }
+
+    /// Method for backwards compatibility of using Strings as Paths
+    const String& GetPathString() const { return type_ == VAR_STRING ? value_.string_ : (type_ == VAR_PATH ? value_.path_.ToString() : String::EMPTY); }
 
     /// Return buffer or empty on type mismatch.
     const PODVector<unsigned char>& GetBuffer() const
@@ -1432,6 +1464,8 @@ template <> inline VariantType GetVariantType<Color>() { return VAR_COLOR; }
 
 template <> inline VariantType GetVariantType<String>() { return VAR_STRING; }
 
+template <> inline VariantType GetVariantType<Path>() { return VAR_PATH; }
+
 template <> inline VariantType GetVariantType<StringHash>() { return VAR_INT; }
 
 template <> inline VariantType GetVariantType<PODVector<unsigned char> >() { return VAR_BUFFER; }
@@ -1488,6 +1522,8 @@ template <> URHO3D_API const Quaternion& Variant::Get<const Quaternion&>() const
 template <> URHO3D_API const Color& Variant::Get<const Color&>() const;
 
 template <> URHO3D_API const String& Variant::Get<const String&>() const;
+
+template <> URHO3D_API const Path& Variant::Get<const Path&>() const;
 
 template <> URHO3D_API const Rect& Variant::Get<const Rect&>() const;
 

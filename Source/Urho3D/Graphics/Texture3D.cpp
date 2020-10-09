@@ -75,8 +75,9 @@ bool Texture3D::BeginLoad(Deserializer& source)
         return true;
     }
 
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
+    Path texPath;
+    String texName, texExt;
+    GetNamePath().Split(texPath, texName, texExt);
 
     cache->ResetDependencies(this);
 
@@ -93,10 +94,11 @@ bool Texture3D::BeginLoad(Deserializer& source)
 
     if (volumeElem)
     {
-        String name = volumeElem.GetAttribute("name");
+        Path name = volumeElem.GetPath("name");
 
-        String volumeTexPath, volumeTexName, volumeTexExt;
-        SplitPath(name, volumeTexPath, volumeTexName, volumeTexExt);
+        Path volumeTexPath;
+        String volumeTexName, volumeTexExt;
+        name.Split(volumeTexPath, volumeTexName, volumeTexExt);
         // If path is empty, add the XML file path
         if (volumeTexPath.Empty())
             name = texPath + name;
@@ -110,10 +112,11 @@ bool Texture3D::BeginLoad(Deserializer& source)
     }
     else if (colorlutElem)
     {
-        String name = colorlutElem.GetAttribute("name");
+        Path name = colorlutElem.GetPath("name");
 
-        String colorlutTexPath, colorlutTexName, colorlutTexExt;
-        SplitPath(name, colorlutTexPath, colorlutTexName, colorlutTexExt);
+        Path colorlutTexPath;
+        String colorlutTexName, colorlutTexExt;
+        name.Split(colorlutTexPath, colorlutTexName, colorlutTexExt);
         // If path is empty, add the XML file path
         if (colorlutTexPath.Empty())
             name = texPath + name;

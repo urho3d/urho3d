@@ -318,7 +318,7 @@ public:
     /// Precache shader variations from an XML file generated with BeginDumpShaders().
     void PrecacheShaders(Deserializer& source);
     /// Set shader cache directory, Direct3D only. This can either be an absolute path or a path within the resource system.
-    void SetShaderCacheDir(const String& path);
+    void SetShaderCacheDir(const Path& path);
 
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -561,7 +561,7 @@ public:
     bool GetUseClipPlane() const { return useClipPlane_; }
 
     /// Return shader cache directory, Direct3D only.
-    const String& GetShaderCacheDir() const { return shaderCacheDir_; }
+    const Path& GetShaderCacheDir() const { return shaderCacheDir_; }
 
     /// Return current rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
@@ -846,9 +846,9 @@ private:
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS]{};
     /// Base directory for shaders.
-    String shaderPath_;
+    Path shaderPath_;
     /// Cache directory for Direct3D binary shaders.
-    String shaderCacheDir_;
+    Path shaderCacheDir_;
     /// File extension for shaders.
     String shaderExtension_;
     /// Last used shader in shader variation query.

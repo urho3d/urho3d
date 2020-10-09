@@ -25,6 +25,7 @@
 #include <Urho3D/AngelScript/Script.h>
 #endif
 #include <Urho3D/Core/Main.h>
+#include <Urho3D/Core/Path.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/IO/FileSystem.h>
@@ -56,7 +57,7 @@ void Urho3DPlayer::Setup()
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
     auto* filesystem = GetSubsystem<FileSystem>();
-    const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
+    const Path commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
         SharedPtr<File> commandFile(new File(context_, commandFileName));
@@ -131,7 +132,7 @@ void Urho3DPlayer::Setup()
     else
     {
         // Use the script file name as the base name for the log file
-        engineParameters_[EP_LOG_NAME] = filesystem->GetAppPreferencesDir("urho3d", "logs") + GetFileNameAndExtension(scriptFileName_) + ".log";
+        engineParameters_[EP_LOG_NAME] = filesystem->GetAppPreferencesDir("urho3d", "logs") + scriptFileName_.GetFileNameAndExtension() + ".log";
     }
 #else
     // On Web platform setup a default windowed resolution similar to the executable samples
@@ -168,7 +169,7 @@ void Urho3DPlayer::Start()
         return;
     }
 
-    String extension = GetExtension(scriptFileName_);
+    String extension = scriptFileName_.GetExtension();
     if (extension != ".lua" && extension != ".luc")
     {
 #ifdef URHO3D_ANGELSCRIPT
@@ -180,7 +181,7 @@ void Urho3DPlayer::Start()
 
         /// \hack If we are running the editor, also instantiate Lua subsystem to enable editing Lua ScriptInstances
 #ifdef URHO3D_LUA
-        if (scriptFileName_.Contains("Editor.as", false))
+        if (scriptFileName_.ToString().Contains("Editor.as", false))
             context_->RegisterSubsystem(new LuaScript(context_));
 #endif
         // If script loading is successful, proceed to main loop
@@ -277,5 +278,5 @@ void Urho3DPlayer::GetScriptFileName()
 {
     const Vector<String>& arguments = GetArguments();
     if (arguments.Size() && arguments[0][0] != '-')
-        scriptFileName_ = GetInternalPath(arguments[0]);
+        scriptFileName_ = Path(arguments[0]);
 }

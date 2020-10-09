@@ -347,12 +347,12 @@ bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
 
     position_ = Vector2(0.0f, info.GetMapHeight());
     source_ = imageElem.GetAttribute("source");
-    String textureFilePath = GetParentPath(tmxFile_->GetName()) + source_;
+    Path textureFilePath = tmxFile_->GetNamePath().GetParentPath() / source_;
     auto* cache = tmxFile_->GetSubsystem<ResourceCache>();
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
     {
-        URHO3D_LOGERROR("Could not load texture " + textureFilePath);
+        URHO3D_LOGERROR("Could not load texture " + textureFilePath.ToString());
         return false;
     }
 
@@ -426,13 +426,13 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
 
                 tsxXMLFiles_[source] = tsxXMLFile;
 
-                String textureFilePath =
-                    GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
+                Path textureFilePath =
+                    GetNamePath().GetParentPath() / tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
                 GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
             }
             else
             {
-                String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
+                Path textureFilePath = GetNamePath().GetParentPath() / tileSetElem.GetChild("image").GetAttribute("source");
                 GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
             }
         }
@@ -440,7 +440,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
         for (XMLElement imageLayerElem = rootElem.GetChild("imagelayer"); imageLayerElem;
              imageLayerElem = imageLayerElem.GetNext("imagelayer"))
         {
-            String textureFilePath = GetParentPath(GetName()) + imageLayerElem.GetChild("image").GetAttribute("source");
+            Path textureFilePath = GetNamePath().GetParentPath() / imageLayerElem.GetChild("image").GetAttribute("source");
             GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
         }
     }
@@ -596,12 +596,12 @@ void TmxFile2D::SetSpriteTextureEdgeOffset(float offset)
 
 SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
 {
-    String tsxFilePath = GetParentPath(GetName()) + source;
+    Path tsxFilePath = GetNamePath().GetParentPath() / source;
     SharedPtr<File> tsxFile = GetSubsystem<ResourceCache>()->GetFile(tsxFilePath);
     SharedPtr<XMLFile> tsxXMLFile(new XMLFile(context_));
     if (!tsxFile || !tsxXMLFile->Load(*tsxFile))
     {
-        URHO3D_LOGERROR("Load TSX file failed " + tsxFilePath);
+        URHO3D_LOGERROR("Load TSX file failed " + tsxFilePath.ToString());
         return SharedPtr<XMLFile>();
     }
 
@@ -657,11 +657,11 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         // Tileset based on single tileset image
         if (imageElem.NotNull()) {
             isSingleTileSet = true;
-            String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+            Path textureFilePath = GetNamePath().GetParentPath() / imageElem.GetAttribute("source");
             SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
             if (!texture)
             {
-                URHO3D_LOGERROR("Could not load texture " + textureFilePath);
+                URHO3D_LOGERROR("Could not load texture " + textureFilePath.ToString());
                 return false;
             }
 
@@ -702,11 +702,11 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         {
             XMLElement imageElem = tileElem.GetChild("image");
             if (imageElem.NotNull()) {
-                String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+                Path textureFilePath = GetNamePath().GetParentPath() / imageElem.GetAttribute("source");
                 SharedPtr<Image> image(cache->GetResource<Image>(textureFilePath));
                 if (!image)
                 {
-                    URHO3D_LOGERROR("Could not load image " + textureFilePath);
+                    URHO3D_LOGERROR("Could not load image " + textureFilePath.ToString());
                     return false;
                 }
                 tileWidth = imageWidth = imageElem.GetInt("width");

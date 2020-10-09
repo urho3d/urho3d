@@ -868,18 +868,19 @@ bool Image::Save(Serializer& dest) const
     return success;
 }
 
-bool Image::SaveFile(const String& fileName) const
+bool Image::SaveFile(const Urho3D::Path& fileName) const
 {
-    if (fileName.EndsWith(".dds", false))
+    String extension = fileName.GetExtension();
+    if (extension == ".dds")
         return SaveDDS(fileName);
-    else if (fileName.EndsWith(".bmp", false))
+    else if (extension == ".bmp")
         return SaveBMP(fileName);
-    else if (fileName.EndsWith(".jpg", false) || fileName.EndsWith(".jpeg", false))
+    else if (extension == ".jpg" || extension == ".jpeg")
         return SaveJPG(fileName, 100);
-    else if (fileName.EndsWith(".tga", false))
+    else if (extension == ".tga")
         return SaveTGA(fileName);
 #ifdef URHO3D_WEBP
-    else if (fileName.EndsWith(".webp", false))
+    else if (extension == ".webp")
         return SaveWEBP(fileName, 100.0f);
 #endif
     else
@@ -1246,14 +1247,14 @@ void Image::ClearInt(unsigned uintColor)
     }
 }
 
-bool Image::SaveBMP(const String& fileName) const
+bool Image::SaveBMP(const Urho3D::Path& fileName) const
 {
     URHO3D_PROFILE(SaveImageBMP);
 
     auto* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    if (fileSystem && !fileSystem->CheckAccess(fileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName.ToString());
         return false;
     }
 
@@ -1264,12 +1265,12 @@ bool Image::SaveBMP(const String& fileName) const
     }
 
     if (data_)
-        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.Get()) != 0;
+        return stbi_write_bmp(fileName.GetNativePathString().CString(), width_, height_, components_, data_.Get()) != 0;
     else
         return false;
 }
 
-bool Image::SavePNG(const String& fileName) const
+bool Image::SavePNG(const Urho3D::Path& fileName) const
 {
     URHO3D_PROFILE(SaveImagePNG);
 
@@ -1280,14 +1281,14 @@ bool Image::SavePNG(const String& fileName) const
         return false;
 }
 
-bool Image::SaveTGA(const String& fileName) const
+bool Image::SaveTGA(const Urho3D::Path& fileName) const
 {
     URHO3D_PROFILE(SaveImageTGA);
 
     auto* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    if (fileSystem && !fileSystem->CheckAccess(fileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName.ToString());
         return false;
     }
 
@@ -1298,19 +1299,19 @@ bool Image::SaveTGA(const String& fileName) const
     }
 
     if (data_)
-        return stbi_write_tga(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get()) != 0;
+        return stbi_write_tga(fileName.GetNativePathString().CString(), width_, height_, components_, data_.Get()) != 0;
     else
         return false;
 }
 
-bool Image::SaveJPG(const String& fileName, int quality) const
+bool Image::SaveJPG(const Urho3D::Path& fileName, int quality) const
 {
     URHO3D_PROFILE(SaveImageJPG);
 
     auto* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    if (fileSystem && !fileSystem->CheckAccess(fileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName.ToString());
         return false;
     }
 
@@ -1321,19 +1322,19 @@ bool Image::SaveJPG(const String& fileName, int quality) const
     }
 
     if (data_)
-        return stbi_write_jpg(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), quality) != 0;
+        return stbi_write_jpg(fileName.GetNativePathString().CString(), width_, height_, components_, data_.Get(), quality) != 0;
     else
         return false;
 }
 
-bool Image::SaveDDS(const String& fileName) const
+bool Image::SaveDDS(const Urho3D::Path& fileName) const
 {
     URHO3D_PROFILE(SaveImageDDS);
 
     File outFile(context_, fileName, FILE_WRITE);
     if (!outFile.IsOpen())
     {
-        URHO3D_LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName.ToString());
         return false;
     }
 
@@ -1378,7 +1379,7 @@ bool Image::SaveDDS(const String& fileName) const
     return true;
 }
 
-bool Image::SaveWEBP(const String& fileName, float compression /* = 0.0f */) const
+bool Image::SaveWEBP(const Urho3D::Path& fileName, float compression /* = 0.0f */) const
 {
 #ifdef URHO3D_WEBP
     URHO3D_PROFILE(SaveImageWEBP);
@@ -1386,9 +1387,9 @@ bool Image::SaveWEBP(const String& fileName, float compression /* = 0.0f */) con
     auto* fileSystem(GetSubsystem<FileSystem>());
     File outFile(context_, fileName, FILE_WRITE);
 
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    if (fileSystem && !fileSystem->CheckAccess(fileName.GetDirectoryPath()))
     {
-        URHO3D_LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName.ToString());
         return false;
     }
 
