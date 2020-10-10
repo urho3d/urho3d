@@ -683,6 +683,71 @@ If the method being called has void return type and no parameters, its name can 
 
 When a scene is saved/loaded, any pending delayed calls are also saved and restored.
 
+\section Script_AutoEventsSubscription Auto subscribe Script objects to events
+
+When an script object is instantiated, some of its methods automatically subscribe to events based on their name.
+This, firstly, eliminates the need to manually write the "SubscribeToEvent" set, bringing the code more declarative, and secondly,
+it optimizes execution, as class methods are searched for events only for the first instance of the class and only in class scope,
+and not every time objects are created.
+
+For a class method to be subscribed, it must have a signature of either "void Name()" or "void Name(StringHash, VariantMap &)".
+After that, methods are subscribed by such patterns of their names:
+
+- on_Name. Works like SubscribeToEvent("Name", "on_Name").
+- onNode_Name. Works like SubscribeToEvent(node, "Name", "onNode_Name").
+- onScene_Name. Works like SubscribeToEvent(node.scene, "Name", "onScene_Name").
+- onParent_Name. Works like SubscribeToEvent(node.parent, "Name", "onParent_Name").
+- onModule_Name. Works like SubscribeToEvent(self.scriptFile, "Name", "onModule_Name").
+- onChild_NameChild_Name. Works like SubscribeToEvent(node.GetChild("NameChild", true), "Name", "onChild_NameChild_Name").
+    In this child name may not contain '_'.
+- onAttr_NameAttr_Name. Works like SubscribeToEvent(NameAttr, "Name", "onAttr_NameAttr_Name").
+    AttrName must be class member, object handle to Object-derived class
+    and may not contain '_'. For example:
+\code
+    class GameMenu : ScriptObject {
+        Node@ btnPause;	// May be assigned in editor by dragndrop
+	    ...
+
+	    protected void onAttr_btnPause_Pressed()
+        {
+	        enterPause(false);
+	    }
+	    ...
+\endcode
+
+- onVar_VarName_Name. Works like SubscribeToEvent(VarName, "Name", "onVar_VarName_Name").
+    VarName must be module global variable, object handle to Object-derived class
+    and may not contain '_'. For example:
+\code
+	    // At begin of script file
+	    Node@ gameEvents;
+	    ...
+		class PauseButton : ScriptObject {
+	        protected void onVar_gameEvents_PauseBegin() {
+	            setDisabled(true);
+	        }
+	    ...
+\endcode
+
+- onGlobal_GlobalName_Name. Works like SubscribeToEvent(globalVars["GlobalName"], "Name", "onGlobal_GlobalName_Name").
+    globalVars["GlobalName"] must be object handle to Object-derived class
+    and GlobalName may not contain '_'.
+
+When script object created by deserialization of scene, subscription occurs at the moment after setting the attributes,
+i.e. after calling "Start", but before calling "ApplyAttributes".
+At this point, all childs of the node have already been created, and node's attributes are set to the actual values.
+This is the most common case.
+
+If script object is created programmatically from script by calling Node.createScriptObject, subscription occurs after the
+object is created and its Start method is called. If child nodes not exists, or script object attributes are not set,
+then their events are not subscribed. 
+
+If script object created from C++ code by ScriptInstance::CreateObject, subscription not maked, and you must
+call ScriptInstance::SubscribeToAutoEvents.
+
+Subscription is performed only once, and in the future, if the attributes of the object change, or the parent node or
+child node change, auto-subscription to their events does not occur, use the usual call SubscribeToEvent.
+
 \section Script_ScriptAPI The script API
 
 Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct low level rendering) are not. Also for scripting convenience some things have been changed from the C++ API:

@@ -36,6 +36,8 @@ namespace Urho3D
 
 class Script;
 class ScriptFile;
+enum { eEventMapUserIdx = 0x1df4 };
+void CleanupTypeInfoScriptInstance(asITypeInfo *type);
 
 /// Inbuilt scripted component methods.
 enum ScriptInstanceMethod
@@ -147,6 +149,8 @@ public:
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    /// Subscribe to events by names of methods in script's class.
+    void SubscribeToAutoEvents();
 
 protected:
     /// Handle scene being assigned.

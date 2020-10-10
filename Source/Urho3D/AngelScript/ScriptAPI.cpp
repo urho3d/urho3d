@@ -26,6 +26,7 @@
 #include "../AngelScript/ScriptAPI.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../Resource/ResourceCache.h"
+#include "ScriptInstance.h"
 
 namespace Urho3D
 {
@@ -73,7 +74,8 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
             asIScriptObject* object = instance->GetScriptObject();
             if (!object)
             {
-                instance->CreateObject(file, className);
+                if (instance->CreateObject(file, className))
+                    instance->SubscribeToAutoEvents();
                 return instance->GetScriptObject();
             }
         }
@@ -281,6 +283,7 @@ static void RegisterScript(asIScriptEngine* engine)
 static void RegisterScriptObject(asIScriptEngine* engine)
 {
     engine->RegisterInterface("ScriptObject");
+    engine->SetTypeInfoUserDataCleanupCallback(CleanupTypeInfoScriptInstance, eEventMapUserIdx);
 }
 
 void RegisterScriptInterfaceAPI(asIScriptEngine* engine)
