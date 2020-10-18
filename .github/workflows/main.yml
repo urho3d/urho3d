@@ -70,7 +70,7 @@ jobs:
         with: { fetch-depth: 0 }
       - name: Free up space
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android
-        if: matrix.platform == 'android'
+        if: matrix.platform == 'android' || (matrix.platform == 'mingw' && matrix.lib-type == 'static' && matrix.build-type == 'dbg')
       - name: Source checksum
         id: source_checksum
         run: rake source_checksum
