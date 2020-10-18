@@ -355,6 +355,12 @@ rootProject.name = "#{name}"
 end
 
 def build_gradle_kts(name)
+  ndk_version = '21.3.6528147'
+  cmake_version = '3.17.3+'
+  build_staging_dir = '.cxx'
+  sdk_version = 30
+  min_sdk_version = 18
+  aar_version = '1.8-ALPHA-SNAPSHOT'
   type = ENV.fetch('URHO3D_LIB_TYPE', 'STATIC').downcase
   <<-EOF
 plugins {
@@ -364,11 +370,11 @@ plugins {
 }
 
 android {
-    ndkVersion = "21.3.6528147"
-    compileSdkVersion(30)
+    ndkVersion = "#{ndk_version}"
+    compileSdkVersion(#{sdk_version})
     defaultConfig {
-        minSdkVersion(18)
-        targetSdkVersion(30)
+        minSdkVersion(#{min_sdk_version})
+        targetSdkVersion(#{sdk_version})
         applicationId = "io.urho3d.#{name}"
         versionCode = 1
         versionName = "1.0"
@@ -377,7 +383,7 @@ android {
             cmake {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
-                    add("-D JNI_DIR=${project.file(".cxx")}")
+                    add("-D JNI_DIR=${project.file("#{build_staging_dir}")}")
                     // Pass along matching env-vars as CMake build options
                     addAll(project.file("script/.build-options")
                         .readLines()
@@ -409,9 +415,9 @@ android {
     }
     externalNativeBuild {
         cmake {
-            version = "3.17.3+"
+            version = "#{cmake_version}"
             path = project.file("CMakeLists.txt")
-            setBuildStagingDirectory(".cxx")
+            setBuildStagingDirectory("#{build_staging_dir}")
         }
     }
     sourceSets {
@@ -445,8 +451,8 @@ val urhoDebugImpl by configurations.creating { isCanBeResolved = true }
 configurations.debugImplementation.get().extendsFrom(urhoDebugImpl)
 
 dependencies {
-    urhoReleaseImpl("io.urho3d:urho3d-lib-#{type}:1.8-ALPHA-SNAPSHOT")
-    urhoDebugImpl("io.urho3d:urho3d-lib-#{type}-debug:1.8-ALPHA-SNAPSHOT")
+    urhoReleaseImpl("io.urho3d:urho3d-lib-#{type}:#{aar_version}")
+    urhoDebugImpl("io.urho3d:urho3d-lib-#{type}-debug:#{aar_version}")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$embeddedKotlinVersion")
     implementation("androidx.core:core-ktx:1.3.2")
@@ -466,13 +472,10 @@ afterEvaluate {
                 dependsOn(unzipTaskName)
             }
             register<Copy>(unzipTaskName) {
-                val dir = File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/${config.toLowerCase()}")
-                if (!dir.exists()) {
-                    val aar = configurations["urho${config}Impl"].resolve().first { it.name.startsWith("urho3d-lib") }
-                    from(zipTree(aar))
-                    include("jni/**")
-                    into(dir)
-                }
+                val aar = configurations["urho${config}Impl"].resolve().first { it.name.startsWith("urho3d-lib") }
+                from(zipTree(aar))
+                include("urho3d/**")
+                into(android.externalNativeBuild.cmake.buildStagingDirectory)
             }
         }
     }

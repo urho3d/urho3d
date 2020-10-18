@@ -100,11 +100,11 @@ dependencies {
 android.libraryVariants.whenObjectAdded {
     val config = name
     packageLibraryProvider.get().apply {
-        // Customize bundle task to also zip the headers; and the static archive (for STATIC lib type)
+        // Customize bundle task to also zip the Urho3D headers and libraries
         File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/$config").list()?.forEach { abi ->
             listOf("include", "lib").forEach {
                 from(File(android.externalNativeBuild.cmake.buildStagingDirectory, "cmake/$config/$abi/$it")) {
-                    into("jni/$abi/$it")
+                    into("urho3d/$config/$abi/$it")
                 }
             }
         }
