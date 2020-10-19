@@ -23,6 +23,21 @@
 import org.gradle.internal.io.NullOutputStream
 import java.io.ByteArrayOutputStream
 
+buildscript {
+    extra["kotlinVersion"] = "1.4.10"
+    val kotlinVersion: String by extra
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
+}
+
+val kotlinVersion: String by ext
+
 allprojects {
     group = "io.urho3d"
     version = determineVersion()
@@ -36,6 +51,7 @@ allprojects {
     }
     buildscript {
         ext {
+            set("kotlinVersion", kotlinVersion)
             set("ndkSideBySideVersion", "21.3.6528147")
             set("cmakeVersion", "3.17.3+")
             set("buildStagingDir", ".cxx")

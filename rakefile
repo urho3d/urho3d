@@ -130,7 +130,6 @@ task :new, [:name, :parent_dir, :use_copy] => [:init] do |_, args|
   puts "Creating a new project in #{dir}..."
   func = FileUtils.method(use_copy ? :cp_r : :ln_s)
   source_tree(name).split("\n").each do |it|
-    next if it.empty?
     dirname, basename = /\// =~ it.split(/\s*<-\s*/).first ? it.match(/([^\s<]+)\/(.+)/).captures : ['.', it]
     FileUtils.mkdir_p("#{dir}/#{dirname}")
     if (matched = basename.match(/(?<basename>\S+)\s*<-\s*:(?<symbol>\S+)/))
@@ -309,15 +308,17 @@ bin/Data/Textures/UrhoIcon.png
 cmake
 gradle
 script
-src/main/cpp/#{name}.cpp <- :urho_app_cpp
-src/main/cpp/#{name}.h <- :urho_app_h
-src/main/java/io/urho3d/#{name.downcase}/MainActivity.kt <- :main_activity_kt
-#{Dir.chdir('android/launcher-app') { (Dir['src/main/res/{drawable,mipmap}*'] + ['']).join("<- android/launcher-app/src/main/res\n") }}
-src/main/res/values/strings.xml <- :strings_xml
-src/main/AndroidManifest.xml <- :android_manifest_xml
-build.gradle.kts <- :build_gradle_kts
-CMakeLists.txt <- :cmake_lists_txt
-proguard-rules.pro <- android/launcher-app
+app/src/main/cpp/#{name}.cpp <- :urho_app_cpp
+app/src/main/cpp/#{name}.h <- :urho_app_h
+app/src/main/java/io/urho3d/#{name.downcase}/MainActivity.kt <- :main_activity_kt
+#{Dir.chdir('android/launcher-app') { Dir['src/main/res/{drawable,mipmap}*'].map { |it| "app/#{it} <- android/launcher-app/src/main/res"}.join("\n") }}
+app/src/main/res/values/strings.xml <- :strings_xml
+app/src/main/AndroidManifest.xml <- :android_manifest_xml
+app/build.gradle.kts <- :app_build_gradle_kts
+app/CMakeLists.txt <- :app_cmake_lists_txt
+app/proguard-rules.pro <- android/launcher-app
+build.gradle.kts <- :root_build_gradle_kts
+CMakeLists.txt <- :root_cmake_lists_txt
 gradle.properties
 gradlew
 gradlew.bat
@@ -332,32 +333,12 @@ end
 
 def settings_gradle_kts(name)
   <<-EOF
-pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            when {
-                requested.id.id.startsWith("com.android.") ->
-                    useModule("com.android.tools.build:gradle:4.0.2")
-                requested.id.id.startsWith("org.jetbrains.kotlin.") ->
-                    useVersion(embeddedKotlinVersion)
-            }
-        }
-    }
-    repositories {
-        gradlePluginPortal()
-        google()
-        jcenter()
-    }
-}
-
 rootProject.name = "#{name}"
+include(":app")
   EOF
 end
 
-def build_gradle_kts(name)
-  ndk_version = '21.3.6528147'
-  cmake_version = '3.17.3+'
-  build_staging_dir = '.cxx'
+def app_build_gradle_kts(name)
   sdk_version = 30
   min_sdk_version = 18
   aar_version = '1.8-ALPHA-SNAPSHOT'
@@ -369,8 +350,13 @@ plugins {
     kotlin("android.extensions")
 }
 
+val kotlinVersion: String by ext
+val ndkSideBySideVersion: String by ext
+val cmakeVersion: String by ext
+val buildStagingDir: String by ext
+
 android {
-    ndkVersion = "#{ndk_version}"
+    ndkVersion = ndkSideBySideVersion
     compileSdkVersion(#{sdk_version})
     defaultConfig {
         minSdkVersion(#{min_sdk_version})
@@ -383,9 +369,9 @@ android {
             cmake {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
-                    add("-D JNI_DIR=${project.file("#{build_staging_dir}")}")
+                    add("-D JNI_DIR=${project.file(buildStagingDir)}")
                     // Pass along matching env-vars as CMake build options
-                    addAll(project.file("script/.build-options")
+                    addAll(project.file("../script/.build-options")
                         .readLines()
                         .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
                     )
@@ -415,31 +401,14 @@ android {
     }
     externalNativeBuild {
         cmake {
-            version = "#{cmake_version}"
-            path = project.file("CMakeLists.txt")
-            setBuildStagingDirectory("#{build_staging_dir}")
+            version = cmakeVersion
+            path = project.file("../CMakeLists.txt")
+            setBuildStagingDirectory(buildStagingDir)
         }
     }
     sourceSets {
         named("main") {
-            assets.srcDir("bin")
-        }
-    }
-}
-
-repositories {
-    google()
-    jcenter()
-    // Remove below two repos if you are only using released AAR from JCenter 
-    mavenLocal()
-    if (System.getenv("GITHUB_ACTOR") != null && System.getenv("GITHUB_TOKEN") != null) {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/urho3d/Urho3D")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
+            assets.srcDir(project.file("../bin"))
         }
     }
 }
@@ -454,7 +423,7 @@ dependencies {
     urhoReleaseImpl("io.urho3d:urho3d-lib-#{type}:#{aar_version}")
     urhoDebugImpl("io.urho3d:urho3d-lib-#{type}-debug:#{aar_version}")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$embeddedKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.2")
@@ -485,6 +454,71 @@ tasks {
     register<Delete>("cleanAll") {
         dependsOn("clean")
         delete = setOf(android.externalNativeBuild.cmake.buildStagingDirectory)
+    }
+}
+  EOF
+end
+
+def root_build_gradle_kts(_)
+  kotlin_version = "1.4.10"
+  ndk_version = '21.3.6528147'
+  cmake_version = '3.17.3+'
+  build_staging_dir = '.cxx'
+  <<-EOF
+buildscript {
+    extra["kotlinVersion"] = "#{kotlin_version}"
+    val kotlinVersion: String by extra
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
+}
+
+val kotlinVersion: String by ext
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        // Remove below two repos if you are only using released AAR from JCenter
+        mavenLocal()
+        if (System.getenv("GITHUB_ACTOR") != null && System.getenv("GITHUB_TOKEN") != null) {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/urho3d/Urho3D")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+    }
+    buildscript {
+        ext {
+            set("kotlinVersion", kotlinVersion)
+            set("ndkSideBySideVersion", "#{ndk_version}")
+            set("cmakeVersion", "#{cmake_version}")
+            set("buildStagingDir", "#{build_staging_dir}")
+        }
+    }
+}
+
+tasks {
+    register<Delete>("clean") {
+        // Clean the build artifacts generated by the Gradle build system only, but keep the buildDir
+        rootProject.buildDir.listFiles { _, name -> name == "intermediates" || name == "kotlin" }?.let {
+            delete = it.toSet()
+        }
+    }
+    register<Delete>("cleanAll") {
+        dependsOn("clean")
+    }
+    wrapper {
+        distributionType = Wrapper.DistributionType.ALL
     }
 }
   EOF
@@ -537,7 +571,16 @@ class MainActivity : UrhoActivity()
   EOF
 end
 
-def cmake_lists_txt(name)
+def app_cmake_lists_txt(name)
+  <<-EOF
+set(TARGET_NAME #{name})
+define_source_files(GLOB_CPP_PATTERNS src/main/cpp/*.cpp GLOB_H_PATTERNS src/main/cpp/*.h RECURSE GROUP)
+setup_main_executable()
+setup_test()
+  EOF
+end
+
+def root_cmake_lists_txt(name)
   <<-EOF
 cmake_minimum_required(VERSION 3.10.2)
 project(#{name})
@@ -545,10 +588,7 @@ project(#{name})
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 include(UrhoCommon)
 
-set(TARGET_NAME #{name})
-define_source_files(GLOB_CPP_PATTERNS src/main/cpp/*.cpp GLOB_H_PATTERNS src/main/cpp/*.h RECURSE GROUP)
-setup_main_executable()
-setup_test()
+add_subdirectory(app)
   EOF
 end
 

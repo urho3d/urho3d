@@ -30,6 +30,7 @@ plugins {
     `maven-publish`
 }
 
+val kotlinVersion: String by ext
 val ndkSideBySideVersion: String by ext
 val cmakeVersion: String by ext
 val buildStagingDir: String by ext
@@ -90,7 +91,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$embeddedKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("com.getkeepsafe.relinker:relinker:1.4.1")
     testImplementation("junit:junit:4.13.1")
     androidTestImplementation("androidx.test:runner:1.3.0")

@@ -20,22 +20,4 @@
 // THE SOFTWARE.
 //
 
-pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            when {
-                requested.id.id.startsWith("com.android.") ->
-                    useModule("com.android.tools.build:gradle:4.0.2")
-                requested.id.id.startsWith("org.jetbrains.kotlin.") ->
-                    useVersion(embeddedKotlinVersion)
-            }
-        }
-    }
-    repositories {
-        gradlePluginPortal()
-        google()
-        jcenter()
-    }
-}
-
 include(":android:urho3d-lib", ":android:launcher-app")

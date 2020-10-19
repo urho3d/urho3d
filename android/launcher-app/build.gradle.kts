@@ -26,6 +26,7 @@ plugins {
     kotlin("android.extensions")
 }
 
+val kotlinVersion: String by ext
 val ndkSideBySideVersion: String by ext
 val cmakeVersion: String by ext
 val buildStagingDir: String by ext
@@ -90,7 +91,7 @@ android {
 dependencies {
     implementation(project(":android:urho3d-lib"))
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$embeddedKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.2")
