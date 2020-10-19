@@ -42,6 +42,8 @@
 #  HAVE_SSE4
 #  HAVE_AVX
 #  HAVE_AVX2
+#
+# CPU SIMD instruction extension support for powerpc/powerpc64 archs:
 #  HAVE_ALTIVEC
 #
 # CPU SIMD instruction extension support for arm/arm64 archs:
