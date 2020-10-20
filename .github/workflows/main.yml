@@ -117,7 +117,13 @@ jobs:
           script/dockerized.sh ${PLATFORM/-*} rake test
         if: matrix.platform == 'android' || (startsWith(matrix.platform, 'linux') && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format')
       - name: Scaffolding - cleanup
-        run: if [[ $PLATFORM == android ]]; then rm -rf build/cache/.m2; else rm -rf build/cache/{stage,projects}; fi
+        run: |
+          if [[ $PLATFORM == android ]]; then
+            rm -rf build/cache/.m2
+            find build/cache/.gradle -name \*urho3d\* |xargs rm -rf
+          else
+            rm -rf build/cache/{stage,projects}
+          fi
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake package
