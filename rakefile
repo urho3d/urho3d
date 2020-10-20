@@ -189,6 +189,9 @@ task :ci do
   ENV['URHO3D_STYLE'] = '1' if ENV['MODIFIER'] == 'clang-format'
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
+  if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n 1`
+    system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
+  end
 end
 
 task :source_checksum do
