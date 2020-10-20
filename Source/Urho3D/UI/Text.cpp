@@ -779,6 +779,8 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     case HA_RIGHT:
         ret += GetSize().x_ - rowWidth;
         break;
+    case HA_CUSTOM:
+        break;
     }
 
     return ret;
