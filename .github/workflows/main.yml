@@ -168,9 +168,28 @@ jobs:
         uses: actions/checkout@v2
         with: { fetch-depth: 0 }
       - name: Install dependencies
-        run: while ! brew install doxygen graphviz; do sleep 1; done
+        run: |
+          while ! brew install doxygen graphviz; do sleep 1; done
+          if [[ $PLATFORM == macOS-make ]]; then
+            while ! brew install ccache; do sleep 1; done
+            brew info ccache |grep -o '\S*lib\S*' >>$GITHUB_PATH
+            echo USE_CCACHE=1 >>$GITHUB_ENV
+          fi
       - name: Install headers
         run: sudo cp -rp $(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/* /usr/local/include
+        if: matrix.platform == 'macOS-make'
+      - name: Source checksum
+        id: source_checksum
+        run: rake source_checksum
+        if: matrix.platform == 'macOS-make'
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: |
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ steps.source_checksum.outputs.hexdigest }}
+          restore-keys: |
+            ${{ matrix.platform }}-${{ matrix.lib-type }}
         if: matrix.platform == 'macOS-make'
       - name: CMake
         run: rake cmake
