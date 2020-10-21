@@ -73,6 +73,9 @@ private:
     /// Handle work item finished event
     void HandleWorkItemFinished(StringHash eventType, VariantMap& eventData);
 
+    /// Send out client messages
+    void SendOutMessages(lws *ws);
+
     /// Work item which runs the WS service loop
     SharedPtr<WorkItem> serviceWorkItem_;
     /// Websocket connection information

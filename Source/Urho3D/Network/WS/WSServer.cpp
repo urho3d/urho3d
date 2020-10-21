@@ -117,7 +117,7 @@ static void RunService(const WorkItem* item, unsigned threadIndex) {
     for (auto it = packets->Begin(); it != packets->End(); ++it) {
         if (!(*it).second_.Empty()) {
             auto ws = (*it).second_.Front().first_;
-            URHO3D_LOGINFOF("Outgoing packet count (server) %d", WSServerInstance->GetNumOutgoingPackets(ws));
+            // URHO3D_LOGINFOF("Outgoing packet count (server) %d", WSServerInstance->GetNumOutgoingPackets(ws));
             lws_callback_on_writable(ws.GetWS());
         }
     }
