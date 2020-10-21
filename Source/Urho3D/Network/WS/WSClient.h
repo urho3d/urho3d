@@ -68,13 +68,12 @@ public:
     unsigned short GetPort() { return port_; };
     /// Get server protocol used for connection
     const String& GetServerProtocol() const { return serverProtocol_; };
+    /// Send out client messages
+    void SendOutMessages(lws *ws);
 
 private:
     /// Handle work item finished event
     void HandleWorkItemFinished(StringHash eventType, VariantMap& eventData);
-
-    /// Send out client messages
-    void SendOutMessages(lws *ws);
 
     /// Work item which runs the WS service loop
     SharedPtr<WorkItem> serviceWorkItem_;

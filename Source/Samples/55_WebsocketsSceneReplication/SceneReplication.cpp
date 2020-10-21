@@ -67,6 +67,19 @@ static const unsigned CTRL_BACK = 2;
 static const unsigned CTRL_LEFT = 4;
 static const unsigned CTRL_RIGHT = 8;
 
+#ifndef __EMSCRIPTEN__
+static SceneReplication* app = nullptr;
+#include <csignal>
+void signalHandler(int signum) {
+    URHO3D_LOGWARNINGF("Signal received %d", signum);
+    if (app)
+    {
+        app->Exit();
+        app = nullptr;
+    }
+}
+#endif
+
 URHO3D_DEFINE_APPLICATION_MAIN(SceneReplication)
 
 SceneReplication::SceneReplication(Context* context) :
@@ -74,8 +87,18 @@ SceneReplication::SceneReplication(Context* context) :
 {
 }
 
+void SceneReplication::Exit()
+{
+    engine_->Exit();
+}
+
 void SceneReplication::Setup()
 {
+#ifndef __EMSCRIPTEN__
+    app = this;
+    signal(SIGINT, signalHandler);
+#endif
+
     Sample::Setup();
 
     auto params = Engine::ParseParameters(GetArguments());

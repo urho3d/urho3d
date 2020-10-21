@@ -53,6 +53,8 @@ public:
     void Setup() override;
     /// Setup after engine initialization and before running the main loop.
     void Start() override;
+    /// Exit the app
+    void Exit();
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
