@@ -425,7 +425,7 @@ void WSClient::SendOutMessages(lws *ws)
             int retval = lws_write(ws, &buf[LWS_PRE],  packet->second_.GetSize(), LWS_WRITE_BINARY);
             if (retval <  packet->second_.GetSize()) {
                 URHO3D_LOGERRORF("Failed to write to WS, bytes written = %d", retval);
-                break;:
+                return;
             }
             WSClientInstance->RemoveOutgoingPacket(ws);
         }
