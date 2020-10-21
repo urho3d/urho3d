@@ -169,7 +169,7 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
                         int retval = lws_write(wsi, &buf[LWS_PRE],  packet->second_.GetSize(), LWS_WRITE_BINARY);
                         if (retval <  packet->second_.GetSize()) {
                             URHO3D_LOGERRORF("Failed to write to WS, bytes written = %d", retval);
-                            break;
+                            break;:
                         }
                         WSClientInstance->RemoveOutgoingPacket(wsi);
                     }
@@ -180,9 +180,11 @@ static int WSCallback(struct lws *wsi, enum lws_callback_reasons reason, void *u
             break;
 
         case LWS_CALLBACK_CLIENT_CLOSED:
+#ifndef __EMSCRIPTEN__
             if (WSClientInstance) {
                 WSClientInstance->Disconnect();
             }
+#endif
             URHO3D_LOGINFOF("LWS_CALLBACK_CLIENT_CLOSED");
             break;
 
@@ -268,22 +270,10 @@ ws_(nullptr)
             // stackRestore(stack);
         };
         libwebsocket.on_message = function(event) {
-            console.log('on_message', event);
-            // const nDataBytes = data.byteLength;
-            //   const dataPtr = Module._malloc(nDataBytes);
-            //   const dataHeap = new Uint8Array(Module.HEAPU8.buffer, dataPtr, nDataBytes);
-            //   dataHeap.set(new Uint8Array(data));
-            //   if (Module.JSResponse) {
-            //     Module.JSResponse(httpRequestHandlerPtr, dataHeap.byteOffset, nDataBytes);
-            //   } else {
-            //     console.error('Module.JSResponse() method doesn\'t exist');
-            //   }
-            //   Module._free(dataHeap.byteOffset);
-            // var stack = stackSave();
             var len = event.data.byteLength;
             var ptr = Module._malloc(len);
 
-            const data = new Uint8Array(Module.HEAPU8.buffer, dataPtr, nDataBytes);
+            const data = new Uint8Array(Module.HEAPU8.buffer, ptr, len);
             data.set(new Uint8Array(event.data));
 
             // client receive //
@@ -292,7 +282,6 @@ ws_(nullptr)
             }
 
             Module._free(data.byteOffset);
-            // stackRestore(stack);
         };
         libwebsocket.on_close = function() {
             // closed //
@@ -381,6 +370,37 @@ void WSClient::Update(float timestep)
             serviceWorkItem_->aux_ = this;
             serviceWorkItem_->sendEvent_ = true;
             workQueue->AddWorkItem(serviceWorkItem_);
+        }
+    }
+#else
+    if(WSClientInstance->GetNumOutgoingPackets(ws_))
+    {
+        auto packet = WSClientInstance->GetOutgoingPacket(ws_);
+        if (packet)
+        {
+            int retval = EM_ASM_INT({
+                var socket = Module.__libwebsocket.socket;
+                if( ! socket ) {
+                    return -1;
+                }
+                // alloc a Uint8Array backed by the incoming data.
+                var data_in = new Uint8Array(Module.HEAPU8.buffer, $0, $1);
+                // allow the dest array
+                var data = new Uint8Array($1);
+                // set the dest from the src
+                data.set(data_in);
+                socket.send(data);
+
+                return $1;
+
+            }, packet->second_.GetData(), packet->second_.GetSize());
+            if (retval <  packet->second_.GetSize())
+            {
+                URHO3D_LOGERRORF("Failed to write to WS, bytes written = %d", retval);
+            } 
+            else 
+                WSClientInstance->RemoveOutgoingPacket(ws_);
+
         }
     }
 #endif

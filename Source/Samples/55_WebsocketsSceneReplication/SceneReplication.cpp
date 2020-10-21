@@ -225,7 +225,7 @@ void SceneReplication::CreateUI()
 
     serverAddress_ = buttonContainer_->CreateChild<LineEdit>();
     serverAddress_->SetStyleAuto();
-    serverAddress_->SetText("ws.arnis.dev");
+    serverAddress_->SetText("wss://ws.arnis.dev");
 
     serverPort_ = buttonContainer_->CreateChild<LineEdit>();
     serverPort_->SetStyleAuto();
