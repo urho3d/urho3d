@@ -42,6 +42,7 @@ string RemoveAll(const string& src, const string& value);
 string ReplaceFirst(const string& src, const string& from, const string& to);
 string RemoveFirst(const string& src, const string& value);
 vector<string> Split(const string& str, char delim);
+vector<string> Split(const string& str, const string& delim);
 string Join(const vector<string>& values, const string& separator);
 bool Contains(const string& str, const string& substr);
 

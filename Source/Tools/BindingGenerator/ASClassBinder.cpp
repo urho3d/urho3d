@@ -1437,6 +1437,33 @@ void ProcessAllClasses(const string& outputBasePath)
             ProcessClass(analyzer, true);
     }
 
+    /*for (xml_node memberdef : SourceData::usings_)
+    {
+        UsingAnalyzer usingAnalyzer(memberdef);
+        
+        TypeAnalyzer typeAnalyzer = usingAnalyzer.GetType();
+
+        if (!typeAnalyzer.IsTemplate())
+            continue;
+
+        string typeName = typeAnalyzer.GetName();
+        shared_ptr<ClassAnalyzer> classAnalyzer = FindClassByName(typeName);
+
+        if (classAnalyzer)
+        {
+            vector<string> classTemplateParams = classAnalyzer->GetTemplateParams();
+            vector<string> usingTemplateParams = Split(typeAnalyzer.GetTemplateParams(), ", ");
+            assert(classTemplateParams.size() == usingTemplateParams.size());
+            map<string, string> templateSpecialization;
+            for (size_t i = 0; i < classTemplateParams.size(); i++)
+                templateSpecialization[classTemplateParams[i]] = usingTemplateParams[i];
+
+            ClassAnalyzer specializedClassAnalyzer(classAnalyzer->GetCompounddef(), usingAnalyzer.GetName(), templateSpecialization);
+            RegisterObjectType(specializedClassAnalyzer, false);
+            RegisterObjectMembers(specializedClassAnalyzer, false);
+        }
+    }*/
+
     _result_Classes->Save();
     _result_Members_HighPriority->Save();
     _result_Members_A->Save();
@@ -1472,4 +1499,4 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Templates->Save();
 }
 
-}
+} // namespace ASBindingGenerator

@@ -168,6 +168,24 @@ vector<string> Split(const string& str, char delim)
     return result;
 }
 
+vector<string> Split(const string& str, const string& delim)
+{
+    vector<string> result;
+    size_t lastPos = 0;
+    size_t findPos = str.find(delim, lastPos);
+
+    while (findPos != string::npos)
+    {
+        result.push_back(str.substr(lastPos, findPos - lastPos));
+        lastPos = findPos + delim.length();
+        findPos = str.find(delim, lastPos);
+    }
+
+    result.push_back(str.substr(lastPos));
+
+    return result;
+}
+
 string CutStart(const string& str, const string& value)
 {
     if (!StartsWith(str, value))

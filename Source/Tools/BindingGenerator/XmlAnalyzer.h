@@ -271,29 +271,30 @@ public:
     const map<string, string>& GetTemplateSpecialization() const { return templateSpecialization_; }
 
     string GetClassName() const;
-    string GetBindedClassName() const { return alias_.empty() ? GetClassName() : alias_; }
-    string GetNameWithTemplateSpecialization() const;
-    string GetComment() const { return ExtractComment(compounddef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
-    string GetKind() const { return ExtractKind(compounddef_); }
+    bool IsRefCounted() const;
+    bool AllFloats() const;
+    bool AllInts() const;
+    bool IsPod() const;
+    bool HasThisConstructor() const;
+    bool IsAbstract() const;
     bool IsInternal() const;
-    bool IsTemplate() const { return ::IsTemplate(compounddef_); }
+    int NumFunctions(const string& name) const;
+    shared_ptr<ClassAnalyzer> GetBaseClass() const;
+    vector<ClassAnalyzer> GetBaseClasses() const;
+    vector<ClassAnalyzer> GetAllBaseClasses() const;
+    string GetNameWithTemplateSpecialization() const;
     vector<ClassFunctionAnalyzer> GetFunctions() const;
     vector<ClassVariableAnalyzer> GetVariables() const;
     bool ContainsFunction(const string& name) const;
     ClassFunctionAnalyzer GetFunction(const string& name) const;
-    int NumFunctions(const string& name) const;
-    bool IsRefCounted() const;// { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); } // TODO передалть чтоб прото искало базовый класс
+
+    string GetBindedClassName() const { return alias_.empty() ? GetClassName() : alias_; }
+    string GetComment() const { return ExtractComment(compounddef_); }
+    string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
+    string GetKind() const { return ExtractKind(compounddef_); }
+    bool IsTemplate() const { return ::IsTemplate(compounddef_); }
     bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
-    bool HasThisConstructor() const;
-    bool IsAbstract() const;
     string GetLocation() const { return GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile(); }
-    bool AllFloats() const;
-    bool AllInts() const;
-    bool IsPod() const;
-    shared_ptr<ClassAnalyzer> GetBaseClass() const;
-    vector<ClassAnalyzer> GetBaseClasses() const;
-    vector<ClassAnalyzer> GetAllBaseClasses() const;
     vector<string> GetTemplateParams() const { return ExtractTemplateParams(compounddef_); }
 };
 
@@ -437,7 +438,8 @@ private:
 public:
     UsingAnalyzer(xml_node memberdef);
 
-    string GetIdentifier() const;
+    string GetName() const { return ExtractName(memberdef_); }
+    TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
 };
 
 // <compounddef kind = "namespace">...</compounddef>

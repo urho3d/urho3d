@@ -1063,6 +1063,7 @@ UsingAnalyzer::UsingAnalyzer(xml_node memberdef)
     assert(ExtractKind(memberdef) == "typedef");
 }
 
+/*
 string UsingAnalyzer::GetIdentifier() const
 {
     string definition = ExtractDefinition(memberdef_);
@@ -1074,6 +1075,7 @@ string UsingAnalyzer::GetIdentifier() const
 
     return result;
 }
+*/
 
 // ============================================================================
 
