@@ -321,7 +321,7 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
         auto nextIt = it;
         while (it != shapeList.End()) {
             nextIt = it + 1;
-            if (connectTail && nextIt == shapeList.End() || nextIt != shapeList.End())
+            if ((connectTail && nextIt == shapeList.End()) || nextIt != shapeList.End())
             {
                 current = (*it);
 
