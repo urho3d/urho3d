@@ -257,12 +257,6 @@ static void DebugTriangle_DebugTriangle_void(DebugTriangle* ptr)
     new(ptr) DebugTriangle();
 }
 
-// HashMap<T, U>::HashMap() | File: ../Container/HashMap.h
-static void HashMap_HashMap_void(HashMap<StringHash, Variant>* ptr)
-{
-    new(ptr) HashMap<StringHash, Variant>();
-}
-
 // OcclusionBatch::OcclusionBatch() | Implicitly-declared
 static void OcclusionBatch_Constructor(OcclusionBatch* ptr)
 {
@@ -917,6 +911,12 @@ static void VAnimEventFrame_Constructor(VAnimEventFrame* ptr)
     new(ptr) VAnimEventFrame();
 }
 
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::HashMap() | File: ../Container/HashMap.h
+static void HashMap_HashMap_void(HashMap<StringHash, Variant>* ptr)
+{
+    new(ptr) HashMap<StringHash, Variant>();
+}
+
 void ASRegisterGenerated_Members_HighPriority(asIScriptEngine* engine)
 {
     // XPathResultSet::XPathResultSet() | File: ../Resource/XMLElement.h
@@ -973,8 +973,6 @@ void ASRegisterGenerated_Members_HighPriority(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector2_Vector2_void), asCALL_CDECL_OBJFIRST);
     // DebugTriangle::DebugTriangle()=default | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DebugTriangle_DebugTriangle_void), asCALL_CDECL_OBJFIRST);
-    // HashMap<T, U>::HashMap() | File: ../Container/HashMap.h
-    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(HashMap_HashMap_void), asCALL_CDECL_OBJFIRST);
     // OcclusionBatch::OcclusionBatch() | Implicitly-declared
     engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(OcclusionBatch_Constructor), asCALL_CDECL_OBJFIRST);
     // BiasParameters::BiasParameters()=default | File: ../Graphics/Light.h
@@ -1213,6 +1211,8 @@ void ASRegisterGenerated_Members_HighPriority(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("VertexBufferMorph", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VertexBufferMorph_Constructor), asCALL_CDECL_OBJFIRST);
     // VAnimEventFrame::VAnimEventFrame() | Implicitly-declared
     engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VAnimEventFrame_Constructor), asCALL_CDECL_OBJFIRST);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::HashMap() | File: ../Container/HashMap.h
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(HashMap_HashMap_void), asCALL_CDECL_OBJFIRST);
 }
 
 }

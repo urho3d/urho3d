@@ -47,9 +47,11 @@ enum PListValueType
 class PListValue;
 
 /// PList value map.
+/// @nobindtemp
 using PListValueMap = HashMap<String, PListValue>;
 
 /// Vector of PList value.
+/// @nobindtemp
 using PListValueVector = Vector<PListValue>;
 
 /// PList value.

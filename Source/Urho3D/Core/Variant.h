@@ -77,9 +77,11 @@ class Variant;
 class VectorBuffer;
 
 /// Vector of variants.
+/// @nobindtemp
 using VariantVector = Vector<Variant>;
 
 /// Vector of strings.
+/// @nobindtemp
 using StringVector = Vector<String>;
 
 /// Map of variants.

@@ -40,6 +40,7 @@ class StringHash;
 template <class T, class U> class HashMap;
 
 /// Map of strings.
+/// @nobindtemp
 using StringMap = HashMap<StringHash, String>;
 
 /// %String class.

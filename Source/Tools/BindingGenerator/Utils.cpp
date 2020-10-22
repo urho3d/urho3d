@@ -24,6 +24,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <cstdarg>
 
 static string _lastErrorMessage;
 
@@ -228,6 +229,24 @@ string Join(const vector<string>& values, const string& separator)
             result += separator;
 
         result += value;
+    }
+
+    return result;
+}
+
+string JoinNonEmpty(const string& separator, const vector<string>& strings)
+{
+    string result;
+
+    for (const string& str : strings)
+    {
+        if (str.empty())
+            continue;
+
+        if (!result.empty())
+            result += separator;
+
+        result += str;
     }
 
     return result;

@@ -1437,9 +1437,13 @@ void ProcessAllClasses(const string& outputBasePath)
             ProcessClass(analyzer, true);
     }
 
-    /*for (xml_node memberdef : SourceData::usings_)
+    for (xml_node memberdef : SourceData::usings_)
     {
         UsingAnalyzer usingAnalyzer(memberdef);
+
+        string comment = usingAnalyzer.GetComment();
+        if (Contains(comment, "NO_BIND") || Contains(comment, "MANUAL_BIND"))
+            continue;
         
         TypeAnalyzer typeAnalyzer = usingAnalyzer.GetType();
 
@@ -1459,10 +1463,11 @@ void ProcessAllClasses(const string& outputBasePath)
                 templateSpecialization[classTemplateParams[i]] = usingTemplateParams[i];
 
             ClassAnalyzer specializedClassAnalyzer(classAnalyzer->GetCompounddef(), usingAnalyzer.GetName(), templateSpecialization);
+            specializedClassAnalyzer.additionalLocation_ = usingAnalyzer.GetLocation();
             RegisterObjectType(specializedClassAnalyzer, false);
             RegisterObjectMembers(specializedClassAnalyzer, false);
         }
-    }*/
+    }
 
     _result_Classes->Save();
     _result_Members_HighPriority->Save();

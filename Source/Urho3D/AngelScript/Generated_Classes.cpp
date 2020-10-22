@@ -688,8 +688,6 @@ void ASRegisterGenerated_Classes(asIScriptEngine* engine)
     engine->RegisterObjectType("Graphics", 0, asOBJ_REF);
     // class GPUObject | File: ../Graphics/GPUObject.h
     engine->RegisterObjectType("GPUObject", sizeof(GPUObject), asOBJ_VALUE | asGetTypeTraits<GPUObject>());
-    // class HashMap | File: ../Container/HashMap.h
-    engine->RegisterObjectType("VariantMap", sizeof(HashMap<StringHash, Variant>), asOBJ_VALUE | asGetTypeTraits<HashMap<StringHash, Variant>>());
     // struct OcclusionBatch | File: ../Graphics/OcclusionBuffer.h
     engine->RegisterObjectType("OcclusionBatch", sizeof(OcclusionBatch), asOBJ_VALUE | asGetTypeTraits<OcclusionBatch>());
 #ifdef URHO3D_PHYSICS
@@ -1242,6 +1240,8 @@ void ASRegisterGenerated_Classes(asIScriptEngine* engine)
     engine->RegisterObjectType("VertexBufferMorph", sizeof(VertexBufferMorph), asOBJ_VALUE | asGetTypeTraits<VertexBufferMorph>());
     // struct VAnimEventFrame | File: ../Scene/ValueAnimation.h
     engine->RegisterObjectType("VAnimEventFrame", sizeof(VAnimEventFrame), asOBJ_VALUE | asGetTypeTraits<VAnimEventFrame>());
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | class HashMap | File: ../Container/HashMap.h
+    engine->RegisterObjectType("VariantMap", sizeof(HashMap<StringHash, Variant>), asOBJ_VALUE | asGetTypeTraits<HashMap<StringHash, Variant>>());
 }
 
 }

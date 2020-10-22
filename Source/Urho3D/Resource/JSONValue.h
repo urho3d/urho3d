@@ -62,12 +62,16 @@ enum JSONNumberType
 class JSONValue;
 
 /// JSON array type.
+/// @nobindtemp
 using JSONArray = Vector<JSONValue>;
 /// JSON object type.
+/// @nobindtemp
 using JSONObject = HashMap<String, JSONValue>;
 /// JSON object iterator.
+/// @nobindtemp
 using JSONObjectIterator = JSONObject::Iterator;
 /// Constant JSON object iterator.
+/// @nobindtemp
 using ConstJSONObjectIterator = JSONObject::ConstIterator;
 
 /// JSON value class.

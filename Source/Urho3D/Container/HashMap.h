@@ -34,7 +34,6 @@ namespace Urho3D
 {
 
 /// Hash map template class.
-/// @specialization{VariantMap,StringHash,Variant}
 template <class T, class U> class HashMap : public HashBase
 {
 public:

@@ -42,12 +42,6 @@ static CScriptArray* HttpRequest_ReadStringVector_void(HttpRequest* ptr)
 }
 #endif
 
-// HashMap<T, U>::~HashMap() | File: ../Container/HashMap.h
-static void HashMap_Destructor_HashMap_void(HashMap<StringHash, Variant>* ptr)
-{
-    ptr->~HashMap<StringHash, Variant>();
-}
-
 #ifdef URHO3D_PHYSICS
 // HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) | File: ../Physics/CollisionShape.h
 static HeightfieldData* HeightfieldData_HeightfieldData_Terrain_unsigned(Terrain *terrain, unsigned lodLevel)
@@ -66,6 +60,12 @@ static void HashIteratorBase_Destructor(HashIteratorBase* ptr)
 static void HashNodeBase_Destructor(HashNodeBase* ptr)
 {
     ptr->~HashNodeBase();
+}
+
+// using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::~HashMap() | File: ../Container/HashMap.h
+static void HashMap_Destructor_HashMap_void(HashMap<StringHash, Variant>* ptr)
+{
+    ptr->~HashMap<StringHash, Variant>();
 }
 
 void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
@@ -283,96 +283,6 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     RegisterSubclass<Deserializer, HttpRequest>(engine, "Deserializer", "HttpRequest");
 #endif
 
-    // const unsigned HashBase::MAX_LOAD_FACTOR | File: ../Container/HashBase.h
-    // Not registered because have @nobind mark
-    // const unsigned HashBase::MIN_BUCKETS | File: ../Container/HashBase.h
-    // Not registered because have @nobind mark
-    // const KeyValue& HashMap<T, U>::Back() const | File: ../Container/HashMap.h
-    // Error: type "const KeyValue&" can not automatically bind
-    // Iterator HashMap<T, U>::Begin() | File: ../Container/HashMap.h
-    // Error: type "Iterator" can not automatically bind
-    // ConstIterator HashMap<T, U>::Begin() const | File: ../Container/HashMap.h
-    // Error: type "ConstIterator" can not automatically bind
-    // void HashMap<T, U>::Clear() | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHODPR(HashMap<StringHash COMMA Variant>, Clear, (), void), asCALL_THISCALL);
-    // bool HashMap<T, U>::Contains(const T& key) const | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "bool Contains(const StringHash&in) const", asMETHODPR(HashMap<StringHash COMMA Variant>, Contains, (const StringHash&) const, bool), asCALL_THISCALL);
-    // bool HashBase::Empty() const | File: ../Container/HashBase.h
-    engine->RegisterObjectMethod("VariantMap", "bool Empty() const", asMETHODPR(HashMap<StringHash COMMA Variant>, Empty, () const, bool), asCALL_THISCALL);
-    // Iterator HashMap<T, U>::End() | File: ../Container/HashMap.h
-    // Error: type "Iterator" can not automatically bind
-    // ConstIterator HashMap<T, U>::End() const | File: ../Container/HashMap.h
-    // Error: type "ConstIterator" can not automatically bind
-    // bool HashMap<T, U>::Erase(const T& key) | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "bool Erase(const StringHash&in)", asMETHODPR(HashMap<StringHash COMMA Variant>, Erase, (const StringHash&), bool), asCALL_THISCALL);
-    // Iterator HashMap<T, U>::Erase(const Iterator& it) | File: ../Container/HashMap.h
-    // Error: type "const Iterator&" can not automatically bind
-    // Iterator HashMap<T, U>::Find(const T& key) | File: ../Container/HashMap.h
-    // Error: type "Iterator" can not automatically bind
-    // ConstIterator HashMap<T, U>::Find(const T& key) const | File: ../Container/HashMap.h
-    // Error: type "ConstIterator" can not automatically bind
-    // const KeyValue& HashMap<T, U>::Front() const | File: ../Container/HashMap.h
-    // Error: type "const KeyValue&" can not automatically bind
-    // HashMap<T, U>::HashMap(const HashMap<T, U>& map) | File: ../Container/HashMap.h
-    // Error: type "const HashMap<T, U>&" can not automatically bind
-    // HashMap<T, U>::HashMap(HashMap<T, U>&& map) noexcept | File: ../Container/HashMap.h
-    // Error: type "HashMap<T, U>&&" can not automatically bind
-    // HashMap<T, U>::HashMap(const std::initializer_list<Pair<T, U>>& list) | File: ../Container/HashMap.h
-    // Error: type "const std::initializer_list<Pair<T, U>>&" can not automatically bind
-    // Iterator HashMap<T, U>::Insert(const Pair<T, U>& pair) | File: ../Container/HashMap.h
-    // Error: type "const Pair<StringHash, Variant>&" can not automatically bind
-    // Iterator HashMap<T, U>::Insert(const Pair<T, U>& pair, bool& exists) | File: ../Container/HashMap.h
-    // Error: type "const Pair<StringHash, Variant>&" can not automatically bind
-    // void HashMap<T, U>::Insert(const HashMap<T, U>& map) | File: ../Container/HashMap.h
-    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
-    // Iterator HashMap<T, U>::Insert(const ConstIterator& it) | File: ../Container/HashMap.h
-    // Error: type "const ConstIterator&" can not automatically bind
-    // void HashMap<T, U>::Insert(const ConstIterator& start, const ConstIterator& end) | File: ../Container/HashMap.h
-    // Error: type "const ConstIterator&" can not automatically bind
-    // Vector<T> HashMap<T, U>::Keys() const | File: ../Container/HashMap.h
-    // Error: type "Vector<StringHash>" can not automatically bind
-    // unsigned HashBase::NumBuckets() const | File: ../Container/HashBase.h
-    engine->RegisterObjectMethod("VariantMap", "uint NumBuckets() const", asMETHODPR(HashMap<StringHash COMMA Variant>, NumBuckets, () const, unsigned), asCALL_THISCALL);
-    // HashMap& HashMap<T, U>::operator+=(const Pair<T, U>& rhs) | File: ../Container/HashMap.h
-    // Error: type "const Pair<StringHash, Variant>&" can not automatically bind
-    // HashMap& HashMap<T, U>::operator+=(const HashMap<T, U>& rhs) | File: ../Container/HashMap.h
-    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
-    // HashMap& HashMap<T, U>::operator=(const HashMap<T, U>& rhs) | File: ../Container/HashMap.h
-    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
-    // HashMap& HashMap<T, U>::operator=(HashMap<T, U>&& rhs) noexcept | File: ../Container/HashMap.h
-    // Error: type "HashMap<StringHash, Variant>&&" can not automatically bind
-    // bool HashMap<T, U>::operator==(const HashMap<T, U>& rhs) const | File: ../Container/HashMap.h
-    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
-    // U& HashMap<T, U>::operator[](const T& key) | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const StringHash&in)", asMETHODPR(HashMap<StringHash COMMA Variant>, operator[], (const StringHash&), Variant&), asCALL_THISCALL);
-    // U* HashMap<T, U>::operator[](const T& key) const | File: ../Container/HashMap.h
-    // Error: type "Variant*" can not automatically bind
-    // HashMap& HashMap<T, U>::Populate(const T& key, const U& value) | File: ../Container/HashMap.h
-    // Not registered because have @nobind mark
-    // template<typename... Args> HashMap& HashMap<T, U>::Populate(const T& key, const U& value, const Args& ... args) | File: ../Container/HashMap.h
-    // Not registered because template
-    // bool HashMap<T, U>::Rehash(unsigned numBuckets) | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "bool Rehash(uint)", asMETHODPR(HashMap<StringHash COMMA Variant>, Rehash, (unsigned), bool), asCALL_THISCALL);
-    // unsigned HashBase::Size() const | File: ../Container/HashBase.h
-    engine->RegisterObjectMethod("VariantMap", "uint Size() const", asMETHODPR(HashMap<StringHash COMMA Variant>, Size, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHODPR(HashMap<StringHash COMMA Variant>, Size, () const, unsigned), asCALL_THISCALL);
-    // void HashMap<T, U>::Sort() | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "void Sort()", asMETHODPR(HashMap<StringHash COMMA Variant>, Sort, (), void), asCALL_THISCALL);
-    // void HashBase::Swap(HashBase& rhs) | File: ../Container/HashBase.h
-    engine->RegisterObjectMethod("VariantMap", "void Swap(HashBase&)", asMETHODPR(HashMap<StringHash COMMA Variant>, Swap, (HashBase&), void), asCALL_THISCALL);
-    // bool HashMap<T, U>::TryGetValue(const T& key, U& out) const | File: ../Container/HashMap.h
-    engine->RegisterObjectMethod("VariantMap", "bool TryGetValue(const StringHash&in, Variant&) const", asMETHODPR(HashMap<StringHash COMMA Variant>, TryGetValue, (const StringHash&, Variant&) const, bool), asCALL_THISCALL);
-    // Vector<U> HashMap<T, U>::Values() const | File: ../Container/HashMap.h
-    // Error: type "Vector<Variant>" can not automatically bind
-    // HashMap<T, U>::~HashMap() | File: ../Container/HashMap.h
-    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(HashMap_Destructor_HashMap_void), asCALL_CDECL_OBJFIRST);
-#ifdef REGISTER_MANUAL_PART_HashBase
-    REGISTER_MANUAL_PART_HashBase(HashMap, "HashMap")
-#endif
-#ifdef REGISTER_MANUAL_PART_HashMap
-    REGISTER_MANUAL_PART_HashMap(HashMap, "HashMap")
-#endif
-
 #ifdef URHO3D_PHYSICS
     // SharedArrayPtr<float> HeightfieldData::heightData_ | File: ../Physics/CollisionShape.h
     // Error: type "SharedArrayPtr<float>" can not automatically bind
@@ -441,6 +351,96 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<HashNodeBase>(engine, "HashNodeBase");
 #ifdef REGISTER_MANUAL_PART_HashNodeBase
     REGISTER_MANUAL_PART_HashNodeBase(HashNodeBase, "HashNodeBase")
+#endif
+
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    // Not registered because have @nobind mark
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    // Not registered because have @nobind mark
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | const KeyValue& HashMap<T, U>::Back() const | File: ../Container/HashMap.h
+    // Error: type "const KeyValue&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::Begin() | File: ../Container/HashMap.h
+    // Error: type "Iterator" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | ConstIterator HashMap<T, U>::Begin() const | File: ../Container/HashMap.h
+    // Error: type "ConstIterator" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | void HashMap<T, U>::Clear() | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHODPR(HashMap<StringHash COMMA Variant>, Clear, (), void), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | bool HashMap<T, U>::Contains(const T& key) const | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "bool Contains(const StringHash&in) const", asMETHODPR(HashMap<StringHash COMMA Variant>, Contains, (const StringHash&) const, bool), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | bool HashBase::Empty() const | File: ../Container/HashBase.h
+    engine->RegisterObjectMethod("VariantMap", "bool Empty() const", asMETHODPR(HashMap<StringHash COMMA Variant>, Empty, () const, bool), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::End() | File: ../Container/HashMap.h
+    // Error: type "Iterator" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | ConstIterator HashMap<T, U>::End() const | File: ../Container/HashMap.h
+    // Error: type "ConstIterator" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | bool HashMap<T, U>::Erase(const T& key) | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "bool Erase(const StringHash&in)", asMETHODPR(HashMap<StringHash COMMA Variant>, Erase, (const StringHash&), bool), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::Erase(const Iterator& it) | File: ../Container/HashMap.h
+    // Error: type "const Iterator&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::Find(const T& key) | File: ../Container/HashMap.h
+    // Error: type "Iterator" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | ConstIterator HashMap<T, U>::Find(const T& key) const | File: ../Container/HashMap.h
+    // Error: type "ConstIterator" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | const KeyValue& HashMap<T, U>::Front() const | File: ../Container/HashMap.h
+    // Error: type "const KeyValue&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::HashMap(const HashMap<T, U>& map) | File: ../Container/HashMap.h
+    // Error: type "const HashMap<T, U>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::HashMap(HashMap<T, U>&& map) noexcept | File: ../Container/HashMap.h
+    // Error: type "HashMap<T, U>&&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::HashMap(const std::initializer_list<Pair<T, U>>& list) | File: ../Container/HashMap.h
+    // Error: type "const std::initializer_list<Pair<T, U>>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::Insert(const Pair<T, U>& pair) | File: ../Container/HashMap.h
+    // Error: type "const Pair<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::Insert(const Pair<T, U>& pair, bool& exists) | File: ../Container/HashMap.h
+    // Error: type "const Pair<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | void HashMap<T, U>::Insert(const HashMap<T, U>& map) | File: ../Container/HashMap.h
+    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Iterator HashMap<T, U>::Insert(const ConstIterator& it) | File: ../Container/HashMap.h
+    // Error: type "const ConstIterator&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | void HashMap<T, U>::Insert(const ConstIterator& start, const ConstIterator& end) | File: ../Container/HashMap.h
+    // Error: type "const ConstIterator&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Vector<T> HashMap<T, U>::Keys() const | File: ../Container/HashMap.h
+    // Error: type "Vector<StringHash>" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | unsigned HashBase::NumBuckets() const | File: ../Container/HashBase.h
+    engine->RegisterObjectMethod("VariantMap", "uint NumBuckets() const", asMETHODPR(HashMap<StringHash COMMA Variant>, NumBuckets, () const, unsigned), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap& HashMap<T, U>::operator+=(const Pair<T, U>& rhs) | File: ../Container/HashMap.h
+    // Error: type "const Pair<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap& HashMap<T, U>::operator+=(const HashMap<T, U>& rhs) | File: ../Container/HashMap.h
+    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap& HashMap<T, U>::operator=(const HashMap<T, U>& rhs) | File: ../Container/HashMap.h
+    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap& HashMap<T, U>::operator=(HashMap<T, U>&& rhs) noexcept | File: ../Container/HashMap.h
+    // Error: type "HashMap<StringHash, Variant>&&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | bool HashMap<T, U>::operator==(const HashMap<T, U>& rhs) const | File: ../Container/HashMap.h
+    // Error: type "const HashMap<StringHash, Variant>&" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | U& HashMap<T, U>::operator[](const T& key) | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const StringHash&in)", asMETHODPR(HashMap<StringHash COMMA Variant>, operator[], (const StringHash&), Variant&), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | U* HashMap<T, U>::operator[](const T& key) const | File: ../Container/HashMap.h
+    // Error: type "Variant*" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap& HashMap<T, U>::Populate(const T& key, const U& value) | File: ../Container/HashMap.h
+    // Not registered because have @nobind mark
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | template<typename... Args> HashMap& HashMap<T, U>::Populate(const T& key, const U& value, const Args& ... args) | File: ../Container/HashMap.h
+    // Not registered because template
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | bool HashMap<T, U>::Rehash(unsigned numBuckets) | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "bool Rehash(uint)", asMETHODPR(HashMap<StringHash COMMA Variant>, Rehash, (unsigned), bool), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | unsigned HashBase::Size() const | File: ../Container/HashBase.h
+    engine->RegisterObjectMethod("VariantMap", "uint Size() const", asMETHODPR(HashMap<StringHash COMMA Variant>, Size, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHODPR(HashMap<StringHash COMMA Variant>, Size, () const, unsigned), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | void HashMap<T, U>::Sort() | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "void Sort()", asMETHODPR(HashMap<StringHash COMMA Variant>, Sort, (), void), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | void HashBase::Swap(HashBase& rhs) | File: ../Container/HashBase.h
+    engine->RegisterObjectMethod("VariantMap", "void Swap(HashBase&)", asMETHODPR(HashMap<StringHash COMMA Variant>, Swap, (HashBase&), void), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | bool HashMap<T, U>::TryGetValue(const T& key, U& out) const | File: ../Container/HashMap.h
+    engine->RegisterObjectMethod("VariantMap", "bool TryGetValue(const StringHash&in, Variant&) const", asMETHODPR(HashMap<StringHash COMMA Variant>, TryGetValue, (const StringHash&, Variant&) const, bool), asCALL_THISCALL);
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | Vector<U> HashMap<T, U>::Values() const | File: ../Container/HashMap.h
+    // Error: type "Vector<Variant>" can not automatically bind
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | HashMap<T, U>::~HashMap() | File: ../Container/HashMap.h
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(HashMap_Destructor_HashMap_void), asCALL_CDECL_OBJFIRST);
+#ifdef REGISTER_MANUAL_PART_HashBase
+    REGISTER_MANUAL_PART_HashBase(HashMap, "HashMap")
+#endif
+#ifdef REGISTER_MANUAL_PART_HashMap
+    REGISTER_MANUAL_PART_HashMap(HashMap, "HashMap")
 #endif
 
 }

@@ -997,6 +997,9 @@ string ClassVariableAnalyzer::GetLocation() const
 
     result += " | File: " + GetHeaderFile();
 
+    if (!classAnalyzer_.additionalLocation_.empty())
+        result = classAnalyzer_.additionalLocation_ + " | " + classAnalyzer_.additionalLocation_;
+
     return result;
 }
 
