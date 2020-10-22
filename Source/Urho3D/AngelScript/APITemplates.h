@@ -313,44 +313,6 @@ static const AttributeInfo& SerializableGetAttributeInfoOLD(unsigned index, Seri
 
 // ================================================================================
 
-// bool Resource::Load(Deserializer &source) | File: ../Resource/Resource.h
-static bool ResourceLoadOLD(File* file, Resource* ptr)
-{
-    return file && ptr->Load(*file);
-}
-
-// bool Resource::Load(Deserializer &source) | File: ../Resource/Resource.h
-static bool ResourceLoadVectorBufferOLD(VectorBuffer& buffer, Resource* ptr)
-{
-    return ptr->Load(buffer);
-}
-
-// bool Resource::LoadFile(const String &fileName) | File: ../Resource/Resource.h
-static bool ResourceLoadByNameOLD(const String& fileName, Resource* ptr)
-{
-    return ptr->LoadFile(fileName);
-}
-
-// virtual bool Resource::Save(Serializer &dest) const | File: ../Resource/Resource.h
-static bool ResourceSaveOLD(File* file, Resource* ptr)
-{
-    return file && ptr->Save(*file);
-}
-
-// virtual bool Resource::Save(Serializer &dest) const | File: ../Resource/Resource.h
-static bool ResourceSaveVectorBufferOLD(VectorBuffer& buffer, Resource* ptr)
-{
-    return ptr->Save(buffer);
-}
-
-// virtual bool Resource::SaveFile(const String &fileName) const | File: ../Resource/Resource.h
-static bool ResourceSaveByNameOLD(const String& fileName, Resource* ptr)
-{
-    return ptr->SaveFile(fileName);
-}
-
-// ================================================================================
-
 template <class T> T* ConstructObject()
 {
     auto* object = new T(GetScriptContext());
