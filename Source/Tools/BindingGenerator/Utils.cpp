@@ -233,7 +233,7 @@ string Join(const vector<string>& values, const string& separator)
     return result;
 }
 
-string JoinNonEmpty(const string& separator, const vector<string>& strings)
+string JoinNonEmpty(const vector<string>& strings, const string& separator)
 {
     string result;
 

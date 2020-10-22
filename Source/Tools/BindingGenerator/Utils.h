@@ -61,4 +61,4 @@ string FirstCharToLower(const string& str);
 string GetLastErrorMessage();
 void SetLastErrorMessage(const string& message);
 
-string JoinNonEmpty(const string& separator, const vector<string>& strings);
+string JoinNonEmpty(const vector<string>& strings, const string& separator);
