@@ -353,9 +353,9 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_HashNodeBase(HashNodeBase, "HashNodeBase")
 #endif
 
-    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | const unsigned HashBase::MAX_LOAD_FACTOR | File: ../Container/HashBase.h
     // Not registered because have @nobind mark
-    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h
+    // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | const unsigned HashBase::MIN_BUCKETS | File: ../Container/HashBase.h
     // Not registered because have @nobind mark
     // using VariantMap = HashMap<StringHash, Variant> | File: ../Core/Variant.h | const KeyValue& HashMap<T, U>::Back() const | File: ../Container/HashMap.h
     // Error: type "const KeyValue&" can not automatically bind

@@ -1463,7 +1463,7 @@ void ProcessAllClasses(const string& outputBasePath)
                 templateSpecialization[classTemplateParams[i]] = usingTemplateParams[i];
 
             ClassAnalyzer specializedClassAnalyzer(classAnalyzer->GetCompounddef(), usingAnalyzer.GetName(), templateSpecialization);
-            specializedClassAnalyzer.additionalLocation_ = usingAnalyzer.GetLocation();
+            specializedClassAnalyzer.usingLocation_ = usingAnalyzer.GetLocation();
             RegisterObjectType(specializedClassAnalyzer, false);
             RegisterObjectMembers(specializedClassAnalyzer, false);
         }

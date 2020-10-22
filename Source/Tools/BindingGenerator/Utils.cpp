@@ -24,7 +24,6 @@
 
 #include <cassert>
 #include <sstream>
-#include <cstdarg>
 
 static string _lastErrorMessage;
 

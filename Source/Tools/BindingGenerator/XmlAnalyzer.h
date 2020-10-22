@@ -264,7 +264,7 @@ private:
     vector<xml_node> GetMemberdefs() const;
 
 public:
-    string additionalLocation_; // using location
+    string usingLocation_;
 
     ClassAnalyzer(xml_node compounddef, const string& alias = string(), const map<string, string>& templateSpecialization = map<string, string>());
     ClassAnalyzer(xml_node compounddef, const ClassTemplateSpecialization& specialization) : ClassAnalyzer(compounddef, specialization.alias_, specialization.specialization_) {}
@@ -296,7 +296,7 @@ public:
     string GetKind() const { return ExtractKind(compounddef_); }
     bool IsTemplate() const { return ::IsTemplate(compounddef_); }
     bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
-    string GetLocation() const { return JoinNonEmpty(" | ", { additionalLocation_, GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile() }); }
+    string GetLocation() const { return JoinNonEmpty(" | ", { usingLocation_, GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile() }); }
     vector<string> GetTemplateParams() const { return ExtractTemplateParams(compounddef_); }
 };
 
@@ -340,7 +340,7 @@ public:
     bool IsParentConstructor() const;
     bool IsThisDestructor() const { return GetName() == "~" + GetClassName(); }
     bool IsParentDestructor() const;
-    string GetLocation() const { return JoinNonEmpty(" | ", { classAnalyzer_.additionalLocation_, GetFunctionLocation(memberdef_) }); }
+    string GetLocation() const { return JoinNonEmpty(" | ", { classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
     bool CanBeGetProperty() const;
