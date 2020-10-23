@@ -33,8 +33,6 @@
 namespace ASBindingGenerator
 {
 
-static unique_ptr<ASGeneratedFile_Enums> _result;
-
 static void ProcessEnum(class EnumAnalyzer& analyzer)
 {
     if (analyzer.IsInternal())
@@ -44,7 +42,7 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     
     if (IsIgnoredHeader(header))
     {
-        Result::AddIgnoredHeader(header);
+        ResultIncludes::AddHeader(header);
         return;
     }
 
@@ -55,16 +53,16 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     if (Contains(comment, "NO_BIND"))
     {
         if (!insideDefine.empty())
-            _result->reg_ << "#ifdef " << insideDefine << "\n";
+            ResultEnums::reg_ << "#ifdef " << insideDefine << "\n";
 
-        _result->reg_ <<
+        ResultEnums::reg_ <<
             "    // " << location << "\n"
             "    // Not registered because have @nobind mark\n";
 
         if (!insideDefine.empty())
-            _result->reg_ << "#endif\n";
+            ResultEnums::reg_ << "#endif\n";
 
-        _result->reg_ << "\n";
+        ResultEnums::reg_ << "\n";
         
         return;
     }
@@ -72,21 +70,22 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     if (Contains(comment, "MANUAL_BIND"))
     {
         if (!insideDefine.empty())
-            _result->reg_ << "#ifdef " << insideDefine << "\n";
+            ResultEnums::reg_ << "#ifdef " << insideDefine << "\n";
 
-        _result->reg_ <<
+        ResultEnums::reg_ <<
             "    // " << location << "\n"
             "    // Not registered because have @manualbind mark\n";
 
         if (!insideDefine.empty())
-            _result->reg_ << "#endif\n";
+            ResultEnums::reg_ << "#endif\n";
 
-        _result->reg_ << "\n";
+        ResultEnums::reg_ << "\n";
 
         return;
     }
 
-    Result::AddHeader(header);
+    ResultIncludes::AddHeader(header);
+    ResultEnums::AddHeader(header);
 
     string enumTypeName = analyzer.GetTypeName();
     string cppEnumBaseType = analyzer.GetBaseType();
@@ -94,19 +93,19 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     if (cppEnumBaseType == "int") // Enums in AngelScript can be only int
     {
         if (!insideDefine.empty())
-            _result->reg_ << "#ifdef " << insideDefine << "\n";
+            ResultEnums::reg_ << "#ifdef " << insideDefine << "\n";
 
-        _result->reg_ <<
+        ResultEnums::reg_ <<
             "    // " << location << "\n"
             "    engine->RegisterEnum(\"" << enumTypeName << "\");\n";
 
         for (string value : analyzer.GetEnumerators())
-            _result->reg_ << "    engine->RegisterEnumValue(\"" << enumTypeName << "\", \"" << value << "\", " << value << ");\n";
+            ResultEnums::reg_ << "    engine->RegisterEnumValue(\"" << enumTypeName << "\", \"" << value << "\", " << value << ");\n";
 
         if (!insideDefine.empty())
-            _result->reg_ << "#endif\n";
+            ResultEnums::reg_ << "#endif\n";
 
-        _result->reg_ << "\n";
+        ResultEnums::reg_ << "\n";
 
         return;
     }
@@ -114,15 +113,15 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     // If enum is not int then register as typedef. But this type can not be used in switch
 
     if (!insideDefine.empty())
-        _result->reg_ << "#ifdef " << insideDefine << "\n";
+        ResultEnums::reg_ << "#ifdef " << insideDefine << "\n";
 
     string asEnumBaseType = CppFundamentalTypeToAS(cppEnumBaseType);
 
-    _result->reg_ <<
+    ResultEnums::reg_ <<
         "    // " << location << "\n"
         "    engine->RegisterTypedef(\"" << enumTypeName << "\", \"" << asEnumBaseType << "\");\n";
 
-    _result->glue_ << "// " << location << "\n";
+    ResultEnums::glue_ << "// " << location << "\n";
 
     vector<string> enumerators = analyzer.GetEnumerators();
 
@@ -130,20 +129,20 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     {
         string constName = enumTypeName + "_" + enumerator;
 
-        _result->glue_ << "static const " << cppEnumBaseType << " " << constName << " = " << enumerator << ";\n";
+        ResultEnums::glue_ << "static const " << cppEnumBaseType << " " << constName << " = " << enumerator << ";\n";
 
-        _result->reg_ << "    engine->RegisterGlobalProperty(\"const " << asEnumBaseType << " " << enumerator << "\", (void*)&" << constName << ");\n";
+        ResultEnums::reg_ << "    engine->RegisterGlobalProperty(\"const " << asEnumBaseType << " " << enumerator << "\", (void*)&" << constName << ");\n";
     }
 
     if (!insideDefine.empty())
-        _result->glue_ << "#endif\n";
+        ResultEnums::glue_ << "#endif\n";
 
-    _result->glue_ << "\n";
+    ResultEnums::glue_ << "\n";
 
     if (!insideDefine.empty())
-        _result->reg_ << "#endif\n";
+        ResultEnums::reg_ << "#endif\n";
 
-    _result->reg_ << "\n";
+    ResultEnums::reg_ << "\n";
 }
 
 static void ProcessFlagset(const GlobalFunctionAnalyzer& analyzer)
@@ -152,11 +151,12 @@ static void ProcessFlagset(const GlobalFunctionAnalyzer& analyzer)
 
     if (IsIgnoredHeader(header))
     {
-        Result::AddIgnoredHeader(header);
+        ResultIncludes::AddHeader(header);
         return;
     }
 
-    Result::AddHeader(header);
+    ResultIncludes::AddHeader(header);
+    ResultEnums::AddHeader(header);
 
     vector<ParamAnalyzer> params = analyzer.GetParams();
     assert(params.size() == 2);
@@ -170,21 +170,18 @@ static void ProcessFlagset(const GlobalFunctionAnalyzer& analyzer)
     string location = analyzer.GetLocation();
 
     if (!insideDefine.empty())
-        _result->reg_ << "#ifdef " << insideDefine << "\n";
+        ResultEnums::reg_ << "#ifdef " << insideDefine << "\n";
 
-    _result->reg_ <<
+    ResultEnums::reg_ <<
         "    // " << location << "\n"
         "    engine->RegisterTypedef(\"" << flagsetName << "\", \"" << asEnumBaseType << "\");\n";
 
     if (!insideDefine.empty())
-        _result->reg_ << "#endif\n";
+        ResultEnums::reg_ << "#endif\n";
 }
 
-void ProcessAllEnums(const string& outputBasePath)
+void ProcessAllEnums()
 {
-    string outputPath = outputBasePath + "/Source/Urho3D/AngelScript/Generated_Enums.cpp";
-    _result.reset(new ASGeneratedFile_Enums(outputPath, "ASRegisterGenerated_Enums"));
-
     NamespaceAnalyzer namespaceAnalyzer(SourceData::namespaceUrho3D_);
     vector<EnumAnalyzer> enumAnalyzers = namespaceAnalyzer.GetEnums();
 
@@ -200,8 +197,6 @@ void ProcessAllEnums(const string& outputBasePath)
         if (functionName == "URHO3D_FLAGSET")
             ProcessFlagset(globalFunctionAnalyzer);
     }
-
-    _result->Save();
 }
 
 } // namespace ASBindingGenerator

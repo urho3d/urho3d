@@ -37,35 +37,6 @@ ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFuncti
 
 // ============================================================================
 
-void ASGeneratedFile_Enums::Save()
-{
-    ofstream out(outputFilePath_);
-
-    out <<
-        "// DO NOT EDIT. This file is generated\n"
-        "\n"
-        "// We need register all enums before registration of any members because members can use any enums\n"
-        "\n"
-        "#include \"../Precompiled.h\"\n"
-        "#include \"../AngelScript/APITemplates.h\"\n"
-        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-        "\n";
-
-    out <<
-        "namespace Urho3D\n"
-        "{\n"
-        "\n"
-        << glue_.str() <<
-        "void " << functionName_ << "(asIScriptEngine* engine)\n"
-        "{\n"
-        << reg_.str() <<
-        "}\n"
-        "\n"
-        "}\n";
-}
-
-// ============================================================================
-
 void ASGeneratedFile_Classes::Save()
 {
     ofstream out(outputFilePath_);
@@ -245,7 +216,7 @@ void ASGeneratedFile_Templates::Save()
 
 // ============================================================================
 
-namespace Result
+namespace ResultIncludes
 {
     // List of all required header files
     static vector<string> headers_;
@@ -253,27 +224,22 @@ namespace Result
     // Discarded header files for statistic
     static vector<string> ignoredHeaders_;
 
-    // GeneratedGlue.h
-    stringstream glueH_;
-
-    // GeneratedGlue.cpp
-    stringstream glueCpp_;
-
-    // Add header to list if not added yet
+    // Add header to lists if not added yet
     void AddHeader(const string& headerFile)
     {
-        if (!CONTAINS(headers_, headerFile))
-            headers_.push_back(headerFile);
+        if (IsIgnoredHeader(headerFile))
+        {
+            if (!CONTAINS(ignoredHeaders_, headerFile))
+                ignoredHeaders_.push_back(headerFile);
+        }
+        else
+        {
+            if (!CONTAINS(headers_, headerFile))
+                headers_.push_back(headerFile);
+        }
     }
 
-    // Add ignored header to list if not added yet
-    void AddIgnoredHeader(const string& headerFile)
-    {
-        if (!CONTAINS(ignoredHeaders_, headerFile))
-            ignoredHeaders_.push_back(headerFile);
-    }
-
-    // Write result to files
+    // Write result to file
     void Save(const string& outputBasePath)
     {
         ofstream ofsIncludes(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedIncludes.h");
@@ -315,7 +281,83 @@ namespace Result
             if (!insideDefine.empty())
                 ofsIncludes << "//#endif\n";
         }
+    }
+}
 
+namespace ResultEnums
+{
+    // List of all required header files
+    static vector<string> headers_;
+
+    // Consts
+    stringstream glue_;
+
+    // Registration function body
+    stringstream reg_;
+
+    // Add header to list if not added yet
+    void AddHeader(const string& headerFile)
+    {
+        if (!CONTAINS(headers_, headerFile))
+            headers_.push_back(headerFile);
+    }
+
+    // Write result to file
+    void Save(const string& outputBasePath)
+    {
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedEnums.cpp");
+        sort(headers_.begin(), headers_.end());
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "// We need register all enums before registration of any members because members can use any enums\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "\n";
+
+        for (const string& header : headers_)
+        {
+            string insideDefine = InsideDefine(header);
+
+            if (!insideDefine.empty())
+                ofs << "#ifdef " << insideDefine << "\n";
+
+            ofs << "#include \"" << header << "\"\n";
+
+            if (!insideDefine.empty())
+                ofs << "#endif\n";
+        }
+
+        if (headers_.size() > 0)
+            ofs << "\n";
+
+        ofs <<
+            "namespace Urho3D\n"
+            "{\n"
+            "\n"
+            << glue_.str() <<
+            "void ASRegisterGenerated_Enums(asIScriptEngine* engine)\n"
+            "{\n"
+            << reg_.str() <<
+            "}\n"
+            "\n"
+            "}\n";
+    }
+}
+
+namespace Result
+{
+    // GeneratedGlue.h
+    stringstream glueH_;
+
+    // GeneratedGlue.cpp
+    stringstream glueCpp_;
+
+    // Write result to files
+    void Save(const string& outputBasePath)
+    {
         ofstream ofsGlueH(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.h");
 
         ofsGlueH <<
@@ -349,6 +391,13 @@ namespace Result
             << glueCpp_.str() <<
             "}\n";
     }
+}
+
+void SaveResult(const string& outputBasePath)
+{
+    ResultIncludes::Save(outputBasePath);
+    ResultEnums::Save(outputBasePath);
+    Result::Save(outputBasePath);
 }
 
 }

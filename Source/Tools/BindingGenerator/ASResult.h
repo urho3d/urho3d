@@ -58,14 +58,6 @@ public:
     ASGeneratedFile_WithRegistrationFunction(const string& outputFilePath, const string& functionName);
 };
 
-class ASGeneratedFile_Enums : public ASGeneratedFile_WithRegistrationFunction
-{
-public:
-    using ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction;
-    
-    void Save() override;
-};
-
 class ASGeneratedFile_Classes : public ASGeneratedFile_WithRegistrationFunction
 {
 public:
@@ -115,6 +107,30 @@ public:
     void Save() override;
 };
 
+namespace ResultIncludes
+{
+    // Add header to lists if not added yet
+    void AddHeader(const string& headerFile);
+
+    // Write result to file
+    void Save(const string& outputBasePath);
+}
+
+namespace ResultEnums
+{
+    // Consts
+    extern stringstream glue_;
+
+    // Registration function body
+    extern stringstream reg_;
+
+    // Add header to list if not added yet
+    void AddHeader(const string& headerFile);
+
+    // Write result to file
+    void Save(const string& outputBasePath);
+}
+
 namespace Result
 {
     // GeneratedGlue.h
@@ -122,12 +138,6 @@ namespace Result
 
     // GeneratedGlue.cpp
     extern stringstream glueCpp_;
-
-    // Add header to list if not added yet
-    void AddHeader(const string& headerFile);
-    
-    // Add ignored header to list if not added yet
-    void AddIgnoredHeader(const string& headerFile);
 
     // Write result to files
     void Save(const string& outputBasePath);

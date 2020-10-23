@@ -33,24 +33,19 @@ namespace SourceData
 
 namespace ASBindingGenerator
 {
-    void ProcessAllEnums(const string& outputBasePath);
+    void ProcessAllEnums();
     void ProcessAllClasses(const string& outputBasePath);
     void ProcessAllGlobalVariables(const string& outputBasePath);
     void ProcessAllGlobalFunctions(const string& outputBasePath);
-    
-    namespace Result
-    {
-        void Save(const string& outputBasePath);
-    }
+    void SaveResult(const string& outputBasePath);
 
     void GenerateBindings(const string& outputBasePath)
     {
-        ProcessAllEnums(outputBasePath);
+        ProcessAllEnums();
         ProcessAllClasses(outputBasePath);
         ProcessAllGlobalVariables(outputBasePath);
         ProcessAllGlobalFunctions(outputBasePath);
-
-        Result::Save(outputBasePath);
+        SaveResult(outputBasePath);
     }
 }
 

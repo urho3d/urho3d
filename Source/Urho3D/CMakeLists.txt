@@ -158,7 +158,7 @@ define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cp
 
 if (URHO3D_GENERATEBINDINGS)
     set (SOURCE_FILES_WITHOUT_GENERATED "${SOURCE_FILES}")
-    list(REMOVE_ITEM SOURCE_FILES_WITHOUT_GENERATED "AngelScript/Generated_Enums.cpp"
+    list(REMOVE_ITEM SOURCE_FILES_WITHOUT_GENERATED "AngelScript/GeneratedEnums.cpp"
                                                     "AngelScript/Generated_Classes.cpp"
                                                     "AngelScript/Generated_Members_HighPriority.cpp"
                                                     "AngelScript/Generated_Members_A.cpp"
@@ -211,7 +211,7 @@ if (URHO3D_GENERATEBINDINGS)
     set (XML_AST_DIR ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/xml)
     
     # Generate xmls and run BindingGenerator
-    add_custom_command (OUTPUT ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
+    add_custom_command (OUTPUT ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedEnums.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Classes.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_A.cpp
@@ -262,7 +262,7 @@ if (URHO3D_GENERATEBINDINGS)
                         COMMENT "Generating bindings to script languages")
 
     if (URHO3D_ANGELSCRIPT)
-        list (APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
+        list (APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedEnums.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Classes.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_A.cpp
@@ -302,7 +302,7 @@ if (URHO3D_GENERATEBINDINGS)
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedIncludes.h
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h)
                                   
-        source_group ("Source Files\\AngelScript" FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
+        source_group ("Source Files\\AngelScript" FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedEnums.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Classes.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_A.cpp
