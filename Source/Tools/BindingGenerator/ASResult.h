@@ -127,6 +127,18 @@ public:
     void Save() override;
 };
 
+namespace ResultHeaders
+{
+    // Add header to list if not added yet
+    void AddHeader(const string& headerFile);
+    
+    // Add header to list if not added yet
+    void AddIgnoredHeader(const string& headerFile);
+
+    // Write result to file
+    void Save(const string& outputBasePath);
+}
+
 namespace ResultGlue
 {
     // GeneratedGlue.h

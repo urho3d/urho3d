@@ -314,6 +314,78 @@ void ASGeneratedFile_Templates::Save()
 
 // ============================================================================
 
+namespace ResultHeaders
+{
+    // List of all required header files
+    static vector<string> headers_;
+
+    // Discarded header files for statistic
+    static vector<string> ignoredHeaders_;
+
+    // Add header to list if not added yet
+    void AddHeader(const string& headerFile)
+    {
+        if (!CONTAINS(headers_, headerFile))
+            headers_.push_back(headerFile);
+    }
+
+    // Add header to list if not added yet
+    void AddIgnoredHeader(const string& headerFile)
+    {
+        if (!CONTAINS(ignoredHeaders_, headerFile))
+            ignoredHeaders_.push_back(headerFile);
+    }
+
+    // Write result to file
+    void Save(const string& outputBasePath)
+    {
+        sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
+        sort(headers_.begin(), headers_.end());
+
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedHeaders.h");
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#pragma once\n"
+            "\n";
+
+        if (ignoredHeaders_.size() > 0)
+        {
+            ofs << "// Ignored headers\n";
+
+            for (string header : ignoredHeaders_)
+            {
+                string insideDefine = InsideDefine(header);
+                if (!insideDefine.empty())
+                    ofs << "//#ifdef " << insideDefine << "\n";
+
+                ofs << "//#include \"" << header << "\"\n";
+
+                if (!insideDefine.empty())
+                    ofs << "//#endif\n";
+            }
+
+            ofs << "\n";
+        }
+
+        for (const string& header : headers_)
+        {
+            string insideDefine = InsideDefine(header);
+            if (!insideDefine.empty())
+                ofs << "#ifdef " << insideDefine << "\n";
+
+            ofs << "#include \"" << header << "\"\n";
+
+            if (!insideDefine.empty())
+                ofs << "#endif\n";
+        }
+
+        if (headers_.size() > 0)
+            ofs << "\n";
+    }
+}
+
 namespace ResultTemplates
 {
     // List of all required header files
@@ -321,6 +393,39 @@ namespace ResultTemplates
 
     // GeneratedTeplates.h
     stringstream ss_;
+
+    // Write result to files
+    void Save(const string& outputBasePath)
+    {
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedTemplates.h");
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#pragma once\n"
+            "\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "#include \"../AngelScript/Manual.h\"\n"
+            "#include \"../AngelScript/GeneratedGlue.h\"\n"
+            "\n";
+
+        sort(headers_.begin(), headers_.end());
+
+        for (const string& header : headers_)
+        {
+            string insideDefine = InsideDefine(header);
+            if (!insideDefine.empty())
+                ofs << "#ifdef " << insideDefine << "\n";
+
+            ofs << "#include \"" << header << "\"\n";
+
+            if (!insideDefine.empty())
+                ofs << "#endif\n";
+        }
+
+        if (headers_.size() > 0)
+            ofs << "\n";
+    }
 }
 
 namespace ResultGlue

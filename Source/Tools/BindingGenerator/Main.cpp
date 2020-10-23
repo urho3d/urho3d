@@ -24,7 +24,7 @@
 
 using namespace std;
 
-//#define DEVELOP
+#define DEVELOP
 
 namespace SourceData
 {
@@ -37,6 +37,11 @@ namespace ASBindingGenerator
     void ProcessAllClasses(const string& outputBasePath);
     void ProcessAllGlobalVariables(const string& outputBasePath);
     void ProcessAllGlobalFunctions(const string& outputBasePath);
+    
+    namespace ResultHeaders
+    {
+        void Save(const string& outputBasePath);
+    }
 
     namespace ResultGlue
     {
@@ -50,6 +55,7 @@ namespace ASBindingGenerator
         ProcessAllGlobalVariables(outputBasePath);
         ProcessAllGlobalFunctions(outputBasePath);
 
+        ResultHeaders::Save(outputBasePath);
         ResultGlue::Save(outputBasePath);
     }
 }
