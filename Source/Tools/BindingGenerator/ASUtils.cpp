@@ -579,62 +579,73 @@ string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool t
 
 // =================================================================================
 
-string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn)
+void GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv>>& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn, string& outDeclaration, string& outDefinition)
 {
-    string result;
-    
     string insideDefine = InsideDefine(functionAnalyzer.GetHeaderFile());
 
     if (!insideDefine.empty())
-        result += "#ifdef " + insideDefine + "\n";
+    {
+        outDeclaration += "#ifdef " + insideDefine + "\n";
+        outDefinition += "#ifdef " + insideDefine + "\n";
+    }
 
-    result +=
+    string wrapperName = GenerateWrapperName(functionAnalyzer);
+
+    outDeclaration +=
         "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer) + "(";
+        + convertedReturn->glueReturnType_ + " " + wrapperName + "(";
+
+    outDefinition +=
+        "// " + functionAnalyzer.GetLocation() + "\n"
+        + convertedReturn->glueReturnType_ + " " + wrapperName + "(";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
     {
         if (i != 0)
-            result += ", ";
+        {
+            outDeclaration += ", ";
+            outDefinition += ", ";
+        }
 
-        result += convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+        outDeclaration += convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+        outDefinition += convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
     }
 
-    result +=
+    outDeclaration += ");\n";
+
+    outDefinition +=
         ")\n"
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
-        result += convertedParams[i]->glue_;
+        outDefinition += convertedParams[i]->glue_;
 
     if (convertedReturn->glueReturnType_ != "void")
-        result += "    " + functionAnalyzer.GetReturnType().ToString() + " result = ";
+        outDefinition += "    " + functionAnalyzer.GetReturnType().ToString() + " result = ";
     else
-        result += "    ";
+        outDefinition += "    ";
 
-    result += functionAnalyzer.GetName() + "(";
+    outDefinition += functionAnalyzer.GetName() + "(";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
     {
         if (i != 0)
-            result += ", ";
+            outDefinition += ", ";
 
-        result += convertedParams[i]->convertedVarName_;
+        outDefinition += convertedParams[i]->convertedVarName_;
     }
 
-    result += ");\n";
+    outDefinition += ");\n";
 
     if (convertedReturn->glueReturnType_ != "void")
-        result += "    " + convertedReturn->glueReturn_;
+        outDefinition += "    " + convertedReturn->glueReturn_;
 
-    result += "}\n";
+    outDefinition += "}\n";
 
     if (!insideDefine.empty())
-        result += "#endif\n";
+        outDefinition += "#endif\n";
 
-    result += "\n";
-
-    return result;
+    outDefinition += "\n";
 }
 
 string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn)

@@ -146,7 +146,16 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
         needWrapper = true;
 
     if (needWrapper)
-        _result->glue_ << GenerateWrapper(functionAnalyzer, convertedParams, retConv);
+    {
+        string declaration;
+        string definition;
+        GenerateWrapper(functionAnalyzer, convertedParams, retConv, declaration, definition);
+        ResultGlue::ssH_ << declaration;
+        ResultGlue::ssCpp_ << definition;
+
+        string header = functionAnalyzer.GetHeaderFile();
+        ResultGlue::AddHeader(header);
+    }
 
     string asReturnType = retConv->asReturnType_;
 

@@ -38,12 +38,19 @@ namespace ASBindingGenerator
     void ProcessAllGlobalVariables(const string& outputBasePath);
     void ProcessAllGlobalFunctions(const string& outputBasePath);
 
+    namespace ResultGlue
+    {
+        void Save(const string& outputBasePath);
+    }
+
     void GenerateBindings(const string& outputBasePath)
     {
         ProcessAllEnums(outputBasePath);
         ProcessAllClasses(outputBasePath);
         ProcessAllGlobalVariables(outputBasePath);
         ProcessAllGlobalFunctions(outputBasePath);
+
+        ResultGlue::Save(outputBasePath);
     }
 }
 

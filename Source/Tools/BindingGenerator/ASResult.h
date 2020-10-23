@@ -120,12 +120,26 @@ public:
 
 class ASGeneratedFile_Templates : public ASGeneratedFile_Base
 {
-
 public:
     ASGeneratedFile_Templates(const string& outputFilePath);
 
     // Write result to file
     void Save() override;
 };
+
+namespace ResultGlue
+{
+    // GeneratedGlue.h
+    extern stringstream ssH_;
+
+    // GeneratedGlue.cpp
+    extern stringstream ssCpp_;
+
+    // Add header to list if not added yet
+    void AddHeader(const string& headerFile);
+
+    // Write result to files
+    void Save(const string& outputBasePath);
+}
 
 }

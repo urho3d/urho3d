@@ -2,6 +2,7 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 // Ignored headers
 //#ifdef URHO3D_IK
@@ -55,28 +56,6 @@
 
 namespace Urho3D
 {
-
-// const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument=true) | File: ../Core/ProcessUtils.h
-static CScriptArray* ParseArguments_String_bool(const String& cmdLine, bool skipFirstArgument)
-{
-    const Vector<String>& result = ParseArguments(cmdLine, skipFirstArgument);
-    return VectorToArray<String>(result, "Array<String>");
-}
-
-// const Vector<String>& GetArguments() | File: ../Core/ProcessUtils.h
-static CScriptArray* GetArguments_void()
-{
-    const Vector<String>& result = GetArguments();
-    return VectorToArray<String>(result, "Array<String>");
-}
-
-// bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV=false) | File: ../Graphics/Drawable.h
-static bool WriteDrawablesToOBJ_PODVectorDrawable_File_bool_bool_bool(CScriptArray* drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
-{
-    PODVector<Drawable*> param0 = ArrayToPODVector<Drawable*>(drawables);
-    bool result = WriteDrawablesToOBJ(param0, outputFile, asZUp, asRightHanded, writeLightmapUV);
-    return result;
-}
 
 void ASRegisterGenerated_GlobalFunctions(asIScriptEngine* engine)
 {

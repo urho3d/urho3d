@@ -193,6 +193,8 @@ if (URHO3D_GENERATEBINDINGS)
                                                     "AngelScript/Generated_Members_Other.cpp"
                                                     "AngelScript/Generated_GlobalVariables.cpp"
                                                     "AngelScript/Generated_GlobalFunctions.cpp"
+                                                    "AngelScript/GeneratedGlue.cpp"
+                                                    "AngelScript/GeneratedGlue.h"
                                                     "AngelScript/Generated_Templates.h")
 
     find_package (Doxygen REQUIRED)
@@ -243,6 +245,8 @@ if (URHO3D_GENERATEBINDINGS)
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Other.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedGlue.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedGlue.h
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h
                                #${CMAKE_SOURCE_DIR}/Source/Urho3D/Lua/Generated.cpp
                                #${CMAKE_SOURCE_DIR}/Source/Urho3D/JavaScript/Generated.cpp
@@ -291,6 +295,8 @@ if (URHO3D_GENERATEBINDINGS)
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Other.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedGlue.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedGlue.h
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h)
                                   
         source_group ("Source Files\\AngelScript" FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
@@ -328,6 +334,8 @@ if (URHO3D_GENERATEBINDINGS)
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Other.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedGlue.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/GeneratedGlue.h
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h)
     endif()
 endif ()

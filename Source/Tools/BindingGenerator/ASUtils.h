@@ -73,7 +73,7 @@ string GenerateWrapperName(const GlobalFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion);
 
-string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
+void GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv>>& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn, string& outDeclaration, string& outDefinition);
 string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
 string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
 
