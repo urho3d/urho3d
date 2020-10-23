@@ -3,19 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Audio/OggVorbisSoundStream.h"
-#include "../Core/Object.h"
-#include "../Graphics/OcclusionBuffer.h"
-#include "../Graphics/Octree.h"
-#include "../Graphics/OctreeQuery.h"
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/Obstacle.h"
-#endif
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/OffMeshConnection.h"
-#endif
-#include "../Scene/ObjectAnimation.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

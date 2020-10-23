@@ -34,16 +34,8 @@ namespace ASBindingGenerator
 class ASGeneratedFile_Base
 {
 protected:
-    // List of all required header files
-    vector<string> headers_;
-
-    // Discarded header files for statistic
-    vector<string> ignoredHeaders_;
-
     // Result file path
     string outputFilePath_;
-
-    void WriteHeaders(ofstream& stream);
 
 public:
     // Wrappers
@@ -51,10 +43,6 @@ public:
 
     // Registration function body
     stringstream reg_;
-
-    // Add header to list if not added yet
-    void AddHeader(const string& headerFile);
-    void AddIgnoredHeader(const string& headerFile);
 
     // Write result to file
     virtual void Save() {};
@@ -127,28 +115,19 @@ public:
     void Save() override;
 };
 
-namespace ResultHeaders
+namespace Result
 {
+    // GeneratedGlue.h
+    extern stringstream glueH_;
+
+    // GeneratedGlue.cpp
+    extern stringstream glueCpp_;
+
     // Add header to list if not added yet
     void AddHeader(const string& headerFile);
     
-    // Add header to list if not added yet
+    // Add ignored header to list if not added yet
     void AddIgnoredHeader(const string& headerFile);
-
-    // Write result to file
-    void Save(const string& outputBasePath);
-}
-
-namespace ResultGlue
-{
-    // GeneratedGlue.h
-    extern stringstream ssH_;
-
-    // GeneratedGlue.cpp
-    extern stringstream ssCpp_;
-
-    // Add header to list if not added yet
-    void AddHeader(const string& headerFile);
 
     // Write result to files
     void Save(const string& outputBasePath);

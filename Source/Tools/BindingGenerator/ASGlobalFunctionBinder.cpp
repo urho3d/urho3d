@@ -150,11 +150,11 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
         string declaration;
         string definition;
         GenerateWrapper(functionAnalyzer, convertedParams, retConv, declaration, definition);
-        ResultGlue::ssH_ << declaration;
-        ResultGlue::ssCpp_ << definition;
+        Result::glueH_ << declaration;
+        Result::glueCpp_ << definition;
 
         string header = functionAnalyzer.GetHeaderFile();
-        ResultGlue::AddHeader(header);
+        Result::AddHeader(header);
     }
 
     string asReturnType = retConv->asReturnType_;
@@ -216,11 +216,11 @@ static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer
     string header = functionAnalyzer.GetHeaderFile();
     if (IsIgnoredHeader(header))
     {
-        _result->AddIgnoredHeader(header);
+        Result::AddIgnoredHeader(header);
         return;
     }
 
-    _result->AddHeader(header);
+    Result::AddHeader(header);
 
     string insideDefine = InsideDefine(header);
     if (!insideDefine.empty())

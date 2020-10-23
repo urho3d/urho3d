@@ -29,60 +29,6 @@
 namespace ASBindingGenerator
 {
 
-void ASGeneratedFile_Base::AddHeader(const string& headerFile)
-{
-    if (!CONTAINS(headers_, headerFile))
-        headers_.push_back(headerFile);
-}
-
-void ASGeneratedFile_Base::AddIgnoredHeader(const string& headerFile)
-{
-    if (!CONTAINS(ignoredHeaders_, headerFile))
-        ignoredHeaders_.push_back(headerFile);
-}
-
-void ASGeneratedFile_Base::WriteHeaders(ofstream& out)
-{
-    sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
-    sort(headers_.begin(), headers_.end());
-
-    if (ignoredHeaders_.size() > 0)
-    {
-        out << "// Ignored headers\n";
-
-        for (string header : ignoredHeaders_)
-        {
-            string insideDefine = InsideDefine(header);
-            if (!insideDefine.empty())
-                out << "//#ifdef " << insideDefine << "\n";
-
-            out << "//#include \"" << header << "\"\n";
-
-            if (!insideDefine.empty())
-                out << "//#endif\n";
-        }
-
-        out << "\n";
-    }
-
-    for (const string& header : headers_)
-    {
-        string insideDefine = InsideDefine(header);
-        if (!insideDefine.empty())
-            out << "#ifdef " << insideDefine << "\n";
-
-        out << "#include \"" << header << "\"\n";
-
-        if (!insideDefine.empty())
-            out << "#endif\n";
-    }
-
-    if (headers_.size() > 0)
-        out << "\n";
-}
-
-// ============================================================================
-
 ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction(const string& outputFilePath, const string& functionName)
 {
     outputFilePath_ = outputFilePath;
@@ -102,9 +48,8 @@ void ASGeneratedFile_Enums::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "\n";
-
-    WriteHeaders(out);
 
     out <<
         "namespace Urho3D\n"
@@ -132,9 +77,8 @@ void ASGeneratedFile_Classes::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "\n";
-
-    WriteHeaders(out);
 
     out <<
         "namespace Urho3D\n"
@@ -161,9 +105,8 @@ void ASGeneratedFile_Members_HighPriority::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "\n";
-
-    WriteHeaders(out);
 
     out <<
         "namespace Urho3D\n"
@@ -192,11 +135,8 @@ void ASGeneratedFile_Members::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "#include \"../AngelScript/Manual.h\"\n"
         "\n"
         "namespace Urho3D\n"
@@ -225,16 +165,11 @@ void ASGeneratedFile_GlobalVariables::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "// Some headers could re-define M_PI, ensure that it's undefined\n"
         "#undef M_PI\n"
-        "\n";
-
-    out <<
+        "\n"
         "namespace Urho3D\n"
         "{\n"
         "\n"
@@ -258,10 +193,9 @@ void ASGeneratedFile_GlobalFunctions::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "#include \"../AngelScript/GeneratedGlue.h\"\n"
         "\n";
-
-    WriteHeaders(out);
 
     out <<
         "namespace Urho3D\n"
@@ -294,11 +228,8 @@ void ASGeneratedFile_Templates::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "#include \"../AngelScript/Manual.h\"\n"
         "\n"
         "namespace Urho3D\n"
@@ -314,7 +245,7 @@ void ASGeneratedFile_Templates::Save()
 
 // ============================================================================
 
-namespace ResultHeaders
+namespace Result
 {
     // List of all required header files
     static vector<string> headers_;
@@ -322,6 +253,12 @@ namespace ResultHeaders
     // Discarded header files for statistic
     static vector<string> ignoredHeaders_;
 
+    // GeneratedGlue.h
+    stringstream glueH_;
+
+    // GeneratedGlue.cpp
+    stringstream glueCpp_;
+
     // Add header to list if not added yet
     void AddHeader(const string& headerFile)
     {
@@ -329,168 +266,79 @@ namespace ResultHeaders
             headers_.push_back(headerFile);
     }
 
-    // Add header to list if not added yet
+    // Add ignored header to list if not added yet
     void AddIgnoredHeader(const string& headerFile)
     {
         if (!CONTAINS(ignoredHeaders_, headerFile))
             ignoredHeaders_.push_back(headerFile);
     }
 
-    // Write result to file
+    // Write result to files
     void Save(const string& outputBasePath)
     {
-        sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
+        ofstream ofsIncludes(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedIncludes.h");
         sort(headers_.begin(), headers_.end());
+        sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
 
-        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedHeaders.h");
-
-        ofs <<
+        ofsIncludes <<
             "// DO NOT EDIT. This file is generated\n"
             "\n"
             "#pragma once\n"
             "\n";
+
+        for (const string& header : headers_)
+        {
+            string insideDefine = InsideDefine(header);
+            if (!insideDefine.empty())
+                ofsIncludes << "#ifdef " << insideDefine << "\n";
+
+            ofsIncludes << "#include \"" << header << "\"\n";
+
+            if (!insideDefine.empty())
+                ofsIncludes << "#endif\n";
+        }
+
+        if (headers_.size() > 0)
+            ofsIncludes << "\n";
 
         if (ignoredHeaders_.size() > 0)
-        {
-            ofs << "// Ignored headers\n";
+            ofsIncludes << "// Ignored headers\n";
 
-            for (string header : ignoredHeaders_)
-            {
-                string insideDefine = InsideDefine(header);
-                if (!insideDefine.empty())
-                    ofs << "//#ifdef " << insideDefine << "\n";
-
-                ofs << "//#include \"" << header << "\"\n";
-
-                if (!insideDefine.empty())
-                    ofs << "//#endif\n";
-            }
-
-            ofs << "\n";
-        }
-
-        for (const string& header : headers_)
+        for (string header : ignoredHeaders_)
         {
             string insideDefine = InsideDefine(header);
             if (!insideDefine.empty())
-                ofs << "#ifdef " << insideDefine << "\n";
+                ofsIncludes << "//#ifdef " << insideDefine << "\n";
 
-            ofs << "#include \"" << header << "\"\n";
+            ofsIncludes << "//#include \"" << header << "\"\n";
 
             if (!insideDefine.empty())
-                ofs << "#endif\n";
+                ofsIncludes << "//#endif\n";
         }
 
-        if (headers_.size() > 0)
-            ofs << "\n";
-    }
-}
+        ofstream ofsGlueH(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.h");
 
-namespace ResultTemplates
-{
-    // List of all required header files
-    static vector<string> headers_;
-
-    // GeneratedTeplates.h
-    stringstream ss_;
-
-    // Write result to files
-    void Save(const string& outputBasePath)
-    {
-        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedTemplates.h");
-
-        ofs <<
+        ofsGlueH <<
             "// DO NOT EDIT. This file is generated\n"
             "\n"
             "#pragma once\n"
             "\n"
-            "#include \"../AngelScript/APITemplates.h\"\n"
-            "#include \"../AngelScript/Manual.h\"\n"
-            "#include \"../AngelScript/GeneratedGlue.h\"\n"
-            "\n";
-
-        sort(headers_.begin(), headers_.end());
-
-        for (const string& header : headers_)
-        {
-            string insideDefine = InsideDefine(header);
-            if (!insideDefine.empty())
-                ofs << "#ifdef " << insideDefine << "\n";
-
-            ofs << "#include \"" << header << "\"\n";
-
-            if (!insideDefine.empty())
-                ofs << "#endif\n";
-        }
-
-        if (headers_.size() > 0)
-            ofs << "\n";
-    }
-}
-
-namespace ResultGlue
-{
-    // List of all required header files
-    static vector<string> headers_;
-
-    // GeneratedGlue.h
-    stringstream ssH_;
-
-    // GeneratedGlue.cpp
-    stringstream ssCpp_;
-
-    // Add header to list if not added yet
-    void AddHeader(const string& headerFile)
-    {
-        if (!CONTAINS(headers_, headerFile))
-            headers_.push_back(headerFile);
-    }
-
-    // Write result to files
-    void Save(const string& outputBasePath)
-    {
-        ofstream ofsH(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.h");
-        ofstream ofsCpp(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.cpp");
-
-        ofsH <<
-            "// DO NOT EDIT. This file is generated\n"
-            "\n"
-            "#pragma once\n"
-            "\n"
-            "#include \"../AngelScript/APITemplates.h\"\n"
-            "#include \"../AngelScript/Manual.h\"\n"
-            "\n";
-
-        sort(headers_.begin(), headers_.end());
-
-        for (const string& header : headers_)
-        {
-            string insideDefine = InsideDefine(header);
-            if (!insideDefine.empty())
-                ofsH << "#ifdef " << insideDefine << "\n";
-
-            ofsH << "#include \"" << header << "\"\n";
-
-            if (!insideDefine.empty())
-                ofsH << "#endif\n";
-        }
-
-        if (headers_.size() > 0)
-            ofsH << "\n";
-
-        ofsH <<
             "namespace Urho3D\n"
             "{\n"
             "\n"
-            << ssH_.str() <<
+            << glueH_.str() <<
+            "\n"
             "}\n";
 
-        ofsCpp <<
+        ofstream ofsGlueCpp(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.cpp");
+
+        ofsGlueCpp <<
             "// DO NOT EDIT. This file is generated\n"
             "\n"
             "#include \"../Precompiled.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedGlue.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
             "\n"
             "namespace Urho3D\n"
             "{\n"
@@ -498,7 +346,7 @@ namespace ResultGlue
             "void FakeAddRef(void* ptr);\n"
             "void FakeReleaseRef(void* ptr);\n"
             "\n"
-            << ssCpp_.str() <<
+            << glueCpp_.str() <<
             "}\n";
     }
 }

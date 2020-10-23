@@ -44,7 +44,7 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
     
     if (IsIgnoredHeader(header))
     {
-        _result->AddIgnoredHeader(header);
+        Result::AddIgnoredHeader(header);
         return;
     }
 
@@ -86,7 +86,7 @@ static void ProcessEnum(class EnumAnalyzer& analyzer)
         return;
     }
 
-    _result->AddHeader(header);
+    Result::AddHeader(header);
 
     string enumTypeName = analyzer.GetTypeName();
     string cppEnumBaseType = analyzer.GetBaseType();
@@ -152,11 +152,11 @@ static void ProcessFlagset(const GlobalFunctionAnalyzer& analyzer)
 
     if (IsIgnoredHeader(header))
     {
-        _result->AddIgnoredHeader(header);
+        Result::AddIgnoredHeader(header);
         return;
     }
 
-    _result->AddHeader(header);
+    Result::AddHeader(header);
 
     vector<ParamAnalyzer> params = analyzer.GetParams();
     assert(params.size() == 2);

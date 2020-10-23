@@ -2,7 +2,8 @@
 
 #include "../Precompiled.h"
 
-#include "../AngelScript/GeneratedGlue.h"
+#include "../AngelScript/APITemplates.h"
+#include "../AngelScript/GeneratedIncludes.h"
 
 namespace Urho3D
 {

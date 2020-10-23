@@ -3,46 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#ifdef URHO3D_PHYSICS
-#include "../Physics/Constraint.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/Constraint2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintDistance2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintFriction2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintGear2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintMotor2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintMouse2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintPrismatic2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintPulley2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintRevolute2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintRope2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintWeld2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ConstraintWheel2D.h"
-#endif
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

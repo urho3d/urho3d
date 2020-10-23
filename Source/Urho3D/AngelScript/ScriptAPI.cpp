@@ -28,6 +28,8 @@
 #include "../Resource/ResourceCache.h"
 #include "../AngelScript/Generated_Templates.h"
 
+#undef GetClassName
+
 namespace Urho3D
 {
 
