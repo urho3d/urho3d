@@ -101,7 +101,9 @@ jobs:
         run: script/dockerized.sh ${PLATFORM/-*} rake doc
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - install
-        run: script/dockerized.sh ${PLATFORM/-*} rake install[~/stage]
+        run: |
+          script/dockerized.sh ${PLATFORM/-*} rake install[~/stage]
+          if [[ $PLATFORM == android ]]; then touch build/cache/.gradle/mark; fi
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - new
         run: script/dockerized.sh ${PLATFORM/-*} rake new
@@ -120,7 +122,7 @@ jobs:
         run: |
           if [[ $PLATFORM == android ]]; then
             rm -rf build/cache/.m2
-            find build/cache/.gradle -name \*urho3d\* |xargs rm -rf
+            find build/cache/.gradle -newer build/cache/.gradle/mark -type d |xargs rm -rf
           else
             rm -rf build/cache/{stage,projects}
           fi
