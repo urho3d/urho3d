@@ -144,8 +144,11 @@ jobs:
       - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
+          PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
+          PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
         run: script/dockerized.sh ${PLATFORM/-*} rake publish
-        if: github.event_name == 'push' && matrix.platform == 'android'
+        if: github.event_name == 'push' && (matrix.platform == 'android' || (matrix.platform == 'web' && matrix.build-type == 'rel'))
   macOS:
     name: 🍏
     runs-on: macos-latest

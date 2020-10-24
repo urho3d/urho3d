@@ -116,7 +116,9 @@ desc 'Publish build artifact'
 task :publish => [:init] do
   if ENV['PLATFORM'] == 'android'
     Rake::Task[:gradle].invoke('publish')
+    next
   end
+  Rake::Task[$publish_task.to_sym].invoke if $publish_task
 end
 
 desc 'Create a new project'
@@ -183,15 +185,60 @@ task :ci do
   else
     # Do nothing
   end
+  case ENV['PLATFORM']
+  when 'web'
+    ENV['EMSCRIPTEN_SHARE_DATA'] = '1'
+    $publish_task = 'ci_publish_web'
+  else
+    # Do nothing
+  end
   ENV['URHO3D_LIB_TYPE'] = ENV['LIB_TYPE'].upcase if /static|shared/ =~ ENV['LIB_TYPE']
   ENV['URHO3D_TESTING'] = '1' if /linux|macOS|win/ =~ ENV['PLATFORM']
   ENV['URHO3D_LINT'] = '1' if ENV['MODIFIER'] == 'clang-tidy'
   ENV['URHO3D_STYLE'] = '1' if ENV['MODIFIER'] == 'clang-format'
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
-  if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n 1`
+  if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n1`
     system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
   end
+end
+
+task :ci_publish_web do
+  require 'json'
+  system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md build/ci/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  Dir.chdir('build/urho3d.github.io/samples') {
+    next unless system 'git diff --quiet Urho3D.js.data'
+    uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
+    system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js) or abort 'Failed to substitute UUID'
+    if system 'git diff --quiet Urho3D.js'
+      File.unlink 'Urho3D.js.bak'
+      Dir['*.js'].each { |file| system %Q(ruby -i -pe "gsub '#{uuid.last}', '#{uuid.first}'" #{file}) }
+    else
+      File.rename 'Urho3D.js.bak', 'Urho3D.js'
+    end
+  }
+  web = {'samples' => {}}
+  Dir.chdir('build/urho3d.github.io/samples') { web['samples']['Native'] = Dir['*.html'].sort }
+  web['player'] = web['samples']['Native'].pop # Assume the last sample after sorting is the Urho3DPlayer.html
+  {'AngelScript' => 'Scripts', 'Lua' => 'LuaScripts'}.each { |lang, subdir|
+    Dir.chdir("bin/Data/#{subdir}") {
+      script_samples = Dir['[0-9]*'].sort
+      deleted_samples = [] # Delete samples that do not have their native counterpart
+      script_samples.each { |sample| deleted_samples.push sample unless web['samples']['Native'].include? "#{sample.split('.').first}.html" }
+      web['samples'][lang] = (script_samples - deleted_samples).map { |sample| "#{subdir}/#{sample}" }
+    }
+  }
+  File.open('build/urho3d.github.io/_data/web.json', 'w') { |file| file.puts web.to_json }
+  system %Q{
+    cd build/urho3d.github.io && \\
+    git config user.name #{ENV['PUBLISHER_NAME']} && \\
+    git config user.email #{ENV['PUBLISHER_EMAIL']} && \\
+    git remote set-url --push origin https://#{ENV['PUBLISHER_TOKEN']}@github.com/urho3d/urho3d.github.io.git && \\
+    git add -A . && \\
+    ( git commit -qm "GH Actions: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/#{ENV['GITHUB_REPOSITORY']}/commit/#{ENV['GITHUB_SHA']}\n\nMessage: #{`git log --format=%B -n 1`}" || true) && \\
+    git push -q >/dev/null 2>&1
+  } or abort 'Failed to update Web samples'
 end
 
 task :source_checksum do
