@@ -39,7 +39,9 @@
 #  HAVE_SSE
 #  HAVE_SSE2
 #  HAVE_SSE3
-#  HAVE_SSE4
+#  HAVE_SSSE3
+#  HAVE_SSE4.1
+#  HAVE_SSE4.2
 #  HAVE_AVX
 #  HAVE_AVX2
 #
@@ -226,7 +228,7 @@ else ()
     elseif (POWERPC)
         check_extension (altivec)
     elseif (X86 OR E2K)
-        foreach (ext sse sse2 sse3 sse4 avx avx2)
+        foreach (ext sse sse2 sse3 ssse3 sse4.1 sse4.2 avx avx2)
             check_extension (${ext})
         endforeach ()
         if (CMAKE_SYSTEM_NAME STREQUAL Linux)
