@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -128,11 +125,6 @@ WIN_CreateDevice(int devindex)
         data->CloseTouchInputHandle = (BOOL (WINAPI *)(HTOUCHINPUT)) SDL_LoadFunction(data->userDLL, "CloseTouchInputHandle");
         data->GetTouchInputInfo = (BOOL (WINAPI *)(HTOUCHINPUT, UINT, PTOUCHINPUT, int)) SDL_LoadFunction(data->userDLL, "GetTouchInputInfo");
         data->RegisterTouchWindow = (BOOL (WINAPI *)(HWND, ULONG)) SDL_LoadFunction(data->userDLL, "RegisterTouchWindow");
-
-        // Urho3D: call SetProcessDPIAware if available to prevent Windows 8.1 from performing unwanted scaling
-        data->SetProcessDPIAware = (BOOL (WINAPI *)()) SDL_LoadFunction(data->userDLL, "SetProcessDPIAware");
-        if (data->SetProcessDPIAware)
-            data->SetProcessDPIAware();
     } else {
         SDL_ClearError();
     }
@@ -394,7 +386,7 @@ SDL_DXGIGetOutputInfo(int displayIndex, int *adapterIndex, int *outputIndex)
     void *pDXGIDLL;
     char *displayName;
     int nAdapter, nOutput;
-    IDXGIFactory *pDXGIFactory;
+    IDXGIFactory *pDXGIFactory = NULL;
     IDXGIAdapter *pDXGIAdapter;
     IDXGIOutput* pDXGIOutput;
 

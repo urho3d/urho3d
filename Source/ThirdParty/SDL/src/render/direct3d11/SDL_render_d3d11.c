@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -636,7 +636,8 @@ D3D11_CreateDeviceResources(SDL_Renderer * renderer)
     /* Create blending states: */
     if (!D3D11_CreateBlendState(renderer, SDL_BLENDMODE_BLEND) ||
         !D3D11_CreateBlendState(renderer, SDL_BLENDMODE_ADD) ||
-        !D3D11_CreateBlendState(renderer, SDL_BLENDMODE_MOD)) {
+        !D3D11_CreateBlendState(renderer, SDL_BLENDMODE_MOD) ||
+        !D3D11_CreateBlendState(renderer, SDL_BLENDMODE_MUL)) {
         /* D3D11_CreateBlendMode will set the SDL error, if it fails */
         goto done;
     }
@@ -1523,6 +1524,18 @@ D3D11_UnlockTexture(SDL_Renderer * renderer, SDL_Texture * texture)
     SAFE_RELEASE(textureData->stagingTexture);
 }
 
+static void
+D3D11_SetTextureScaleMode(SDL_Renderer * renderer, SDL_Texture * texture, SDL_ScaleMode scaleMode)
+{
+    D3D11_TextureData *textureData = (D3D11_TextureData *) texture->driverdata;
+    
+    if (!textureData) {
+        return;
+    }
+
+    textureData->scaleMode = (scaleMode == SDL_ScaleModeNearest) ?  D3D11_FILTER_MIN_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+}
+
 static int
 D3D11_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture)
 {
@@ -1728,82 +1741,88 @@ D3D11_QueueCopyEx(SDL_Renderer * renderer, SDL_RenderCommand *cmd, SDL_Texture *
     float minx, miny, maxx, maxy;
     float minu, maxu, minv, maxv;
 
-    if (flip & SDL_FLIP_HORIZONTAL) {
-        minu = (float) srcrect->x / texture->w;
-        maxu = (float) (srcrect->x + srcrect->w) / texture->w;
-    } else {
-        minu = (float) (srcrect->x + srcrect->w) / texture->w;
-        maxu = (float) srcrect->x / texture->w;
+    if (!verts) {
+        return -1;
     }
 
-    if (flip & SDL_FLIP_VERTICAL) {
-        minv = (float) srcrect->y / texture->h;
-        maxv = (float) (srcrect->y + srcrect->h) / texture->h;
-    } else {
-        minv = (float) (srcrect->y + srcrect->h) / texture->h;
-        maxv = (float) srcrect->y / texture->h;
-    }
+    cmd->data.draw.count = 1;
 
     minx = -center->x;
     maxx = dstrect->w - center->x;
     miny = -center->y;
     maxy = dstrect->h - center->y;
 
-    cmd->data.draw.count = 1;
+    if (flip & SDL_FLIP_HORIZONTAL) {
+        minu = (float) (srcrect->x + srcrect->w) / texture->w;
+        maxu = (float) srcrect->x / texture->w;
+    } else {
+        minu = (float) srcrect->x / texture->w;
+        maxu = (float) (srcrect->x + srcrect->w) / texture->w;
+    }
+
+    if (flip & SDL_FLIP_VERTICAL) {
+        minv = (float) (srcrect->y + srcrect->h) / texture->h;
+        maxv = (float) srcrect->y / texture->h;
+    } else {
+        minv = (float) srcrect->y / texture->h;
+        maxv = (float) (srcrect->y + srcrect->h) / texture->h;
+    }
+
+
 
     verts->pos.x = minx;
     verts->pos.y = miny;
     verts->pos.z = 0.0f;
-    verts->tex.x = minu;
-    verts->tex.y = minv;
     verts->color.x = r;
     verts->color.y = g;
     verts->color.z = b;
     verts->color.w = a;
+    verts->tex.x = minu;
+    verts->tex.y = minv;
     verts++;
 
     verts->pos.x = minx;
     verts->pos.y = maxy;
     verts->pos.z = 0.0f;
-    verts->tex.x = minu;
-    verts->tex.y = maxv;
     verts->color.x = r;
     verts->color.y = g;
     verts->color.z = b;
     verts->color.w = a;
+    verts->tex.x = minu;
+    verts->tex.y = maxv;
     verts++;
 
     verts->pos.x = maxx;
     verts->pos.y = miny;
     verts->pos.z = 0.0f;
-    verts->tex.x = maxu;
-    verts->tex.y = minv;
     verts->color.x = r;
     verts->color.y = g;
     verts->color.z = b;
     verts->color.w = a;
+    verts->tex.x = maxu;
+    verts->tex.y = minv;
     verts++;
 
     verts->pos.x = maxx;
     verts->pos.y = maxy;
     verts->pos.z = 0.0f;
-    verts->tex.x = maxu;
-    verts->tex.y = maxv;
     verts->color.x = r;
     verts->color.y = g;
     verts->color.z = b;
     verts->color.w = a;
+    verts->tex.x = maxu;
+    verts->tex.y = maxv;
     verts++;
 
     verts->pos.x = dstrect->x + center->x;  /* X translation */
     verts->pos.y = dstrect->y + center->y;  /* Y translation */
     verts->pos.z = (float)(M_PI * (float) angle / 180.0f);  /* rotation */
-    verts->tex.x = 0.0f;
-    verts->tex.y = 0.0f;
     verts->color.x = 0;
     verts->color.y = 0;
     verts->color.z = 0;
     verts->color.w = 0;
+    verts->tex.x = 0.0f;
+    verts->tex.y = 0.0f;
     verts++;
 
     return 0;
@@ -1817,6 +1836,12 @@ D3D11_UpdateVertexBuffer(SDL_Renderer *renderer,
     D3D11_RenderData *rendererData = (D3D11_RenderData *) renderer->driverdata;
     HRESULT result = S_OK;
     const int vbidx = rendererData->currentVertexBuffer;
+    const UINT stride = sizeof(VertexPositionColor);
+    const UINT offset = 0;
+
+    if (dataSizeInBytes == 0) {
+        return 0;  /* nothing to do. */
+    }
 
     if (rendererData->vertexBuffers[vbidx] && rendererData->vertexBufferSizes[vbidx] >= dataSizeInBytes) {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1836,8 +1861,6 @@ D3D11_UpdateVertexBuffer(SDL_Renderer *renderer,
     } else {
         D3D11_BUFFER_DESC vertexBufferDesc;
         D3D11_SUBRESOURCE_DATA vertexBufferData;
-        const UINT stride = sizeof(VertexPositionColor);
-        const UINT offset = 0;
 
         SAFE_RELEASE(rendererData->vertexBuffers[vbidx]);
 
@@ -1862,14 +1885,16 @@ D3D11_UpdateVertexBuffer(SDL_Renderer *renderer,
             return -1;
         }
 
-        ID3D11DeviceContext_IASetVertexBuffers(rendererData->d3dContext,
-            0,
-            1,
-            &rendererData->vertexBuffers[vbidx],
-            &stride,
-            &offset
-            );
+        rendererData->vertexBufferSizes[vbidx] = dataSizeInBytes;
     }
+
+    ID3D11DeviceContext_IASetVertexBuffers(rendererData->d3dContext,
+        0,
+        1,
+        &rendererData->vertexBuffers[vbidx],
+        &stride,
+        &offset
+        );
 
     rendererData->currentVertexBuffer++;
     if (rendererData->currentVertexBuffer >= SDL_arraysize(rendererData->vertexBuffers)) {
@@ -2486,6 +2511,7 @@ D3D11_CreateRenderer(SDL_Window * window, Uint32 flags)
     renderer->UpdateTextureYUV = D3D11_UpdateTextureYUV;
     renderer->LockTexture = D3D11_LockTexture;
     renderer->UnlockTexture = D3D11_UnlockTexture;
+    renderer->SetTextureScaleMode = D3D11_SetTextureScaleMode;
     renderer->SetRenderTarget = D3D11_SetRenderTarget;
     renderer->QueueSetViewport = D3D11_QueueSetViewport;
     renderer->QueueSetDrawColor = D3D11_QueueSetViewport;  /* SetViewport and SetDrawColor are (currently) no-ops. */

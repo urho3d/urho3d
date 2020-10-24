@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -226,6 +226,9 @@ RPI_FreeCursor(SDL_Cursor * cursor)
             SDL_free(cursor->driverdata);
         }
         SDL_free(cursor);
+        if (cursor == global_cursor) {
+            global_cursor = NULL;
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,13 +32,6 @@
 
 typedef struct SDL_RenderDriver SDL_RenderDriver;
 
-typedef enum
-{
-    SDL_ScaleModeNearest,
-    SDL_ScaleModeLinear,
-    SDL_ScaleModeBest
-} SDL_ScaleMode;
-
 /* Define the SDL texture structure */
 struct SDL_Texture
 {
@@ -60,6 +53,7 @@ struct SDL_Texture
     void *pixels;
     int pitch;
     SDL_Rect locked_rect;
+    SDL_Surface *locked_surface;  /**< Locked region exposed as a SDL surface */
 
     Uint32 last_command_generation; /* last command queue generation this texture was in. */
 
@@ -110,13 +104,6 @@ typedef struct SDL_RenderCommand
     struct SDL_RenderCommand *next;
 } SDL_RenderCommand;
 
-typedef struct SDL_AllocVertGap
-{
-    size_t offset;
-    size_t len;
-    struct SDL_AllocVertGap *next;
-} SDL_AllocVertGap;
-
 
 /* Define the SDL renderer structure */
 struct SDL_Renderer
@@ -152,6 +139,7 @@ struct SDL_Renderer
     int (*LockTexture) (SDL_Renderer * renderer, SDL_Texture * texture,
                         const SDL_Rect * rect, void **pixels, int *pitch);
     void (*UnlockTexture) (SDL_Renderer * renderer, SDL_Texture * texture);
+    void (*SetTextureScaleMode) (SDL_Renderer * renderer, SDL_Texture * texture, SDL_ScaleMode scaleMode);
     int (*SetRenderTarget) (SDL_Renderer * renderer, SDL_Texture * texture);
     int (*RenderReadPixels) (SDL_Renderer * renderer, const SDL_Rect * rect,
                              Uint32 format, void * pixels, int pitch);
@@ -226,8 +214,6 @@ struct SDL_Renderer
     void *vertex_data;
     size_t vertex_data_used;
     size_t vertex_data_allocation;
-    SDL_AllocVertGap vertex_data_gaps;
-    SDL_AllocVertGap *vertex_data_gaps_pool;
 
     void *driverdata;
 };

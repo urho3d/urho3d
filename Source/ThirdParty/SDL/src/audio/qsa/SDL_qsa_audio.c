@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -619,8 +619,8 @@ QSA_Deinitialize(void)
 {
     /* Clear devices array on shutdown */
     /* !!! FIXME: we zero these on init...any reason to do it here? */
-    SDL_zero(qsa_playback_device);
-    SDL_zero(qsa_capture_device);
+    SDL_zeroa(qsa_playback_device);
+    SDL_zeroa(qsa_capture_device);
     qsa_playback_devices = 0;
     qsa_capture_devices = 0;
 }
@@ -629,8 +629,8 @@ static int
 QSA_Init(SDL_AudioDriverImpl * impl)
 {
     /* Clear devices array */
-    SDL_zero(qsa_playback_device);
-    SDL_zero(qsa_capture_device);
+    SDL_zeroa(qsa_playback_device);
+    SDL_zeroa(qsa_capture_device);
     qsa_playback_devices = 0;
     qsa_capture_devices = 0;
 

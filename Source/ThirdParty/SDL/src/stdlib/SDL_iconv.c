@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -888,7 +888,7 @@ SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf,
     }
 
     stringsize = inbytesleft > 4 ? inbytesleft : 4;
-    string = SDL_malloc(stringsize);
+    string = (char *) SDL_malloc(stringsize);
     if (!string) {
         SDL_iconv_close(cd);
         return NULL;
@@ -898,13 +898,14 @@ SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf,
     SDL_memset(outbuf, 0, 4);
 
     while (inbytesleft > 0) {
+        const size_t oldinbytesleft = inbytesleft;
         retCode = SDL_iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
         switch (retCode) {
         case SDL_ICONV_E2BIG:
             {
                 char *oldstring = string;
                 stringsize *= 2;
-                string = SDL_realloc(string, stringsize);
+                string = (char *) SDL_realloc(string, stringsize);
                 if (!string) {
                     SDL_iconv_close(cd);
                     return NULL;
@@ -923,6 +924,11 @@ SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf,
         case SDL_ICONV_ERROR:
             /* We can't continue... */
             inbytesleft = 0;
+            break;
+        }
+        /* Avoid infinite loops when nothing gets converted */
+        if (oldinbytesleft == inbytesleft)
+        {
             break;
         }
     }

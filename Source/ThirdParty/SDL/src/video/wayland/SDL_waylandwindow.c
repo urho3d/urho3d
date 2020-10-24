@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -87,6 +87,10 @@ handle_configure_wl_shell_surface(void *data, struct wl_shell_surface *shell_sur
     wind->resize.width = width;
     wind->resize.height = height;
     wind->resize.pending = SDL_TRUE;
+
+    if (!(window->flags & SDL_WINDOW_OPENGL)) {
+        Wayland_HandlePendingResize(window);  /* OpenGL windows handle this in SwapWindow */
+    }
 }
 
 static void
@@ -118,7 +122,9 @@ handle_configure_zxdg_shell_surface(void *data, struct zxdg_surface_v6 *zxdg, ui
         window->h = wind->resize.height;
 
         wl_surface_set_buffer_scale(wind->surface, get_window_scale_factor(window));
-        WAYLAND_wl_egl_window_resize(wind->egl_window, window->w * get_window_scale_factor(window), window->h * get_window_scale_factor(window), 0, 0);
+        if (wind->egl_window) {
+            WAYLAND_wl_egl_window_resize(wind->egl_window, window->w * get_window_scale_factor(window), window->h * get_window_scale_factor(window), 0, 0);
+        }
 
         zxdg_surface_v6_ack_configure(zxdg, serial);
 
@@ -132,6 +138,9 @@ handle_configure_zxdg_shell_surface(void *data, struct zxdg_surface_v6 *zxdg, ui
         wind->resize.pending = SDL_TRUE;
         wind->resize.configure = SDL_TRUE;
         wind->resize.serial = serial;
+        if (!(window->flags & SDL_WINDOW_OPENGL)) {
+            Wayland_HandlePendingResize(window);  /* OpenGL windows handle this in SwapWindow */
+        }
     }
 }
 
@@ -223,7 +232,9 @@ handle_configure_xdg_shell_surface(void *data, struct xdg_surface *xdg, uint32_t
         window->h = wind->resize.height;
 
         wl_surface_set_buffer_scale(wind->surface, get_window_scale_factor(window));
-        WAYLAND_wl_egl_window_resize(wind->egl_window, window->w * get_window_scale_factor(window), window->h * get_window_scale_factor(window), 0, 0);
+        if (wind->egl_window) {
+            WAYLAND_wl_egl_window_resize(wind->egl_window, window->w * get_window_scale_factor(window), window->h * get_window_scale_factor(window), 0, 0);
+        }
 
         xdg_surface_ack_configure(xdg, serial);
 
@@ -237,6 +248,9 @@ handle_configure_xdg_shell_surface(void *data, struct xdg_surface *xdg, uint32_t
         wind->resize.pending = SDL_TRUE;
         wind->resize.configure = SDL_TRUE;
         wind->resize.serial = serial;
+        if (!(window->flags & SDL_WINDOW_OPENGL)) {
+            Wayland_HandlePendingResize(window);  /* OpenGL windows handle this in SwapWindow */
+        }
     }
 }
 
@@ -372,6 +386,9 @@ update_scale_factor(SDL_WindowData *window) {
        window->resize.height = window->sdlwindow->h;
        window->resize.scale_factor = new_factor;
        window->resize.pending = SDL_TRUE;
+       if (!(window->sdlwindow->flags & SDL_WINDOW_OPENGL)) {
+           Wayland_HandlePendingResize(window->sdlwindow);  /* OpenGL windows handle this in SwapWindow */
+       }
    }
 }
 
@@ -589,7 +606,7 @@ Wayland_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered)
         const enum zxdg_toplevel_decoration_v1_mode mode = bordered ? ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE : ZXDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
         zxdg_toplevel_decoration_v1_set_mode(wind->server_decoration, mode);
     } else if ((viddata->kwin_server_decoration_manager) && (wind->kwin_server_decoration)) {
-        const enum org_kde_kwin_server_decoration_mode mode = bordered ? ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_SERVER : ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_NONE;
+        const enum org_kde_kwin_server_decoration_manager_mode mode = bordered ? ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_SERVER : ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_NONE;
         org_kde_kwin_server_decoration_request_mode(wind->kwin_server_decoration, mode);
     }
 }
@@ -624,9 +641,11 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
     c = _this->driverdata;
     window->driverdata = data;
 
-    if (!(window->flags & SDL_WINDOW_OPENGL)) {
-        SDL_GL_LoadLibrary(NULL);
-        window->flags |= SDL_WINDOW_OPENGL;
+    if (!(window->flags & SDL_WINDOW_VULKAN)) {
+        if (!(window->flags & SDL_WINDOW_OPENGL)) {
+            SDL_GL_LoadLibrary(NULL);
+            window->flags |= SDL_WINDOW_OPENGL;
+        }
     }
 
     if (window->x == SDL_WINDOWPOS_UNDEFINED) {
@@ -690,14 +709,16 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
     }
 #endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
 
-    data->egl_window = WAYLAND_wl_egl_window_create(data->surface,
+    if (window->flags & SDL_WINDOW_OPENGL) {
+        data->egl_window = WAYLAND_wl_egl_window_create(data->surface,
                                             window->w * data->scale_factor, window->h * data->scale_factor);
 
-    /* Create the GLES window surface */
-    data->egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType) data->egl_window);
+        /* Create the GLES window surface */
+        data->egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType) data->egl_window);
     
-    if (data->egl_surface == EGL_NO_SURFACE) {
-        return SDL_SetError("failed to create a window surface");
+        if (data->egl_surface == EGL_NO_SURFACE) {
+            return SDL_SetError("failed to create an EGL window surface");
+        }
     }
 
     if (c->shell.xdg) {
@@ -736,7 +757,7 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
         data->kwin_server_decoration = org_kde_kwin_server_decoration_manager_create(c->kwin_server_decoration_manager, data->surface);
         if (data->kwin_server_decoration) {
             const SDL_bool bordered = (window->flags & SDL_WINDOW_BORDERLESS) == 0;
-            const enum org_kde_kwin_server_decoration_mode mode = bordered ? ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_SERVER : ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_NONE;
+            const enum org_kde_kwin_server_decoration_manager_mode mode = bordered ? ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_SERVER : ORG_KDE_KWIN_SERVER_DECORATION_MANAGER_MODE_NONE;
             org_kde_kwin_server_decoration_request_mode(data->kwin_server_decoration, mode);
         }
     }
@@ -774,6 +795,45 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
     return 0;
 }
 
+
+void
+Wayland_HandlePendingResize(SDL_Window *window)
+{
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+
+    if (data->resize.pending) {
+        struct wl_region *region;
+        if (data->scale_factor != data->resize.scale_factor) {
+            window->w = 0;
+            window->h = 0;
+        }
+        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESIZED, data->resize.width, data->resize.height);
+        window->w = data->resize.width;
+        window->h = data->resize.height;
+        data->scale_factor = data->resize.scale_factor;
+        wl_surface_set_buffer_scale(data->surface, data->scale_factor);
+        if (data->egl_window) {
+            WAYLAND_wl_egl_window_resize(data->egl_window, window->w * data->scale_factor, window->h * data->scale_factor, 0, 0);
+        }
+
+        if (data->resize.configure) {
+           if (data->waylandData->shell.xdg) {
+              xdg_surface_ack_configure(data->shell_surface.xdg.surface, data->resize.serial);
+           } else if (data->waylandData->shell.zxdg) {
+              zxdg_surface_v6_ack_configure(data->shell_surface.zxdg.surface, data->resize.serial);
+           }
+           data->resize.configure = SDL_FALSE;
+        }
+
+        region = wl_compositor_create_region(data->waylandData->compositor);
+        wl_region_add(region, 0, 0, window->w, window->h);
+        wl_surface_set_opaque_region(data->surface, region);
+        wl_region_destroy(region);
+
+        data->resize.pending = SDL_FALSE;
+    }
+}
+
 void Wayland_SetWindowSize(_THIS, SDL_Window * window)
 {
     SDL_VideoData *data = _this->driverdata;
@@ -781,7 +841,10 @@ void Wayland_SetWindowSize(_THIS, SDL_Window * window)
     struct wl_region *region;
 
     wl_surface_set_buffer_scale(wind->surface, get_window_scale_factor(window));
-    WAYLAND_wl_egl_window_resize(wind->egl_window, window->w * get_window_scale_factor(window), window->h * get_window_scale_factor(window), 0, 0);
+
+    if (wind->egl_window) {
+        WAYLAND_wl_egl_window_resize(wind->egl_window, window->w * get_window_scale_factor(window), window->h * get_window_scale_factor(window), 0, 0);
+    }
 
     region = wl_compositor_create_region(data->compositor);
     wl_region_add(region, 0, 0, window->w, window->h);
@@ -813,8 +876,12 @@ void Wayland_DestroyWindow(_THIS, SDL_Window *window)
     SDL_WindowData *wind = window->driverdata;
 
     if (data) {
-        SDL_EGL_DestroySurface(_this, wind->egl_surface);
-        WAYLAND_wl_egl_window_destroy(wind->egl_window);
+        if (wind->egl_surface) {
+            SDL_EGL_DestroySurface(_this, wind->egl_surface);
+        }
+        if (wind->egl_window) {
+            WAYLAND_wl_egl_window_destroy(wind->egl_window);
+        }
 
         if (wind->server_decoration) {
            zxdg_toplevel_decoration_v1_destroy(wind->server_decoration);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,6 +36,7 @@ extern Uint8* SDL_expand_byte[9];
 #define SDL_COPY_BLEND              0x00000010
 #define SDL_COPY_ADD                0x00000020
 #define SDL_COPY_MOD                0x00000040
+#define SDL_COPY_MUL                0x00000080
 #define SDL_COPY_COLORKEY           0x00000100
 #define SDL_COPY_NEAREST            0x00000200
 #define SDL_COPY_RLE_DESIRED        0x00001000

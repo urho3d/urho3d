@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -86,6 +86,7 @@ class SDL_BWin:public BDirectWindow
         _buffer_locker = new BLocker();
         _bitmap = NULL;
         _clips = NULL;
+        _num_clips = 0;
 
 #ifdef DRAWTHREAD
         _draw_thread_id = spawn_thread(HAIKU_DrawThread, "drawing_thread",
@@ -139,6 +140,7 @@ class SDL_BWin:public BDirectWindow
             _gl_type = gl_flags;
         }
         AddChild(_SDL_GLView);
+        _SDL_GLView->SetEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
         _SDL_GLView->EnableDirectMode(true);
         _SDL_GLView->LockGL();  /* "New" GLViews are created */
         Unlock();
@@ -179,13 +181,17 @@ class SDL_BWin:public BDirectWindow
             _connected = true;
 
         case B_DIRECT_MODIFY:
-            if(_clips) {
-                free(_clips);
-                _clips = NULL;
+            if (info->clip_list_count > _num_clips)
+            {
+                if(_clips) {
+                    free(_clips);
+                    _clips = NULL;
+                }
             }
 
             _num_clips = info->clip_list_count;
-            _clips = (clipping_rect *)malloc(_num_clips*sizeof(clipping_rect));
+            if (_clips == NULL)
+                _clips = (clipping_rect *)malloc(_num_clips*sizeof(clipping_rect));
             if(_clips) {
                 memcpy(_clips, info->clip_list,
                     _num_clips*sizeof(clipping_rect));
@@ -314,22 +320,17 @@ class SDL_BWin:public BDirectWindow
                 && msg->FindInt32("be:transit", &transit) == B_OK) {
                 _MouseMotionEvent(where, transit);
             }
-
-            /* FIXME: Apparently a button press/release event might be dropped
-               if made before before a different button is released.  Does
-               B_MOUSE_MOVED have the data needed to check if a mouse button
-               state has changed? */
-            if (msg->FindInt32("buttons", &buttons) == B_OK) {
-                _MouseButtonEvent(buttons);
-            }
             break;
 
         case B_MOUSE_DOWN:
-        case B_MOUSE_UP:
-            /* _MouseButtonEvent() detects any and all buttons that may have
-               changed state, as well as that button's new state */
             if (msg->FindInt32("buttons", &buttons) == B_OK) {
-                _MouseButtonEvent(buttons);
+                _MouseButtonEvent(buttons, SDL_PRESSED);
+            }
+            break;
+
+        case B_MOUSE_UP:
+            if (msg->FindInt32("buttons", &buttons) == B_OK) {
+                _MouseButtonEvent(buttons, SDL_RELEASED);
             }
             break;
 
@@ -492,26 +493,17 @@ private:
  if true:  SDL_SetCursor(NULL); */
     }
 
-    void _MouseButtonEvent(int32 buttons) {
+    void _MouseButtonEvent(int32 buttons, Uint8 state) {
         int32 buttonStateChange = buttons ^ _last_buttons;
 
-        /* Make sure at least one button has changed state */
-        if( !(buttonStateChange) ) {
-            return;
-        }
-
-        /* Add any mouse button events */
         if(buttonStateChange & B_PRIMARY_MOUSE_BUTTON) {
-            _SendMouseButton(SDL_BUTTON_LEFT, buttons &
-                B_PRIMARY_MOUSE_BUTTON);
+            _SendMouseButton(SDL_BUTTON_LEFT, state);
         }
         if(buttonStateChange & B_SECONDARY_MOUSE_BUTTON) {
-            _SendMouseButton(SDL_BUTTON_RIGHT, buttons &
-                B_PRIMARY_MOUSE_BUTTON);
+            _SendMouseButton(SDL_BUTTON_RIGHT, state);
         }
         if(buttonStateChange & B_TERTIARY_MOUSE_BUTTON) {
-            _SendMouseButton(SDL_BUTTON_MIDDLE, buttons &
-                B_PRIMARY_MOUSE_BUTTON);
+            _SendMouseButton(SDL_BUTTON_MIDDLE, state);
         }
 
         _last_buttons = buttons;
@@ -652,7 +644,7 @@ private:
     clipping_rect   _bounds;
     BLocker        *_buffer_locker;
     clipping_rect  *_clips;
-    int32           _num_clips;
+    uint32          _num_clips;
     int32           _bytes_per_px;
     thread_id       _draw_thread_id;
 

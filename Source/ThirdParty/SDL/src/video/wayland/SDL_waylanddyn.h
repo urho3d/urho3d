@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -59,6 +59,9 @@ void SDL_WAYLAND_UnloadSymbols(void);
 }
 #endif
 
+/* Must be included before our #defines, see Bugzilla #4957 */
+#include "wayland-client-core.h"
+
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
 
 #ifdef _WAYLAND_CLIENT_H
@@ -74,6 +77,7 @@ void SDL_WAYLAND_UnloadSymbols(void);
 #define wl_proxy_marshal (*WAYLAND_wl_proxy_marshal)
 #define wl_proxy_set_user_data (*WAYLAND_wl_proxy_set_user_data)
 #define wl_proxy_get_user_data (*WAYLAND_wl_proxy_get_user_data)
+#define wl_proxy_get_version (*WAYLAND_wl_proxy_get_version)
 #define wl_proxy_add_listener (*WAYLAND_wl_proxy_add_listener)
 #define wl_proxy_marshal_constructor (*WAYLAND_wl_proxy_marshal_constructor)
 #define wl_proxy_marshal_constructor_versioned (*WAYLAND_wl_proxy_marshal_constructor_versioned)
@@ -98,7 +102,6 @@ void SDL_WAYLAND_UnloadSymbols(void);
 
 #endif /* SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC */
 
-#include "wayland-client-core.h"
 #include "wayland-client-protocol.h"
 #include "wayland-egl.h"
 

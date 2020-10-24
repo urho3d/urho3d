@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -72,6 +72,7 @@ SDL_X11_SYM(char*,XGetAtomName,(Display *a,Atom b),(a,b),return)
 SDL_X11_SYM(int,XGetInputFocus,(Display *a,Window *b,int *c),(a,b,c),return)
 SDL_X11_SYM(int,XGetErrorDatabaseText,(Display* a,_Xconst char* b,_Xconst char* c,_Xconst char* d,char* e,int f),(a,b,c,d,e,f),return)
 SDL_X11_SYM(XModifierKeymap*,XGetModifierMapping,(Display* a),(a),return)
+SDL_X11_SYM(int,XGetKeyboardControl,(Display* a, XKeyboardState* b),(a,b),return)
 SDL_X11_SYM(int,XGetPointerControl,(Display* a,int* b,int* c,int* d),(a,b,c,d),return)
 SDL_X11_SYM(Window,XGetSelectionOwner,(Display* a,Atom b),(a,b),return)
 SDL_X11_SYM(XVisualInfo*,XGetVisualInfo,(Display* a,long b,XVisualInfo* c,int* d),(a,b,c,d),return)

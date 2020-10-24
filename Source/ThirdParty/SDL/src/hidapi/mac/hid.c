@@ -17,7 +17,7 @@
  files located at the root of the source distribution.
  These files may also be found in the public source
  code repository located at:
- http://github.com/signal11/hidapi .
+ https://github.com/libusb/hidapi .
  ********************************************************/
 #include "../../SDL_internal.h"
 
@@ -29,7 +29,6 @@
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <wchar.h>
-#include <locale.h>
 #include <pthread.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -42,10 +41,10 @@
  StackOverflow. It is used with his permission. */
 typedef int pthread_barrierattr_t;
 typedef struct pthread_barrier {
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-    int count;
-    int trip_count;
+	pthread_mutex_t mutex;
+	pthread_cond_t cond;
+	int count;
+	int trip_count;
 } pthread_barrier_t;
 
 static int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
@@ -179,22 +178,22 @@ static void free_hid_device(hid_device *dev)
 	free(dev->input_report_buf);
 
 	if (device_list) {
-    	if (device_list->dev == dev) {
-    		device_list = device_list->next;
-    	}
-    	else {
-    		struct hid_device_list_node *node = device_list;
-    		while (node) {
-    			if (node->next && node->next->dev == dev) {
-    				struct hid_device_list_node *new_next = node->next->next;
-    				free(node->next);
-    				node->next = new_next;
-    				break;
-    			}
+		if (device_list->dev == dev) {
+			device_list = device_list->next;
+		}
+		else {
+			struct hid_device_list_node *node = device_list;
+			while (node) {
+				if (node->next && node->next->dev == dev) {
+					struct hid_device_list_node *new_next = node->next->next;
+					free(node->next);
+					node->next = new_next;
+					break;
+				}
 
-    			node = node->next;
-    		}
-    	}
+				node = node->next;
+			}
+		}
 	}
 	
 	/* Clean up the thread objects */
@@ -372,6 +371,27 @@ static int make_path(IOHIDDeviceRef device, char *buf, size_t len)
 	return res+1;
 }
 
+static void hid_device_removal_callback(void *context, IOReturn result,
+                                        void *sender, IOHIDDeviceRef hid_ref)
+{
+	// The device removal callback is sometimes called even after being
+	// unregistered, leading to a crash when trying to access fields in
+	// the already freed hid_device. We keep a linked list of all created
+	// hid_device's so that the one being removed can be checked against
+	// the list to see if it really hasn't been closed yet and needs to
+	// be dealt with here.
+	struct hid_device_list_node *node = device_list;
+	while (node) {
+		if (node->dev->device_handle == hid_ref) {
+			node->dev->disconnected = 1;
+			CFRunLoopStop(node->dev->run_loop);
+			break;
+		}
+
+		node = node->next;
+	}
+}
+
 /* Initialize the IOHIDManager. Return 0 for success and -1 for failure. */
 static int init_hid_manager(void)
 {
@@ -381,6 +401,7 @@ static int init_hid_manager(void)
 	if (hid_mgr) {
 		IOHIDManagerSetDeviceMatching(hid_mgr, NULL);
 		IOHIDManagerScheduleWithRunLoop(hid_mgr, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+		IOHIDManagerRegisterDeviceRemovalCallback(hid_mgr, hid_device_removal_callback, NULL);
 		return 0;
 	}
 	
@@ -426,8 +447,6 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 	CFIndex num_devices;
 	int i;
 	
-	setlocale(LC_ALL,"");
-	
 	/* Set up the HID Manager if it hasn't been done */
 	if (hid_init() < 0)
 		return NULL;
@@ -459,9 +478,10 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 		
 		IOHIDDeviceRef dev = device_array[i];
 		
-        if (!dev) {
-            continue;
-        }
+		if (!dev) {
+			continue;
+		}
+
 		dev_vid = get_vendor_id(dev);
 		dev_pid = get_product_id(dev);
 		
@@ -567,30 +587,6 @@ hid_device * HID_API_EXPORT hid_open(unsigned short vendor_id, unsigned short pr
 	hid_free_enumeration(devs);
 	
 	return handle;
-}
-
-static void hid_device_removal_callback(void *context, IOReturn result,
-                                        void *sender)
-{
-	/* Stop the Run Loop for this device. */
-	hid_device *dev = (hid_device *)context;
-
-	// The device removal callback is sometimes called even after being
-	// unregistered, leading to a crash when trying to access fields in
-	// the already freed hid_device. We keep a linked list of all created
-	// hid_device's so that the one being removed can be checked against
-	// the list to see if it really hasn't been closed yet and needs to
-	// be dealt with here.
-	struct hid_device_list_node *node = device_list;
-	while (node) {
-		if (node->dev == dev) {
-			dev->disconnected = 1;
-			CFRunLoopStop(dev->run_loop);
-			break;
-		}
-
-		node = node->next;
-	}
 }
 
 /* The Run Loop calls this function for each input report received.
@@ -766,7 +762,6 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 				IOHIDDeviceRegisterInputReportCallback(
 													   os_dev, dev->input_report_buf, dev->max_input_report_len,
 													   &hid_report_callback, dev);
-				IOHIDDeviceRegisterRemovalCallback(dev->device_handle, hid_device_removal_callback, dev);
 
 				struct hid_device_list_node *node = (struct hid_device_list_node *)calloc(1, sizeof(struct hid_device_list_node));
 				node->dev = dev;
@@ -1042,7 +1037,6 @@ void HID_API_EXPORT hid_close(hid_device *dev)
 		IOHIDDeviceRegisterInputReportCallback(
 											   dev->device_handle, dev->input_report_buf, dev->max_input_report_len,
 											   NULL, dev);
-		IOHIDDeviceRegisterRemovalCallback(dev->device_handle, NULL, dev);
 		IOHIDDeviceUnscheduleFromRunLoop(dev->device_handle, dev->run_loop, dev->run_loop_mode);
 		IOHIDDeviceScheduleWithRunLoop(dev->device_handle, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
 	}
@@ -1156,8 +1150,6 @@ int main(void)
 	CFIndex num_devices = CFSetGetCount(device_set);
 	IOHIDDeviceRef *device_array = calloc(num_devices, sizeof(IOHIDDeviceRef));
 	CFSetGetValues(device_set, (const void **) device_array);
-	
-	setlocale(LC_ALL, "");
 	
 	for (i = 0; i < num_devices; i++) {
 		IOHIDDeviceRef dev = device_array[i];

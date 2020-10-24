@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -208,7 +208,7 @@ GL_ClearErrors(SDL_Renderer *renderer)
         return;
     }
     while (data->glGetError() != GL_NO_ERROR) {
-        continue;
+        /* continue; */
     }
 }
 
@@ -1277,9 +1277,9 @@ GLES2_RunCommandQueue(SDL_Renderer * renderer, SDL_RenderCommand *cmd, void *ver
                     data->drawstate.clear_color = color;
                 }
 
-                if (data->drawstate.cliprect_enabled) {
+                if (data->drawstate.cliprect_enabled || data->drawstate.cliprect_enabled_dirty) {
                     data->glDisable(GL_SCISSOR_TEST);
-                    data->drawstate.cliprect_enabled_dirty = SDL_TRUE;
+                    data->drawstate.cliprect_enabled_dirty = data->drawstate.cliprect_enabled;
                 }
 
                 data->glClear(GL_COLOR_BUFFER_BIT);
@@ -1743,6 +1743,36 @@ GLES2_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture)
     GLES2_UpdateTexture(renderer, texture, &rect, tdata->pixel_data, tdata->pitch);
 }
 
+static void
+GLES2_SetTextureScaleMode(SDL_Renderer * renderer, SDL_Texture * texture, SDL_ScaleMode scaleMode)
+{
+    GLES2_RenderData *renderdata = (GLES2_RenderData *) renderer->driverdata;
+    GLES2_TextureData *data = (GLES2_TextureData *) texture->driverdata;
+    GLenum glScaleMode = (scaleMode == SDL_ScaleModeNearest) ? GL_NEAREST : GL_LINEAR;
+
+    if (data->yuv) {
+        renderdata->glActiveTexture(GL_TEXTURE2);
+        renderdata->glBindTexture(data->texture_type, data->texture_v);
+        renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MIN_FILTER, glScaleMode);
+        renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MAG_FILTER, glScaleMode);
+
+        renderdata->glActiveTexture(GL_TEXTURE1);
+        renderdata->glBindTexture(data->texture_type, data->texture_u);
+        renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MIN_FILTER, glScaleMode);
+        renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MAG_FILTER, glScaleMode);
+    } else if (data->nv12) {
+        renderdata->glActiveTexture(GL_TEXTURE1);
+        renderdata->glBindTexture(data->texture_type, data->texture_u);
+        renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MIN_FILTER, glScaleMode);
+        renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MAG_FILTER, glScaleMode);
+    }
+
+    renderdata->glActiveTexture(GL_TEXTURE0);
+    renderdata->glBindTexture(data->texture_type, data->texture);
+    renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MIN_FILTER, glScaleMode);
+    renderdata->glTexParameteri(data->texture_type, GL_TEXTURE_MAG_FILTER, glScaleMode);
+}
+
 static int
 GLES2_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture)
 {
@@ -1812,7 +1842,7 @@ GLES2_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
     int status;
 
     temp_pitch = rect->w * SDL_BYTESPERPIXEL(temp_format);
-    buflen = (size_t) (rect->h * temp_pitch);
+    buflen = rect->h * temp_pitch;
     if (buflen == 0) {
         return 0;  /* nothing to do. */
     }
@@ -2064,6 +2094,7 @@ GLES2_CreateRenderer(SDL_Window *window, Uint32 flags)
     renderer->UpdateTextureYUV    = GLES2_UpdateTextureYUV;
     renderer->LockTexture         = GLES2_LockTexture;
     renderer->UnlockTexture       = GLES2_UnlockTexture;
+    renderer->SetTextureScaleMode = GLES2_SetTextureScaleMode;
     renderer->SetRenderTarget     = GLES2_SetRenderTarget;
     renderer->QueueSetViewport    = GLES2_QueueSetViewport;
     renderer->QueueSetDrawColor   = GLES2_QueueSetViewport;  /* SetViewport and SetDrawColor are (currently) no-ops. */

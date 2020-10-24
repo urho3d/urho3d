@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,7 +48,7 @@ SDL_DYNAPI_PROC(int,SDL_snprintf,(SDL_OUT_Z_CAP(b) char *a, size_t b, SDL_PRINTF
 #undef SDL_CreateThread
 #endif
 
-#if defined(__WIN32__) && !defined(HAVE_LIBC)
+#if defined(__WIN32__)
 SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThread,(SDL_ThreadFunction a, const char *b, void *c, pfnSDL_CurrentBeginThread d, pfnSDL_CurrentEndThread e),(a,b,c,d,e),return)
 #elif defined(__OS2__)
 SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThread,(SDL_ThreadFunction a, const char *b, void *c, pfnSDL_CurrentBeginThread d, pfnSDL_CurrentEndThread e),(a,b,c,d,e),return)
@@ -715,7 +715,7 @@ SDL_DYNAPI_PROC(SDL_bool,SDL_HasAVX512F,(void),(),return)
 #ifdef __ANDROID__
 SDL_DYNAPI_PROC(SDL_bool,SDL_IsChromebook,(void),(),return)
 SDL_DYNAPI_PROC(SDL_bool,SDL_IsDeXMode,(void),(),return)
-SDL_DYNAPI_PROC(void,SDL_AndroidBackButton,(void),(),return)
+SDL_DYNAPI_PROC(void,SDL_AndroidBackButton,(void),(),)
 #endif
 SDL_DYNAPI_PROC(double,SDL_exp,(double a),(a),return)
 SDL_DYNAPI_PROC(float,SDL_expf,(float a),(a),return)
@@ -744,7 +744,7 @@ SDL_DYNAPI_PROC(SDL_bool,SDL_HasColorKey,(SDL_Surface *a),(a),return)
 #undef SDL_CreateThreadWithStackSize
 #endif
 
-#if defined(__WIN32__) && !defined(HAVE_LIBC)
+#if defined(__WIN32__)
 SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d, pfnSDL_CurrentBeginThread e, pfnSDL_CurrentEndThread f),(a,b,c,d,e,f),return)
 #elif defined(__OS2__)
 SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d, pfnSDL_CurrentBeginThread e, pfnSDL_CurrentEndThread f),(a,b,c,d,e,f),return)
@@ -780,3 +780,32 @@ SDL_DYNAPI_PROC(size_t,SDL_RWread,(SDL_RWops *a, void *b, size_t c, size_t d),(a
 SDL_DYNAPI_PROC(size_t,SDL_RWwrite,(SDL_RWops *a, const void *b, size_t c, size_t d),(a,b,c,d),return)
 SDL_DYNAPI_PROC(int,SDL_RWclose,(SDL_RWops *a),(a),return)
 SDL_DYNAPI_PROC(void*,SDL_LoadFile,(const char *a, size_t *b),(a,b),return)
+SDL_DYNAPI_PROC(SDL_MetalView,SDL_Metal_CreateView,(SDL_Window *a),(a),return)
+SDL_DYNAPI_PROC(void,SDL_Metal_DestroyView,(SDL_MetalView a),(a),)
+SDL_DYNAPI_PROC(int,SDL_LockTextureToSurface,(SDL_Texture *a, const SDL_Rect *b, SDL_Surface **c),(a,b,c),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasARMSIMD,(void),(),return)
+SDL_DYNAPI_PROC(char*,SDL_strtokr,(char *a, const char *b, char **c),(a,b,c),return)
+SDL_DYNAPI_PROC(wchar_t*,SDL_wcsstr,(const wchar_t *a, const wchar_t *b),(a,b),return)
+SDL_DYNAPI_PROC(int,SDL_wcsncmp,(const wchar_t *a, const wchar_t *b, size_t c),(a,b,c),return)
+SDL_DYNAPI_PROC(SDL_GameControllerType,SDL_GameControllerTypeForIndex,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_GameControllerType,SDL_GameControllerGetType,(SDL_GameController *a),(a),return)
+SDL_DYNAPI_PROC(SDL_GameController*,SDL_GameControllerFromPlayerIndex,(int a),(a),return)
+SDL_DYNAPI_PROC(void,SDL_GameControllerSetPlayerIndex,(SDL_GameController *a, int b),(a,b),)
+SDL_DYNAPI_PROC(SDL_Joystick*,SDL_JoystickFromPlayerIndex,(int a),(a),return)
+SDL_DYNAPI_PROC(void,SDL_JoystickSetPlayerIndex,(SDL_Joystick *a, int b),(a,b),)
+SDL_DYNAPI_PROC(int,SDL_SetTextureScaleMode,(SDL_Texture *a, SDL_ScaleMode b),(a,b),return)
+SDL_DYNAPI_PROC(int,SDL_GetTextureScaleMode,(SDL_Texture *a, SDL_ScaleMode *b),(a,b),return)
+SDL_DYNAPI_PROC(void,SDL_OnApplicationWillTerminate,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_OnApplicationDidReceiveMemoryWarning,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_OnApplicationWillResignActive,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_OnApplicationDidEnterBackground,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_OnApplicationWillEnterForeground,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_OnApplicationDidBecomeActive,(void),(),)
+#ifdef __IPHONEOS__
+SDL_DYNAPI_PROC(void,SDL_OnApplicationDidChangeStatusBarOrientation,(void),(),)
+#endif
+#ifdef __ANDROID__
+SDL_DYNAPI_PROC(int,SDL_GetAndroidSDKVersion,(void),(),return)
+#endif
+SDL_DYNAPI_PROC(int,SDL_isupper,(int a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_islower,(int a),(a),return)

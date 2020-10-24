@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -39,6 +39,7 @@ typedef struct
 {
     EGLSurface egl_surface;
     EGLContext egl_context; /* We use this to preserve the context when losing focus */
+    SDL_bool   backup_done;
     ANativeWindow *native_window;
     
 } SDL_WindowData;

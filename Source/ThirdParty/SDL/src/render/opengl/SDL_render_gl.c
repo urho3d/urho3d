@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -180,7 +180,7 @@ GL_ClearErrors(SDL_Renderer *renderer)
         }
     } else if (data->glGetError != NULL) {
         while (data->glGetError() != GL_NO_ERROR) {
-            continue;
+            /* continue; */
         }
     }
 }
@@ -768,6 +768,43 @@ GL_UnlockTexture(SDL_Renderer * renderer, SDL_Texture * texture)
     GL_UpdateTexture(renderer, texture, rect, pixels, data->pitch);
 }
 
+static void
+GL_SetTextureScaleMode(SDL_Renderer * renderer, SDL_Texture * texture, SDL_ScaleMode scaleMode)
+{
+    GL_RenderData *renderdata = (GL_RenderData *) renderer->driverdata;
+    const GLenum textype = renderdata->textype;
+    GL_TextureData *data = (GL_TextureData *) texture->driverdata;
+    GLenum glScaleMode = (scaleMode == SDL_ScaleModeNearest) ? GL_NEAREST : GL_LINEAR;
+
+    renderdata->glEnable(textype);
+    renderdata->glBindTexture(textype, data->texture);
+    renderdata->glTexParameteri(textype, GL_TEXTURE_MIN_FILTER, glScaleMode);
+    renderdata->glTexParameteri(textype, GL_TEXTURE_MAG_FILTER, glScaleMode);
+    renderdata->glDisable(textype);
+
+    if (texture->format == SDL_PIXELFORMAT_YV12 ||
+        texture->format == SDL_PIXELFORMAT_IYUV) {
+        renderdata->glEnable(textype);
+        renderdata->glBindTexture(textype, data->utexture);
+        renderdata->glTexParameteri(textype, GL_TEXTURE_MIN_FILTER, glScaleMode);
+        renderdata->glTexParameteri(textype, GL_TEXTURE_MAG_FILTER, glScaleMode);
+
+        renderdata->glBindTexture(textype, data->vtexture);
+        renderdata->glTexParameteri(textype, GL_TEXTURE_MIN_FILTER, glScaleMode);
+        renderdata->glTexParameteri(textype, GL_TEXTURE_MAG_FILTER, glScaleMode);
+        renderdata->glDisable(textype);
+    }
+
+    if (texture->format == SDL_PIXELFORMAT_NV12 ||
+        texture->format == SDL_PIXELFORMAT_NV21) {
+        renderdata->glEnable(textype);
+        renderdata->glBindTexture(textype, data->utexture);
+        renderdata->glTexParameteri(textype, GL_TEXTURE_MIN_FILTER, glScaleMode);
+        renderdata->glTexParameteri(textype, GL_TEXTURE_MAG_FILTER, glScaleMode);
+        renderdata->glDisable(textype);
+    }
+}
+
 static int
 GL_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture)
 {
@@ -1166,9 +1203,9 @@ GL_RunCommandQueue(SDL_Renderer * renderer, SDL_RenderCommand *cmd, void *vertic
                     data->drawstate.clear_color = color;
                 }
 
-                if (data->drawstate.cliprect_enabled) {
+                if (data->drawstate.cliprect_enabled || data->drawstate.cliprect_enabled_dirty) {
                     data->glDisable(GL_SCISSOR_TEST);
-                    data->drawstate.cliprect_enabled_dirty = SDL_TRUE;
+                    data->drawstate.cliprect_enabled_dirty = data->drawstate.cliprect_enabled;
                 }
 
                 data->glClear(GL_COLOR_BUFFER_BIT);
@@ -1210,6 +1247,7 @@ GL_RunCommandQueue(SDL_Renderer * renderer, SDL_RenderCommand *cmd, void *vertic
                         data->glVertex2f(verts[0], verts[1]);
                     }
                     data->glEnd();
+                    verts -= 2 * count;
 
                     /* The line is half open, so we need one more point to complete it.
                      * http://www.opengl.org/documentation/specs/version1.1/glspec1.1/node47.html
@@ -1576,6 +1614,7 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
     renderer->UpdateTextureYUV = GL_UpdateTextureYUV;
     renderer->LockTexture = GL_LockTexture;
     renderer->UnlockTexture = GL_UnlockTexture;
+    renderer->SetTextureScaleMode = GL_SetTextureScaleMode;
     renderer->SetRenderTarget = GL_SetRenderTarget;
     renderer->QueueSetViewport = GL_QueueSetViewport;
     renderer->QueueSetDrawColor = GL_QueueSetViewport;  /* SetViewport and SetDrawColor are (currently) no-ops. */

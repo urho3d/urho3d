@@ -20,39 +20,21 @@
  files located at the root of the source distribution.
  These files may also be found in the public source
  code repository located at:
-        http://github.com/signal11/hidapi .
+        https://github.com/libusb/hidapi .
 ********************************************************/
+
+/* This file is heavily modified from the original libusb.c, for portability.
+ * Last upstream update was from July 25, 2019, Git commit 93dca807.
+ */
+
 #include "../../SDL_internal.h"
+#include "SDL_thread.h"
+#include "SDL_mutex.h"
 
 #ifdef SDL_JOYSTICK_HIDAPI
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE /* needed for wcsdup() before glibc 2.10 */
-#endif
-
-/* C */
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <locale.h>
-#include <errno.h>
-
-/* Unix */
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <sys/utsname.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <wchar.h>
-
-/* GNU / LibUSB */
 #include <libusb.h>
-#ifndef __ANDROID__
-#include <iconv.h>
-#endif
+#include <locale.h> /* setlocale */
 
 #include "hidapi.h"
 
@@ -61,66 +43,62 @@ namespace NAMESPACE
 {
 #endif
 
-#ifdef __ANDROID__
-
 /* Barrier implementation because Android/Bionic don't have pthread_barrier.
    This implementation came from Brent Priddy and was posted on
    StackOverflow. It is used with his permission. */
-typedef int pthread_barrierattr_t;
-typedef struct pthread_barrier {
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-    int count;
-    int trip_count;
-} pthread_barrier_t;
 
-static int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
+typedef struct _SDL_ThreadBarrier
 {
-	if(count == 0) {
-		errno = EINVAL;
-		return -1;
+	SDL_mutex *mutex;
+	SDL_cond *cond;
+	Uint32 count;
+	Uint32 trip_count;
+} SDL_ThreadBarrier;
+
+static int SDL_CreateThreadBarrier(SDL_ThreadBarrier *barrier, Uint32 count)
+{
+	if (barrier == NULL) {
+		return SDL_SetError("barrier must be non-NULL");
+	}
+	if (count == 0) {
+		return SDL_SetError("count must be > 0");
 	}
 
-	if(pthread_mutex_init(&barrier->mutex, 0) < 0) {
-		return -1;
+	barrier->mutex = SDL_CreateMutex();
+	if (barrier->mutex == NULL) {
+		return -1; /* Error set by CreateMutex */
 	}
-	if(pthread_cond_init(&barrier->cond, 0) < 0) {
-		pthread_mutex_destroy(&barrier->mutex);
-		return -1;
+	barrier->cond = SDL_CreateCond();
+	if (barrier->cond == NULL) {
+		return -1; /* Error set by CreateCond */
 	}
+
 	barrier->trip_count = count;
 	barrier->count = 0;
 
 	return 0;
 }
 
-static int pthread_barrier_destroy(pthread_barrier_t *barrier)
+static void SDL_DestroyThreadBarrier(SDL_ThreadBarrier *barrier)
 {
-	pthread_cond_destroy(&barrier->cond);
-	pthread_mutex_destroy(&barrier->mutex);
-	return 0;
+	SDL_DestroyCond(barrier->cond);
+	SDL_DestroyMutex(barrier->mutex);
 }
 
-static int pthread_barrier_wait(pthread_barrier_t *barrier)
+static int SDL_WaitThreadBarrier(SDL_ThreadBarrier *barrier)
 {
-	pthread_mutex_lock(&barrier->mutex);
-	++(barrier->count);
-	if(barrier->count >= barrier->trip_count)
-	{
+	SDL_LockMutex(barrier->mutex);
+	barrier->count += 1;
+	if (barrier->count >= barrier->trip_count) {
 		barrier->count = 0;
-		pthread_cond_broadcast(&barrier->cond);
-		pthread_mutex_unlock(&barrier->mutex);
+		SDL_CondBroadcast(barrier->cond);
+		SDL_UnlockMutex(barrier->mutex);
 		return 1;
 	}
-	else
-	{
-		pthread_cond_wait(&barrier->cond, &(barrier->mutex));
-		pthread_mutex_unlock(&barrier->mutex);
-		return 0;
-	}
+	SDL_CondWait(barrier->cond, barrier->mutex);
+	SDL_UnlockMutex(barrier->mutex);
+	return 0;
 }
-
-#endif
 
 #if defined(__cplusplus) && !defined(NAMESPACE)
 extern "C" {
@@ -163,6 +141,7 @@ struct hid_device_ {
 
 	/* The interface number of the HID */
 	int interface;
+	int detached_driver;
 
 	/* Indexes of Strings */
 	int manufacturer_index;
@@ -173,10 +152,10 @@ struct hid_device_ {
 	int blocking; /* boolean */
 
 	/* Read thread objects */
-	pthread_t thread;
-	pthread_mutex_t mutex; /* Protects input_reports */
-	pthread_cond_t condition;
-	pthread_barrier_t barrier; /* Ensures correct startup sequence */
+	SDL_Thread *thread;
+	SDL_mutex *mutex; /* Protects input_reports */
+	SDL_cond *condition;
+	SDL_ThreadBarrier barrier; /* Ensures correct startup sequence */
 	int shutdown_thread;
 	int cancelled;
 	struct libusb_transfer *transfer;
@@ -192,12 +171,12 @@ static int return_data(hid_device *dev, unsigned char *data, size_t length);
 
 static hid_device *new_hid_device(void)
 {
-	hid_device *dev = (hid_device *)calloc(1, sizeof(hid_device));
+	hid_device *dev = (hid_device*) calloc(1, sizeof(hid_device));
 	dev->blocking = 1;
 
-	pthread_mutex_init(&dev->mutex, NULL);
-	pthread_cond_init(&dev->condition, NULL);
-	pthread_barrier_init(&dev->barrier, NULL, 2);
+	dev->mutex = SDL_CreateMutex();
+	dev->condition = SDL_CreateCond();
+	SDL_CreateThreadBarrier(&dev->barrier, 2);
 
 	return dev;
 }
@@ -205,17 +184,17 @@ static hid_device *new_hid_device(void)
 static void free_hid_device(hid_device *dev)
 {
 	/* Clean up the thread objects */
-	pthread_barrier_destroy(&dev->barrier);
-	pthread_cond_destroy(&dev->condition);
-	pthread_mutex_destroy(&dev->mutex);
+	SDL_DestroyThreadBarrier(&dev->barrier);
+	SDL_DestroyCond(dev->condition);
+	SDL_DestroyMutex(dev->mutex);
 
 	/* Free the device itself */
 	free(dev);
 }
 
 #if 0
-/*TODO: Implement this funciton on hidapi/libusb.. */
-static void register_error(hid_device *device, const char *op)
+/*TODO: Implement this function on hidapi/libusb.. */
+static void register_error(hid_device *dev, const char *op)
 {
 
 }
@@ -400,20 +379,13 @@ static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 	int len;
 	wchar_t *str = NULL;
 
-#ifndef __ANDROID__ /* we don't use iconv on Android */
 	wchar_t wbuf[256];
-	/* iconv variables */
-	iconv_t ic;
+	SDL_iconv_t ic;
 	size_t inbytes;
 	size_t outbytes;
 	size_t res;
-#ifdef __FreeBSD__
 	const char *inptr;
-#else
-	char *inptr;
-#endif
 	char *outptr;
-#endif
 
 	/* Determine which language to use. */
 	uint16_t lang;
@@ -430,32 +402,13 @@ static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 	if (len < 0)
 		return NULL;
 
-#ifdef __ANDROID__
-
-	/* Bionic does not have iconv support nor wcsdup() function, so it
-	   has to be done manually.  The following code will only work for
-	   code points that can be represented as a single UTF-16 character,
-	   and will incorrectly convert any code points which require more
-	   than one UTF-16 character.
-
-	   Skip over the first character (2-bytes).  */
-	len -= 2;
-	str = malloc((len / 2 + 1) * sizeof(wchar_t));
-	int i;
-	for (i = 0; i < len / 2; i++) {
-		str[i] = buf[i * 2 + 2] | (buf[i * 2 + 3] << 8);
-	}
-	str[len / 2] = 0x00000000;
-
-#else
-
 	/* buf does not need to be explicitly NULL-terminated because
 	   it is only passed into iconv() which does not need it. */
 
 	/* Initialize iconv. */
-	ic = iconv_open("WCHAR_T", "UTF-16LE");
-	if (ic == (iconv_t)-1) {
-		LOG("iconv_open() failed\n");
+	ic = SDL_iconv_open("WCHAR_T", "UTF-16LE");
+	if (ic == (SDL_iconv_t)-1) {
+		LOG("SDL_iconv_open() failed\n");
 		return NULL;
 	}
 
@@ -465,9 +418,9 @@ static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 	inbytes = len-2;
 	outptr = (char*) wbuf;
 	outbytes = sizeof(wbuf);
-	res = iconv(ic, &inptr, &inbytes, &outptr, &outbytes);
+	res = SDL_iconv(ic, &inptr, &inbytes, &outptr, &outbytes);
 	if (res == (size_t)-1) {
-		LOG("iconv() failed\n");
+		LOG("SDL_iconv() failed\n");
 		goto err;
 	}
 
@@ -480,9 +433,7 @@ static wchar_t *get_usb_string(libusb_device_handle *dev, uint8_t idx)
 	str = wcsdup(wbuf);
 
 err:
-	iconv_close(ic);
-
-#endif
+	SDL_iconv_close(ic);
 
 	return str;
 }
@@ -531,7 +482,8 @@ int HID_API_EXPORT hid_exit(void)
 static int is_xbox360(unsigned short vendor_id, const struct libusb_interface_descriptor *intf_desc)
 {
 	static const int XB360_IFACE_SUBCLASS = 93;
-	static const int XB360_IFACE_PROTOCOL = 1; /* Wired only */
+	static const int XB360_IFACE_PROTOCOL = 1; /* Wired */
+	static const int XB360W_IFACE_PROTOCOL = 129; /* Wireless */
 	static const int SUPPORTED_VENDORS[] = {
 		0x0079, /* GPD Win 2 */
 		0x044f, /* Thrustmaster */
@@ -541,8 +493,9 @@ static int is_xbox360(unsigned short vendor_id, const struct libusb_interface_de
 		0x06a3, /* Saitek */
 		0x0738, /* Mad Catz */
 		0x07ff, /* Mad Catz */
-		0x0e6f, /* Unknown */
+		0x0e6f, /* PDP */
 		0x0f0d, /* Hori */
+		0x1038, /* SteelSeries */
 		0x11c9, /* Nacon */
 		0x12ab, /* Unknown */
 		0x1430, /* RedOctane */
@@ -555,10 +508,10 @@ static int is_xbox360(unsigned short vendor_id, const struct libusb_interface_de
 		0x24c6, /* PowerA */
 	};
 
-	if (intf_desc->bInterfaceNumber == 0 &&
-	    intf_desc->bInterfaceClass == LIBUSB_CLASS_VENDOR_SPEC &&
+	if (intf_desc->bInterfaceClass == LIBUSB_CLASS_VENDOR_SPEC &&
 	    intf_desc->bInterfaceSubClass == XB360_IFACE_SUBCLASS &&
-	    intf_desc->bInterfaceProtocol == XB360_IFACE_PROTOCOL) {
+	    (intf_desc->bInterfaceProtocol == XB360_IFACE_PROTOCOL ||
+	     intf_desc->bInterfaceProtocol == XB360W_IFACE_PROTOCOL)) {
 		int i;
 		for (i = 0; i < sizeof(SUPPORTED_VENDORS)/sizeof(SUPPORTED_VENDORS[0]); ++i) {
 			if (vendor_id == SUPPORTED_VENDORS[i]) {
@@ -576,10 +529,11 @@ static int is_xboxone(unsigned short vendor_id, const struct libusb_interface_de
         static const int SUPPORTED_VENDORS[] = {
             0x045e, /* Microsoft */
             0x0738, /* Mad Catz */
-            0x0e6f, /* Unknown */
+            0x0e6f, /* PDP */
             0x0f0d, /* Hori */
             0x1532, /* Razer Wildcat */
             0x24c6, /* PowerA */
+            0x2e24, /* Hyperkin */
         };
 
 	if (intf_desc->bInterfaceNumber == 0 &&
@@ -603,13 +557,7 @@ static int should_enumerate_interface(unsigned short vendor_id, const struct lib
 
 	/* Also enumerate Xbox 360 controllers */
 	if (is_xbox360(vendor_id, intf_desc))
-	{
-		/* hid_write() to Xbox 360 controllers doesn't seem to work on Linux:
-		   - xpad 1-2:1.0: xpad_try_sending_next_out_packet - usb_submit_urb failed with result -2
-		   Xbox 360 controller support is good on Linux anyway, so we'll ignore this for now.
 		return 1;
-		*/
-	}
 
 	/* Also enumerate Xbox One controllers */
 	if (is_xboxone(vendor_id, intf_desc))
@@ -660,25 +608,25 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 						/* Check the VID/PID against the arguments */
 						if ((vendor_id == 0x0 || vendor_id == dev_vid) &&
 						    (product_id == 0x0 || product_id == dev_pid)) {
-							struct hid_device_info *tmp;
-
-							/* VID/PID match. Create the record. */
-							tmp = (struct hid_device_info *)calloc(1, sizeof(struct hid_device_info));
-							if (cur_dev) {
-								cur_dev->next = tmp;
-							}
-							else {
-								root = tmp;
-							}
-							cur_dev = tmp;
-
-							/* Fill out the record */
-							cur_dev->next = NULL;
-							cur_dev->path = make_path(dev, interface_num);
-
 							res = libusb_open(dev, &handle);
 
 							if (res >= 0) {
+								struct hid_device_info *tmp;
+
+								/* VID/PID match. Create the record. */
+								tmp = (struct hid_device_info*) calloc(1, sizeof(struct hid_device_info));
+								if (cur_dev) {
+									cur_dev->next = tmp;
+								}
+								else {
+									root = tmp;
+								}
+								cur_dev = tmp;
+
+								/* Fill out the record */
+								cur_dev->next = NULL;
+								cur_dev->path = make_path(dev, interface_num);
+
 								/* Serial Number */
 								if (desc.iSerialNumber > 0)
 									cur_dev->serial_number =
@@ -756,16 +704,22 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 #endif /* INVASIVE_GET_USAGE */
 
 								libusb_close(handle);
-							}
-							/* VID/PID */
-							cur_dev->vendor_id = dev_vid;
-							cur_dev->product_id = dev_pid;
 
-							/* Release Number */
-							cur_dev->release_number = desc.bcdDevice;
+								/* VID/PID */
+								cur_dev->vendor_id = dev_vid;
+								cur_dev->product_id = dev_pid;
 
-							/* Interface Number */
-							cur_dev->interface_number = interface_num;
+								/* Release Number */
+								cur_dev->release_number = desc.bcdDevice;
+
+								/* Interface Number */
+								cur_dev->interface_number = interface_num;
+								cur_dev->interface_class = intf_desc->bInterfaceClass;
+								cur_dev->interface_subclass = intf_desc->bInterfaceSubClass;
+								cur_dev->interface_protocol = intf_desc->bInterfaceProtocol;
+
+							} else
+								LOG("Can't open device 0x%.4x/0x%.4x during enumeration: %d\n", dev_vid, dev_pid, res);
 						}
 					}
 				} /* altsettings */
@@ -836,19 +790,19 @@ static void read_callback(struct libusb_transfer *transfer)
 
 	if (transfer->status == LIBUSB_TRANSFER_COMPLETED) {
 
-		struct input_report *rpt = (struct input_report *)malloc(sizeof(*rpt));
-		rpt->data = (uint8_t *)malloc(transfer->actual_length);
+		struct input_report *rpt = (struct input_report*) malloc(sizeof(*rpt));
+		rpt->data = (uint8_t*) malloc(transfer->actual_length);
 		memcpy(rpt->data, transfer->buffer, transfer->actual_length);
 		rpt->len = transfer->actual_length;
 		rpt->next = NULL;
 
-		pthread_mutex_lock(&dev->mutex);
+		SDL_LockMutex(dev->mutex);
 
 		/* Attach the new report object to the end of the list. */
 		if (dev->input_reports == NULL) {
 			/* The list is empty. Put it at the root. */
 			dev->input_reports = rpt;
-			pthread_cond_signal(&dev->condition);
+			SDL_CondSignal(dev->condition);
 		}
 		else {
 			/* Find the end of the list and attach. */
@@ -867,7 +821,7 @@ static void read_callback(struct libusb_transfer *transfer)
 				return_data(dev, NULL, 0);
 			}
 		}
-		pthread_mutex_unlock(&dev->mutex);
+		SDL_UnlockMutex(dev->mutex);
 	}
 	else if (transfer->status == LIBUSB_TRANSFER_CANCELLED) {
 		dev->shutdown_thread = 1;
@@ -896,14 +850,14 @@ static void read_callback(struct libusb_transfer *transfer)
 }
 
 
-static void *read_thread(void *param)
+static int read_thread(void *param)
 {
 	hid_device *dev = (hid_device *)param;
-	unsigned char *buf;
+	uint8_t *buf;
 	const size_t length = dev->input_ep_max_packet_size;
 
 	/* Set up the transfer object. */
-	buf = (unsigned char *)malloc(length);
+	buf = (uint8_t*) malloc(length);
 	dev->transfer = libusb_alloc_transfer(0);
 	libusb_fill_interrupt_transfer(dev->transfer,
 		dev->device_handle,
@@ -919,7 +873,7 @@ static void *read_thread(void *param)
 	libusb_submit_transfer(dev->transfer);
 
 	/* Notify the main thread that the read thread is up and running. */
-	pthread_barrier_wait(&dev->barrier);
+	SDL_WaitThreadBarrier(&dev->barrier);
 
 	/* Handle all the events. */
 	while (!dev->shutdown_thread) {
@@ -951,9 +905,9 @@ static void *read_thread(void *param)
 	   make sure that a thread which is about to go to sleep waiting on
 	   the condition actually will go to sleep before the condition is
 	   signaled. */
-	pthread_mutex_lock(&dev->mutex);
-	pthread_cond_broadcast(&dev->condition);
-	pthread_mutex_unlock(&dev->mutex);
+	SDL_LockMutex(dev->mutex);
+	SDL_CondBroadcast(dev->condition);
+	SDL_UnlockMutex(dev->mutex);
 
 	/* The dev->transfer->buffer and dev->transfer objects are cleaned up
 	   in hid_close(). They are not cleaned up here because this thread
@@ -963,9 +917,42 @@ static void *read_thread(void *param)
 	   since hid_close() calls libusb_cancel_transfer(), on these objects,
 	   they can not be cleaned up here. */
 
-	return NULL;
+	return 0;
 }
 
+static void init_xboxone(libusb_device_handle *device_handle, struct libusb_config_descriptor *conf_desc)
+{
+        static const int XB1_IFACE_SUBCLASS = 71;
+        static const int XB1_IFACE_PROTOCOL = 208;
+	int j, k, res;
+
+	for (j = 0; j < conf_desc->bNumInterfaces; j++) {
+		const struct libusb_interface *intf = &conf_desc->interface[j];
+		for (k = 0; k < intf->num_altsetting; k++) {
+			const struct libusb_interface_descriptor *intf_desc;
+			intf_desc = &intf->altsetting[k];
+
+			if (intf_desc->bInterfaceNumber != 0 &&
+			    intf_desc->bAlternateSetting == 0 &&
+			    intf_desc->bInterfaceClass == LIBUSB_CLASS_VENDOR_SPEC &&
+			    intf_desc->bInterfaceSubClass == XB1_IFACE_SUBCLASS &&
+			    intf_desc->bInterfaceProtocol == XB1_IFACE_PROTOCOL) {
+				res = libusb_claim_interface(device_handle, intf_desc->bInterfaceNumber);
+				if (res < 0) {
+					LOG("can't claim interface %d: %d\n", intf_desc->bInterfaceNumber, res);
+					continue;
+				}
+
+				res = libusb_set_interface_alt_setting(device_handle, intf_desc->bInterfaceNumber, intf_desc->bAlternateSetting);
+				if (res < 0) {
+					LOG("xbox init: can't set alt setting %d: %d\n", intf_desc->bInterfaceNumber, res);
+				}
+
+				libusb_release_interface(device_handle, intf_desc->bInterfaceNumber);
+			}
+		}
+	}
+}
 
 hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 {
@@ -987,9 +974,13 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 		struct libusb_device_descriptor desc;
 		struct libusb_config_descriptor *conf_desc = NULL;
 		int i,j,k;
+
 		libusb_get_device_descriptor(usb_dev, &desc);
 
-		if (libusb_get_active_config_descriptor(usb_dev, &conf_desc) < 0)
+		res = libusb_get_active_config_descriptor(usb_dev, &conf_desc);
+		if (res < 0)
+			libusb_get_config_descriptor(usb_dev, 0, &conf_desc);
+		if (!conf_desc)
 			continue;
 		for (j = 0; j < conf_desc->bNumInterfaces; j++) {
 			const struct libusb_interface *intf = &conf_desc->interface[j];
@@ -999,6 +990,8 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 				if (should_enumerate_interface(desc.idVendor, intf_desc)) {
 					char *dev_path = make_path(usb_dev, intf_desc->bInterfaceNumber);
 					if (!strcmp(dev_path, path)) {
+						int detached_driver = 0;
+
 						/* Matched Paths. Open this device */
 
 						/* OPEN HERE */
@@ -1009,6 +1002,7 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 							break;
 						}
 						good_open = 1;
+
 #ifdef DETACH_KERNEL_DRIVER
 						/* Detach the kernel driver, but only if the
 						   device is managed by the kernel */
@@ -1021,8 +1015,10 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 								good_open = 0;
 								break;
 							}
+							detached_driver = 1;
 						}
 #endif
+
 						res = libusb_claim_interface(dev->device_handle, intf_desc->bInterfaceNumber);
 						if (res < 0) {
 							LOG("can't claim interface %d: %d\n", intf_desc->bInterfaceNumber, res);
@@ -1032,6 +1028,11 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 							break;
 						}
 
+						/* Initialize XBox One controllers */
+						if (is_xboxone(desc.idVendor, intf_desc)) {
+							init_xboxone(dev->device_handle, conf_desc);
+						}
+
 						/* Store off the string descriptor indexes */
 						dev->manufacturer_index = desc.iManufacturer;
 						dev->product_index      = desc.iProduct;
@@ -1039,6 +1040,7 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 
 						/* Store off the interface number */
 						dev->interface = intf_desc->bInterfaceNumber;
+						dev->detached_driver = detached_driver;
 
 						/* Find the INPUT and OUTPUT endpoints. An
 						   OUTPUT endpoint is not required. */
@@ -1072,10 +1074,10 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 							}
 						}
 
-						pthread_create(&dev->thread, NULL, read_thread, dev);
+						dev->thread = SDL_CreateThread(read_thread, NULL, dev);
 
 						/* Wait here for the read thread to be initialized. */
-						pthread_barrier_wait(&dev->barrier);
+						SDL_WaitThreadBarrier(&dev->barrier);
 
 					}
 					free(dev_path);
@@ -1103,17 +1105,17 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 int HID_API_EXPORT hid_write(hid_device *dev, const unsigned char *data, size_t length)
 {
 	int res;
-	int report_number = data[0];
-	int skipped_report_id = 0;
-
-	if (report_number == 0x0) {
-		data++;
-		length--;
-		skipped_report_id = 1;
-	}
-
 
 	if (dev->output_endpoint <= 0) {
+		int report_number = data[0];
+		int skipped_report_id = 0;
+
+		if (report_number == 0x0) {
+			data++;
+			length--;
+			skipped_report_id = 1;
+		}
+
 		/* No interrupt out endpoint. Use the Control Endpoint */
 		res = libusb_control_transfer(dev->device_handle,
 			LIBUSB_REQUEST_TYPE_CLASS|LIBUSB_RECIPIENT_INTERFACE|LIBUSB_ENDPOINT_OUT,
@@ -1143,9 +1145,6 @@ int HID_API_EXPORT hid_write(hid_device *dev, const unsigned char *data, size_t 
 		if (res < 0)
 			return -1;
 
-		if (skipped_report_id)
-			actual_length++;
-
 		return actual_length;
 	}
 }
@@ -1166,11 +1165,13 @@ static int return_data(hid_device *dev, unsigned char *data, size_t length)
 	return len;
 }
 
+#if 0 /* TODO: pthread_cleanup SDL? */
 static void cleanup_mutex(void *param)
 {
 	hid_device *dev = (hid_device *)param;
-	pthread_mutex_unlock(&dev->mutex);
+	SDL_UnlockMutex(dev->mutex);
 }
+#endif
 
 
 int HID_API_EXPORT hid_read_timeout(hid_device *dev, unsigned char *data, size_t length, int milliseconds)
@@ -1184,8 +1185,8 @@ int HID_API_EXPORT hid_read_timeout(hid_device *dev, unsigned char *data, size_t
 	return transferred;
 #endif
 
-	pthread_mutex_lock(&dev->mutex);
-	pthread_cleanup_push(&cleanup_mutex, dev);
+	SDL_LockMutex(dev->mutex);
+	/* TODO: pthread_cleanup SDL? */
 
 	/* There's an input report queued up. Return it. */
 	if (dev->input_reports) {
@@ -1204,7 +1205,7 @@ int HID_API_EXPORT hid_read_timeout(hid_device *dev, unsigned char *data, size_t
 	if (milliseconds == -1) {
 		/* Blocking */
 		while (!dev->input_reports && !dev->shutdown_thread) {
-			pthread_cond_wait(&dev->condition, &dev->mutex);
+			SDL_CondWait(dev->condition, dev->mutex);
 		}
 		if (dev->input_reports) {
 			bytes_read = return_data(dev, data, length);
@@ -1213,17 +1214,9 @@ int HID_API_EXPORT hid_read_timeout(hid_device *dev, unsigned char *data, size_t
 	else if (milliseconds > 0) {
 		/* Non-blocking, but called with timeout. */
 		int res;
-		struct timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts);
-		ts.tv_sec += milliseconds / 1000;
-		ts.tv_nsec += (milliseconds % 1000) * 1000000;
-		if (ts.tv_nsec >= 1000000000L) {
-			ts.tv_sec++;
-			ts.tv_nsec -= 1000000000L;
-		}
 
 		while (!dev->input_reports && !dev->shutdown_thread) {
-			res = pthread_cond_timedwait(&dev->condition, &dev->mutex, &ts);
+			res = SDL_CondWaitTimeout(dev->condition, dev->mutex, milliseconds);
 			if (res == 0) {
 				if (dev->input_reports) {
 					bytes_read = return_data(dev, data, length);
@@ -1234,7 +1227,7 @@ int HID_API_EXPORT hid_read_timeout(hid_device *dev, unsigned char *data, size_t
 				   or the read thread was shutdown. Run the
 				   loop again (ie: don't break). */
 			}
-			else if (res == ETIMEDOUT) {
+			else if (res == SDL_MUTEX_TIMEDOUT) {
 				/* Timed out. */
 				bytes_read = 0;
 				break;
@@ -1252,8 +1245,8 @@ int HID_API_EXPORT hid_read_timeout(hid_device *dev, unsigned char *data, size_t
 	}
 
 ret:
-	pthread_mutex_unlock(&dev->mutex);
-	pthread_cleanup_pop(0);
+	SDL_UnlockMutex(dev->mutex);
+	/* TODO: pthread_cleanup SDL? */
 
 	return bytes_read;
 }
@@ -1334,6 +1327,8 @@ int HID_API_EXPORT hid_get_feature_report(hid_device *dev, unsigned char *data, 
 
 void HID_API_EXPORT hid_close(hid_device *dev)
 {
+	int status;
+
 	if (!dev)
 		return;
 
@@ -1342,7 +1337,7 @@ void HID_API_EXPORT hid_close(hid_device *dev)
 	libusb_cancel_transfer(dev->transfer);
 
 	/* Wait for read_thread() to end. */
-	pthread_join(dev->thread, NULL);
+	SDL_WaitThread(dev->thread, &status);
 
 	/* Clean up the Transfer objects allocated in read_thread(). */
 	free(dev->transfer->buffer);
@@ -1351,15 +1346,24 @@ void HID_API_EXPORT hid_close(hid_device *dev)
 	/* release the interface */
 	libusb_release_interface(dev->device_handle, dev->interface);
 
+#ifdef DETACH_KERNEL_DRIVER
+	/* Re-attach kernel driver if necessary. */
+	if (dev->detached_driver) {
+		int res = libusb_attach_kernel_driver(dev->device_handle, dev->interface);
+		if (res < 0)
+			LOG("Couldn't re-attach kernel driver.\n");
+	}
+#endif
+
 	/* Close the handle */
 	libusb_close(dev->device_handle);
 
 	/* Clear out the queue of received reports. */
-	pthread_mutex_lock(&dev->mutex);
+	SDL_LockMutex(dev->mutex);
 	while (dev->input_reports) {
 		return_data(dev, NULL, 0);
 	}
-	pthread_mutex_unlock(&dev->mutex);
+	SDL_UnlockMutex(dev->mutex);
 
 	free_hid_device(dev);
 }
@@ -1452,7 +1456,7 @@ static struct lang_map_entry lang_map[] = {
 	LANG("English - Ireland", "en_ie", 0x1809),
 	LANG("English - Jamaica", "en_jm", 0x2009),
 	LANG("English - New Zealand", "en_nz", 0x1409),
-	LANG("English - Phillippines", "en_ph", 0x3409),
+	LANG("English - Philippines", "en_ph", 0x3409),
 	LANG("English - Southern Africa", "en_za", 0x1C09),
 	LANG("English - Trinidad", "en_tt", 0x2C09),
 	LANG("English - Great Britain", "en_gb", 0x0809),
@@ -1487,7 +1491,7 @@ static struct lang_map_entry lang_map[] = {
 	LANG("Lithuanian", "lt", 0x0427),
 	LANG("F.Y.R.O. Macedonia", "mk", 0x042F),
 	LANG("Malay - Malaysia", "ms_my", 0x043E),
-	LANG("Malay – Brunei", "ms_bn", 0x083E),
+	LANG("Malay ??? Brunei", "ms_bn", 0x083E),
 	LANG("Maltese", "mt", 0x043A),
 	LANG("Marathi", "mr", 0x044E),
 	LANG("Norwegian - Bokml", "no_no", 0x0414),
@@ -1538,7 +1542,7 @@ static struct lang_map_entry lang_map[] = {
 	LANG("Ukrainian", "uk", 0x0422),
 	LANG("Urdu", "ur", 0x0420),
 	LANG("Uzbek - Cyrillic", "uz_uz", 0x0843),
-	LANG("Uzbek – Latin", "uz_uz", 0x0443),
+	LANG("Uzbek ??? Latin", "uz_uz", 0x0443),
 	LANG("Vietnamese", "vi", 0x042A),
 	LANG("Xhosa", "xh", 0x0434),
 	LANG("Yiddish", "yi", 0x043D),

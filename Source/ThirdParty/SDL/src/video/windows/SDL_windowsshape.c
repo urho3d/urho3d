@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,6 +34,7 @@ Win32_CreateShaper(SDL_Window * window) {
     result->mode.mode = ShapeModeDefault;
     result->mode.parameters.binarizationCutoff = 1;
     result->userx = result->usery = 0;
+    result->hasshape = SDL_FALSE;
     result->driverdata = (SDL_ShapeData*)SDL_malloc(sizeof(SDL_ShapeData));
     ((SDL_ShapeData*)result->driverdata)->mask_tree = NULL;
     /* Put some driver-data here. */

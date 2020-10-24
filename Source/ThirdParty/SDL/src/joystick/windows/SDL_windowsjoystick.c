@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -230,7 +230,7 @@ SDL_JoystickThread(void *_data)
 
 #if SDL_JOYSTICK_XINPUT
     SDL_bool bOpenedXInputDevices[XUSER_MAX_COUNT];
-    SDL_zero(bOpenedXInputDevices);
+    SDL_zeroa(bOpenedXInputDevices);
 #endif
 
     if (SDL_CreateDeviceNotification(&notification_data) < 0) {
@@ -426,6 +426,11 @@ WINDOWS_JoystickGetDevicePlayerIndex(int device_index)
     return device->bXInputDevice ? (int)device->XInputUserId : -1;
 }
 
+static void
+WINDOWS_JoystickSetDevicePlayerIndex(int device_index, int player_index)
+{
+}
+
 /* return the stable device guid for this device index */
 static SDL_JoystickGUID
 WINDOWS_JoystickGetDeviceGUID(int device_index)
@@ -483,12 +488,12 @@ WINDOWS_JoystickOpen(SDL_Joystick * joystick, int device_index)
 }
 
 static int
-WINDOWS_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+WINDOWS_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
     if (joystick->hwdata->bXInputDevice) {
-        return SDL_XINPUT_JoystickRumble(joystick, low_frequency_rumble, high_frequency_rumble, duration_ms);
+        return SDL_XINPUT_JoystickRumble(joystick, low_frequency_rumble, high_frequency_rumble);
     } else {
-        return SDL_DINPUT_JoystickRumble(joystick, low_frequency_rumble, high_frequency_rumble, duration_ms);
+        return SDL_DINPUT_JoystickRumble(joystick, low_frequency_rumble, high_frequency_rumble);
     }
 }
 
@@ -564,6 +569,7 @@ SDL_JoystickDriver SDL_WINDOWS_JoystickDriver =
     WINDOWS_JoystickDetect,
     WINDOWS_JoystickGetDeviceName,
     WINDOWS_JoystickGetDevicePlayerIndex,
+    WINDOWS_JoystickSetDevicePlayerIndex,
     WINDOWS_JoystickGetDeviceGUID,
     WINDOWS_JoystickGetDeviceInstanceID,
     WINDOWS_JoystickOpen,

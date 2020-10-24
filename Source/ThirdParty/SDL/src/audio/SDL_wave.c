@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -38,6 +38,7 @@
 #include "SDL_hints.h"
 #include "SDL_audio.h"
 #include "SDL_wave.h"
+#include "SDL_audio_c.h"
 
 /* Reads the value stored at the location of the f1 pointer, multiplies it
  * with the second argument and then stores the result to f1.
@@ -112,7 +113,7 @@ WaveDebugLogFormat(WaveFile *file)
     Uint32 wavebps = format->byterate;
     char channelstr[64];
 
-    SDL_zero(channelstr);
+    SDL_zeroa(channelstr);
 
     switch (format->encoding) {
     case PCM_CODE:
@@ -647,7 +648,7 @@ MS_ADPCM_Decode(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
     MS_ADPCM_ChannelState cstate[2];
 
     SDL_zero(state);
-    SDL_zero(cstate);
+    SDL_zeroa(cstate);
 
     if (chunk->size != chunk->length) {
         /* Could not read everything. Recalculate number of sample frames. */
@@ -691,7 +692,7 @@ MS_ADPCM_Decode(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
         return SDL_OutOfMemory();
     }
 
-    state.cstate = &cstate;
+    state.cstate = cstate;
 
     /* Decode block by block. A truncated block will stop the decoding. */
     bytesleft = state.input.size - state.input.pos;
@@ -717,7 +718,7 @@ MS_ADPCM_Decode(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
         result = MS_ADPCM_DecodeBlockData(&state);
         if (result == -1) {
             /* Unexpected end. Stop decoding and return partial data if necessary. */
-            if (file->trunchint == TruncVeryStrict || file->trunchint == TruncVeryStrict) {
+            if (file->trunchint == TruncVeryStrict || file->trunchint == TruncStrict) {
                 SDL_free(state.output.data);
                 return SDL_SetError("Truncated data chunk");
             } else if (file->trunchint != TruncDropFrame) {
@@ -1114,7 +1115,7 @@ IMA_ADPCM_Decode(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
 
         if (result == -1) {
             /* Unexpected end. Stop decoding and return partial data if necessary. */
-            if (file->trunchint == TruncVeryStrict || file->trunchint == TruncVeryStrict) {
+            if (file->trunchint == TruncVeryStrict || file->trunchint == TruncStrict) {
                 SDL_free(state.output.data);
                 SDL_free(cstate);
                 return SDL_SetError("Truncated data chunk");
@@ -2080,6 +2081,8 @@ WaveLoad(SDL_RWops *src, WaveFile *file, SDL_AudioSpec *spec, Uint8 **audio_buf,
         }
         break;
     }
+
+    spec->silence = SDL_SilenceValueForFormat(spec->format);
 
     /* Report the end position back to the cleanup code. */
     if (RIFFlengthknown) {

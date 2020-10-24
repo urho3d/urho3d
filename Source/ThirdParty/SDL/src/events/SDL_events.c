@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,6 +32,13 @@
 #endif
 #include "../video/SDL_sysvideo.h"
 #include "SDL_syswm.h"
+
+#undef SDL_PRIs64
+#ifdef __WIN32__
+#define SDL_PRIs64	"I64d"
+#else
+#define SDL_PRIs64	"lld"
+#endif
 
 /* An arbitrary limit so we don't have unbounded growth */
 #define SDL_MAX_QUEUED_EVENTS   65535
@@ -279,8 +286,8 @@ SDL_LogEvent(const SDL_Event *event)
 
         #define PRINT_FINGER_EVENT(event) \
             SDL_snprintf(details, sizeof (details), " (timestamp=%u touchid=%"SDL_PRIs64" fingerid=%"SDL_PRIs64" x=%f y=%f dx=%f dy=%f pressure=%f)", \
-                (uint) event->tfinger.timestamp, event->tfinger.touchId, \
-                event->tfinger.fingerId, event->tfinger.x, event->tfinger.y, \
+                (uint) event->tfinger.timestamp, (long long)event->tfinger.touchId, \
+                (long long)event->tfinger.fingerId, event->tfinger.x, event->tfinger.y, \
                 event->tfinger.dx, event->tfinger.dy, event->tfinger.pressure)
         SDL_EVENT_CASE(SDL_FINGERDOWN) PRINT_FINGER_EVENT(event); break;
         SDL_EVENT_CASE(SDL_FINGERUP) PRINT_FINGER_EVENT(event); break;
@@ -289,8 +296,8 @@ SDL_LogEvent(const SDL_Event *event)
 
         #define PRINT_DOLLAR_EVENT(event) \
             SDL_snprintf(details, sizeof (details), " (timestamp=%u touchid=%"SDL_PRIs64" gestureid=%"SDL_PRIs64" numfingers=%u error=%f x=%f y=%f)", \
-                (uint) event->dgesture.timestamp, event->dgesture.touchId, \
-                event->dgesture.gestureId, (uint) event->dgesture.numFingers, \
+                (uint) event->dgesture.timestamp, (long long)event->dgesture.touchId, \
+                (long long)event->dgesture.gestureId, (uint) event->dgesture.numFingers, \
                 event->dgesture.error, event->dgesture.x, event->dgesture.y);
         SDL_EVENT_CASE(SDL_DOLLARGESTURE) PRINT_DOLLAR_EVENT(event); break;
         SDL_EVENT_CASE(SDL_DOLLARRECORD) PRINT_DOLLAR_EVENT(event); break;
@@ -298,7 +305,7 @@ SDL_LogEvent(const SDL_Event *event)
 
         SDL_EVENT_CASE(SDL_MULTIGESTURE)
             SDL_snprintf(details, sizeof (details), " (timestamp=%u touchid=%"SDL_PRIs64" dtheta=%f ddist=%f x=%f y=%f numfingers=%u)",
-                (uint) event->mgesture.timestamp, event->mgesture.touchId,
+                (uint) event->mgesture.timestamp, (long long)event->mgesture.touchId,
                 event->mgesture.dTheta, event->mgesture.dDist,
                 event->mgesture.x, event->mgesture.y, (uint) event->mgesture.numFingers);
             break;
@@ -728,7 +735,7 @@ SDL_WaitEventTimeout(SDL_Event * event, int timeout)
                 /* Timeout expired and no events */
                 return 0;
             }
-            SDL_Delay(10);
+            SDL_Delay(1);
             break;
         default:
             /* Has events */

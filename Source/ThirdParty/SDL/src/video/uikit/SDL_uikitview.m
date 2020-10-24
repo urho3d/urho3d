@@ -1,6 +1,6 @@
  /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -198,7 +198,7 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
         /* FIXME, need to send: int clicks = (int) touch.tapCount; ? */
 
         CGPoint locationInView = [self touchLocation:touch shouldNormalize:YES];
-        SDL_SendTouch(touchId, (SDL_FingerID)((size_t)touch),
+        SDL_SendTouch(touchId, (SDL_FingerID)((size_t)touch), sdlwindow,
                       SDL_TRUE, locationInView.x, locationInView.y, pressure);
     }
 }
@@ -217,7 +217,7 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
         /* FIXME, need to send: int clicks = (int) touch.tapCount; ? */
 
         CGPoint locationInView = [self touchLocation:touch shouldNormalize:YES];
-        SDL_SendTouch(touchId, (SDL_FingerID)((size_t)touch),
+        SDL_SendTouch(touchId, (SDL_FingerID)((size_t)touch), sdlwindow,
                       SDL_FALSE, locationInView.x, locationInView.y, pressure);
     }
 }
@@ -239,7 +239,7 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
         }
 
         CGPoint locationInView = [self touchLocation:touch shouldNormalize:YES];
-        SDL_SendTouchMotion(touchId, (SDL_FingerID)((size_t)touch),
+        SDL_SendTouchMotion(touchId, (SDL_FingerID)((size_t)touch), sdlwindow,
                             locationInView.x, locationInView.y, pressure);
     }
 }

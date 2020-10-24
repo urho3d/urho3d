@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,16 +25,6 @@
 #include "SDL_log.h"
 #include "SDL_error.h"
 #include "SDL_error_c.h"
-
-
-/* Routine to get the thread-specific error variable */
-#if SDL_THREADS_DISABLED
-/* The default (non-thread-safe) global error variable */
-static SDL_error SDL_global_error;
-#define SDL_GetErrBuf() (&SDL_global_error)
-#else
-extern SDL_error *SDL_GetErrBuf(void);
-#endif /* SDL_THREADS_DISABLED */
 
 #define SDL_ERRBUFIZE   1024
 

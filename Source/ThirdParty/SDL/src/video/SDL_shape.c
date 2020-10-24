@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -88,7 +88,7 @@ SDL_CalculateShapeBitmap(SDL_WindowShapeMode mode,SDL_Surface *shape,Uint8* bitm
             pixel = (Uint8 *)(shape->pixels) + (y*shape->pitch) + (x*shape->format->BytesPerPixel);
             switch(shape->format->BytesPerPixel) {
                 case(1):
-                    pixel_value = *(Uint8*)pixel;
+                    pixel_value = *pixel;
                     break;
                 case(2):
                     pixel_value = *(Uint16*)pixel;
@@ -141,7 +141,7 @@ RecursivelyCalculateShapeTree(SDL_WindowShapeMode mode,SDL_Surface* mask,SDL_Rec
             pixel = (Uint8 *)(mask->pixels) + (y*mask->pitch) + (x*mask->format->BytesPerPixel);
             switch(mask->format->BytesPerPixel) {
                 case(1):
-                    pixel_value = *(Uint8*)pixel;
+                    pixel_value = *pixel;
                     break;
                 case(2):
                     pixel_value = *(Uint16*)pixel;

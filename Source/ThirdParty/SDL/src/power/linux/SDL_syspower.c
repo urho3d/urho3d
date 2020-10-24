@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -99,7 +99,7 @@ make_proc_acpi_key_val(char **_ptr, char **_key, char **_val)
 
     *(ptr++) = '\0';  /* terminate the key. */
 
-    while ((*ptr == ' ') && (*ptr != '\0')) {
+    while (*ptr == ' ') {
         ptr++;  /* skip whitespace. */
     }
 
@@ -289,7 +289,7 @@ static SDL_bool
 next_string(char **_ptr, char **_str)
 {
     char *ptr = *_ptr;
-    char *str = *_str;
+    char *str;
 
     while (*ptr == ' ') {       /* skip any spaces... */
         ptr++;
@@ -451,6 +451,8 @@ SDL_GetPowerInfo_Linux_sys_class_power_supply(SDL_PowerState *state, int *second
         SDL_PowerState st;
         int secs;
         int pct;
+        int energy;
+        int power;
 
         if ((SDL_strcmp(name, ".") == 0) || (SDL_strcmp(name, "..") == 0)) {
             continue;  /* skip these, of course. */
@@ -492,11 +494,16 @@ SDL_GetPowerInfo_Linux_sys_class_power_supply(SDL_PowerState *state, int *second
             pct = (pct > 100) ? 100 : pct; /* clamp between 0%, 100% */
         }
 
-        if (!read_power_file(base, name, "time_to_empty_now", str, sizeof (str))) {
-            secs = -1;
-        } else {
+        if (read_power_file(base, name, "time_to_empty_now", str, sizeof (str))) {
             secs = SDL_atoi(str);
             secs = (secs <= 0) ? -1 : secs;  /* 0 == unknown */
+        } else if (st == SDL_POWERSTATE_ON_BATTERY) {
+            /* energy is Watt*hours and power is Watts */
+            energy = (read_power_file(base, name, "energy_now", str, sizeof (str))) ? SDL_atoi(str) : -1;
+            power = (read_power_file(base, name, "power_now", str, sizeof (str))) ? SDL_atoi(str) : -1;
+            secs = (energy >= 0 && power > 0) ? (3600LL * energy) / power : -1;
+        } else {
+            secs = -1;
         }
 
         /*

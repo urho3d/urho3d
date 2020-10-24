@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -140,7 +140,7 @@ SDL_GetBasePath(void)
         if (retval == NULL) {
             /* older kernels don't have /proc/self ... try PID version... */
             char path[64];
-            const int rc = (int) SDL_snprintf(path, sizeof(path),
+            const int rc = SDL_snprintf(path, sizeof(path),
                                               "/proc/%llu/exe",
                                               (unsigned long long) getpid());
             if ( (rc > 0) && (rc < sizeof(path)) ) {

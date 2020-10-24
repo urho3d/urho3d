@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -344,7 +344,7 @@ Android_AddJoystick(int device_id, const char *name, const char *desc, int vendo
     }
 
 #ifdef SDL_JOYSTICK_HIDAPI
-    if (HIDAPI_IsDevicePresent(vendor_id, product_id, 0)) {
+    if (HIDAPI_IsDevicePresent(vendor_id, product_id, 0, name)) {
         /* The HIDAPI driver is taking care of this device */
         return -1;
     }
@@ -497,7 +497,7 @@ Android_RemoveJoystick(int device_id)
 }
 
 
-static void ANDROID_JoystickDetect();
+static void ANDROID_JoystickDetect(void);
 
 static int
 ANDROID_JoystickInit(void)
@@ -587,6 +587,11 @@ ANDROID_JoystickGetDevicePlayerIndex(int device_index)
     return -1;
 }
 
+static void
+ANDROID_JoystickSetDevicePlayerIndex(int device_index, int player_index)
+{
+}
+
 static SDL_JoystickGUID
 ANDROID_JoystickGetDeviceGUID(int device_index)
 {
@@ -624,7 +629,7 @@ ANDROID_JoystickOpen(SDL_Joystick * joystick, int device_index)
 }
 
 static int
-ANDROID_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+ANDROID_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
     return SDL_Unsupported();
 }
@@ -696,6 +701,7 @@ SDL_JoystickDriver SDL_ANDROID_JoystickDriver =
     ANDROID_JoystickDetect,
     ANDROID_JoystickGetDeviceName,
     ANDROID_JoystickGetDevicePlayerIndex,
+    ANDROID_JoystickSetDevicePlayerIndex,
     ANDROID_JoystickGetDeviceGUID,
     ANDROID_JoystickGetDeviceInstanceID,
     ANDROID_JoystickOpen,

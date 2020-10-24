@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,6 +35,7 @@ typedef struct _SDL_JoystickAxisInfo
     Sint16 value;               /* Current axis state */
     Sint16 zero;                /* Zero point on the axis (-32768 for triggers) */
     SDL_bool has_initial_value; /* Whether we've seen a value on the axis yet */
+    SDL_bool has_second_value;  /* Whether we've seen a second value on the axis yet */
     SDL_bool sent_initial_value; /* Whether we've sent the initial axis value */
 } SDL_JoystickAxisInfo;
 
@@ -42,7 +43,6 @@ struct _SDL_Joystick
 {
     SDL_JoystickID instance_id; /* Device instance, monotonically increasing from 0 */
     char *name;                 /* Joystick name - system dependent */
-    int player_index;           /* Joystick player index, or -1 if unavailable */
     SDL_JoystickGUID guid;      /* Joystick guid */
 
     int naxes;                  /* Number of axis controls on the joystick */
@@ -60,6 +60,10 @@ struct _SDL_Joystick
     int nbuttons;               /* Number of buttons on the joystick */
     Uint8 *buttons;             /* Current button states */
 
+    Uint16 low_frequency_rumble;
+    Uint16 high_frequency_rumble;
+    Uint32 rumble_expiration;
+
     SDL_bool attached;
     SDL_bool is_game_controller;
     SDL_bool delayed_guide_button; /* SDL_TRUE if this device has the guide button event delayed */
@@ -73,14 +77,6 @@ struct _SDL_Joystick
 
     struct _SDL_Joystick *next; /* pointer to next joystick we have allocated */
 };
-
-#if defined(__IPHONEOS__) || defined(__ANDROID__)
-#define HAVE_STEAMCONTROLLERS
-#define USE_STEAMCONTROLLER_HIDAPI
-#elif defined(__LINUX__)
-#define HAVE_STEAMCONTROLLERS
-#define USE_STEAMCONTROLLER_LINUX
-#endif
 
 /* Device bus definitions */
 #define SDL_HARDWARE_BUS_USB        0x03
@@ -109,6 +105,9 @@ typedef struct _SDL_JoystickDriver
     /* Function to get the player index of a joystick */
     int (*GetDevicePlayerIndex)(int device_index);
 
+    /* Function to get the player index of a joystick */
+    void (*SetDevicePlayerIndex)(int device_index, int player_index);
+
     /* Function to return the stable GUID for a plugged in device */
     SDL_JoystickGUID (*GetDeviceGUID)(int device_index);
 
@@ -123,7 +122,7 @@ typedef struct _SDL_JoystickDriver
     int (*Open)(SDL_Joystick * joystick, int device_index);
 
     /* Rumble functionality */
-    int (*Rumble)(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms);
+    int (*Rumble)(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble);
 
     /* Function to update the state of a joystick - called as a device poll.
      * This function shouldn't update the joystick structure directly,
@@ -139,6 +138,9 @@ typedef struct _SDL_JoystickDriver
     void (*Quit)(void);
 
 } SDL_JoystickDriver;
+
+/* Windows and Mac OSX has a limit of MAX_DWORD / 1000, Linux kernel has a limit of 0xFFFF */
+#define SDL_MAX_RUMBLE_DURATION_MS  0xFFFF
 
 /* The available joystick drivers */
 extern SDL_JoystickDriver SDL_ANDROID_JoystickDriver;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -482,7 +482,7 @@ SDL_Convert_U16_to_F32_SSE2(SDL_AudioCVT *cvt, SDL_AudioFormat format)
     if ((((size_t) src) & 15) == 0) {
         /* Aligned! Do SSE blocks as long as we have 16 bytes available. */
         const __m128 divby32768 = _mm_set1_ps(DIVBY32768);
-        const __m128 minus1 = _mm_set1_ps(1.0f);
+        const __m128 minus1 = _mm_set1_ps(-1.0f);
         while (i >= 8) {   /* 8 * 16-bit */
             const __m128i ints = _mm_load_si128((__m128i const *) src);  /* get 8 sint16 into an XMM register. */
             /* treat as int32, shift left to clear every other sint16, then back right with zero-extend. Now sint32. */
@@ -614,7 +614,7 @@ static void SDLCALL
 SDL_Convert_F32_to_U8_SSE2(SDL_AudioCVT *cvt, SDL_AudioFormat format)
 {
     const float *src = (const float *) cvt->buf;
-    Uint8 *dst = (Uint8 *) cvt->buf;
+    Uint8 *dst = cvt->buf;
     int i;
 
     LOG_DEBUG_CONVERT("AUDIO_F32", "AUDIO_U8 (using SSE2)");
@@ -879,10 +879,10 @@ SDL_Convert_S8_to_F32_NEON(SDL_AudioCVT *cvt, SDL_AudioFormat format)
             const int16x8_t int16hi = vmovl_s8(vget_high_s8(bytes));  /* convert top 8 bytes to 8 int16 */
             const int16x8_t int16lo = vmovl_s8(vget_low_s8(bytes));   /* convert bottom 8 bytes to 8 int16 */
             /* split int16 to two int32, then convert to float, then multiply to normalize, store. */
-            vst1q_f32(dst, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_high_s16(int16hi))), divby128));
-            vst1q_f32(dst+4, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_low_s16(int16hi))), divby128));
-            vst1q_f32(dst+8, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_high_s16(int16lo))), divby128));
-            vst1q_f32(dst+12, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_low_s16(int16lo))), divby128));
+            vst1q_f32(dst, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_low_s16(int16lo))), divby128));
+            vst1q_f32(dst+4, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_high_s16(int16lo))), divby128));
+            vst1q_f32(dst+8, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_low_s16(int16hi))), divby128));
+            vst1q_f32(dst+12, vmulq_f32(vcvtq_f32_s32(vmovl_s16(vget_high_s16(int16hi))), divby128));
             i -= 16; mmsrc -= 16; dst -= 16;
         }
 
@@ -931,10 +931,10 @@ SDL_Convert_U8_to_F32_NEON(SDL_AudioCVT *cvt, SDL_AudioFormat format)
             const uint16x8_t uint16hi = vmovl_u8(vget_high_u8(bytes));  /* convert top 8 bytes to 8 uint16 */
             const uint16x8_t uint16lo = vmovl_u8(vget_low_u8(bytes));   /* convert bottom 8 bytes to 8 uint16 */
             /* split uint16 to two uint32, then convert to float, then multiply to normalize, subtract to adjust for sign, store. */
-            vst1q_f32(dst, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_high_u16(uint16hi))), divby128));
-            vst1q_f32(dst+4, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_low_u16(uint16hi))), divby128));
-            vst1q_f32(dst+8, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_high_u16(uint16lo))), divby128));
-            vst1q_f32(dst+12, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_low_u16(uint16lo))), divby128));
+            vst1q_f32(dst, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_low_u16(uint16lo))), divby128));
+            vst1q_f32(dst+4, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_high_u16(uint16lo))), divby128));
+            vst1q_f32(dst+8, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_low_u16(uint16hi))), divby128));
+            vst1q_f32(dst+12, vmlaq_f32(negone, vcvtq_f32_u32(vmovl_u16(vget_high_u16(uint16hi))), divby128));
             i -= 16; mmsrc -= 16; dst -= 16;
         }
 

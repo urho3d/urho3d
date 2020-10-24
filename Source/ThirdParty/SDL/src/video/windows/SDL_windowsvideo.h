@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "../../SDL_internal.h"
 
 #ifndef SDL_windowsvideo_h_
@@ -137,9 +134,6 @@ typedef struct SDL_VideoData
     BOOL (WINAPI *CloseTouchInputHandle)( HTOUCHINPUT );
     BOOL (WINAPI *GetTouchInputInfo)( HTOUCHINPUT, UINT, PTOUCHINPUT, int );
     BOOL (WINAPI *RegisterTouchWindow)( HWND, ULONG );
-
-    // Urho3D: added
-    BOOL (WINAPI *SetProcessDPIAware)();
 
     void* shcoreDLL;
     HRESULT (WINAPI *GetDpiForMonitor)( HMONITOR         hmonitor,

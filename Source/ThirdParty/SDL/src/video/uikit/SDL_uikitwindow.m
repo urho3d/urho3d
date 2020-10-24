@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -364,12 +364,16 @@ UIKit_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
 
             /* These struct members were added in SDL 2.0.4. */
             if (versionnum >= SDL_VERSIONNUM(2,0,4)) {
+#if SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2
                 if ([data.viewcontroller.view isKindOfClass:[SDL_uikitopenglview class]]) {
                     SDL_uikitopenglview *glview = (SDL_uikitopenglview *)data.viewcontroller.view;
                     info->info.uikit.framebuffer = glview.drawableFramebuffer;
                     info->info.uikit.colorbuffer = glview.drawableRenderbuffer;
                     info->info.uikit.resolveFramebuffer = glview.msaaResolveFramebuffer;
                 } else {
+#else
+                {
+#endif
                     info->info.uikit.framebuffer = 0;
                     info->info.uikit.colorbuffer = 0;
                     info->info.uikit.resolveFramebuffer = 0;

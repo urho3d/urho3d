@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -230,10 +227,9 @@ WIN_WarpMouse(SDL_Window * window, int x, int y)
     POINT pt;
 
     /* Don't warp the mouse while we're doing a modal interaction */
-    // Urho3D: disable check as warping should already be used responsibly and a possible bug #1258 results from this from SDL 2.0.4 onward
-    //if (data->in_title_click || data->focus_click_pending) {
-    //    return;
-    //}
+    if (data->in_title_click || data->focus_click_pending) {
+        return;
+    }
 
     pt.x = x;
     pt.y = y;

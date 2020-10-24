@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@
 #include "SDL_messagebox.h"
 #include "SDL_shape.h"
 #include "SDL_thread.h"
+#include "SDL_metal.h"
 
 #include "SDL_vulkan_internal.h"
 
@@ -276,6 +277,13 @@ struct SDL_VideoDevice
 
     /* * * */
     /*
+     * Metal support
+     */
+    SDL_MetalView (*Metal_CreateView) (_THIS, SDL_Window * window);
+    void (*Metal_DestroyView) (_THIS, SDL_MetalView view);
+
+    /* * * */
+    /*
      * Event manager functions
      */
     void (*PumpEvents) (_THIS);
@@ -421,6 +429,7 @@ extern VideoBootStrap NACL_bootstrap;
 extern VideoBootStrap VIVANTE_bootstrap;
 extern VideoBootStrap Emscripten_bootstrap;
 extern VideoBootStrap QNX_bootstrap;
+extern VideoBootStrap OFFSCREEN_bootstrap;
 
 extern SDL_VideoDevice *SDL_GetVideoDevice(void);
 extern int SDL_AddBasicVideoDisplay(const SDL_DisplayMode * desktop_mode);
@@ -430,6 +439,7 @@ extern int SDL_GetIndexOfDisplay(SDL_VideoDisplay *display);
 extern SDL_VideoDisplay *SDL_GetDisplay(int displayIndex);
 extern SDL_VideoDisplay *SDL_GetDisplayForWindow(SDL_Window *window);
 extern void *SDL_GetDisplayDriverData( int displayIndex );
+extern SDL_bool SDL_IsVideoContextExternal(void);
 
 extern void SDL_GL_DeduceMaxSupportedESProfile(int* major, int* minor);
 
@@ -451,13 +461,6 @@ extern SDL_Window * SDL_GetFocusWindow(void);
 extern SDL_bool SDL_ShouldAllowTopmost(void);
 
 extern float SDL_ComputeDiagonalDPI(int hpix, int vpix, float hinches, float vinches);
-
-extern void SDL_OnApplicationWillTerminate(void);
-extern void SDL_OnApplicationDidReceiveMemoryWarning(void);
-extern void SDL_OnApplicationWillResignActive(void);
-extern void SDL_OnApplicationDidEnterBackground(void);
-extern void SDL_OnApplicationWillEnterForeground(void);
-extern void SDL_OnApplicationDidBecomeActive(void);
 
 extern void SDL_ToggleDragAndDropSupport(void);
 

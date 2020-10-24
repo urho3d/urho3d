@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,12 +24,9 @@
  * SDL_x11vulkan.c.
  */
 
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
-// Urho3D - iOS/tvOS simulator does not have Metal support
-#if SDL_VIDEO_VULKAN && SDL_VIDEO_DRIVER_UIKIT && !defined(TARGET_IPHONE_SIMULATOR)
+#if SDL_VIDEO_VULKAN && SDL_VIDEO_DRIVER_UIKIT
 
 #include "SDL_uikitvideo.h"
 #include "SDL_uikitwindow.h"
@@ -203,6 +200,7 @@ SDL_bool UIKit_Vulkan_CreateSurface(_THIS,
                                             "vkCreateIOSSurfaceMVK");
     VkIOSSurfaceCreateInfoMVK createInfo = {};
     VkResult result;
+    SDL_MetalView metalview;
 
     if (!_this->vulkan_config.loader_handle) {
         SDL_SetError("Vulkan is not loaded");
@@ -215,24 +213,37 @@ SDL_bool UIKit_Vulkan_CreateSurface(_THIS,
         return SDL_FALSE;
     }
 
+    metalview = UIKit_Metal_CreateView(_this, window);
+    if (metalview == NULL) {
+        return SDL_FALSE;
+    }
+
     createInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
     createInfo.pNext = NULL;
     createInfo.flags = 0;
-    createInfo.pView = (__bridge void *)UIKit_Mtl_AddMetalView(window);
+    createInfo.pView = (const void *)metalview;
     result = vkCreateIOSSurfaceMVK(instance, &createInfo,
                                        NULL, surface);
     if (result != VK_SUCCESS) {
+        UIKit_Metal_DestroyView(_this, metalview);
         SDL_SetError("vkCreateIOSSurfaceMVK failed: %s",
                      SDL_Vulkan_GetResultString(result));
         return SDL_FALSE;
     }
+
+    /* Unfortunately there's no SDL_Vulkan_DestroySurface function we can call
+     * Metal_DestroyView from. Right now the metal view's ref count is +2 (one
+     * from returning a new view object in CreateView, and one because it's
+     * a subview of the window.) If we release the view here to make it +1, it
+     * will be destroyed when the window is destroyed. */
+    CFBridgingRelease(metalview);
 
     return SDL_TRUE;
 }
 
 void UIKit_Vulkan_GetDrawableSize(_THIS, SDL_Window *window, int *w, int *h)
 {
-    UIKit_Mtl_GetDrawableSize(window, w, h);
+    UIKit_Metal_GetDrawableSize(window, w, h);
 }
 
 #endif

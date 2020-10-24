@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #include "../SDL_internal.h"
 
 /* General gesture handling code for SDL */
@@ -38,12 +36,14 @@
 
 #define MAXPATHSIZE 1024
 
-#define DOLLARNPOINTS 64
-#define DOLLARSIZE 256
-
 #define ENABLE_DOLLAR
 
-#define PHI 0.618033989
+#define DOLLARNPOINTS 64
+
+#if defined(ENABLE_DOLLAR)
+#  define DOLLARSIZE 256
+#  define PHI 0.618033989
+#endif
 
 typedef struct {
     float x,y;
@@ -174,60 +174,12 @@ int SDL_SaveDollarTemplate(SDL_GestureID gestureId, SDL_RWops *dst)
     for (i = 0; i < SDL_numGestureTouches; i++) {
         SDL_GestureTouch* touch = &SDL_gestureTouch[i];
         for (j = 0; j < touch->numDollarTemplates; j++) {
-            // Urho3D: gesture IDs are stored as 32bit, so check the low bits only. Fix index variable (i -> j)
-            if ((touch->dollarTemplate[j].hash & 0xffffffff) == (gestureId & 0xffffffff)) {
+            if (touch->dollarTemplate[j].hash == gestureId) {
                 return SaveTemplate(&touch->dollarTemplate[j], dst);
             }
         }
     }
     return SDL_SetError("Unknown gestureId");
-}
-
-// Urho3D: added function
-static void SDL_RemoveDollarTemplate_one(SDL_GestureTouch* inTouch, int index)
-{
-    if (index < inTouch->numDollarTemplates - 1) {
-        SDL_memmove(&inTouch->dollarTemplate[index], &inTouch->dollarTemplate[index + 1],
-            (inTouch->numDollarTemplates - 1 - index) * sizeof(SDL_DollarTemplate));
-    }
-    if (inTouch->numDollarTemplates > 1) {
-        inTouch->dollarTemplate = SDL_realloc(inTouch->dollarTemplate,
-            (inTouch->numDollarTemplates - 1) * sizeof(SDL_DollarTemplate));
-    }
-    else {
-        SDL_free(inTouch->dollarTemplate);
-        inTouch->dollarTemplate = NULL;
-    }
-    --inTouch->numDollarTemplates;
-}
-
-// Urho3D: added function
-int SDL_RemoveDollarTemplate(SDL_GestureID gestureId)
-{
-    int i,j,ret = 0;
-    for (i = 0; i < SDL_numGestureTouches; i++) {
-        SDL_GestureTouch* touch = &SDL_gestureTouch[i];
-        for (j = 0; j < touch->numDollarTemplates; j++) {
-            // Urho3D: gesture IDs are stored as 32bit, so check the low bits only
-            if ((touch->dollarTemplate[j].hash & 0xffffffff) == (gestureId & 0xffffffff)) {
-                SDL_RemoveDollarTemplate_one(touch, j);
-                ret = 1;
-            }
-        }
-    }
-    return ret;
-}
-
-// Urho3D: added function
-void SDL_RemoveAllDollarTemplates(void)
-{
-    int i;
-    for (i = 0; i < SDL_numGestureTouches; i++) {
-        SDL_GestureTouch* touch = &SDL_gestureTouch[i];
-        SDL_free(touch->dollarTemplate);
-        touch->dollarTemplate = NULL;
-        touch->numDollarTemplates = 0;
-    }
 }
 
 /* path is an already sampled set of points
@@ -385,7 +337,7 @@ static float bestDollarDifference(SDL_FloatPoint* points,SDL_FloatPoint* templ)
 }
 
 /* DollarPath contains raw points, plus (possibly) the calculated length */
-static int dollarNormalize(const SDL_DollarPath *path,SDL_FloatPoint *points)
+static int dollarNormalize(const SDL_DollarPath *path,SDL_FloatPoint *points, SDL_bool is_recording)
 {
     int i;
     float interval;
@@ -431,7 +383,9 @@ static int dollarNormalize(const SDL_DollarPath *path,SDL_FloatPoint *points)
         dist += d;
     }
     if (numPoints < DOLLARNPOINTS-1) {
-        SDL_SetError("ERROR: NumPoints = %i", numPoints);
+        if (is_recording) {
+            SDL_SetError("ERROR: NumPoints = %i", numPoints);
+        }
         return 0;
     }
     /* copy the last point */
@@ -485,7 +439,7 @@ static float dollarRecognize(const SDL_DollarPath *path,int *bestTempl,SDL_Gestu
 
     SDL_memset(points, 0, sizeof(points));
 
-    dollarNormalize(path,points);
+    dollarNormalize(path, points, SDL_FALSE);
 
     /* PrintPath(points); */
     *bestTempl = -1;
@@ -548,43 +502,48 @@ static SDL_GestureTouch * SDL_GetGestureTouch(SDL_TouchID id)
     return NULL;
 }
 
-static int SDL_SendGestureMulti(SDL_GestureTouch* touch,float dTheta,float dDist)
+static void SDL_SendGestureMulti(SDL_GestureTouch* touch,float dTheta,float dDist)
 {
-    SDL_Event event;
-    event.mgesture.type = SDL_MULTIGESTURE;
-    event.mgesture.touchId = touch->id;
-    event.mgesture.x = touch->centroid.x;
-    event.mgesture.y = touch->centroid.y;
-    event.mgesture.dTheta = dTheta;
-    event.mgesture.dDist = dDist;
-    event.mgesture.numFingers = touch->numDownFingers;
-    return SDL_PushEvent(&event) > 0;
+    if (SDL_GetEventState(SDL_MULTIGESTURE) == SDL_ENABLE) {
+        SDL_Event event;
+        event.mgesture.type = SDL_MULTIGESTURE;
+        event.mgesture.touchId = touch->id;
+        event.mgesture.x = touch->centroid.x;
+        event.mgesture.y = touch->centroid.y;
+        event.mgesture.dTheta = dTheta;
+        event.mgesture.dDist = dDist;
+        event.mgesture.numFingers = touch->numDownFingers;
+        SDL_PushEvent(&event);
+    }
 }
 
 #if defined(ENABLE_DOLLAR)
-static int SDL_SendGestureDollar(SDL_GestureTouch* touch,
+static void SDL_SendGestureDollar(SDL_GestureTouch* touch,
                           SDL_GestureID gestureId,float error)
 {
-    SDL_Event event;
-    event.dgesture.type = SDL_DOLLARGESTURE;
-    event.dgesture.touchId = touch->id;
-    event.dgesture.x = touch->centroid.x;
-    event.dgesture.y = touch->centroid.y;
-    event.dgesture.gestureId = gestureId;
-    event.dgesture.error = error;
-    /* A finger came up to trigger this event. */
-    event.dgesture.numFingers = touch->numDownFingers + 1;
-    return SDL_PushEvent(&event) > 0;
+    if (SDL_GetEventState(SDL_DOLLARGESTURE) == SDL_ENABLE) {
+        SDL_Event event;
+        event.dgesture.type = SDL_DOLLARGESTURE;
+        event.dgesture.touchId = touch->id;
+        event.dgesture.x = touch->centroid.x;
+        event.dgesture.y = touch->centroid.y;
+        event.dgesture.gestureId = gestureId;
+        event.dgesture.error = error;
+        /* A finger came up to trigger this event. */
+        event.dgesture.numFingers = touch->numDownFingers + 1;
+        SDL_PushEvent(&event);
+    }
 }
 
-
-static int SDL_SendDollarRecord(SDL_GestureTouch* touch,SDL_GestureID gestureId)
+static void SDL_SendDollarRecord(SDL_GestureTouch* touch,SDL_GestureID gestureId)
 {
-    SDL_Event event;
-    event.dgesture.type = SDL_DOLLARRECORD;
-    event.dgesture.touchId = touch->id;
-    event.dgesture.gestureId = gestureId;
-    return SDL_PushEvent(&event) > 0;
+    if (SDL_GetEventState(SDL_DOLLARRECORD) == SDL_ENABLE) {
+        SDL_Event event;
+        event.dgesture.type = SDL_DOLLARRECORD;
+        event.dgesture.touchId = touch->id;
+        event.dgesture.gestureId = gestureId;
+        SDL_PushEvent(&event);
+    }
 }
 #endif
 
@@ -626,7 +585,7 @@ void SDL_GestureProcessEvent(SDL_Event* event)
 #if defined(ENABLE_DOLLAR)
             if (inTouch->recording) {
                 inTouch->recording = SDL_FALSE;
-                dollarNormalize(&inTouch->dollarPath,path);
+                dollarNormalize(&inTouch->dollarPath, path, SDL_TRUE);
                 /* PrintPath(path); */
                 if (recordAll) {
                     index = SDL_AddDollarGesture(NULL,path);

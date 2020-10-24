@@ -17,7 +17,7 @@
  files located at the root of the source distribution.
  These files may also be found in the public source
  code repository located at:
-        http://github.com/signal11/hidapi .
+        https://github.com/libusb/hidapi .
 ********************************************************/
 
 /** @file
@@ -33,8 +33,12 @@
       #define HID_API_EXPORT __declspec(dllexport)
       #define HID_API_CALL
 #else
+#ifndef HID_API_EXPORT
       #define HID_API_EXPORT /**< API export macro */
+#endif
+#ifndef HID_API_CALL
       #define HID_API_CALL /**< API call macro */
+#endif
 #endif
 
 #define HID_API_EXPORT_CALL HID_API_EXPORT HID_API_CALL /**< API export and call macro*/
@@ -77,6 +81,12 @@ namespace NAMESPACE {
 			    in all cases, and valid on the Windows implementation
 			    only if the device contains more than one interface. */
 			int interface_number;
+
+			/** Additional information about the USB interface.
+			    Valid on libusb and Android implementations. */
+			int interface_class;
+			int interface_subclass;
+			int interface_protocol;
 
 			/** Pointer to the next device */
 			struct hid_device_info *next;

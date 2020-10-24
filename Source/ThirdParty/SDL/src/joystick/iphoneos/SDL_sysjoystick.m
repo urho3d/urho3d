@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 
 // Urho3D - use the generated SDL_config.h header in the build tree
 /* needed for SDL_IPHONE_MAX_GFORCE macro */
-#include "SDL_config.h"
+#include "../../../include/SDL_config.h"
 
 #include "SDL_assert.h"
 #include "SDL_events.h"
@@ -133,6 +133,11 @@ IOS_AddMFIJoystickDevice(SDL_JoystickDeviceItem *device, GCController *controlle
 
     if (controller.extendedGamepad) {
         GCExtendedGamepad *gamepad = controller.extendedGamepad;
+        BOOL is_xbox = [controller.vendorName containsString: @"Xbox"];
+        BOOL is_ps4 = [controller.vendorName containsString: @"DUALSHOCK"];
+#if TARGET_OS_TV
+        BOOL is_MFi = (!is_xbox && !is_ps4);
+#endif
         int nbuttons = 0;
 
         /* These buttons are part of the original MFi spec */
@@ -159,20 +164,24 @@ IOS_AddMFIJoystickDevice(SDL_JoystickDeviceItem *device, GCController *controlle
             device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_BACK);
             ++nbuttons;
         }
-        if ([gamepad respondsToSelector:@selector(buttonMenu)] && gamepad.buttonMenu) {
-            device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_START);
-            ++nbuttons;
-        } else {
-            device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_START);
-            ++nbuttons;
+        BOOL has_direct_menu = [gamepad respondsToSelector:@selector(buttonMenu)] && gamepad.buttonMenu;
+#if TARGET_OS_TV
+        /* On tvOS MFi controller menu button brings you to the home screen */
+        if (is_MFi) {
+            has_direct_menu = FALSE;
+        }
+#endif
+        device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_START);
+        ++nbuttons;
+        if (!has_direct_menu) {
             device->uses_pause_handler = SDL_TRUE;
         }
 #pragma clang diagnostic pop
 
-        if ([controller.vendorName containsString: @"Xbox"]) {
+        if (is_xbox) {
             vendor = VENDOR_MICROSOFT;
             product = 0x02E0; /* Assume Xbox One S BLE Controller unless/until GCController flows VID/PID */
-        } else if ([controller.vendorName containsString: @"DUALSHOCK"]) {
+        } else if (is_ps4) {
             vendor = VENDOR_SONY;
             product = 0x09CC; /* Assume DS4 Slim unless/until GCController flows VID/PID */
         } else {
@@ -208,21 +217,15 @@ IOS_AddMFIJoystickDevice(SDL_JoystickDeviceItem *device, GCController *controlle
     }
 #if TARGET_OS_TV
     else if (controller.microGamepad) {
-        GCMicroGamepad *gamepad = controller.microGamepad;
         int nbuttons = 0;
 
         device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_A);
         device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_B); /* Button X on microGamepad */
         nbuttons += 2;
 
-        if ([gamepad respondsToSelector:@selector(buttonMenu)] && gamepad.buttonMenu) {
-            device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_START);
-            ++nbuttons;
-        } else {
-            device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_START);
-            ++nbuttons;
-            device->uses_pause_handler = SDL_TRUE;
-        }
+        device->button_mask |= (1 << SDL_CONTROLLER_BUTTON_START);
+        ++nbuttons;
+        device->uses_pause_handler = SDL_TRUE;
 
         vendor = VENDOR_APPLE;
         product = 3;
@@ -471,6 +474,15 @@ IOS_JoystickGetDevicePlayerIndex(int device_index)
     return device ? (int)device->controller.playerIndex : -1;
 }
 
+static void
+IOS_JoystickSetDevicePlayerIndex(int device_index, int player_index)
+{
+    SDL_JoystickDeviceItem *device = GetDeviceForIndex(device_index);
+    if (device) {
+        device->controller.playerIndex = player_index;
+    }
+}
+
 static SDL_JoystickGUID
 IOS_JoystickGetDeviceGUID( int device_index )
 {
@@ -618,7 +630,6 @@ IOS_MFIJoystickUpdate(SDL_Joystick * joystick)
         GCController *controller = joystick->hwdata->controller;
         Uint8 hatstate = SDL_HAT_CENTERED;
         int i;
-        int updateplayerindex = 0;
         int pause_button_index = 0;
 
         if (controller.extendedGamepad) {
@@ -672,17 +683,10 @@ IOS_MFIJoystickUpdate(SDL_Joystick * joystick)
             hatstate = IOS_MFIJoystickHatStateForDPad(gamepad.dpad);
 
             for (i = 0; i < SDL_arraysize(axes); i++) {
-                /* The triggers (axes 2 and 5) are resting at -32768 but SDL
-                 * initializes its values to 0. We only want to make sure the
-                 * player index is up to date if the user actually moves an axis. */
-                if ((i != 2 && i != 5) || axes[i] != -32768) {
-                    updateplayerindex |= (joystick->axes[i].value != axes[i]);
-                }
                 SDL_PrivateJoystickAxis(joystick, i, axes[i]);
             }
 
             for (i = 0; i < button_count; i++) {
-                updateplayerindex |= (joystick->buttons[i] != buttons[i]);
                 SDL_PrivateJoystickButton(joystick, i, buttons[i]);
             }
         } else if (controller.gamepad) {
@@ -703,7 +707,6 @@ IOS_MFIJoystickUpdate(SDL_Joystick * joystick)
             hatstate = IOS_MFIJoystickHatStateForDPad(gamepad.dpad);
 
             for (i = 0; i < button_count; i++) {
-                updateplayerindex |= (joystick->buttons[i] != buttons[i]);
                 SDL_PrivateJoystickButton(joystick, i, buttons[i]);
             }
         }
@@ -717,7 +720,6 @@ IOS_MFIJoystickUpdate(SDL_Joystick * joystick)
             };
 
             for (i = 0; i < SDL_arraysize(axes); i++) {
-                updateplayerindex |= (joystick->axes[i].value != axes[i]);
                 SDL_PrivateJoystickAxis(joystick, i, axes[i]);
             }
 
@@ -739,14 +741,12 @@ IOS_MFIJoystickUpdate(SDL_Joystick * joystick)
 #pragma clang diagnostic pop
 
             for (i = 0; i < button_count; i++) {
-                updateplayerindex |= (joystick->buttons[i] != buttons[i]);
                 SDL_PrivateJoystickButton(joystick, i, buttons[i]);
             }
         }
 #endif /* TARGET_OS_TV */
 
         if (joystick->nhats > 0) {
-            updateplayerindex |= (joystick->hats[0] != hatstate);
             SDL_PrivateJoystickHat(joystick, 0, hatstate);
         }
 
@@ -754,37 +754,15 @@ IOS_MFIJoystickUpdate(SDL_Joystick * joystick)
             for (i = 0; i < joystick->hwdata->num_pause_presses; i++) {
                 SDL_PrivateJoystickButton(joystick, pause_button_index, SDL_PRESSED);
                 SDL_PrivateJoystickButton(joystick, pause_button_index, SDL_RELEASED);
-                updateplayerindex = YES;
             }
             joystick->hwdata->num_pause_presses = 0;
-        }
-
-        if (updateplayerindex && controller.playerIndex == -1) {
-            BOOL usedPlayerIndexSlots[4] = {NO, NO, NO, NO};
-
-            /* Find the player index of all other connected controllers. */
-            for (GCController *c in [GCController controllers]) {
-                if (c != controller && c.playerIndex >= 0) {
-                    usedPlayerIndexSlots[c.playerIndex] = YES;
-                }
-            }
-
-            /* Set this controller's player index to the first unused index.
-             * FIXME: This logic isn't great... but SDL doesn't expose this
-             * concept in its external API, so we don't have much to go on. */
-            for (i = 0; i < SDL_arraysize(usedPlayerIndexSlots); i++) {
-                if (!usedPlayerIndexSlots[i]) {
-                    controller.playerIndex = i;
-                    break;
-                }
-            }
         }
     }
 #endif /* SDL_JOYSTICK_MFI */
 }
 
 static int
-IOS_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+IOS_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
     return SDL_Unsupported();
 }
@@ -876,6 +854,7 @@ SDL_JoystickDriver SDL_IOS_JoystickDriver =
     IOS_JoystickDetect,
     IOS_JoystickGetDeviceName,
     IOS_JoystickGetDevicePlayerIndex,
+    IOS_JoystickSetDevicePlayerIndex,
     IOS_JoystickGetDeviceGUID,
     IOS_JoystickGetDeviceInstanceID,
     IOS_JoystickOpen,

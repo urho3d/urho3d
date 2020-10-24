@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -58,6 +58,11 @@ DUMMY_JoystickGetDevicePlayerIndex(int device_index)
     return -1;
 }
 
+static void
+DUMMY_JoystickSetDevicePlayerIndex(int device_index, int player_index)
+{
+}
+
 static SDL_JoystickGUID
 DUMMY_JoystickGetDeviceGUID(int device_index)
 {
@@ -79,7 +84,7 @@ DUMMY_JoystickOpen(SDL_Joystick * joystick, int device_index)
 }
 
 static int
-DUMMY_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+DUMMY_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
     return SDL_Unsupported();
 }
@@ -106,6 +111,7 @@ SDL_JoystickDriver SDL_DUMMY_JoystickDriver =
     DUMMY_JoystickDetect,
     DUMMY_JoystickGetDeviceName,
     DUMMY_JoystickGetDevicePlayerIndex,
+    DUMMY_JoystickSetDevicePlayerIndex,
     DUMMY_JoystickGetDeviceGUID,
     DUMMY_JoystickGetDeviceInstanceID,
     DUMMY_JoystickOpen,

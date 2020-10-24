@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -512,6 +512,9 @@ SDL_SYS_HapticMouse(void)
 int
 SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick)
 {
+    if (joystick->driver != &SDL_LINUX_JoystickDriver) {
+        return 0;
+    }
     return EV_IsHaptic(joystick->hwdata->fd);
 }
 
@@ -522,6 +525,9 @@ SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick)
 int
 SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
 {
+    if (joystick->driver != &SDL_LINUX_JoystickDriver) {
+        return 0;
+    }
     /* We are assuming Linux is using evdev which should trump the old
      * joystick methods. */
     if (SDL_strcmp(joystick->hwdata->fname, haptic->hwdata->fname) == 0) {
@@ -541,7 +547,10 @@ SDL_SYS_HapticOpenFromJoystick(SDL_Haptic * haptic, SDL_Joystick * joystick)
     int fd;
     int ret;
     SDL_hapticlist_item *item;
-
+    
+    if (joystick->driver != &SDL_LINUX_JoystickDriver) {
+        return -1;
+    }
     /* Find the joystick in the haptic list. */
     for (item = SDL_hapticlist; item; item = item->next) {
         if (SDL_strcmp(item->fname, joystick->hwdata->fname) == 0) {

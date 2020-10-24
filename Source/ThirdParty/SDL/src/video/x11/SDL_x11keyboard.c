@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
@@ -270,8 +267,11 @@ X11_InitKeyboard(_THIS)
     int best_index;
     int distance;
     Bool xkb_repeat = 0;
+    XKeyboardState values = { .global_auto_repeat = AutoRepeatModeOff };
     
-    X11_XAutoRepeatOn(data->display);
+    X11_XGetKeyboardControl(data->display, &values);
+    if (values.global_auto_repeat != AutoRepeatModeOn)
+        X11_XAutoRepeatOn(data->display);
 
 #if SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM
     {
@@ -294,8 +294,7 @@ X11_InitKeyboard(_THIS)
            Compose keys will work correctly. */
         char *prev_locale = setlocale(LC_ALL, NULL);
         char *prev_xmods  = X11_XSetLocaleModifiers(NULL);
-        // Urho3D - bug fix - the default XMODIFIERS should be null instead of empty string
-        const char *new_xmods = 0;
+        const char *new_xmods = "";
         const char *env_xmods = SDL_getenv("XMODIFIERS");
         SDL_bool has_dbus_ime_support = SDL_FALSE;
 

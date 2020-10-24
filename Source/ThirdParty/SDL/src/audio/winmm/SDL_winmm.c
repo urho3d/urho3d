@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -387,7 +387,7 @@ WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
         return SDL_OutOfMemory();
     }
 
-    SDL_zero(this->hidden->wavebuf);
+    SDL_zeroa(this->hidden->wavebuf);
     for (i = 0; i < NUM_BUFFERS; ++i) {
         this->hidden->wavebuf[i].dwBufferLength = this->spec.size;
         this->hidden->wavebuf[i].dwFlags = WHDR_DONE;

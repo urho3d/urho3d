@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -473,7 +473,7 @@ Cocoa_InitKeyboard(_THIS)
     SDL_SetScancodeName(SDL_SCANCODE_RALT, "Right Option");
     SDL_SetScancodeName(SDL_SCANCODE_RGUI, "Right Command");
 
-    data->modifierFlags = [NSEvent modifierFlags];
+    data->modifierFlags = (unsigned int)[NSEvent modifierFlags];
     SDL_ToggleModState(KMOD_CAPS, (data->modifierFlags & NSEventModifierFlagCapsLock) != 0);
 }
 
@@ -590,7 +590,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
         break;
     case NSEventTypeFlagsChanged:
         /* FIXME CW 2007-08-14: check if this whole mess that takes up half of this file is really necessary */
-        HandleModifiers(_this, scancode, [event modifierFlags]);
+        HandleModifiers(_this, scancode, (unsigned int)[event modifierFlags]);
         break;
     default: /* just to avoid compiler warnings */
         break;

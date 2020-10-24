@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,7 +48,7 @@ X11_CreateEmptyCursor()
         XColor color;
         Pixmap pixmap;
 
-        SDL_zero(data);
+        SDL_zeroa(data);
         color.red = color.green = color.blue = 0;
         pixmap = X11_XCreateBitmapFromData(display, DefaultRootWindow(display),
                                        data, 1, 1);

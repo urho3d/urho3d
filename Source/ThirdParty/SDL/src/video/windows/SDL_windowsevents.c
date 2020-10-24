@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -47,9 +47,6 @@
 #include "wmmsg.h"
 #endif
 
-/* For processing mouse WM_*BUTTON* and WM_MOUSEMOVE message-data from GetMessageExtraInfo() */
-#define MOUSEEVENTF_FROMTOUCH 0xFF515700
-
 /* Masks for processing the windows KEYDOWN and KEYUP messages */
 #define REPEATED_KEYMASK    (1<<30)
 #define EXTENDED_KEYMASK    (1<<24)
@@ -89,6 +86,11 @@ VKeytoScancode(WPARAM vkey)
 /* Windows generates this virtual keycode for Keypad 5 when NumLock is off.
     case VK_CLEAR: return SDL_SCANCODE_CLEAR;
 */
+    case VK_LEFT: return SDL_SCANCODE_LEFT;
+    case VK_UP: return SDL_SCANCODE_UP;
+    case VK_RIGHT: return SDL_SCANCODE_RIGHT;
+    case VK_DOWN: return SDL_SCANCODE_DOWN;
+
     case VK_MODECHANGE: return SDL_SCANCODE_MODE;
     case VK_SELECT: return SDL_SCANCODE_SELECT;
     case VK_EXECUTE: return SDL_SCANCODE_EXECUTE;
@@ -246,7 +248,7 @@ WIN_CheckWParamMouseButton(SDL_bool bwParamMousePressed, SDL_bool bSDLMousePress
 
 /*
 * Some windows systems fail to send a WM_LBUTTONDOWN sometimes, but each mouse move contains the current button state also
-*  so this funciton reconciles our view of the world with the current buttons reported by windows
+*  so this function reconciles our view of the world with the current buttons reported by windows
 */
 static void
 WIN_CheckWParamMouseButtons(WPARAM wParam, SDL_WindowData *data, SDL_MouseID mouseID)
@@ -261,7 +263,6 @@ WIN_CheckWParamMouseButtons(WPARAM wParam, SDL_WindowData *data, SDL_MouseID mou
         data->mouse_button_flags = wParam;
     }
 }
-
 
 static void
 WIN_CheckRawMouseButtons(ULONG rawButtons, SDL_WindowData *data)
@@ -359,32 +360,45 @@ ShouldGenerateWindowCloseOnAltF4(void)
     return !SDL_GetHintBoolean(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, SDL_FALSE);
 }
 
-static SDL_bool isVistaOrNewer = SDL_FALSE;
 /* Win10 "Fall Creators Update" introduced the bug that SetCursorPos() (as used by SDL_WarpMouseInWindow())
    doesn't reliably generate WM_MOUSEMOVE events anymore (see #3931) which breaks relative mouse mode via warping.
    This is used to implement a workaround.. */
 static SDL_bool isWin10FCUorNewer = SDL_FALSE;
 
-/* Checks a mouse or raw packet for touch indication.
-   returns: 0 for not touch input, 1 for touch input.
-*/
-static LPARAM
-GetMessageExtraInfoAndCheckMousePacketTouch(int *checkTouch) {
+/* We want to generate mouse events from mouse and pen, and touch events from touchscreens */
+#define MI_WP_SIGNATURE         0xFF515700
+#define MI_WP_SIGNATURE_MASK    0xFFFFFF00
+#define IsTouchEvent(dw) ((dw) & MI_WP_SIGNATURE_MASK) == MI_WP_SIGNATURE
+
+typedef enum
+{
+    SDL_MOUSE_EVENT_SOURCE_UNKNOWN,
+    SDL_MOUSE_EVENT_SOURCE_MOUSE,
+    SDL_MOUSE_EVENT_SOURCE_TOUCH,
+    SDL_MOUSE_EVENT_SOURCE_PEN,
+} SDL_MOUSE_EVENT_SOURCE;
+
+static SDL_MOUSE_EVENT_SOURCE GetMouseMessageSource()
+{
     LPARAM extrainfo = GetMessageExtraInfo();
     /* Mouse data (ignoring synthetic mouse events generated for touchscreens) */
     /* Versions below Vista will set the low 7 bits to the Mouse ID and don't use bit 7:
        Check bits 8-32 for the signature (which will indicate a Tablet PC Pen or Touch Device).
        Only check bit 7 when Vista and up(Cleared=Pen, Set=Touch(which we need to filter out)),
        when the signature is set. The Mouse ID will be zero for an actual mouse. */
-    *checkTouch = (!(((extrainfo & 0x7F) && (isVistaOrNewer ? (extrainfo & 0x80) : 1)) || ((extrainfo & 0xFFFFFF00) == 0xFF515700)));
-    return extrainfo;
+    if (IsTouchEvent(extrainfo)) {
+        if (extrainfo & 0x80) {
+            return SDL_MOUSE_EVENT_SOURCE_TOUCH;
+        } else {
+            return SDL_MOUSE_EVENT_SOURCE_PEN;
+        }
+    }
+    return SDL_MOUSE_EVENT_SOURCE_MOUSE;
 }
 
 LRESULT CALLBACK
 WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    int checkTouch = -1; /* Default to -1 for not yet loaded */
-    LPARAM extrainfo;    /* The extra info when checkTouch >= 0. */
     SDL_WindowData *data;
     LRESULT returnCode = -1;
 
@@ -469,7 +483,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         data->focus_click_pending |= SDL_BUTTON_X2MASK;
                     }
                 }
-                
+
                 SDL_SendWindowEvent(data->window, SDL_WINDOWEVENT_SHOWN, 0, 0);
                 if (SDL_GetKeyboardFocus() != data->window) {
                     SDL_SetKeyboardFocus(data->window);
@@ -498,7 +512,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     WIN_ResetDeadKeys();
                 }
 
-                if (GetClipCursor(&rect) && SDL_memcmp(&rect, &data->cursor_clipped_rect, sizeof(rect) == 0)) {
+                if (GetClipCursor(&rect) && SDL_memcmp(&rect, &data->cursor_clipped_rect, sizeof(rect)) == 0) {
                     ClipCursor(NULL);
                     SDL_zero(data->cursor_clipped_rect);
                 }
@@ -512,10 +526,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
         {
             SDL_Mouse *mouse = SDL_GetMouse();
-            extrainfo = GetMessageExtraInfoAndCheckMousePacketTouch(&checkTouch); /* load */
             if (!mouse->relative_mode || mouse->relative_mode_warp) {
                 /* Only generate mouse events for real mouse */
-                if (((extrainfo & MOUSEEVENTF_FROMTOUCH) != MOUSEEVENTF_FROMTOUCH) && checkTouch) {
+                if (GetMouseMessageSource() != SDL_MOUSE_EVENT_SOURCE_TOUCH) {
                     SDL_SendMouseMotion(data->window, 0, 0, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                     if (isWin10FCUorNewer && mouse->relative_mode_warp) {
                         /* To work around #3931, Win10 bug introduced in Fall Creators Update, where
@@ -529,6 +542,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         SDL_SendMouseMotion(data->window, 0, 0, center_x, center_y);
                     }
                 }
+            } else {
+                /* We still need to update focus */
+                SDL_SetMouseFocus(data->window);
             }
         }
         /* don't break here, fall through to check the wParam like the button presses */
@@ -545,18 +561,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_XBUTTONDOWN:
     case WM_XBUTTONDBLCLK:
         {
-            SDL_Mouse *mouse;
-
-            // Urho3D: in_title_click may be erroneously left on with non-Aero styles, causing the hidden mouse centering to stop working.
-            // To work around, reset whenever a normal mouse button up/down event is received
-            data->in_title_click = SDL_FALSE;
-
-            mouse = SDL_GetMouse();
-            if (checkTouch < 0) {
-                extrainfo = GetMessageExtraInfoAndCheckMousePacketTouch(&checkTouch);
-            }
+            SDL_Mouse *mouse = SDL_GetMouse();
             if (!mouse->relative_mode || mouse->relative_mode_warp) {
-                if (((extrainfo & MOUSEEVENTF_FROMTOUCH) != MOUSEEVENTF_FROMTOUCH) && checkTouch) {
+                if (GetMouseMessageSource() != SDL_MOUSE_EVENT_SOURCE_TOUCH) {
                     WIN_CheckWParamMouseButtons(wParam, data, 0);
                 }
             }
@@ -582,9 +589,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             /* Mouse data (ignoring synthetic mouse events generated for touchscreens) */
             if (inp.header.dwType == RIM_TYPEMOUSE) {
-                extrainfo = GetMessageExtraInfoAndCheckMousePacketTouch(&checkTouch);
-                if (!checkTouch)
+                if (GetMouseMessageSource() == SDL_MOUSE_EVENT_SOURCE_TOUCH) {
                     break;
+                }
                 if (isRelative) {
                     RAWMOUSE* rawmouse = &inp.data.mouse;
 
@@ -592,16 +599,22 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         SDL_SendMouseMotion(data->window, 0, 1, (int)rawmouse->lLastX, (int)rawmouse->lLastY);
                     } else {
                         /* synthesize relative moves from the abs position */
-                        static SDL_Point initialMousePoint;
-                        if (initialMousePoint.x == 0 && initialMousePoint.y == 0) {
-                            initialMousePoint.x = rawmouse->lLastX;
-                            initialMousePoint.y = rawmouse->lLastY;
+                        static SDL_Point lastMousePoint;
+                        SDL_bool virtual_desktop = (rawmouse->usFlags & MOUSE_VIRTUAL_DESKTOP) ? SDL_TRUE : SDL_FALSE;
+                        int w = GetSystemMetrics(virtual_desktop ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
+                        int h = GetSystemMetrics(virtual_desktop ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
+                        int x = (int)(((float)rawmouse->lLastX / 65535.0f) * w);
+                        int y = (int)(((float)rawmouse->lLastY / 65535.0f) * h);
+
+                        if (lastMousePoint.x == 0 && lastMousePoint.y == 0) {
+                            lastMousePoint.x = x;
+                            lastMousePoint.y = y;
                         }
 
-                        SDL_SendMouseMotion(data->window, 0, 1, (int)(rawmouse->lLastX-initialMousePoint.x), (int)(rawmouse->lLastY-initialMousePoint.y));
+                        SDL_SendMouseMotion(data->window, 0, 1, (int)(x-lastMousePoint.x), (int)(y-lastMousePoint.y));
 
-                        initialMousePoint.x = rawmouse->lLastX;
-                        initialMousePoint.y = rawmouse->lLastY;
+                        lastMousePoint.x = x;
+                        lastMousePoint.y = y;
                     }
                     WIN_CheckRawMouseButtons(rawmouse->usButtonFlags, data);
                 } else if (isCapture) {
@@ -760,8 +773,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             int max_w, max_h;
             BOOL constrain_max_size;
 
-            if (SDL_IsShapedWindow(data->window))
+            if (SDL_IsShapedWindow(data->window)) {
                 Win32_ResizeWindowShape(data->window);
+            }
 
             /* If this is an expected size change, allow it */
             if (data->expected_resize) {
@@ -863,8 +877,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             w = rect.right - rect.left;
             h = rect.bottom - rect.top;
-            SDL_SendWindowEvent(data->window, SDL_WINDOWEVENT_RESIZED, w,
-                                h);
+            SDL_SendWindowEvent(data->window, SDL_WINDOWEVENT_RESIZED, w, h);
 
             /* Forces a WM_PAINT event */
             InvalidateRect(hwnd, NULL, FALSE);
@@ -913,8 +926,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             RECT rect;
             if (GetUpdateRect(hwnd, &rect, FALSE)) {
                 ValidateRect(hwnd, NULL);
-                SDL_SendWindowEvent(data->window, SDL_WINDOWEVENT_EXPOSED,
-                                    0, 0);
+                SDL_SendWindowEvent(data->window, SDL_WINDOWEVENT_EXPOSED, 0, 0);
             }
         }
         returnCode = 0;
@@ -991,13 +1003,13 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     y = (float)(input->y - rect.top)/(rect.bottom - rect.top);
 
                     if (input->dwFlags & TOUCHEVENTF_DOWN) {
-                        SDL_SendTouch(touchId, input->dwID, SDL_TRUE, x, y, 1.0f);
+                        SDL_SendTouch(touchId, input->dwID, data->window, SDL_TRUE, x, y, 1.0f);
                     }
                     if (input->dwFlags & TOUCHEVENTF_MOVE) {
-                        SDL_SendTouchMotion(touchId, input->dwID, x, y, 1.0f);
+                        SDL_SendTouchMotion(touchId, input->dwID, data->window, x, y, 1.0f);
                     }
                     if (input->dwFlags & TOUCHEVENTF_UP) {
-                        SDL_SendTouch(touchId, input->dwID, SDL_FALSE, x, y, 1.0f);
+                        SDL_SendTouch(touchId, input->dwID, data->window, SDL_FALSE, x, y, 1.0f);
                     }
                 }
             }
@@ -1119,6 +1131,7 @@ WIN_PumpEvents(_THIS)
     const Uint8 *keystate;
     MSG msg;
     DWORD start_ticks = GetTickCount();
+    int new_messages = 0;
 
     if (g_WindowsEnableMessageLoop) {
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -1132,7 +1145,15 @@ WIN_PumpEvents(_THIS)
 
             /* Make sure we don't busy loop here forever if there are lots of events coming in */
             if (SDL_TICKS_PASSED(msg.time, start_ticks)) {
-                break;
+                /* We might get a few new messages generated by the Steam overlay or other application hooks
+                   In this case those messages will be processed before any pending input, so we want to continue after those messages.
+                   (thanks to Peter Deayton for his investigation here)
+                 */
+                const int MAX_NEW_MESSAGES = 3;
+                ++new_messages;
+                if (new_messages > MAX_NEW_MESSAGES) {
+                    break;
+                }
             }
         }
     }
@@ -1165,14 +1186,6 @@ struct SDL_WIN_OSVERSIONINFOW {
     ULONG dwPlatformId;
     WCHAR szCSDVersion[128];
 };
-
-static SDL_bool
-IsWinVistaOrNewer(void)
-{
-    DWORD version = GetVersion();
-    DWORD major = (DWORD)(LOBYTE(LOWORD(version)));
-    return (major >= 6)? SDL_TRUE : SDL_FALSE;
-}
 
 static SDL_bool
 IsWin10FCUorNewer(void)
@@ -1262,7 +1275,6 @@ SDL_RegisterApp(char *name, Uint32 style, void *hInst)
         return SDL_SetError("Couldn't register application class");
     }
 
-    isVistaOrNewer = IsWinVistaOrNewer();
     isWin10FCUorNewer = IsWin10FCUorNewer();
 
     app_registered = 1;

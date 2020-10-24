@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -55,6 +55,8 @@ SDL_YUV_CONVERSION_MODE SDL_GetYUVConversionModeForResolution(int width, int hei
     }
     return mode;
 }
+
+#if SDL_HAVE_YUV
 
 static int GetYUVConversionType(int width, int height, YCbCrType *yuv_type)
 {
@@ -1221,6 +1223,7 @@ SDL_ConvertPixels_Planar2x2_to_Planar2x2(int width, int height,
     return SDL_SetError("SDL_ConvertPixels_Planar2x2_to_Planar2x2: Unsupported YUV conversion: %s -> %s", SDL_GetPixelFormatName(src_format), SDL_GetPixelFormatName(dst_format));
 }
 
+#ifdef __SSE2__
 #define PACKED4_TO_PACKED4_ROW_SSE2(shuffle)                                                        \
     while (x >= 4) {                                                                                \
         __m128i yuv = _mm_loadu_si128((__m128i*)srcYUV);                                            \
@@ -1236,6 +1239,8 @@ SDL_ConvertPixels_Planar2x2_to_Planar2x2(int width, int height,
         dstYUV += 16;                                                                               \
         x -= 4;                                                                                     \
     }                                                                                               \
+
+#endif
 
 static int
 SDL_ConvertPixels_YUY2_to_UYVY(int width, int height, const void *src, int src_pitch, void *dst, int dst_pitch)
@@ -1806,11 +1811,14 @@ SDL_ConvertPixels_Packed4_to_Planar2x2(int width, int height,
     return 0;
 }
 
+#endif /* SDL_HAVE_YUV */
+
 int
 SDL_ConvertPixels_YUV_to_YUV(int width, int height,
          Uint32 src_format, const void *src, int src_pitch,
          Uint32 dst_format, void *dst, int dst_pitch)
 {
+#if SDL_HAVE_YUV
     if (src_format == dst_format) {
         if (src == dst) {
             /* Nothing to do */
@@ -1830,6 +1838,9 @@ SDL_ConvertPixels_YUV_to_YUV(int width, int height,
     } else {
         return SDL_SetError("SDL_ConvertPixels_YUV_to_YUV: Unsupported YUV conversion: %s -> %s", SDL_GetPixelFormatName(src_format), SDL_GetPixelFormatName(dst_format));
     }
+#else
+	return SDL_SetError("SDL not built with YUV support");
+#endif
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

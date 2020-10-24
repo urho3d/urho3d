@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,7 +42,7 @@ static int xinput2_multitouch_supported = 0;
  * this extension */
 static int xinput2_opcode;
 
-static void parse_valuators(const double *input_values,unsigned char *mask,int mask_len,
+static void parse_valuators(const double *input_values, const unsigned char *mask,int mask_len,
                             double *output_values,int output_values_len) {
     int i = 0,z = 0;
     int top = mask_len * 8;
@@ -230,7 +230,7 @@ X11_HandleXinput2Event(SDL_VideoData *videodata,XGenericEventCookie *cookie)
             float x, y;
             SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
             xinput2_normalize_touch_coordinates(window, xev->event_x, xev->event_y, &x, &y);
-            SDL_SendTouch(xev->sourceid,xev->detail, SDL_TRUE, x, y, 1.0);
+            SDL_SendTouch(xev->sourceid, xev->detail, window, SDL_TRUE, x, y, 1.0);
             return 1;
             }
             break;
@@ -239,7 +239,7 @@ X11_HandleXinput2Event(SDL_VideoData *videodata,XGenericEventCookie *cookie)
             float x, y;
             SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
             xinput2_normalize_touch_coordinates(window, xev->event_x, xev->event_y, &x, &y);
-            SDL_SendTouch(xev->sourceid,xev->detail, SDL_FALSE, x, y, 1.0);
+            SDL_SendTouch(xev->sourceid, xev->detail, window, SDL_FALSE, x, y, 1.0);
             return 1;
             }
             break;
@@ -248,7 +248,7 @@ X11_HandleXinput2Event(SDL_VideoData *videodata,XGenericEventCookie *cookie)
             float x, y;
             SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
             xinput2_normalize_touch_coordinates(window, xev->event_x, xev->event_y, &x, &y);
-            SDL_SendTouchMotion(xev->sourceid,xev->detail, x, y, 1.0);
+            SDL_SendTouchMotion(xev->sourceid, xev->detail, window, x, y, 1.0);
             return 1;
             }
             break;

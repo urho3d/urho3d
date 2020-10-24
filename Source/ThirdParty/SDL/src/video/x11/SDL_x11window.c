@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -393,12 +393,33 @@ X11_CreateWindow(_THIS, SDL_Window * window)
     long fevent = 0;
 
 #if SDL_VIDEO_OPENGL_GLX || SDL_VIDEO_OPENGL_EGL
-    if ((window->flags & SDL_WINDOW_OPENGL) &&
+    const char *forced_visual_id = SDL_GetHint(SDL_HINT_VIDEO_X11_WINDOW_VISUALID);
+
+    if (forced_visual_id != NULL && forced_visual_id[0] != '\0')
+    {
+        XVisualInfo *vi, template;
+        int nvis;
+
+        SDL_zero(template);
+        template.visualid = SDL_strtol(forced_visual_id, NULL, 0);
+        vi = X11_XGetVisualInfo(display, VisualIDMask, &template, &nvis);
+        if (vi) {
+            visual = vi->visual;
+            depth = vi->depth;
+            X11_XFree(vi);
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else if ((window->flags & SDL_WINDOW_OPENGL) &&
         !SDL_getenv("SDL_VIDEO_X11_VISUALID")) {
         XVisualInfo *vinfo = NULL;
 
 #if SDL_VIDEO_OPENGL_EGL
-        if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES 
+        if (((_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES) ||
+             SDL_GetHintBoolean(SDL_HINT_VIDEO_X11_FORCE_EGL, SDL_FALSE))
 #if SDL_VIDEO_OPENGL_GLX            
             && ( !_this->gl_data || X11_GL_UseEGL(_this) )
 #endif
@@ -608,16 +629,16 @@ X11_CreateWindow(_THIS, SDL_Window * window)
     }
     windowdata = (SDL_WindowData *) window->driverdata;
 
-#if SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2
+#if SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2 || SDL_VIDEO_OPENGL_EGL
     if ((window->flags & SDL_WINDOW_OPENGL) && 
-        _this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES
+        ((_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES) ||
+         SDL_GetHintBoolean(SDL_HINT_VIDEO_X11_FORCE_EGL, SDL_FALSE))
 #if SDL_VIDEO_OPENGL_GLX            
         && ( !_this->gl_data || X11_GL_UseEGL(_this) )
 #endif  
     ) {
 #if SDL_VIDEO_OPENGL_EGL  
         if (!_this->egl_data) {
-            X11_XDestroyWindow(display, w);
             return -1;
         }
 
@@ -625,7 +646,6 @@ X11_CreateWindow(_THIS, SDL_Window * window)
         windowdata->egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType) w);
 
         if (windowdata->egl_surface == EGL_NO_SURFACE) {
-            X11_XDestroyWindow(display, w);
             return SDL_SetError("Could not create GLES window surface");
         }
 #else
@@ -785,9 +805,46 @@ X11_SetWindowPosition(_THIS, SDL_Window * window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     Display *display = data->videodata->display;
+    unsigned int childCount;
+    Window childReturn, root, parent;
+    Window* children;
+    XWindowAttributes attrs;
+    int orig_x, orig_y;
+    Uint32 timeout;
 
+    X11_XSync(display, False);
+    X11_XQueryTree(display, data->xwindow, &root, &parent, &children, &childCount);
+    X11_XGetWindowAttributes(display, data->xwindow, &attrs);
+    X11_XTranslateCoordinates(display, parent, DefaultRootWindow(display),
+                              attrs.x, attrs.y, &orig_x, &orig_y, &childReturn);
+
+    /*Attempt to move the window*/
     X11_XMoveWindow(display, data->xwindow, window->x - data->border_left, window->y - data->border_top);
-    X11_XFlush(display);
+
+    /* Wait a brief time to see if the window manager decided to let this move happen.
+       If the window changes at all, even to an unexpected value, we break out. */
+    timeout = SDL_GetTicks() + 100;
+    while (SDL_TRUE) {
+        int x, y;
+        X11_XSync(display, False);
+        X11_XGetWindowAttributes(display, data->xwindow, &attrs);
+        X11_XTranslateCoordinates(display, parent, DefaultRootWindow(display),
+                                  attrs.x, attrs.y, &x, &y, &childReturn);
+
+        if ((x != orig_x) || (y != orig_y)) {
+            window->x = x;
+            window->y = y;
+            break;  /* window moved, time to go. */
+        } else if ((x == window->x) && (y == window->y)) {
+            break;  /* we're at the place we wanted to be anyhow, drop out. */
+        }
+
+        if (SDL_TICKS_PASSED(SDL_GetTicks(), timeout)) {
+            break;
+        }
+
+        SDL_Delay(10);
+    }
 }
 
 void
@@ -853,6 +910,14 @@ X11_SetWindowSize(_THIS, SDL_Window * window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     Display *display = data->videodata->display;
+    XWindowAttributes attrs;
+    int orig_w, orig_h;
+    Uint32 timeout;
+
+    X11_XSync(display, False);
+    X11_XGetWindowAttributes(display, data->xwindow, &attrs);
+    orig_w = attrs.width;
+    orig_h = attrs.height;
 
     if (SDL_IsShapedWindow(window)) {
         X11_ResizeWindowShape(window);
@@ -896,7 +961,27 @@ X11_SetWindowSize(_THIS, SDL_Window * window)
         X11_XResizeWindow(display, data->xwindow, window->w, window->h);
     }
 
-    X11_XFlush(display);
+    /* Wait a brief time to see if the window manager decided to let this resize happen.
+       If the window changes at all, even to an unexpected value, we break out. */
+    timeout = SDL_GetTicks() + 100;
+    while (SDL_TRUE) {
+        X11_XSync(display, False);
+        X11_XGetWindowAttributes(display, data->xwindow, &attrs);
+
+        if ((attrs.width != orig_w) || (attrs.height != orig_h)) {
+            window->w = attrs.width;
+            window->h = attrs.height;
+            break;  /* window changed, time to go. */
+        } else if ((attrs.width == window->w) && (attrs.height == window->h)) {
+            break;  /* we're at the place we wanted to be anyhow, drop out. */
+        }
+
+        if (SDL_TICKS_PASSED(SDL_GetTicks(), timeout)) {
+            break;
+        }
+
+        SDL_Delay(10);
+    }
 }
 
 int

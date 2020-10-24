@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,9 +27,31 @@
 
 #import "SDL_cocoametalview.h"
 
-#if SDL_VIDEO_DRIVER_COCOA && (SDL_VIDEO_VULKAN || SDL_VIDEO_RENDER_METAL)
+#if SDL_VIDEO_DRIVER_COCOA && (SDL_VIDEO_VULKAN || SDL_VIDEO_METAL)
 
 #include "SDL_assert.h"
+#include "SDL_events.h"
+
+static int SDLCALL
+SDL_MetalViewEventWatch(void *userdata, SDL_Event *event)
+{
+    /* Update the drawable size when SDL receives a size changed event for
+     * the window that contains the metal view. It would be nice to use
+     * - (void)resizeWithOldSuperviewSize:(NSSize)oldSize and
+     * - (void)viewDidChangeBackingProperties instead, but SDL's size change
+     * events don't always happen in the same frame (for example when a
+     * resizable window exits a fullscreen Space via the user pressing the OS
+     * exit-space button). */
+    if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+        @autoreleasepool {
+            SDL_cocoametalview *view = (__bridge SDL_cocoametalview *)userdata;
+            if (view.sdlWindowID == event->window.windowID) {
+                [view updateDrawableSize];
+            }
+        }
+    }
+    return 0;
+}
 
 @implementation SDL_cocoametalview
 
@@ -55,18 +77,28 @@
 
 - (instancetype)initWithFrame:(NSRect)frame
                       highDPI:(BOOL)highDPI
+                     windowID:(Uint32)windowID;
 {
     if ((self = [super initWithFrame:frame])) {
         self.highDPI = highDPI;
+        self.sdlWindowID = windowID;
         self.wantsLayer = YES;
 
         /* Allow resize. */
         self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 
+        SDL_AddEventWatch(SDL_MetalViewEventWatch, self);
+
         [self updateDrawableSize];
     }
   
     return self;
+}
+
+- (void)dealloc
+{
+    SDL_DelEventWatch(SDL_MetalViewEventWatch, self);
+    [super dealloc];
 }
 
 - (NSInteger)tag
@@ -77,8 +109,8 @@
 - (void)updateDrawableSize
 {
     CAMetalLayer *metalLayer = (CAMetalLayer *)self.layer;
-    CGSize size = self.bounds.size;
-    CGSize backingSize = size;
+    NSSize size = self.bounds.size;
+    NSSize backingSize = size;
 
     if (self.highDPI) {
         /* Note: NSHighResolutionCapable must be set to true in the app's
@@ -88,34 +120,46 @@
     }
 
     metalLayer.contentsScale = backingSize.height / size.height;
-    metalLayer.drawableSize = backingSize;
-}
-
-/* Set the size of the metal drawables when the view is resized. */
-- (void)resizeWithOldSuperviewSize:(NSSize)oldSize
-{
-    [super resizeWithOldSuperviewSize:oldSize];
-    [self updateDrawableSize];
+    metalLayer.drawableSize = NSSizeToCGSize(backingSize);
 }
 
 @end
 
-SDL_cocoametalview*
-Cocoa_Mtl_AddMetalView(SDL_Window* window)
-{
+SDL_MetalView
+Cocoa_Metal_CreateView(_THIS, SDL_Window * window)
+{ @autoreleasepool {
     SDL_WindowData* data = (__bridge SDL_WindowData *)window->driverdata;
     NSView *view = data->nswindow.contentView;
     BOOL highDPI = (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) != 0;
-    SDL_cocoametalview *metalview;
+    Uint32 windowID = SDL_GetWindowID(window);
+    SDL_cocoametalview *newview;
+    SDL_MetalView metalview;
 
-    metalview = [[SDL_cocoametalview alloc] initWithFrame:view.frame highDPI:highDPI];
-    [view addSubview:metalview];
+    newview = [[SDL_cocoametalview alloc] initWithFrame:view.frame
+                                                highDPI:highDPI
+                                                windowID:windowID];
+    if (newview == nil) {
+        return NULL;
+    }
+
+    [view addSubview:newview];
+
+    metalview = (SDL_MetalView)CFBridgingRetain(newview);
+    [newview release];
+
     return metalview;
-}
+}}
 
 void
-Cocoa_Mtl_GetDrawableSize(SDL_Window * window, int * w, int * h)
-{
+Cocoa_Metal_DestroyView(_THIS, SDL_MetalView view)
+{ @autoreleasepool {
+    SDL_cocoametalview *metalview = CFBridgingRelease(view);
+    [metalview removeFromSuperview];
+}}
+
+void
+Cocoa_Metal_GetDrawableSize(SDL_Window * window, int * w, int * h)
+{ @autoreleasepool {
     SDL_WindowData *data = (__bridge SDL_WindowData *)window->driverdata;
     NSView *view = data->nswindow.contentView;
     SDL_cocoametalview* metalview = [view viewWithTag:METALVIEW_TAG];
@@ -131,8 +175,8 @@ Cocoa_Mtl_GetDrawableSize(SDL_Window * window, int * w, int * h)
     } else {
         SDL_GetWindowSize(window, w, h);
     }
-}
+}}
 
-#endif /* SDL_VIDEO_DRIVER_COCOA && (SDL_VIDEO_VULKAN || SDL_VIDEO_RENDER_METAL) */
+#endif /* SDL_VIDEO_DRIVER_COCOA && (SDL_VIDEO_VULKAN || SDL_VIDEO_METAL) */
 
 /* vi: set ts=4 sw=4 expandtab: */

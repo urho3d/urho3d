@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,13 +48,14 @@ extern "C" {
 static int SDL_BeAppActive = 0;
 static SDL_Thread *SDL_AppThread = NULL;
 
+/* Default application signature */
+const char *signature = "application/x-SDL-executable";
+
 static int
 StartBeApp(void *unused)
 {
     BApplication *App;
 
-    // default application signature
-    const char *signature = "application/x-SDL-executable";
     // dig resources for correct signature
     image_info info;
     int32 cookie = 0;

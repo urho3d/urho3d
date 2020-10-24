@@ -1,8 +1,5 @@
-// Modified by Yao Wei Tjong for Urho3D
-
 package org.libsdl.app;
 
-import android.annotation.TargetApi;
 import android.media.*;
 import android.os.Build;
 import android.util.Log;
@@ -244,8 +241,6 @@ public class SDLAudioManager
     /**
      * This method is called by SDL using JNI.
      */
-    // Urho3D - suppress lint error
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static void audioWriteFloatBuffer(float[] buffer) {
         if (mAudioTrack == null) {
             Log.e(TAG, "Attempted to make audio call with uninitialized audio!");
@@ -329,8 +324,6 @@ public class SDLAudioManager
     }
 
     /** This method is called by SDL using JNI. */
-    // Urho3D - suppress lint error
-    @TargetApi(Build.VERSION_CODES.M)
     public static int captureReadFloatBuffer(float[] buffer, boolean blocking) {
         return mAudioRecord.read(buffer, 0, buffer.length, blocking ? AudioRecord.READ_BLOCKING : AudioRecord.READ_NON_BLOCKING);
     }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,8 +31,10 @@
 #include "SDL_timer.h"
 #include "SDL_joystick.h"
 #include "SDL_gamecontroller.h"
+#include "../../SDL_hints_c.h"
 #include "../SDL_sysjoystick.h"
 #include "SDL_hidapijoystick_c.h"
+#include "SDL_hidapi_rumble.h"
 
 
 #ifdef SDL_JOYSTICK_HIDAPI_SWITCH
@@ -91,6 +93,14 @@ typedef struct
 {
     Uint8 rgucButtons[2];
     Uint8 ucStickHat;
+    Uint8 rgucJoystickLeft[2];
+    Uint8 rgucJoystickRight[2];
+} SwitchInputOnlyControllerStatePacket_t;
+
+typedef struct
+{
+    Uint8 rgucButtons[2];
+    Uint8 ucStickHat;
     Sint16 sJoystickLeft[2];
     Sint16 sJoystickRight[2];
 } SwitchSimpleStatePacket_t;
@@ -135,11 +145,11 @@ typedef struct
 
     #define k_unSubcommandDataBytes 35
     union {
-        Uint8 rgucSubcommandData[ k_unSubcommandDataBytes ];
+        Uint8 rgucSubcommandData[k_unSubcommandDataBytes];
 
         struct {
             SwitchSPIOpData_t opData;
-            Uint8 rgucReadData[ k_unSubcommandDataBytes - sizeof(SwitchSPIOpData_t) ];
+            Uint8 rgucReadData[k_unSubcommandDataBytes - sizeof(SwitchSPIOpData_t)];
         } spiReadData;
 
         struct {
@@ -170,7 +180,7 @@ typedef struct
     SwitchCommonOutputPacket_t commonData;
 
     Uint8 ucSubcommandID;
-    Uint8 rgucSubcommandData[ k_unSwitchOutputPacketDataLength - sizeof(SwitchCommonOutputPacket_t) - 1 ];
+    Uint8 rgucSubcommandData[k_unSwitchOutputPacketDataLength - sizeof(SwitchCommonOutputPacket_t) - 1];
 } SwitchSubcommandOutputPacket_t;
 
 typedef struct
@@ -178,17 +188,24 @@ typedef struct
     Uint8 ucPacketType;
     Uint8 ucProprietaryID;
 
-    Uint8 rgucProprietaryData[ k_unSwitchOutputPacketDataLength - 1 - 1 ];
+    Uint8 rgucProprietaryData[k_unSwitchOutputPacketDataLength - 1 - 1];
 } SwitchProprietaryOutputPacket_t;
 #pragma pack()
 
 typedef struct {
-    hid_device *dev;
-    SDL_bool m_bIsUsingBluetooth;
+    SDL_HIDAPI_Device *device;
+    SDL_bool m_bInputOnly;
+    SDL_bool m_bHasHomeLED;
+    SDL_bool m_bUsingBluetooth;
+    SDL_bool m_bIsGameCube;
+    SDL_bool m_bUseButtonLabels;
     Uint8 m_nCommandNumber;
     SwitchCommonOutputPacket_t m_RumblePacket;
-    Uint32 m_nRumbleExpiration;
     Uint8 m_rgucReadBuffer[k_unSwitchMaxOutputPacketLength];
+    SDL_bool m_bRumbleActive;
+    Uint32 m_unRumbleRefresh;
+
+    SwitchInputOnlyControllerStatePacket_t m_lastInputOnlyState;
     SwitchSimpleStatePacket_t m_lastSimpleState;
     SwitchStatePacket_t m_lastFullState;
 
@@ -209,30 +226,62 @@ typedef struct {
 } SDL_DriverSwitch_Context;
 
 
-static SDL_bool
-HIDAPI_DriverSwitch_IsSupportedDevice(Uint16 vendor_id, Uint16 product_id, Uint16 version, int interface_number)
+static SDL_bool IsGameCubeFormFactor(int vendor_id, int product_id)
 {
-    return SDL_IsJoystickNintendoSwitchPro(vendor_id, product_id);
+    static Uint32 gamecube_formfactor[] = {
+        MAKE_VIDPID(0x0e6f, 0x0185),    /* PDP Wired Fight Pad Pro for Nintendo Switch */
+        MAKE_VIDPID(0x20d6, 0xa711),    /* Core (Plus) Wired Controller */
+    };
+    Uint32 id = MAKE_VIDPID(vendor_id, product_id);
+    int i;
+
+    for (i = 0; i < SDL_arraysize(gamecube_formfactor); ++i) {
+        if (id == gamecube_formfactor[i]) {
+            return SDL_TRUE;
+        }
+    }
+    return SDL_FALSE;
+}
+
+static SDL_bool
+HIDAPI_DriverSwitch_IsSupportedDevice(const char *name, SDL_GameControllerType type, Uint16 vendor_id, Uint16 product_id, Uint16 version, int interface_number, int interface_class, int interface_subclass, int interface_protocol)
+{
+    /* The HORI Wireless Switch Pad enumerates as a HID device when connected via USB
+       with the same VID/PID as when connected over Bluetooth but doesn't actually
+       support communication over USB. The most reliable way to block this without allowing the
+       controller to continually attempt to reconnect is to filter it out by manufactuer/product string.
+       Note that the controller does have a different product string when connected over Bluetooth.
+     */
+    if (SDL_strcmp( name, "HORI Wireless Switch Pad" ) == 0) {
+        return SDL_FALSE;
+    }
+    return (type == SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO);
 }
 
 static const char *
 HIDAPI_DriverSwitch_GetDeviceName(Uint16 vendor_id, Uint16 product_id)
 {
     /* Give a user friendly name for this controller */
-    if (SDL_IsJoystickNintendoSwitchPro(vendor_id, product_id)) {
-        return "Nintendo Switch Pro Controller";
-    }
-    return NULL;
+    return "Nintendo Switch Pro Controller";
 }
 
 static int ReadInput(SDL_DriverSwitch_Context *ctx)
 {
-    return hid_read_timeout(ctx->dev, ctx->m_rgucReadBuffer, sizeof(ctx->m_rgucReadBuffer), 0);
+    /* Make sure we don't try to read at the same time a write is happening */
+    if (SDL_AtomicGet(&ctx->device->rumble_pending) > 0) {
+        return 0;
+    }
+
+    return hid_read_timeout(ctx->device->dev, ctx->m_rgucReadBuffer, sizeof(ctx->m_rgucReadBuffer), 0);
 }
 
-static int WriteOutput(SDL_DriverSwitch_Context *ctx, Uint8 *data, int size)
+static int WriteOutput(SDL_DriverSwitch_Context *ctx, const Uint8 *data, int size)
 {
-    return hid_write(ctx->dev, data, size);
+    /* Use the rumble thread for general asynchronous writes */
+    if (SDL_HIDAPI_LockRumble() < 0) {
+        return -1;
+    }
+    return SDL_HIDAPI_SendRumbleAndUnlock(ctx->device, data, size);
 }
 
 static SwitchSubcommandInputPacket_t *ReadSubcommandReply(SDL_DriverSwitch_Context *ctx, ESwitchSubcommandIDs expectedID)
@@ -245,7 +294,7 @@ static SwitchSubcommandInputPacket_t *ReadSubcommandReply(SDL_DriverSwitch_Conte
     while ((nRead = ReadInput(ctx)) != -1) {
         if (nRead > 0) {
             if (ctx->m_rgucReadBuffer[0] == k_eSwitchInputReportIDs_SubcommandReply) {
-                SwitchSubcommandInputPacket_t *reply = (SwitchSubcommandInputPacket_t *)&ctx->m_rgucReadBuffer[ 1 ];
+                SwitchSubcommandInputPacket_t *reply = (SwitchSubcommandInputPacket_t *)&ctx->m_rgucReadBuffer[1];
                 if (reply->ucSubcommandID == expectedID && (reply->ucSubcommandAck & 0x80)) {
                     return reply;
                 }
@@ -270,7 +319,7 @@ static SDL_bool ReadProprietaryReply(SDL_DriverSwitch_Context *ctx, ESwitchPropr
     int nRead = 0;
     while ((nRead = ReadInput(ctx)) != -1) {
         if (nRead > 0) {
-            if (ctx->m_rgucReadBuffer[0] == k_eSwitchInputReportIDs_CommandAck && ctx->m_rgucReadBuffer[ 1 ] == expectedID) {
+            if (ctx->m_rgucReadBuffer[0] == k_eSwitchInputReportIDs_CommandAck && ctx->m_rgucReadBuffer[1] == expectedID) {
                 return SDL_TRUE;
             }
         } else {
@@ -302,7 +351,7 @@ static void ConstructSubcommand(SDL_DriverSwitch_Context *ctx, ESwitchSubcommand
 static SDL_bool WritePacket(SDL_DriverSwitch_Context *ctx, void *pBuf, Uint8 ucLen)
 {
     Uint8 rgucBuf[k_unSwitchMaxOutputPacketLength];
-    const size_t unWriteSize = ctx->m_bIsUsingBluetooth ? k_unSwitchBluetoothPacketLength : k_unSwitchUSBPacketLength;
+    const size_t unWriteSize = ctx->m_bUsingBluetooth ? k_unSwitchBluetoothPacketLength : k_unSwitchUSBPacketLength;
 
     if (ucLen > k_unSwitchOutputPacketDataLength) {
         return SDL_FALSE;
@@ -352,7 +401,9 @@ static SDL_bool WriteProprietary(SDL_DriverSwitch_Context *ctx, ESwitchProprieta
 
         packet.ucPacketType = k_eSwitchOutputReportIDs_Proprietary;
         packet.ucProprietaryID = ucCommand;
-        SDL_memcpy(packet.rgucProprietaryData, pBuf, ucLen);
+        if (pBuf) {
+            SDL_memcpy(packet.rgucProprietaryData, pBuf, ucLen);
+        }
 
         if (!WritePacket(ctx, &packet, sizeof(packet))) {
             continue;
@@ -403,6 +454,16 @@ static SDL_bool WriteRumble(SDL_DriverSwitch_Context *ctx)
     ctx->m_RumblePacket.ucPacketNumber = ctx->m_nCommandNumber;
     ctx->m_nCommandNumber = (ctx->m_nCommandNumber + 1) & 0xF;
 
+    /* Refresh the rumble state periodically */
+    if (ctx->m_bRumbleActive) {
+        ctx->m_unRumbleRefresh = SDL_GetTicks() + 30;
+        if (!ctx->m_unRumbleRefresh) {
+            ctx->m_unRumbleRefresh = 1;
+        }
+    } else {
+        ctx->m_unRumbleRefresh = 0;
+    }
+
     return WritePacket(ctx, (Uint8 *)&ctx->m_RumblePacket, sizeof(ctx->m_RumblePacket));
 }
 
@@ -417,7 +478,8 @@ static SDL_bool BTrySetupUSB(SDL_DriverSwitch_Context *ctx)
         return SDL_FALSE;
     }
     if (!WriteProprietary(ctx, k_eSwitchProprietaryCommandIDs_HighSpeed, NULL, 0, SDL_TRUE)) {
-        return SDL_FALSE;
+        /* The 8BitDo M30 and SF30 Pro don't respond to this command, but otherwise work correctly */
+        /*return SDL_FALSE;*/
     }
     if (!WriteProprietary(ctx, k_eSwitchProprietaryCommandIDs_Handshake, NULL, 0, SDL_TRUE)) {
         return SDL_FALSE;
@@ -515,7 +577,7 @@ static SDL_bool LoadStickCalibration(SDL_DriverSwitch_Context *ctx)
         }
     }
 
-    if (ctx->m_bIsUsingBluetooth) {
+    if (ctx->m_bUsingBluetooth) {
         for (stick = 0; stick < 2; ++stick) {
             for(axis = 0; axis < 2; ++axis) {
                 ctx->m_StickExtents[stick].axis[axis].sMin = (Sint16)(SDL_MIN_SINT16 * 0.5f);
@@ -569,8 +631,62 @@ static Sint16 ApplyStickCalibration(SDL_DriverSwitch_Context *ctx, int nStick, i
     return ApplyStickCalibrationCentered(ctx, nStick, nAxis, sRawValue, ctx->m_StickCalData[nStick].axis[nAxis].sCenter);
 }
 
+static void SDLCALL SDL_GameControllerButtonReportingHintChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
+{
+    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)userdata;
+    ctx->m_bUseButtonLabels = SDL_GetStringBoolean(hint, SDL_TRUE);
+}
+
+static Uint8 RemapButton(SDL_DriverSwitch_Context *ctx, Uint8 button)
+{
+    if (!ctx->m_bUseButtonLabels) {
+        /* Use button positions */
+        if (ctx->m_bIsGameCube) {
+            switch (button) {
+            case SDL_CONTROLLER_BUTTON_B:
+                return SDL_CONTROLLER_BUTTON_X;
+            case SDL_CONTROLLER_BUTTON_X:
+                return SDL_CONTROLLER_BUTTON_B;
+            default:
+                break;
+            }
+        } else {
+            switch (button) {
+            case SDL_CONTROLLER_BUTTON_A:
+                return SDL_CONTROLLER_BUTTON_B;
+            case SDL_CONTROLLER_BUTTON_B:
+                return SDL_CONTROLLER_BUTTON_A;
+            case SDL_CONTROLLER_BUTTON_X:
+                return SDL_CONTROLLER_BUTTON_Y;
+            case SDL_CONTROLLER_BUTTON_Y:
+                return SDL_CONTROLLER_BUTTON_X;
+            default:
+                break;
+            }
+        }
+    }
+    return button;
+}
+ 
 static SDL_bool
-HIDAPI_DriverSwitch_Init(SDL_Joystick *joystick, hid_device *dev, Uint16 vendor_id, Uint16 product_id, void **context)
+HIDAPI_DriverSwitch_InitDevice(SDL_HIDAPI_Device *device)
+{
+    return HIDAPI_JoystickConnected(device, NULL);
+}
+
+static int
+HIDAPI_DriverSwitch_GetDevicePlayerIndex(SDL_HIDAPI_Device *device, SDL_JoystickID instance_id)
+{
+    return -1;
+}
+
+static void
+HIDAPI_DriverSwitch_SetDevicePlayerIndex(SDL_HIDAPI_Device *device, SDL_JoystickID instance_id, int player_index)
+{
+}
+
+static SDL_bool
+HIDAPI_DriverSwitch_OpenJoystick(SDL_HIDAPI_Device *device, SDL_Joystick *joystick)
 {
     SDL_DriverSwitch_Context *ctx;
     Uint8 input_mode;
@@ -578,58 +694,76 @@ HIDAPI_DriverSwitch_Init(SDL_Joystick *joystick, hid_device *dev, Uint16 vendor_
     ctx = (SDL_DriverSwitch_Context *)SDL_calloc(1, sizeof(*ctx));
     if (!ctx) {
         SDL_OutOfMemory();
-        return SDL_FALSE;
+        goto error;
     }
-    ctx->dev = dev;
+    ctx->device = device;
+    device->context = ctx;
 
-    *context = ctx;
-
-    /* Initialize rumble data */
-    SetNeutralRumble(&ctx->m_RumblePacket.rumbleData[0]);
-    SetNeutralRumble(&ctx->m_RumblePacket.rumbleData[1]);
-
-    /* Try setting up USB mode, and if that fails we're using Bluetooth */
-    if (!BTrySetupUSB(ctx)) {
-        ctx->m_bIsUsingBluetooth = SDL_TRUE;
+    device->dev = hid_open_path(device->path, 0);
+    if (!device->dev) {
+        SDL_SetError("Couldn't open %s", device->path);
+        goto error;
     }
 
-    if (!LoadStickCalibration(ctx)) {
-        SDL_SetError("Couldn't load stick calibration");
-        SDL_free(ctx);
-        return SDL_FALSE;
-    }
+    /* Find out whether or not we can send output reports */
+    ctx->m_bInputOnly = SDL_IsJoystickNintendoSwitchProInputOnly(device->vendor_id, device->product_id);
+    if (!ctx->m_bInputOnly) {
+        /* The Power A Nintendo Switch Pro controllers don't have a Home LED */
+        ctx->m_bHasHomeLED = (device->vendor_id != 0 && device->product_id != 0) ? SDL_TRUE : SDL_FALSE;
 
-    if (!SetVibrationEnabled(ctx, 1)) {
-        SDL_SetError("Couldn't enable vibration");
-        SDL_free(ctx);
-        return SDL_FALSE;
-    }
+        /* Initialize rumble data */
+        SetNeutralRumble(&ctx->m_RumblePacket.rumbleData[0]);
+        SetNeutralRumble(&ctx->m_RumblePacket.rumbleData[1]);
 
-    /* Set the desired input mode */
-    if (ctx->m_bIsUsingBluetooth) {
-        input_mode = k_eSwitchInputReportIDs_SimpleControllerState;
-    } else {
-        input_mode = k_eSwitchInputReportIDs_FullControllerState;
-    }
-    if (!SetInputMode(ctx, input_mode)) {
-        SDL_SetError("Couldn't set input mode");
-        SDL_free(ctx);
-        return SDL_FALSE;
-    }
-
-    /* Start sending USB reports */
-    if (!ctx->m_bIsUsingBluetooth) {
-        /* ForceUSB doesn't generate an ACK, so don't wait for a reply */
-        if (!WriteProprietary(ctx, k_eSwitchProprietaryCommandIDs_ForceUSB, NULL, 0, SDL_FALSE)) {
-            SDL_SetError("Couldn't start USB reports");
-            SDL_free(ctx);
-            return SDL_FALSE;
+        /* Try setting up USB mode, and if that fails we're using Bluetooth */
+        if (!BTrySetupUSB(ctx)) {
+            ctx->m_bUsingBluetooth = SDL_TRUE;
         }
+
+        if (!LoadStickCalibration(ctx)) {
+            SDL_SetError("Couldn't load stick calibration");
+            goto error;
+        }
+
+        if (!SetVibrationEnabled(ctx, 1)) {
+            SDL_SetError("Couldn't enable vibration");
+            goto error;
+        }
+
+        /* Set the desired input mode */
+        if (ctx->m_bUsingBluetooth) {
+            input_mode = k_eSwitchInputReportIDs_SimpleControllerState;
+        } else {
+            input_mode = k_eSwitchInputReportIDs_FullControllerState;
+        }
+        if (!SetInputMode(ctx, input_mode)) {
+            SDL_SetError("Couldn't set input mode");
+            goto error;
+        }
+
+        /* Start sending USB reports */
+        if (!ctx->m_bUsingBluetooth) {
+            /* ForceUSB doesn't generate an ACK, so don't wait for a reply */
+            if (!WriteProprietary(ctx, k_eSwitchProprietaryCommandIDs_ForceUSB, NULL, 0, SDL_FALSE)) {
+                SDL_SetError("Couldn't start USB reports");
+                goto error;
+            }
+        }
+
+        /* Set the LED state */
+        if (ctx->m_bHasHomeLED) {
+            SetHomeLED(ctx, 100);
+        }
+        SetSlotLED(ctx, (joystick->instance_id % 4));
     }
 
-    /* Set the LED state */
-    SetHomeLED(ctx, 100);
-    SetSlotLED(ctx, (joystick->instance_id % 4));
+    if (IsGameCubeFormFactor(device->vendor_id, device->product_id)) {
+        /* This is a controller shaped like a GameCube controller, with a large central A button */
+        ctx->m_bIsGameCube = SDL_TRUE;
+    }
+
+    SDL_AddHintCallback(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS,
+                        SDL_GameControllerButtonReportingHintChanged, ctx);
 
     /* Initialize the joystick capabilities */
     joystick->nbuttons = SDL_CONTROLLER_BUTTON_MAX;
@@ -637,12 +771,23 @@ HIDAPI_DriverSwitch_Init(SDL_Joystick *joystick, hid_device *dev, Uint16 vendor_
     joystick->epowerlevel = SDL_JOYSTICK_POWER_WIRED;
 
     return SDL_TRUE;
+
+error:
+    if (device->dev) {
+        hid_close(device->dev);
+        device->dev = NULL;
+    }
+    if (device->context) {
+        SDL_free(device->context);
+        device->context = NULL;
+    }
+    return SDL_FALSE;
 }
 
 static int
-HIDAPI_DriverSwitch_Rumble(SDL_Joystick *joystick, hid_device *dev, void *context, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+HIDAPI_DriverSwitch_RumbleJoystick(SDL_HIDAPI_Device *device, SDL_Joystick *joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
-    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)context;
+    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)device->context;
 
     /* Experimentally determined rumble values. These will only matter on some controllers as tested ones
      * seem to disregard these and just use any non-zero rumble values as a binary flag for constant rumble
@@ -667,17 +812,109 @@ HIDAPI_DriverSwitch_Rumble(SDL_Joystick *joystick, hid_device *dev, void *contex
         SetNeutralRumble(&ctx->m_RumblePacket.rumbleData[1]);
     }
 
+    ctx->m_bRumbleActive = (low_frequency_rumble || high_frequency_rumble) ? SDL_TRUE : SDL_FALSE;
+
     if (!WriteRumble(ctx)) {
         SDL_SetError("Couldn't send rumble packet");
         return -1;
     }
-
-    if ((low_frequency_rumble || high_frequency_rumble) && duration_ms) {
-        ctx->m_nRumbleExpiration = SDL_GetTicks() + duration_ms;
-    } else {
-        ctx->m_nRumbleExpiration = 0;
-    }
     return 0;
+}
+
+static void HandleInputOnlyControllerState(SDL_Joystick *joystick, SDL_DriverSwitch_Context *ctx, SwitchInputOnlyControllerStatePacket_t *packet)
+{
+    Sint16 axis;
+
+    if (packet->rgucButtons[0] != ctx->m_lastInputOnlyState.rgucButtons[0]) {
+        Uint8 data = packet->rgucButtons[0];
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_A), (data & 0x04) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_B), (data & 0x02) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_X), (data & 0x08) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_Y), (data & 0x01) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, (data & 0x10) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, (data & 0x20) ? SDL_PRESSED : SDL_RELEASED);
+
+        axis = (data & 0x40) ? 32767 : -32768;
+        SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_TRIGGERLEFT, axis);
+
+        axis = (data & 0x80) ? 32767 : -32768;
+        SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_TRIGGERRIGHT, axis);
+    }
+
+    if (packet->rgucButtons[1] != ctx->m_lastInputOnlyState.rgucButtons[1]) {
+        Uint8 data = packet->rgucButtons[1];
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_BACK, (data & 0x01) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_START, (data & 0x02) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_LEFTSTICK, (data & 0x04) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_RIGHTSTICK, (data & 0x08) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_GUIDE, (data & 0x10) ? SDL_PRESSED : SDL_RELEASED);
+    }
+
+    if (packet->ucStickHat != ctx->m_lastInputOnlyState.ucStickHat) {
+        SDL_bool dpad_up = SDL_FALSE;
+        SDL_bool dpad_down = SDL_FALSE;
+        SDL_bool dpad_left = SDL_FALSE;
+        SDL_bool dpad_right = SDL_FALSE;
+
+        switch (packet->ucStickHat) {
+        case 0:
+            dpad_up = SDL_TRUE;
+            break;
+        case 1:
+            dpad_up = SDL_TRUE;
+            dpad_right = SDL_TRUE;
+            break;
+        case 2:
+            dpad_right = SDL_TRUE;
+            break;
+        case 3:
+            dpad_right = SDL_TRUE;
+            dpad_down = SDL_TRUE;
+            break;
+        case 4:
+            dpad_down = SDL_TRUE;
+            break;
+        case 5:
+            dpad_left = SDL_TRUE;
+            dpad_down = SDL_TRUE;
+            break;
+        case 6:
+            dpad_left = SDL_TRUE;
+            break;
+        case 7:
+            dpad_up = SDL_TRUE;
+            dpad_left = SDL_TRUE;
+            break;
+        default:
+            break;
+        }
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_DPAD_DOWN, dpad_down);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_DPAD_UP, dpad_up);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, dpad_right);
+        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_DPAD_LEFT, dpad_left);
+    }
+
+    if (packet->rgucJoystickLeft[0] != ctx->m_lastInputOnlyState.rgucJoystickLeft[0]) {
+        axis = (Sint16)(RemapVal(packet->rgucJoystickLeft[0], SDL_MIN_UINT8, SDL_MAX_UINT8, SDL_MIN_SINT16, SDL_MAX_SINT16));
+        SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_LEFTX, axis);
+    }
+
+    if (packet->rgucJoystickLeft[1] != ctx->m_lastInputOnlyState.rgucJoystickLeft[1]) {
+        axis = (Sint16)(RemapVal(packet->rgucJoystickLeft[1], SDL_MIN_UINT8, SDL_MAX_UINT8, SDL_MIN_SINT16, SDL_MAX_SINT16));
+        SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_LEFTY, axis);
+    }
+
+    if (packet->rgucJoystickRight[0] != ctx->m_lastInputOnlyState.rgucJoystickRight[0]) {
+        axis = (Sint16)(RemapVal(packet->rgucJoystickRight[0], SDL_MIN_UINT8, SDL_MAX_UINT8, SDL_MIN_SINT16, SDL_MAX_SINT16));
+        SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTX, axis);
+    }
+
+    if (packet->rgucJoystickRight[1] != ctx->m_lastInputOnlyState.rgucJoystickRight[1]) {
+        axis = (Sint16)(RemapVal(packet->rgucJoystickRight[1], SDL_MIN_UINT8, SDL_MAX_UINT8, SDL_MIN_SINT16, SDL_MAX_SINT16));
+        SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTY, axis);
+    }
+
+    ctx->m_lastInputOnlyState = *packet;
 }
 
 static void HandleSimpleControllerState(SDL_Joystick *joystick, SDL_DriverSwitch_Context *ctx, SwitchSimpleStatePacket_t *packet)
@@ -688,10 +925,10 @@ static void HandleSimpleControllerState(SDL_Joystick *joystick, SDL_DriverSwitch
 
     if (packet->rgucButtons[0] != ctx->m_lastSimpleState.rgucButtons[0]) {
         Uint8 data = packet->rgucButtons[0];
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_A, (data & 0x01) ? SDL_PRESSED : SDL_RELEASED);
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_B, (data & 0x02) ? SDL_PRESSED : SDL_RELEASED);
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_X, (data & 0x04) ? SDL_PRESSED : SDL_RELEASED);
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_Y, (data & 0x08) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_A), (data & 0x01) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_B), (data & 0x02) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_X), (data & 0x04) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_Y), (data & 0x08) ? SDL_PRESSED : SDL_RELEASED);
         SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, (data & 0x10) ? SDL_PRESSED : SDL_RELEASED);
         SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, (data & 0x20) ? SDL_PRESSED : SDL_RELEASED);
 
@@ -776,10 +1013,10 @@ static void HandleFullControllerState(SDL_Joystick *joystick, SDL_DriverSwitch_C
 
     if (packet->controllerState.rgucButtons[0] != ctx->m_lastFullState.controllerState.rgucButtons[0]) {
         Uint8 data = packet->controllerState.rgucButtons[0];
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_X, (data & 0x01) ? SDL_PRESSED : SDL_RELEASED);
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_Y, (data & 0x02) ? SDL_PRESSED : SDL_RELEASED);
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_A, (data & 0x04) ? SDL_PRESSED : SDL_RELEASED);
-        SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_B, (data & 0x08) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_X), (data & 0x01) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_Y), (data & 0x02) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_A), (data & 0x04) ? SDL_PRESSED : SDL_RELEASED);
+        SDL_PrivateJoystickButton(joystick, RemapButton(ctx, SDL_CONTROLLER_BUTTON_B), (data & 0x08) ? SDL_PRESSED : SDL_RELEASED);
         SDL_PrivateJoystickButton(joystick, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, (data & 0x40) ? SDL_PRESSED : SDL_RELEASED);
         axis = (data & 0x80) ? 32767 : -32768;
         SDL_PrivateJoystickAxis(joystick, SDL_CONTROLLER_AXIS_TRIGGERRIGHT, axis);
@@ -847,43 +1084,71 @@ static void HandleFullControllerState(SDL_Joystick *joystick, SDL_DriverSwitch_C
 }
 
 static SDL_bool
-HIDAPI_DriverSwitch_Update(SDL_Joystick *joystick, hid_device *dev, void *context)
+HIDAPI_DriverSwitch_UpdateDevice(SDL_HIDAPI_Device *device)
 {
-    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)context;
+    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)device->context;
+    SDL_Joystick *joystick = NULL;
     int size;
 
+    if (device->num_joysticks > 0) {
+        joystick = SDL_JoystickFromInstanceID(device->joysticks[0]);
+    }
+    if (!joystick) {
+        return SDL_FALSE;
+    }
+
     while ((size = ReadInput(ctx)) > 0) {
-        switch (ctx->m_rgucReadBuffer[0]) {
-        case k_eSwitchInputReportIDs_SimpleControllerState:
-            HandleSimpleControllerState(joystick, ctx, (SwitchSimpleStatePacket_t *)&ctx->m_rgucReadBuffer[1]);
-            break;
-        case k_eSwitchInputReportIDs_FullControllerState:
-            HandleFullControllerState(joystick, ctx, (SwitchStatePacket_t *)&ctx->m_rgucReadBuffer[1]);
-            break;
-        default:
-            break;
+        if (ctx->m_bInputOnly) {
+            HandleInputOnlyControllerState(joystick, ctx, (SwitchInputOnlyControllerStatePacket_t *)&ctx->m_rgucReadBuffer[0]);
+        } else {
+            switch (ctx->m_rgucReadBuffer[0]) {
+            case k_eSwitchInputReportIDs_SimpleControllerState:
+                HandleSimpleControllerState(joystick, ctx, (SwitchSimpleStatePacket_t *)&ctx->m_rgucReadBuffer[1]);
+                break;
+            case k_eSwitchInputReportIDs_FullControllerState:
+                HandleFullControllerState(joystick, ctx, (SwitchStatePacket_t *)&ctx->m_rgucReadBuffer[1]);
+                break;
+            default:
+                break;
+            }
         }
     }
 
-    if (ctx->m_nRumbleExpiration) {
-        Uint32 now = SDL_GetTicks();
-        if (SDL_TICKS_PASSED(now, ctx->m_nRumbleExpiration)) {
-            HIDAPI_DriverSwitch_Rumble(joystick, dev, context, 0, 0, 0);
-        }
+    if (ctx->m_bRumbleActive &&
+        SDL_TICKS_PASSED(SDL_GetTicks(), ctx->m_unRumbleRefresh)) {
+        WriteRumble(ctx);
     }
 
+    if (size < 0) {
+        /* Read error, device is disconnected */
+        HIDAPI_JoystickDisconnected(device, joystick->instance_id);
+    }
     return (size >= 0);
 }
 
 static void
-HIDAPI_DriverSwitch_Quit(SDL_Joystick *joystick, hid_device *dev, void *context)
+HIDAPI_DriverSwitch_CloseJoystick(SDL_HIDAPI_Device *device, SDL_Joystick *joystick)
 {
-    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)context;
+    SDL_DriverSwitch_Context *ctx = (SDL_DriverSwitch_Context *)device->context;
 
-    /* Restore simple input mode for other applications */
-    SetInputMode(ctx, k_eSwitchInputReportIDs_SimpleControllerState);
+    if (!ctx->m_bInputOnly) {
+        /* Restore simple input mode for other applications */
+        SetInputMode(ctx, k_eSwitchInputReportIDs_SimpleControllerState);
+    }
 
-    SDL_free(context);
+    SDL_DelHintCallback(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS,
+                        SDL_GameControllerButtonReportingHintChanged, ctx);
+
+    hid_close(device->dev);
+    device->dev = NULL;
+
+    SDL_free(device->context);
+    device->context = NULL;
+}
+
+static void
+HIDAPI_DriverSwitch_FreeDevice(SDL_HIDAPI_Device *device)
+{
 }
 
 SDL_HIDAPI_DeviceDriver SDL_HIDAPI_DriverSwitch =
@@ -892,10 +1157,14 @@ SDL_HIDAPI_DeviceDriver SDL_HIDAPI_DriverSwitch =
     SDL_TRUE,
     HIDAPI_DriverSwitch_IsSupportedDevice,
     HIDAPI_DriverSwitch_GetDeviceName,
-    HIDAPI_DriverSwitch_Init,
-    HIDAPI_DriverSwitch_Rumble,
-    HIDAPI_DriverSwitch_Update,
-    HIDAPI_DriverSwitch_Quit
+    HIDAPI_DriverSwitch_InitDevice,
+    HIDAPI_DriverSwitch_GetDevicePlayerIndex,
+    HIDAPI_DriverSwitch_SetDevicePlayerIndex,
+    HIDAPI_DriverSwitch_UpdateDevice,
+    HIDAPI_DriverSwitch_OpenJoystick,
+    HIDAPI_DriverSwitch_RumbleJoystick,
+    HIDAPI_DriverSwitch_CloseJoystick,
+    HIDAPI_DriverSwitch_FreeDevice
 };
 
 #endif /* SDL_JOYSTICK_HIDAPI_SWITCH */
