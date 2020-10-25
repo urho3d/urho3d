@@ -52,8 +52,6 @@ public:
     /// Swap with another vector.
     void Swap(VectorBase& rhs)
     {
-        if (&rhs == this)
-            return;
         Urho3D::Swap(size_, rhs.size_);
         Urho3D::Swap(capacity_, rhs.capacity_);
         Urho3D::Swap(buffer_, rhs.buffer_);

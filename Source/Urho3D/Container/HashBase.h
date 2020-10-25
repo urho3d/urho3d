@@ -117,8 +117,6 @@ public:
     /// Swap with another hash set or map.
     void Swap(HashBase& rhs)
     {
-        if (&rhs == this)
-            return;
         Urho3D::Swap(head_, rhs.head_);
         Urho3D::Swap(tail_, rhs.tail_);
         Urho3D::Swap(ptrs_, rhs.ptrs_);

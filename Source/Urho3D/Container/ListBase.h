@@ -105,8 +105,6 @@ public:
     /// Swap with another linked list.
     void Swap(ListBase& rhs)
     {
-        if (&rhs == this)
-            return;
         Urho3D::Swap(head_, rhs.head_);
         Urho3D::Swap(tail_, rhs.tail_);
         Urho3D::Swap(allocator_, rhs.allocator_);
