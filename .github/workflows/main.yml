@@ -23,11 +23,7 @@
 ---
 
 name: CI/CD
-on:
-  push:
-    branches: [ '*' ]
-  pull_request:
-    branches: [ '*' ]
+on: [push, pull_request]
 jobs:
   linux:
     name: 🐧
@@ -70,7 +66,9 @@ jobs:
         with: { fetch-depth: 0 }
       - name: Free up space
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android
-        if: matrix.platform == 'android' || (matrix.platform == 'mingw' && matrix.lib-type == 'static' && matrix.build-type == 'dbg')
+        if: |
+          matrix.platform == 'android' ||
+          (matrix.platform == 'mingw' && matrix.lib-type == 'static' && matrix.build-type == 'dbg')
       - name: Source checksum
         id: source_checksum
         run: rake source_checksum
@@ -117,7 +115,9 @@ jobs:
         run: |
           cd build/cache/projects/UrhoApp
           script/dockerized.sh ${PLATFORM/-*} rake test
-        if: matrix.platform == 'android' || (startsWith(matrix.platform, 'linux') && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format')
+        if: |
+          matrix.platform == 'android' ||
+          (startsWith(matrix.platform, 'linux') && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format')
       - name: Scaffolding - cleanup
         run: |
           if [[ $PLATFORM == android ]]; then
@@ -148,7 +148,10 @@ jobs:
           PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
           PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
         run: script/dockerized.sh ${PLATFORM/-*} rake publish
-        if: github.event_name == 'push' && (matrix.platform == 'android' || (matrix.platform == 'web' && matrix.build-type == 'rel'))
+        if: |
+          github.event_name == 'push' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) &&
+          (matrix.platform == 'android' || (matrix.platform == 'web' && matrix.build-type == 'rel'))
   macOS:
     name: 🍏
     runs-on: macos-latest
