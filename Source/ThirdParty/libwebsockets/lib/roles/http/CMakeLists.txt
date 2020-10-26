@@ -33,7 +33,6 @@ include_directories(. ./compression)
 
 list(APPEND SOURCES
 	roles/http/header.c
-	roles/http/date.c
 	roles/http/parsers.c)
 	
 if (NOT LWS_WITHOUT_SERVER)

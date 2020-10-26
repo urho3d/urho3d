@@ -231,32 +231,6 @@ struct lws_foreign_thread_pollfd {
 };
 #endif /* network */
 
-#if LWS_MAX_SMP > 1
-
-struct lws_mutex_refcount {
-	pthread_mutex_t lock;
-	pthread_t lock_owner;
-	const char *last_lock_reason;
-	char lock_depth;
-	char metadata;
-};
-
-void
-lws_mutex_refcount_init(struct lws_mutex_refcount *mr);
-
-void
-lws_mutex_refcount_destroy(struct lws_mutex_refcount *mr);
-
-void
-lws_mutex_refcount_lock(struct lws_mutex_refcount *mr, const char *reason);
-
-void
-lws_mutex_refcount_assert_held(struct lws_mutex_refcount *mr);
-
-void
-lws_mutex_refcount_unlock(struct lws_mutex_refcount *mr);
-#endif
-
 #if defined(LWS_WITH_NETWORK)
 #include "private-lib-core-net.h"
 #endif
@@ -570,7 +544,7 @@ lws_vhost_destroy1(struct lws_vhost *vh);
 
 
 #if defined(LWS_PLAT_FREERTOS)
-int
+LWS_EXTERN int
 lws_find_string_in_file(const char *filename, const char *str, int stringlen);
 #endif
 
@@ -587,22 +561,22 @@ struct lws_buflist {
 	size_t pos;
 };
 
-char *
+LWS_EXTERN char *
 lws_strdup(const char *s);
 
-extern int log_level;
+LWS_EXTERN int log_level;
 
-int
+LWS_EXTERN int
 lws_b64_selftest(void);
 
 
 #ifndef LWS_NO_DAEMONIZE
- pid_t get_daemonize_pid();
+ LWS_EXTERN pid_t get_daemonize_pid();
 #else
  #define get_daemonize_pid() (0)
 #endif
 
-void lwsl_emit_stderr(int level, const char *line);
+LWS_EXTERN void lwsl_emit_stderr(int level, const char *line);
 
 #if !defined(LWS_WITH_TLS)
  #define LWS_SSL_ENABLED(context) (0)
@@ -657,13 +631,13 @@ lws_vhost_unlock(struct lws_vhost *vhost)
 #define lws_pt_stats_unlock(_a) (void)(_a)
 #endif
 
-int LWS_WARN_UNUSED_RESULT
+LWS_EXTERN int LWS_WARN_UNUSED_RESULT
 lws_ssl_capable_read_no_ssl(struct lws *wsi, unsigned char *buf, int len);
 
-int LWS_WARN_UNUSED_RESULT
+LWS_EXTERN int LWS_WARN_UNUSED_RESULT
 lws_ssl_capable_write_no_ssl(struct lws *wsi, unsigned char *buf, int len);
 
-int LWS_WARN_UNUSED_RESULT
+LWS_EXTERN int LWS_WARN_UNUSED_RESULT
 lws_ssl_pending_no_ssl(struct lws *wsi);
 
 int
@@ -688,10 +662,10 @@ lws_find_mount(struct lws *wsi, const char *uri_ptr, int uri_len);
 /*
  * custom allocator
  */
-void *
+LWS_EXTERN void *
 lws_realloc(void *ptr, size_t size, const char *reason);
 
-void * LWS_WARN_UNUSED_RESULT
+LWS_EXTERN void * LWS_WARN_UNUSED_RESULT
 lws_zalloc(size_t size, const char *reason);
 
 #ifdef LWS_PLAT_OPTEE
@@ -716,17 +690,17 @@ lws_vfs_select_fops(const struct lws_plat_file_ops *fops, const char *vfs_path,
 
 /* lws_plat_ */
 
-int
+LWS_EXTERN int
 lws_plat_context_early_init(void);
-void
+LWS_EXTERN void
 lws_plat_context_early_destroy(struct lws_context *context);
-void
+LWS_EXTERN void
 lws_plat_context_late_destroy(struct lws_context *context);
 
-int
+LWS_EXTERN int
 lws_plat_init(struct lws_context *context,
 	      const struct lws_context_creation_info *info);
-int
+LWS_EXTERN int
 lws_plat_drop_app_privileges(struct lws_context *context, int actually_drop);
 
 #if defined(LWS_WITH_UNIX_SOCK) && !defined(WIN32)
@@ -740,11 +714,11 @@ lws_plat_ntpclient_config(struct lws_context *context);
 int
 lws_plat_ifname_to_hwaddr(int fd, const char *ifname, uint8_t *hwaddr, int len);
 
-int
+LWS_EXTERN int
 lws_check_byte_utf8(unsigned char state, unsigned char c);
-int LWS_WARN_UNUSED_RESULT
+LWS_EXTERN int LWS_WARN_UNUSED_RESULT
 lws_check_utf8(unsigned char *state, unsigned char *buf, size_t len);
-int alloc_file(struct lws_context *context, const char *filename,
+LWS_EXTERN int alloc_file(struct lws_context *context, const char *filename,
 			  uint8_t **buf, lws_filepos_t *amount);
 
 void lws_msleep(unsigned int);

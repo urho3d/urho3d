@@ -896,13 +896,6 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
-    # Urho3D external dependency
-    if (${TARGET} MATCHES Urho3D)
-        if (URHO3D_NETWORK AND URHO3D_WEBSOCKETS AND NOT WEB)
-            list (APPEND LIBS websockets)
-        endif ()
-    endif ()
-
     # Urho3D/LuaJIT external dependency
     if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32 AND NOT WEB)

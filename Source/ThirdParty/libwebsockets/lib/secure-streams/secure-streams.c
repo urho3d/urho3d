@@ -71,9 +71,6 @@ static const char *state_names[] = {
 const char *
 lws_ss_state_name(int state)
 {
-	if (state >= LWSSSCS_USER_BASE)
-		return "user state";
-
 	if (state >= (int)LWS_ARRAY_SIZE(state_names))
 		return "unknown";
 
@@ -145,8 +142,7 @@ lws_ss_exp_cb_metadata(void *priv, const char *name, char *out, size_t *pos,
 	lws_ss_handle_t *h = (lws_ss_handle_t *)priv;
 	const char *replace = NULL;
 	size_t total, budget;
-	lws_ss_metadata_t *md = lws_ss_policy_metadata(h->policy, name),
-			*hmd = lws_ss_get_handle_metadata(h, name);
+	lws_ss_metadata_t *md = lws_ss_policy_metadata(h->policy, name);
 
 	if (!md) {
 		lwsl_err("%s: Unknown metadata %s\n", __func__, name);
@@ -154,8 +150,10 @@ lws_ss_exp_cb_metadata(void *priv, const char *name, char *out, size_t *pos,
 		return LSTRX_FATAL_NAME_UNKNOWN;
 	}
 
-	replace = hmd->value;
-	total = hmd->length;
+	lwsl_info("%s %s %d\n", __func__, name, (int)md->length);
+
+	replace = h->metadata[md->length].value;
+	total = h->metadata[md->length].length;
 	// lwsl_hexdump_err(replace, total);
 
 	budget = olen - *pos;
@@ -188,7 +186,7 @@ lws_ss_set_timeout_us(lws_ss_handle_t *h, lws_usec_t us)
 }
 
 lws_ss_state_return_t
-_lws_ss_backoff(lws_ss_handle_t *h, lws_usec_t us_override)
+lws_ss_backoff(lws_ss_handle_t *h)
 {
 	uint64_t ms;
 	char conceal;
@@ -208,24 +206,12 @@ _lws_ss_backoff(lws_ss_handle_t *h, lws_usec_t us_override)
 		return lws_ss_event_helper(h, LWSSSCS_ALL_RETRIES_FAILED);
 	}
 
-	/* Only increase our planned backoff, or go with it */
-
-	if (us_override < (lws_usec_t)ms * LWS_US_PER_MS)
-		us_override = ms * LWS_US_PER_MS;
-
 	h->seqstate = SSSEQ_RECONNECT_WAIT;
-	lws_ss_set_timeout_us(h, us_override);
+	lws_ss_set_timeout_us(h, ms * LWS_US_PER_MS);
 
-	lwsl_info("%s: ss %p: retry wait %dms\n", __func__, h,
-						  (int)(us_override / 1000));
+	lwsl_info("%s: ss %p: retry wait %"PRIu64"ms\n", __func__, h, ms);
 
 	return LWSSSSRET_OK;
-}
-
-lws_ss_state_return_t
-lws_ss_backoff(lws_ss_handle_t *h)
-{
-	return _lws_ss_backoff(h, 0);
 }
 
 #if defined(LWS_WITH_SYS_SMD)

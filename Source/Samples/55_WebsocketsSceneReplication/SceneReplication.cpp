@@ -89,7 +89,8 @@ void SceneReplication::Start()
     // Create the scene content
     CreateScene();
 
-    if (!GetSubsystem<Engine>()->IsHeadless()) {
+    if (!GetSubsystem<Engine>()->IsHeadless())
+    {
         // Execute base class startup
         Sample::Start();
 

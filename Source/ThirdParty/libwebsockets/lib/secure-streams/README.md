@@ -13,11 +13,11 @@ creation, but able to be updated from a remote copy.
 
 Both client and server networking can be handled using Secure Streams APIS.
 
-![overview](/doc-assets/ss-operation-modes.png)
+![overview](../doc-assets/ss-operation-modes.png)
 
 ## Secure Streams CLIENT State lifecycle
 
-![overview](/doc-assets/ss-state-flow.png)
+![overview](../doc-assets/ss-state-flow.png)
 
 Secure Streams are created using `lws_ss_create()`, after that they may acquire
 underlying connections, and lose them, but the lifecycle of the Secure Stream
@@ -55,7 +55,7 @@ destroy the handle themselves, in that case the handler should return
 
 ## Secure Streams SERVER State lifecycle
 
-![overview](/doc-assets/ss-state-flow-server.png)
+![overview](../doc-assets/ss-state-flow-server.png)
 
 You can also run servers defined using Secure Streams, the main difference is
 that the user code must assertively create a secure stream of the server type
@@ -326,33 +326,6 @@ interval described in the associated retry / backoff selection, are important
 enough to wake the whole system from low power suspend so they happen on
 schedule.
 
-### `metadata`
-
-This allows declaring basically dynamic symbol names to be used by the streamtype,
-along with an optional mapping to a protocol-specific entity such as a given
-http header.  Eg:
-
-```
-		"metadata": [ { "myname": "" }, { "ctype": "content-type:" } ],
-```
-
-In this example "ctype" is associated with the http header "content-type" while
-"myname" doesn't have any association to a header.
-
-Symbol names may be used in the other policy for the streamtype for string
-substitution using the syntax like `xxx${myname}yyy`, forward references are
-valid but the scope of the symbols is just the streamtype the metadata is
-defined for.
-
-Client code can set metadata by name, using the `lws_ss_set_metadata()` api, this
-should be done before a transaction.  And for metadata associated with a
-protocol-specific entity, like http headers, if incoming responses contain the
-mentioned header, the metadata symbol is set to that value at the client before
-any rx proceeds.
-
-Metadata continues to work the same for the client in the case it is proxying its
-connectivity, metadata is passed in both directions serialized over the proxy link.
-
 ## http transport
 
 ### `http_method`
@@ -388,21 +361,6 @@ The URL path can include metatadata like this
 ${metadataname} will be replaced by the current value of the
 same metadata name.  The metadata names must be listed in the
 "metadata": [ ] section.
-
-### `http_resp_map`
-
-If your server overloads the meaning of the http transport response code with
-server-custom application codes, you can map these to discrete Secure Streams
-state callbacks using a JSON map, eg
-
-```
-		"http_resp_map": [ { "530": 1530 }, { "531": 1531 } ],
-```
-
-It's not recommended to abuse the transport layer http response code by
-mixing it with application state information like this, but if it's dealing
-with legacy serverside that takes this approach, it's possible to handle it
-in SS this way while removing the dependency on http.
 
 ### `http_auth_header`
 

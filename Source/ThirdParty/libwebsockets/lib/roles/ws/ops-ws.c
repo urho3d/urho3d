@@ -633,6 +633,7 @@ drain_extension:
 				return -1;
 			}
 			if (n == PMDR_DID_NOTHING)
+				/* ie, not PMDR_NOTHING_WE_SHOULD_DO */
 				break;
 #endif
 			lwsl_debug("%s: post ext ret %d, ebuf in %d / out %d\n",
@@ -691,7 +692,8 @@ utf8_fail:
 
 			/* if pmd not enabled, in == out */
 
-			if (n == PMDR_DID_NOTHING
+			if (n == PMDR_DID_NOTHING ||
+			    n == PMDR_NOTHING_WE_SHOULD_DO
 #if !defined(LWS_WITHOUT_EXTENSIONS)
 				       	||
 			    n == PMDR_UNKNOWN
@@ -979,7 +981,7 @@ rops_handle_POLLIN_ws(struct lws_context_per_thread *pt, struct lws *wsi,
 			return LWS_HPI_RET_PLEASE_CLOSE_ME;
 		}
 
-		n = lws_http_client_socket_service(wsi, pollfd);
+		n = lws_client_socket_service(wsi, pollfd);
 		if (n)
 			return LWS_HPI_RET_WSI_ALREADY_DIED;
 #endif

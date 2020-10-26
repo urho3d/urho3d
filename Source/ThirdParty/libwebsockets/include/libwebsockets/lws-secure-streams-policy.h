@@ -154,29 +154,15 @@ enum {
 	_LWSSS_HBI_COUNT /* always last */
 };
 
-/*
- * This does for both the static policy metadata entry, and the runtime metadata
- * handling object.
- */
-
 typedef struct lws_ss_metadata {
 	struct lws_ss_metadata	*next;
 	const char		*name;
 	void			*value;
 	size_t			length;
 
-	uint8_t			value_on_lws_heap; /* proxy + rx metadata does this */
-	uint8_t			value_is_http_token; /* valid if set by policy */
-	uint8_t			value_length; /* only valid if set by policy */
-#if defined(LWS_WITH_SECURE_STREAMS_PROXY_API)
-	uint8_t			pending_onward:1;
-#endif
+	uint8_t			value_on_lws_heap; /* proxy does this */
 } lws_ss_metadata_t;
 
-typedef struct lws_ss_http_respmap {
-	uint16_t		resp;	/* the http response code */
-	uint16_t		state;	/* low 16-bits of associated state */
-} lws_ss_http_respmap_t;
 
 /**
  * lws_ss_policy_t: policy database entry for a stream type
@@ -225,8 +211,6 @@ typedef struct lws_ss_policy {
 			const char	*blob_header[_LWSSS_HBI_COUNT];
 			const char	*auth_preamble;
 
-			const lws_ss_http_respmap_t *respmap;
-
 			union {
 //				struct { /* LWSSSP_H1 */
 //				} h1;
@@ -240,7 +224,6 @@ typedef struct lws_ss_policy {
 			} u;
 
 			uint16_t	resp_expect;
-			uint8_t		count_respmap;
 			uint8_t		fail_redirect:1;
 		} http;
 

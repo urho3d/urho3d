@@ -75,9 +75,10 @@ if (NOT LWS_WITHOUT_SERVER OR LWS_WITH_SECURE_STREAMS_PROCESS_API)
 	add_subdir_include_directories(listen)
 endif()
 
-if (LWS_WITH_CLIENT AND (LWS_ROLE_H1 OR LWS_ROLE_H2))
+if (NOT LWS_WITHOUT_CLIENT)
 	list(APPEND SOURCES
-		roles/http/client/client-http.c)
+		roles/http/client/client-http.c
+		roles/http/client/client-handshake.c)
 endif()
 
 #

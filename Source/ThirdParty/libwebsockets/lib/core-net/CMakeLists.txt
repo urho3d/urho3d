@@ -60,14 +60,10 @@ if (LWS_WITH_SEQUENCER)
 		core-net/sequencer.c)
 endif()
 
-if (LWS_WITH_CLIENT)
+if (NOT LWS_WITHOUT_CLIENT)
 	list(APPEND SOURCES
-		core-net/client/client.c
-		core-net/client/connect.c
-		core-net/client/connect2.c
-		core-net/client/connect3.c
-		core-net/client/connect4.c
-	)
+		core-net/connect.c
+		core-net/client.c)
 endif()
 
 if (NOT LWS_WITHOUT_SERVER)

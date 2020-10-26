@@ -24,10 +24,10 @@
 
 include_directories(.)
 
-macro(add_subdir_include_dirs arg1)
-	add_subdirectory(${arg1})
-	list(APPEND LWS_LIB_BUILD_INC_PATHS ${_CMAKE_INC_LIST}) 
-endmacro()
+#macro(add_subdir_include_dirs arg1)
+#	add_subdirectory(${arg1})
+#	list(APPEND LWS_LIB_BUILD_INC_PATHS ${_CMAKE_INC_LIST})
+#endmacro()
 
 set(LWS_LIB_INCLUDES "")
 
@@ -115,9 +115,9 @@ if (LWS_WITH_TLS)
 endif()
 
 # Generate the lws_config.h that includes all the private compilation settings.
-configure_file(
-       "${PROJECT_SOURCE_DIR}/cmake/lws_config_private.h.in"
-       "${PROJECT_BINARY_DIR}/lws_config_private.h")
+#configure_file(
+#       "${PROJECT_SOURCE_DIR}/cmake/lws_config_private.h.in"
+#       "${PROJECT_BINARY_DIR}/lws_config_private.h")
 
 add_subdir_include_dirs(core)
 add_subdir_include_dirs(misc)
@@ -150,18 +150,17 @@ if (LWS_WITH_STATIC)
         set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     endif()
 
-	add_library(websockets STATIC ${SOURCES})# ${HDR_PUBLIC})
-	set_target_properties(websockets PROPERTIES LINKER_LANGUAGE C)
+#	add_library(websockets STATIC ${SOURCES})# ${HDR_PUBLIC})
+#	set_target_properties(websockets PROPERTIES LINKER_LANGUAGE C)
 	list(APPEND LWS_LIBRARIES websockets)
-	target_include_directories(websockets PRIVATE ${LWS_LIB_BUILD_INC_PATHS})
-	target_compile_definitions(websockets PRIVATE LWS_BUILDING_STATIC)
+#	target_include_directories(websockets PRIVATE ${LWS_LIB_BUILD_INC_PATHS})
 
 	if (WIN32)
 		# Windows uses the same .lib ending for static libraries and shared
 		# library linker files, so rename the static library.
-		set_target_properties(websockets
-			PROPERTIES
-			OUTPUT_NAME websockets_static)
+#		set_target_properties(websockets
+#			PROPERTIES
+#			OUTPUT_NAME websockets_static)
 	endif()
 	
 endif()
@@ -175,7 +174,6 @@ if (LWS_WITH_SHARED)
 	set_target_properties(websockets_shared PROPERTIES LINKER_LANGUAGE C)
 	list(APPEND LWS_LIBRARIES websockets_shared)
 	target_include_directories(websockets_shared PRIVATE ${LWS_LIB_BUILD_INC_PATHS})
-	target_compile_definitions(websockets_shared PRIVATE LWS_BUILDING_SHARED)
 
 	# We want the shared lib to be named "libwebsockets"
 	# not "libwebsocket_shared".
@@ -213,11 +211,11 @@ endif()
 # part of the lib build but different targets 
 #
 
-if (LWS_WITH_SHARED)
-	get_target_property(LWS_LIB_INCLUDES websockets_shared INCLUDE_DIRECTORIES)
-else()
-	get_target_property(LWS_LIB_INCLUDES websockets INCLUDE_DIRECTORIES)
-endif()
+#if (LWS_WITH_SHARED)
+#	get_target_property(LWS_LIB_INCLUDES websockets_shared INCLUDE_DIRECTORIES)
+#else()
+#	get_target_property(LWS_LIB_INCLUDES websockets INCLUDE_DIRECTORIES)
+#endif()
 
 
 # Set the so version of the lib.
@@ -234,7 +232,7 @@ endif()
 
 # Setup the linking for all libs.
 foreach (lib ${LWS_LIBRARIES})
-	target_link_libraries(${lib} ${LIB_LIST})
+#	target_link_libraries(${lib} ${LIB_LIST})
 endforeach()
 
 #
@@ -250,12 +248,12 @@ if (LWS_WITH_SHARED)
 endif()
 
 # Install libs and headers.
-install(TARGETS ${LWS_LIBRARIES}
-		EXPORT LibwebsocketsTargets
-		LIBRARY DESTINATION "${LWS_INSTALL_LIB_DIR}${LIB_SUFFIX}" COMPONENT core
-		ARCHIVE DESTINATION "${LWS_INSTALL_LIB_DIR}${LIB_SUFFIX}" COMPONENT core
-		RUNTIME DESTINATION "${LWS_INSTALL_BIN_DIR}" COMPONENT core # Windows DLLs
-		PUBLIC_HEADER DESTINATION "${LWS_INSTALL_INCLUDE_DIR}" COMPONENT dev)
+#install(TARGETS ${LWS_LIBRARIES}
+#		EXPORT LibwebsocketsTargets
+#		LIBRARY DESTINATION "${LWS_INSTALL_LIB_DIR}${LIB_SUFFIX}" COMPONENT core
+#		ARCHIVE DESTINATION "${LWS_INSTALL_LIB_DIR}${LIB_SUFFIX}" COMPONENT core
+#		RUNTIME DESTINATION "${LWS_INSTALL_BIN_DIR}" COMPONENT core # Windows DLLs
+#		PUBLIC_HEADER DESTINATION "${LWS_INSTALL_INCLUDE_DIR}" COMPONENT dev)
 		
 	#set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries" PARENT_SCOPE)
 set(CPACK_COMPONENT_DEV_DISPLAY_NAME "Development files" PARENT_SCOPE)

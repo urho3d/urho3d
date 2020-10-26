@@ -262,7 +262,7 @@ int
 lws_ss_serialize_state(struct lws_dsh *dsh, lws_ss_constate_t state,
 		       lws_ss_tx_ordinal_t ack)
 {
-	uint8_t pre[8];
+	uint8_t pre[12];
 	int n = 4;
 
 	lwsl_info("%s: %s, ord 0x%x\n", __func__, lws_ss_state_name(state),
@@ -273,7 +273,7 @@ lws_ss_serialize_state(struct lws_dsh *dsh, lws_ss_constate_t state,
 
 	if (state > 255) {
 		pre[2] = 8;
-		lws_ser_wu32be(&pre[3], ack);
+		lws_ser_wu32be(&pre[3], state);
 		n = 7;
 	} else {
 		pre[2] = 5;
@@ -495,15 +495,6 @@ lws_ss_deserialize_parse(struct lws_ss_serialization_parser *par,
 
 				par->ps = RPAR_STATEINDEX;
 				par->ctr = 0;
-				break;
-
-			case LWSSS_SER_RXPRE_METADATA:
-				if (!client)
-					goto hangup;
-				if (par->rem < 3)
-					goto hangup;
-				par->ctr = 0;
-				par->ps = RPAR_METADATA_NAMELEN;
 				break;
 
 			case LWSSS_SER_RXPRE_TXCR_UPDATE:
@@ -889,7 +880,6 @@ payload_ff:
 			break;
 
 		case RPAR_METADATA_NAMELEN:
-			/* both client and proxy */
 			if (!--par->rem)
 				goto hangup;
 			par->slen = *cp++;
@@ -900,7 +890,6 @@ payload_ff:
 			break;
 
 		case RPAR_METADATA_NAME:
-			/* both client and proxy */
 			if (!--par->rem)
 				goto hangup;
 			par->metadata_name[par->ctr++] = *cp++;
@@ -909,62 +898,7 @@ payload_ff:
 			par->metadata_name[par->ctr] = '\0';
 			par->ps = RPAR_METADATA_VALUE;
 
-			if (client) {
-				lws_sspc_metadata_t *md;
-				lws_sspc_handle_t *h =
-						client_pss_to_sspc_h(pss, ssi);
-
-				/*
-				 * client side does not have access to policy
-				 * and any metadata are new to it each time,
-				 * we allocate them, removing any existing with
-				 * the same name first
-				 */
-
-				lws_start_foreach_dll_safe(struct lws_dll2 *, d, d1,
-						lws_dll2_get_head(
-							&h->metadata_owner_rx)) {
-					md = lws_container_of(d,
-						   lws_sspc_metadata_t, list);
-
-					if (!strcmp(md->name,
-						    par->metadata_name)) {
-						lws_dll2_remove(&md->list);
-						lws_free(md);
-					}
-
-				} lws_end_foreach_dll_safe(d, d1);
-
-				/*
-				 * Create the client's rx metadata entry
-				 */
-
-				md = lws_malloc(sizeof(lws_sspc_metadata_t) +
-						par->rem + 1, "rxmeta");
-				if (!md) {
-					lwsl_err("%s: OOM\n", __func__);
-					goto hangup;
-				}
-				memset(md, 0, sizeof(lws_sspc_metadata_t));
-
-				lws_strncpy(md->name, par->metadata_name,
-						sizeof(md->name));
-				md->len = par->rem;
-				par->rxmetaval = (uint8_t *)&md[1];
-				/*
-				 * Overallocate by 1 and put a NUL just beyond
-				 * the official md->len, so value can be easily
-				 * dereferenced safely for NUL-terminated string
-				 * apis that's the most common usage
-				 */
-				par->rxmetaval[md->len] = '\0';
-				lws_dll2_add_tail(&md->list,
-						  &h->metadata_owner_rx);
-				par->ctr = 0;
-				break;
-			}
-
-			/* proxy side is receiving it */
+			/* only proxy side can receive these */
 
 			if (!proxy_pss_to_ss_h(pss))
 				goto hangup;
@@ -973,9 +907,8 @@ payload_ff:
 			 * This is the policy's metadata list for the given
 			 * name
 			 */
-			pm = lws_ss_policy_metadata(
-					proxy_pss_to_ss_h(pss)->policy,
-					par->metadata_name);
+			pm = lws_ss_policy_metadata(proxy_pss_to_ss_h(pss)->policy,
+						    par->metadata_name);
 			if (!pm) {
 				lwsl_err("%s: metadata %s not in proxy policy\n",
 					 __func__, par->metadata_name);
@@ -983,9 +916,7 @@ payload_ff:
 				goto hangup;
 			}
 
-			par->ssmd = lws_ss_get_handle_metadata(
-					proxy_pss_to_ss_h(pss),
-					par->metadata_name);
+			par->ssmd = &proxy_pss_to_ss_h(pss)->metadata[pm->length];
 
 			if (par->ssmd->value_on_lws_heap)
 				lws_free_set_NULL(par->ssmd->value);
@@ -997,33 +928,21 @@ payload_ff:
 				goto hangup;
 			}
 			par->ssmd->length = par->rem;
-			((uint8_t *)par->ssmd->value)[par->rem] = '\0';
 			/* mark it as needing cleanup */
 			par->ssmd->value_on_lws_heap = 1;
 			par->ctr = 0;
 			break;
 
 		case RPAR_METADATA_VALUE:
-			/* both client and proxy */
-
-			if (client) {
-				*par->rxmetaval++ = *cp++;
-			} else
-				((uint8_t *)(par->ssmd->value))[par->ctr++] = *cp++;
-
+			((uint8_t *)(par->ssmd->value))[par->ctr++] = *cp++;
 			if (--par->rem)
 				break;
 
 			/* we think we got all the value */
-			if (client)
-				lwsl_notice("%s: RX METADATA %s\n", __func__,
-						par->metadata_name);
-			else {
-				lwsl_info("%s: RPAR_METADATA_VALUE for %s (len %d)\n",
+			lwsl_info("%s: RPAR_METADATA_VALUE for %s (len %d)\n",
 				  __func__, par->ssmd->name,
 				  (int)par->ssmd->length);
-				lwsl_hexdump_info(par->ssmd->value, par->ssmd->length);
-			}
+			lwsl_hexdump_info(par->ssmd->value, par->ssmd->length);
 			par->ps = RPAR_TYPE;
 			break;
 
@@ -1257,7 +1176,7 @@ payload_ff:
 				break;
 			}
 
-			if (par->ctr < 0 || par->ctr > 16)
+			if (par->ctr < 0)
 				goto hangup;
 
 #if defined(_DEBUG)

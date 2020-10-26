@@ -174,6 +174,7 @@ enum pmd_return {
 	PMDR_HAS_PENDING,
 	PMDR_EMPTY_NONFINAL,
 	PMDR_EMPTY_FINAL,
+	PMDR_NOTHING_WE_SHOULD_DO,
 
 	PMDR_FAILED = -1
 };
@@ -409,7 +410,7 @@ struct lws_context_per_thread {
 	struct lws_pollfd *fds;
 	volatile struct lws_foreign_thread_pollfd * volatile foreign_pfd_list;
 #ifdef _WIN32
-	WSAEVENT events;
+       WSAEVENT events[WSA_MAXIMUM_WAIT_EVENTS];
 	CRITICAL_SECTION interrupt_lock;
 #endif
 	lws_sockfd_type dummy_pipe_fds[2];
@@ -461,9 +462,6 @@ struct lws_context_per_thread {
 	unsigned char event_loop_destroy_processing_done:1;
 	unsigned char destroy_self:1;
 	unsigned char is_destroyed:1;
-#ifdef _WIN32
-	unsigned char interrupt_requested:1;
-#endif
 };
 
 #if defined(LWS_WITH_SERVER_STATUS)
@@ -1089,11 +1087,11 @@ lws_change_pollfd(struct lws *wsi, int _and, int _or);
 #if defined(LWS_WITH_SERVER)
  int _lws_vhost_init_server(const struct lws_context_creation_info *info,
 			      struct lws_vhost *vhost);
-struct lws_vhost *
+ LWS_EXTERN struct lws_vhost *
  lws_select_vhost(struct lws_context *context, int port, const char *servername);
-int LWS_WARN_UNUSED_RESULT
+ LWS_EXTERN int LWS_WARN_UNUSED_RESULT
  lws_parse_ws(struct lws *wsi, unsigned char **buf, size_t len);
-void
+ LWS_EXTERN void
  lws_server_get_canonical_hostname(struct lws_context *context,
 				   const struct lws_context_creation_info *info);
 #else
@@ -1244,7 +1242,7 @@ lws_http_client_connect_via_info2(struct lws *wsi);
 
 #if defined(LWS_WITH_CLIENT)
 int
-lws_http_client_socket_service(struct lws *wsi, struct lws_pollfd *pollfd);
+lws_client_socket_service(struct lws *wsi, struct lws_pollfd *pollfd);
 
 int LWS_WARN_UNUSED_RESULT
 lws_http_transaction_completed_client(struct lws *wsi);

@@ -291,7 +291,7 @@ extern const struct lws_role_ops role_ops_raw_skt, role_ops_raw_file,
 #endif
 
 #if defined(LWS_ROLE_H2)
- #include "h2/private-lib-roles-h2.h"
+ #include "private-lib-roles-h2.h"
 #else
  #define lwsi_role_h2(wsi) (0)
 #endif

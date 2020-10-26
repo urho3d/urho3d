@@ -200,7 +200,6 @@ struct lws_ss_serialization_parser {
 	uint64_t		ust_pwait;
 
 	lws_ss_metadata_t	*ssmd;
-	uint8_t			*rxmetaval;
 
 	int			ps;
 	int			ctr;
@@ -260,7 +259,6 @@ typedef struct lws_sspc_handle {
 	struct lws_ss_serialization_parser parser;
 
 	lws_dll2_owner_t	metadata_owner;
-	lws_dll2_owner_t	metadata_owner_rx;
 
 	struct lws_dll2		client_list;
 	struct lws_tx_credit	txc;
@@ -325,15 +323,12 @@ struct policy_cb_args {
 
 	struct lws_b64state b64;
 
-	lws_ss_http_respmap_t respmap[16];
-
 	union u heads[_LTY_COUNT];
 	union u curr[_LTY_COUNT];
 
 	uint8_t *p;
 
 	int count;
-	char pending_respmap;
 };
 
 #if defined(LWS_WITH_SYS_SMD)
@@ -378,9 +373,6 @@ lws_ss_destroy_dll(struct lws_dll2 *d, void *user);
 int
 lws_sspc_destroy_dll(struct lws_dll2 *d, void *user);
 
-void
-lws_sspc_rxmetadata_destroy(lws_sspc_handle_t *h);
-
 int
 lws_ss_policy_set(struct lws_context *context, const char *name);
 
@@ -389,9 +381,6 @@ lws_ss_sys_fetch_policy(struct lws_context *context);
 
 lws_ss_state_return_t
 lws_ss_event_helper(lws_ss_handle_t *h, lws_ss_constate_t cs);
-
-lws_ss_state_return_t
-_lws_ss_backoff(lws_ss_handle_t *h, lws_usec_t us_override);
 
 lws_ss_state_return_t
 lws_ss_backoff(lws_ss_handle_t *h);

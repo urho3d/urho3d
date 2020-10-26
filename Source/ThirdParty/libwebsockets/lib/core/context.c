@@ -546,9 +546,6 @@ lws_create_context(const struct lws_context_creation_info *info)
 #if !defined(LWS_PLAT_FREERTOS)
 	context->uid = info->uid;
 	context->gid = info->gid;
-	context->gid = -1;
-	context->uid = -1;
-    lwsl_notice("LWS: GID: %d, UID: %d\n", context->gid, context->uid);
 	context->username = info->username;
 	context->groupname = info->groupname;
 #endif
@@ -570,7 +567,7 @@ lws_create_context(const struct lws_context_creation_info *info)
 	context->pss_policies = info->pss_policies;
 #endif
 
-#if defined(LWS_WITH_SECURE_STREAMS_PROXY_API) && defined(LWS_WITH_CLIENT)
+#if defined(LWS_WITH_SECURE_STREAMS_PROXY_API)
 	context->ss_proxy_bind = info->ss_proxy_bind;
 	context->ss_proxy_port = info->ss_proxy_port;
 	context->ss_proxy_address = info->ss_proxy_address;
@@ -1425,7 +1422,7 @@ lws_context_destroy2(struct lws_context *context)
 #endif
 #endif
 
-#if defined(LWS_WITH_SECURE_STREAMS_PROXY_API) && defined(LWS_WITH_CLIENT)
+#if defined(LWS_WITH_SECURE_STREAMS_PROXY_API)
 		lws_dll2_foreach_safe(&pt->ss_client_owner, NULL, lws_sspc_destroy_dll);
 #endif
 
@@ -1511,14 +1508,14 @@ lws_context_destroy2(struct lws_context *context)
 
 	lwsl_debug("%p: post dc2\n", __func__);
 
-	if (!context->pt[0].event_loop_foreign) {
-		int n;
+//	if (!context->pt[0].event_loop_foreign) {
+//		int n;
 		for (n = 0; n < context->count_threads; n++)
 			if (context->pt[n].inside_service) {
 				lwsl_debug("%p: bailing as inside service\n", __func__);
 				return;
 			}
-	}
+//	}
 #endif
 
 	lws_context_destroy3(context);

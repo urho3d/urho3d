@@ -29,6 +29,7 @@
 #define _DARWIN_C_SOURCE
 #endif
 
+#include <libwebsockets.h>
 #include "private-lib-core.h"
 #include <string.h>
 #include <stdio.h>

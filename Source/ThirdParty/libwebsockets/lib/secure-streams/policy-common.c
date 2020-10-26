@@ -59,35 +59,16 @@ int
 lws_ss_set_metadata(struct lws_ss_handle *h, const char *name,
 		    const void *value, size_t len)
 {
-	lws_ss_metadata_t *omd = lws_ss_get_handle_metadata(h, name);
+	lws_ss_metadata_t *omd = lws_ss_policy_metadata(h->policy, name);
 
 	if (!omd) {
 		lwsl_info("%s: unknown metadata %s\n", __func__, name);
 		return 1;
 	}
 
-	// lwsl_notice("%s: %s %s\n", __func__, name, (const char *)value);
-
-	omd->name = name;
-	omd->value = (void *)value;
-	omd->length = len;
-
-	return 0;
-}
-
-int
-lws_ss_get_metadata(struct lws_ss_handle *h, const char *name,
-		    const void **value, size_t *len)
-{
-	lws_ss_metadata_t *omd = lws_ss_get_handle_metadata(h, name);
-
-	if (!omd) {
-		lwsl_info("%s: unknown metadata %s\n", __func__, name);
-		return 1;
-	}
-
-	*value = omd->value;
-	*len = omd->length;
+	h->metadata[omd->length].name = name;
+	h->metadata[omd->length].value = (void *)value;
+	h->metadata[omd->length].length = len;
 
 	return 0;
 }
@@ -95,13 +76,12 @@ lws_ss_get_metadata(struct lws_ss_handle *h, const char *name,
 lws_ss_metadata_t *
 lws_ss_get_handle_metadata(struct lws_ss_handle *h, const char *name)
 {
-	int n = 0;
+	lws_ss_metadata_t *omd = lws_ss_policy_metadata(h->policy, name);
 
-	for (n = 0; n < h->policy->metadata_count; n++)
-		if (!strcmp(name, h->metadata[n].name))
-			return &h->metadata[n];
+	if (!omd)
+		return NULL;
 
-	return NULL;
+	return &h->metadata[omd->length];
 }
 
 lws_ss_metadata_t *
@@ -333,6 +313,7 @@ lws_ss_policy_set(struct lws_context *context, const char *name)
 	else
 		m = 0;
 
+	(void)m;
 	lwsl_info("%s: %s, pad %d%c: %s\n", __func__, buf, m, '%', name);
 
 	/* Create vhosts for each type of trust store */

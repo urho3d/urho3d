@@ -610,8 +610,10 @@ lws_broadcast(struct lws_context_per_thread *pt, int reason, void *in, size_t le
 	lws_fakewsi_def_plwsa(pt);
 	int n, ret = 0;
 
-
 	lws_fakewsi_prep_plwsa_ctx(pt->context);
+#if !defined(LWS_PLAT_FREERTOS) && LWS_MAX_SMP > 1
+	((struct lws *)plwsa)->tsi = (int)(pt - &pt->context->pt[0]);
+#endif
 
 	while (v) {
 		const struct lws_protocols *p = v->protocols;
@@ -637,6 +639,13 @@ lws_wsi_user(struct lws *wsi)
 {
 	return wsi->user_space;
 }
+
+int
+lws_wsi_tsi(struct lws *wsi)
+{
+	return wsi->tsi;
+}
+
 
 void
 lws_set_wsi_user(struct lws *wsi, void *data)
