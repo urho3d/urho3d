@@ -683,20 +683,17 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     {
     case MSG_CREATENODE:
         {
-            URHO3D_LOGINFOF("MSG_CREATENODE received with size %d", msg.GetSize());
             unsigned nodeID = msg.ReadNetID();
             // In case of the root node (scene), it should already exist. Do not create in that case
             Node* node = scene_->GetNode(nodeID);
             if (!node)
             {
-                URHO3D_LOGINFOF("CREATE NODE 1: %d", nodeID);
                 // Add initially to the root level. May be moved as we receive the parent attribute
                 node = scene_->CreateChild(nodeID, REPLICATED);
                 // Create smoothed transform component
                 node->CreateComponent<SmoothedTransform>(LOCAL);
             }
 
-            URHO3D_LOGINFOF("CREATE NODE 2: %d", nodeID);
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg);
             auto* transform = node->GetComponent<SmoothedTransform>();
@@ -705,7 +702,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();
-            URHO3D_LOGINFOF("CREATE NODE 3");
             while (numVars)
             {
                 StringHash key = msg.ReadStringHash();
@@ -713,14 +709,10 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 --numVars;
             }
 
-            URHO3D_LOGINFOF("CREATE NODE 4");
-
             // Read components
             unsigned numComponents = msg.ReadVLE();
-            URHO3D_LOGINFOF("NUm components %d", numComponents);
             while (numComponents)
             {
-                URHO3D_LOGINFOF("CREATE NODE 5");
                 --numComponents;
 
                 StringHash type = msg.ReadStringHash();
@@ -733,7 +725,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                     if (component)
                         component->Remove();
                     component = node->CreateComponent(type, REPLICATED, componentID);
-                    URHO3D_LOGINFOF("CREATE NODE 6");
                 }
 
                 // If was unable to create the component, would desync the message and therefore have to abort
@@ -746,7 +737,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // Read initial attributes and apply
                 component->ReadDeltaUpdate(msg);
                 component->ApplyAttributes();
-                URHO3D_LOGINFOF("CREATE NODE 7");
             }
         }
         break;
@@ -1402,10 +1392,7 @@ void Connection::ProcessNewNode(Node* node)
         component->WriteInitialDeltaUpdate(msg_, timeStamp_);
     }
 
-    URHO3D_LOGINFOF("MSG_CREATENODE sending with size %d", msg_.GetSize());
     SendMessage(MSG_CREATENODE, true, true, msg_);
-//    auto test = MemoryBuffer(msg_.GetData(), msg_.GetSize());
-//    ProcessSceneUpdate(MSG_CREATENODE, test);
 
     nodeState.markedDirty_ = false;
     sceneState_.dirtyNodes_.Erase(node->GetID());

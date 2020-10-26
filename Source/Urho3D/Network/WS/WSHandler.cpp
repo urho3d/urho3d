@@ -26,7 +26,9 @@
 #include "WSHandler.h"
 #include "WSPacket.h"
 
+#ifndef __EMSCRIPTEN__
 #include <libwebsockets.h>
+#endif
 
 using namespace Urho3D;
 
@@ -104,6 +106,7 @@ List<WSPacket>* WSHandler::GetOutgoingPackets(const WSConnection& ws)
 
 void WSHandler::OutputWSLog(int level, const char *line)
 {
+#ifndef __EMSCRIPTEN__
     switch(level) {
         case LLL_NOTICE:
             URHO3D_LOGINFOF("WSClient: %s", line);
@@ -118,6 +121,7 @@ void WSHandler::OutputWSLog(int level, const char *line)
             URHO3D_LOGINFOF("WSClient: %s", line);
             break;
     }
+#endif
 }
 
 #endif

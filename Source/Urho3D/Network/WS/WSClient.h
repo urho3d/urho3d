@@ -68,6 +68,8 @@ public:
     unsigned short GetPort() { return port_; };
     /// Get server protocol used for connection
     const String& GetServerProtocol() const { return serverProtocol_; };
+    /// Send out client messages
+    void SendOutMessages(lws *ws);
 
 private:
     /// Handle work item finished event
