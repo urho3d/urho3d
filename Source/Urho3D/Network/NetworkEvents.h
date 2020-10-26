@@ -102,9 +102,10 @@ URHO3D_EVENT(E_REMOTEEVENTDATA, RemoteEventData)
     URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
-/// Server refuses client connection because of the ban.
+/// Server refuses/disconnects client connection because of the ban.
 URHO3D_EVENT(E_NETWORKBANNED, NetworkBanned)
 {
+	URHO3D_PARAM(P_REASON, Reason);   // String
 }
 
 /// Server refuses connection because of invalid password.
@@ -147,6 +148,50 @@ URHO3D_EVENT(E_NATMASTERCONNECTIONSUCCEEDED, NetworkNatMasterConnectionSucceeded
 /// Disconnected from NAT master server.
 URHO3D_EVENT(E_NATMASTERDISCONNECTED, NetworkNatMasterDisconnected)
 {
+}
+
+/// When P2P network declines our connection
+URHO3D_EVENT(E_P2PJOINREQUESTDENIED, P2PJoinRequestDenied)
+{
+}
+
+/// Status of all p2p connection readiness
+URHO3D_EVENT(E_P2PALLREADYCHANGED, P2PAllReadyChanged)
+{
+	URHO3D_PARAM(P_READY, Ready);   // String
+}
+
+/// P2P session was started succesfully
+URHO3D_EVENT(E_P2PSESSIONSTARTED, P2PSessionStarted)
+{
+}
+
+/// P2P session join successfull
+URHO3D_EVENT(E_P2PSESSIONJOINED, P2PSessionJoined)
+{
+}
+
+/// P2P session join succesfull
+URHO3D_EVENT(E_P2PSESSIONJOINFAILED, P2PSessionJoinFailed)
+{
+}
+
+/// Server/Host doesn't allow any new connections
+URHO3D_EVENT(E_SERVERFULL, ServerFull)
+{
+}
+
+/// Server/Host doesn't allow any new connections
+URHO3D_EVENT(E_NETWORKMODEMISMATCH, NetworkModeMismatch)
+{
+}
+
+/// When host system is elected
+URHO3D_EVENT(E_P2PNEWHOST, P2PNewHost)
+{
+    URHO3D_PARAM(P_ADDRESS, Address);   // String
+    URHO3D_PARAM(P_PORT, Port);   // int
+    URHO3D_PARAM(P_GUID, GUID);   // String
 }
 
 }

@@ -39,6 +39,9 @@ namespace SLNet
     struct Packet;
     class NatPunchthroughClient;
     class RakPeerInterface;
+    class FullyConnectedMesh2;
+    class ReadyEvent;
+    class ConnectionGraph2;
 }
 
 namespace Urho3D
@@ -137,6 +140,7 @@ public:
     void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Assign scene. On the server, this will cause the client to load it.
     void SetScene(Scene* newScene);
+    void SetSceneLoaded(bool value);
     /// Assign identity. Called by Network.
     void SetIdentity(const VariantMap& identity);
     /// Set new controls.
@@ -168,9 +172,11 @@ public:
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& buffer);
     /// Ban this connections IP address.
-    void Ban();
+    void Ban(const String& reason);
     /// Return the RakNet address/guid.
     const SLNet::AddressOrGUID& GetAddressOrGUID() const { return *address_; }
+
+    String GetGUID();
     /// Set the the RakNet address/guid.
     void SetAddressOrGUID(const SLNet::AddressOrGUID& addr);
     /// Return client identity.
@@ -221,6 +227,9 @@ public:
     /// Return bytes received per second.
     float GetBytesInPerSec() const;
 
+    int GetLastPing();
+    int GetAveragePing();
+
     /// Return bytes sent per second.
     float GetBytesOutPerSec() const;
 
@@ -253,6 +262,14 @@ public:
     /// Identity map.
     VariantMap identity_;
 
+    void SetReady(bool value);
+    const bool GetReady() const { return ready_; }
+
+    /// Set the IP address for this connection
+    void SetIP(const String& ipAddress);
+    /// Retrieve IP address for this connection
+    const String GetIP() const { return ipAddress_; }
+
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
@@ -265,7 +282,7 @@ private:
     /// Process package download related messages. Called by Network.
     void ProcessPackageDownload(int msgID, MemoryBuffer& msg);
     /// Process an Identity message from the client. Called by Network.
-    void ProcessIdentity(int msgID, MemoryBuffer& msg);
+    bool ProcessIdentity(int msgID, MemoryBuffer& msg);
     /// Process a Controls message from the client. Called by Network.
     void ProcessControls(int msgID, MemoryBuffer& msg);
     /// Process a SceneLoaded message from the client. Called by Network.
@@ -294,6 +311,8 @@ private:
     void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
+    /// Handle P2P join request messages
+    void ProcessP2PRequest(int msgID);
 
     /// Scene.
     WeakPtr<Scene> scene_;
@@ -345,6 +364,12 @@ private:
     Timer packetCounterTimer_;
     /// Last heard timer, resets when new packet is incoming.
     Timer lastHeardTimer_;
+
+    /// Connection IP address
+    String ipAddress_;
+    /// Is the connection ready
+    bool ready_;
+
     /// Outgoing packet buffer which can contain multiple messages
     HashMap<int, VectorBuffer> outgoingBuffer_;
     /// Outgoing packet size limit

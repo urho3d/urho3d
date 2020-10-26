@@ -167,10 +167,28 @@ static HttpRequest* NetworkMakeHttpRequest(const String& url, const String& verb
 
 void RegisterNetwork(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("NetworkMode");
+    engine->RegisterEnumValue("NetworkMode", "SERVER_CLIENT", SERVER_CLIENT);
+    engine->RegisterEnumValue("NetworkMode", "PEER_TO_PEER", PEER_TO_PEER);
+
     RegisterObject<Network>(engine, "Network");
     engine->RegisterObjectMethod("Network", "bool Connect(const String&in, uint16, Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, Connect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void Disconnect(int waitMSec = 0)", asMETHOD(Network, Disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool StartServer(uint16, uint maxConnections = 128)", asMETHOD(Network, StartServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool StartSession(Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, StartSession), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void JoinSession(const String&guid, Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, JoinSession), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "int get_participantCount()", asMETHOD(Network, GetParticipantCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool IsHostSystem()", asMETHOD(Network, IsHostSystem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "const String get_hostAddress()", asMETHOD(Network, GetHostAddress), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void SetReady(bool)", asMETHOD(Network, SetReady), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool GetReady(bool)", asMETHOD(Network, GetReady), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void ResetHost()", asMETHOD(Network, ResetHost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void SetNATAutoReconnect(bool)", asMETHOD(Network, SetNATAutoReconnect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool get_natAutoRecconect() const", asMETHOD(Network, GetNATAutoReconnect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void SetMode(NetworkMode, bool = false)", asMETHOD(Network, SetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "int get_participantCount() const", asMETHOD(Network, GetParticipantCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "NetworkMode GetMode()", asMETHOD(Network, GetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void SetAllowedConnections(uint16)", asMETHOD(Network, SetAllowedConnections), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool DiscoverHosts(uint16)", asMETHOD(Network, DiscoverHosts), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool SetDiscoveryBeacon(const VariantMap&in data = VariantMap())", asMETHOD(Network, SetDiscoveryBeacon), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool SetPassword(const String&password)", asMETHOD(Network, SetPassword), asCALL_THISCALL);
@@ -202,6 +220,7 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "Connection@+ get_serverConnection() const", asMETHOD(Network, GetServerConnection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Array<Connection@>@ get_clientConnections() const", asFUNCTION(NetworkGetClientConnections), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Network@+ get_network()", asFUNCTION(GetNetwork), asCALL_CDECL);
+
 }
 
 void RegisterNetworkAPI(asIScriptEngine* engine)

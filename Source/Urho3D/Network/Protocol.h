@@ -63,6 +63,10 @@ static const int MSG_REMOTEEVENT = 0x96;
 static const int MSG_REMOTENODEEVENT = 0x97;
 /// Server->client: info about package.
 static const int MSG_PACKAGEINFO = 0x98;
+/// Client->server ask to join P2P network
+static const int MSG_P2P_JOIN_REQUEST = 0x99;
+/// Server->client deny P2P join request
+static const int MSG_P2P_JOIN_REQUEST_DENIED = 0x9A;
 
 /// Packet that includes all the above messages
 static const int MSG_PACKED_MESSAGE = 0x99;

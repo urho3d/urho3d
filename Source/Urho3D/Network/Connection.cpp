@@ -78,11 +78,14 @@ Connection::Connection(Context* context, bool isClient, const SLNet::AddressOrGU
     sceneLoaded_(false),
     logStatistics_(false),
     address_(nullptr),
-    packedMessageLimit_(1024)
+    packedMessageLimit_(1024),
+    ready_(false)
 {
     sceneState_.connection_ = this;
     port_ = address.systemAddress.GetPort();
     SetAddressOrGUID(address);
+
+    URHO3D_LOGINFO("Creating connection " + String(address_->ToString()));
 }
 
 Connection::~Connection()
@@ -113,8 +116,7 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const Vecto
     SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
-    unsigned contentID)
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID)
 {
     if (numBytes && !data)
     {
@@ -211,10 +213,14 @@ void Connection::SetScene(Scene* newScene)
     }
     else
     {
-        // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
         SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, URHO3D_HANDLER(Connection, HandleAsyncLoadFinished));
     }
+}
+
+void Connection::SetSceneLoaded(bool value)
+{
+    sceneLoaded_ = value;
 }
 
 void Connection::SetIdentity(const VariantMap& identity)
@@ -258,8 +264,10 @@ void Connection::Disconnect(int waitMSec)
 
 void Connection::SendServerUpdate()
 {
-    if (!scene_ || !sceneLoaded_)
+    if (!scene_ || !sceneLoaded_) {
+//        URHO3D_LOGERROR("Server update failed " + String(sceneLoaded_));
         return;
+    }
 
     // Always check the root node (scene) first so that the scene-wide components get sent first,
     // and all other replicated nodes get added to the dirty set for sending the initial state
@@ -280,8 +288,10 @@ void Connection::SendServerUpdate()
 
 void Connection::SendClientUpdate()
 {
-    if (!scene_ || !sceneLoaded_)
+    if (!scene_ || !sceneLoaded_) {
+        //URHO3D_LOGERROR("No scene, not sending client update " + String(sceneLoaded_));
         return;
+    }
 
     msg_.Clear();
     msg_.WriteUInt(controls_.buttons_);
@@ -447,6 +457,9 @@ void Connection::ProcessPendingLatestData()
 
 bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
 {
+    // New incomming message, reset last heard timer
+    lastHeardTimer_.Reset();
+
     tempPacketCounter_.x_++;
     if (buffer.GetSize() == 0)
         return false;
@@ -501,6 +514,10 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
                 ProcessSceneUpdate(msgID, msg);
                 break;
 
+            case MSG_P2P_JOIN_REQUEST_DENIED:
+                ProcessP2PRequest(msgID);
+                break;
+
             case MSG_REMOTEEVENT:
             case MSG_REMOTENODEEVENT:
                 ProcessRemoteEvent(msgID, msg);
@@ -517,19 +534,24 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
     return true;
 }
 
-void Connection::Ban()
+void Connection::Ban(const String& reason)
 {
-    if (peer_)
+    if (peer_ && !ipAddress_.Empty() && IsClient())
     {
-        peer_->AddToBanList(address_->ToString(false), 0);
+        GetSubsystem<Network>()->BanConnection(this, reason);
     }
+}
+
+void Connection::SetIP(const String& ipAddress)
+{
+    ipAddress_ = ipAddress;
 }
 
 void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 {
     if (IsClient())
     {
-        URHO3D_LOGWARNING("Received unexpected LoadScene message from client " + ToString());
+        URHO3D_LOGWARNING("Received unexpected LoadScene message from client " + ToString() + " => " + String(peer_->GetMyGUID()));
         return;
     }
 
@@ -934,12 +956,14 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
     }
 }
 
-void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
+bool Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        URHO3D_LOGWARNING("Received unexpected Identity message from server");
-        return;
+        if (GetSubsystem<Network>()->GetMode() == SERVER_CLIENT) {
+            URHO3D_LOGWARNING("Received unexpected Identity message from server " + GetGUID());
+        }
+        return false;
     }
 
     identity_ = msg.ReadVariantMap();
@@ -954,13 +978,15 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
     // If connection was denied as a response to the identity event, disconnect now
     if (!eventData[P_ALLOW].GetBool())
         Disconnect();
+
+    return true;
 }
 
 void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        URHO3D_LOGWARNING("Received unexpected Controls message from server");
+        URHO3D_LOGWARNING("Received unexpected Controls message from server " + GetGUID());
         return;
     }
 
@@ -1641,6 +1667,11 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
     RequestNeededPackages(1, msg);
 }
 
+void Connection::ProcessP2PRequest(int msgID)
+{
+    URHO3D_LOGERROR("P2P join request denied!");
+}
+
 void Connection::ProcessUnknownMessage(int msgID, MemoryBuffer& msg)
 {
     // If message was not handled internally, forward as an event
@@ -1658,10 +1689,32 @@ String Connection::GetAddress() const {
 }
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
-{ 
+{
     delete address_;
     address_ = nullptr;
     address_ = new SLNet::AddressOrGUID(addr);
 }
 
+String Connection::GetGUID()
+{
+    if (!IsClient()) {
+        return GetSubsystem<Network>()->GetGUID();
+    }
+    return address_->rakNetGuid.ToString();
+}
+
+int Connection::GetLastPing()
+{
+    return peer_->GetLastPing(*address_);
+}
+
+int Connection::GetAveragePing()
+{
+    return peer_->GetAveragePing(*address_);
+}
+
+void Connection::SetReady(bool value)
+{
+    ready_ = value;
+}
 }

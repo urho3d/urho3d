@@ -53,6 +53,7 @@ const char* logStyles[] =
 {
     "ConsoleTraceText",
     "ConsoleDebugText",
+    "ConsoleDebugText",
     "ConsoleInfoText",
     "ConsoleWarningText",
     "ConsoleErrorText",

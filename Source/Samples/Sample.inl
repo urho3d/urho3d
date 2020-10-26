@@ -62,6 +62,10 @@ void Sample::Setup()
     engineParameters_[EP_FULL_SCREEN]  = false;
     engineParameters_[EP_HEADLESS]     = false;
     engineParameters_[EP_SOUND]        = false;
+    engineParameters_[EP_WINDOW_HEIGHT] = 600;
+    engineParameters_[EP_WINDOW_WIDTH] = 800;
+    engineParameters_[EP_LOG_LEVEL] = LOG_INFO;
+    engineParameters_[EP_MONITOR] = 1;
 
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
@@ -209,6 +213,8 @@ void Sample::CreateConsoleAndDebugHud()
     Console* console = engine_->CreateConsole();
     console->SetDefaultStyle(xmlFile);
     console->GetBackground()->SetOpacity(0.8f);
+    console->SetNumHistoryRows(1000);
+    console->SetNumBufferedRows(100);
 
     // Create debug HUD.
     DebugHud* debugHud = engine_->CreateDebugHud();

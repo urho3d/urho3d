@@ -3111,7 +3111,7 @@ The event includes the attribute name, index, new value as a Variant, and the la
 
 \section Network_Messages Raw network messages
 
-All network messages have an integer ID. The first ID you can use for custom messages is 153 (lower ID's are either reserved for SLikeNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+All network messages have an integer ID. The first ID you can use for custom messages is 155 (lower ID's are either reserved for SLikeNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
 
 To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
 

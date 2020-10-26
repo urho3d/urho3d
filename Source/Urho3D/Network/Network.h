@@ -34,6 +34,12 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
+/// Supported network modes
+enum NetworkMode {
+    PEER_TO_PEER,
+    SERVER_CLIENT
+};
+
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object
 {
@@ -48,10 +54,9 @@ public:
     /// Handle an inbound message.
     void HandleMessage(const SLNet::AddressOrGUID& source, int packetID, int msgID, const char* data, size_t numBytes);
     /// Handle a new client connection.
-    void NewConnectionEstablished(const SLNet::AddressOrGUID& connection);
+    void NewConnectionEstablished(const SLNet::AddressOrGUID& connection, const char* address = nullptr);
     /// Handle a client disconnection.
     void ClientDisconnected(const SLNet::AddressOrGUID& connection);
-
     /// Set the data that will be used for a reply to attempts at host discovery on LAN/subnet.
     void SetDiscoveryBeacon(const VariantMap& data);
     /// Scan the LAN/subnet for available hosts.
@@ -64,6 +69,30 @@ public:
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
+    /// Start P2P session
+    bool StartSession(Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Join existing P2P session
+    void JoinSession(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Current peer count in session
+    int GetParticipantCount();
+    /// Is host connected to the P2P session
+    bool IsConnectedHost();
+    /// Are we the host system in P2P session
+    bool IsHostSystem();
+    /// Get host GUID
+    const String GetHostAddress();
+    /// Let other peers know about our readiness
+    void SetReady(bool value);
+    /// Get current ready status
+    bool GetReady();
+    /// Handle all peer readiness in session
+    void ReadyStatusChanged();
+    /// Reset our P2P session timer, peer with largest timer value becomes the host
+    void ResetHost();
+    /// Set NAT server auto reconnecting when disconnection happens
+    void SetNATAutoReconnect(bool retry);
+    /// Get NAT server auto reconnect
+    const bool GetNATAutoReconnect() const { return natAutoReconnect_; }
     /// Start a server on a port using UDP protocol. Return true if successful.
     bool StartServer(unsigned short port, unsigned int maxConnections = 128);
     /// Stop the server.
@@ -102,8 +131,10 @@ public:
     void SendPackageToClients(Scene* scene, PackageFile* package);
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
     SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
-    /// Ban specific IP addresses.
+    /// Ban specific IP addresses. Also supports wildcard addresses like 192.68.1.*
     void BanAddress(const String& address);
+    /// Ban specific connection
+    void BanConnection(Connection* connection, const String& reason);
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
 
@@ -115,6 +146,8 @@ public:
 
     /// Return a client or server connection by RakNet connection address, or null if none exist.
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
+    /// Return a client or server connection by kNet MessageConnection, or null if none exist.
+    Connection* GetClientConnection(const SLNet::AddressOrGUID& connection) const;
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
@@ -131,12 +164,27 @@ public:
     void Update(float timeStep);
     /// Send outgoing messages after frame logic. Called by HandleRenderUpdate.
     void PostUpdate(float timeStep);
+    /// Change network mode
+    void SetMode(NetworkMode mode, bool force = false);
+    /// Get current network mode
+    const NetworkMode  GetMode() const { return networkMode_; }
+    /// Set incoming connection count. If connectionCount < current connection count, no new connections will be made
+    void SetAllowedConnections(unsigned short connectionCount);
 
 private:
+    /// Send out identity to all connected peers
+    void SendOutIdentityToPeers();
+    /// Connect to NAT server which will handle P2P session
+    bool ConnectNAT(const String& address, unsigned short port);
+
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle render update frame event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Start P2P session when connected to NAT master
+    void HandleNATStartSession(StringHash eventType, VariantMap& eventData);
+    /// Join P2P session when connected to NAT master
+    void HandleNATJoinSession(StringHash eventType, VariantMap& eventData);
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
@@ -145,7 +193,6 @@ private:
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.
     void HandleIncomingPacket(SLNet::Packet* packet, bool isServer);
-
     /// SLikeNet peer instance for server connection.
     SLNet::RakPeerInterface* rakPeer_;
     /// SLikeNet peer instance for client connection.
@@ -190,6 +237,20 @@ private:
     SLNet::RakNetGUID* remoteGUID_;
     /// Local server GUID.
     String guid_;
+    /// Ready event for automated event handling in P2P connections
+    SLNet::ReadyEvent *readyEvent_;
+    /// P2P connection mesh, each peer connected to all other peers
+    SLNet::FullyConnectedMesh2 *fullyConnectedMesh2_;
+    /// Connection graph to automate peer to peer discovery and fill fullyConnectedMesh2_
+    SLNet::ConnectionGraph2 *connectionGraph2_;
+    /// P2P current host guid
+    String hostGuid_;
+    /// current network mode - P2P or server-client mode
+    NetworkMode networkMode_;
+    /// Automatically reconnect to NAT punchtrough master server
+    bool natAutoReconnect_{};
+    /// Max allowed connections, if exceeded, no new connections will be made
+    unsigned short allowedConnectionCount_;
 };
 
 /// Register Network library objects.
