@@ -25,6 +25,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("com.android.library")
+    id("com.jfrog.bintray")
     kotlin("android")
     kotlin("android.extensions")
     `maven-publish`
@@ -172,6 +173,31 @@ publishing {
     }
 }
 
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publish = true
+    override = true
+    setPublications("UrhoRelease", "UrhoDebug")
+    pkg.apply {
+        repo = "maven"
+        name = project.name
+        setLicenses("MIT")
+        vcsUrl = "https://github.com/urho3d/Urho3D.git"
+        userOrg = "urho3d"
+        setLabels("android", "game-development", "game-engine", "open-source", "urho3d")
+        websiteUrl = "https://urho3d.io/"
+        issueTrackerUrl = "https://github.com/urho3d/Urho3D/issues"
+        githubRepo = "urho3d/Urho3D"
+        publicDownloadNumbers = true
+        desc = project.description
+        version.apply {
+            name = project.version.toString()
+            desc = project.description
+        }
+    }
+}
+
 fun MavenPublication.configure(config: String) {
     val libType = System.getenv("URHO3D_LIB_TYPE")?.toLowerCase() ?: "static"
     groupId = project.group.toString()
@@ -204,7 +230,7 @@ fun MavenPublication.configure(config: String) {
             asNode().apply {
                 appendNode("name", "Urho3D")
                 appendNode("description", project.description)
-                appendNode("url", "https://urho3d.github.io/")
+                appendNode("url", "https://urho3d.io/")
             }
         }
     }

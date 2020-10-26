@@ -147,6 +147,8 @@ jobs:
           PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
           PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
           PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
         run: script/dockerized.sh ${PLATFORM/-*} rake publish
         if: |
           github.event_name == 'push' &&

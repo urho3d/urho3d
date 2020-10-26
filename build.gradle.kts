@@ -36,6 +36,10 @@ buildscript {
     }
 }
 
+plugins {
+    id("com.jfrog.bintray") version "1.8.5" apply false
+}
+
 val kotlinVersion: String by ext
 
 allprojects {

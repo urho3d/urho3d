@@ -115,7 +115,7 @@ end
 desc 'Publish build artifact'
 task :publish => [:init] do
   if ENV['PLATFORM'] == 'android'
-    Rake::Task[:gradle].invoke('publish')
+    Rake::Task[:gradle].invoke("publish #{/refs\/tags\// =~ ENV['GITHUB_REF'] ? 'bintrayUpload' : ''}")
     next
   end
   Rake::Task[$publish_task.to_sym].invoke if $publish_task
