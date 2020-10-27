@@ -881,9 +881,9 @@ IME_HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM *lParam, SDL_VideoD
     case WM_INPUTLANGCHANGE:
         IME_InputLangChanged(videodata);
         break;
-    case WM_IME_SETCONTEXT:
-        *lParam = 0;
-        break;
+    //case WM_IME_SETCONTEXT:
+    //    *lParam = 0;
+    //    break;
     case WM_IME_STARTCOMPOSITION:
         trap = SDL_TRUE;
         break;
