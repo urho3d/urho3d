@@ -192,6 +192,12 @@ public:
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(unsigned gid) const;
 
+    /// Return tile frame set by gid, if not exist return 0.
+    FrameSet2D* GetTileFrameSet(unsigned gid) const;
+
+    /// Updates FrameSet's timers, in all tile sets.
+    void UpdateAnimationTimers(float timeStep);
+
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
 
@@ -220,6 +226,8 @@ private:
     HashMap<unsigned, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.
     HashMap<unsigned, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
+    /// Gid to tile frame set mapping.
+    HashMap<unsigned, SharedPtr<FrameSet2D> > gidToFrameSetMapping_;
     /// Gid to tile collision shape mapping.
     HashMap<unsigned, Vector<SharedPtr<TileMapObject2D> > > gidToCollisionShapeMapping_;
     /// Layers.

@@ -25,6 +25,8 @@
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Resource/ResourceCache.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
 #include "../Scene/Node.h"
 #include "../Urho2D/StaticSprite2D.h"
 #include "../Urho2D/TileMap2D.h"
@@ -243,6 +245,40 @@ void TileMapLayer2D::SetVisible(bool visible)
     {
         if (nodes_[i])
             nodes_[i]->SetEnabled(visible_);
+    }
+}
+
+void TileMapLayer2D::UpdateAnimations()
+{
+    if (GetLayerType() != LT_TILE_LAYER)
+        return;
+
+    TmxFile2D* tmxFile = GetTileMap()->GetTmxFile();
+    for (int y = 0; y < GetHeight(); y++)
+    {
+        for (int x = 0; x < GetWidth(); x++)
+        {
+            Tile2D* tile = GetTile(x, y);
+            if (!tile)
+                continue;
+
+            if (tile->IsAnimated())
+            {
+                Node* node = GetTileNode(x, y);
+                if (node)
+                {
+                    unsigned curGid = tile->GetGid();
+                    FrameSet2D* frameSet = tmxFile->GetTileFrameSet(curGid);
+                    unsigned newGid = frameSet->GetCurrentFrameGid();
+                    if (curGid != newGid)
+                    {
+                        Sprite2D* sprite = tmxFile->GetTileSprite(newGid);
+                        auto* spriteComponent = node->GetComponent<StaticSprite2D>();
+                        spriteComponent->SetSprite(sprite);
+                    }
+                }
+            }
+        }
     }
 }
 

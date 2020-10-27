@@ -23,6 +23,12 @@ struct TileMapInfo2D
     tolua_readonly tolua_property__get_set float mapHeight;
 };
 
+struct TileFrameInfo2D
+{
+    unsigned gid_ @ gid;
+    unsigned duration_ @ duration;
+};
+
 enum TileMapLayerType2D
 {
     LT_TILE_LAYER,
@@ -47,6 +53,13 @@ class PropertySet2D
     const String GetProperty(const String name) const;
 };
 
+class FrameSet2D
+{
+    void UpdateTimer(float timeStep);
+    unsigned GetCurrentFrameGid() const;
+    unsigned GetNumFrames() const;
+};
+
 static const unsigned FLIP_HORIZONTAL;
 static const unsigned FLIP_VERTICAL;
 static const unsigned FLIP_DIAGONAL;
@@ -62,6 +75,7 @@ class Tile2D
     Sprite2D* GetSprite() const;
     bool HasProperty(const String name) const;
     const String GetProperty(const String name) const;
+    bool IsAnimated() const;
 
     tolua_readonly tolua_property__get_set unsigned gid;
     tolua_readonly tolua_property__get_set Sprite2D* sprite;

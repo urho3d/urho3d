@@ -160,6 +160,51 @@ const String& PropertySet2D::GetProperty(const String& name) const
     return i->second_;
 }
 
+FrameSet2D::FrameSet2D() = default;
+
+FrameSet2D::~FrameSet2D() = default;
+
+void FrameSet2D::Load(const XMLElement& element)
+{
+    assert(element.GetName() == "animation");
+    for (XMLElement frameElem = element.GetChild("frame"); frameElem; frameElem = frameElem.GetNext("frame"))
+    {
+        SharedPtr<TileFrameInfo2D> info(new TileFrameInfo2D());
+        info->gid_ = frameElem.GetUInt("tileid") + 1;
+        info->duration_ = frameElem.GetUInt("duration");
+        frames_.Push(info);
+
+        lapTime_ += info->duration_;
+    }
+
+}
+
+void FrameSet2D::UpdateTimer(float timeStep)
+{
+    timeElapsed_ += timeStep * 1000.0f;
+    if (timeElapsed_ > lapTime_)
+        timeElapsed_ -= lapTime_;
+}
+
+unsigned FrameSet2D::GetCurrentFrameGid() const
+{
+    unsigned minInterval = 0;
+    unsigned maxInterval = 0;
+    for (unsigned i = 0; i < frames_.Size(); ++i)
+    {
+        minInterval = maxInterval;
+        maxInterval += frames_[i]->duration_;
+        if (timeElapsed_ >= static_cast<float>(minInterval) && timeElapsed_ < static_cast<float>(maxInterval))
+            return frames_[i]->gid_;
+    }
+    return frames_[0]->gid_;
+}
+
+unsigned FrameSet2D::GetNumFrames() const
+{
+    return frames_.Size();
+}
+
 Tile2D::Tile2D() :
     gid_(0)
 {
@@ -183,6 +228,14 @@ const String& Tile2D::GetProperty(const String& name) const
         return String::EMPTY;
 
     return propertySet_->GetProperty(name);
+}
+
+bool Tile2D::IsAnimated() const
+{
+    if (!frameSet_)
+        return false;
+    else
+        return true;
 }
 
 TileMapObject2D::TileMapObject2D() = default;

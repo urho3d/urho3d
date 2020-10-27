@@ -228,6 +228,8 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapWidth() const", asMETHOD(TileMapInfo2D, GetMapWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapHeight() const", asMETHOD(TileMapInfo2D, GetMapHeight), asCALL_THISCALL);
 
+    RegisterRefCounted<TileFrameInfo2D>(engine, "TileFrameInfo2D");
+
     engine->RegisterEnum("TileMapLayerType2D");
     engine->RegisterEnumValue("TileMapLayerType2D", "LT_TILE_LAYER", LT_TILE_LAYER);
     engine->RegisterEnumValue("TileMapLayerType2D", "LT_OBJECT_GROUP", LT_OBJECT_GROUP);
@@ -244,7 +246,12 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
 
     RegisterRefCounted<PropertySet2D>(engine, "PropertySet2D");
     engine->RegisterObjectMethod("PropertySet2D", "bool HasProperty(const String&in) const", asMETHOD(PropertySet2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PropertySet2D", "const String& GetProperty(const String&in) const", asMETHOD(PropertySet2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PropertySet2D", "const String& GetProperty(const String&in) const", asMETHOD(PropertySet2D, GetProperty), asCALL_THISCALL);
+
+    RegisterRefCounted<FrameSet2D>(engine, "FrameSet2D");
+    engine->RegisterObjectMethod("FrameSet2D", "void UpdateTimer(float timeStep)", asMETHOD(FrameSet2D, UpdateTimer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FrameSet2D", "uint GetCurrentFrameGid() const", asMETHOD(FrameSet2D, GetCurrentFrameGid), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FrameSet2D", "uint GetNumFrames() const", asMETHOD(FrameSet2D, GetNumFrames), asCALL_THISCALL);
 
     engine->RegisterGlobalProperty("const uint FLIP_HORIZONTAL", (void*)&FLIP_HORIZONTAL);
     engine->RegisterGlobalProperty("const uint FLIP_VERTICAL", (void*)&FLIP_VERTICAL);
@@ -259,7 +266,8 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Tile2D", "bool get_swapXY() const", asMETHOD(Tile2D, GetSwapXY), asCALL_THISCALL);
     engine->RegisterObjectMethod("Tile2D", "Sprite2D@+ get_sprite() const", asMETHOD(Tile2D, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod("Tile2D", "bool HasProperty(const String&in) const", asMETHOD(Tile2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHOD(Tile2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHOD(Tile2D, GetProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "bool IsAnimated() const", asMETHOD(Tile2D, IsAnimated), asCALL_THISCALL);
 
     RegisterRefCounted<TileMapObject2D>(engine, "TileMapObject2D");
     engine->RegisterObjectMethod("TileMapObject2D", "TileObjectType2D get_objectType() const", asMETHOD(TileMapObject2D, GetObjectType), asCALL_THISCALL);
@@ -278,9 +286,12 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapObject2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapObject2D, GetProperty), asCALL_THISCALL);
 }
 
+// FIXME: complete the bindings for the rest of the class methods
 static void RegisterTmxFile2D(asIScriptEngine* engine)
 {
     RegisterResource<TmxFile2D>(engine, "TmxFile2D");
+    engine->RegisterObjectMethod("TmxFile2D", "void UpdateAnimationTimers(float)", asMETHOD(TmxFile2D, UpdateAnimationTimers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TmxFile2D", "uint GetNumLayers() const", asMETHOD(TmxFile2D, GetNumLayers), asCALL_THISCALL);
     engine->RegisterObjectMethod("TmxFile2D", "void set_edgeOffset(float)", asMETHOD(TmxFile2D, SetSpriteTextureEdgeOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("TmxFile2D", "float get_edgeOffset() const", asMETHOD(TmxFile2D, GetSpriteTextureEdgeOffset), asCALL_THISCALL);
 }
@@ -293,8 +304,9 @@ static void RegisterTileMapLayer2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapLayer2D", "int get_drawOrder() const", asMETHOD(TileMapLayer2D, GetDrawOrder), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "void set_visible(bool)", asMETHOD(TileMapLayer2D, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "bool get_visible() const", asMETHOD(TileMapLayer2D, IsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapLayer2D", "void UpdateAnimations()", asMETHOD(TileMapLayer2D, UpdateAnimations), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "bool HasProperty(const String&in) const", asMETHOD(TileMapLayer2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapLayer2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapLayer2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapLayer2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapLayer2D, GetProperty), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapLayer2D", "TileMapLayerType2D get_layerType() const", asMETHOD(TileMapLayer2D, GetLayerType), asCALL_THISCALL);
 
     // For tile layer only

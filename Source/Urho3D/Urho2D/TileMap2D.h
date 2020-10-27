@@ -44,6 +44,9 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Handle node being assigned.
+    void OnNodeSet(Node* node) override;
+
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
@@ -75,6 +78,9 @@ public:
     ///
     Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(unsigned gid) const;
 private:
+    /// Handle scene update.
+    void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
+
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
     /// Tile map information.
