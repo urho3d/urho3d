@@ -33,11 +33,13 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+#ifdef URHO3D_NAVIGATION
 // NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared 
 static void NavigationGeometryInfo_Destructor(NavigationGeometryInfo* ptr)
 {
     ptr->~NavigationGeometryInfo();
 }
+#endif
 
 // explicit NamedPipe::NamedPipe(Context* context) | File: ../IO/NamedPipe.h
 static NamedPipe* NamedPipe_NamedPipe_Context()
@@ -235,17 +237,21 @@ static void NetworkState_Destructor(NetworkState* ptr)
     ptr->~NetworkState();
 }
 
+#ifdef URHO3D_NAVIGATION
 // NavigationPathPoint::~NavigationPathPoint() | Implicitly-declared 
 static void NavigationPathPoint_Destructor(NavigationPathPoint* ptr)
 {
     ptr->~NavigationPathPoint();
 }
+#endif
 
+#ifdef URHO3D_NAVIGATION
 // NavAreaStub::~NavAreaStub() | Implicitly-declared 
 static void NavAreaStub_Destructor(NavAreaStub* ptr)
 {
     ptr->~NavAreaStub();
 }
+#endif
 
 // NodeImpl::~NodeImpl() | Implicitly-declared 
 static void NodeImpl_Destructor(NodeImpl* ptr)

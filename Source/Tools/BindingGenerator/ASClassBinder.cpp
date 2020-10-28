@@ -481,13 +481,23 @@ static void RegisterImplicitlyDeclaredDestructor(const ClassAnalyzer& classAnaly
     string className = classAnalyzer.GetClassName();
     string wrapperName = className + "_Destructor";
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
+    string header = classAnalyzer.GetHeaderFile();
+    string insideDefine = InsideDefine(header);
+
+    if (!insideDefine.empty())
+        result->glue_ << "#ifdef " << insideDefine << "\n";
 
     result->glue_ <<
         "// " << className << "::~" << className << "() | Implicitly-declared \n"
         "static void " << wrapperName << "(" << className << "* ptr)\n"
         "{\n"
         "    ptr->~" << className << "();\n"
-        "}\n\n";
+        "}\n";
+
+    if (!insideDefine.empty())
+        result->glue_ << "#endif\n";
+
+    result->glue_ << "\n";
 
     result->reg_ <<
         "    // " << className << "::~" << className << "() | Implicitly-declared\n"
