@@ -49,7 +49,7 @@ environment:
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
   URHO3D_LUAJIT: 1
-  URHO3D_GENERATEBINDINGS: 1
+  URHO3D_GENERATEBINDINGS: 0
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED

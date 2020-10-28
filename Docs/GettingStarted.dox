@@ -152,7 +152,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LIB_TYPE      |STATIC|Specify Urho3D library type, possible values are STATIC (default) and SHARED (not available for Emscripten)|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (RPI and generic ARM cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
-|URHO3D_GENERATEBINDINGS|0|Document the new build option here|
+|URHO3D_GENERATEBINDINGS|0|Enable script API binding generation|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (downstream project only)|
