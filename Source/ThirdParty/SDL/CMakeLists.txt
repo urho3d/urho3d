@@ -537,10 +537,10 @@ if(LIBC)
     set(HAVE_SIGNAL_H 1)
     foreach(_FN
             malloc calloc realloc free qsort abs memset memcpy memmove memcmp
-            wcslen wcscmp
+            wcslen wcslcpy wcslcat wcsdup wcsstr wcscmp wcsncmp
             strlen _strrev _strupr _strlwr strchr strrchr strstr itoa _ltoa
             _ultoa strtol strtoul strtoll strtod atoi atof strcmp strncmp
-            _stricmp _strnicmp sscanf
+            _stricmp _strnicmp strtok_s sscanf
             acos acosf asin asinf atan atanf atan2 atan2f ceil ceilf
             copysign copysignf cos cosf exp expf fabs fabsf floor floorf fmod fmodf
             log logf log10 log10f pow powf scalbn scalbnf sin sinf sqrt sqrtf tan tanf)
@@ -589,10 +589,11 @@ if(LIBC)
     foreach(_FN
             strtod malloc calloc realloc free getenv setenv putenv unsetenv
             qsort abs bcopy memset memcpy memmove memcmp strlen strlcpy strlcat
-            _strrev _strupr _strlwr strchr strrchr strstr itoa _ltoa
+            _strrev _strupr _strlwr strchr strrchr strstr strtok_r itoa _ltoa
             _uitoa _ultoa strtol strtoul _i64toa _ui64toa strtoll strtoull
             atoi atof strcmp strncmp _stricmp strcasecmp _strnicmp strncasecmp
-            vsscanf vsnprintf fopen64 fseeko fseeko64 sigaction setjmp
+            wcscmp wcsdup wcslcat wcslcpy wcslen wcsncmp wcsstr
+            sscanf vsscanf vsnprintf fopen64 fseeko fseeko64 sigaction setjmp
             nanosleep sysconf sysctlbyname getauxval poll _Exit
             )
       string(TOUPPER ${_FN} _UPPER)
@@ -604,8 +605,10 @@ if(LIBC)
     if(HAVE_LIBM)
       set(CMAKE_REQUIRED_LIBRARIES m)
       foreach(_FN
-              atan atan2 ceil copysign cos cosf fabs floor log pow scalbn sin
-              sinf sqrt sqrtf tan tanf acos asin)
+              atan atan2 atanf atan2f ceil ceilf copysign copysignf cos cosf
+              exp expf fabs fabsf floor floorf fmod fmodf log logf log10 log10f
+              pow powf scalbn scalbnf sin sinf sqrt sqrtf tan tanf acos acosf
+              asin asinf)
         string(TOUPPER ${_FN} _UPPER)
         set(_HAVEVAR "HAVE_${_UPPER}")
         check_function_exists("${_FN}" ${_HAVEVAR})
@@ -668,6 +671,13 @@ if(SDL_VIDEO)
     file(GLOB VIDEO_DUMMY_SOURCES ${SDL2_SOURCE_DIR}/src/video/dummy/*.c)
     set(SOURCE_FILES ${SOURCE_FILES} ${VIDEO_DUMMY_SOURCES})
     set(HAVE_VIDEO_DUMMY TRUE)
+    set(HAVE_SDL_VIDEO TRUE)
+  endif()
+  if(VIDEO_OFFSCREEN)
+    set(SDL_VIDEO_DRIVER_OFFSCREEN 1)
+    file(GLOB VIDEO_OFFSCREEN_SOURCES ${SDL2_SOURCE_DIR}/src/video/offscreen/*.c)
+    set(SOURCE_FILES ${SOURCE_FILES} ${VIDEO_OFFSCREEN_SOURCES})
+    set(HAVE_VIDEO_OFFSCREEN TRUE)
     set(HAVE_SDL_VIDEO TRUE)
   endif()
 endif()
@@ -751,12 +761,18 @@ if(ANDROID)
     set(HAVE_SDL_VIDEO TRUE)
 
     # Core stuff
-    find_library(ANDROID_DL_LIBRARY dl)
+    # find_library(ANDROID_DL_LIBRARY dl)
+    # FIXME failing dlopen https://github.com/android-ndk/ndk/issues/929
+    find_library(ANDROID_DL_LIBRARY NAMES libdl.so dl)
     find_library(ANDROID_LOG_LIBRARY log)
     find_library(ANDROID_LIBRARY_LIBRARY android)
     list(APPEND EXTRA_LIBS ${ANDROID_DL_LIBRARY} ${ANDROID_LOG_LIBRARY} ${ANDROID_LIBRARY_LIBRARY})
     add_definitions(-DGL_GLEXT_PROTOTYPES)
 
+    if (HAVE_HIDAPI)
+        list(APPEND EXTRA_LIBS hidapi)
+    endif()
+    
     #enable gles
     if(VIDEO_OPENGLES)
       CheckOpenGLES()
@@ -1273,7 +1289,6 @@ elseif(WINDOWS)
   # headers needed elsewhere ...
   check_include_file(mmdeviceapi.h HAVE_MMDEVICEAPI_H)
   check_include_file(audioclient.h HAVE_AUDIOCLIENT_H)
-  check_include_file(endpointvolume.h HAVE_ENDPOINTVOLUME_H)
 
   if(SDL_AUDIO)
     set(SDL_AUDIO_DRIVER_WINMM 1)
@@ -1380,6 +1395,7 @@ elseif(WINDOWS)
 
   if(SDL_JOYSTICK)
     CheckHIDAPI()
+    # TODO: Remove this hid.c block when SDL_hidapi.c is supported on Windows!
     if(HAVE_HIDAPI)
       set(SOURCE_FILES ${SOURCE_FILES} ${SDL2_SOURCE_DIR}/src/hidapi/windows/hid.c)
     endif()

@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -61,12 +64,10 @@ android_egl_context_restore(SDL_Window *window)
     if (window) {
         SDL_Event event;
         SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-        if (SDL_GL_MakeCurrent(window, (SDL_GLContext) data->egl_context) < 0) {
-            /* The context is no longer valid, create a new one */
-            data->egl_context = (EGLContext) SDL_GL_CreateContext(window);
-            SDL_GL_MakeCurrent(window, (SDL_GLContext) data->egl_context);
-            event.type = SDL_RENDER_DEVICE_RESET;
-            SDL_PushEvent(&event);
+        // Urho3D: make sure there is a valid stored context to restore
+        if (data->egl_context && SDL_GL_MakeCurrent(window, (SDL_GLContext) data->egl_context) < 0) {
+            // Urho3D: if the old context could not be restored, leave it to the Graphics subsystem to create a new one
+            data->egl_context = NULL;
         }
         data->backup_done = 0;
     }
