@@ -527,11 +527,13 @@ static Viewport* Viewport_Viewport_Context_Scene_Camera_IntRect_RenderPath(Scene
     return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
 }
 
+#ifdef URHO3D_URHO2D
 // Vertex2D::~Vertex2D() | Implicitly-declared 
 static void Vertex2D_Destructor(Vertex2D* ptr)
 {
     ptr->~Vertex2D();
 }
+#endif
 
 // VertexBufferMorph::~VertexBufferMorph() | Implicitly-declared 
 static void VertexBufferMorph_Destructor(VertexBufferMorph* ptr)

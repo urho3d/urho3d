@@ -309,11 +309,13 @@ static void RefCount_Destructor_RefCount_void(RefCount* ptr)
     ptr->~RefCount();
 }
 
+#ifdef URHO3D_NETWORK
 // RemoteEvent::~RemoteEvent() | Implicitly-declared 
 static void RemoteEvent_Destructor(RemoteEvent* ptr)
 {
     ptr->~RemoteEvent();
 }
+#endif
 
 // RenderPathCommand::~RenderPathCommand() | Implicitly-declared 
 static void RenderPathCommand_Destructor(RenderPathCommand* ptr)

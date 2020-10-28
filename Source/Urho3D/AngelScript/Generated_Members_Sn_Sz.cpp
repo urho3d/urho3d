@@ -528,11 +528,13 @@ static void SourceBatch_Destructor_SourceBatch_void(SourceBatch* ptr)
     ptr->~SourceBatch();
 }
 
+#ifdef URHO3D_URHO2D
 // SourceBatch2D::~SourceBatch2D() | Implicitly-declared 
 static void SourceBatch2D_Destructor(SourceBatch2D* ptr)
 {
     ptr->~SourceBatch2D();
 }
+#endif
 
 // StoredLogMessage::StoredLogMessage(const String& message, int level, bool error) | File: ../IO/Log.h
 static void StoredLogMessage_StoredLogMessage_String_int_bool(StoredLogMessage* ptr, const String &message, int level, bool error)

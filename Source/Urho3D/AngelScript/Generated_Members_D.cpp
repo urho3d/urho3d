@@ -241,11 +241,13 @@ static void DebugTriangle_Destructor(DebugTriangle* ptr)
     ptr->~DebugTriangle();
 }
 
+#ifdef URHO3D_URHO2D
 // DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared 
 static void DelayedWorldTransform2D_Destructor(DelayedWorldTransform2D* ptr)
 {
     ptr->~DelayedWorldTransform2D();
 }
+#endif
 
 // Decal::~Decal() | Implicitly-declared 
 static void Decal_Destructor(Decal* ptr)
@@ -265,11 +267,13 @@ static void DecalVertex_Destructor(DecalVertex* ptr)
     ptr->~DecalVertex();
 }
 
+#ifdef URHO3D_PHYSICS
 // DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared 
 static void DelayedWorldTransform_Destructor(DelayedWorldTransform* ptr)
 {
     ptr->~DelayedWorldTransform();
 }
+#endif
 
 // DirtyBits::DirtyBits(const DirtyBits& bits) | File: ../Scene/ReplicationState.h
 static void DirtyBits_DirtyBits_DirtyBits(DirtyBits* ptr, const DirtyBits &bits)

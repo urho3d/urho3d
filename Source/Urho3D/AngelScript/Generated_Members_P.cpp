@@ -39,11 +39,13 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+#ifdef URHO3D_PHYSICS
 // PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared 
 static void PhysicsWorldConfig_Destructor(PhysicsWorldConfig* ptr)
 {
     ptr->~PhysicsWorldConfig();
 }
+#endif
 
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
 static CScriptArray* ParticleEmitter_GetLights_void(ParticleEmitter* ptr)
@@ -370,17 +372,21 @@ static void PerThreadSceneResult_Destructor(PerThreadSceneResult* ptr)
     ptr->~PerThreadSceneResult();
 }
 
+#ifdef URHO3D_NETWORK
 // PackageDownload::~PackageDownload() | Implicitly-declared 
 static void PackageDownload_Destructor(PackageDownload* ptr)
 {
     ptr->~PackageDownload();
 }
+#endif
 
+#ifdef URHO3D_NETWORK
 // PackageUpload::~PackageUpload() | Implicitly-declared 
 static void PackageUpload_Destructor(PackageUpload* ptr)
 {
     ptr->~PackageUpload();
 }
+#endif
 
 // Particle::~Particle() | Implicitly-declared 
 static void Particle_Destructor(Particle* ptr)
@@ -388,23 +394,29 @@ static void Particle_Destructor(Particle* ptr)
     ptr->~Particle();
 }
 
+#ifdef URHO3D_URHO2D
 // Particle2D::~Particle2D() | Implicitly-declared 
 static void Particle2D_Destructor(Particle2D* ptr)
 {
     ptr->~Particle2D();
 }
+#endif
 
+#ifdef URHO3D_PHYSICS
 // PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared 
 static void PhysicsRaycastResult_Destructor(PhysicsRaycastResult* ptr)
 {
     ptr->~PhysicsRaycastResult();
 }
+#endif
 
+#ifdef URHO3D_URHO2D
 // PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared 
 static void PhysicsRaycastResult2D_Destructor(PhysicsRaycastResult2D* ptr)
 {
     ptr->~PhysicsRaycastResult2D();
 }
+#endif
 
 void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
 {

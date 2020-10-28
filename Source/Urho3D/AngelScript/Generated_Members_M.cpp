@@ -259,11 +259,13 @@ static void ModelMorph_Destructor(ModelMorph* ptr)
     ptr->~ModelMorph();
 }
 
+#ifdef URHO3D_PHYSICS
 // ManifoldPair::~ManifoldPair() | Implicitly-declared 
 static void ManifoldPair_Destructor(ManifoldPair* ptr)
 {
     ptr->~ManifoldPair();
 }
+#endif
 
 // MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared 
 static void MaterialShaderParameter_Destructor(MaterialShaderParameter* ptr)
